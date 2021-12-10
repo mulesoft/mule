@@ -156,12 +156,12 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
       ((ConfigurableApplicationContext) baseMuleArtifactContext).setParent(parentContext);
     }
     serviceConfigurators.forEach(serviceConfigurator -> serviceConfigurator.configure(muleContext.getCustomizationService()));
-    baseMuleArtifactContext.refresh();
     BaseSpringRegistry baseRegistry = new BaseSpringRegistry(baseMuleArtifactContext, muleContext,
                                                              ((DefaultMuleContext) muleContext).getLifecycleInterceptor());
 
     ((DefaultMuleContext) muleContext).setRegistry(baseRegistry);
     ((DefaultMuleContext) muleContext).setInjector(baseRegistry);
+    baseMuleArtifactContext.refresh();
 
     muleArtifactContext = createApplicationContext(muleContext,
                                                    baseMuleArtifactContext.getBean(BaseConfigurationComponentLocator.class),

@@ -16,7 +16,6 @@ import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocato
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
@@ -41,7 +40,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
  */
 class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServiceConfigurator {
 
-  private final MuleContext muleContext;
   private org.mule.runtime.core.internal.registry.Registry originalRegistry;
 
   public BaseSpringMuleContextServiceConfigurator(MuleContext muleContext,
@@ -49,13 +47,11 @@ class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContext
                                                   Registry serviceLocator,
                                                   org.mule.runtime.core.internal.registry.Registry originalRegistry) {
     super((CustomServiceRegistry) muleContext.getCustomizationService(), beanDefinitionRegistry, serviceLocator);
-    this.muleContext = muleContext;
     this.originalRegistry = originalRegistry;
   }
 
   void createArtifactServices() {
-    registerConstantBeanDefinition(FEATURE_FLAGGING_SERVICE_KEY, ((MuleContextWithRegistry) muleContext).getRegistry()
-        .lookupObject(FEATURE_FLAGGING_SERVICE_KEY));
+    registerConstantBeanDefinition(FEATURE_FLAGGING_SERVICE_KEY, originalRegistry.lookupObject(FEATURE_FLAGGING_SERVICE_KEY));
 
     registerConstantBeanDefinition(ConfigurationComponentLocator.REGISTRY_KEY, new BaseConfigurationComponentLocator());
 

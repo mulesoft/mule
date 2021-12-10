@@ -33,6 +33,7 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
 
   private final DefaultRegistry serviceDiscoverer;
   private final MuleContextWithRegistry muleContext;
+  private final Registry originalRegistry;
 
   /**
    * Configures the context.
@@ -41,6 +42,7 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
    */
   public BaseMuleArtifactContext(MuleContext muleContext) {
     this.muleContext = (MuleContextWithRegistry) muleContext;
+    this.originalRegistry = ((MuleRegistryHelper) (((MuleContextWithRegistry) muleContext).getRegistry())).getDelegate();
     this.serviceDiscoverer = new DefaultRegistry(muleContext);
   }
 
@@ -60,7 +62,6 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
   @Override
   protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
     super.customizeBeanFactory(beanFactory);
-    Registry originalRegistry = ((MuleRegistryHelper) (muleContext.getRegistry())).getDelegate();
     new BaseSpringMuleContextServiceConfigurator(muleContext,
                                                  beanFactory,
                                                  serviceDiscoverer,
