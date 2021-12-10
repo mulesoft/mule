@@ -7,17 +7,38 @@
 package org.mule.runtime.config.internal;
 
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_GHOST_BUSTER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMERS_REGISTRY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMER_RESOLVER;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
+import org.mule.runtime.config.internal.el.DataWeaveExtendedExpressionLanguageAdaptorFactoryBean;
+import org.mule.runtime.config.internal.el.DefaultExpressionManagerFactoryBean;
+import org.mule.runtime.config.internal.registry.SpringRegistryBootstrap;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
+import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
+import org.mule.runtime.core.internal.registry.TypeBasedTransformerResolver;
+import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
+import org.mule.runtime.core.internal.transformer.DefaultTransformersRegistry;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
 import java.util.Map;
@@ -40,13 +61,24 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
  */
 class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServiceConfigurator {
 
+  private final MuleContext muleContext;
+  private final ArtifactType artifactType;
+  private final OptionalObjectsController optionalObjectsController;
+  private final ConfigurationProperties configurationProperties;
   private org.mule.runtime.core.internal.registry.Registry originalRegistry;
 
   public BaseSpringMuleContextServiceConfigurator(MuleContext muleContext,
+                                                  ConfigurationProperties configurationProperties,
+                                                  ArtifactType artifactType,
+                                                  OptionalObjectsController optionalObjectsController,
                                                   BeanDefinitionRegistry beanDefinitionRegistry,
                                                   Registry serviceLocator,
                                                   org.mule.runtime.core.internal.registry.Registry originalRegistry) {
     super((CustomServiceRegistry) muleContext.getCustomizationService(), beanDefinitionRegistry, serviceLocator);
+    this.muleContext = muleContext;
+    this.configurationProperties = configurationProperties;
+    this.artifactType = artifactType;
+    this.optionalObjectsController = optionalObjectsController;
     this.originalRegistry = originalRegistry;
   }
 
@@ -64,7 +96,23 @@ class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContext
     contributedErrorTypeLocator.setDelegate(createDefaultErrorTypeLocator(contributedErrorTypeRepository));
     registerConstantBeanDefinition(ErrorTypeLocator.class.getName(), contributedErrorTypeLocator);
 
+    registerConstantBeanDefinition(OBJECT_CONFIGURATION_PROPERTIES, configurationProperties);
+
+    registerBeanDefinition(OBJECT_TRANSFORMER_RESOLVER, getBeanDefinition(TypeBasedTransformerResolver.class));
+    registerBeanDefinition(OBJECT_TRANSFORMERS_REGISTRY, getBeanDefinition(DefaultTransformersRegistry.class));
+
+    registerBeanDefinition(OBJECT_STREAMING_MANAGER, getBeanDefinition(DefaultStreamingManager.class));
+    registerBeanDefinition(OBJECT_STREAMING_GHOST_BUSTER, getBeanDefinition(StreamingGhostBuster.class));
+
+    registerBeanDefinition(OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER,
+                           getBeanDefinition(DataWeaveExtendedExpressionLanguageAdaptorFactoryBean.class));
+    registerBeanDefinition(OBJECT_EXPRESSION_LANGUAGE, getBeanDefinition(MVELExpressionLanguage.class));
+    registerBeanDefinition(OBJECT_EXPRESSION_MANAGER, getBeanDefinition(DefaultExpressionManagerFactoryBean.class));
+
+    registerConstantBeanDefinition(OBJECT_REGISTRY, getServiceLocator());
+
     createRuntimeServices();
+    createBootstrapBeanDefinitions();
     absorbOriginalRegistry();
   }
 
@@ -83,6 +131,19 @@ class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContext
 
         registerBeanDefinition(serviceName, beanDefinition);
       }
+    }
+  }
+
+  protected void createBootstrapBeanDefinitions() {
+    try {
+      SpringRegistryBootstrap springRegistryBootstrap =
+          new SpringRegistryBootstrap(artifactType, muleContext, optionalObjectsController, this::registerBeanDefinition,
+                                      propertyKey -> propertyKey.endsWith(".binding.provider")
+                                          || propertyKey.endsWith(".FunctionsProvider")
+                                          || propertyKey.endsWith(COMPATIBILITY_PLUGIN_INSTALLED));
+      springRegistryBootstrap.initialise();
+    } catch (InitialisationException e) {
+      throw new RuntimeException(e);
     }
   }
 
