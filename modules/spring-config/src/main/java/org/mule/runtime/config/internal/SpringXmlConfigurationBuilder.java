@@ -150,14 +150,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     }
 
     initialiseIfNeeded(this, muleContext);
-    OptionalObjectsController applicationObjectController = createApplicationObjectController();
 
-    Optional<ConfigurationProperties> parentConfigurationProperties = resolveParentConfigurationProperties();
-    final BaseMuleArtifactContext baseMuleArtifactContext = new BaseMuleArtifactContext(muleContext,
-                                                                                        applicationObjectController,
-                                                                                        parentConfigurationProperties,
-                                                                                        getArtifactProperties(),
-                                                                                        artifactType);
+    final BaseMuleArtifactContext baseMuleArtifactContext = new BaseMuleArtifactContext(muleContext);
     if (baseMuleArtifactContext instanceof ConfigurableApplicationContext) {
       ((ConfigurableApplicationContext) baseMuleArtifactContext).setParent(parentContext);
     }
@@ -169,7 +163,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     ((DefaultMuleContext) muleContext).setInjector(baseRegistry);
     baseMuleArtifactContext.refresh();
 
-    muleArtifactContext = createApplicationContext(muleContext, applicationObjectController, parentConfigurationProperties,
+    muleArtifactContext = createApplicationContext(muleContext,
                                                    baseMuleArtifactContext.getBean(BaseConfigurationComponentLocator.class),
                                                    baseMuleArtifactContext.getBean(ContributedErrorTypeRepository.class),
                                                    baseMuleArtifactContext.getBean(ContributedErrorTypeLocator.class),
@@ -186,20 +180,11 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   protected void addResources(List<ConfigResource> allResources) {}
 
   private MuleArtifactContext createApplicationContext(MuleContext muleContext,
-                                                       OptionalObjectsController optionalObjectsController,
-                                                       Optional<ConfigurationProperties> parentConfigurationProperties,
                                                        BaseConfigurationComponentLocator baseConfigurationComponentLocator,
                                                        ContributedErrorTypeRepository errorTypeRepository,
                                                        ContributedErrorTypeLocator errorTypeLocator,
                                                        FeatureFlaggingService featureFlaggingService)
       throws Exception {
-    // TODO MULE-10084 : Refactor to only accept artifactConfiguration and not artifactConfigResources
-    return doCreateApplicationContext(muleContext, artifactDeclaration, optionalObjectsController, parentConfigurationProperties,
-                                      baseConfigurationComponentLocator, errorTypeRepository, errorTypeLocator,
-                                      featureFlaggingService);
-  }
-
-  protected OptionalObjectsController createApplicationObjectController() {
     OptionalObjectsController applicationObjectcontroller = new DefaultOptionalObjectsController();
     OptionalObjectsController parentObjectController = null;
 
@@ -211,13 +196,15 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
       applicationObjectcontroller = new CompositeOptionalObjectsController(applicationObjectcontroller, parentObjectController);
     }
 
-    return applicationObjectcontroller;
+    // TODO MULE-10084 : Refactor to only accept artifactConfiguration and not artifactConfigResources
+    return doCreateApplicationContext(muleContext, artifactDeclaration, applicationObjectcontroller,
+                                      baseConfigurationComponentLocator, errorTypeRepository, errorTypeLocator,
+                                      featureFlaggingService);
   }
 
   private MuleArtifactContext doCreateApplicationContext(MuleContext muleContext,
                                                          ArtifactDeclaration artifactDeclaration,
                                                          OptionalObjectsController optionalObjectsController,
-                                                         Optional<ConfigurationProperties> parentConfigurationProperties,
                                                          BaseConfigurationComponentLocator baseConfigurationComponentLocator,
                                                          ContributedErrorTypeRepository errorTypeRepository,
                                                          ContributedErrorTypeLocator errorTypeLocator,
@@ -235,7 +222,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     if (enableLazyInit) {
       muleArtifactContext = new LazyMuleArtifactContext(muleContext, artifactAst,
                                                         optionalObjectsController,
-                                                        parentConfigurationProperties,
+                                                        resolveParentConfigurationProperties(),
                                                         baseConfigurationComponentLocator,
                                                         errorTypeRepository, errorTypeLocator,
                                                         getArtifactProperties(), artifactType,
@@ -246,7 +233,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     } else {
       muleArtifactContext = new MuleArtifactContext(muleContext, artifactAst,
                                                     optionalObjectsController,
-                                                    parentConfigurationProperties,
+                                                    resolveParentConfigurationProperties(),
                                                     baseConfigurationComponentLocator,
                                                     errorTypeRepository, errorTypeLocator,
                                                     getArtifactProperties(), artifactType,

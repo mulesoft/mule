@@ -6,25 +6,18 @@
  */
 package org.mule.runtime.config.internal;
 
-import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.createConfigurationAttributeResolver;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 
 import static java.lang.String.format;
 
-import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
-import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.Registry;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -41,30 +34,16 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
   private final DefaultRegistry serviceDiscoverer;
   private final MuleContextWithRegistry muleContext;
   private final Registry originalRegistry;
-  private final ArtifactType artifactType;
-  private final OptionalObjectsController optionalObjectsController;
-  private final PropertiesResolverConfigurationProperties configurationProperties;
 
   /**
    * Configures the context.
    *
    * @param muleContext the {@link MuleContext} that own this context
    */
-  public BaseMuleArtifactContext(MuleContext muleContext,
-                                 OptionalObjectsController optionalObjectsController,
-                                 Optional<ConfigurationProperties> parentConfigurationProperties,
-                                 Map<String, String> artifactProperties,
-                                 ArtifactType artifactType) {
+  public BaseMuleArtifactContext(MuleContext muleContext) {
     this.muleContext = (MuleContextWithRegistry) muleContext;
     this.originalRegistry = ((MuleRegistryHelper) (((MuleContextWithRegistry) muleContext).getRegistry())).getDelegate();
     this.serviceDiscoverer = new DefaultRegistry(muleContext);
-    this.artifactType = artifactType;
-    this.optionalObjectsController = optionalObjectsController;
-
-    this.configurationProperties = createConfigurationAttributeResolver(parentConfigurationProperties,
-                                                                        artifactProperties,
-                                                                        new ClassLoaderResourceProvider(muleContext
-                                                                            .getExecutionClassLoader()));
   }
 
   @Override
@@ -84,9 +63,6 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
   protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
     super.customizeBeanFactory(beanFactory);
     new BaseSpringMuleContextServiceConfigurator(muleContext,
-                                                 configurationProperties,
-                                                 artifactType,
-                                                 optionalObjectsController,
                                                  beanFactory,
                                                  serviceDiscoverer,
                                                  originalRegistry)

@@ -49,10 +49,6 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
     this.serviceLocator = serviceLocator;
   }
 
-  protected static BeanDefinition getBeanDefinition(Class<?> beanType) {
-    return getBeanDefinitionBuilder(beanType).getBeanDefinition();
-  }
-
   protected void registerConstantBeanDefinition(String serviceId, Object impl) {
     registerBeanDefinition(serviceId, getConstantObjectBeanDefinition(impl));
   }
@@ -139,9 +135,5 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
 
   protected CustomServiceRegistry getCustomServiceRegistry() {
     return customServiceRegistry;
-  }
-
-  protected Registry getServiceLocator() {
-    return serviceLocator;
   }
 }
