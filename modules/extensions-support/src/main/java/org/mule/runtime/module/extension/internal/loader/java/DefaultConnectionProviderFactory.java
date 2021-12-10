@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.connection.SdkConnectionProviderAdapter.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -15,6 +17,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
+import org.mule.runtime.module.extension.internal.loader.parser.java.connection.SdkConnectionProviderAdapter;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.lang.ref.WeakReference;
@@ -28,7 +31,7 @@ import java.lang.ref.WeakReference;
  */
 public final class DefaultConnectionProviderFactory<C> implements ConnectionProviderFactory<C> {
 
-  private final WeakReference<Class<? extends ConnectionProvider>> providerClass;
+  private final WeakReference<Class<?>> providerClass;
   private final WeakReference<ClassLoader> extensionClassLoader;
 
   /**
@@ -41,14 +44,20 @@ public final class DefaultConnectionProviderFactory<C> implements ConnectionProv
    */
   public DefaultConnectionProviderFactory(Class<?> providerClass, ClassLoader extensionClassLoader) {
     this.extensionClassLoader = new WeakReference<>(extensionClassLoader);
-    if (!ConnectionProvider.class.isAssignableFrom(providerClass)) {
-      throw new IllegalConnectionProviderModelDefinitionException(String
-          .format("Class '%s' was specified as a connection provider but it doesn't implement the '%s' interface",
-                  providerClass.getName(), ConnectionProvider.class.getName()));
+    if (ConnectionProvider.class.isAssignableFrom(providerClass)) {
+
+    }
+    if (!isConnectionProvider(providerClass)) {
+      throw new IllegalConnectionProviderModelDefinitionException(format(
+                                                                         "Class '%s' was specified as a connection provider but it doesn't implement neither the '%s' or '%s' interfaces",
+                                                                         providerClass.getName(),
+                                                                         ConnectionProvider.class.getName(),
+                                                                         org.mule.sdk.api.connectivity.ConnectionProvider.class
+                                                                             .getName()));
     }
 
     checkInstantiable(providerClass, new ReflectionCache());
-    this.providerClass = new WeakReference<>((Class<? extends ConnectionProvider>) providerClass);
+    this.providerClass = new WeakReference<>(providerClass);
   }
 
   /**
@@ -57,7 +66,7 @@ public final class DefaultConnectionProviderFactory<C> implements ConnectionProv
   @Override
   public ConnectionProvider<C> newInstance() {
     try {
-      return withContextClassLoader(extensionClassLoader.get(), () -> (ConnectionProvider<C>) providerClass.get().newInstance());
+      return withContextClassLoader(extensionClassLoader.get(), () -> from(providerClass.get().newInstance()));
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not create connection provider of type "
           + providerClass.get().getName()), e);
@@ -69,6 +78,19 @@ public final class DefaultConnectionProviderFactory<C> implements ConnectionProv
    */
   @Override
   public Class<? extends ConnectionProvider> getObjectType() {
-    return providerClass.get();
+    Class<?> type = providerClass.get();
+
+    if (type == null) {
+      return null;
+    }
+
+    return ConnectionProvider.class.isAssignableFrom(type)
+        ? (Class<? extends ConnectionProvider>) type
+        : SdkConnectionProviderAdapter.class;
+  }
+
+  private boolean isConnectionProvider(Class<?> providerClass) {
+    return ConnectionProvider.class.isAssignableFrom(providerClass)
+        || org.mule.sdk.api.connectivity.ConnectionProvider.class.isAssignableFrom(providerClass);
   }
 }

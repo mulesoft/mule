@@ -6,19 +6,26 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static java.util.Collections.emptyList;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConnectionProviderFactory;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.module.extension.internal.loader.parser.java.connection.SdkConnectionProviderAdapter;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.internal.util.ValueSetter;
+
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Implementation of {@link ResolverSetBasedObjectBuilder} which produces instances of {@link ConnectionProviderModel}
@@ -33,6 +40,8 @@ public abstract class ConnectionProviderObjectBuilder<C>
   protected final PoolingProfile poolingProfile;
   protected final ExtensionModel extensionModel;
   protected final MuleContext muleContext;
+
+  private final AtomicBoolean firstBuild = new AtomicBoolean(true);
   protected String ownerConfigName;
 
   /**
@@ -106,8 +115,22 @@ public abstract class ConnectionProviderObjectBuilder<C>
   @Override
   public Pair<ConnectionProvider<C>, ResolverSetResult> build(ResolverSetResult result) throws MuleException {
     ConnectionProvider<C> value = instantiateObject().getFirst();
+
+    if (firstBuild.compareAndSet(false, true)) {
+      Class<?> actualClass = value instanceof SdkConnectionProviderAdapter
+          ? ((SdkConnectionProviderAdapter<C>) value).getDelegate().getClass()
+          : value.getClass();
+
+      singleValueSetters = super.createSingleValueSetters(actualClass, resolverSet);
+    }
+
     populate(result, value);
     return new Pair<>(value, result);
+  }
+
+  @Override
+  protected List<ValueSetter> createSingleValueSetters(Class<?> prototypeClass, ResolverSet resolverSet) {
+    return emptyList();
   }
 
   /**
