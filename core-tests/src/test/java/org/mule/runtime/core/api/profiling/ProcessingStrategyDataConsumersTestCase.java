@@ -116,7 +116,7 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
       try {
         enableProfilingFeatureTestConsumer(muleContext, eventType, true);
       } catch (Exception e) {
-        throw new RuntimeException();
+        throw new RuntimeException(e);
       }
     });
   }

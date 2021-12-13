@@ -42,11 +42,11 @@ public class ComponentThreadingDataProducerProvider
 
   @Override
   public <T extends ProfilingEventContext, S> ResettableProfilingDataProducer<T, S> getProfilingDataProducer(
-                                                                                                             ProfilingProducerScope producerContext) {
+                                                                                                             ProfilingProducerScope producerScope) {
     return (ResettableProfilingDataProducer<T, S>) new ComponentThreadingProfilingDataProducer(profilingService,
                                                                                                profilingEventType,
                                                                                                threadSnapshotCollector,
-                                                                                               producerContext,
+                                                                                               producerScope,
                                                                                                featureFlaggingService);
   }
 }

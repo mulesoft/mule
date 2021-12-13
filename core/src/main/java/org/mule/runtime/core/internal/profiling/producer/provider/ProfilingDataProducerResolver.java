@@ -127,7 +127,7 @@ public class ProfilingDataProducerResolver {
 
   public <T extends ProfilingEventContext, S> ResettableProfilingDataProducer<T, S> getProfilingDataProducer(
                                                                                                              ProfilingEventType<T> profilingEventType,
-                                                                                                             ProfilingProducerScope producerContext) {
+                                                                                                             ProfilingProducerScope producerScope) {
     return profilingDataProducerProviders.computeIfAbsent(profilingEventType,
                                                           profEventType -> {
                                                             throw new MuleRuntimeException(
@@ -136,6 +136,6 @@ public class ProfilingDataProducerResolver {
                                                                                                                        getFullyQualifiedProfilingEventTypeIdentifier(
                                                                                                                                                                      profilingEventType)))));
                                                           })
-        .getProfilingDataProducer(producerContext);
+        .getProfilingDataProducer(producerScope);
   }
 }

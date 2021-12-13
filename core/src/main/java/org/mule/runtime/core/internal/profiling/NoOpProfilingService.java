@@ -11,7 +11,6 @@ import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.core.internal.profiling.threading.JvmThreadSnapshotCollector;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -24,9 +23,6 @@ import java.util.function.Function;
  * @since 4.5.0
  */
 public class NoOpProfilingService implements CoreProfilingService {
-
-  // Verify if this is needed.
-  private final ThreadSnapshotCollector threadSnapshotCollector = new JvmThreadSnapshotCollector();
 
   @SuppressWarnings("rawtypes")
   private final ProfilingDataProducer<?, ?> profilingDataProducer = new ProfilingDataProducer() {
@@ -66,7 +62,7 @@ public class NoOpProfilingService implements CoreProfilingService {
 
   @Override
   public ThreadSnapshotCollector getThreadSnapshotCollector() {
-    return threadSnapshotCollector;
+    throw new UnsupportedOperationException();
   }
 
   @Override
