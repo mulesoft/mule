@@ -6,11 +6,24 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
+import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
+import static org.mule.tck.MuleTestUtils.stubComponentExecutor;
+import static org.mule.tck.MuleTestUtils.stubFailingComponentExecutor;
+import static org.mule.test.heisenberg.extension.HeisenbergErrors.CONNECTIVITY;
+import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
+import static org.mule.test.marvel.drstrange.DrStrangeErrorTypeDefinition.CUSTOM_ERROR;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
+import static reactor.core.Exceptions.unwrap;
+
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.SECONDS;
+
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -31,17 +44,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.junit.MockitoJUnit.rule;
-import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
-import static org.mule.tck.MuleTestUtils.stubComponentExecutor;
-import static org.mule.tck.MuleTestUtils.stubFailingComponentExecutor;
-import static org.mule.test.heisenberg.extension.HeisenbergErrors.CONNECTIVITY;
-import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
-import static org.mule.test.marvel.drstrange.DrStrangeErrorTypeDefinition.CUSTOM_ERROR;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
-import static reactor.core.Exceptions.unwrap;
 
 import io.qameta.allure.Issue;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -59,6 +61,7 @@ import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEv
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
@@ -169,7 +172,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   private ConnectionManagerAdapter connectionManagerAdapter;
 
   @Mock
-  private ProfilingDataProducer<ComponentThreadingProfilingEventContext> threadReleaseDataProducer;
+  private ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> threadReleaseDataProducer;
 
   private final String name;
   private final Object result = new Object();
