@@ -10,10 +10,10 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.extension.api.runtime.exception.SdkExceptionHandlerFactory;
 import org.mule.sdk.api.runtime.exception.ExceptionHandler;
-import org.mule.sdk.api.runtime.exception.ExceptionHandlerFactory;
 
-public final class DefaultExceptionHandlerFactory implements ExceptionHandlerFactory {
+public final class DefaultExceptionHandlerFactory implements SdkExceptionHandlerFactory {
 
   private final ExceptionHandler enricher;
 

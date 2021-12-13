@@ -97,6 +97,7 @@ import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.exception.SdkExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
@@ -109,7 +110,6 @@ import org.mule.runtime.module.extension.internal.runtime.execution.OperationArg
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
-import org.mule.sdk.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
@@ -183,7 +183,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   protected Object configuration;
 
   @Mock(lenient = true)
-  protected ExceptionHandlerFactory exceptionHandlerFactory;
+  protected SdkExceptionHandlerFactory exceptionHandlerFactory;
 
   @Mock(lenient = true)
   protected MetadataResolverFactory metadataResolverFactory;
