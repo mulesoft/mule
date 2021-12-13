@@ -29,9 +29,10 @@ import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
+import static org.mule.runtime.core.internal.processor.rector.profiling.ProfilingTestUtils.mockProcessingStrategyProfilingChainWithoutTriggeringEvent;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
-import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServicesWithProfilingService;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.Component;
@@ -58,6 +59,7 @@ import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
@@ -99,7 +101,9 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
   @Before
   public void createMocks() throws Exception {
     muleContext.dispose();
-    muleContext = mockContextWithServices();
+    CoreProfilingService coreProfilingService = mock(CoreProfilingService.class);
+    mockProcessingStrategyProfilingChainWithoutTriggeringEvent(coreProfilingService);
+    muleContext = mockContextWithServicesWithProfilingService(coreProfilingService);
     when(muleContext.getStatistics()).thenReturn(new AllStatistics());
     when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
     notificationFirer = getNotificationDispatcher(muleContext);

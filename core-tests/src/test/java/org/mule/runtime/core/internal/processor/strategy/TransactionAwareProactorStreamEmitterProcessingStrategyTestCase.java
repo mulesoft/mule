@@ -24,6 +24,7 @@ import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.P
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
 import io.qameta.allure.Issue;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -141,6 +142,7 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
   }
 
   @Test
+  @Ignore("MULE-19988")
   public void testTransactionProfiling() throws Exception {
     getInstance()
         .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));

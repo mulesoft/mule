@@ -6,12 +6,7 @@
  */
 package org.mule.runtime.core.privileged.processor.chain;
 
-import static java.lang.String.format;
-import static java.lang.System.currentTimeMillis;
-import static java.lang.Thread.currentThread;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.replace;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
@@ -37,6 +32,12 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.resolveException;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.resolveMessagingException;
+
+import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
+import static java.lang.Thread.currentThread;
+import static java.util.stream.Collectors.toList;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
@@ -46,7 +47,6 @@ import static reactor.core.publisher.Operators.lift;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -161,11 +161,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   @Inject
   private ProfilingService profilingService;
 
-  @Inject
-  private FeatureFlaggingService featureFlaggingService;
-
-  private ProfilingDataProducer<org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext> startingOperationExecutionDataProducer;
-  private ProfilingDataProducer<org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext> endOperationExecutionDataProducer;
+  private ProfilingDataProducer<org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext, CoreEvent> startingOperationExecutionDataProducer;
+  private ProfilingDataProducer<org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext, CoreEvent> endOperationExecutionDataProducer;
 
   AbstractMessageProcessorChain(String name,
                                 Optional<ProcessingStrategy> processingStrategyOptional,
@@ -591,15 +588,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
     initialiseIfNeeded(getMessageProcessorsForLifecycle(), muleContext);
 
-    if (isProfilingEnabled()) {
-      startingOperationExecutionDataProducer = profilingService.getProfilingDataProducer(STARTING_OPERATION_EXECUTION);
-      endOperationExecutionDataProducer = profilingService.getProfilingDataProducer(OPERATION_EXECUTED);
-    }
-  }
-
-  private boolean isProfilingEnabled() {
-    return profilingService != null && featureFlaggingService != null
-        && featureFlaggingService.isEnabled(ENABLE_PROFILING_SERVICE);
+    startingOperationExecutionDataProducer = profilingService.getProfilingDataProducer(STARTING_OPERATION_EXECUTION);
+    endOperationExecutionDataProducer = profilingService.getProfilingDataProducer(OPERATION_EXECUTED);
   }
 
   @Override

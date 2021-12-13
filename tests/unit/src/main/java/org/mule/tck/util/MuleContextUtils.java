@@ -49,8 +49,7 @@ import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
-import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -84,6 +83,8 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 import org.mockito.Mockito;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Provides helper methods to handle mock {@link MuleContext}s in unit tests.
@@ -208,9 +209,11 @@ public class MuleContextUtils {
   /**
    * Creates and configures a mock {@link MuleContext} to return testing services implementations.
    *
+   * @param coreProfilingService profiling service to use.
+   *
    * @return the created {@code muleContext}.
    */
-  public static MuleContextWithRegistry mockContextWithServices() {
+  public static MuleContextWithRegistry mockContextWithServicesWithProfilingService(CoreProfilingService coreProfilingService) {
     final MuleContextWithRegistry muleContext = mockMuleContext();
 
     final ExtensionManager extensionManager = mock(ExtensionManager.class, withSettings().lenient());
@@ -262,7 +265,7 @@ public class MuleContextUtils {
       injectableObjects.put(ConfigurationComponentLocator.class, configurationComponentLocator);
       injectableObjects.put(ConfigurationProperties.class, configProps);
       injectableObjects.put(FeatureFlaggingService.class, featureFlaggingService);
-      injectableObjects.put(ProfilingService.class, mock(DefaultProfilingService.class));
+      injectableObjects.put(CoreProfilingService.class, coreProfilingService);
 
       // Ensure injection of consistent mock objects
       when(muleContext.getInjector()).thenReturn(new MocksInjector(injectableObjects));
@@ -271,6 +274,15 @@ public class MuleContextUtils {
     }
 
     return muleContext;
+  }
+
+  /**
+   * Creates and configures a mock {@link MuleContext} to return testing services implementations.
+   *
+   * @return the created {@code muleContext}.
+   */
+  public static MuleContextWithRegistry mockContextWithServices() {
+    return mockContextWithServicesWithProfilingService(mock(CoreProfilingService.class));
   }
 
   /**

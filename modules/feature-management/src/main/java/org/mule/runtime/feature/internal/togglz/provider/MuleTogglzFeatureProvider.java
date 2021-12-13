@@ -7,6 +7,7 @@
 package org.mule.runtime.feature.internal.togglz.provider;
 
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.feature.internal.togglz.MuleTogglzProfilingFeature;
 import org.mule.runtime.feature.internal.togglz.MuleTogglzRuntimeFeature;
 import org.togglz.core.Feature;
 import org.togglz.core.spi.FeatureProvider;
@@ -33,6 +34,17 @@ public interface MuleTogglzFeatureProvider extends FeatureProvider {
    * @return the registered {@link Feature}. If the feature is already registered it returns the corresponding togglz feature.
    */
   MuleTogglzRuntimeFeature getOrRegisterRuntimeTogglzFeatureFrom(org.mule.runtime.api.config.Feature feature);
+
+  /**
+   * Registers a Togglz {@link Feature} associated to a {@link ProfilingEventType} and a
+   * {@link org.mule.runtime.api.profiling.ProfilingDataConsumer}
+   *
+   * @param profilingEventType the {@link ProfilingEventType}.
+   * @param consumerName       the id associated to a {@link org.mule.runtime.api.profiling.ProfilingDataConsumer}
+   * @return the registered {@link Feature}
+   */
+  MuleTogglzProfilingFeature getOrRegisterProfilingTogglzFeatureFrom(ProfilingEventType<?> profilingEventType,
+                                                                     String consumerName);
 
   /**
    * returns a {@link Feature} by name
