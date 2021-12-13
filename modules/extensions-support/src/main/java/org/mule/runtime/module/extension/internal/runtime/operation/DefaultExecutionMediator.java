@@ -30,6 +30,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
@@ -74,7 +75,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   private final ResultTransformer resultTransformer;
   private final ClassLoader executionClassLoader;
   private final ComponentModel operationModel;
-  private final ProfilingDataProducer<ComponentThreadingProfilingEventContext> threadReleaseDataProducer;
+  private final ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> threadReleaseDataProducer;
 
   private static final Logger LOGGER = getLogger(DefaultExecutionMediator.class);
 
@@ -89,7 +90,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
                                   ErrorTypeRepository typeRepository,
                                   ClassLoader executionClassLoader,
                                   ResultTransformer resultTransformer,
-                                  ProfilingDataProducer<ComponentThreadingProfilingEventContext> threadReleaseDataProducer) {
+                                  ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> threadReleaseDataProducer) {
     this.interceptorChain = interceptorChain;
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel, typeRepository);
     this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
@@ -238,17 +239,12 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   }
 
   private void profileThreadRelease(ExecutionContextAdapter<M> context) {
-    // TODO: Evaluate a feature flag check (could be "thread.profiling" or something like that) and a get of the producer for each
-    // invocation.
-    if (threadReleaseDataProducer == null) {
-      return;
-    }
-
     String threadName = currentThread().getName();
     String artifactId = getArtifactId(context.getMuleContext());
     String artifactType = getArtifactType(context.getMuleContext());
-    threadReleaseDataProducer.triggerProfilingEvent(new DefaultComponentThreadingProfilingEventContext(context.getEvent(), context
-        .getComponent().getLocation(), threadName, artifactId, artifactType, currentTimeMillis()));
+    threadReleaseDataProducer.triggerProfilingEvent(context
+        .getEvent(), event -> new DefaultComponentThreadingProfilingEventContext(event, context
+            .getComponent().getLocation(), threadName, artifactId, artifactType, currentTimeMillis()));
   }
 
   private Throwable handleError(Throwable original, ExecutionContextAdapter context) {
