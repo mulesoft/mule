@@ -51,7 +51,6 @@ import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -66,10 +65,10 @@ import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
-import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
@@ -88,8 +87,6 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 import org.mockito.Mockito;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * Provides helper methods to handle mock {@link MuleContext}s in unit tests.
@@ -192,11 +189,12 @@ public class MuleContextUtils {
 
     StreamingManager streamingManager = mock(StreamingManager.class, RETURNS_DEEP_STUBS);
     try {
-      MuleRegistry registry = mock(MuleRegistryHelper.class, withSettings().lenient());
+      MuleRegistryHelper registry = mock(MuleRegistryHelper.class, withSettings().lenient());
       when(muleContext.getRegistry()).thenReturn(registry);
       ComponentInitialStateManager componentInitialStateManager =
           mock(ComponentInitialStateManager.class, withSettings().lenient());
       when(componentInitialStateManager.mustStartMessageSource(any())).thenReturn(true);
+      when(registry.getDelegate()).thenReturn(registry);
       when(registry.lookupObject(ComponentInitialStateManager.SERVICE_ID)).thenReturn(componentInitialStateManager);
       when(registry.lookupObject(FEATURE_FLAGGING_SERVICE_KEY)).thenReturn(mock(FeatureFlaggingService.class));
       doReturn(streamingManager).when(registry).lookupObject(StreamingManager.class);

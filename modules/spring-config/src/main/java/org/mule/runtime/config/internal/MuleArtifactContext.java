@@ -144,6 +144,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   protected SpringConfigurationComponentLocator componentLocator;
   private final ContributedErrorTypeRepository errorTypeRepository;
   private final ContributedErrorTypeLocator errorTypeLocator;
+  private final Map<String, String> artifactProperties;
   protected List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
   private final ExtensionManager extensionManager;
 
@@ -185,6 +186,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     this.baseComponentLocator = baseConfigurationComponentLocator;
     this.errorTypeRepository = errorTypeRepository;
     this.errorTypeLocator = errorTypeLocator;
+    this.artifactProperties = artifactProperties;
 
     extensionManager = muleContext.getExtensionManager();
 
@@ -528,6 +530,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   protected SpringMuleContextServiceConfigurator createServiceConfigurator(DefaultListableBeanFactory beanFactory) {
     return new SpringMuleContextServiceConfigurator(muleContext,
                                                     getConfigurationProperties(),
+                                                    artifactProperties,
                                                     getArtifactType(),
                                                     getOptionalObjectsController(),
                                                     beanFactory,

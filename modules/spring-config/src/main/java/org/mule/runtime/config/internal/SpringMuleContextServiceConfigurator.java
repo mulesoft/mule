@@ -131,7 +131,6 @@ import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.metadata.cache.DefaultPersistentMetadataCacheManager;
 import org.mule.runtime.core.internal.policy.DefaultPolicyManager;
 import org.mule.runtime.core.internal.processor.interceptor.DefaultProcessorInterceptorManager;
-import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.ProfilingServiceWrapper;
 import org.mule.runtime.core.internal.registry.TypeBasedTransformerResolver;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
@@ -255,10 +254,12 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
       .build();
 
   private final ConfigurationProperties configurationProperties;
+  private final Map<String, String> artifactProperties;
   private final Registry serviceLocator;
 
   public SpringMuleContextServiceConfigurator(MuleContextWithRegistry muleContext,
                                               ConfigurationProperties configurationProperties,
+                                              Map<String, String> artifactProperties,
                                               ArtifactType artifactType,
                                               OptionalObjectsController optionalObjectsController,
                                               BeanDefinitionRegistry beanDefinitionRegistry,
@@ -268,6 +269,7 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
 
     this.muleContext = muleContext;
     this.configurationProperties = configurationProperties;
+    this.artifactProperties = artifactProperties;
     this.customServiceRegistry = (CustomServiceRegistry) muleContext.getCustomizationService();
     this.artifactType = artifactType;
     this.optionalObjectsController = optionalObjectsController;
@@ -301,6 +303,8 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
     createLocalLockFactoryBeanDefinitions();
     createQueueManagerBeanDefinitions();
     createCustomServices();
+
+    artifactProperties.forEach((k, v) -> registerConstantBeanDefinition(k, v));
   }
 
   private void loadServiceConfigurators() {
