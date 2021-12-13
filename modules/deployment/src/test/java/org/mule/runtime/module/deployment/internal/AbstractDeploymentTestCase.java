@@ -205,7 +205,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static final String[] NONE = new String[0];
   protected static final int ONE_HOUR_IN_MILLISECONDS = 3600000;
   protected static final String MULE_POLICY_CLASSIFIER = "mule-policy";
-  protected static final String MULE_EXTENSION_CLASSIFIER = MULE_PLUGIN_CLASSIFIER;
   protected static final String MANUAL_EXECUTION_CORRELATION_ID = "manualExecution";
 
   // Resources
@@ -1469,7 +1468,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private ArtifactPluginFileBuilder createHelloExtensionV2PluginFileBuilder() {
     MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName("helloExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("helloExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("helloExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "2.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
         .setId(MULE_LOADER_ID).build());
@@ -1484,7 +1483,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private ArtifactPluginFileBuilder createGoodbyeExtensionV1PluginFileBuilder() {
     MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName("goodbyeExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("goodbyeExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("goodbyeExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "2.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
         .setId(MULE_LOADER_ID).build());
@@ -1522,7 +1521,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML,
                                                                                                   moduleDestination);
     builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
-    builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER, MULE_LOADER_ID));
+    builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_PLUGIN_CLASSIFIER, MULE_LOADER_ID));
     builder.setRequiredProduct(MULE).setMinMuleVersion(MIN_MULE_VERSION);
 
     return new ArtifactPluginFileBuilder(extensionName)
@@ -1547,7 +1546,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
         .addProperty(EXPORTED_PACKAGES, asList("org.foo")).setId(MULE_LOADER_ID)
         .build());
-    builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER, MULE_LOADER_ID));
+    builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_PLUGIN_CLASSIFIER, MULE_LOADER_ID));
 
     return new ArtifactPluginFileBuilder(extensionName)
         .containingResource("module-using-byeSource.xml", moduleDestination)
@@ -1603,7 +1602,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private ArtifactPluginFileBuilder createHelloExtensionV1PluginFileBuilder() {
     MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName("helloExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("helloExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("helloExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
         .build());
@@ -1618,7 +1617,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private ArtifactPluginFileBuilder createLoadClassExtensionPluginFileBuilder() {
     MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName("loadClassExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("loadClassExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("loadClassExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
         .build());
@@ -1633,7 +1632,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private ArtifactPluginFileBuilder createCallbackExtensionPluginFileBuilder() {
     MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName("callbackExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("callbackExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("callbackExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
         .build());
@@ -1648,7 +1647,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private ArtifactPluginFileBuilder createOracleExtensionPluginFileBuilder() {
     MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName("oracleExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("oracleExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("oracleExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
         .build());
@@ -1674,7 +1673,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName(extensionName + "Plugin").setRequiredProduct(MULE)
         .withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName + "Plugin",
-                                                                 MULE_EXTENSION_CLASSIFIER,
+                                                                 MULE_PLUGIN_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
         .build());
@@ -1689,7 +1688,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private ArtifactPluginFileBuilder createUsingObjectStorePluginFileBuilder() {
     MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName("usingObjectStorePlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("usingObjectStorePlugin", MULE_EXTENSION_CLASSIFIER,
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("usingObjectStorePlugin", MULE_PLUGIN_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
         .build());

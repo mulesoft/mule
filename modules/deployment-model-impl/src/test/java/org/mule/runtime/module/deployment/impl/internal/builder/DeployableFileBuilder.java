@@ -26,7 +26,6 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.UUID;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.runtime.module.artifact.builder.AbstractDependencyFileBuilder;
 import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
@@ -240,8 +239,7 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
     }
     final Artifact artifact = new Artifact(artifactCoordinates, uri);
     // mule-maven-plugin (packager) will not include packages/resources for mule-plugin dependencies
-    boolean shouldAddPackagesAndResources =
-        !BundleDescriptor.MULE_PLUGIN_CLASSIFIER.equals(artifact.getArtifactCoordinates().getClassifier())
+    boolean shouldAddPackagesAndResources = !MULE_PLUGIN_CLASSIFIER.equals(artifact.getArtifactCoordinates().getClassifier())
             && artifact.getUri() != null
             // mule-domain are set with a "" URI
             && isNotBlank(artifact.getUri().getPath());
