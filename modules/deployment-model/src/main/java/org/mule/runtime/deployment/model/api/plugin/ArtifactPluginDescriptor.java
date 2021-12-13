@@ -10,10 +10,12 @@ package org.mule.runtime.deployment.model.api.plugin;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.api.deployment.meta.LicenseModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.util.Optional;
 import java.util.Properties;
@@ -21,7 +23,7 @@ import java.util.Properties;
 public final class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
 
   private static final String META_INF = "META-INF";
-  public static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
+  public static final String MULE_PLUGIN_CLASSIFIER = BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
   public static final String EXTENSION_BUNDLE_TYPE = "jar";
   private static final String MULE_ARTIFACT = "mule-artifact";
 

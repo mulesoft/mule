@@ -6,14 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
-import static com.google.common.collect.ImmutableSet.copyOf;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExtensionInfo;
+
 import static java.util.Collections.emptySet;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExtensionInfo;
+
+import static com.google.common.collect.ImmutableSet.copyOf;
 import static org.reflections.util.ClasspathHelper.forClassLoader;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -47,7 +49,7 @@ class ClasspathBasedDslContext implements DslResolvingContext {
   private final ClassLoader classLoader;
   private final Map<String, Class<?>> extensionsByName = new HashMap<>();
   private final Map<String, ExtensionModel> resolvedModels = new HashMap<>();
-  private LazyValue<TypeCatalog> typeCatalog = new LazyValue<>(() -> TypeCatalog.getDefault(getExtensions()));
+  private final LazyValue<TypeCatalog> typeCatalog = new LazyValue<>(() -> TypeCatalog.getDefault(getExtensions()));
 
   ClasspathBasedDslContext(ClassLoader classLoader) {
     this.classLoader = classLoader;

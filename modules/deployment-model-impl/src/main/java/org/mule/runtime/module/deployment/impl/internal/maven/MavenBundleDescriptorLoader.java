@@ -7,7 +7,6 @@
 
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
-import static java.util.Collections.singletonMap;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
@@ -15,7 +14,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFolder;
@@ -23,6 +22,8 @@ import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomPropertiesFolder;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomPropertiesFromJar;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
+
+import static java.util.Collections.singletonMap;
 
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;

@@ -7,6 +7,7 @@
 package org.mule.runtime.deployment.model.api.artifact.extension;
 
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
@@ -27,6 +28,7 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.LoaderDescriber;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,6 +38,10 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
+
+import org.jgrapht.alg.TransitiveReduction;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleDirectedGraph;
 
 /**
  * Discover the {@link ExtensionModel} based on the {@link ExtensionModelLoader} type.
@@ -100,43 +106,50 @@ public class ExtensionModelDiscoverer {
     final Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> descriptorsWithExtensions = synchronizedSet(new HashSet<>());
 
     if (discoveryRequest.isParallelDiscovery()) {
-      discoveryRequest.getArtifactPlugins()
-          .parallelStream()
-          .filter(artifactPlugin -> !requiresDependencyDsl(artifactPlugin))
-          .forEach(artifactPlugin -> discoverPluginExtensionModel(discoveryRequest,
-                                                                  discoveryRequest.getParentArtifactExtensions(),
-                                                                  descriptorsWithExtensions, artifactPlugin));
+      SimpleDirectedGraph<BundleDescriptor, DefaultEdge> depsGraph = new SimpleDirectedGraph<>(DefaultEdge.class);
 
       discoveryRequest.getArtifactPlugins()
-          // an xml-sdk extension may use the dsl of another xml-sdk extension, so these cannot be parallelized
           .stream()
-          .filter(artifactPlugin -> requiresDependencyDsl(artifactPlugin))
-          .forEach(artifactPlugin -> {
-            Set<ExtensionModel> extensions = descriptorsWithExtensions.stream().map(Pair::getSecond).collect(toSet());
-            extensions.addAll(discoveryRequest.getParentArtifactExtensions());
-            discoverPluginExtensionModel(discoveryRequest, extensions, descriptorsWithExtensions, artifactPlugin);
-          });
+          .map(p -> p.getFirst())
+          .forEach(apd -> depsGraph.addVertex(apd.getBundleDescriptor()));
+      discoveryRequest.getArtifactPlugins()
+          .stream()
+          .map(p -> p.getFirst())
+          .forEach(apd -> apd.getClassLoaderModel().getDependencies().stream()
+              .filter(dep -> dep.getDescriptor().getClassifier().map(MULE_PLUGIN_CLASSIFIER::equals).orElse(false))
+              .forEach(dep -> depsGraph.addEdge(apd.getBundleDescriptor(), dep.getDescriptor(), new DefaultEdge())));
+      TransitiveReduction.INSTANCE.reduce(depsGraph);
+
+      while (!depsGraph.vertexSet().isEmpty()) {
+        discoveryRequest.getArtifactPlugins()
+            .parallelStream()
+            .filter(artifactPlugin -> depsGraph.vertexSet().contains(artifactPlugin.getFirst().getBundleDescriptor())
+                && depsGraph.outDegreeOf(artifactPlugin.getFirst().getBundleDescriptor()) == 0)
+            .forEach(artifactPlugin -> {
+              depsGraph.removeVertex(artifactPlugin.getFirst().getBundleDescriptor());
+
+              discoverPluginExtensionModel(discoveryRequest, descriptorsWithExtensions, artifactPlugin);
+            });
+      }
     } else {
       discoveryRequest.getArtifactPlugins()
           .stream()
-          .forEach(artifactPlugin -> {
-            Set<ExtensionModel> extensions = descriptorsWithExtensions.stream().map(Pair::getSecond).collect(toSet());
-            extensions.addAll(discoveryRequest.getParentArtifactExtensions());
-            discoverPluginExtensionModel(discoveryRequest, extensions, descriptorsWithExtensions, artifactPlugin);
-          });
+          .forEach(artifactPlugin -> discoverPluginExtensionModel(discoveryRequest, descriptorsWithExtensions, artifactPlugin));
     }
 
     return descriptorsWithExtensions;
   }
 
-  protected boolean requiresDependencyDsl(Pair<ArtifactPluginDescriptor, ArtifactClassLoader> artifactPlugin) {
-    return artifactPlugin.getFirst().getExtensionModelDescriptorProperty()
-        .map(extModelDescriptorProperty -> extModelDescriptorProperty.getId())
-        .map(loaderId -> !LOADER_IDS_NOT_REQUIRING_DEPENDENCIES_DSL.contains(loaderId))
-        .orElse(true);
+  protected void discoverPluginExtensionModel(ExtensionDiscoveryRequest discoveryRequest,
+                                                final Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> descriptorsWithExtensions,
+                                                Pair<ArtifactPluginDescriptor, ArtifactClassLoader> artifactPlugin) {
+    Set<ExtensionModel> extensions = descriptorsWithExtensions.stream().map(Pair::getSecond).collect(toSet());
+    extensions.addAll(discoveryRequest.getParentArtifactExtensions());
+    discoverPluginExtensionModelWithDependencies(discoveryRequest, extensions, descriptorsWithExtensions, artifactPlugin);
   }
 
-  protected void discoverPluginExtensionModel(ExtensionDiscoveryRequest discoveryRequest, Set<ExtensionModel> extensions,
+  protected void discoverPluginExtensionModelWithDependencies(ExtensionDiscoveryRequest discoveryRequest,
+                                                              Set<ExtensionModel> extensions,
                                               final Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> descriptorsWithExtensions,
                                               Pair<ArtifactPluginDescriptor, ArtifactClassLoader> artifactPlugin) {
     final ArtifactPluginDescriptor artifactPluginDescriptor = artifactPlugin.getFirst();

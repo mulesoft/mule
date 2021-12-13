@@ -6,20 +6,22 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
-import static com.google.common.io.Files.createTempDir;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.SYSTEM;
+import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
+
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
+import static com.google.common.io.Files.createTempDir;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.SYSTEM;
-import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenReactorResolver;

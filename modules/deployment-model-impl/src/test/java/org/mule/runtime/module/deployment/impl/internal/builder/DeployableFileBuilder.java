@@ -6,16 +6,11 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.builder;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.REPOSITORY_FOLDER;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASS_LOADER_MODEL_VERSION_120;
@@ -23,8 +18,15 @@ import static org.mule.runtime.module.deployment.impl.internal.maven.Heavyweight
 import static org.mule.tck.ZipUtils.compress;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.serializeToFile;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.UUID;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.runtime.module.artifact.builder.AbstractDependencyFileBuilder;
 import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
@@ -238,10 +240,11 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
     }
     final Artifact artifact = new Artifact(artifactCoordinates, uri);
     // mule-maven-plugin (packager) will not include packages/resources for mule-plugin dependencies
-    boolean shouldAddPackagesAndResources = !MULE_PLUGIN_CLASSIFIER.equals(artifact.getArtifactCoordinates().getClassifier())
-        && artifact.getUri() != null
-        // mule-domain are set with a "" URI
-        && isNotBlank(artifact.getUri().getPath());
+    boolean shouldAddPackagesAndResources =
+        !BundleDescriptor.MULE_PLUGIN_CLASSIFIER.equals(artifact.getArtifactCoordinates().getClassifier())
+            && artifact.getUri() != null
+            // mule-domain are set with a "" URI
+            && isNotBlank(artifact.getUri().getPath());
     if (isSupportingPackagesResourcesInformation() && shouldAddPackagesAndResources) {
       JarInfo jarInfo = jarFileExplorer.explore(artifact.getUri());
       artifact.setPackages(jarInfo.getPackages().toArray(new String[jarInfo.getPackages().size()]));

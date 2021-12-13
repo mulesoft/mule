@@ -6,15 +6,6 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
-import static com.google.common.io.Files.createTempDir;
-import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
-import static java.lang.Boolean.valueOf;
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
@@ -25,10 +16,21 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_ARTIFACTS_IDS;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.PROVIDED;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
+
+import static java.lang.Boolean.valueOf;
+import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+
+import static com.google.common.io.Files.createTempDir;
+import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
+import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.maven.client.api.MavenClient;
