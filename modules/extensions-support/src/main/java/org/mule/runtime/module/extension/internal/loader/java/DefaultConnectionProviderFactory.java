@@ -44,9 +44,7 @@ public final class DefaultConnectionProviderFactory<C> implements ConnectionProv
    */
   public DefaultConnectionProviderFactory(Class<?> providerClass, ClassLoader extensionClassLoader) {
     this.extensionClassLoader = new WeakReference<>(extensionClassLoader);
-    if (ConnectionProvider.class.isAssignableFrom(providerClass)) {
 
-    }
     if (!isConnectionProvider(providerClass)) {
       throw new IllegalConnectionProviderModelDefinitionException(format(
                                                                          "Class '%s' was specified as a connection provider but it doesn't implement neither the '%s' or '%s' interfaces",

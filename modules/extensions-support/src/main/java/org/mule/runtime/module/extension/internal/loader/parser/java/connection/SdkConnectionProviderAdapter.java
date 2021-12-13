@@ -21,11 +21,13 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.internal.registry.InjectionTargetDecorator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SdkConnectionProviderAdapter<C> implements ConnectionProvider<C>, Lifecycle, MuleContextAware {
+public class SdkConnectionProviderAdapter<C> implements ConnectionProvider<C>, Lifecycle, MuleContextAware,
+    InjectionTargetDecorator<org.mule.sdk.api.connectivity.ConnectionProvider<C>> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SdkConnectionProviderAdapter.class);
 
@@ -67,6 +69,7 @@ public class SdkConnectionProviderAdapter<C> implements ConnectionProvider<C>, L
     return new SdkConnectionValidationResultAdapter(delegate.validate(connection));
   }
 
+  @Override
   public org.mule.sdk.api.connectivity.ConnectionProvider<C> getDelegate() {
     return delegate;
   }

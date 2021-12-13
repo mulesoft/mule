@@ -12,6 +12,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.mule.runtime.core.internal.registry.MuleRegistryHelper.getInjectionTarget;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -315,6 +316,7 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
    */
   @Override
   public <T> T inject(T object) {
+    object = getInjectionTarget(object);
     try {
       return initialiseObject((ConfigurableApplicationContext) applicationContext, EMPTY, object);
     } catch (LifecycleException e) {
