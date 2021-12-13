@@ -522,11 +522,8 @@ public class SourceAdapter implements Lifecycle, Restartable {
   }
 
   Optional<Publisher<Void>> getReconnectionAction(ConnectionException e) {
-    Reconnectable adapter = SdkReconnectableAdapter.from(sourceInvokationTarget.get());
-    if (adapter != null) {
-      return of(create(sink -> (adapter).reconnect(e, new ReactiveReconnectionCallback(sink))));
-    }
-    return empty();
+    Optional<Reconnectable> adapter = SdkReconnectableAdapter.from(sourceInvokationTarget.get());
+    return adapter.map(reconnectable -> create(sink -> (reconnectable).reconnect(e, new ReactiveReconnectionCallback(sink))));
   }
 
   public SourceTransactionalAction getTransactionalAction() {

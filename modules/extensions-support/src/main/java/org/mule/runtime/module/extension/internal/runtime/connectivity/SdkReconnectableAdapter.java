@@ -6,9 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.sdk.api.runtime.connectivity.Reconnectable;
 import org.mule.sdk.api.runtime.connectivity.ReconnectionCallback;
+
+import java.util.Optional;
 
 /**
  * Adapts a legacy {@link org.mule.runtime.extension.api.runtime.connectivity.Reconnectable} into an sdk-api {@link Reconnectable}
@@ -19,13 +24,13 @@ public class SdkReconnectableAdapter implements Reconnectable {
 
   private final org.mule.runtime.extension.api.runtime.connectivity.Reconnectable delegate;
 
-  public static Reconnectable from(Object value) {
+  public static Optional<Reconnectable> from(Object value) {
     if (value instanceof Reconnectable) {
-      return (Reconnectable) value;
+      return of((Reconnectable) value);
     } else if (value instanceof org.mule.runtime.extension.api.runtime.connectivity.Reconnectable) {
-      return new SdkReconnectableAdapter((org.mule.runtime.extension.api.runtime.connectivity.Reconnectable) value);
+      return of(new SdkReconnectableAdapter((org.mule.runtime.extension.api.runtime.connectivity.Reconnectable) value));
     } else {
-      return null;
+      return empty();
     }
   }
 
