@@ -141,8 +141,8 @@ public class ExtensionModelDiscoverer {
   }
 
   protected void discoverPluginExtensionModel(ExtensionDiscoveryRequest discoveryRequest,
-                                                final Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> descriptorsWithExtensions,
-                                                Pair<ArtifactPluginDescriptor, ArtifactClassLoader> artifactPlugin) {
+                                              final Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> descriptorsWithExtensions,
+                                              Pair<ArtifactPluginDescriptor, ArtifactClassLoader> artifactPlugin) {
     Set<ExtensionModel> extensions = descriptorsWithExtensions.stream().map(Pair::getSecond).collect(toSet());
     extensions.addAll(discoveryRequest.getParentArtifactExtensions());
     discoverPluginExtensionModelWithDependencies(discoveryRequest, extensions, descriptorsWithExtensions, artifactPlugin);
@@ -150,8 +150,8 @@ public class ExtensionModelDiscoverer {
 
   protected void discoverPluginExtensionModelWithDependencies(ExtensionDiscoveryRequest discoveryRequest,
                                                               Set<ExtensionModel> extensions,
-                                              final Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> descriptorsWithExtensions,
-                                              Pair<ArtifactPluginDescriptor, ArtifactClassLoader> artifactPlugin) {
+                                                              final Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> descriptorsWithExtensions,
+                                                              Pair<ArtifactPluginDescriptor, ArtifactClassLoader> artifactPlugin) {
     final ArtifactPluginDescriptor artifactPluginDescriptor = artifactPlugin.getFirst();
     Optional<LoaderDescriber> loaderDescriber = artifactPluginDescriptor.getExtensionModelDescriptorProperty();
     ClassLoader artifactClassloader = artifactPlugin.getSecond().getClassLoader();
