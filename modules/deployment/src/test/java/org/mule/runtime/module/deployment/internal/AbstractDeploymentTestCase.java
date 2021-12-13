@@ -6,6 +6,45 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
+import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
+import static org.mule.runtime.api.deployment.meta.Product.MULE;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
+import static org.mule.runtime.core.api.util.FileUtils.unzip;
+import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
+import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.ARTIFACT_ID;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.CLASSIFIER;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.GROUP_ID;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.TYPE;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.VERSION;
+import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
+import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.JAR_ARTIFACT_FILTER;
+import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
+import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.correlationIdCount;
+import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
+import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
+import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
+import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
+
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
@@ -14,6 +53,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
+
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
@@ -43,44 +83,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
-import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
-import static org.mule.runtime.api.deployment.meta.Product.MULE;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
-import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
-import static org.mule.runtime.core.api.util.FileUtils.unzip;
-import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
-import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.ARTIFACT_ID;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.CLASSIFIER;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.GROUP_ID;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.TYPE;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.VERSION;
-import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
-import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
-import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.JAR_ARTIFACT_FILTER;
-import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
-import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.correlationIdCount;
-import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
-import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
-import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
-import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.functional.api.flow.FlowRunner;
@@ -165,6 +167,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import org.slf4j.Logger;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -172,8 +176,8 @@ import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
 import org.mockito.verification.VerificationMode;
-import org.slf4j.Logger;
 
 @RunWith(Parameterized.class)
 /**
@@ -201,7 +205,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static final String[] NONE = new String[0];
   protected static final int ONE_HOUR_IN_MILLISECONDS = 3600000;
   protected static final String MULE_POLICY_CLASSIFIER = "mule-policy";
-  protected static final String MULE_EXTENSION_CLASSIFIER = "mule-plugin";
   protected static final String MANUAL_EXECUTION_CORRELATION_ID = "manualExecution";
 
   // Resources
@@ -1465,7 +1468,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private ArtifactPluginFileBuilder createHelloExtensionV2PluginFileBuilder() {
     MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName("helloExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("helloExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("helloExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "2.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
         .setId(MULE_LOADER_ID).build());
@@ -1480,7 +1483,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private ArtifactPluginFileBuilder createGoodbyeExtensionV1PluginFileBuilder() {
     MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName("goodbyeExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("goodbyeExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("goodbyeExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "2.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
         .setId(MULE_LOADER_ID).build());
@@ -1518,7 +1521,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML,
                                                                                                   moduleDestination);
     builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
-    builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER, MULE_LOADER_ID));
+    builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_PLUGIN_CLASSIFIER, MULE_LOADER_ID));
     builder.setRequiredProduct(MULE).setMinMuleVersion(MIN_MULE_VERSION);
 
     return new ArtifactPluginFileBuilder(extensionName)
@@ -1543,7 +1546,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
         .addProperty(EXPORTED_PACKAGES, asList("org.foo")).setId(MULE_LOADER_ID)
         .build());
-    builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER, MULE_LOADER_ID));
+    builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_PLUGIN_CLASSIFIER, MULE_LOADER_ID));
 
     return new ArtifactPluginFileBuilder(extensionName)
         .containingResource("module-using-byeSource.xml", moduleDestination)
@@ -1599,7 +1602,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private ArtifactPluginFileBuilder createHelloExtensionV1PluginFileBuilder() {
     MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName("helloExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("helloExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("helloExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
         .build());
@@ -1614,7 +1617,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private ArtifactPluginFileBuilder createLoadClassExtensionPluginFileBuilder() {
     MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName("loadClassExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("loadClassExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("loadClassExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
         .build());
@@ -1629,7 +1632,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private ArtifactPluginFileBuilder createCallbackExtensionPluginFileBuilder() {
     MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName("callbackExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("callbackExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("callbackExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
         .build());
@@ -1644,7 +1647,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private ArtifactPluginFileBuilder createOracleExtensionPluginFileBuilder() {
     MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName("oracleExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("oracleExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("oracleExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
         .build());
@@ -1670,7 +1673,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName(extensionName + "Plugin").setRequiredProduct(MULE)
         .withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName + "Plugin",
-                                                                 MULE_EXTENSION_CLASSIFIER,
+                                                                 MULE_PLUGIN_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
         .build());
@@ -1685,7 +1688,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private ArtifactPluginFileBuilder createUsingObjectStorePluginFileBuilder() {
     MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName("usingObjectStorePlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("usingObjectStorePlugin", MULE_EXTENSION_CLASSIFIER,
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("usingObjectStorePlugin", MULE_PLUGIN_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
         .build());

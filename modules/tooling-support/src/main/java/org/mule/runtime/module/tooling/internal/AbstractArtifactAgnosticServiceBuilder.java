@@ -6,17 +6,18 @@
  */
 package org.mule.runtime.module.tooling.internal;
 
+import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.addSharedLibraryDependency;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.createDeployablePomFile;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.updateArtifactPom;
+
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.addSharedLibraryDependency;
-import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.createDeployablePomFile;
-import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.updateArtifactPom;
 
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;

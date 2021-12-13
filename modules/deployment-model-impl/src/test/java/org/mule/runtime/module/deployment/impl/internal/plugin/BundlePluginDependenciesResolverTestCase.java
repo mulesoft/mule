@@ -7,10 +7,16 @@
 
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.deployment.impl.internal.plugin.BundlePluginDependenciesResolver.MULE_HTTP_CONNECTOR_ARTIFACT_ID;
+import static org.mule.runtime.module.deployment.impl.internal.plugin.BundlePluginDependenciesResolver.MULE_HTTP_CONNECTOR_GROUP_ID;
+
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -22,10 +28,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.module.deployment.impl.internal.plugin.BundlePluginDependenciesResolver.MULE_HTTP_CONNECTOR_ARTIFACT_ID;
-import static org.mule.runtime.module.deployment.impl.internal.plugin.BundlePluginDependenciesResolver.MULE_HTTP_CONNECTOR_GROUP_ID;
 
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.resolver.DuplicateExportedPackageException;

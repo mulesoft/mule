@@ -7,6 +7,17 @@
 
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
+import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
+import static org.mule.maven.client.test.MavenTestUtils.getMavenProjectVersion;
+import static org.mule.maven.client.test.MavenTestUtils.mavenPomFinder;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.core.api.util.FileUtils.unzip;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.COMPILE;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.PROVIDED;
+import static org.mule.runtime.module.deployment.impl.internal.BundleDependencyMatcher.bundleDependency;
+import static org.mule.runtime.module.deployment.impl.internal.MavenTestUtils.installArtifact;
+
 import static java.io.File.separator;
 import static java.lang.String.format;
 import static java.nio.file.Paths.get;
@@ -14,6 +25,7 @@ import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.of;
+
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -32,16 +44,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
-import static org.mule.maven.client.test.MavenTestUtils.getMavenProjectVersion;
-import static org.mule.maven.client.test.MavenTestUtils.mavenPomFinder;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.runtime.core.api.util.FileUtils.unzip;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.COMPILE;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.PROVIDED;
-import static org.mule.runtime.module.deployment.impl.internal.BundleDependencyMatcher.bundleDependency;
-import static org.mule.runtime.module.deployment.impl.internal.MavenTestUtils.installArtifact;
 
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -68,11 +70,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
-import org.hamcrest.TypeSafeMatcher;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -80,6 +78,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
+import org.hamcrest.TypeSafeMatcher;
 
 import io.qameta.allure.Issue;
 

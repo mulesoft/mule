@@ -6,17 +6,21 @@
  */
 package org.mule.test.runner.maven;
 
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.test.runner.maven.ArtifactFactory.createFromPomFile;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.test.runner.maven.ArtifactFactory.createFromPomFile;
 
 import java.io.File;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
-import io.qameta.allure.Issue;
 import org.eclipse.aether.artifact.Artifact;
+
 import org.junit.Test;
+
+import io.qameta.allure.Issue;
 
 @Issue("MULE-19417")
 public class ArtifactFactoryTestCase {
@@ -25,7 +29,7 @@ public class ArtifactFactoryTestCase {
   private static final String GROUP_ID = "org.mule.tests";
   private static final String ARTIFACT_ID = "simple-pom";
   private static final String VERSION = "1.0.0";
-  private static final String PACKAGING = "mule-plugin";
+  private static final String PACKAGING = MULE_PLUGIN_CLASSIFIER;
 
   @Test
   public void pomWithProperties() {

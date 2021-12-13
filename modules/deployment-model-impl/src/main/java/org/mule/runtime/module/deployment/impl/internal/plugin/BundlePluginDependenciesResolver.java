@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
+import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
+
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toSet;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
-import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
 
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.resolver.DuplicateExportedPackageException;
