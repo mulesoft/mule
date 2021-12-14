@@ -45,7 +45,7 @@ public class SdkConnectionProviderAdapter<C> implements ConnectionProvider<C>, L
       } else if (connectionProvider instanceof org.mule.sdk.api.connectivity.PoolingConnectionProvider) {
         return new SdkPoolingConnectionProviderAdapter<>((org.mule.sdk.api.connectivity.PoolingConnectionProvider<C>) connectionProvider);
       } else if (connectionProvider instanceof org.mule.sdk.api.connectivity.ConnectionProvider) {
-        return (ConnectionProvider<C>) connectionProvider;
+        return new SdkConnectionProviderAdapter<>((org.mule.sdk.api.connectivity.ConnectionProvider<C>) connectionProvider);
       } else {
         throw new IllegalArgumentException("Unsupported ConnectionProvider type " + connectionProvider.getClass().getName());
       }
