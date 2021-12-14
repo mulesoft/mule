@@ -6,17 +6,15 @@
  */
 package org.mule.test.oauth;
 
-import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+import static org.mule.sdk.api.connectivity.ConnectionValidationResult.success;
+
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.AuthorizationCode;
+import org.mule.sdk.api.connectivity.ConnectionValidationResult;
+import org.mule.sdk.api.connectivity.PoolingConnectionProvider;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
 @AuthorizationCode(accessTokenUrl = TestOAuthConnectionProvider.ACCESS_TOKEN_URL,

@@ -6,17 +6,17 @@
  */
 package org.mule.test.marvel.drstrange;
 
-import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+import static org.mule.sdk.api.connectivity.ConnectionValidationResult.success;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.param.reference.ConfigReference;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.reference.ConfigReference;
+import org.mule.sdk.api.connectivity.ConnectionProvider;
+import org.mule.sdk.api.connectivity.ConnectionValidationResult;
 import org.mule.test.marvel.ironman.IronMan;
 
 @Alias("mystic")
