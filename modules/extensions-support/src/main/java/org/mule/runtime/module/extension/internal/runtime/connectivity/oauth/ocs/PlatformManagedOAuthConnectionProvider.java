@@ -17,7 +17,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.connection.ConnectionUtils.unwrap;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
-import static org.mule.runtime.core.internal.registry.MuleRegistryHelper.getInjectionTarget;
+import static org.mule.runtime.core.internal.util.InjectionUtils.getInjectionTarget;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getCallbackValuesExtractors;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.updateOAuthParameters;
@@ -298,14 +298,15 @@ public class PlatformManagedOAuthConnectionProvider<C>
   }
 
   private void updateOAuthState() {
-    Consumer<ResourceOwnerOAuthContext> onUpdate = context -> updateOAuthParameters(delegateForInjection, callbackValues, context);
+    Consumer<ResourceOwnerOAuthContext> onUpdate =
+        context -> updateOAuthParameters(delegateForInjection, callbackValues, context);
     oauthConfig.getDelegateGrantType().accept(new OAuthGrantTypeVisitor() {
 
       @Override
       public void visit(AuthorizationCodeGrantType grantType) {
         oauthStateFieldSetter.set(delegateForInjection, new PlatformAuthorizationCodeStateAdapter(dancer,
-                                                                                               descriptor,
-                                                                                               onUpdate));
+                                                                                                  descriptor,
+                                                                                                  onUpdate));
       }
 
       @Override

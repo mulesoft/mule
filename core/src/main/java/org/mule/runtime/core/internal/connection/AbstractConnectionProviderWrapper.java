@@ -15,7 +15,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.connection.ConnectionUtils.unwrap;
-import static org.mule.runtime.core.internal.registry.MuleRegistryHelper.getInjectionTarget;
+import static org.mule.runtime.core.internal.util.InjectionUtils.getInjectionTarget;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.config.PoolingProfile;

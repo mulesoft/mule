@@ -12,7 +12,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.mule.runtime.core.internal.registry.MuleRegistryHelper.getInjectionTarget;
+import static org.mule.runtime.core.internal.util.InjectionUtils.getInjectionTarget;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
 import org.mule.runtime.api.exception.MuleException;

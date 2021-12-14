@@ -53,7 +53,8 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
     super(delegate, reconnectionConfig, callbackValues);
     this.oauthConfig = oauthConfig;
     this.oauthHandler = oauthHandler;
-    authCodeStateSetter = getOAuthStateSetter(getDelegateForInjection(), AuthorizationCodeState.class, oauthConfig.getGrantType());
+    authCodeStateSetter =
+        getOAuthStateSetter(getDelegateForInjection(), AuthorizationCodeState.class, oauthConfig.getGrantType());
     dance = Once.of(this::updateAuthState);
   }
 

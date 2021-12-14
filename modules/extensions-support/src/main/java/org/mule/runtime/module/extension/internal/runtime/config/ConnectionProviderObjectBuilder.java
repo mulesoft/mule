@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.util.Collections.emptyList;
-import static org.mule.runtime.core.internal.registry.MuleRegistryHelper.getInjectionTarget;
+import static org.mule.runtime.core.internal.util.InjectionUtils.getInjectionTarget;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.connection.SdkConnectionProviderAdapter.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConnectionProviderFactory;
 
@@ -27,7 +27,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.runtime.module.extension.internal.util.ValueSetter;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Implementation of {@link ResolverSetBasedObjectBuilder} which produces instances of {@link ConnectionProviderModel}
@@ -43,7 +42,7 @@ public abstract class ConnectionProviderObjectBuilder<C>
   protected final ExtensionModel extensionModel;
   protected final MuleContext muleContext;
 
-  private final AtomicBoolean firstBuild = new AtomicBoolean(true);
+  private volatile boolean firstBuild = true;
   protected String ownerConfigName;
 
   /**
@@ -118,12 +117,17 @@ public abstract class ConnectionProviderObjectBuilder<C>
   public Pair<ConnectionProvider<C>, ResolverSetResult> build(ResolverSetResult result) throws MuleException {
     ConnectionProvider<C> value = from(instantiateObject().getFirst());
 
-    if (firstBuild.compareAndSet(true, false)) {
-      Class<?> actualClass = value instanceof SdkConnectionProviderAdapter
-          ? ((SdkConnectionProviderAdapter<C>) value).getDelegate().getClass()
-          : value.getClass();
+    if (firstBuild) {
+      synchronized (this) {
+        if (firstBuild) {
+          Class<?> actualClass = value instanceof SdkConnectionProviderAdapter
+              ? ((SdkConnectionProviderAdapter<C>) value).getDelegate().getClass()
+              : value.getClass();
 
-      singleValueSetters = super.createSingleValueSetters(actualClass, resolverSet);
+          singleValueSetters = super.createSingleValueSetters(actualClass, resolverSet);
+          firstBuild = false;
+        }
+      }
     }
 
     populate(result, getInjectionTarget(value));
