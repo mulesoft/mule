@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -39,6 +41,7 @@ import org.mockito.junit.MockitoRule;
 
 import com.google.common.collect.ImmutableList;
 
+//DELETE THIS CLASS
 public class ConfigurationProviderToolingAdapterTestCase extends AbstractConfigurationProviderTestCase<HeisenbergExtension> {
 
   private static final Class MODULE_CLASS = HeisenbergExtension.class;
@@ -114,9 +117,8 @@ public class ConfigurationProviderToolingAdapterTestCase extends AbstractConfigu
 
   @Test
   public void testCacheUsedForResolution() throws Exception {
-    provider.initialise();
-    provider.start();
-    ((ConfigurationProviderToolingAdapter) provider).getMetadataKeys();
+    ConfigurationCacheIdResolver configurationCacheIdResolver = new ConfigurationCacheIdResolver(muleContext, provider);
+    assertThat(configurationCacheIdResolver.getConfigurationCacheId(), is(CONFIG_NAME));
   }
 
 

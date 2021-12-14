@@ -86,9 +86,7 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
   protected final ConnectionManager connectionManager;
   private final ConfigurationInstance configuration;
   private final ReflectionCache reflectionCache;
-  private final MetadataCacheIdGeneratorFactory<ComponentAst> cacheIdGeneratorFactory;
-
-  private LazyValue<MetadataCacheIdGenerator<ComponentAst>> cacheIdGeneratorLazyValue;
+  private final ConfigurationCacheIdResolver configurationCacheIdResolver;
 
   ConfigurationProviderToolingAdapter(String name,
                                       ExtensionModel extensionModel,
@@ -103,20 +101,7 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
     DefaultRegistry registry = new DefaultRegistry(muleContext);
     this.connectionManager = registry.<ConnectionManager>lookupByName(OBJECT_CONNECTION_MANAGER).get();
     this.metadataService = registry.<MuleMetadataService>lookupByType(MuleMetadataService.class).get();
-    this.cacheIdGeneratorFactory =
-        registry.<MetadataCacheIdGeneratorFactory>lookupByType(MetadataCacheIdGeneratorFactory.class).get();
-    setCacheIdGenerator();
-  }
-
-  private void setCacheIdGenerator() {
-    cacheIdGeneratorLazyValue = new LazyValue<>(() -> {
-      DslResolvingContext context = DslResolvingContext.getDefault(muleContext.getExtensionManager().getExtensions());
-      ComponentLocator<ComponentAst> configLocator = location -> muleContext.getConfigurationComponentLocator()
-          .find(location)
-          .map(component -> (ComponentAst) component.getAnnotation(ANNOTATION_COMPONENT_CONFIG));
-
-      return cacheIdGeneratorFactory.create(context, configLocator);
-    });
+    this.configurationCacheIdResolver = new ConfigurationCacheIdResolver(muleContext, this);
   }
 
   /**
@@ -178,18 +163,9 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
           ((BaseEventContext) fakeEvent.getContext()).success();
         }
       }
-    }, connectionManager, metadataService.getMetadataCache(getMetadataCacheId().getValue()),
+    }, connectionManager, metadataService.getMetadataCache(configurationCacheIdResolver.getConfigurationCacheId()),
                                       ExtensionsTypeLoaderFactory.getDefault()
                                           .createTypeLoader(classLoader));
-  }
-
-  private MetadataCacheId getMetadataCacheId() {
-    return cacheIdGeneratorLazyValue.get().getIdForGlobalMetadata((ComponentAst) this.getAnnotation(ANNOTATION_COMPONENT_CONFIG))
-        .orElseThrow(() -> new IllegalStateException(
-                                                     format("Missing information to obtain the MetadataCache for the component '%s'. "
-                                                         +
-                                                         "Expected to have the ComponentAst information in the '%s' annotation but none was found.",
-                                                            this.getLocation().toString(), ANNOTATION_COMPONENT_CONFIG)));
   }
 
   /**
