@@ -19,10 +19,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.Aquarium;
 import org.mule.test.petstore.extension.ExclusiveCashier;
@@ -50,19 +50,17 @@ public class PetStoreExclusiveParameterRequiredWithNullExpressionTestCase extend
 
   @Override
   protected void addBuilders(List<ConfigurationBuilder> builders) {
-    builders.add(new ConfigurationBuilder() {
+    builders.add(new AbstractConfigurationBuilder() {
 
       @Override
-      public void configure(MuleContext muleContext) throws ConfigurationException {
+      public void doConfigure(MuleContext muleContext) throws ConfigurationException {
         doReturn(empty()).when(configProperties).resolveBooleanProperty(anyString());
         muleContext.getCustomizationService().overrideDefaultServiceImpl(OBJECT_CONFIGURATION_PROPERTIES, configProperties);
       }
-
-      @Override
-      public void addServiceConfigurator(ServiceConfigurator serviceConfigurator) {}
     });
-  }
 
+    super.addBuilders(builders);
+  }
 
   @Override
   protected String getConfigFile() {
