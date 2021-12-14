@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * ADD JDOC exclusive for ConfigurationProviderToolingAdapter
+ * Class that resolves the id used to retrieve the cache for metadata resolutions for {@link ConfigurationProviderToolingAdapter}
  *
  * @since 4.5
  */
@@ -32,9 +32,17 @@ public class ConfigurationCacheIdResolver {
   private Supplier<String> idSupplier;
 
   public ConfigurationCacheIdResolver(MuleContext muleContext, ConfigurationProvider configuration) {
+    generateConfigurationCacheIdSupplier(muleContext, configuration);
+  }
+
+  public String getConfigurationCacheId() {
+    return idSupplier.get();
+  }
+
+  private void generateConfigurationCacheIdSupplier(MuleContext muleContext, ConfigurationProvider configuration) {
     DefaultRegistry registry = new DefaultRegistry(muleContext);
     Optional<MetadataCacheIdGeneratorFactory> cacheIdGeneratorFactory =
-        registry.<MetadataCacheIdGeneratorFactory>lookupByType(MetadataCacheIdGeneratorFactory.class);
+        registry.lookupByType(MetadataCacheIdGeneratorFactory.class);
     if (cacheIdGeneratorFactory.isPresent()) {
       idSupplier = new LazyValue(() -> {
         try {
@@ -62,11 +70,6 @@ public class ConfigurationCacheIdResolver {
     } else {
       idSupplier = new LazyValue<>(() -> configuration.getName());
     }
-
-  }
-
-  public String getConfigurationCacheId() {
-    return idSupplier.get();
   }
 
 }
