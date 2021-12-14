@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.internal.registry.MuleRegistryHelper.getInjectionTarget;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.connection.SdkConnectionProviderAdapter.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConnectionProviderFactory;
 
 import org.mule.runtime.api.config.PoolingProfile;
@@ -115,7 +116,7 @@ public abstract class ConnectionProviderObjectBuilder<C>
 
   @Override
   public Pair<ConnectionProvider<C>, ResolverSetResult> build(ResolverSetResult result) throws MuleException {
-    ConnectionProvider<C> value = instantiateObject().getFirst();
+    ConnectionProvider<C> value = from(instantiateObject().getFirst());
 
     if (firstBuild.compareAndSet(true, false)) {
       Class<?> actualClass = value instanceof SdkConnectionProviderAdapter

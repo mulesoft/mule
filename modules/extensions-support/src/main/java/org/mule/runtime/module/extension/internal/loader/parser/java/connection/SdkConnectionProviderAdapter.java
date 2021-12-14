@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -24,12 +25,11 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.internal.registry.InjectionTargetDecorator;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SdkConnectionProviderAdapter<C> implements ConnectionProvider<C>, Lifecycle, MuleContextAware,
     InjectionTargetDecorator<org.mule.sdk.api.connectivity.ConnectionProvider<C>> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(SdkConnectionProviderAdapter.class);
+  private static final Logger LOGGER = getLogger(SdkConnectionProviderAdapter.class);
 
   private final org.mule.sdk.api.connectivity.ConnectionProvider<C> delegate;
   private MuleContext muleContext;
@@ -38,10 +38,14 @@ public class SdkConnectionProviderAdapter<C> implements ConnectionProvider<C>, L
     if (connectionProvider != null) {
       if (connectionProvider instanceof ConnectionProvider) {
         return (ConnectionProvider<C>) connectionProvider;
+      } else if (connectionProvider instanceof SdkConnectionProviderAdapter) {
+        return (ConnectionProvider<C>) connectionProvider;
       } else if (connectionProvider instanceof org.mule.sdk.api.connectivity.CachedConnectionProvider) {
         return new SdkCachedConnectionProviderAdapter<>((org.mule.sdk.api.connectivity.CachedConnectionProvider<C>) connectionProvider);
       } else if (connectionProvider instanceof org.mule.sdk.api.connectivity.PoolingConnectionProvider) {
         return new SdkPoolingConnectionProviderAdapter<>((org.mule.sdk.api.connectivity.PoolingConnectionProvider<C>) connectionProvider);
+      } else if (connectionProvider instanceof org.mule.sdk.api.connectivity.ConnectionProvider) {
+        return (ConnectionProvider<C>) connectionProvider;
       } else {
         throw new IllegalArgumentException("Unsupported ConnectionProvider type " + connectionProvider.getClass().getName());
       }

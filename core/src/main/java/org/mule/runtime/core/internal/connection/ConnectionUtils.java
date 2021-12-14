@@ -59,6 +59,14 @@ public final class ConnectionUtils {
     }
   }
 
+  public static <C> ConnectionProvider<C> unwrap(ConnectionProvider<C> connectionProvider) {
+    while (connectionProvider instanceof ConnectionProviderWrapper) {
+      connectionProvider = ((ConnectionProviderWrapper<C>) connectionProvider).getDelegate();
+    }
+
+    return connectionProvider;
+  }
+
   public static <C> void logPoolStatus(Logger logger, GenericObjectPool<C> pool, String poolId) {
     if (logger.isDebugEnabled()) {
       String maxActive =
