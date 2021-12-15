@@ -13,7 +13,6 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
@@ -24,6 +23,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.java.connection.JavaConnectionProviderModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils;
 
 import java.util.List;
@@ -83,7 +83,7 @@ abstract class AbstractJavaExecutableComponentModelParser extends AbstractJavaMo
       connected = true;
       ExtensionParameter connectionParameter = connectionParameters.iterator().next();
       final Type connectionType = resolveConnectionType(connectionParameter);
-      transactional = connectionType.isAssignableTo(TransactionalConnection.class);
+      transactional = JavaConnectionProviderModelParserUtils.isTransactional(connectionType);
       additionalModelProperties.add(new ConnectivityModelProperty(connectionType));
     } else {
       throw new IllegalOperationModelDefinitionException(format(

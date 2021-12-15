@@ -47,6 +47,9 @@ public class SoapServiceProviderWrapper extends SoapComponentWrapper implements 
   }
 
   public boolean supportsConnectivityTesting() {
-    return !(super.getDeclaringClass().isPresent() && NoConnectivityTest.class.isAssignableFrom(super.getDeclaringClass().get()));
+    return super.getDeclaringClass()
+        .map(clazz -> !NoConnectivityTest.class.isAssignableFrom(clazz)
+            && !org.mule.sdk.api.connectivity.NoConnectivityTest.class.isAssignableFrom(clazz))
+        .orElse(true);
   }
 }

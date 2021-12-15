@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.internal.connection.ConnectionUtils.getInjectionTarget;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.config.PoolingProfile;
@@ -44,10 +45,12 @@ public abstract class AbstractConnectionProviderWrapper<C> implements Connection
 
   private static final Logger LOGGER = getLogger(AbstractConnectionProviderWrapper.class);
 
+  private final ConnectionProvider<C> delegate;
+
+  private Object delegateForInjection;
+
   @Inject
   protected MuleContext muleContext;
-
-  private final ConnectionProvider<C> delegate;
 
   /**
    * Creates a new instance which wraps the {@code delegate}
@@ -82,6 +85,17 @@ public abstract class AbstractConnectionProviderWrapper<C> implements Connection
   @Override
   public ConnectionProvider<C> getDelegate() {
     return delegate;
+  }
+
+  protected Object getDelegateForInjection() {
+    if (delegateForInjection == null) {
+      synchronized (this) {
+        if (delegateForInjection == null) {
+          delegateForInjection = getInjectionTarget(delegate);
+        }
+      }
+    }
+    return delegateForInjection;
   }
 
   /**

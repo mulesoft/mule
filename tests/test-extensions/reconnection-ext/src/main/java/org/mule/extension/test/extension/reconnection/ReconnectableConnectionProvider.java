@@ -6,12 +6,13 @@
  */
 package org.mule.extension.test.extension.reconnection;
 
-import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
-import org.mule.runtime.api.connection.CachedConnectionProvider;
+import static org.mule.sdk.api.connectivity.ConnectionValidationResult.success;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
+import org.mule.sdk.api.connectivity.CachedConnectionProvider;
+import org.mule.sdk.api.connectivity.ConnectionValidationResult;
 
 
 /**

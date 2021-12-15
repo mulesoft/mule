@@ -21,8 +21,8 @@ import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
-import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.sdk.api.connectivity.TransactionalConnection;
 
 import java.util.Optional;
 

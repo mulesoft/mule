@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.registry;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.core.internal.util.InjectionUtils.getInjectionTarget;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withAnnotation;
@@ -122,6 +123,7 @@ public class SimpleRegistry extends TransientRegistry implements Injector {
    */
   @Override
   public <T> T inject(T object) {
+    object = getInjectionTarget(object);
     return (T) applyProcessors(object, null);
   }
 
