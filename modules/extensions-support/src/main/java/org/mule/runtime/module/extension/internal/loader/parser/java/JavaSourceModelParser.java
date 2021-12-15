@@ -264,11 +264,11 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
     return mapReduceSingleAnnotation(sourceElement, "source", sourceElement.getName(), BackPressure.class,
                                      org.mule.sdk.api.annotation.source.BackPressure.class,
                                      (legacyAnnotation) -> new BackPressureStrategyModelProperty(legacyAnnotation
-                                         .getEnumValue(BackPressure::defaultMode), new LinkedHashSet<BackPressureMode>(legacyAnnotation.getArrayValue(BackPressure::supportedModes))),
+                                         .getEnumValue(BackPressure::defaultMode), new LinkedHashSet<BackPressureMode>(legacyAnnotation.getEnumArrayValue(BackPressure::supportedModes))),
                                      (sdkAnnotation) -> new BackPressureStrategyModelProperty(fromSdkBackPressureMode(sdkAnnotation
                                          .getEnumValue(org.mule.sdk.api.annotation.source.BackPressure::defaultMode)),
                                                                                               new LinkedHashSet<BackPressureMode>(sdkAnnotation
-                                                                                                  .getArrayValue(org.mule.sdk.api.annotation.source.BackPressure::supportedModes)
+                                                                                                  .getEnumArrayValue(org.mule.sdk.api.annotation.source.BackPressure::supportedModes)
                                                                                                   .stream()
                                                                                                   .map(JavaParserSourceUtils::fromSdkBackPressureMode)
                                                                                                   .collect(toList()))));

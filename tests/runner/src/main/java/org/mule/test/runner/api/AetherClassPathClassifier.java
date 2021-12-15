@@ -7,15 +7,27 @@
 
 package org.mule.test.runner.api;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
-import static com.google.common.collect.Maps.newLinkedHashMap;
+import static org.mule.maven.client.internal.util.VersionChecker.areCompatibleVersions;
+import static org.mule.maven.client.internal.util.VersionChecker.isHighestVersion;
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
+import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
+import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
+import static org.mule.test.runner.api.ArtifactClassificationType.SERVICE;
+import static org.mule.test.runner.utils.RunnerModuleUtils.JAR_EXTENSION;
+import static org.mule.test.runner.utils.RunnerModuleUtils.getDefaultSdkApiArtifact;
+
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Maps.newLinkedHashMap;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
@@ -26,15 +38,6 @@ import static org.eclipse.aether.util.artifact.JavaScopes.TEST;
 import static org.eclipse.aether.util.filter.DependencyFilterUtils.andFilter;
 import static org.eclipse.aether.util.filter.DependencyFilterUtils.classpathFilter;
 import static org.eclipse.aether.util.filter.DependencyFilterUtils.orFilter;
-import static org.mule.maven.client.internal.util.VersionChecker.areCompatibleVersions;
-import static org.mule.maven.client.internal.util.VersionChecker.isHighestVersion;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
-import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
-import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
-import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
-import static org.mule.test.runner.api.ArtifactClassificationType.SERVICE;
-import static org.mule.test.runner.utils.RunnerModuleUtils.JAR_EXTENSION;
-import static org.mule.test.runner.utils.RunnerModuleUtils.getDefaultSdkApiArtifact;
 
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -63,6 +66,7 @@ import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
+
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -106,7 +110,6 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   private static final String SNAPSHOT_WILCARD_FILE_FILTER = "*-SNAPSHOT*.*";
   private static final String TESTS_CLASSIFIER = "tests";
   private static final String TESTS_JAR = "-tests.jar";
-  private static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
   private static final String MULE_SERVICE_CLASSIFIER = "mule-service";
 
   private static final String RUNTIME_GROUP_ID = "org.mule.runtime";
@@ -116,14 +119,14 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  private VersionScheme versionScheme = new GenericVersionScheme();
+  private final VersionScheme versionScheme = new GenericVersionScheme();
 
   private final String muleVersion;
 
-  private DependencyResolver dependencyResolver;
-  private ArtifactClassificationTypeResolver artifactClassificationTypeResolver;
-  private PluginResourcesResolver pluginResourcesResolver = new PluginResourcesResolver();
-  private ServiceResourcesResolver serviceResourcesResolver = new ServiceResourcesResolver();
+  private final DependencyResolver dependencyResolver;
+  private final ArtifactClassificationTypeResolver artifactClassificationTypeResolver;
+  private final PluginResourcesResolver pluginResourcesResolver = new PluginResourcesResolver();
+  private final ServiceResourcesResolver serviceResourcesResolver = new ServiceResourcesResolver();
 
   static String getMuleVersion() {
     try {

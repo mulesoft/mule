@@ -7,15 +7,17 @@
 
 package org.mule.runtime.core.api.profiling;
 
-import static com.google.common.collect.ImmutableSet.of;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.EXTENSION_PROFILING_EVENT;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROFILING_SERVICE_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.internal.processor.rector.profiling.ProfilingTestUtils.enableProfilingFeatureTestConsumer;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
+
+import static com.google.common.collect.ImmutableSet.of;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
@@ -23,6 +25,8 @@ import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ExtensionProfilingEventContext;
+import org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils;
+import org.mule.runtime.core.internal.profiling.ArtifactProfilingProducerScope;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -50,6 +54,7 @@ public class ExtensionProfilingDataConsumerTestCase extends AbstractMuleContextT
   public static final String OK = "OK";
   public static final String PROFILING_EVENT_CONTEXT = "PROFILING_EVENT_CONTEXT";
   public static final String COMPONENT_PROFILING_EVENT_IDENTIFIER = "COMPONENT_PROFILING_EVENT_IDENTIFIER";
+  public static final String TEST_DATA_CONSUMER = "TEST_DATA_CONSUMER";
 
   @Rule
   public MockitoRule mockitorule = MockitoJUnit.rule();
@@ -77,10 +82,13 @@ public class ExtensionProfilingDataConsumerTestCase extends AbstractMuleContextT
 
   @Test
   @Description("When a profiling event related to an extension is triggered, the data consumers process the data accordingly.")
-  public void dataConsumersForComponentProfilingEventAreTriggered() {
-    ProfilingDataProducer<ExtensionProfilingEventContext> dataProducer =
-        profilingService.getProfilingDataProducer(EXTENSION_PROFILING_EVENT);
-    dataProducer.triggerProfilingEvent(profilingEventContext);
+  public void dataConsumersForComponentProfilingEventAreTriggered() throws Exception {
+    enableProfilingFeatureTestConsumer(muleContext, EXTENSION_PROFILING_EVENT, true);
+
+    ProfilingDataProducer<ExtensionProfilingEventContext, Object> dataProducer =
+        profilingService.getProfilingDataProducer(EXTENSION_PROFILING_EVENT,
+                                                  new ArtifactProfilingProducerScope(ProfilingUtils.getArtifactId(muleContext)));
+    dataProducer.triggerProfilingEvent(new Object(), o -> profilingEventContext);
 
     verify(logger).info(PROFILING_EVENT_CONTEXT);
     verify(logger).info(OK);

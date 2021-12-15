@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.registry;
 
+import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.TransfromersStory.TRANSFORMERS;
+
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -19,6 +22,7 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.transformer.builder.MockConverterBuilder;
 import org.mule.runtime.core.privileged.transformer.CompositeConverter;
+import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -28,12 +32,19 @@ import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.Peach;
 import org.mule.tck.testmodels.fruit.Seed;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.List;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-public class MuleRegistryHelperTestCase extends AbstractMuleContextTestCase {
+@Feature(REGISTRY)
+@Story(TRANSFORMERS)
+public class DefaultTransformersRegistryTestCase extends AbstractMuleContextTestCase {
 
   private static final DataType ORANGE_DATA_TYPE = DataType.fromType(Orange.class);
   private static final DataType BLOOD_ORANGE_DATA_TYPE = DataType.fromType(BloodOrange.class);
@@ -47,19 +58,27 @@ public class MuleRegistryHelperTestCase extends AbstractMuleContextTestCase {
   private Transformer t1;
   private Transformer t2;
 
+  private TransformersRegistry transformersRegistry;
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    t1 = new MockConverterBuilder().named("t1").from(ORANGE_DATA_TYPE).to(FRUIT_DATA_TYPE).build();
+    t2 = new MockConverterBuilder().named("t2").from(DataType.OBJECT).to(FRUIT_DATA_TYPE).build();
+
+    Map<String, Object> startupRegistry = new HashMap<>();
+    startupRegistry.put(t1.getName(), t1);
+    startupRegistry.put(t2.getName(), t2);
+    return startupRegistry;
+  }
+
   @Before
   public void setUp() throws Exception {
-    t1 = new MockConverterBuilder().named("t1").from(ORANGE_DATA_TYPE).to(FRUIT_DATA_TYPE).build();
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(t1);
-
-    t2 = new MockConverterBuilder().named("t2").from(DataType.OBJECT).to(FRUIT_DATA_TYPE).build();
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(t2);
+    transformersRegistry = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(TransformersRegistry.class);
   }
 
   @Test
   public void lookupsTransformersByType() throws Exception {
-    List trans =
-        ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformers(BLOOD_ORANGE_DATA_TYPE, FRUIT_DATA_TYPE);
+    List<Transformer> trans = transformersRegistry.lookupTransformers(BLOOD_ORANGE_DATA_TYPE, FRUIT_DATA_TYPE);
     assertEquals(2, trans.size());
     assertTrue(trans.contains(t1));
     assertTrue(trans.contains(t2));
@@ -67,8 +86,7 @@ public class MuleRegistryHelperTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void lookupsTransformerByPriority() throws Exception {
-    Transformer result =
-        ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(BLOOD_ORANGE_DATA_TYPE, FRUIT_DATA_TYPE);
+    Transformer result = transformersRegistry.lookupTransformer(BLOOD_ORANGE_DATA_TYPE, FRUIT_DATA_TYPE);
     assertNotNull(result);
     assertEquals(t1, result);
   }
@@ -81,27 +99,26 @@ public class MuleRegistryHelperTestCase extends AbstractMuleContextTestCase {
         new MockConverterBuilder().named("appleToBanana").from(APPLE_DATA_TYPE).to(BANANA_DATA_TYPE).build();
     Transformer bananaToBloodOrange =
         new MockConverterBuilder().named("bananaToBloodOrange").from(BANANA_DATA_TYPE).to(BLOOD_ORANGE_DATA_TYPE).build();
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(fruitToSeed);
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(seedToApple);
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(appleToBanana);
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(bananaToBloodOrange);
+    transformersRegistry.registerTransformer(fruitToSeed);
+    transformersRegistry.registerTransformer(seedToApple);
+    transformersRegistry.registerTransformer(appleToBanana);
+    transformersRegistry.registerTransformer(bananaToBloodOrange);
 
-    Transformer trans =
-        ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(FRUIT_DATA_TYPE, BLOOD_ORANGE_DATA_TYPE);
+    Transformer trans = transformersRegistry.lookupTransformer(FRUIT_DATA_TYPE, BLOOD_ORANGE_DATA_TYPE);
     assertThat(trans, is(notNullValue()));
     assertThat(trans, instanceOf(CompositeConverter.class));
     assertThat(trans.getName(), is("fruitToSeedseedToAppleappleToBananabananaToBloodOrange"));
 
     // The same should be returned if we ask for it with compatible data types
-    trans = ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(FRUIT_DATA_TYPE, ORANGE_DATA_TYPE);
+    trans = transformersRegistry.lookupTransformer(FRUIT_DATA_TYPE, ORANGE_DATA_TYPE);
     assertThat(trans, instanceOf(CompositeConverter.class));
     assertThat(trans.getName(), is("fruitToSeedseedToAppleappleToBananabananaToBloodOrange"));
 
-    trans = ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(PEACH_DATA_TYPE, BLOOD_ORANGE_DATA_TYPE);
+    trans = transformersRegistry.lookupTransformer(PEACH_DATA_TYPE, BLOOD_ORANGE_DATA_TYPE);
     assertThat(trans, instanceOf(CompositeConverter.class));
     assertThat(trans.getName(), is("fruitToSeedseedToAppleappleToBananabananaToBloodOrange"));
 
-    trans = ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(PEACH_DATA_TYPE, ORANGE_DATA_TYPE);
+    trans = transformersRegistry.lookupTransformer(PEACH_DATA_TYPE, ORANGE_DATA_TYPE);
     assertThat(trans, instanceOf(CompositeConverter.class));
     assertThat(trans.getName(), is("fruitToSeedseedToAppleappleToBananabananaToBloodOrange"));
   }
@@ -112,11 +129,13 @@ public class MuleRegistryHelperTestCase extends AbstractMuleContextTestCase {
         .to(BLOOD_ORANGE_DATA_TYPE).weighting(10).build();
     Transformer bananaToOrange =
         new MockConverterBuilder().named("bananaToOrange").from(BANANA_DATA_TYPE).to(ORANGE_DATA_TYPE).weighting(1).build();
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(bananaToBloodOrange);
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(bananaToOrange);
+    TransformersRegistry transfromersRegistry =
+        ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(TransformersRegistry.class);
+    transfromersRegistry.registerTransformer(bananaToBloodOrange);
+    transfromersRegistry.registerTransformer(bananaToOrange);
 
     Transformer trans =
-        ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(BANANA_DATA_TYPE, ORANGE_DATA_TYPE);
+        transformersRegistry.lookupTransformer(BANANA_DATA_TYPE, ORANGE_DATA_TYPE);
 
     assertThat(trans, is(notNullValue()));
     assertThat(trans.getName(), is("bananaToOrange"));

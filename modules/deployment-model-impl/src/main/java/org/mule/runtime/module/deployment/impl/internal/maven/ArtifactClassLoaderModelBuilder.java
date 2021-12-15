@@ -6,15 +6,6 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.Objects.requireNonNull;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Stream.concat;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.codehaus.plexus.util.xml.Xpp3DomUtils.mergeXpp3Dom;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
@@ -22,6 +13,7 @@ import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMav
 import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMavenPlugin.MULE_EXTENSIONS_PLUGIN_GROUP_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFolder;
 import static org.mule.tools.api.classloader.Constants.ADDITIONAL_PLUGIN_DEPENDENCIES_FIELD;
 import static org.mule.tools.api.classloader.Constants.PLUGIN_DEPENDENCIES_FIELD;
@@ -29,6 +21,17 @@ import static org.mule.tools.api.classloader.Constants.PLUGIN_DEPENDENCY_FIELD;
 import static org.mule.tools.api.classloader.Constants.PLUGIN_FIELD;
 import static org.mule.tools.api.classloader.Constants.SHARED_LIBRARIES_FIELD;
 import static org.mule.tools.api.classloader.Constants.SHARED_LIBRARY_FIELD;
+
+import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.codehaus.plexus.util.xml.Xpp3DomUtils.mergeXpp3Dom;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -71,7 +74,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
   private static final String VERSION = "version";
   private static final String CLASSIFIER = "classifier";
   private static final String TYPE = "type";
-  protected static final String MULE_PLUGIN = "mule-plugin";
+  protected static final String MULE_PLUGIN = MULE_PLUGIN_CLASSIFIER;
 
   private boolean processSharedLibraries = false;
   private boolean processAdditionalPluginLibraries = false;

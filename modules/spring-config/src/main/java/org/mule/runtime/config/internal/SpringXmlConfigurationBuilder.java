@@ -56,8 +56,6 @@ import org.mule.runtime.core.internal.config.ParentMuleContextAwareConfiguration
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.context.NullDomainMuleContextLifecycleStrategy;
-import org.mule.runtime.core.internal.registry.CompositeMuleRegistryHelper;
-import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.dsl.api.ConfigResource;
 
@@ -348,28 +346,13 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
     if (parentContext != null) {
       registry = createRegistryWithParentContext(muleContext, baseApplicationContext, applicationContext, parentContext);
-
-      if ((parentContext instanceof MuleArtifactContext &&
-          ((MuleArtifactContext) parentContext).getMuleContext().getRegistry() instanceof MuleRegistryHelper)) {
-        MuleRegistryHelper parentMuleRegistryHelper =
-            (MuleRegistryHelper) ((MuleArtifactContext) parentContext).getMuleContext().getRegistry();
-
-        // TODO MULE-19960 Refactor how transformers are discovered and remove this
-        CompositeMuleRegistryHelper compositeMuleRegistryHelper =
-            new CompositeMuleRegistryHelper(registry, muleContext, parentMuleRegistryHelper);
-        ((MuleContextWithRegistry) muleContext).setRegistry(compositeMuleRegistryHelper);
-      } else {
-        ((MuleContextWithRegistry) muleContext).setRegistry(registry);
-      }
-
     } else {
       registry = new SpringRegistry(baseApplicationContext, applicationContext, muleContext,
                                     new ConfigurationDependencyResolver(applicationContext.getApplicationModel()),
                                     ((DefaultMuleContext) muleContext).getLifecycleInterceptor());
-
-      ((MuleContextWithRegistry) muleContext).setRegistry(registry);
     }
 
+    ((MuleContextWithRegistry) muleContext).setRegistry(registry);
     ((DefaultMuleContext) muleContext).setInjector(registry);
   }
 

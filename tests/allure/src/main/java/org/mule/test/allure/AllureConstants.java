@@ -534,6 +534,7 @@ public interface AllureConstants {
 
     interface SerializationStory {
 
+      String MESSAGE_SERIALIZATION = "Message Serialization";
       String STATISTICS = "Payload statistics";
     }
 
@@ -824,6 +825,12 @@ public interface AllureConstants {
     interface ObjectRegistrationStory {
 
       String OBJECT_REGISTRATION = "Object Registration";
+
+    }
+
+    interface TransfromersStory {
+
+      String TRANSFORMERS = "Transformers";
 
     }
 

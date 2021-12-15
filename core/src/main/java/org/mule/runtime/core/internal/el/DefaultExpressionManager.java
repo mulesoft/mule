@@ -38,8 +38,8 @@ import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.util.OneTimeWarning;
+import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 import org.mule.runtime.core.privileged.util.TemplateParser;
 
 import java.util.Iterator;
@@ -61,6 +61,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
                                                                  "Expression parsing is deprecated, regular expressions should be used instead.");
 
   private MuleContext muleContext;
+  private TransformersRegistry transformersRegistry;
   private StreamingManager streamingManager;
 
   private ExtendedExpressionLanguageAdaptor expressionLanguage;
@@ -148,8 +149,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
 
   private TypedValue<?> transform(TypedValue<?> target, DataType sourceType, DataType outputType) throws TransformerException {
     if (target.getValue() != null && !isInstance(outputType.getType(), target.getValue())) {
-      Object result = ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(sourceType, outputType)
-          .transform(target);
+      Object result = transformersRegistry.lookupTransformer(sourceType, outputType).transform(target);
       return new TypedValue<>(result, outputType);
     } else {
       return target;
@@ -370,6 +370,11 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
   @Inject
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
+  }
+
+  @Inject
+  public void setTransformersRegistry(TransformersRegistry transformersRegistry) {
+    this.transformersRegistry = transformersRegistry;
   }
 
   @Inject

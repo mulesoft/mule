@@ -7,12 +7,13 @@
 
 package org.mule.runtime.module.artifact.api.descriptor;
 
-import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+
+import static com.google.common.base.Preconditions.checkState;
 
 import java.util.Map;
 import java.util.Optional;
@@ -21,6 +22,8 @@ import java.util.Optional;
  * Describes a bundle by its Maven coordinates.
  */
 public final class BundleDescriptor {
+
+  public static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
 
   private static final String STRINGARTIFACT_FILENAME_SEPARATOR = "-";
   private String groupId;
@@ -60,7 +63,7 @@ public final class BundleDescriptor {
   }
 
   public boolean isPlugin() {
-    return classifier.map(classifier -> classifier.equals("mule-plugin")).orElse(false);
+    return classifier.map(classifier -> classifier.equals(MULE_PLUGIN_CLASSIFIER)).orElse(false);
   }
 
   /**
