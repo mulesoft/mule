@@ -7,42 +7,42 @@
 package org.mule.runtime.module.launcher.log4j2;
 
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
-import static org.mule.test.allure.AllureConstants.ComponentsFeature.LoggerStory.LOGGER;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import io.qameta.allure.Story;
-import io.qameta.allure.Feature;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.selector.ContextSelector;
 import org.apache.logging.log4j.message.MessageFactory;
+
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
-@Feature(CORE_COMPONENTS)
-@Story(LOGGER)
 public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
 
   private static final String LOGGER_NAME = DispatchingLoggerTestCase.class.getName();
 
   private static final String MESSAGE = "Hello Log!";
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   private ClassLoader currentClassLoader;
 
@@ -115,8 +115,8 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
     // Expected Loggers
     Logger containerLogger = mock(Logger.class);
     Logger regionClassLoaderLogger = mock(Logger.class);
-    when(containerLoggerContext.getLogger(any(), any())).thenReturn(containerLogger);
-    when(regionClassLoaderLoggerContext.getLogger(any(), any())).thenReturn(regionClassLoaderLogger);
+    when(containerLoggerContext.getLogger(anyString(), any())).thenReturn(containerLogger);
+    when(regionClassLoaderLoggerContext.getLogger(anyString(), any())).thenReturn(regionClassLoaderLogger);
     when(artifactAwareContextSelector.getContextWithResolvedContextClassLoader(currentClassLoader))
         .thenAnswer(invocation -> containerLoggerContext);
     // Triggers of the expected Loggers
