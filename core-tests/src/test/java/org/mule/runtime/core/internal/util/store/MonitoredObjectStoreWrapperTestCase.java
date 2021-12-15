@@ -10,20 +10,29 @@ import static java.lang.System.currentTimeMillis;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.junit.MockitoJUnit.rule;
+import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.probe.PollingProber.check;
 
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreSettings;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.util.store.MonitoredObjectStoreWrapper.StoredObject;
+import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.core.util.store.InMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -33,6 +42,7 @@ import org.mule.tck.size.SmallTest;
 import java.io.Serializable;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Rule;
@@ -40,6 +50,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoRule;
 
+import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
 
 @SmallTest
@@ -219,5 +230,44 @@ public class MonitoredObjectStoreWrapperTestCase extends AbstractMuleTestCase {
 
     wrapper = new MonitoredObjectStoreWrapper(objectStore, settings);
     wrapper.expire();
+  }
+
+  @Test
+  @Issue("MULE-19992")
+  @Description("Tests that private store entries are also expired in secondary nodes in a cluster.")
+  public void expirePrivateObjectStoreInSecondaryNode()
+      throws ObjectStoreException, InitialisationException {
+    when(settings.getMaxEntries()).thenReturn(empty());
+    when(settings.getEntryTTL()).thenReturn(of(1L));
+    when(settings.getExpirationInterval()).thenReturn(1L);
+    when(settings.isAlwaysExpire()).thenReturn(true);
+
+    objectStore = new InMemoryObjectStore() {
+
+      @Override
+      public List<String> allKeys() {
+        return (List<String>) store.values().stream().map(e -> ((InMemoryObjectStore.StoredObject) e).getId()).collect(toList());
+      }
+    };
+
+    objectStore.store(KEY, new StoredObject<>("", 0L, KEY));
+    assertEquals(Collections.singletonList(KEY), objectStore.allKeys());
+
+    MuleContextWithRegistry muleContext = mock(MuleContextWithRegistry.class);
+    SimpleUnitTestSupportSchedulerService schedulerService = new SimpleUnitTestSupportSchedulerService();
+    when(muleContext.getSchedulerService()).thenReturn(schedulerService);
+    when(muleContext.getSchedulerBaseConfig())
+        .thenReturn(config().withPrefix(MonitoredObjectStoreWrapperTestCase.class.getName() + "#" + name.getMethodName()));
+
+    when(muleContext.isPrimaryPollingInstance()).thenReturn(false);
+
+    wrapper = new MonitoredObjectStoreWrapper(objectStore, settings);
+    wrapper.setMuleContext(muleContext);
+    wrapper.initialise();
+
+    new PollingProber(5000, 1000).check(new JUnitLambdaProbe(() -> {
+      assertFalse(objectStore.contains(KEY));
+      return true;
+    }, "Expiration is not being performed for secondary node."));
   }
 }
