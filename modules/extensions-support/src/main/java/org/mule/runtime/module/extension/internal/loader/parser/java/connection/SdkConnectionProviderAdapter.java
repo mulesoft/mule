@@ -65,8 +65,6 @@ public class SdkConnectionProviderAdapter<C> implements ConnectionProvider<C>, L
     if (connectionProvider != null) {
       if (connectionProvider instanceof ConnectionProvider) {
         return (ConnectionProvider<C>) connectionProvider;
-      } else if (connectionProvider instanceof SdkConnectionProviderAdapter) {
-        return (ConnectionProvider<C>) connectionProvider;
       } else if (connectionProvider instanceof org.mule.sdk.api.connectivity.CachedConnectionProvider) {
         return new SdkCachedConnectionProviderAdapter<>((org.mule.sdk.api.connectivity.CachedConnectionProvider<C>) connectionProvider);
       } else if (connectionProvider instanceof org.mule.sdk.api.connectivity.PoolingConnectionProvider) {
