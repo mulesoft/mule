@@ -81,7 +81,8 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
   protected ConnectionProvider<C> doBuild(ResolverSetResult result) throws MuleException {
     ConnectionProvider<C> provider = super.build(result).getFirst();
     MuleVersion muleVersion = new MuleVersion(MULE_VERSION);
-    injectFields(providerModel, getInjectionTarget(provider), ownerConfigName, muleContext.getConfiguration().getDefaultEncoding(), muleVersion);
+    injectFields(providerModel, getInjectionTarget(provider), ownerConfigName,
+                 muleContext.getConfiguration().getDefaultEncoding(), muleVersion);
     return provider;
   }
 

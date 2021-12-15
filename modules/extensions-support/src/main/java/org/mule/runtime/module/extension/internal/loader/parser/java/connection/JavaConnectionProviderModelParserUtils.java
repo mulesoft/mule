@@ -55,6 +55,5 @@ public final class JavaConnectionProviderModelParserUtils {
     return connectionType.isAssignableTo(TransactionalConnection.class);
   }
 
-  private JavaConnectionProviderModelParserUtils() {
-  }
+  private JavaConnectionProviderModelParserUtils() {}
 }

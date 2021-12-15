@@ -28,8 +28,7 @@ import org.slf4j.Logger;
  */
 public final class ConnectionUtils {
 
-  private ConnectionUtils() {
-  }
+  private ConnectionUtils() {}
 
   /**
    * Returns the {@link RetryPolicyTemplate} defined in the {@code reconnectionConfig}. If none was specified or the
@@ -63,8 +62,8 @@ public final class ConnectionUtils {
   }
 
   /**
-   * Use this method to obtain the real connection provider in case the supplied {@code connectionProvider}
-   * is a {@link ConnectionProviderWrapper}
+   * Use this method to obtain the real connection provider in case the supplied {@code connectionProvider} is a
+   * {@link ConnectionProviderWrapper}
    *
    * @param connectionProvider a connection provider
    * @param <C>                the connection generic type
@@ -80,10 +79,9 @@ public final class ConnectionUtils {
   }
 
   /**
-   * When performing injecting dependencies or parameter values, the target {@code connectionProvider} might be wrapped
-   * in a {@link ConnectionProviderWrapper} or other types of {@link InjectionTargetDecorator}. Use this method to obtain
-   * the actual instance in which injection needs to happen so that the adapters don't hide the injection targets during
-   * introspection.
+   * When performing injecting dependencies or parameter values, the target {@code connectionProvider} might be wrapped in a
+   * {@link ConnectionProviderWrapper} or other types of {@link InjectionTargetDecorator}. Use this method to obtain the actual
+   * instance in which injection needs to happen so that the adapters don't hide the injection targets during introspection.
    *
    * @param connectionProvider the target connection provider
    * @param <C>                the connection generic type
@@ -101,7 +99,7 @@ public final class ConnectionUtils {
       String maxIdle = pool.getMaxIdle() < 0 ? "unlimited" : String.valueOf(pool.getMaxIdle());
       logger
           .debug("Status for pool {}: {} connections are active out of {} max active limit, {} connections are idle out of {} max idle limit",
-              poolId, pool.getNumActive(), maxActive, pool.getNumIdle(), maxIdle);
+                 poolId, pool.getNumActive(), maxActive, pool.getNumIdle(), maxIdle);
     }
   }
 }

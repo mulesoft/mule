@@ -132,11 +132,11 @@ public abstract class ConnectionProviderObjectBuilder<C>
   }
 
   /**
-   * In order to support {@link org.mule.sdk.api.connectivity.ConnectionProvider} instances, introspection needs to be
-   * deferred to the actual instantiation process so that {@link SdkConnectionProviderAdapter} can be unwrapped.
+   * In order to support {@link org.mule.sdk.api.connectivity.ConnectionProvider} instances, introspection needs to be deferred to
+   * the actual instantiation process so that {@link SdkConnectionProviderAdapter} can be unwrapped.
    * <p>
-   * Therefore, this method always returns an empty list so that no introspection happens on the setup of this builder
-   * but deferred to the first execution of the {@link #build(ResolverSetResult)} method.
+   * Therefore, this method always returns an empty list so that no introspection happens on the setup of this builder but
+   * deferred to the first execution of the {@link #build(ResolverSetResult)} method.
    */
   @Override
   protected List<ValueSetter> createSingleValueSetters(Class<?> prototypeClass, ResolverSet resolverSet) {

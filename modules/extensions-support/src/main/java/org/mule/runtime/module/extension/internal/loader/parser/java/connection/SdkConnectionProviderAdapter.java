@@ -31,9 +31,9 @@ import org.slf4j.Logger;
 /**
  * Adapts a sdk-api {@link org.mule.sdk.api.connectivity.ConnectionProvider} into a mule-api {@link ConnectionProvider}.
  * <p>
- * This adapter acts as a decorator which (if needed) propagates the {@link Lifecycle} and {@link MuleContextAware}
- * signals to the delegate. It also considers the case of the delegate being a pooling or cached provider, in which the
- * returned adapter will also implement the necessary interfaces.
+ * This adapter acts as a decorator which (if needed) propagates the {@link Lifecycle} and {@link MuleContextAware} signals to the
+ * delegate. It also considers the case of the delegate being a pooling or cached provider, in which the returned adapter will
+ * also implement the necessary interfaces.
  * <p>
  * Instances are to be created through the {@link #from(Object)} factory method.
  *
@@ -53,8 +53,8 @@ public class SdkConnectionProviderAdapter<C> implements ConnectionProvider<C>, L
   /**
    * Returns the given {@code connectionProvider} as a {@link ConnectionProvider}, creating an adapter around it if needed.
    * <p>
-   * If the provider is already an adapter or a native {@link ConnectionProvider}, the same instance is returned. Otherwise,
-   * an adapter is created.
+   * If the provider is already an adapter or a native {@link ConnectionProvider}, the same instance is returned. Otherwise, an
+   * adapter is created.
    *
    * @param connectionProvider the instance to be adapted
    * @param <C>                the connection's generic type

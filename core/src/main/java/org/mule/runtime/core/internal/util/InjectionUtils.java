@@ -15,8 +15,7 @@ import org.mule.runtime.core.internal.registry.InjectionTargetDecorator;
  */
 public final class InjectionUtils {
 
-  private InjectionUtils() {
-  }
+  private InjectionUtils() {}
 
   /**
    * Recursively tests the given {@code object} to be an instance of {@link InjectionTargetDecorator} and returns the actual
