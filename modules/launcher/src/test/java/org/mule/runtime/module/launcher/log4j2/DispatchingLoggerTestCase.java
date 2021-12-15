@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -20,19 +22,24 @@ import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.selector.ContextSelector;
 import org.apache.logging.log4j.message.MessageFactory;
+
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
 
   private static final String LOGGER_NAME = DispatchingLoggerTestCase.class.getName();
   private static final String MESSAGE = "Hello Log!";
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   private ClassLoader currentClassLoader;
 
