@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.util.Collections.emptyList;
-import static org.mule.runtime.core.internal.util.InjectionUtils.getInjectionTarget;
+import static org.mule.runtime.core.internal.connection.ConnectionUtils.getInjectionTarget;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.connection.SdkConnectionProviderAdapter.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConnectionProviderFactory;
 
@@ -115,25 +115,29 @@ public abstract class ConnectionProviderObjectBuilder<C>
 
   @Override
   public Pair<ConnectionProvider<C>, ResolverSetResult> build(ResolverSetResult result) throws MuleException {
-    ConnectionProvider<C> value = from(instantiateObject().getFirst());
+    final ConnectionProvider<C> value = from(instantiateObject().getFirst());
+    Object injectionTarget = getInjectionTarget(value);
 
     if (firstBuild) {
       synchronized (this) {
         if (firstBuild) {
-          Class<?> actualClass = value instanceof SdkConnectionProviderAdapter
-              ? ((SdkConnectionProviderAdapter<C>) value).getDelegate().getClass()
-              : value.getClass();
-
-          singleValueSetters = super.createSingleValueSetters(actualClass, resolverSet);
+          singleValueSetters = super.createSingleValueSetters(injectionTarget.getClass(), resolverSet);
           firstBuild = false;
         }
       }
     }
 
-    populate(result, getInjectionTarget(value));
+    populate(result, injectionTarget);
     return new Pair<>(value, result);
   }
 
+  /**
+   * In order to support {@link org.mule.sdk.api.connectivity.ConnectionProvider} instances, introspection needs to be
+   * deferred to the actual instantiation process so that {@link SdkConnectionProviderAdapter} can be unwrapped.
+   * <p>
+   * Therefore, this method always returns an empty list so that no introspection happens on the setup of this builder
+   * but deferred to the first execution of the {@link #build(ResolverSetResult)} method.
+   */
   @Override
   protected List<ValueSetter> createSingleValueSetters(Class<?> prototypeClass, ResolverSet resolverSet) {
     return emptyList();

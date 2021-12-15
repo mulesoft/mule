@@ -24,16 +24,43 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.internal.registry.InjectionTargetDecorator;
 
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 
+/**
+ * Adapts a sdk-api {@link org.mule.sdk.api.connectivity.ConnectionProvider} into a mule-api {@link ConnectionProvider}.
+ * <p>
+ * This adapter acts as a decorator which (if needed) propagates the {@link Lifecycle} and {@link MuleContextAware}
+ * signals to the delegate. It also considers the case of the delegate being a pooling or cached provider, in which the
+ * returned adapter will also implement the necessary interfaces.
+ * <p>
+ * Instances are to be created through the {@link #from(Object)} factory method.
+ *
+ * @param <C> the connection generic type
+ * @since 4.5.0
+ */
 public class SdkConnectionProviderAdapter<C> implements ConnectionProvider<C>, Lifecycle, MuleContextAware,
     InjectionTargetDecorator<org.mule.sdk.api.connectivity.ConnectionProvider<C>> {
 
   private static final Logger LOGGER = getLogger(SdkConnectionProviderAdapter.class);
 
   private final org.mule.sdk.api.connectivity.ConnectionProvider<C> delegate;
+
+  @Inject
   private MuleContext muleContext;
 
+  /**
+   * Returns the given {@code connectionProvider} as a {@link ConnectionProvider}, creating an adapter around it if needed.
+   * <p>
+   * If the provider is already an adapter or a native {@link ConnectionProvider}, the same instance is returned. Otherwise,
+   * an adapter is created.
+   *
+   * @param connectionProvider the instance to be adapted
+   * @param <C>                the connection's generic type
+   * @return a {@link ConnectionProvider}
+   * @throws IllegalArgumentException if {@code connectionProvider} is {@code null} or not a valid connection provider.
+   */
   public static <C> ConnectionProvider<C> from(Object connectionProvider) {
     if (connectionProvider != null) {
       if (connectionProvider instanceof ConnectionProvider) {

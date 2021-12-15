@@ -12,6 +12,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.internal.registry.InjectionTargetDecorator;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.core.internal.util.InjectionUtils;
 
@@ -27,7 +28,8 @@ import org.slf4j.Logger;
  */
 public final class ConnectionUtils {
 
-  private ConnectionUtils() {}
+  private ConnectionUtils() {
+  }
 
   /**
    * Returns the {@link RetryPolicyTemplate} defined in the {@code reconnectionConfig}. If none was specified or the
@@ -60,6 +62,15 @@ public final class ConnectionUtils {
     }
   }
 
+  /**
+   * Use this method to obtain the real connection provider in case the supplied {@code connectionProvider}
+   * is a {@link ConnectionProviderWrapper}
+   *
+   * @param connectionProvider a connection provider
+   * @param <C>                the connection generic type
+   * @return the unwrapped provider
+   * @since 4.5.0
+   */
   public static <C> ConnectionProvider<C> unwrap(ConnectionProvider<C> connectionProvider) {
     while (connectionProvider instanceof ConnectionProviderWrapper) {
       connectionProvider = ((ConnectionProviderWrapper<C>) connectionProvider).getDelegate();
@@ -68,6 +79,17 @@ public final class ConnectionUtils {
     return connectionProvider;
   }
 
+  /**
+   * When performing injecting dependencies or parameter values, the target {@code connectionProvider} might be wrapped
+   * in a {@link ConnectionProviderWrapper} or other types of {@link InjectionTargetDecorator}. Use this method to obtain
+   * the actual instance in which injection needs to happen so that the adapters don't hide the injection targets during
+   * introspection.
+   *
+   * @param connectionProvider the target connection provider
+   * @param <C>                the connection generic type
+   * @return the real injection target
+   * @since 4.5.0
+   */
   public static <C> Object getInjectionTarget(ConnectionProvider<C> connectionProvider) {
     return InjectionUtils.getInjectionTarget(unwrap(connectionProvider));
   }
@@ -79,7 +101,7 @@ public final class ConnectionUtils {
       String maxIdle = pool.getMaxIdle() < 0 ? "unlimited" : String.valueOf(pool.getMaxIdle());
       logger
           .debug("Status for pool {}: {} connections are active out of {} max active limit, {} connections are idle out of {} max idle limit",
-                 poolId, pool.getNumActive(), maxActive, pool.getNumIdle(), maxIdle);
+              poolId, pool.getNumActive(), maxActive, pool.getNumIdle(), maxIdle);
     }
   }
 }
