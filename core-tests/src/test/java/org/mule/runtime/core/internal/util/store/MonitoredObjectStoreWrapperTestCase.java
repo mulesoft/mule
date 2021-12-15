@@ -24,6 +24,7 @@ import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.probe.PollingProber.check;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStore;
@@ -236,7 +237,7 @@ public class MonitoredObjectStoreWrapperTestCase extends AbstractMuleTestCase {
   @Issue("MULE-19992")
   @Description("Tests that private store entries are also expired in secondary nodes in a cluster.")
   public void expirePrivateObjectStoreInSecondaryNode()
-      throws ObjectStoreException, InitialisationException {
+          throws MuleException {
     when(settings.getMaxEntries()).thenReturn(empty());
     when(settings.getEntryTTL()).thenReturn(of(1L));
     when(settings.getExpirationInterval()).thenReturn(1L);
@@ -269,5 +270,7 @@ public class MonitoredObjectStoreWrapperTestCase extends AbstractMuleTestCase {
       assertFalse(objectStore.contains(KEY));
       return true;
     }, "Expiration is not being performed for secondary node."));
+
+    schedulerService.stop();
   }
 }
