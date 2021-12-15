@@ -142,7 +142,6 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
   }
 
   @Test
-  @Ignore("MULE-19988")
   public void testTransactionProfiling() throws Exception {
     getInstance()
         .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));

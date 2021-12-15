@@ -961,7 +961,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   }
 
   @Test
-  @Ignore("MULE-19988")
   public void testProfiling() throws Exception {
     muleContext.start();
     triggerableMessageSource = new TriggerableMessageSource(FAIL);

@@ -19,6 +19,7 @@ import static com.google.common.collect.ImmutableSet.of;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.junit.After;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
@@ -78,12 +79,19 @@ public class ExtensionProfilingDataConsumerTestCase extends AbstractMuleContextT
     profilingService = new TestDefaultProfilingService(logger);
     initialiseIfNeeded(profilingService, muleContext);
     startIfNeeded(profilingService);
+    enableProfilingFeatureTestConsumer(muleContext, EXTENSION_PROFILING_EVENT, true);
   }
+
+  @After
+  public void after() throws Exception {
+    enableProfilingFeatureTestConsumer(muleContext, EXTENSION_PROFILING_EVENT, false);
+  }
+
+
 
   @Test
   @Description("When a profiling event related to an extension is triggered, the data consumers process the data accordingly.")
   public void dataConsumersForComponentProfilingEventAreTriggered() throws Exception {
-    enableProfilingFeatureTestConsumer(muleContext, EXTENSION_PROFILING_EVENT, true);
 
     ProfilingDataProducer<ExtensionProfilingEventContext, Object> dataProducer =
         profilingService.getProfilingDataProducer(EXTENSION_PROFILING_EVENT,
