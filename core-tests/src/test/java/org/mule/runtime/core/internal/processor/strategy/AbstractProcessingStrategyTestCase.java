@@ -317,18 +317,22 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
                                                 PS_OPERATION_EXECUTED, PS_FLOW_MESSAGE_PASSING)));
     when(profilingDataConsumer.getEventContextFilter()).thenReturn(processingStrategyProfilingEventContext -> true);
 
+    setFeaturesState(profiling);
+  }
+
+  private void setFeaturesState(boolean state) throws RegistrationException {
     ProfilingFeatureFlaggingService featureFlaggingService =
         ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(ProfilingFeatureFlaggingService.class);
     featureFlaggingService
-        .toggleProfilingFeature(PS_SCHEDULING_FLOW_EXECUTION, profilingDataConsumer.getClass().getName(), profiling);
-    featureFlaggingService.toggleProfilingFeature(STARTING_FLOW_EXECUTION, profilingDataConsumer.getClass().getName(), profiling);
-    featureFlaggingService.toggleProfilingFeature(FLOW_EXECUTED, profilingDataConsumer.getClass().getName(), profiling);
+        .toggleProfilingFeature(PS_SCHEDULING_FLOW_EXECUTION, profilingDataConsumer.getClass().getName(), state);
+    featureFlaggingService.toggleProfilingFeature(STARTING_FLOW_EXECUTION, profilingDataConsumer.getClass().getName(), state);
+    featureFlaggingService.toggleProfilingFeature(FLOW_EXECUTED, profilingDataConsumer.getClass().getName(), state);
     featureFlaggingService
-        .toggleProfilingFeature(PS_SCHEDULING_OPERATION_EXECUTION, profilingDataConsumer.getClass().getName(), profiling);
+        .toggleProfilingFeature(PS_SCHEDULING_OPERATION_EXECUTION, profilingDataConsumer.getClass().getName(), state);
     featureFlaggingService
-        .toggleProfilingFeature(PS_STARTING_OPERATION_EXECUTION, profilingDataConsumer.getClass().getName(), profiling);
-    featureFlaggingService.toggleProfilingFeature(PS_OPERATION_EXECUTED, profilingDataConsumer.getClass().getName(), profiling);
-    featureFlaggingService.toggleProfilingFeature(PS_FLOW_MESSAGE_PASSING, profilingDataConsumer.getClass().getName(), profiling);
+        .toggleProfilingFeature(PS_STARTING_OPERATION_EXECUTION, profilingDataConsumer.getClass().getName(), state);
+    featureFlaggingService.toggleProfilingFeature(PS_OPERATION_EXECUTED, profilingDataConsumer.getClass().getName(), state);
+    featureFlaggingService.toggleProfilingFeature(PS_FLOW_MESSAGE_PASSING, profilingDataConsumer.getClass().getName(), state);
   }
 
   @Override
@@ -363,7 +367,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     asyncExecutor.assertNoFailures();
 
     cachedThreadPool.shutdownNow();
-    reset(profilingDataConsumer);
+    setFeaturesState(false);
   }
 
   @Test
