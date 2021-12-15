@@ -17,13 +17,14 @@ import static org.mule.runtime.connectivity.internal.platform.schema.SemanticTer
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConnectionProvider;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.connection.JavaConnectionProviderModelParserUtils.isCachedConnectionProvider;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.connection.JavaConnectionProviderModelParserUtils.isDefinedThroughSdkApi;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.connection.JavaConnectionProviderModelParserUtils.isPoolingConnectionProvider;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLibModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
 
-import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
@@ -109,9 +110,9 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
   @Override
   public ConnectionManagementType getConnectionManagementType() {
     ConnectionManagementType managementType = NONE;
-    if (element.isAssignableTo(PoolingConnectionProvider.class)) {
+    if (isPoolingConnectionProvider(element)) {
       managementType = POOLING;
-    } else if (element.isAssignableTo(CachedConnectionProvider.class)) {
+    } else if (isCachedConnectionProvider(element)) {
       managementType = CACHED;
     }
 
@@ -128,7 +129,8 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
 
   @Override
   public boolean supportsConnectivityTesting() {
-    return !element.isAssignableTo(NoConnectivityTest.class);
+    return !element.isAssignableTo(NoConnectivityTest.class)
+        && !element.isAssignableTo(org.mule.runtime.extension.api.connectivity.NoConnectivityTest.class);
   }
 
   @Override
@@ -171,7 +173,11 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
   }
 
   private void collectAdditionalModelProperties() {
-    List<Type> providerGenerics = element.getSuperTypeGenerics(ConnectionProvider.class);
+    Class<?> baseInterface = isDefinedThroughSdkApi(element)
+        ? org.mule.sdk.api.connectivity.ConnectionProvider.class
+        : ConnectionProvider.class;
+
+    List<Type> providerGenerics = element.getSuperTypeGenerics(baseInterface);
 
     if (providerGenerics.size() != 1) {
       // TODO: MULE-9220: Add a syntax validator for this

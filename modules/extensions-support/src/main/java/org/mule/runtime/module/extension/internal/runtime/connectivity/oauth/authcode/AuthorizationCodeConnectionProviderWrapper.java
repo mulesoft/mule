@@ -40,7 +40,7 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
 
   private final AuthorizationCodeConfig oauthConfig;
   private final AuthorizationCodeOAuthHandler oauthHandler;
-  private final FieldSetter<ConnectionProvider<C>, AuthorizationCodeState> authCodeStateSetter;
+  private final FieldSetter<Object, AuthorizationCodeState> authCodeStateSetter;
   private final RunOnce dance;
 
   private AuthorizationCodeOAuthDancer dancer;
@@ -53,7 +53,8 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
     super(delegate, reconnectionConfig, callbackValues);
     this.oauthConfig = oauthConfig;
     this.oauthHandler = oauthHandler;
-    authCodeStateSetter = getOAuthStateSetter(delegate, AuthorizationCodeState.class, oauthConfig.getGrantType());
+    authCodeStateSetter =
+        getOAuthStateSetter(getDelegateForInjection(), AuthorizationCodeState.class, oauthConfig.getGrantType());
     dance = Once.of(this::updateAuthState);
   }
 
@@ -64,7 +65,7 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
   }
 
   private void updateAuthState() {
-    final ConnectionProvider<C> delegate = getDelegate();
+    final Object delegate = getDelegateForInjection();
     ResourceOwnerOAuthContext context = getContext();
     authCodeStateSetter
         .set(delegate, new UpdatingAuthorizationCodeState(oauthConfig,

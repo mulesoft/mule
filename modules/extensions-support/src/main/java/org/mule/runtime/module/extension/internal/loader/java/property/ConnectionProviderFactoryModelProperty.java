@@ -25,8 +25,7 @@ public final class ConnectionProviderFactoryModelProperty implements ModelProper
    * 
    * @param connectionProviderFactory a {@link ConnectionProviderFactory}
    */
-  public ConnectionProviderFactoryModelProperty(
-                                                ConnectionProviderFactory connectionProviderFactory) {
+  public ConnectionProviderFactoryModelProperty(ConnectionProviderFactory connectionProviderFactory) {
     this.connectionProviderFactory = connectionProviderFactory;
   }
 

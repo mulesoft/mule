@@ -28,6 +28,7 @@ import static com.google.common.collect.ImmutableSet.of;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.junit.After;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -108,13 +109,18 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
     when(identifier.getName()).thenReturn("test");
     when(identifier.getNamespace()).thenReturn("test");
     profilingService = getTestProfilingService();
-    enableProfilingFeatures();
+    setProfilingFeatureStatus(true);
   }
 
-  private void enableProfilingFeatures() {
+  @After
+  public void after() throws Exception {
+    setProfilingFeatureStatus(false);
+  }
+
+  private void setProfilingFeatureStatus(boolean status) {
     eventType().forEach(eventType -> {
       try {
-        enableProfilingFeatureTestConsumer(muleContext, eventType, true);
+        enableProfilingFeatureTestConsumer(muleContext, eventType, status);
       } catch (Exception e) {
         throw new RuntimeException(e);
       }

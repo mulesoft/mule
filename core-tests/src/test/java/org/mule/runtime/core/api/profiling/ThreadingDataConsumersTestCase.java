@@ -28,6 +28,7 @@ import com.google.gson.Gson;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -105,15 +106,20 @@ public class ThreadingDataConsumersTestCase extends AbstractMuleContextTestCase 
     when(identifier.getName()).thenReturn("test");
     when(identifier.getNamespace()).thenReturn("test");
     profilingService = getTestProfilingService();
-    enableProfilingFeatures();
+    setProfilingFeatureStatus(true);
   }
 
-  private void enableProfilingFeatures() {
+  @After
+  public void after() throws Exception {
+    setProfilingFeatureStatus(false);
+  }
+
+  private void setProfilingFeatureStatus(boolean status) {
     eventType().forEach(eventType -> {
       try {
-        enableProfilingFeatureTestConsumer(muleContext, eventType, true);
+        enableProfilingFeatureTestConsumer(muleContext, eventType, status);
       } catch (Exception e) {
-        throw new RuntimeException();
+        throw new RuntimeException(e);
       }
     });
   }

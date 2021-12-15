@@ -21,8 +21,8 @@ import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
-import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
+import org.mule.sdk.api.connectivity.TransactionalConnection;
+import org.mule.sdk.api.connectivity.XATransactionalConnection;
 
 import java.util.function.Supplier;
 
