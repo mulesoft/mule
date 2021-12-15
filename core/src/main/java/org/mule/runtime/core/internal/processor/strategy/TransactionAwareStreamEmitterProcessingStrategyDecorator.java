@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
@@ -43,7 +40,6 @@ import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
-import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -137,15 +133,9 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
     String artifactType = muleContext.getArtifactType().getAsString();
 
     Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transfomer =
-        new Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext>() {
-
-          @Override
-          public ComponentProcessingStrategyProfilingEventContext apply(CoreEvent coreEvent) {
-            return new DefaultComponentProcessingStrategyProfilingEventContext(coreEvent, getLocation(processor),
-                                                                               Thread.currentThread().getName(), artifactId,
-                                                                               artifactType, currentTimeMillis());
-          }
-        };
+        coreEvent -> new DefaultComponentProcessingStrategyProfilingEventContext(coreEvent, getLocation(processor),
+                                                                                 Thread.currentThread().getName(), artifactId,
+                                                                                 artifactType, currentTimeMillis());
 
     return pub -> subscriberContext()
         .flatMapMany(ctx -> {
