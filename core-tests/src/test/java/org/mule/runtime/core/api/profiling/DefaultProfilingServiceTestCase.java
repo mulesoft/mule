@@ -31,6 +31,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.junit.After;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
@@ -48,6 +49,7 @@ import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessi
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentThreadingDataConsumer;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.notification.ProfilingNotification;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.HashMap;
@@ -103,6 +105,17 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
     startIfNeeded(profilingService);
     profilingService.registerProfilingDataProducer(TestProfilingEventType.TEST_PROFILING_EVENT_TYPE,
                                                    new TestProfilingDataProducer(profilingService));
+    setTestFeatureStatus(true);
+  }
+
+  @After
+  public void after() throws MuleException {
+    setTestFeatureStatus(false);
+  }
+
+  private void setTestFeatureStatus(boolean status) throws RegistrationException {
+    enableProfilingFeatureTestConsumer(muleContext, EXTENSION_PROFILING_EVENT, status);
+    enableProfilingFeatureTestConsumer(muleContext, STARTING_OPERATION_EXECUTION, status);
   }
 
   @Test
@@ -147,8 +160,6 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
   @Test
   @Description("When a generic component profiling event is produced a notification is triggered if it is enabled for a consumer")
   public void notificationTriggeredOnComponentProfilingEvent() throws Exception {
-    enableProfilingFeatureTestConsumer(muleContext, EXTENSION_PROFILING_EVENT, true);
-
     ProfilingDataProducer<ExtensionProfilingEventContext, Object> profilingDataProducer =
         profilingService.getProfilingDataProducer(EXTENSION_PROFILING_EVENT);
     profilingDataProducer
@@ -160,8 +171,6 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
   @Test
   @Description("When a operation started event is produced, then a notification is triggered")
   public void notificationTriggeredOnOperationStartedEvent() throws Exception {
-    enableProfilingFeatureTestConsumer(muleContext, STARTING_OPERATION_EXECUTION, true);
-
     ProfilingDataProducer<ComponentThreadingProfilingEventContext, Object> profilingDataProducer =
         profilingService.getProfilingDataProducer(STARTING_OPERATION_EXECUTION);
     profilingDataProducer.triggerProfilingEvent(mock(ComponentThreadingProfilingEventContext.class));
