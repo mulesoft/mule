@@ -6,28 +6,34 @@
  */
 package org.mule.test.module.extension.connector;
 
-import static java.util.Collections.singletonMap;
+import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
+
 import static java.util.Optional.empty;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
-import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.Aquarium;
 import org.mule.test.petstore.extension.ExclusiveCashier;
 import org.mule.test.petstore.extension.ExclusivePetBreeder;
 import org.mule.test.petstore.extension.PetStoreDeal;
 
-import java.util.Map;
+import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
+
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -43,9 +49,17 @@ public class PetStoreExclusiveParameterRequiredWithNullExpressionTestCase extend
   private ConfigurationProperties configProperties;
 
   @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    doReturn(empty()).when(configProperties).resolveBooleanProperty(anyString());
-    return singletonMap(OBJECT_CONFIGURATION_PROPERTIES, configProperties);
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    builders.add(new AbstractConfigurationBuilder() {
+
+      @Override
+      public void doConfigure(MuleContext muleContext) throws ConfigurationException {
+        doReturn(empty()).when(configProperties).resolveBooleanProperty(anyString());
+        muleContext.getCustomizationService().overrideDefaultServiceImpl(OBJECT_CONFIGURATION_PROPERTIES, configProperties);
+      }
+    });
+
+    super.addBuilders(builders);
   }
 
   @Override

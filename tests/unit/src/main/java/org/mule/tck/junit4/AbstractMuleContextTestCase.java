@@ -6,19 +6,6 @@
  */
 package org.mule.tck.junit4;
 
-import static java.lang.Thread.currentThread;
-import static java.lang.Thread.sleep;
-import static java.lang.reflect.Proxy.getInvocationHandler;
-import static java.lang.reflect.Proxy.isProxyClass;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.AbstractComponent.ANNOTATION_NAME;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
@@ -32,6 +19,21 @@ import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+
+import static java.lang.Thread.currentThread;
+import static java.lang.Thread.sleep;
+import static java.lang.reflect.Proxy.getInvocationHandler;
+import static java.lang.reflect.Proxy.isProxyClass;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -47,7 +49,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
@@ -57,6 +58,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuilder;
+import org.mule.runtime.core.internal.config.builders.ServiceCustomizationsConfigurationBuilder;
 import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.tck.SensingNullMessageProcessor;
@@ -278,7 +280,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
         MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
         List<ConfigurationBuilder> builders = new ArrayList<>();
-        builders.add(new SimpleConfigurationBuilder(getStartUpRegistryObjects()));
+        builders.add(new ServiceCustomizationsConfigurationBuilder(getStartUpRegistryObjects()));
         addBuilders(builders);
         builders.add(new MockExtensionManagerConfigurationBuilder());
         builders.add(getBuilder());

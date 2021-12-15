@@ -52,6 +52,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.SchedulerContainerPoolsConfig;
 import org.mule.runtime.api.store.ObjectStore;
@@ -62,6 +63,8 @@ import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.cluster.DefaultClusterService;
+import org.mule.runtime.core.internal.config.CustomService;
+import org.mule.runtime.core.internal.config.CustomServiceRegistry;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.internal.connection.DefaultConnectivityTesterFactory;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
@@ -96,6 +99,8 @@ import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 
+import java.util.Map.Entry;
+
 /**
  * Configures defaults required by Mule. This configuration builder is used to configure mule with these defaults when no other
  * ConfigurationBuilder that sets these is being used. This is used by both AbstractMuleTestCase and MuleClient. <br>
@@ -119,6 +124,19 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
     configureQueueManager(muleContext);
 
     registry.registerObject(OBJECT_MULE_CONTEXT, muleContext);
+
+    for (Entry<String, CustomService> entry : ((CustomServiceRegistry) (muleContext.getCustomizationService()))
+        .getCustomServices()
+        .entrySet()) {
+      entry.getValue().getServiceImpl().ifPresent(s -> {
+        try {
+          registerObject(entry.getKey(), s, muleContext);
+        } catch (RegistrationException e) {
+          throw new MuleRuntimeException(e);
+        }
+      });
+    }
+
     registerObject(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager(), muleContext);
 
     registerObject(BASE_IN_MEMORY_OBJECT_STORE_KEY, createDefaultInMemoryObjectStore(), muleContext);
