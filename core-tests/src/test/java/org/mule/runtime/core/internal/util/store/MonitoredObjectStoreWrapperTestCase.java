@@ -237,7 +237,7 @@ public class MonitoredObjectStoreWrapperTestCase extends AbstractMuleTestCase {
   @Issue("MULE-19992")
   @Description("Tests that private store entries are also expired in secondary nodes in a cluster.")
   public void expirePrivateObjectStoreInSecondaryNode()
-          throws MuleException {
+      throws MuleException {
     when(settings.getMaxEntries()).thenReturn(empty());
     when(settings.getEntryTTL()).thenReturn(of(1L));
     when(settings.getExpirationInterval()).thenReturn(1L);
