@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -20,19 +22,25 @@ import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.selector.ContextSelector;
 import org.apache.logging.log4j.message.MessageFactory;
+
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
 
   private static final String LOGGER_NAME = DispatchingLoggerTestCase.class.getName();
+
   private static final String MESSAGE = "Hello Log!";
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   private ClassLoader currentClassLoader;
 
@@ -43,23 +51,32 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
   private Logger originalLogger;
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private LoggerContext loggerContext;
+  private LoggerContext containerLoggerContext;
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private ContextSelector contextSelector;
 
+  @Mock
+  private ArtifactAwareContextSelector artifactAwareContextSelector;
+
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private MessageFactory messageFactory;
+
+  @Mock
+  RegionClassLoader regionClassLoader;
+
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  LoggerContext regionClassLoaderLoggerContext;
 
   private Logger logger;
 
   @Before
   public void before() {
     currentClassLoader = Thread.currentThread().getContextClassLoader();
-    when(loggerContext.getConfiguration().getLoggerConfig(anyString()).getLevel()).thenReturn(Level.INFO);
-
+    when(containerLoggerContext.getConfiguration().getLoggerConfig(anyString()).getLevel()).thenReturn(Level.INFO);
     logger =
-        new DispatchingLogger(originalLogger, currentClassLoader.hashCode(), loggerContext, contextSelector, messageFactory) {
+        new DispatchingLogger(originalLogger, currentClassLoader.hashCode(), containerLoggerContext, contextSelector,
+                              messageFactory) {
 
           @Override
           public String getName() {
@@ -90,4 +107,5 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
       verify(contextSelector).getContext(LOGGER_NAME, regionClassLoader, true);
     });
   }
+
 }
