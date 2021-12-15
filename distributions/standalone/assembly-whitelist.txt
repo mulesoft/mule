@@ -80,7 +80,7 @@
 /mule-standalone-${productVersion}/lib/boot/README.txt
 /mule-standalone-${productVersion}/lib/boot/wrapper-3.2.3.jar
 /mule-standalone-${productVersion}/lib/boot/wrapper-windows-x86-32.dll
-/mule-standalone-${productVersion}/lib/boot/disruptor-3.3.0.jar
+/mule-standalone-${productVersion}/lib/boot/disruptor-3.4.2.jar
 /mule-standalone-${productVersion}/lib/boot/jcl-over-slf4j-1.7.24.jar
 /mule-standalone-${productVersion}/lib/boot/log4j-1.2-api-2.12.2.jar
 /mule-standalone-${productVersion}/lib/boot/log4j-api-2.12.2.jar

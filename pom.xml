@@ -221,7 +221,7 @@
         <jythonVersion>2.7.2b2</jythonVersion>
         <jrubyVersion>9.2.14.0</jrubyVersion>
         <log4jVersion>2.12.2</log4jVersion>
-        <disruptorVersion>3.3.0</disruptorVersion>
+        <disruptorVersion>3.4.2</disruptorVersion>
         <mockitoVersion>1.10.19</mockitoVersion>
         <muleExtensionsApiVersion>1.0.0-alpha-1</muleExtensionsApiVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
