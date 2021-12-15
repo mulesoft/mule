@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
+import static org.mule.runtime.core.internal.connection.ConnectionUtils.getInjectionTarget;
 import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
 
@@ -21,7 +23,6 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.internal.connection.ConfigNameResolverConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ErrorTypeHandlerConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.PoolingConnectionProviderWrapper;
@@ -79,9 +80,8 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
 
   protected ConnectionProvider<C> doBuild(ResolverSetResult result) throws MuleException {
     ConnectionProvider<C> provider = super.build(result).getFirst();
-    String muleversion = MuleExtensionModelProvider.MULE_VERSION;
-    MuleVersion muleVersion = new MuleVersion(muleversion);
-    injectFields(providerModel, provider, ownerConfigName, muleContext.getConfiguration().getDefaultEncoding(), muleVersion);
+    MuleVersion muleVersion = new MuleVersion(MULE_VERSION);
+    injectFields(providerModel, getInjectionTarget(provider), ownerConfigName, muleContext.getConfiguration().getDefaultEncoding(), muleVersion);
     return provider;
   }
 

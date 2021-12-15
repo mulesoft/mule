@@ -13,6 +13,7 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.util.InjectionUtils;
 
 import java.util.Optional;
 
@@ -65,6 +66,10 @@ public final class ConnectionUtils {
     }
 
     return connectionProvider;
+  }
+
+  public static <C> Object getInjectionTarget(ConnectionProvider<C> connectionProvider) {
+    return InjectionUtils.getInjectionTarget(unwrap(connectionProvider));
   }
 
   public static <C> void logPoolStatus(Logger logger, GenericObjectPool<C> pool, String poolId) {

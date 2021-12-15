@@ -14,8 +14,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.internal.connection.ConnectionUtils.unwrap;
-import static org.mule.runtime.core.internal.util.InjectionUtils.getInjectionTarget;
+import static org.mule.runtime.core.internal.connection.ConnectionUtils.getInjectionTarget;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.config.PoolingProfile;
@@ -92,7 +91,7 @@ public abstract class AbstractConnectionProviderWrapper<C> implements Connection
     if (delegateForInjection == null) {
       synchronized (this) {
         if (delegateForInjection == null) {
-          delegateForInjection = getInjectionTarget(unwrap(delegate));
+          delegateForInjection = getInjectionTarget(delegate);
         }
       }
     }
