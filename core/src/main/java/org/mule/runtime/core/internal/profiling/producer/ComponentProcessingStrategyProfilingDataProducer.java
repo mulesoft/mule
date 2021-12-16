@@ -31,18 +31,16 @@ public class ComponentProcessingStrategyProfilingDataProducer
 
   private final DefaultProfilingService defaultProfilingService;
   private final ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType;
-  private final ProfilingFeatureFlaggingService featureFlaggingService;
-  private ProfilingDataProducerStatus profilingProducerStatus;
+  private final ProfilingDataProducerStatus profilingProducerStatus;
 
   public ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService defaultProfilingService,
                                                           ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType,
-                                                          ProfilingProducerScope profilingProducerContext,
+                                                          ProfilingProducerScope profilingProducerScope,
                                                           ProfilingFeatureFlaggingService featureFlaggingService) {
     this.defaultProfilingService = defaultProfilingService;
     this.profilingEventType = profilingEventType;
     this.profilingProducerStatus =
-        featureFlaggingService.getProfilingDataProducerStatus(profilingEventType, profilingProducerContext);
-    this.featureFlaggingService = featureFlaggingService;
+        featureFlaggingService.getProfilingDataProducerStatus(profilingEventType, profilingProducerScope);
   }
 
   @Override
@@ -62,6 +60,6 @@ public class ComponentProcessingStrategyProfilingDataProducer
 
   @Override
   public void reset() {
-    this.profilingProducerStatus.reset();
+    profilingProducerStatus.reset();
   }
 }

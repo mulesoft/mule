@@ -34,6 +34,7 @@ import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.TaskSchedulingProfilingEventContext;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.tracing.DefaultComponentMetadata;
 import org.mule.runtime.core.internal.profiling.tracing.DefaultExecutionContext;
@@ -136,7 +137,7 @@ public class TaskSchedulingLoggerDataConsumerTestCase extends AbstractMuleContex
   @Test
   @Description("When a profiling event related to task scheduling is triggered, the data consumer logs the data accordingly.")
   public void dataConsumerLogs() {
-    ProfilingDataProducer<TaskSchedulingProfilingEventContext> dataProducer =
+    ProfilingDataProducer<TaskSchedulingProfilingEventContext, ?> dataProducer =
         profilingService.getProfilingDataProducer(profilingEventType);
     dataProducer.triggerProfilingEvent(profilingEventContext);
     verify(logger).debug(jsonToLog(profilingEventType, profilingEventContext));
@@ -146,7 +147,7 @@ public class TaskSchedulingLoggerDataConsumerTestCase extends AbstractMuleContex
   @Description("When a profiling event related to task scheduling is triggered, the data consumer filter events with empty execution context.")
   public void dataConsumerFilter() {
     when(profilingEventContext.getTaskTracingContext()).thenReturn(null);
-    ProfilingDataProducer<TaskSchedulingProfilingEventContext> dataProducer =
+    ProfilingDataProducer<TaskSchedulingProfilingEventContext, ?> dataProducer =
         profilingService.getProfilingDataProducer(profilingEventType);
     dataProducer.triggerProfilingEvent(profilingEventContext);
     verifyZeroInteractions(logger);

@@ -41,7 +41,6 @@ public class CpuLiteNonBlockingProcessingStrategyEnricher implements ReactivePro
   public ReactiveProcessor enrich(ReactiveProcessor processor) {
     return processingStrategyReactiveProcessorFrom(processor, liteSchedulerSupplier.get(), artifactId, artifactType)
         .withProfilingService(profilingService)
-        .withTaskTracing(featureFlaggingService.isEnabled(MuleRuntimeFeature.ENABLE_PROFILING_SERVICE))
         .build();
   }
 }

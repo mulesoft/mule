@@ -25,10 +25,13 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
-import org.reactivestreams.Publisher;
+import org.mule.runtime.core.internal.profiling.tracing.DefaultComponentMetadata;
+import org.mule.runtime.core.internal.profiling.tracing.DefaultExecutionContext;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Builder for a {@link ReactiveProcessor} that enriches a pipeline {@link ReactiveProcessor} with processing strategy logic. The
@@ -95,6 +98,7 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
                                                                                                   ReactorPublisherBuilder<T> publisher) {
 
     ComponentLocation location = getLocation(pipeline);
+
     ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> psSchedulingFlowExecutionDataProducer =
         dataProducerFromProfilingService(PS_SCHEDULING_FLOW_EXECUTION);
     ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> startingFlowExecutionDataproducer =
@@ -102,19 +106,22 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
     ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> flowExecutedDataProducer =
         dataProducerFromProfilingService(FLOW_EXECUTED);
 
-    Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transfomer =
-        coreEvent -> new DefaultComponentProcessingStrategyProfilingEventContext(coreEvent, getLocation(pipeline),
+    Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transformer =
+        coreEvent -> new DefaultComponentProcessingStrategyProfilingEventContext(coreEvent, location,
                                                                                  Thread.currentThread().getName(), artifactId,
                                                                                  artifactType, currentTimeMillis());
 
     return publisher
-        .setTracingContext(profilingService, artifactId, artifactType, location)
-        .profileProcessingStrategyEvent(profilingService, psSchedulingFlowExecutionDataProducer, transfomer)
+        .setTracingContext(profilingService,
+                           coreEvent -> new DefaultExecutionContext(new DefaultComponentMetadata(coreEvent.getCorrelationId(),
+                                                                                                 artifactId, artifactType,
+                                                                                                 location)))
+        .profileProcessingStrategyEvent(profilingService, psSchedulingFlowExecutionDataProducer, transformer)
         .publishOn(ofNullable(scheduler))
-        .profileProcessingStrategyEvent(profilingService, startingFlowExecutionDataproducer, transfomer)
+        .profileProcessingStrategyEvent(profilingService, startingFlowExecutionDataproducer, transformer)
         .doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
         .transform(pipeline)
-        .profileProcessingStrategyEvent(profilingService, flowExecutedDataProducer, transfomer);
+        .profileProcessingStrategyEvent(profilingService, flowExecutedDataProducer, transformer);
   }
 
   private ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> dataProducerFromProfilingService(

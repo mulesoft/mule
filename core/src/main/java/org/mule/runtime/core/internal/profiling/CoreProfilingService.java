@@ -12,6 +12,7 @@ import org.mule.runtime.api.profiling.ProfilingService;
 
 import java.util.function.Function;
 
+import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -52,4 +53,7 @@ public interface CoreProfilingService extends ProfilingService {
                                                                             ProfilingDataProducer<T, S> dataProducer,
                                                                             Function<S, T> transformer);
 
+  <S> Mono<S> setCurrentExecutionContext(Mono<S> original, Function<S, ExecutionContext> executionContextSupplier);
+
+  <S> Flux<S> setCurrentExecutionContext(Flux<S> original, Function<S, ExecutionContext> executionContextSupplier);
 }

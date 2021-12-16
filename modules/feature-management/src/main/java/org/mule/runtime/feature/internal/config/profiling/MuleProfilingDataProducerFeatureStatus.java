@@ -52,7 +52,7 @@ public class MuleProfilingDataProducerFeatureStatus implements ProfilingDataProd
 
   @Override
   public boolean isEnabled() {
-    return profilingFeaturesStates.stream().anyMatch(profilingFeatureState -> profilingFeatureState.isEnabled());
+    return profilingFeaturesStates.stream().anyMatch(FeatureState::isEnabled);
   }
 
   @Override

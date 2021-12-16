@@ -7,22 +7,14 @@
 
 package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 
-import static org.mule.runtime.core.internal.profiling.ThreadProfilingContext.currentThreadProfilingContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.CoreProfilingService;
-import org.mule.runtime.api.profiling.ProfilingService;
-import org.mule.runtime.api.profiling.tracing.TracingContext;
-import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
-import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.internal.profiling.OperationMetadata;
-import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
-import org.mule.runtime.core.internal.profiling.tracing.DefaultComponentMetadata;
-import org.mule.runtime.core.internal.profiling.tracing.DefaultExecutionContext;
 
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
@@ -89,13 +81,12 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
    */
   ReactorPublisherBuilder<T> doOnSubscribe(Consumer<? super Subscription> onSubscribe);
 
-  ReactorPublisherBuilder<T> setTracingContext(ProfilingService profilingService, String artifactId, String artifactType,
-                                               ComponentLocation componentLocation);
+  ReactorPublisherBuilder<T> profileProcessingStrategyEvent(CoreProfilingService profilingService,
+                                                            ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> dataProducer,
+                                                            Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transformer);
 
-  ReactorPublisherBuilder<T> profileProcessingStrategyEvent(ComponentLocation location,
-                                                            Optional<? extends ProfilingDataProducer> dataProducer,
-                                                            String artifactId,
-                                                            String artifactType);
+  ReactorPublisherBuilder<T> setTracingContext(CoreProfilingService profilingService,
+                                               Function<CoreEvent, ExecutionContext> executionContextSupplier);
 
   T build();
 
@@ -146,18 +137,6 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     }
 
     @Override
-    public ReactorPublisherBuilder<Mono<CoreEvent>> setTracingContext(ProfilingService profilingService,
-                                                                      String artifactId, String artifactType,
-                                                                      ComponentLocation componentLocation) {
-      if (profilingService != null) {
-        mono =
-            mono.doOnNext(coreEvent -> setTracingContext(profilingService, artifactId, artifactType, componentLocation,
-                                                         coreEvent));
-      }
-      return this;
-    }
-
-    @Override
     public ReactorPublisherBuilder<Mono<CoreEvent>> profileProcessingStrategyEvent(CoreProfilingService profilingService,
                                                                                    ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> dataProducer,
                                                                                    Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transformer) {
@@ -165,7 +144,15 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
       return this;
     }
 
+    @Override
+    public ReactorPublisherBuilder<Mono<CoreEvent>> setTracingContext(CoreProfilingService profilingService,
+                                                                      Function<CoreEvent, ExecutionContext> executionContextSupplier) {
+      mono = profilingService.setCurrentExecutionContext(mono, executionContextSupplier);
+      return this;
+    }
+
   }
+
 
   /**
    * Builder for a {@link Flux}.
@@ -214,44 +201,19 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     }
 
     @Override
-    public ReactorPublisherBuilder<Flux<CoreEvent>> setTracingContext(ProfilingService profilingService, String artifactId,
-                                                                      String artifactType,
-                                                                      ComponentLocation componentLocation) {
-      if (profilingService != null) {
-        flux =
-            flux.doOnNext(coreEvent -> setTracingContext(profilingService, artifactId, artifactType, componentLocation,
-                                                         coreEvent));
-      }
+    public ReactorPublisherBuilder<Flux<CoreEvent>> profileProcessingStrategyEvent(CoreProfilingService profilingService,
+                                                                                   ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> dataProducer,
+                                                                                   Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transformer) {
+      flux = profilingService.enrichWithProfilingEventFlux(flux, dataProducer, transformer);
       return this;
     }
 
     @Override
-    public ReactorPublisherBuilder<Flux<CoreEvent>> profileProcessingStrategyEvent(ComponentLocation location,
-                                                                                   Optional<? extends ProfilingDataProducer> dataProducer,
-                                                                                   String artifactId, String artifactType) {
-      flux =
-          dataProducer.map(dp -> flux.doOnNext(e -> doProfileProcessingStrategyEvent(location, artifactId, artifactType, dp, e)))
-              .orElse(flux);
+    public ReactorPublisherBuilder<Flux<CoreEvent>> setTracingContext(CoreProfilingService profilingService,
+                                                                      Function<CoreEvent, ExecutionContext> executionContextSupplier) {
+      flux = profilingService.setCurrentExecutionContext(flux, executionContextSupplier);
       return this;
     }
 
-  default void setTracingContext(ProfilingService profilingService, String artifactId, String artifactType,
-                                 ComponentLocation componentLocation, CoreEvent coreEvent) {
-    ExecutionContext executionContext =
-        new DefaultExecutionContext(new DefaultComponentMetadata(coreEvent.getCorrelationId(), artifactId,
-                                                                 artifactType, componentLocation));
-    profilingService.getTracingService().setCurrentExecutionContext(executionContext);
-  }
-
-  static void doProfileProcessingStrategyEvent(ComponentLocation componentLocation, String artifactId, String artifactType,
-                                               ProfilingDataProducer dp,
-                                               CoreEvent e) {
-    dp.triggerProfilingEvent(new DefaultComponentProcessingStrategyProfilingEventContext(e,
-                                                                                         componentLocation,
-                                                                                         currentThread()
-                                                                                             .getName(),
-                                                                                         artifactId,
-                                                                                         artifactType,
-                                                                                         currentTimeMillis()));
   }
 }

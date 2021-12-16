@@ -46,7 +46,6 @@ public class CpuLiteAsyncNonBlockingProcessingStrategyEnricher implements Reacti
     return processingStrategyReactiveProcessorFrom(processor, liteSchedulerSupplier.get(), artifactId, artifactType)
         .withCallbackScheduler(nonBlockingSchedulerSupplier.get())
         .withProfilingService(profilingService)
-        .withTaskTracing(featureFlaggingService.isEnabled(ENABLE_PROFILING_SERVICE))
         .build();
   }
 }

@@ -60,7 +60,6 @@ public class ProactorProcessingStrategyEnricher implements ReactiveProcessorEnri
     return processingStrategyReactiveProcessorFrom(processor, contextSchedulerSupplier.get(), artifactId, artifactType)
         .withDispatcherScheduler(schedulerDecorator.apply(contextSchedulerSupplier.get()))
         .withProfilingService(profilingService)
-        .withTaskTracing(featureFlaggingService.isEnabled(MuleRuntimeFeature.ENABLE_PROFILING_SERVICE))
         .withParallelism(getChainParallelism(processor))
         .build();
   }
