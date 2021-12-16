@@ -48,8 +48,6 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
-import reactor.util.context.Context;
-
 /**
  * Decorates a {@link ProcessingStrategy} so that processing takes place on the current thread in the event of a transaction being
  * active.
