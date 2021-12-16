@@ -73,7 +73,6 @@ import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
@@ -83,6 +82,7 @@ import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ResultTransformer;
 import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionMediator;
+import org.mule.sdk.api.runtime.exception.ExceptionHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;

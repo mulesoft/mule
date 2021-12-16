@@ -25,7 +25,6 @@ import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
@@ -125,7 +124,7 @@ public final class JavaErrorModelParserUtils {
 
     return classValue
         .flatMap(c -> c.getDeclaringClass())
-        .map(clazz -> new ExceptionHandlerModelProperty(new DefaultExceptionHandlerFactory((Class<? extends ExceptionHandler>) clazz)));
+        .map(clazz -> new ExceptionHandlerModelProperty(new DefaultExceptionHandlerFactory(clazz)));
   }
 
   private static List<ErrorModelParser> parseErrorTypeDefinitions(Type type) {

@@ -28,6 +28,7 @@ import org.mule.runtime.extension.api.annotation.license.RequiresEntitlement;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.ClassValue;
@@ -57,6 +58,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.api.loader.java.type.WithOperationContainers;
 import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
+import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
@@ -438,6 +440,33 @@ public final class JavaExtensionModelParserUtils {
       toRemoveIn = null;
     }
     return new ImmutableDeprecationModel(message, since, toRemoveIn);
+  }
+
+  public static Optional<MediaTypeModelProperty> getMediaTypeModelProperty(WithAnnotations element,
+                                                                           String elementType,
+                                                                           String elementName) {
+    Optional<String> stringValue = mapReduceSingleAnnotation(
+                                                             element,
+                                                             elementType,
+                                                             elementName,
+                                                             MediaType.class,
+                                                             org.mule.sdk.api.annotation.param.MediaType.class,
+                                                             ann -> ann.getStringValue(MediaType::value),
+                                                             ann -> ann
+                                                                 .getStringValue(org.mule.sdk.api.annotation.param.MediaType::value));
+
+    Optional<Boolean> booleanValue = mapReduceSingleAnnotation(
+                                                               element,
+                                                               elementType,
+                                                               elementName,
+                                                               MediaType.class,
+                                                               org.mule.sdk.api.annotation.param.MediaType.class,
+                                                               ann -> ann.getBooleanValue(MediaType::strict),
+                                                               ann -> ann
+                                                                   .getBooleanValue(org.mule.sdk.api.annotation.param.MediaType::strict));
+
+
+    return stringValue.flatMap(str -> booleanValue.map(bool -> new MediaTypeModelProperty(str, bool)));
   }
 
 }

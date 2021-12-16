@@ -403,8 +403,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   @Override
   public Optional<MediaTypeModelProperty> getMediaTypeModelProperty() {
-    return operationElement.getAnnotation(MediaType.class)
-        .map(a -> new MediaTypeModelProperty(a.value(), a.strict()));
+    return JavaExtensionModelParserUtils.getMediaTypeModelProperty(operationElement, "Operation", getName());
   }
 
   @Override

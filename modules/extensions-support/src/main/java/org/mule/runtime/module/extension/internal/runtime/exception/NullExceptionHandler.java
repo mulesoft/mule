@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.exception;
 
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
+import org.mule.sdk.api.runtime.exception.ExceptionHandler;
 
 public final class NullExceptionHandler extends ExceptionHandler {
 

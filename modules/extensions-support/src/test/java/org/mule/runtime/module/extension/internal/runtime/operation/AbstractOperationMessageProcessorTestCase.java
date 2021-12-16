@@ -97,7 +97,7 @@ import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
+import org.mule.runtime.extension.api.runtime.exception.SdkExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
@@ -183,7 +183,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   protected Object configuration;
 
   @Mock(lenient = true)
-  protected ExceptionHandlerFactory exceptionHandlerFactory;
+  protected SdkExceptionHandlerFactory exceptionHandlerFactory;
 
   @Mock(lenient = true)
   protected MetadataResolverFactory metadataResolverFactory;

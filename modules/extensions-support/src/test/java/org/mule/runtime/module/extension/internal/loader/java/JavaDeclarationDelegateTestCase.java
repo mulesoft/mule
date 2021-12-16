@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.loader.java;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.valueOf;
 import static java.util.Arrays.asList;
-import static java.util.Arrays.stream;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -42,6 +41,7 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.DIS
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_ALL_NODES;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_PRIMARY_NODE_ONLY;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
+import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
@@ -86,7 +86,7 @@ import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinit
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
+import org.mule.runtime.extension.api.runtime.exception.SdkExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
@@ -98,6 +98,8 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Exception
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
+import org.mule.sdk.api.exception.ModuleException;
+import org.mule.sdk.api.runtime.exception.ExceptionHandler;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.test.heisenberg.extension.AsyncHeisenbergSource;
@@ -107,7 +109,7 @@ import org.mule.test.heisenberg.extension.HeisenbergOperations;
 import org.mule.test.heisenberg.extension.HeisenbergSource;
 import org.mule.test.heisenberg.extension.MoneyLaunderingOperation;
 import org.mule.test.heisenberg.extension.SecureHeisenbergConnectionProvider;
-import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
+import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Investment;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
@@ -721,12 +723,16 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(operation.getAllParameters(), hasSize(0));
     assertConnected(operation, false);
     assertTransactional(operation, false);
-    java.util.Optional<ExceptionHandlerFactory> exceptionEnricherFactory = operation
+    java.util.Optional<SdkExceptionHandlerFactory> exceptionEnricherFactory = operation
         .getModelProperty(ExceptionHandlerModelProperty.class)
         .map(ExceptionHandlerModelProperty::getExceptionHandlerFactory);
 
     assertThat(exceptionEnricherFactory.isPresent(), is(true));
-    assertThat(exceptionEnricherFactory.get().createHandler(), instanceOf(CureCancerExceptionEnricher.class));
+    ExceptionHandler handler = exceptionEnricherFactory.get().createHandler();
+    Exception exception = handler.enrichException(new Exception());
+    assertThat(exception, instanceOf(ModuleException.class));
+    assertThat(((ModuleException) exception).getType(), is(HEALTH));
+    assertThat(exception.getCause(), instanceOf(HeisenbergException.class));
 
     operation = getOperation(extensionDeclaration, GET_MEDICAL_HISTORY);
     assertParameter(operation.getAllParameters(), "healthByYear", "",
@@ -862,7 +868,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(source.getOutputAttributes().getType(), equalTo(outputMetadataType));
 
     ConfigurationDeclaration config = extensionDeclaration.getConfigurations().get(0);
-    assertThat(config.getMessageSources(), hasSize(5));
+    assertThat(config.getMessageSources(), hasSize(6));
     assertHeisenbergSource(config.getMessageSources().get(0), ASYNC_SOURCE_NAME, AsyncHeisenbergSource.class);
     assertHeisenbergSource(config.getMessageSources().get(1), SOURCE_NAME, HeisenbergSource.class);
   }

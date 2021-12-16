@@ -75,7 +75,7 @@ import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
+import org.mule.runtime.extension.api.runtime.exception.SdkExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigTypeModelProperty;
@@ -332,7 +332,7 @@ public final class ExtensionsTestUtils {
     return group;
   }
 
-  public static void mockExceptionEnricher(EnrichableModel enrichableModel, ExceptionHandlerFactory exceptionHandlerFactory) {
+  public static void mockExceptionEnricher(EnrichableModel enrichableModel, SdkExceptionHandlerFactory exceptionHandlerFactory) {
     Optional<ExceptionHandlerModelProperty> property = exceptionHandlerFactory != null
         ? of(new ExceptionHandlerModelProperty(exceptionHandlerFactory))
         : empty();

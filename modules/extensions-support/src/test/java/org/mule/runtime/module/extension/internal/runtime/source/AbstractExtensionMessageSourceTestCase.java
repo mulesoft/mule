@@ -73,7 +73,7 @@ import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
+import org.mule.runtime.extension.api.runtime.exception.SdkExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
@@ -158,7 +158,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
   protected ExceptionCallback exceptionCallback;
 
   @Mock
-  protected ExceptionHandlerFactory enricherFactory;
+  protected SdkExceptionHandlerFactory enricherFactory;
 
   @Mock
   protected ConfigurationProvider configurationProvider;

@@ -54,12 +54,12 @@ import org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.api.util.ExceptionUtils;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
+import org.mule.sdk.api.runtime.exception.ExceptionHandler;
 import org.mule.sdk.api.runtime.source.Source;
 import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
-import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
+import org.mule.test.heisenberg.extension.exception.SdkHeisenbergConnectionExceptionEnricher;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -370,7 +370,7 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
 
   @Test
   public void enrichExceptionWithSourceExceptionEnricher() throws Exception {
-    when(enricherFactory.createHandler()).thenReturn(new HeisenbergConnectionExceptionEnricher());
+    when(enricherFactory.createHandler()).thenReturn(new SdkHeisenbergConnectionExceptionEnricher());
     mockExceptionEnricher(sourceModel, enricherFactory);
     mockExceptionEnricher(sourceModel, enricherFactory);
     ExtensionMessageSource messageSource = getNewExtensionMessageSourceInstance();
