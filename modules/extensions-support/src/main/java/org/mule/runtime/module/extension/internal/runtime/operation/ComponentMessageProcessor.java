@@ -434,8 +434,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
       OperationExecutionFunction operationExecutionFunction = (parameters, operationEvent, callback) -> {
         setOperationExecutionParams(location, event, configuration, parameters, operationEvent, callback, ctx);
-
-        fluxSupplier.get().next(operationEvent);
+        fluxSupplier.get(ctx).next(operationEvent);
       };
 
       if (location != null) {
