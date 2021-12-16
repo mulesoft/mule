@@ -12,7 +12,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.connectivity.internal.platform.schema.SemanticTermsHelper.getAllTermsFromAnnotations;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.base.delegate.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConfigParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConnectionParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;

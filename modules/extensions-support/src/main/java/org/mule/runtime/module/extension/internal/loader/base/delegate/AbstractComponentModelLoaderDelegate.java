@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.java;
+package org.mule.runtime.module.extension.internal.loader.base.delegate;
 
 /**
- * Base class for sub delegates of {@link DefaultJavaModelLoaderDelegate}
+ * Base class for sub delegates of {@link DefaultExtensionModelLoaderDelegate}
  *
  * @since 4.0
  */
-abstract class AbstractModelLoaderDelegate {
+abstract class AbstractComponentModelLoaderDelegate {
 
-  protected final DefaultJavaModelLoaderDelegate loader;
+  protected final DefaultExtensionModelLoaderDelegate loader;
 
-  AbstractModelLoaderDelegate(DefaultJavaModelLoaderDelegate loader) {
+  AbstractComponentModelLoaderDelegate(DefaultExtensionModelLoaderDelegate loader) {
     this.loader = loader;
   }
 

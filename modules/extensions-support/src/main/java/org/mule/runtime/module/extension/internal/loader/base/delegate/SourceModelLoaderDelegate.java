@@ -4,25 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.java;
+package org.mule.runtime.module.extension.internal.loader.base.delegate;
 
 import static java.lang.String.format;
 import static java.util.Optional.of;
 import static org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty.getDefault;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
-import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_ALL_NODES;
-import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_PRIMARY_NODE_ONLY;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasSourceDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
-import org.mule.runtime.extension.api.property.SourceClusterSupportModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser.SourceCallbackModelParser;
-import org.mule.sdk.api.annotation.source.SourceClusterSupport;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,15 +27,15 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * Helper class for declaring sources through a {@link DefaultJavaModelLoaderDelegate}
+ * Helper class for declaring sources through a {@link DefaultExtensionModelLoaderDelegate}
  *
  * @since 4.0
  */
-final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
+final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelegate {
 
   private final Map<SourceModelParser, SourceDeclarer> sourceDeclarers = new HashMap<>();
 
-  SourceModelLoaderDelegate(DefaultJavaModelLoaderDelegate delegate) {
+  SourceModelLoaderDelegate(DefaultExtensionModelLoaderDelegate delegate) {
     super(delegate);
   }
 

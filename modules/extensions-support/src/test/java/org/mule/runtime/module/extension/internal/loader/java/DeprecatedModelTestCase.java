@@ -43,6 +43,7 @@ import org.mule.runtime.extension.api.runtime.route.Route;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
+import org.mule.runtime.module.extension.internal.loader.base.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.List;
@@ -327,7 +328,7 @@ public class DeprecatedModelTestCase extends AbstractMuleTestCase {
   }
 
   private ExtensionDeclaration getExtensionDeclaration(Class<?> extensionClass) {
-    ExtensionDeclarer declarer = new DefaultJavaModelLoaderDelegate(extensionClass, "1.0.0-dev")
+    ExtensionDeclarer declarer = new DefaultExtensionModelLoaderDelegate(extensionClass, "1.0.0-dev")
         .declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
     return declarer.getDeclaration();
   }

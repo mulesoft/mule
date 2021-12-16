@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.validation;
+package org.mule.runtime.module.extension.internal.loader.base.validator;
 
 import static java.lang.String.format;
 import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.validateConfigOverrideParametersNotAllowed;
@@ -26,7 +26,6 @@ import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
-import org.mule.runtime.extension.api.property.SyntheticModelModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
@@ -52,6 +51,7 @@ import com.google.common.collect.Multimap;
  *
  * @since 4.0
  */
+//TODO: Split java part away
 public final class ConnectionProviderModelValidator implements ExtensionModelValidator {
 
   @Override

@@ -11,8 +11,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getExtensionInfo;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.base.delegate.MuleExtensionAnnotationParser.getExtensionInfo;
+import static org.mule.runtime.module.extension.internal.loader.base.delegate.MuleExtensionAnnotationParser.mapReduceAnnotation;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;

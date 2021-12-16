@@ -34,6 +34,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFet
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithDeclaringClass;
+import org.mule.runtime.module.extension.internal.loader.base.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -49,7 +50,7 @@ public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
   private static final String BASE_TYPE_ID = BaseType.class.getName();
   private static final String SUBTYPE_ID = SubType.class.getName();
 
-  private DefaultJavaModelLoaderDelegate loader;
+  private DefaultExtensionModelLoaderDelegate loader;
   private ExtensionDeclarer pluginDeclarer;
   private ObjectType baseMetadataType;
   private ObjectType subMetadataType;
@@ -90,7 +91,7 @@ public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
     when(pluginCtx.getDslResolvingContext()).thenReturn(dslResolvingCtx);
     when(pluginCtx.getExtensionClassLoader()).thenReturn(getClass().getClassLoader());
 
-    loader = new DefaultJavaModelLoaderDelegate(extensionElement, "1.0.0");
+    loader = new DefaultExtensionModelLoaderDelegate(extensionElement, "1.0.0");
   }
 
   @Test

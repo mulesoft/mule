@@ -29,7 +29,7 @@ import org.mule.runtime.api.meta.model.parameter.FieldValueProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.base.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.test.values.extension.ValuesExtension;
 
@@ -44,7 +44,7 @@ public class ValueProvidersParameterDeclarationEnricherTestCase {
 
   @Before
   public void setUp() {
-    ExtensionDeclarer declarer = new DefaultJavaModelLoaderDelegate(ValuesExtension.class, getProductVersion())
+    ExtensionDeclarer declarer = new DefaultExtensionModelLoaderDelegate(ValuesExtension.class, getProductVersion())
         .declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
     new ValueProvidersParameterDeclarationEnricher()
         .enrich(new DefaultExtensionLoadingContext(declarer, this.getClass().getClassLoader(), getDefault(emptySet())));

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.java;
+package org.mule.runtime.module.extension.internal.loader.base.delegate;
 
 import static java.lang.String.format;
 import static java.util.Optional.of;
@@ -25,16 +25,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Helper class for declaring operations through a {@link DefaultJavaModelLoaderDelegate}
+ * Helper class for declaring operations through a {@link DefaultExtensionModelLoaderDelegate}
  *
  * @since 4.0
  */
-final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
+final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDelegate {
 
   private final Map<OperationModelParser, OperationDeclarer> operationDeclarers = new HashMap<>();
   private final RouterModelLoaderDelegate routersDelegate;
 
-  OperationModelLoaderDelegate(DefaultJavaModelLoaderDelegate delegate) {
+  OperationModelLoaderDelegate(DefaultExtensionModelLoaderDelegate delegate) {
     super(delegate);
     routersDelegate = new RouterModelLoaderDelegate(delegate);
   }

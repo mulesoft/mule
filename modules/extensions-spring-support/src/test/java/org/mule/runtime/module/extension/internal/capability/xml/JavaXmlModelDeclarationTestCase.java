@@ -21,7 +21,7 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.base.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -123,7 +123,7 @@ public class JavaXmlModelDeclarationTestCase extends AbstractMuleTestCase {
   }
 
   private ExtensionDeclaration getExtensionDeclaration(Class<?> extensionClass) {
-    ExtensionDeclarer declarer = new DefaultJavaModelLoaderDelegate(extensionClass, EXTENSION_VERSION)
+    ExtensionDeclarer declarer = new DefaultExtensionModelLoaderDelegate(extensionClass, EXTENSION_VERSION)
         .declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
     return declarer.getDeclaration();
   }

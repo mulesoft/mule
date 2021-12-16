@@ -50,6 +50,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.base.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.HeisenbergOperations;
@@ -76,8 +77,8 @@ public class DisplayModelTestCase extends AbstractMuleTestCase {
     String version = getProductVersion();
     ClassLoader cl = getClass().getClassLoader();
     DefaultExtensionLoadingContext loadingCtx = new DefaultExtensionLoadingContext(cl, DSL_CTX);
-    DefaultJavaModelLoaderDelegate heisenbergLoader = new DefaultJavaModelLoaderDelegate(HeisenbergExtension.class, version);
-    DefaultJavaModelLoaderDelegate marvelLoader = new DefaultJavaModelLoaderDelegate(MarvelExtension.class, version);
+    DefaultExtensionModelLoaderDelegate heisenbergLoader = new DefaultExtensionModelLoaderDelegate(HeisenbergExtension.class, version);
+    DefaultExtensionModelLoaderDelegate marvelLoader = new DefaultExtensionModelLoaderDelegate(MarvelExtension.class, version);
     heisenbergDeclarer = heisenbergLoader.declare(loadingCtx);
     marvelDeclarer = marvelLoader.declare(loadingCtx);
   }
@@ -232,28 +233,28 @@ public class DisplayModelTestCase extends AbstractMuleTestCase {
   @Test(expected = IllegalParameterModelDefinitionException.class)
   public void parseLegacyAndSdkDisplayNameAnnotationsOnParameter() {
     ModelLoaderDelegate modelLoaderDelegate =
-        new DefaultJavaModelLoaderDelegate(ExtensionWithInvalidUseOfDisplayNameAnnotation.class, "1.0.0-dev");
+        new DefaultExtensionModelLoaderDelegate(ExtensionWithInvalidUseOfDisplayNameAnnotation.class, "1.0.0-dev");
     modelLoaderDelegate.declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
   }
 
   @Test(expected = IllegalParameterModelDefinitionException.class)
   public void parseLegacyAndSdkExampleAnnotationsOnParameter() {
     ModelLoaderDelegate modelLoaderDelegate =
-        new DefaultJavaModelLoaderDelegate(ExtensionWithInvalidUseOfExampleAnnotation.class, "1.0.0-dev");
+        new DefaultExtensionModelLoaderDelegate(ExtensionWithInvalidUseOfExampleAnnotation.class, "1.0.0-dev");
     modelLoaderDelegate.declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
   }
 
   @Test(expected = IllegalParameterModelDefinitionException.class)
   public void parseLegacyAndSdkSummaryAnnotationsOnParameter() {
     ModelLoaderDelegate modelLoaderDelegate =
-        new DefaultJavaModelLoaderDelegate(ExtensionWithInvalidUseOfSummaryAnnotation.class, "1.0.0-dev");
+        new DefaultExtensionModelLoaderDelegate(ExtensionWithInvalidUseOfSummaryAnnotation.class, "1.0.0-dev");
     modelLoaderDelegate.declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
   }
 
   @Test(expected = IllegalParameterModelDefinitionException.class)
   public void parseLegacyAndSdkClassValueAnnotationsOnParameter() {
     ModelLoaderDelegate modelLoaderDelegate =
-        new DefaultJavaModelLoaderDelegate(ExtensionWithInvalidUseOfClassValueAnnotation.class, "1.0.0-dev");
+        new DefaultExtensionModelLoaderDelegate(ExtensionWithInvalidUseOfClassValueAnnotation.class, "1.0.0-dev");
     modelLoaderDelegate.declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
   }
 

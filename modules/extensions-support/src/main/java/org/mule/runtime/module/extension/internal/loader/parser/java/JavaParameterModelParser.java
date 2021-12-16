@@ -27,9 +27,9 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_S
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.roleOf;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.getQName;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceRepeatableAnnotation;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseLayoutAnnotations;
+import static org.mule.runtime.module.extension.internal.loader.base.delegate.MuleExtensionAnnotationParser.mapReduceRepeatableAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.base.delegate.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.base.delegate.MuleExtensionAnnotationParser.parseLayoutAnnotations;
 import static org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureTypeResolver.getInfrastructureType;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addTermIfPresent;

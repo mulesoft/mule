@@ -32,7 +32,7 @@ import static org.mule.runtime.extension.internal.loader.util.JavaParserUtils.to
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.isIgnoreDisabled;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.base.delegate.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.hasParameterGroupAnnotation;
 import static org.reflections.ReflectionUtils.getAllFields;
@@ -112,7 +112,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.enricher.MetadataTypeEnricher;
-import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
+import org.mule.runtime.module.extension.internal.loader.base.delegate.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEncodingModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
