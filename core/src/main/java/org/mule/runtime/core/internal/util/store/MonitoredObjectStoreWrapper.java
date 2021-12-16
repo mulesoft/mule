@@ -76,17 +76,11 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
    */
   protected String name = null;
 
-  /**
-   * Whether old entries should be expired every time the expiration thread runs.
-   */
-  private boolean shouldAlwaysExpire;
-
   public MonitoredObjectStoreWrapper(ObjectStore<StoredObject<T>> baseStore, ObjectStoreSettings settings) {
     this.baseStore = baseStore;
     maxEntries = settings.getMaxEntries().orElse(null);
     entryTtl = settings.getEntryTTL().orElse(null);
     expirationInterval = settings.getExpirationInterval();
-    shouldAlwaysExpire = settings.isAlwaysExpire();
   }
 
   @Override
@@ -156,7 +150,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
 
   @Override
   public void run() {
-    if (context.isPrimaryPollingInstance() || shouldAlwaysExpire) {
+    if (context.isPrimaryPollingInstance()) {
       expire();
     }
   }
