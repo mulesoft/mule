@@ -6,8 +6,6 @@
  */
 package org.mule.service.el;
 
-import static org.mule.runtime.api.el.ValidationResult.success;
-
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
@@ -37,7 +35,7 @@ public class MockExpressionLanguage implements ExpressionLanguage {
   }
 
   public ValidationResult validate(String expression) {
-    return success();
+    throw new UnsupportedOperationException();
   }
 
   public Iterator<TypedValue<?>> split(String expression, BindingContext context) {

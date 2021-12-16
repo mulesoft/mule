@@ -275,7 +275,9 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private ArtifactType artifactType;
 
   private ErrorTypeLocator errorTypeLocator;
+  private final Object errorTypeLocatorLock = new Object();
   private ErrorTypeRepository errorTypeRepository;
+  private final Object errorTypeRepositoryLock = new Object();
 
   private ConfigurationComponentLocator componentLocator;
 
@@ -1129,16 +1131,26 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   @Override
   public ErrorTypeLocator getErrorTypeLocator() {
     if (errorTypeLocator == null) {
-      errorTypeLocator = getRegistry().lookupObject(ErrorTypeLocator.class.getName());
+      synchronized (errorTypeLocatorLock) {
+        if (errorTypeLocator == null) {
+          errorTypeLocator = getRegistry().lookupObject(ErrorTypeLocator.class.getName());
+        }
+      }
     }
+
     return errorTypeLocator;
   }
 
   @Override
   public ErrorTypeRepository getErrorTypeRepository() {
     if (errorTypeRepository == null) {
-      errorTypeRepository = getRegistry().lookupObject(ErrorTypeRepository.class.getName());
+      synchronized (errorTypeRepositoryLock) {
+        if (errorTypeRepository == null) {
+          errorTypeRepository = getRegistry().lookupObject(ErrorTypeRepository.class.getName());
+        }
+      }
     }
+
     return errorTypeRepository;
   }
 
