@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher.log4j2;
 
+import org.apache.logging.log4j.core.config.ConfigurationFileWatcher;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
 import org.mule.config.i18n.MessageFactory;
@@ -37,7 +38,6 @@ import org.apache.logging.log4j.core.appender.rolling.TriggeringPolicy;
 import org.apache.logging.log4j.core.config.AbstractConfiguration;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.ConfigurationListener;
-import org.apache.logging.log4j.core.config.ConfiguratonFileWatcher;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.config.Reconfigurable;
 import org.apache.logging.log4j.core.layout.PatternLayout;
@@ -130,7 +130,8 @@ final class LoggerContextConfigurer
         if (configFile != null && configuration instanceof Reconfigurable)
         {
             configuration.getWatchManager().setIntervalSeconds(DEFAULT_MONITOR_INTERVAL_SECS);
-            FileWatcher watcher = new ConfiguratonFileWatcher((Reconfigurable) configuration, getListeners(configuration));
+            FileWatcher watcher = new ConfigurationFileWatcher(configuration, (Reconfigurable) configuration,
+                                                               getListeners(configuration), configFile.lastModified());
             configuration.getWatchManager().watchFile(configFile, watcher);
         }
     }
