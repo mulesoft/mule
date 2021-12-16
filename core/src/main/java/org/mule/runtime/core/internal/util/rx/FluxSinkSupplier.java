@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.util.rx;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import reactor.core.publisher.FluxSink;
+import reactor.util.context.Context;
 
 import java.util.function.Supplier;
 
@@ -19,4 +20,13 @@ import java.util.function.Supplier;
  * @since 4.3
  */
 public interface FluxSinkSupplier<T> extends Supplier<FluxSink<T>>, Disposable {
+
+  /**
+   * Get sink taking into account the given {@link Context}. This can be used to know if there is an active transaction.
+   *
+   * @since 4.5, 4.4.1, 4.3.1
+   */
+  default FluxSink<T> get(Context ctx) {
+    return this.get();
+  }
 }
