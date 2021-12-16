@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.parser.java.notificati
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.base.delegate.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.exception.MuleRuntimeException;

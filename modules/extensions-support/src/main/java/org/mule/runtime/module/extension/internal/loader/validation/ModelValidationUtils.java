@@ -27,15 +27,15 @@ import java.util.List;
  *
  * @since 4.0
  */
-final class ModelValidationUtils {
+public final class ModelValidationUtils {
 
   private ModelValidationUtils() {}
 
-  static boolean isCompiletime(ExtensionModel model) {
+  public static boolean isCompiletime(ExtensionModel model) {
     return model.getModelProperty(CompileTimeModelProperty.class).isPresent();
   }
 
-  static void validateConfigOverrideParametersNotAllowed(ParameterizedModel model, ProblemsReporter reporter, String kind) {
+  public static void validateConfigOverrideParametersNotAllowed(ParameterizedModel model, ProblemsReporter reporter, String kind) {
 
     List<String> configOverrideParameters = model.getAllParameterModels().stream()
         .filter(ParameterModel::isOverrideFromConfig)
@@ -52,7 +52,7 @@ final class ModelValidationUtils {
     }
   }
 
-  static void validateConfigParametersNamesNotAllowed(ParameterizedModel model, ProblemsReporter reporter, String kind) {
+  public static void validateConfigParametersNamesNotAllowed(ParameterizedModel model, ProblemsReporter reporter, String kind) {
 
     model.getAllParameterModels().stream()
         .filter(parameterModel -> parameterModel.getName().equals(NAME_ATTRIBUTE_NAME)

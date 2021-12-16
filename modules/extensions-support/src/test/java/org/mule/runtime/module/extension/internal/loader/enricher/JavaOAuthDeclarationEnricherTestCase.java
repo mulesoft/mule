@@ -18,7 +18,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.base.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.oauth.TestOAuthExtension;
 
@@ -31,7 +31,7 @@ public class JavaOAuthDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() {
-    ExtensionDeclarer declarer = new DefaultJavaModelLoaderDelegate(TestOAuthExtension.class, getProductVersion())
+    ExtensionDeclarer declarer = new DefaultExtensionModelLoaderDelegate(TestOAuthExtension.class, getProductVersion())
         .declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
     new JavaOAuthDeclarationEnricher()
         .enrich(new DefaultExtensionLoadingContext(declarer, this.getClass().getClassLoader(), getDefault(emptySet())));

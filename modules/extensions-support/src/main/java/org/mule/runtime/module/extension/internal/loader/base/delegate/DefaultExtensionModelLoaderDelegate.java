@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.java;
+package org.mule.runtime.module.extension.internal.loader.base.delegate;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
@@ -49,7 +49,7 @@ import java.util.function.Supplier;
  *
  * @since 4.0
  */
-public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
+public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate {
 
   protected Class<?> extensionType;
   protected final ExtensionElement extensionElement;
@@ -70,13 +70,13 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   private ExtensionDeclarer declarer;
   private String namespace;
 
-  public DefaultJavaModelLoaderDelegate(ExtensionElement extensionElement, String version) {
+  public DefaultExtensionModelLoaderDelegate(ExtensionElement extensionElement, String version) {
     this.version = version;
     this.extensionElement = extensionElement;
   }
 
 
-  public DefaultJavaModelLoaderDelegate(Class<?> extensionType, String version) {
+  public DefaultExtensionModelLoaderDelegate(Class<?> extensionType, String version) {
     this(new ExtensionTypeWrapper<>(extensionType, getDefault().createTypeLoader(extensionType.getClassLoader())), version);
     this.extensionType = extensionType;
   }

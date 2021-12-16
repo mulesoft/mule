@@ -29,7 +29,7 @@ import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
 import org.mule.runtime.internal.dsl.DefaultDslResolvingContext;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.config.dsl.config.extension.SimpleExtension;
-import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.base.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.tck.classlaoder.TestClassLoader;
 
 import java.util.List;
@@ -53,7 +53,7 @@ public class ConfigurationDefinitionParserTestCase {
       Builder<?> definitionBuilder = new Builder<>().withIdentifier("test").withNamespace("namespace");
 
       ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(classLoader, getDefault(emptySet()));
-      DefaultJavaModelLoaderDelegate loader = new DefaultJavaModelLoaderDelegate(SimpleExtension.class, "1.0.0-dev");
+      DefaultExtensionModelLoaderDelegate loader = new DefaultExtensionModelLoaderDelegate(SimpleExtension.class, "1.0.0-dev");
       loader.declare(ctx);
       ExtensionModelFactory factory = new ExtensionModelFactory();
       ExtensionModel extensionModel = factory.create(ctx);

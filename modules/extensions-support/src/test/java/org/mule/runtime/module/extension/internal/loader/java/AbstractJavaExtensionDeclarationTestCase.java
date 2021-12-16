@@ -28,24 +28,25 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
+import org.mule.runtime.module.extension.internal.loader.base.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.List;
 
 public abstract class AbstractJavaExtensionDeclarationTestCase extends AbstractMuleTestCase {
 
-  private DefaultJavaModelLoaderDelegate loader;
+  private DefaultExtensionModelLoaderDelegate loader;
 
-  protected DefaultJavaModelLoaderDelegate getLoader() {
+  protected DefaultExtensionModelLoaderDelegate getLoader() {
     return loader;
   }
 
-  protected void setLoader(DefaultJavaModelLoaderDelegate loader) {
+  protected void setLoader(DefaultExtensionModelLoaderDelegate loader) {
     this.loader = loader;
   }
 
-  protected DefaultJavaModelLoaderDelegate loaderFor(final Class<?> type) {
-    return new DefaultJavaModelLoaderDelegate(type, getProductVersion());
+  protected DefaultExtensionModelLoaderDelegate loaderFor(final Class<?> type) {
+    return new DefaultExtensionModelLoaderDelegate(type, getProductVersion());
   }
 
   protected ExtensionDeclarer declareExtension() {

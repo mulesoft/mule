@@ -32,6 +32,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.base.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
@@ -86,14 +87,14 @@ public class LayoutModelTestCase extends AbstractJavaExtensionDeclarationTestCas
   @Test(expected = IllegalParameterModelDefinitionException.class)
   public void parseLegacyAndSdkPlacementAnnotationsOnParameter() {
     ModelLoaderDelegate modelLoaderDelegate =
-        new DefaultJavaModelLoaderDelegate(ExtensionWithInvalidUseOfPlacementAnnotation.class, "1.0.0-dev");
+        new DefaultExtensionModelLoaderDelegate(ExtensionWithInvalidUseOfPlacementAnnotation.class, "1.0.0-dev");
     modelLoaderDelegate.declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
   }
 
   @Test(expected = IllegalParameterModelDefinitionException.class)
   public void parseLegacyAndSdkTextAnnotationsOnParameter() {
     ModelLoaderDelegate modelLoaderDelegate =
-        new DefaultJavaModelLoaderDelegate(ExtensionWithInvalidUseOfPlacementAnnotation.class, "1.0.0-dev");
+        new DefaultExtensionModelLoaderDelegate(ExtensionWithInvalidUseOfPlacementAnnotation.class, "1.0.0-dev");
     modelLoaderDelegate.declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
   }
 

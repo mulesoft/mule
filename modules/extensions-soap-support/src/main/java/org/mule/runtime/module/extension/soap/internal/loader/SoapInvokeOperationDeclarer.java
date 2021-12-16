@@ -43,7 +43,7 @@ import org.mule.runtime.extension.api.soap.SoapOutputPayload;
 import org.mule.runtime.extension.api.soap.WebServiceTypeKey;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
-import org.mule.runtime.module.extension.internal.loader.java.StereotypeModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.base.delegate.StereotypeModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;

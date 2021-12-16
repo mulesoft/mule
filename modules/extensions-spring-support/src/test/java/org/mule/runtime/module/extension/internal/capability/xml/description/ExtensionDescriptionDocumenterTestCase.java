@@ -40,7 +40,7 @@ import org.mule.runtime.module.extension.internal.AbstractAnnotationProcessorTes
 import org.mule.runtime.module.extension.internal.capability.xml.extension.multiple.config.TestExtensionWithDocumentationAndMultipleConfig;
 import org.mule.runtime.module.extension.internal.capability.xml.extension.single.config.TestExtensionWithDocumentationAndSingleConfig;
 import org.mule.runtime.module.extension.internal.loader.enricher.ExtensionDescriptionsEnricher;
-import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.base.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDocumentationResourceGenerator;
 import org.mule.tck.size.SmallTest;
 
@@ -118,7 +118,7 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
   public void loadDocumentationFromFile() {
     ClassLoader cl = currentThread().getContextClassLoader();
     ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(cl, getDefault(emptySet()));
-    DefaultJavaModelLoaderDelegate loader = new DefaultJavaModelLoaderDelegate(extensionClass, "1.0.0-dev");
+    DefaultExtensionModelLoaderDelegate loader = new DefaultExtensionModelLoaderDelegate(extensionClass, "1.0.0-dev");
     loader.declare(ctx);
     ExtensionDescriptionsEnricher enricher = new ExtensionDescriptionsEnricher();
     enricher.enrich(ctx);
@@ -239,7 +239,7 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
 
         assertThat(extension, instanceOf(TypeElement.class));
         ctx = new DefaultExtensionLoadingContext(currentThread().getContextClassLoader(), getDefault(emptySet()));
-        DefaultJavaModelLoaderDelegate loader = new DefaultJavaModelLoaderDelegate(extensionClass, "1.0.0-dev");
+        DefaultExtensionModelLoaderDelegate loader = new DefaultExtensionModelLoaderDelegate(extensionClass, "1.0.0-dev");
         declaration = loader.declare(ctx).getDeclaration();
         documenter.document(declaration, (TypeElement) extension);
       }

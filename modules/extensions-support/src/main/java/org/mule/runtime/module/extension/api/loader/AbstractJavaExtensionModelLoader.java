@@ -46,9 +46,9 @@ import org.mule.runtime.module.extension.internal.loader.enricher.SampleDataDecl
 import org.mule.runtime.module.extension.internal.loader.enricher.ValueProvidersParameterDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.validation.ComponentLocationModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.ConfigurationModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.ConnectionProviderModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.DeprecationModelValidator;
+import org.mule.runtime.module.extension.internal.loader.base.validator.ConfigurationModelValidator;
+import org.mule.runtime.module.extension.internal.loader.base.validator.ConnectionProviderModelValidator;
+import org.mule.runtime.module.extension.internal.loader.base.validator.DeprecationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.IgnoredExtensionParameterModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.InjectedFieldsModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.InputParametersTypeModelValidator;
@@ -81,8 +81,8 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
   public static final String EXTENSION_TYPE = "EXTENSION_TYPE";
   public static final String VERSION = "version";
   private final List<ExtensionModelValidator> customValidators = unmodifiableList(asList(
-                                                                                         new ConfigurationModelValidator(),
-                                                                                         new ConnectionProviderModelValidator(),
+                                                                                         new ConfigurationModelValidator(), //
+                                                                                         new ConnectionProviderModelValidator(), //
                                                                                          new PojosModelValidator(),
                                                                                          new DeprecationModelValidator(),
                                                                                          new InputParametersTypeModelValidator(),

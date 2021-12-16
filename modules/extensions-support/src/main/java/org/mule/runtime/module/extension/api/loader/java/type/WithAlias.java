@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.api.loader.java.type;
 
 import static java.lang.String.format;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.base.delegate.MuleExtensionAnnotationParser.mapReduceAnnotation;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.extension.api.annotation.Alias;
