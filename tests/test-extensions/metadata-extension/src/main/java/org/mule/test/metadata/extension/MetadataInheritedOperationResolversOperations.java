@@ -9,7 +9,6 @@ package org.mule.test.metadata.extension;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
-import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;

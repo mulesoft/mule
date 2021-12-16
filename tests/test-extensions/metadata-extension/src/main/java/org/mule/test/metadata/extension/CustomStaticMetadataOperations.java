@@ -7,6 +7,9 @@
 package org.mule.test.metadata.extension;
 
 import static java.lang.Thread.currentThread;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_CSV;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_JSON;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_XML;
 
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
@@ -42,11 +45,13 @@ public class CustomStaticMetadataOperations {
   public static final String XML_VALUE = IOUtils.toString(cl.getResourceAsStream("order.xml"));
 
   @OutputXmlType(schema = "order.xsd", qname = "shiporder")
+  @MediaType(value = APPLICATION_XML, strict = false)
   public InputStream xmlOutput() {
     return cl.getResourceAsStream("order.xml");
   }
 
   @OutputXmlType(schema = "orderWithImport.xsd", qname = "shiporder")
+  @MediaType(value = APPLICATION_XML, strict = false)
   public InputStream xmlOutputSchemaWithImport() {
     return cl.getResourceAsStream("order.xml");
   }
@@ -60,16 +65,19 @@ public class CustomStaticMetadataOperations {
   }
 
   @OutputXmlType(schema = "order.xsd", qname = "shiporder")
+  @MediaType(value = APPLICATION_XML, strict = false)
   public String xmlInput(@InputXmlType(schema = "order.xsd", qname = "shiporder") InputStream xml) {
     return XML_VALUE;
   }
 
   @OutputJsonType(schema = "person-schema.json")
+  @MediaType(value = APPLICATION_JSON, strict = false)
   public InputStream jsonOutput() {
     return new ByteArrayInputStream(JSON_VALUE.getBytes());
   }
 
   @OutputJsonType(schema = "persons-schema.json")
+  @MediaType(value = APPLICATION_JSON, strict = false)
   public InputStream jsonOutputArray() {
     return new ByteArrayInputStream(JSON_ARRAY_VALUE.getBytes());
   }
@@ -111,13 +119,13 @@ public class CustomStaticMetadataOperations {
     return jsonArrayList;
   }
 
-  @MediaType(value = "application/json")
+  @MediaType(value = APPLICATION_JSON)
   public String jsonInputStream(@InputJsonType(schema = "person-schema.json") InputStream json) {
     return IOUtils.toString(json);
   }
 
-  public List<InputStream> jsonInputList(@InputJsonType(schema = "person-schema.json") List<InputStream> jsonList) {
-    return jsonList;
+  public List<InputStream> jsonInputList(@InputJsonType(schema = "person-schema.json") List<InputStream> persons) {
+    return persons;
   }
 
   @OutputResolver(output = CsvInputStaticTypeResolver.class)
@@ -128,11 +136,13 @@ public class CustomStaticMetadataOperations {
     return csvList;
   }
 
+  @MediaType(value = APPLICATION_JSON)
   public int jsonInputMap(@InputJsonType(schema = "person-schema.json") Map<String, Object> json) {
     return (int) json.get("age");
   }
 
   @OutputJsonType(schema = "person-schema.json")
+  @MediaType(value = APPLICATION_JSON, strict = false)
   public Result<InputStream, Banana> customTypeOutputWithStaticAttributes() {
     return Result.<InputStream, Banana>builder()
         .output(new ByteArrayInputStream(new byte[] {}))
@@ -140,20 +150,22 @@ public class CustomStaticMetadataOperations {
   }
 
   @OutputResolver(output = CsvInputStaticTypeResolver.class)
+  @MediaType(value = APPLICATION_CSV, strict = false)
   public Object customTypeOutput() {
     return CSV_VALUE;
   }
 
-  @MediaType("application/json")
+  @MediaType(APPLICATION_JSON)
   public String customTypeInput(@TypeResolver(JsonInputStaticTypeResolver.class) InputStream type) {
     return IOUtils.toString(type);
   }
 
-  @MediaType("application/json")
+  @MediaType(APPLICATION_JSON)
   public String customIntersectionTypeInput(@TypeResolver(JsonInputStaticIntersectionTypeResolver.class) InputStream data) {
     return IOUtils.toString(data);
   }
 
+  @MediaType(value = APPLICATION_JSON, strict = false)
   @OutputResolver(output = JsonOutputStaticIntersectionTypeResolver.class)
   public String customIntersectionTypeOutput() {
     return JSON_VALUE;
@@ -211,6 +223,7 @@ public class CustomStaticMetadataOperations {
   }
 
   @OutputXmlType(schema = "", qname = "shiporder")
+  @MediaType(value = APPLICATION_XML)
   public List<InputStream> xmlOutputListWithEmptySchema() {
     ArrayList<InputStream> xmlList = new ArrayList();
     xmlList.add(cl.getResourceAsStream("order.xml"));
@@ -219,6 +232,7 @@ public class CustomStaticMetadataOperations {
   }
 
   @OutputResolver(output = JavaOutputStaticTypeResolver.class)
+  @MediaType(value = "application/java", strict = false)
   public Object customInputAndOutput(@TypeResolver(JsonInputStaticTypeResolver.class) InputStream type) {
     return null;
   }

@@ -6,8 +6,11 @@
  */
 package org.mule.test.some.extension;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
+
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -15,6 +18,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
+@MediaType(ANY)
 public class AnotherExclusiveOptionalsEmittingSource extends Source<Object, Void> {
 
   @ParameterGroup(name = "Alias Parameter Group", showInDsl = true)

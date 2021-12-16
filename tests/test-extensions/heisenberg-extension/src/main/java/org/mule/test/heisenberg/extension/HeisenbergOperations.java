@@ -260,13 +260,13 @@ public class HeisenbergOperations implements Disposable {
   }
 
   @OutputResolver(output = TucoMetadataResolver.class)
-  @MediaType(strict = false)
+  @MediaType(strict = false, value = TEXT_PLAIN)
   public String colorizeMeth() {
     return "Blue";
   }
 
   @OutputResolver(output = TucoMetadataResolver.class)
-  @MediaType(strict = false)
+  @MediaType(strict = false, value = TEXT_PLAIN)
   public String callDea() {
     return "Help DEA!";
   }
@@ -286,7 +286,7 @@ public class HeisenbergOperations implements Disposable {
                                                     @Optional(defaultValue = "-1") @org.mule.sdk.api.annotation.param.Optional(
                                                         defaultValue = "0") int index) {
     Charset lastSupportedEncoding = Charset.availableCharsets().values().stream().reduce((first, last) -> last).get();
-    org.mule.runtime.api.metadata.DataType dt =
+    DataType dt =
         DataType.builder().type(String.class).mediaType("dead/dead").charset(lastSupportedEncoding.toString()).build();
 
     return Result.<String, IntegerAttributes>builder().output(config.getEnemies().get(index))

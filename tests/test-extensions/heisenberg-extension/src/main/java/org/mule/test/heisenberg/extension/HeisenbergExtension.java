@@ -69,7 +69,7 @@ import javax.inject.Inject;
 @Sources({HeisenbergSource.class, HeisenbergSourceAllOptionalCallbacks.class, DEARadioSource.class, AsyncHeisenbergSource.class})
 @org.mule.sdk.api.annotation.Sources({ReconnectableHeisenbergSource.class, HeisenbergClusterSource.class,
     IgnoredHeisenbergSource.class, SdkIgnoredHeisenbergSource.class, ReconnectableHeisenbergSdkSource.class})
-@Export(classes = {HeisenbergExtension.class, DifferedKnockableDoor.class}, resources = "methRecipe.json")
+@Export(classes = {HeisenbergExtension.class, DifferedKnockableDoor.class, HeisenbergErrors.class}, resources = "methRecipe.json")
 @SubTypeMapping(baseType = Weapon.class, subTypes = {Ricin.class})
 @SubTypeMapping(baseType = Drug.class, subTypes = {Meta.class})
 @SubTypeMapping(baseType = Investment.class, subTypes = {CarWash.class, CarDealer.class})
