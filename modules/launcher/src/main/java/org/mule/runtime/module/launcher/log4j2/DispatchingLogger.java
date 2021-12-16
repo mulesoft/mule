@@ -80,7 +80,6 @@ abstract class DispatchingLogger extends Logger {
     if (useThisLoggerContextClassLoader(resolvedCtxClassLoader)) {
       return originalLogger;
     }
-
     Reference<Logger> loggerReference;
 
     // Switch back the tccl for the cache lookup, to avoid caffeine internal threads to have a reference to an app classloader.
