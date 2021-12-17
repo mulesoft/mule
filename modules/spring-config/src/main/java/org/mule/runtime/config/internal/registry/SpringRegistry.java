@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.registry;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.Config;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 
 import java.util.LinkedHashMap;
@@ -26,6 +27,7 @@ public class SpringRegistry extends AbstractSpringRegistry {
   private final BeanDependencyResolver beanDependencyResolver;
 
   private ApplicationContext baseApplicationContext;
+  private ConfigurationDependencyResolver configurationDependencyResolver;
 
   public SpringRegistry(ApplicationContext baseApplicationContext,
                         ApplicationContext applicationContext,
@@ -35,6 +37,7 @@ public class SpringRegistry extends AbstractSpringRegistry {
     super(applicationContext, muleContext, lifecycleInterceptor);
     this.baseApplicationContext = baseApplicationContext;
     this.beanDependencyResolver = new DefaultBeanDependencyResolver(dependencyResolver, this);
+    this.configurationDependencyResolver = dependencyResolver;
   }
 
   @Override
@@ -89,6 +92,10 @@ public class SpringRegistry extends AbstractSpringRegistry {
   @Override
   public BeanDependencyResolver getBeanDependencyResolver() {
     return beanDependencyResolver;
+  }
+
+  public ConfigurationDependencyResolver getConfigurationDependencyResolver() {
+    return configurationDependencyResolver;
   }
 
 }
