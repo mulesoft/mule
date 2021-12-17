@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.soap.api.loader;
 
-import org.mule.runtime.module.extension.api.loader.java.AbstractJavaExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.soap.internal.loader.SoapModelLoaderDelegate;
 
 /**

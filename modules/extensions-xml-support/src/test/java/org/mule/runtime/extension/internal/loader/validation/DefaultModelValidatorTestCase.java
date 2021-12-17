@@ -33,7 +33,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
-import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;

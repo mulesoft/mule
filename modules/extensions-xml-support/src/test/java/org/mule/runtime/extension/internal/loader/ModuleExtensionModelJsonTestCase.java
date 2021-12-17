@@ -27,7 +27,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
-import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;

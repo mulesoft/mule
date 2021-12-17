@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.api.loader.java;
+package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
@@ -24,10 +24,10 @@ import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
-import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegateFactory;
+import org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateFactory;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
-import org.mule.runtime.module.extension.api.loader.AbstractExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.validator.ConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validator.ConnectionProviderModelValidator;
