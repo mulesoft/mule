@@ -16,7 +16,7 @@ import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.internal.dsl.DefaultDslResolvingContext;
-import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
+import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
