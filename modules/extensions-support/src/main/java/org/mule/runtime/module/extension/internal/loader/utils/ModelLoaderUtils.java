@@ -6,20 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.utils;
 
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
-
-import org.mule.metadata.api.model.ArrayType;
-import org.mule.metadata.api.model.IntersectionType;
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.ObjectFieldType;
-import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.api.model.UnionType;
-import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.metadata.message.api.MessageMetadataType;
-import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithSemanticTermsDeclaration;
-import org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation;
-import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.parser.SemanticTermsParser;
 
 /**

@@ -12,7 +12,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelParserFactory;
+import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 
@@ -22,7 +22,7 @@ public class JavaExtensionModelParserFactory implements ExtensionModelParserFact
 
   @Override
   public ExtensionModelParser createParser(ExtensionLoadingContext context) {
-   return new JavaExtensionModelParser(getExtensionElement(context), context);
+    return new JavaExtensionModelParser(getExtensionElement(context), context);
   }
 
   public static ExtensionElement getExtensionElement(ExtensionLoadingContext context) {
@@ -31,7 +31,7 @@ public class JavaExtensionModelParserFactory implements ExtensionModelParserFact
       try {
         ClassLoader extensionClassLoader = context.getExtensionClassLoader();
         return new ExtensionTypeWrapper<>(loadClass(type, extensionClassLoader),
-            new DefaultExtensionsTypeLoaderFactory().createTypeLoader(extensionClassLoader));
+                                          new DefaultExtensionsTypeLoaderFactory().createTypeLoader(extensionClassLoader));
       } catch (ClassNotFoundException e) {
         throw new RuntimeException(format("Class '%s' cannot be loaded", type), e);
       }

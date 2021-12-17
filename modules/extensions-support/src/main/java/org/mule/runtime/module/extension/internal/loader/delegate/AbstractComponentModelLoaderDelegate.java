@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.base.delegate;
+package org.mule.runtime.module.extension.internal.loader.delegate;
 
 /**
  * Base class for sub delegates of {@link DefaultExtensionModelLoaderDelegate}

@@ -11,7 +11,7 @@ import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
-import org.mule.runtime.module.extension.internal.loader.base.validator.ConfigurationModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validator.ConfigurationModelValidator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 

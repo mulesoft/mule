@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.api.loader;
 
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
+import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
 
 /**
  * {@link ModelLoaderDelegate} factory

@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.api.loader;
+package org.mule.runtime.module.extension.internal.loader.delegate;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelParserFactory;
+import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
 
 /**
  * Contract for classes that creates an {@link ExtensionDeclarer} from a {@link ExtensionLoadingContext}.
