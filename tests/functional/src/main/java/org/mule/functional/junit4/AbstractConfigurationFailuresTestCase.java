@@ -41,7 +41,7 @@ import org.mule.runtime.core.api.context.notification.MuleContextNotificationLis
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.api.loader.java.CraftedExtensionModelLoader;
-import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
+import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.tck.config.TestNotificationListenerRegistryConfigurationBuilder;
 import org.mule.tck.config.TestPolicyProviderConfigurationBuilder;
