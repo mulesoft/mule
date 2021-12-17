@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.base.validator;
 
 import static java.lang.String.format;
-import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.validateConfigOverrideParametersNotAllowed;
+import static org.mule.runtime.module.extension.internal.loader.java.validation.ModelValidationUtils.validateConfigOverrideParametersNotAllowed;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isSynthetic;
 
 import org.mule.runtime.api.connection.CachedConnectionProvider;

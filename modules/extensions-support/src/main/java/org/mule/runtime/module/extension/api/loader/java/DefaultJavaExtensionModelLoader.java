@@ -7,13 +7,14 @@
 package org.mule.runtime.module.extension.api.loader.java;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
 
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegateFactory;
-import org.mule.runtime.module.extension.internal.loader.enricher.CustomStaticTypeDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.base.delegate.DefaultExtensionModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.CustomStaticTypeDeclarationEnricher;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class DefaultJavaExtensionModelLoader extends AbstractJavaExtensionModelL
 
   public static final String JAVA_LOADER_ID = "java";
 
-  private List<DeclarationEnricher> customEnrichers = asList(new CustomStaticTypeDeclarationEnricher());
+  private final List<DeclarationEnricher> customEnrichers = unmodifiableList(asList(new CustomStaticTypeDeclarationEnricher()));
 
   public DefaultJavaExtensionModelLoader() {
     super(JAVA_LOADER_ID, (ModelLoaderDelegateFactory) DefaultExtensionModelLoaderDelegate::new);

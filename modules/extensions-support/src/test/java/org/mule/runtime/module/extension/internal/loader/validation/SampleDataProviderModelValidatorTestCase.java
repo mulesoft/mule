@@ -46,6 +46,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SampleDataProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SampleDataProviderFactoryModelProperty.SampleDataProviderFactoryModelPropertyBuilder;
+import org.mule.runtime.module.extension.internal.loader.java.validation.JavaSampleDataModelValidator;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.sdk.api.annotation.param.Config;
 import org.mule.sdk.api.annotation.param.Connection;
@@ -80,7 +81,7 @@ public class SampleDataProviderModelValidatorTestCase {
   private final MetadataType NUMBER_TYPE = loader.load(Integer.class);
   private final ReflectionCache reflectionCache = new ReflectionCache();
 
-  private SampleDataModelValidator validator;
+  private JavaSampleDataModelValidator validator;
   private ProblemsReporter problemsReporter;
 
   @Mock(lenient = true)
@@ -111,7 +112,7 @@ public class SampleDataProviderModelValidatorTestCase {
   @Before
   public void setUp() {
     OUTPUT_RESULT = mock(Result.class);
-    validator = new SampleDataModelValidator();
+    validator = new JavaSampleDataModelValidator();
     problemsReporter = new ProblemsReporter(extensionModel);
 
     providerBuilder = builder(ConnectedSampleDataProvider.class);

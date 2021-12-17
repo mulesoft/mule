@@ -41,7 +41,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors;
+import org.mule.runtime.module.extension.internal.error.ModuleErrors;
 import org.mule.runtime.soap.api.exception.error.SoapErrors;
 import org.mule.test.soap.extension.FootballSoapExtension;
 

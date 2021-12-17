@@ -39,7 +39,7 @@ import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
 import org.mule.runtime.module.extension.internal.AbstractAnnotationProcessorTestCase;
 import org.mule.runtime.module.extension.internal.capability.xml.extension.multiple.config.TestExtensionWithDocumentationAndMultipleConfig;
 import org.mule.runtime.module.extension.internal.capability.xml.extension.single.config.TestExtensionWithDocumentationAndSingleConfig;
-import org.mule.runtime.module.extension.internal.loader.enricher.ExtensionDescriptionsEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.ExtensionDescriptionsEnricher;
 import org.mule.runtime.module.extension.internal.loader.base.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDocumentationResourceGenerator;
 import org.mule.tck.size.SmallTest;
