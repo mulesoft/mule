@@ -14,6 +14,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
  * @since 4.1
  */
 @FunctionalInterface
+@Deprecated
 public interface ModelLoaderDelegateFactory {
 
   /**

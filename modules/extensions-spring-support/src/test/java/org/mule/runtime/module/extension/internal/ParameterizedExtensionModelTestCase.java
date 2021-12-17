@@ -12,8 +12,8 @@ import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
-import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+import static org.mule.runtime.module.extension.internal.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.loader.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.COMPILATION_MODE;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.api.loader;
 
-import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -14,19 +13,20 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_SDK_IGNORE_COMPONENT;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_SDK_POLLING_SOURCE_LIMIT;
-import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_COMPONENT_IGNORE;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENABLE_POLLING_SOURCE_LIMIT_PARAMETER;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserFactory.getExtensionElement;
 
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.privileged.DeclarationEnrichers;
-import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelParserFactory;
+import org.mule.runtime.module.extension.internal.loader.base.AbstractExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.base.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.base.validator.ConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.base.validator.ConnectionProviderModelValidator;
 import org.mule.runtime.module.extension.internal.loader.base.validator.DeprecationModelValidator;
@@ -46,7 +46,6 @@ import org.mule.runtime.module.extension.internal.loader.java.enricher.RequiredF
 import org.mule.runtime.module.extension.internal.loader.java.enricher.RuntimeVersionDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.SampleDataDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.ValueProvidersParameterDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.validation.ComponentLocationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.java.validation.IgnoredExtensionParameterModelValidator;
 import org.mule.runtime.module.extension.internal.loader.java.validation.InjectedFieldsModelValidator;
@@ -66,17 +65,18 @@ import org.mule.runtime.module.extension.internal.loader.java.validation.Paramet
 import org.mule.runtime.module.extension.internal.loader.java.validation.PojosModelValidator;
 import org.mule.runtime.module.extension.internal.loader.java.validation.PrivilegedApiValidator;
 import org.mule.runtime.module.extension.internal.loader.java.validation.SourceCallbacksModelValidator;
+import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserFactory;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;
 
-public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
+public abstract class AbstractJavaExtensionModelLoader extends AbstractExtensionModelLoader {
 
   private static final boolean IGNORE_DISABLED = getProperty(DISABLE_SDK_IGNORE_COMPONENT) != null;
   private static final boolean ENABLE_POLLING_SOURCE_LIMIT = getProperty(ENABLE_SDK_POLLING_SOURCE_LIMIT) != null;
   public static final String TYPE_PROPERTY_NAME = "type";
-  public static final String EXTENSION_TYPE = "EXTENSION_TYPE";
+
   public static final String VERSION = "version";
 
   private final List<ExtensionModelValidator> customValidators = unmodifiableList(asList(
@@ -124,17 +124,22 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new PollingSourceDeclarationEnricher()));
 
   private final String id;
-  private final ModelLoaderDelegateFactory factory;
+  private final ModelLoaderDelegateFactory modelLoaderDelegateFactory;
 
   @Deprecated
   public AbstractJavaExtensionModelLoader(String id, BiFunction<Class<?>, String, ModelLoaderDelegate> delegate) {
-    this(id, (ModelLoaderDelegateFactory) (extensionElement, version) -> delegate
-        .apply(extensionElement.getDeclaringClass().get(), version));
+    this(id, (ModelLoaderDelegateFactory) (extensionElement, version) ->
+        delegate.apply(extensionElement.getDeclaringClass().get(), version));
   }
 
-  public AbstractJavaExtensionModelLoader(String id, ModelLoaderDelegateFactory factory) {
+  @Deprecated
+  public AbstractJavaExtensionModelLoader(String id, ModelLoaderDelegateFactory modelLoaderDelegateFactory) {
     this.id = id;
-    this.factory = factory;
+    this.modelLoaderDelegateFactory = modelLoaderDelegateFactory;
+  }
+
+  public AbstractJavaExtensionModelLoader(String id) {
+    this(id, (ModelLoaderDelegateFactory) (e, v) -> new DefaultExtensionModelLoaderDelegate(v));
   }
 
   /**
@@ -165,15 +170,16 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
    * {@inheritDoc}
    */
   @Override
-  protected void declareExtension(ExtensionLoadingContext context) {
-    ExtensionElement extensionType = getExtensionType(context);
-    String version =
-        context.<String>getParameter(VERSION).orElseThrow(() -> new IllegalArgumentException("version not specified"));
-    factory.getLoader(extensionType, version).declare(context);
+  protected ExtensionModelParserFactory getExtensionModelParserFactory(ExtensionLoadingContext context) {
+    return new JavaExtensionModelParserFactory();
+  }
+
+  protected ModelLoaderDelegate getModelLoaderDelegate(String version) {
+    return modelLoaderDelegateFactory.getLoader(null, version);
   }
 
   private Collection<DeclarationEnricher> getPrivilegedDeclarationEnrichers(ExtensionLoadingContext context) {
-    ExtensionElement extensionType = getExtensionType(context);
+    ExtensionElement extensionType = getExtensionElement(context);
     if (extensionType.getDeclaringClass().isPresent()) {
       try {
         // TODO: MULE-12744. If this call throws an exception it means that the extension cannot access the privileged API.
@@ -194,18 +200,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
     return emptyList();
   }
 
-  private ExtensionElement getExtensionType(ExtensionLoadingContext context) {
-    return context.<ExtensionElement>getParameter(EXTENSION_TYPE).orElseGet(() -> {
-      String type = (String) context.getParameter("type").get();
-      try {
-        ClassLoader extensionClassLoader = context.getExtensionClassLoader();
-        return new ExtensionTypeWrapper<>(loadClass(type, extensionClassLoader),
-                                          new DefaultExtensionsTypeLoaderFactory().createTypeLoader(extensionClassLoader));
-      } catch (ClassNotFoundException e) {
-        throw new RuntimeException(format("Class '%s' cannot be loaded", type), e);
-      }
-    });
-  }
+
 
   private <R> R instantiateOrFail(Class<R> clazz) {
     try {

@@ -27,7 +27,7 @@ import java.util.TreeSet;
 
 import org.junit.Test;
 
-public class DefaultExtensionModelLoaderDelegateTestCase {
+public class AbstractExtensionModelLoaderDelegateTestCase {
 
   @Test
   public void verifyExportedTypesAndResourcesFromExtensionUsingSdkApi() {

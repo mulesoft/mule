@@ -151,4 +151,5 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
    * @return the notifications the extension emits.
    */
   List<NotificationModel> getNotificationModels();
+
 }

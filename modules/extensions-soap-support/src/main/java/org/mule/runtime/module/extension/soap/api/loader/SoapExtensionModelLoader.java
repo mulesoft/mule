@@ -21,5 +21,4 @@ public class SoapExtensionModelLoader extends AbstractJavaExtensionModelLoader {
   public SoapExtensionModelLoader() {
     super(SOAP_LOADER_ID, SoapModelLoaderDelegate::new);
   }
-
 }
