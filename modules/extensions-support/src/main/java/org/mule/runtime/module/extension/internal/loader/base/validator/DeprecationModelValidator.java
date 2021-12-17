@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.base.validator;
 
 import static java.lang.String.format;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
-import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
+import static org.mule.runtime.module.extension.internal.loader.java.validation.ModelValidationUtils.isCompiletime;
 
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.NamedObject;

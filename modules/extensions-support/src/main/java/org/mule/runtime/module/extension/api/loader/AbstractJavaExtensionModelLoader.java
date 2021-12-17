@@ -27,47 +27,45 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
-import org.mule.runtime.module.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.DefaultEncodingDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.DynamicMetadataDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.ExtensionDescriptionsEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.JavaConfigurationDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.JavaOAuthDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.MimeTypeParametersDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.ObjectStoreParameterDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.ParameterAllowedStereotypesDeclarionEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.ParameterLayoutOrderDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.PollingSourceDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.RedeliveryPolicyDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.RefNameDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.RequiredForMetadataDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.RuntimeVersionDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.SampleDataDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.ValueProvidersParameterDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
-import org.mule.runtime.module.extension.internal.loader.validation.ComponentLocationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.base.validator.ConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.base.validator.ConnectionProviderModelValidator;
 import org.mule.runtime.module.extension.internal.loader.base.validator.DeprecationModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.IgnoredExtensionParameterModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.InjectedFieldsModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.InputParametersTypeModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.JavaSubtypesModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.MediaTypeModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.MetadataComponentModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.NullSafeModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.OAuthConnectionProviderModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.OperationParametersTypeModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.OperationReturnTypeModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.PagedOperationModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.ParameterGroupModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.ParameterPluralNameModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.ParameterTypeModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.PojosModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.PrivilegedApiValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.SampleDataModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.SourceCallbacksModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidator;
+import org.mule.runtime.module.extension.internal.loader.base.validator.ParameterPluralNameModelValidator;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.DefaultEncodingDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.DynamicMetadataDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.ExtensionDescriptionsEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.JavaConfigurationDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.JavaMimeTypeParametersDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.JavaOAuthDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.JavaObjectStoreParameterDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.ParameterAllowedStereotypesDeclarionEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.ParameterLayoutOrderDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.PollingSourceDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.RefNameDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.RequiredForMetadataDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.RuntimeVersionDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.SampleDataDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.ValueProvidersParameterDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
+import org.mule.runtime.module.extension.internal.loader.java.validation.ComponentLocationModelValidator;
+import org.mule.runtime.module.extension.internal.loader.java.validation.IgnoredExtensionParameterModelValidator;
+import org.mule.runtime.module.extension.internal.loader.java.validation.InjectedFieldsModelValidator;
+import org.mule.runtime.module.extension.internal.loader.java.validation.JavaInputParametersTypeModelValidator;
+import org.mule.runtime.module.extension.internal.loader.java.validation.JavaOAuthConnectionProviderModelValidator;
+import org.mule.runtime.module.extension.internal.loader.java.validation.JavaParameterTypeModelValidator;
+import org.mule.runtime.module.extension.internal.loader.java.validation.JavaSampleDataModelValidator;
+import org.mule.runtime.module.extension.internal.loader.java.validation.JavaSubtypesModelValidator;
+import org.mule.runtime.module.extension.internal.loader.java.validation.JavaValueProviderModelValidator;
+import org.mule.runtime.module.extension.internal.loader.java.validation.MediaTypeModelValidator;
+import org.mule.runtime.module.extension.internal.loader.java.validation.MetadataComponentModelValidator;
+import org.mule.runtime.module.extension.internal.loader.java.validation.NullSafeModelValidator;
+import org.mule.runtime.module.extension.internal.loader.java.validation.OperationParametersTypeModelValidator;
+import org.mule.runtime.module.extension.internal.loader.java.validation.OperationReturnTypeModelValidator;
+import org.mule.runtime.module.extension.internal.loader.java.validation.PagedOperationModelValidator;
+import org.mule.runtime.module.extension.internal.loader.java.validation.ParameterGroupModelValidator;
+import org.mule.runtime.module.extension.internal.loader.java.validation.PojosModelValidator;
+import org.mule.runtime.module.extension.internal.loader.java.validation.PrivilegedApiValidator;
+import org.mule.runtime.module.extension.internal.loader.java.validation.SourceCallbacksModelValidator;
 
 import java.util.Collection;
 import java.util.List;
@@ -80,12 +78,13 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
   public static final String TYPE_PROPERTY_NAME = "type";
   public static final String EXTENSION_TYPE = "EXTENSION_TYPE";
   public static final String VERSION = "version";
+
   private final List<ExtensionModelValidator> customValidators = unmodifiableList(asList(
-                                                                                         new ConfigurationModelValidator(), //
-                                                                                         new ConnectionProviderModelValidator(), //
+                                                                                         new ConfigurationModelValidator(),
+                                                                                         new ConnectionProviderModelValidator(),
                                                                                          new PojosModelValidator(),
                                                                                          new DeprecationModelValidator(),
-                                                                                         new InputParametersTypeModelValidator(),
+                                                                                         new JavaInputParametersTypeModelValidator(),
                                                                                          new JavaSubtypesModelValidator(),
                                                                                          new MediaTypeModelValidator(),
                                                                                          new MetadataComponentModelValidator(),
@@ -95,35 +94,33 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                          new SourceCallbacksModelValidator(),
                                                                                          new PagedOperationModelValidator(),
                                                                                          new ParameterGroupModelValidator(),
-                                                                                         new ParameterTypeModelValidator(),
+                                                                                         new JavaParameterTypeModelValidator(),
                                                                                          new ParameterPluralNameModelValidator(),
-                                                                                         new OAuthConnectionProviderModelValidator(),
-                                                                                         new ValueProviderModelValidator(),
-                                                                                         new SampleDataModelValidator(),
+                                                                                         new JavaOAuthConnectionProviderModelValidator(),
+                                                                                         new JavaValueProviderModelValidator(),
+                                                                                         new JavaSampleDataModelValidator(),
                                                                                          new PrivilegedApiValidator(),
                                                                                          new ComponentLocationModelValidator(),
                                                                                          new InjectedFieldsModelValidator(),
                                                                                          new IgnoredExtensionParameterModelValidator()));
 
   private final List<DeclarationEnricher> customDeclarationEnrichers = unmodifiableList(asList(
-                                                                                               new BooleanParameterDeclarationEnricher(),
                                                                                                new RefNameDeclarationEnricher(),
                                                                                                new DefaultEncodingDeclarationEnricher(),
                                                                                                new RuntimeVersionDeclarationEnricher(),
                                                                                                // TODO: MOVE TO EXT_API when
                                                                                                // https://www.mulesoft.org/jira/browse/MULE-13070
-                                                                                               new MimeTypeParametersDeclarationEnricher(),
+                                                                                               new JavaMimeTypeParametersDeclarationEnricher(),
                                                                                                new DynamicMetadataDeclarationEnricher(),
                                                                                                new RequiredForMetadataDeclarationEnricher(),
                                                                                                new JavaConfigurationDeclarationEnricher(),
                                                                                                new JavaOAuthDeclarationEnricher(),
-                                                                                               new RedeliveryPolicyDeclarationEnricher(),
                                                                                                new ExtensionDescriptionsEnricher(),
                                                                                                new ValueProvidersParameterDeclarationEnricher(),
                                                                                                new SampleDataDeclarationEnricher(),
                                                                                                new ParameterAllowedStereotypesDeclarionEnricher(),
                                                                                                new ParameterLayoutOrderDeclarationEnricher(),
-                                                                                               new ObjectStoreParameterDeclarationEnricher(),
+                                                                                               new JavaObjectStoreParameterDeclarationEnricher(),
                                                                                                new PollingSourceDeclarationEnricher()));
 
   private final String id;

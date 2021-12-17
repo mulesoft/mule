@@ -24,6 +24,7 @@ import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescripto
 import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
+import org.mule.runtime.module.extension.internal.loader.java.validation.ParameterGroupModelValidator;
 import org.mule.tck.size.SmallTest;
 
 import java.io.Serializable;

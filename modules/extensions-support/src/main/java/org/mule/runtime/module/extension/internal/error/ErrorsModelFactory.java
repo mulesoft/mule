@@ -9,8 +9,8 @@ package org.mule.runtime.module.extension.internal.error;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.error.ErrorModelUtils.isMuleError;
-import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.CONNECTIVITY;
-import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.RETRY_EXHAUSTED;
+import static org.mule.runtime.module.extension.internal.error.ModuleErrors.CONNECTIVITY;
+import static org.mule.runtime.module.extension.internal.error.ModuleErrors.RETRY_EXHAUSTED;
 import static org.mule.sdk.api.error.MuleErrors.ANY;
 import static org.mule.sdk.api.error.MuleErrors.CRITICAL;
 

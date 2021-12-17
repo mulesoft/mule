@@ -39,6 +39,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
+import org.mule.runtime.module.extension.internal.loader.java.validation.InjectedFieldsModelValidator;
 import org.mule.sdk.api.annotation.param.RuntimeVersion;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
