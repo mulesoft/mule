@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
-import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.test.runner.infrastructure.ExtensionsTestInfrastructureDiscoverer;
 

@@ -35,7 +35,8 @@ public final class ModelValidationUtils {
     return model.getModelProperty(CompileTimeModelProperty.class).isPresent();
   }
 
-  public static void validateConfigOverrideParametersNotAllowed(ParameterizedModel model, ProblemsReporter reporter, String kind) {
+  public static void validateConfigOverrideParametersNotAllowed(ParameterizedModel model, ProblemsReporter reporter,
+                                                                String kind) {
 
     List<String> configOverrideParameters = model.getAllParameterModels().stream()
         .filter(ParameterModel::isOverrideFromConfig)

@@ -9,8 +9,8 @@ package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.module.extension.internal.loader.base.delegate.MuleExtensionAnnotationParser.getExtensionInfo;
-import static org.mule.runtime.module.extension.internal.loader.base.delegate.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.delegate.MuleExtensionAnnotationParser.getExtensionInfo;
+import static org.mule.runtime.module.extension.internal.loader.delegate.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
 
 import org.mule.metadata.api.ClassTypeLoader;

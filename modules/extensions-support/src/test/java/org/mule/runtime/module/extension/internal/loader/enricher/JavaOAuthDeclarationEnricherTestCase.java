@@ -18,7 +18,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.base.delegate.DefaultExtensionModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.JavaOAuthDeclarationEnricher;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.oauth.TestOAuthExtension;

@@ -4,14 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.api.loader.java;
+package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.CustomStaticTypeDeclarationEnricher;
 
 import java.util.List;

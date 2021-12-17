@@ -49,8 +49,8 @@ import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
-import org.mule.runtime.module.extension.internal.loader.base.delegate.DefaultExtensionModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.HeisenbergOperations;
@@ -77,7 +77,8 @@ public class DisplayModelTestCase extends AbstractMuleTestCase {
     String version = getProductVersion();
     ClassLoader cl = getClass().getClassLoader();
     DefaultExtensionLoadingContext loadingCtx = new DefaultExtensionLoadingContext(cl, DSL_CTX);
-    DefaultExtensionModelLoaderDelegate heisenbergLoader = new DefaultExtensionModelLoaderDelegate(HeisenbergExtension.class, version);
+    DefaultExtensionModelLoaderDelegate heisenbergLoader =
+        new DefaultExtensionModelLoaderDelegate(HeisenbergExtension.class, version);
     DefaultExtensionModelLoaderDelegate marvelLoader = new DefaultExtensionModelLoaderDelegate(MarvelExtension.class, version);
     heisenbergDeclarer = heisenbergLoader.declare(loadingCtx);
     marvelDeclarer = marvelLoader.declare(loadingCtx);

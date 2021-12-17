@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
-import static org.mule.runtime.module.extension.internal.loader.base.delegate.MuleExtensionAnnotationParser.getExtensionInfo;
+import static org.mule.runtime.module.extension.internal.loader.delegate.MuleExtensionAnnotationParser.getExtensionInfo;
 
 import static java.util.Collections.emptySet;
 import static java.util.Optional.ofNullable;

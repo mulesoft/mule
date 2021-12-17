@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.api.loader;
+package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
@@ -23,14 +23,16 @@ import org.mule.runtime.extension.api.annotation.privileged.DeclarationEnrichers
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
+import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
+import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegateFactory;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelParserFactory;
-import org.mule.runtime.module.extension.internal.loader.base.AbstractExtensionModelLoader;
-import org.mule.runtime.module.extension.internal.loader.base.delegate.DefaultExtensionModelLoaderDelegate;
-import org.mule.runtime.module.extension.internal.loader.base.validator.ConfigurationModelValidator;
-import org.mule.runtime.module.extension.internal.loader.base.validator.ConnectionProviderModelValidator;
-import org.mule.runtime.module.extension.internal.loader.base.validator.DeprecationModelValidator;
-import org.mule.runtime.module.extension.internal.loader.base.validator.ParameterPluralNameModelValidator;
+import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
+import org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.validator.ConfigurationModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validator.ConnectionProviderModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validator.DeprecationModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validator.ParameterPluralNameModelValidator;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.DefaultEncodingDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.DynamicMetadataDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.ExtensionDescriptionsEnricher;
@@ -128,8 +130,8 @@ public abstract class AbstractJavaExtensionModelLoader extends AbstractExtension
 
   @Deprecated
   public AbstractJavaExtensionModelLoader(String id, BiFunction<Class<?>, String, ModelLoaderDelegate> delegate) {
-    this(id, (ModelLoaderDelegateFactory) (extensionElement, version) ->
-        delegate.apply(extensionElement.getDeclaringClass().get(), version));
+    this(id, (ModelLoaderDelegateFactory) (extensionElement, version) -> delegate
+        .apply(extensionElement.getDeclaringClass().get(), version));
   }
 
   @Deprecated

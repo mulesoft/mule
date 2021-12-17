@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.base.validator;
+package org.mule.runtime.module.extension.internal.loader.validator;
 
 import static java.lang.String.format;
 import static org.mule.runtime.module.extension.internal.loader.java.validation.ModelValidationUtils.validateConfigOverrideParametersNotAllowed;
@@ -51,7 +51,7 @@ import com.google.common.collect.Multimap;
  *
  * @since 4.0
  */
-//TODO: Split java part away
+// TODO: Split java part away
 public final class ConnectionProviderModelValidator implements ExtensionModelValidator {
 
   @Override

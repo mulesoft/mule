@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.base;
+package org.mule.runtime.module.extension.internal.loader;
 
 import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
@@ -17,13 +17,13 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENA
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
-import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelParserFactory;
-import org.mule.runtime.module.extension.internal.loader.base.delegate.DefaultExtensionModelLoaderDelegate;
-import org.mule.runtime.module.extension.internal.loader.base.validator.ConfigurationModelValidator;
-import org.mule.runtime.module.extension.internal.loader.base.validator.ConnectionProviderModelValidator;
-import org.mule.runtime.module.extension.internal.loader.base.validator.DeprecationModelValidator;
-import org.mule.runtime.module.extension.internal.loader.base.validator.ParameterPluralNameModelValidator;
+import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
+import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.validator.ConfigurationModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validator.ConnectionProviderModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validator.DeprecationModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validator.ParameterPluralNameModelValidator;
 
 import java.util.List;
 
@@ -35,10 +35,10 @@ public abstract class AbstractExtensionModelLoader extends ExtensionModelLoader 
   public static final String VERSION = "version";
 
   private final List<ExtensionModelValidator> validators = unmodifiableList(asList(
-      new ConfigurationModelValidator(),
-      new ConnectionProviderModelValidator(),
-      new DeprecationModelValidator(),
-      new ParameterPluralNameModelValidator()));
+                                                                                   new ConfigurationModelValidator(),
+                                                                                   new ConnectionProviderModelValidator(),
+                                                                                   new DeprecationModelValidator(),
+                                                                                   new ParameterPluralNameModelValidator()));
 
   /**
    * {@inheritDoc}
