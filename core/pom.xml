@@ -55,7 +55,7 @@
         								</goals>
         							</pluginExecutionFilter>
         							<action>
-        								<ignore></ignore>
+        								<ignore/>
         							</action>
         						</pluginExecution>
         					</pluginExecutions>
@@ -186,7 +186,7 @@
             <!-- not to be confused with LMAX Disruptor (used by log4j2), this one provides queue impls used by Vibur -->
             <groupId>com.conversantmedia</groupId>
             <artifactId>disruptor</artifactId>
-            <version>1.2.10</version>
+            <version>1.2.19</version>
         </dependency>
         <dependency>
             <!-- javax.jms is included to provide the same user experience on CE/EE when JMS connector is used -->
