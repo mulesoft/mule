@@ -31,6 +31,10 @@ public class ConfigurationDependencyResolver {
     this.appModelDependencyGraph = generateFor(applicationModel);
   }
 
+  public ConfigurationDependencyResolver(ArtifactAstDependencyGraph graph) {
+    this.appModelDependencyGraph = graph;
+  }
+
   /**
    * @param componentName the name attribute value of the component
    * @return the dependencies of the component with component name {@code #componentName}. An empty collection if there is no
@@ -47,7 +51,23 @@ public class ConfigurationDependencyResolver {
         .collect(toList());
   }
 
-  private static class ComponentNamePredicate implements Predicate<ComponentAst> {
+  /**
+   * @param componentName the name attribute value of the component
+   * @return the direct dependencies of the component with component name {@code #componentName}. An empty collection if there is
+   *         no component with such name.
+   */
+  public Collection<String> getDirectComponentDependencies(String componentName) {
+    return appModelDependencyGraph
+        .getRequiredComponents(new ComponentNamePredicate(componentName))
+        .stream()
+        .map(ComponentAst::getComponentId)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .collect(toList()); // todo: return pairs like the declaredDependenciesResolver
+  }
+
+
+  static class ComponentNamePredicate implements Predicate<ComponentAst> {
 
     private final String componentName;
 

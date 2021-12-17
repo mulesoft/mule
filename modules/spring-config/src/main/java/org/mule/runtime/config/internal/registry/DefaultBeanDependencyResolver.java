@@ -13,6 +13,7 @@ import static java.util.stream.StreamSupport.stream;
 import static com.google.common.graph.Traverser.forTree;
 
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.config.internal.DependencyNode;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
 
@@ -126,26 +127,5 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
     }
   }
 
-  private class DependencyNode {
 
-    private final Object value;
-    private final List<DependencyNode> children = new LinkedList<>();
-
-    private DependencyNode(Object value) {
-      this.value = value;
-    }
-
-    public DependencyNode addChild(DependencyNode child) {
-      children.add(child);
-      return this;
-    }
-
-    public List<DependencyNode> getChildren() {
-      return children;
-    }
-
-    public Object getValue() {
-      return value;
-    }
-  }
 }
