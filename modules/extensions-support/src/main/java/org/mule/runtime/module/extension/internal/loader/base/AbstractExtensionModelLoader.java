@@ -17,7 +17,9 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENA
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
-import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
+import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelParserFactory;
+import org.mule.runtime.module.extension.internal.loader.base.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.base.validator.ConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.base.validator.ConnectionProviderModelValidator;
 import org.mule.runtime.module.extension.internal.loader.base.validator.DeprecationModelValidator;
@@ -25,9 +27,7 @@ import org.mule.runtime.module.extension.internal.loader.base.validator.Paramete
 
 import java.util.List;
 
-public class DefaultExtensionModelLoader extends ExtensionModelLoader {
-
-  private static final String DEFAULT_LOADER_ID = "default";
+public abstract class AbstractExtensionModelLoader extends ExtensionModelLoader {
 
   private static final boolean IGNORE_DISABLED = getProperty(DISABLE_SDK_IGNORE_COMPONENT) != null;
   private static final boolean ENABLE_POLLING_SOURCE_LIMIT = getProperty(ENABLE_SDK_POLLING_SOURCE_LIMIT) != null;
@@ -44,14 +44,6 @@ public class DefaultExtensionModelLoader extends ExtensionModelLoader {
    * {@inheritDoc}
    */
   @Override
-  public String getId() {
-    return DEFAULT_LOADER_ID;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   protected void configureContextBeforeDeclaration(ExtensionLoadingContext context) {
     context.addCustomValidators(validators);
 
@@ -63,14 +55,21 @@ public class DefaultExtensionModelLoader extends ExtensionModelLoader {
     }
   }
 
+  protected abstract ExtensionModelParserFactory getExtensionModelParserFactory(ExtensionLoadingContext context);
+
   /**
    * {@inheritDoc}
    */
   @Override
-  protected void declareExtension(ExtensionLoadingContext context) {
-    ExtensionElement extensionType = getExtensionType(context);
+  protected final void declareExtension(ExtensionLoadingContext context) {
     String version =
         context.<String>getParameter(VERSION).orElseThrow(() -> new IllegalArgumentException("version not specified"));
-    factory.getLoader(extensionType, version).declare(context);
+
+    ExtensionModelParserFactory parserFactory = getExtensionModelParserFactory(context);
+    getModelLoaderDelegate(version).declare(parserFactory, context);
+  }
+
+  protected ModelLoaderDelegate getModelLoaderDelegate(String version) {
+    return new DefaultExtensionModelLoaderDelegate(version);
   }
 }

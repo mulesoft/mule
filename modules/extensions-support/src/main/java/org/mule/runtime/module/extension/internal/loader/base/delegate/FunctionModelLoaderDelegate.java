@@ -23,7 +23,6 @@ import java.util.Map;
  */
 final class FunctionModelLoaderDelegate extends AbstractComponentModelLoaderDelegate {
 
-
   private final Map<FunctionModelParser, FunctionDeclarer> functionDeclarers = new HashMap<>();
 
   FunctionModelLoaderDelegate(DefaultExtensionModelLoaderDelegate delegate) {

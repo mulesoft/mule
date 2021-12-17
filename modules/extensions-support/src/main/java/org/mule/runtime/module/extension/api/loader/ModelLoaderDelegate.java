@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.api.loader;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelParserFactory;
 
 /**
  * Contract for classes that creates an {@link ExtensionDeclarer} from a {@link ExtensionLoadingContext}.
@@ -22,5 +23,10 @@ public interface ModelLoaderDelegate {
    * @param context an {@link ExtensionLoadingContext} instance.
    * @return a built {@link ExtensionDeclarer}.
    */
+  @Deprecated
   ExtensionDeclarer declare(ExtensionLoadingContext context);
+
+  default ExtensionDeclarer declare(ExtensionModelParserFactory parserFactory, ExtensionLoadingContext context) {
+    return declare(context);
+  }
 }

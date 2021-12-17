@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentDeclarationTypeName;
 import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
@@ -32,12 +31,11 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
-import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.error.ErrorsModelFactory;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelParserFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserFactory;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -51,8 +49,6 @@ import java.util.function.Supplier;
  */
 public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate {
 
-  protected Class<?> extensionType;
-  protected final ExtensionElement extensionElement;
   protected final String version;
 
   private final ConfigModelLoaderDelegate configLoaderDelegate = new ConfigModelLoaderDelegate(this);
@@ -70,24 +66,23 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
   private ExtensionDeclarer declarer;
   private String namespace;
 
-  public DefaultExtensionModelLoaderDelegate(ExtensionElement extensionElement, String version) {
+  public DefaultExtensionModelLoaderDelegate(String version) {
     this.version = version;
-    this.extensionElement = extensionElement;
   }
 
-
-  public DefaultExtensionModelLoaderDelegate(Class<?> extensionType, String version) {
-    this(new ExtensionTypeWrapper<>(extensionType, getDefault().createTypeLoader(extensionType.getClassLoader())), version);
-    this.extensionType = extensionType;
+  @Override
+  @Deprecated
+  public ExtensionDeclarer declare(ExtensionLoadingContext context) {
+    return declare(new JavaExtensionModelParserFactory(), context);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public ExtensionDeclarer declare(ExtensionLoadingContext context) {
+  public ExtensionDeclarer declare(ExtensionModelParserFactory parserFactory, ExtensionLoadingContext context) {
     stereotypeModelLoaderDelegate = new StereotypeModelLoaderDelegate(context);
-    ExtensionModelParser parser = new JavaExtensionModelParser(extensionElement, stereotypeModelLoaderDelegate, context);
+    ExtensionModelParser parser = parserFactory.createParser(context);
     ExtensionDeclarer declarer =
         context.getExtensionDeclarer()
             .named(parser.getName())
@@ -95,7 +90,7 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
             .fromVendor(parser.getVendor())
             .withCategory(parser.getCategory())
             .withModelProperty(parser.getLicenseModelProperty())
-            .withXmlDsl(getXmlDslModel(extensionElement, version, parser.getXmlDslConfiguration()));
+            .withXmlDsl(getXmlDslModel(parser.getName(), version, parser.getXmlDslConfiguration()));
 
     // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
     context.getParameter("COMPILATION_MODE")
@@ -118,7 +113,7 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
     configLoaderDelegate.declareConfigurations(declarer, parser);
     connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers());
 
-    if (!extensionElement.getConfigurations().isEmpty()) {
+    if (!parser.getConfigurationParsers().isEmpty()) {
       operationLoaderDelegate.declareOperations(declarer, declarer, parser.getOperationModelParsers());
       functionModelLoaderDelegate.declareFunctions(declarer, parser.getFunctionModelParsers());
       sourceModelLoaderDelegate.declareMessageSources(declarer, declarer, parser.getSourceModelParsers());
