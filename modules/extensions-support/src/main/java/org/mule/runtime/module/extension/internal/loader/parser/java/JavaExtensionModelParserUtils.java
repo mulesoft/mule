@@ -43,7 +43,6 @@ import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
-import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.ComponentElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ConnectionProviderElement;
@@ -58,6 +57,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.api.loader.java.type.WithOperationContainers;
 import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
+import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
@@ -68,6 +68,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelPa
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEnterpriseLicenseInfo;
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEntitlementInfo;
+import org.mule.runtime.module.extension.internal.loader.parser.java.operation.JavaOperationModelParserUtils;
 import org.mule.sdk.api.annotation.semantics.file.FilePath;
 
 import java.lang.annotation.Annotation;
@@ -128,11 +129,13 @@ public final class JavaExtensionModelParserUtils {
   public static List<OperationModelParser> getOperationParsers(JavaExtensionModelParser extensionModelParser,
                                                                ExtensionElement extensionElement,
                                                                WithOperationContainers operationContainers,
+                                                               boolean requiresConfig,
                                                                ExtensionLoadingContext loadingContext) {
     return operationContainers.getOperationContainers().stream()
         .flatMap(container -> container.getOperations().stream()
             .map(method -> new JavaOperationModelParser(extensionModelParser, extensionElement, container, method,
-                                                        loadingContext)))
+                loadingContext)))
+        .filter(parser -> JavaOperationModelParserUtils.requiresConfig(parser) == requiresConfig)
         .collect(toList());
   }
 

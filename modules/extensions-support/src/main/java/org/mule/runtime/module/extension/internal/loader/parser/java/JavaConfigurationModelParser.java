@@ -94,8 +94,12 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public List<OperationModelParser> getOperationParsers() {
-    return JavaExtensionModelParserUtils.getOperationParsers(extensionModelParser, extensionElement, configElement,
-                                                             loadingContext);
+    return JavaExtensionModelParserUtils.getOperationParsers(
+        extensionModelParser,
+        extensionElement,
+        configElement,
+        true,
+        loadingContext);
   }
 
   @Override

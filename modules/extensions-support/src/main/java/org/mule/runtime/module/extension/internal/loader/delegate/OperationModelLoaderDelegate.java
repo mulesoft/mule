@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.delegate;
 import static java.lang.String.format;
 import static java.util.Optional.of;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.operation.JavaOperationModelParserUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -49,7 +50,7 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
         continue;
       }
 
-      final boolean requiresConfig = parser.hasConfig() || parser.isConnected() || parser.isAutoPaging();
+      final boolean requiresConfig = requiresConfig(parser);
       HasOperationDeclarer actualDeclarer = requiresConfig
           ? ownerDeclarer
           : extensionDeclarer;
@@ -61,7 +62,7 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
                                                                + "since connections are required for paging", parser.getName()));
       }
 
-      if (actualDeclarer == extensionDeclarer && requiresConfig) {
+      if (extensionLevelOperation && requiresConfig) {
         throw new IllegalOperationModelDefinitionException(format(
                                                                   "Operation '%s' is defined at the extension level but it requires a config. "
                                                                       + "Remove such parameter or move the operation to the proper config",

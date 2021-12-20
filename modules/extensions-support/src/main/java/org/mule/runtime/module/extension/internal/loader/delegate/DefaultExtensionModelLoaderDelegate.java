@@ -80,7 +80,6 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
    */
   @Override
   public ExtensionDeclarer declare(ExtensionModelParserFactory parserFactory, ExtensionLoadingContext context) {
-    stereotypeModelLoaderDelegate = new StereotypeModelLoaderDelegate(context);
     ExtensionModelParser parser = parserFactory.createParser(context);
     ExtensionDeclarer declarer =
         context.getExtensionDeclarer()
@@ -97,6 +96,8 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
 
     this.declarer = declarer;
     namespace = getExtensionsNamespace(declarer.getDeclaration());
+    stereotypeModelLoaderDelegate = new StereotypeModelLoaderDelegate(context);
+    stereotypeModelLoaderDelegate.setNamespace(namespace);
 
     parser.getDeprecationModel().ifPresent(declarer::withDeprecation);
     parser.getExternalLibraryModels().forEach(declarer::withExternalLibrary);
@@ -112,11 +113,9 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
     configLoaderDelegate.declareConfigurations(declarer, parser);
     connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers());
 
-    if (!parser.getConfigurationParsers().isEmpty()) {
-      operationLoaderDelegate.declareOperations(declarer, declarer, parser.getOperationModelParsers());
-      functionModelLoaderDelegate.declareFunctions(declarer, parser.getFunctionModelParsers());
-      sourceModelLoaderDelegate.declareMessageSources(declarer, declarer, parser.getSourceModelParsers());
-    }
+    operationLoaderDelegate.declareOperations(declarer, declarer, parser.getOperationModelParsers());
+    functionModelLoaderDelegate.declareFunctions(declarer, parser.getFunctionModelParsers());
+    sourceModelLoaderDelegate.declareMessageSources(declarer, declarer, parser.getSourceModelParsers());
 
     getStereotypeModelLoaderDelegate().resolveDeclaredTypesStereotypes(declarer.getDeclaration());
 

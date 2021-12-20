@@ -262,6 +262,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
     return getOperationParsers(this,
                                extensionElement,
                                extensionElement,
+                               false,
                                loadingContext);
   }
 
