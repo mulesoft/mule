@@ -4,10 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.soap.api.loader;
+package org.mule.runtime.module.extension.soap.internal.loader;
 
 import org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader;
-import org.mule.runtime.module.extension.soap.internal.loader.SoapModelLoaderDelegate;
 
 /**
  * Loads a Soap Based extension by introspecting a class which uses the Soap Extensions API annotations
