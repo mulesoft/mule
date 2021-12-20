@@ -55,7 +55,7 @@ public class PipelineProcessingStrategyReactiveProcessorBuilderTestCase extends 
   private CoreEvent coreEvent;
 
   @Mock(answer = RETURNS_MOCKS)
-  private ProfilingService profilingService;
+  private CoreProfilingService profilingService;
 
   @Mock
   private ProfilingDataProducer profilingDataProducer;
