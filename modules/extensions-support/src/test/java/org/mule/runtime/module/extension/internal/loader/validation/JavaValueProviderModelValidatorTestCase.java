@@ -194,7 +194,7 @@ public class JavaValueProviderModelValidatorTestCase {
     mockParameter(operationParameter, builder);
 
     validate();
-    assertProblems("The following ValueProvider implementations [org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidatorTestCase$SomeValueProvider, org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidatorTestCase$SomeOtherValueProvider] use the same id [valueProviderId]. ValueProvider ids must be unique.");
+    assertProblems("The following ValueProvider implementations [org.mule.runtime.module.extension.internal.loader.validation.JavaValueProviderModelValidatorTestCase$SomeValueProvider, org.mule.runtime.module.extension.internal.loader.validation.JavaValueProviderModelValidatorTestCase$SomeOtherValueProvider] use the same id [valueProviderId]. ValueProvider ids must be unique.");
   }
 
   @Test

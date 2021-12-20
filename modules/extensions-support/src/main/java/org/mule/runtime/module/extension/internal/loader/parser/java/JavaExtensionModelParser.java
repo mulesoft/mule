@@ -12,6 +12,7 @@ import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
+import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.delegate.MuleExtensionAnnotationParser.mapReduceRepeatableAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.delegate.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getOperationParsers;
@@ -262,15 +263,18 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
     return getOperationParsers(this,
                                extensionElement,
                                extensionElement,
-                               false,
-                               loadingContext);
+                               loadingContext)
+                                   .filter(operation -> !requiresConfig(operation))
+                                   .collect(toList());
   }
 
   @Override
   public List<SourceModelParser> getSourceModelParsers() {
     return JavaExtensionModelParserUtils.getSourceParsers(extensionElement,
                                                           extensionElement.getSources(),
-                                                          loadingContext);
+                                                          loadingContext)
+        .filter(source -> !requiresConfig(source))
+        .collect(toList());
   }
 
   @Override

@@ -68,7 +68,6 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelPa
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEnterpriseLicenseInfo;
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEntitlementInfo;
-import org.mule.runtime.module.extension.internal.loader.parser.java.operation.JavaOperationModelParserUtils;
 import org.mule.sdk.api.annotation.semantics.file.FilePath;
 
 import java.lang.annotation.Annotation;
@@ -76,6 +75,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import com.google.common.base.Enums;
 
@@ -126,25 +126,21 @@ public final class JavaExtensionModelParserUtils {
   }
 
 
-  public static List<OperationModelParser> getOperationParsers(JavaExtensionModelParser extensionModelParser,
-                                                               ExtensionElement extensionElement,
-                                                               WithOperationContainers operationContainers,
-                                                               boolean requiresConfig,
-                                                               ExtensionLoadingContext loadingContext) {
+  public static Stream<OperationModelParser> getOperationParsers(JavaExtensionModelParser extensionModelParser,
+                                                                 ExtensionElement extensionElement,
+                                                                 WithOperationContainers operationContainers,
+                                                                 ExtensionLoadingContext loadingContext) {
     return operationContainers.getOperationContainers().stream()
         .flatMap(container -> container.getOperations().stream()
             .map(method -> new JavaOperationModelParser(extensionModelParser, extensionElement, container, method,
-                loadingContext)))
-        .filter(parser -> JavaOperationModelParserUtils.requiresConfig(parser) == requiresConfig)
-        .collect(toList());
+                                                        loadingContext)));
   }
 
-  public static List<SourceModelParser> getSourceParsers(ExtensionElement extensionElement,
-                                                         List<SourceElement> sources,
-                                                         ExtensionLoadingContext loadingContext) {
+  public static Stream<SourceModelParser> getSourceParsers(ExtensionElement extensionElement,
+                                                           List<SourceElement> sources,
+                                                           ExtensionLoadingContext loadingContext) {
     return sources.stream()
-        .map(source -> new JavaSourceModelParser(extensionElement, source, loadingContext))
-        .collect(toList());
+        .map(source -> new JavaSourceModelParser(extensionElement, source, loadingContext));
   }
 
   public static List<ConnectionProviderModelParser> getConnectionProviderModelParsers(

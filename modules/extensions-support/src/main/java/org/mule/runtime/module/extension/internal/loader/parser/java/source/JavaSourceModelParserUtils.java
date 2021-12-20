@@ -16,9 +16,9 @@ import org.mule.sdk.api.annotation.source.SourceClusterSupport;
  *
  * @since 4.5.0
  */
-public class JavaParserSourceUtils {
+public class JavaSourceModelParserUtils {
 
-  private JavaParserSourceUtils() {}
+  private JavaSourceModelParserUtils() {}
 
   public static BackPressureMode fromSdkBackPressureMode(org.mule.sdk.api.runtime.source.BackPressureMode backPressureMode) {
     switch (backPressureMode) {
@@ -27,7 +27,6 @@ public class JavaParserSourceUtils {
       case FAIL:
         return BackPressureMode.FAIL;
       case WAIT:
-        return BackPressureMode.WAIT;
       default:
         return BackPressureMode.WAIT;
     }
