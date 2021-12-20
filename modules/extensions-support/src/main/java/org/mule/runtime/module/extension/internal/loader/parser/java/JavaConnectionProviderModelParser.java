@@ -15,11 +15,13 @@ import static org.mule.runtime.api.meta.model.connection.ConnectionManagementTyp
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.connectivity.internal.platform.schema.SemanticTermsHelper.getConnectionTermsFromAnnotations;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConnectionProvider;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.connection.JavaConnectionProviderModelParserUtils.isCachedConnectionProvider;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.connection.JavaConnectionProviderModelParserUtils.isDefinedThroughSdkApi;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.connection.JavaConnectionProviderModelParserUtils.isPoolingConnectionProvider;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.connection.SdkCredentialPlacementUtils.from;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLibModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
@@ -65,6 +67,8 @@ import java.util.Set;
  * @since 4.5.0
  */
 public class JavaConnectionProviderModelParser implements ConnectionProviderModelParser {
+
+  private static final String CONNECTION_PROVIDER_NAME = "connection provider";
 
   private final JavaExtensionModelParser extensionModelParser;
   private final ConnectionProviderElement element;
@@ -141,23 +145,69 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
   @Override
   public Optional<OAuthModelProperty> getOAuthModelProperty() {
     List<OAuthGrantType> grantTypes = new LinkedList<>();
-    element.getAnnotation(AuthorizationCode.class)
-        .ifPresent(a -> grantTypes.add(new AuthorizationCodeGrantType(a.accessTokenUrl(),
-                                                                      a.authorizationUrl(),
-                                                                      a.accessTokenExpr(),
-                                                                      a.expirationExpr(),
-                                                                      a.refreshTokenExpr(),
-                                                                      a.defaultScopes(),
-                                                                      a.credentialsPlacement(),
-                                                                      a.includeRedirectUriInRefreshTokenRequest())));
+    mapReduceSingleAnnotation(element, CONNECTION_PROVIDER_NAME, element.getName(), AuthorizationCode.class,
+                              org.mule.sdk.api.annotation.connectivity.oauth.AuthorizationCode.class,
+                              authorizationCodeAnnotationValueFetcher -> new AuthorizationCodeGrantType(
+                                                                                                        authorizationCodeAnnotationValueFetcher
+                                                                                                            .getStringValue(AuthorizationCode::accessTokenUrl),
+                                                                                                        authorizationCodeAnnotationValueFetcher
+                                                                                                            .getStringValue(AuthorizationCode::authorizationUrl),
+                                                                                                        authorizationCodeAnnotationValueFetcher
+                                                                                                            .getStringValue(AuthorizationCode::accessTokenExpr),
+                                                                                                        authorizationCodeAnnotationValueFetcher
+                                                                                                            .getStringValue(AuthorizationCode::expirationExpr),
+                                                                                                        authorizationCodeAnnotationValueFetcher
+                                                                                                            .getStringValue(AuthorizationCode::refreshTokenExpr),
+                                                                                                        authorizationCodeAnnotationValueFetcher
+                                                                                                            .getStringValue(AuthorizationCode::defaultScopes),
+                                                                                                        authorizationCodeAnnotationValueFetcher
+                                                                                                            .getEnumValue(AuthorizationCode::credentialsPlacement),
+                                                                                                        authorizationCodeAnnotationValueFetcher
+                                                                                                            .getBooleanValue(AuthorizationCode::includeRedirectUriInRefreshTokenRequest)),
+                              authorizationCodeAnnotationValueFetcher -> new AuthorizationCodeGrantType(
+                                                                                                        authorizationCodeAnnotationValueFetcher
+                                                                                                            .getStringValue(org.mule.sdk.api.annotation.connectivity.oauth.AuthorizationCode::accessTokenUrl),
+                                                                                                        authorizationCodeAnnotationValueFetcher
+                                                                                                            .getStringValue(org.mule.sdk.api.annotation.connectivity.oauth.AuthorizationCode::authorizationUrl),
+                                                                                                        authorizationCodeAnnotationValueFetcher
+                                                                                                            .getStringValue(org.mule.sdk.api.annotation.connectivity.oauth.AuthorizationCode::accessTokenExpr),
+                                                                                                        authorizationCodeAnnotationValueFetcher
+                                                                                                            .getStringValue(org.mule.sdk.api.annotation.connectivity.oauth.AuthorizationCode::expirationExpr),
+                                                                                                        authorizationCodeAnnotationValueFetcher
+                                                                                                            .getStringValue(org.mule.sdk.api.annotation.connectivity.oauth.AuthorizationCode::refreshTokenExpr),
+                                                                                                        authorizationCodeAnnotationValueFetcher
+                                                                                                            .getStringValue(org.mule.sdk.api.annotation.connectivity.oauth.AuthorizationCode::defaultScopes),
+                                                                                                        authorizationCodeAnnotationValueFetcher
+                                                                                                            .getEnumValue(authorizationCode -> from(authorizationCode
+                                                                                                                .credentialsPlacement())),
+                                                                                                        authorizationCodeAnnotationValueFetcher
+                                                                                                            .getBooleanValue(org.mule.sdk.api.annotation.connectivity.oauth.AuthorizationCode::includeRedirectUriInRefreshTokenRequest)))
+                                                                                                                .ifPresent(grantTypes::add);
 
-    element.getAnnotation(ClientCredentials.class).ifPresent(a -> grantTypes.add(new ClientCredentialsGrantType(a.tokenUrl(),
-                                                                                                                a.accessTokenExpr(),
-                                                                                                                a.expirationExpr(),
-                                                                                                                a.defaultScopes(),
-                                                                                                                a.credentialsPlacement()))
-
-    );
+    mapReduceSingleAnnotation(element, CONNECTION_PROVIDER_NAME, element.getName(), ClientCredentials.class,
+                              org.mule.sdk.api.annotation.connectivity.oauth.ClientCredentials.class,
+                              clientCredentialsAnnotationValueFetcher -> new ClientCredentialsGrantType(clientCredentialsAnnotationValueFetcher
+                                  .getStringValue(ClientCredentials::tokenUrl),
+                                                                                                        clientCredentialsAnnotationValueFetcher
+                                                                                                            .getStringValue(ClientCredentials::accessTokenExpr),
+                                                                                                        clientCredentialsAnnotationValueFetcher
+                                                                                                            .getStringValue(ClientCredentials::expirationExpr),
+                                                                                                        clientCredentialsAnnotationValueFetcher
+                                                                                                            .getStringValue(ClientCredentials::defaultScopes),
+                                                                                                        clientCredentialsAnnotationValueFetcher
+                                                                                                            .getEnumValue(ClientCredentials::credentialsPlacement)),
+                              clientCredentialsAnnotationValueFetcher -> new ClientCredentialsGrantType(clientCredentialsAnnotationValueFetcher
+                                  .getStringValue(org.mule.sdk.api.annotation.connectivity.oauth.ClientCredentials::tokenUrl),
+                                                                                                        clientCredentialsAnnotationValueFetcher
+                                                                                                            .getStringValue(org.mule.sdk.api.annotation.connectivity.oauth.ClientCredentials::accessTokenExpr),
+                                                                                                        clientCredentialsAnnotationValueFetcher
+                                                                                                            .getStringValue(org.mule.sdk.api.annotation.connectivity.oauth.ClientCredentials::defaultScopes),
+                                                                                                        clientCredentialsAnnotationValueFetcher
+                                                                                                            .getStringValue(org.mule.sdk.api.annotation.connectivity.oauth.ClientCredentials::expirationExpr),
+                                                                                                        clientCredentialsAnnotationValueFetcher
+                                                                                                            .getEnumValue(clientCredentials -> from(clientCredentials
+                                                                                                                .credentialsPlacement()))))
+                                                                                                                    .ifPresent(grantTypes::add);
 
     return grantTypes.isEmpty() ? empty() : of(new OAuthModelProperty(grantTypes));
   }
