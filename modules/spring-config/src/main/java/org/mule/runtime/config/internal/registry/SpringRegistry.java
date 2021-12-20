@@ -11,27 +11,27 @@ import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolve
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.AbstractApplicationContext;
 
 public class SpringRegistry extends AbstractSpringRegistry {
 
   public static final String REGISTRY_ID = "org.mule.Registry.Spring";
 
-  private ApplicationContext baseApplicationContext;
+  /**
+   * Key used to lookup Spring Application Context from SpringRegistry via Mule's Registry interface.
+   */
+  public static final String SPRING_APPLICATION_CONTEXT = "springApplicationContext";
+  private final BeanDependencyResolver beanDependencyResolver;
 
-  // Registered objects before the spring registry has been initialised.
-  private final Map<String, BeanDefinition> registeredBeanDefinitionsBeforeInitialization = new HashMap<>();
+  private ApplicationContext baseApplicationContext;
 
   public SpringRegistry(ApplicationContext baseApplicationContext,
                         ApplicationContext applicationContext,
@@ -40,12 +40,16 @@ public class SpringRegistry extends AbstractSpringRegistry {
                         LifecycleInterceptor lifecycleInterceptor) {
     super(applicationContext, muleContext, lifecycleInterceptor);
     this.baseApplicationContext = baseApplicationContext;
+    this.beanDependencyResolver = new DefaultBeanDependencyResolver(dependencyResolver, this);
   }
 
   @Override
   protected void doInitialise() throws InitialisationException {
-    ((AbstractApplicationContext) getApplicationContext())
-        .addBeanFactoryPostProcessor(createBeforeInitialisationRegisteredObjectsPostProcessor());
+    addBeanFactoryPostProcessor(createBeforeInitialisationRegisteredObjectsPostProcessor());
+
+    // This is used to track the Spring context lifecycle since there is no way to confirm the lifecycle phase from the
+    // application context
+    springContextInitialised.set(true);
 
     super.doInitialise();
   }
@@ -55,9 +59,9 @@ public class SpringRegistry extends AbstractSpringRegistry {
 
       @Override
       public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-        registeredBeanDefinitionsBeforeInitialization.entrySet().stream().forEach(beanDefinitionEntry -> {
-          registry.registerBeanDefinition(beanDefinitionEntry.getKey(), beanDefinitionEntry.getValue());
-        });
+        registeredBeanDefinitionsBeforeInitialization.entrySet().stream()
+            .forEach(beanDefinitionEntry -> registry.registerBeanDefinition(beanDefinitionEntry.getKey(),
+                                                                            beanDefinitionEntry.getValue()));
       }
 
       @Override
@@ -68,9 +72,7 @@ public class SpringRegistry extends AbstractSpringRegistry {
   }
 
   @Override
-  public void disposeContext() {
-    super.disposeContext();
-
+  protected void disposeContext() {
     if (((ConfigurableApplicationContext) baseApplicationContext).isActive()) {
       ((ConfigurableApplicationContext) baseApplicationContext).close();
     }
@@ -84,6 +86,11 @@ public class SpringRegistry extends AbstractSpringRegistry {
     objects.putAll(internalLookupByTypeWithoutAncestorsAndObjectProviders(type, false, false, baseApplicationContext));
     objects.putAll(internalLookupByTypeWithoutAncestorsAndObjectProviders(type, false, false, getApplicationContext()));
     return objects;
+  }
+
+  @Override
+  public BeanDependencyResolver getBeanDependencyResolver() {
+    return beanDependencyResolver;
   }
 
 }
