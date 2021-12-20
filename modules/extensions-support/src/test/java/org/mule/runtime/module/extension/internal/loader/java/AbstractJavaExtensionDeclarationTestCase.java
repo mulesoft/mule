@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
 
@@ -23,6 +25,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarati
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.extension.api.declaration.type.RedeliveryPolicyTypeBuilder;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -103,5 +106,10 @@ public abstract class AbstractJavaExtensionDeclarationTestCase extends AbstractM
   protected void assertConfigRefParam(ParameterModel configRef) {
     assertThat(configRef.getName(), is(CONFIG_ATTRIBUTE_NAME));
     assertType(configRef.getType(), ConfigurationProvider.class, ObjectType.class);
+  }
+
+  protected void assertRedeliveryPolicyParameter(ParameterModel redelivery) {
+    assertThat(redelivery.getName(), is(REDELIVERY_POLICY_PARAMETER_NAME));
+    assertThat(redelivery.getType(), is(equalTo(new RedeliveryPolicyTypeBuilder().buildRedeliveryPolicyType())));
   }
 }

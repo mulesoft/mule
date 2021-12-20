@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.delegate;
 import static java.lang.String.format;
 import static java.util.Optional.of;
 import static org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty.getDefault;
+import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 
@@ -50,7 +51,7 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
         continue;
       }
 
-      final boolean requiresConfig = parser.hasConfig() || parser.isConnected();
+      final boolean requiresConfig = requiresConfig(parser);
       HasSourceDeclarer actualDeclarer = requiresConfig
           ? ownerDeclarer
           : extensionDeclarer;

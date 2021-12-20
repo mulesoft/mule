@@ -48,7 +48,8 @@ public class JavaExtensionModelParserFactory implements ExtensionModelParserFact
               try {
                 ClassLoader extensionClassLoader = context.getExtensionClassLoader();
                 return new ExtensionTypeWrapper<>(loadClass(type, extensionClassLoader),
-                    new DefaultExtensionsTypeLoaderFactory().createTypeLoader(extensionClassLoader));
+                                                  new DefaultExtensionsTypeLoaderFactory()
+                                                      .createTypeLoader(extensionClassLoader));
               } catch (ClassNotFoundException e) {
                 throw new RuntimeException(format("Class '%s' cannot be loaded", type), e);
               }
