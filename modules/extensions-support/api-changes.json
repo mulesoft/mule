@@ -1,4 +1,42 @@
 {
+  "4.5.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader",
+          "package": "org.mule.runtime.module.extension.api.loader",
+          "classSimpleName": "AbstractJavaExtensionModelLoader",
+          "elementKind": "class",
+          "justification": "API is impossible to implement nor consume"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate",
+          "package": "org.mule.runtime.module.extension.api.loader",
+          "classSimpleName": "ModelLoaderDelegate",
+          "elementKind": "interface",
+          "justification": "API is impossible to implement nor consume"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.module.extension.api.loader.ModelLoaderDelegateFactory",
+          "package": "org.mule.runtime.module.extension.api.loader",
+          "classSimpleName": "ModelLoaderDelegateFactory",
+          "elementKind": "interface",
+          "justification": "API is impossible to implement nor consume"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader",
+          "package": "org.mule.runtime.module.extension.api.loader.java",
+          "classSimpleName": "DefaultJavaExtensionModelLoader",
+          "elementKind": "class",
+          "justification": "API is impossible to implement nor consume"
+        }
+      ]
+    }
+  },
   "4.1.0": {
     "revapi": {
       "ignore": [

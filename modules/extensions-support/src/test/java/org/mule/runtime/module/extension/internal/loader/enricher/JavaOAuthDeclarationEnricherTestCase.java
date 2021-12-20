@@ -8,17 +8,18 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.core.Is.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getDeclaration;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.declarerFor;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.JavaOAuthDeclarationEnricher;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.oauth.TestOAuthExtension;
@@ -32,8 +33,7 @@ public class JavaOAuthDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() {
-    ExtensionDeclarer declarer = new DefaultExtensionModelLoaderDelegate(TestOAuthExtension.class, getProductVersion())
-        .declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
+    ExtensionDeclarer declarer = declarerFor(TestOAuthExtension.class, getProductVersion());
     new JavaOAuthDeclarationEnricher()
         .enrich(new DefaultExtensionLoadingContext(declarer, this.getClass().getClassLoader(), getDefault(emptySet())));
     declaration = declarer.getDeclaration();

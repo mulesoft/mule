@@ -35,7 +35,7 @@ public class OAuthConnectionProviderModelLoaderTestCase extends AbstractJavaExte
 
   @Before
   public void setUp() {
-    setLoader(loaderFor(TestOAuthExtension.class));
+    setDeclarer(declarerFor(TestOAuthExtension.class));
     extensionDeclaration = declareExtension().getDeclaration();
   }
 

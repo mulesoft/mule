@@ -24,11 +24,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.EXTENSION_TYPE;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -49,6 +52,7 @@ import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
@@ -69,6 +73,7 @@ import org.mule.runtime.core.internal.streaming.bytes.SimpleByteBufferManager;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeHandlerManagerFactory;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
@@ -77,7 +82,9 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.exception.SdkExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
+import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
@@ -85,6 +92,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Exception
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserFactory;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
@@ -98,9 +106,7 @@ import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
 import org.custommonkey.xmlunit.XMLUnit;
-
 import org.hamcrest.Matcher;
-
 import org.mockito.Mockito;
 
 public final class ExtensionsTestUtils {
@@ -240,8 +246,7 @@ public final class ExtensionsTestUtils {
   }
 
   public static ConfigurationInstance getConfigurationInstanceFromRegistry(String key, CoreEvent muleEvent,
-                                                                           MuleContext muleContext)
-      throws Exception {
+                                                                           MuleContext muleContext) {
     ExtensionManager extensionManager = muleContext.getExtensionManager();
     return extensionManager.getConfiguration(key, muleEvent);
   }
@@ -397,5 +402,28 @@ public final class ExtensionsTestUtils {
         .filter(connectionProvider -> connectionProvider.getName().equals(connectionProviderName))
         .findAny()
         .orElse(null);
+  }
+
+  public static ExtensionDeclarer declarerFor(Class<?> extensionClass, String version) {
+    return declarerFor(extensionClass, extensionClass.getClassLoader(), version);
+  }
+
+  public static ExtensionDeclarer declarerFor(Class<?> extensionClass, ClassLoader classLoader, String version) {
+    DefaultExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(
+                                                                            classLoader,
+                                                                            getDefault(emptySet()));
+
+    return declarerFor(extensionClass, version, ctx);
+  }
+
+  public static ExtensionDeclarer declarerFor(Class<?> extensionClass, String version, ExtensionLoadingContext context) {
+    context.addParameter(VERSION, version);
+    context.addParameter(EXTENSION_TYPE, extensionClass);
+
+    return javaDeclarerFor(version, context);
+  }
+
+  public static ExtensionDeclarer javaDeclarerFor(String version, ExtensionLoadingContext context) {
+    return new DefaultExtensionModelLoaderDelegate(version).declare(new JavaExtensionModelParserFactory(), context);
   }
 }

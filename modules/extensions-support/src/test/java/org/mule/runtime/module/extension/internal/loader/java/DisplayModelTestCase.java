@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
@@ -14,7 +13,6 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.meta.model.display.PathModel.Type.ANY;
 import static org.mule.runtime.api.meta.model.display.PathModel.Type.DIRECTORY;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
@@ -28,8 +26,8 @@ import static org.mule.test.heisenberg.extension.HeisenbergOperations.KNOCKEABLE
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_EXAMPLE;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.declarerFor;
 
-import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
@@ -48,9 +46,6 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
-import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
-import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.HeisenbergOperations;
@@ -66,7 +61,6 @@ import org.junit.Test;
 
 public class DisplayModelTestCase extends AbstractMuleTestCase {
 
-  private static final DslResolvingContext DSL_CTX = getDefault(emptySet());
   private static final String PARAMETER_GROUP_DISPLAY_NAME = "Date of decease";
   private static final String PARAMETER_GROUP_ORIGINAL_DISPLAY_NAME = "dateOfDeath";
   private ExtensionDeclarer heisenbergDeclarer;
@@ -75,13 +69,8 @@ public class DisplayModelTestCase extends AbstractMuleTestCase {
   @Before
   public void setUp() {
     String version = getProductVersion();
-    ClassLoader cl = getClass().getClassLoader();
-    DefaultExtensionLoadingContext loadingCtx = new DefaultExtensionLoadingContext(cl, DSL_CTX);
-    DefaultExtensionModelLoaderDelegate heisenbergLoader =
-        new DefaultExtensionModelLoaderDelegate(HeisenbergExtension.class, version);
-    DefaultExtensionModelLoaderDelegate marvelLoader = new DefaultExtensionModelLoaderDelegate(MarvelExtension.class, version);
-    heisenbergDeclarer = heisenbergLoader.declare(loadingCtx);
-    marvelDeclarer = marvelLoader.declare(loadingCtx);
+    heisenbergDeclarer = declarerFor(HeisenbergExtension.class, version);
+    marvelDeclarer = declarerFor(MarvelExtension.class, version);
   }
 
   @Test
@@ -233,30 +222,22 @@ public class DisplayModelTestCase extends AbstractMuleTestCase {
 
   @Test(expected = IllegalParameterModelDefinitionException.class)
   public void parseLegacyAndSdkDisplayNameAnnotationsOnParameter() {
-    ModelLoaderDelegate modelLoaderDelegate =
-        new DefaultExtensionModelLoaderDelegate(ExtensionWithInvalidUseOfDisplayNameAnnotation.class, "1.0.0-dev");
-    modelLoaderDelegate.declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
+    declarerFor(ExtensionWithInvalidUseOfDisplayNameAnnotation.class, "1.0.0-dev");
   }
 
   @Test(expected = IllegalParameterModelDefinitionException.class)
   public void parseLegacyAndSdkExampleAnnotationsOnParameter() {
-    ModelLoaderDelegate modelLoaderDelegate =
-        new DefaultExtensionModelLoaderDelegate(ExtensionWithInvalidUseOfExampleAnnotation.class, "1.0.0-dev");
-    modelLoaderDelegate.declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
+    declarerFor(ExtensionWithInvalidUseOfExampleAnnotation.class, "1.0.0-dev");
   }
 
   @Test(expected = IllegalParameterModelDefinitionException.class)
   public void parseLegacyAndSdkSummaryAnnotationsOnParameter() {
-    ModelLoaderDelegate modelLoaderDelegate =
-        new DefaultExtensionModelLoaderDelegate(ExtensionWithInvalidUseOfSummaryAnnotation.class, "1.0.0-dev");
-    modelLoaderDelegate.declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
+    declarerFor(ExtensionWithInvalidUseOfSummaryAnnotation.class, "1.0.0-dev");
   }
 
   @Test(expected = IllegalParameterModelDefinitionException.class)
   public void parseLegacyAndSdkClassValueAnnotationsOnParameter() {
-    ModelLoaderDelegate modelLoaderDelegate =
-        new DefaultExtensionModelLoaderDelegate(ExtensionWithInvalidUseOfClassValueAnnotation.class, "1.0.0-dev");
-    modelLoaderDelegate.declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
+    declarerFor(ExtensionWithInvalidUseOfClassValueAnnotation.class, "1.0.0-dev");
   }
 
   private ConfigurationDeclaration findConfigByName(ExtensionDeclaration declaration, String name) {
