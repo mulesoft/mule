@@ -22,6 +22,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.NAME_PARAM_DESCR
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.declarerFor;
 
 import org.mule.runtime.api.meta.DescribedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -40,7 +41,6 @@ import org.mule.runtime.module.extension.internal.AbstractAnnotationProcessorTes
 import org.mule.runtime.module.extension.internal.capability.xml.extension.multiple.config.TestExtensionWithDocumentationAndMultipleConfig;
 import org.mule.runtime.module.extension.internal.capability.xml.extension.single.config.TestExtensionWithDocumentationAndSingleConfig;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.ExtensionDescriptionsEnricher;
-import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDocumentationResourceGenerator;
 import org.mule.tck.size.SmallTest;
 
@@ -118,8 +118,7 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
   public void loadDocumentationFromFile() {
     ClassLoader cl = currentThread().getContextClassLoader();
     ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(cl, getDefault(emptySet()));
-    DefaultExtensionModelLoaderDelegate loader = new DefaultExtensionModelLoaderDelegate(extensionClass, "1.0.0-dev");
-    loader.declare(ctx);
+    declarerFor(extensionClass, "1.0.0-dev", ctx);
     ExtensionDescriptionsEnricher enricher = new ExtensionDescriptionsEnricher();
     enricher.enrich(ctx);
     ExtensionModelFactory factory = new ExtensionModelFactory();
@@ -239,8 +238,7 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
 
         assertThat(extension, instanceOf(TypeElement.class));
         ctx = new DefaultExtensionLoadingContext(currentThread().getContextClassLoader(), getDefault(emptySet()));
-        DefaultExtensionModelLoaderDelegate loader = new DefaultExtensionModelLoaderDelegate(extensionClass, "1.0.0-dev");
-        declaration = loader.declare(ctx).getDeclaration();
+        declarerFor(extensionClass, "1.0.0-dev", ctx);
         documenter.document(declaration, (TypeElement) extension);
       }
       return false;

@@ -6,22 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml;
 
-import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.declarerFor;
 
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -123,9 +119,7 @@ public class JavaXmlModelDeclarationTestCase extends AbstractMuleTestCase {
   }
 
   private ExtensionDeclaration getExtensionDeclaration(Class<?> extensionClass) {
-    ExtensionDeclarer declarer = new DefaultExtensionModelLoaderDelegate(extensionClass, EXTENSION_VERSION)
-        .declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
-    return declarer.getDeclaration();
+    return declarerFor(extensionClass, EXTENSION_VERSION).getDeclaration();
   }
 
   @Extension(name = EXTENSION_NAME)
