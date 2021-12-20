@@ -6,13 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import static java.util.Collections.emptySet;
 import static java.util.Optional.ofNullable;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.PERSONAL_INFORMATION_GROUP_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.RICIN_GROUP_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.KILL_WITH_GROUP;
@@ -30,9 +28,6 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
-import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
-import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
@@ -46,7 +41,7 @@ public class LayoutModelTestCase extends AbstractJavaExtensionDeclarationTestCas
 
   @Before
   public void setUp() {
-    setLoader(loaderFor(HeisenbergExtension.class));
+    setDeclarer(declarerFor(HeisenbergExtension.class));
   }
 
   @Test
@@ -86,16 +81,12 @@ public class LayoutModelTestCase extends AbstractJavaExtensionDeclarationTestCas
 
   @Test(expected = IllegalParameterModelDefinitionException.class)
   public void parseLegacyAndSdkPlacementAnnotationsOnParameter() {
-    ModelLoaderDelegate modelLoaderDelegate =
-        new DefaultExtensionModelLoaderDelegate(ExtensionWithInvalidUseOfPlacementAnnotation.class, "1.0.0-dev");
-    modelLoaderDelegate.declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
+    declarerFor(ExtensionWithInvalidUseOfPlacementAnnotation.class, "1.0.0-dev");
   }
 
   @Test(expected = IllegalParameterModelDefinitionException.class)
   public void parseLegacyAndSdkTextAnnotationsOnParameter() {
-    ModelLoaderDelegate modelLoaderDelegate =
-        new DefaultExtensionModelLoaderDelegate(ExtensionWithInvalidUseOfPlacementAnnotation.class, "1.0.0-dev");
-    modelLoaderDelegate.declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
+    declarerFor(ExtensionWithInvalidUseOfPlacementAnnotation.class, "1.0.0-dev");
   }
 
   private void assertParameterPlacement(Pair<ParameterGroupDeclaration, ParameterDeclaration> pair, String groupName,

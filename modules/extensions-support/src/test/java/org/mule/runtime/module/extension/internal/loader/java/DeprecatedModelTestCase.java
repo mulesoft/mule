@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import static java.util.Collections.emptySet;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.declarerFor;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -22,7 +21,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarati
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.FunctionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.NamedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
@@ -42,8 +40,6 @@ import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.route.Route;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
-import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.List;
@@ -328,9 +324,7 @@ public class DeprecatedModelTestCase extends AbstractMuleTestCase {
   }
 
   private ExtensionDeclaration getExtensionDeclaration(Class<?> extensionClass) {
-    ExtensionDeclarer declarer = new DefaultExtensionModelLoaderDelegate(extensionClass, "1.0.0-dev")
-        .declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
-    return declarer.getDeclaration();
+    return declarerFor(extensionClass, "1.0.0-dev").getDeclaration();
   }
 
   private NamedDeclaration getNamedDeclaration(List<? extends NamedDeclaration> namedDeclarationList, String name) {

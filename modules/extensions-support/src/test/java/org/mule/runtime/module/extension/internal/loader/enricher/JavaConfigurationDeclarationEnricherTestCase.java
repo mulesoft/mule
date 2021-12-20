@@ -13,12 +13,13 @@ import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.checkIsPresent;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getDeclaration;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.declarerFor;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.JavaConfigurationDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigTypeModelProperty;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -34,8 +35,7 @@ public class JavaConfigurationDeclarationEnricherTestCase {
 
   @Before
   public void setUp() {
-    ExtensionDeclarer declarer = new DefaultExtensionModelLoaderDelegate(HeisenbergExtension.class, getProductVersion())
-        .declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
+    ExtensionDeclarer declarer = declarerFor(HeisenbergExtension.class, getProductVersion());
     new JavaConfigurationDeclarationEnricher()
         .enrich(new DefaultExtensionLoadingContext(declarer, this.getClass().getClassLoader(), getDefault(emptySet())));
     declaration = declarer.getDeclaration();

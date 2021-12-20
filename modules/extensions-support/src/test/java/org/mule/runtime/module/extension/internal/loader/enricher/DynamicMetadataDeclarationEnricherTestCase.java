@@ -35,6 +35,7 @@ import static org.mule.test.metadata.extension.resolver.TestOutputAnyTypeResolve
 import static org.mule.test.metadata.extension.resolver.TestOutputResolverWithKeyResolver.TEST_OUTPUT_RESOLVER_WITH_KEY_RESOLVER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.declarerFor;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
 import org.mule.metadata.api.model.MetadataType;
@@ -51,7 +52,6 @@ import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.ResolverInformation;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.DynamicMetadataDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
@@ -77,10 +77,7 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
 
   @Before
   public void setUp() {
-    DefaultExtensionModelLoaderDelegate loader =
-        new DefaultExtensionModelLoaderDelegate(MetadataExtension.class, getProductVersion());
-    ExtensionDeclarer declarer =
-        loader.declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
+    ExtensionDeclarer declarer = declarerFor(MetadataExtension.class, getProductVersion());
     new DynamicMetadataDeclarationEnricher()
         .enrich(new DefaultExtensionLoadingContext(declarer, this.getClass().getClassLoader(), getDefault(emptySet())));
     declaration = declarer.getDeclaration();

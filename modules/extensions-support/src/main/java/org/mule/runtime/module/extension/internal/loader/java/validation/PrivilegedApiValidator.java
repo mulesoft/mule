@@ -19,8 +19,10 @@ import org.mule.runtime.extension.api.loader.ProblemsReporter;
  */
 public class PrivilegedApiValidator implements ExtensionModelValidator {
 
-  static final String NO_PRIVILEGED_ARTIFACTS_ERROR = "Extension has privileged packages but no privileged artifacts defined";
-  static final String NO_PRIVILEGED_PACKAGES_ERROR = "Extension has privileged artifacts but no privileged packages defined";
+  public static final String NO_PRIVILEGED_ARTIFACTS_ERROR =
+      "Extension has privileged packages but no privileged artifacts defined";
+  public static final String NO_PRIVILEGED_PACKAGES_ERROR =
+      "Extension has privileged artifacts but no privileged packages defined";
 
   @Override
   public void validate(ExtensionModel model, ProblemsReporter problemsReporter) throws IllegalModelDefinitionException {

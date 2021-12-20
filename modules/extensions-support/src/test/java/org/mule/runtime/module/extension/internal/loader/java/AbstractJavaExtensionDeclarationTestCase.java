@@ -6,10 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
@@ -27,35 +25,46 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.util.List;
 
 public abstract class AbstractJavaExtensionDeclarationTestCase extends AbstractMuleTestCase {
 
-  private DefaultExtensionModelLoaderDelegate loader;
+  private ExtensionDeclarer declarer;
 
-  protected DefaultExtensionModelLoaderDelegate getLoader() {
-    return loader;
+  protected ExtensionDeclarer getDeclarer() {
+    return declarer;
   }
 
-  protected void setLoader(DefaultExtensionModelLoaderDelegate loader) {
-    this.loader = loader;
+  protected void setDeclarer(ExtensionDeclarer declarer) {
+    this.declarer = declarer;
   }
 
-  protected DefaultExtensionModelLoaderDelegate loaderFor(final Class<?> type) {
-    return new DefaultExtensionModelLoaderDelegate(type, getProductVersion());
+  protected ExtensionDeclarer declarerFor(final Class<?> type) {
+    return ExtensionsTestUtils.declarerFor(type, getProductVersion());
+  }
+
+  protected ExtensionDeclarer declarerFor(final Class<?> type, String version) {
+    return ExtensionsTestUtils.declarerFor(type, version);
+  }
+
+  protected ExtensionDeclarer declarerFor(Class<?> type, ExtensionLoadingContext ctx) {
+    return declarerFor(type, getProductVersion(), ctx);
+  }
+
+  protected ExtensionDeclarer declarerFor(Class<?> type, String version, ExtensionLoadingContext ctx) {
+    return ExtensionsTestUtils.declarerFor(type, version, ctx);
   }
 
   protected ExtensionDeclarer declareExtension() {
-    return declareExtension(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
+    return declarer;
   }
 
-  protected ExtensionDeclarer declareExtension(ExtensionLoadingContext context) {
-    return getLoader().declare(context);
-  }
+  // protected ExtensionDeclarer declareExtension(ExtensionLoadingContext context) {
+  // return getDeclarer().declare(context);
+  // }
 
   protected ConfigurationDeclaration getConfiguration(ExtensionDeclaration extensionDeclaration, final String configurationName) {
     return extensionDeclaration.getConfigurations()

@@ -6,21 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import static java.util.Collections.emptySet;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.declarerFor;
 
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.ImportedTypeModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
-import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
-import org.mule.test.module.extension.internal.util.extension.SimpleExtensionUsingLegacyApi;
 import org.mule.test.module.extension.internal.util.extension.SimpleExtensionUsingSdkApi;
 
 import java.util.TreeSet;
@@ -31,13 +26,10 @@ public class AbstractExtensionModelLoaderDelegateTestCase {
 
   @Test
   public void verifyExportedTypesAndResourcesFromExtensionUsingSdkApi() {
-    DefaultExtensionModelLoaderDelegate defaultExtensionModelLoaderDelegate =
-        new DefaultExtensionModelLoaderDelegate(SimpleExtensionUsingSdkApi.class, "1.0.0-dev");
-
-    ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
-    ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(currentClassLoader, getDefault(emptySet()));
-
-    ExtensionDeclarer extensionDeclarer = defaultExtensionModelLoaderDelegate.declare(ctx);
+    ExtensionDeclarer extensionDeclarer = declarerFor(
+                                                      SimpleExtensionUsingSdkApi.class,
+                                                      Thread.currentThread().getContextClassLoader(),
+                                                      "1.0.0-dev");
 
     assertThat(extensionDeclarer.getDeclaration().getResources().size(), is(1));
     assertThat(extensionDeclarer.getDeclaration().getResources().iterator().next(), equalTo("simpleResource.json"));
@@ -49,13 +41,10 @@ public class AbstractExtensionModelLoaderDelegateTestCase {
 
   @Test
   public void verifyExportedTypesAndResourcesFromExtensionUsingLegacyApi() {
-    DefaultExtensionModelLoaderDelegate defaultExtensionModelLoaderDelegate =
-        new DefaultExtensionModelLoaderDelegate(SimpleExtensionUsingLegacyApi.class, "1.0.0-dev");
-
-    ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
-    ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(currentClassLoader, getDefault(emptySet()));
-
-    ExtensionDeclarer extensionDeclarer = defaultExtensionModelLoaderDelegate.declare(ctx);
+    ExtensionDeclarer extensionDeclarer = declarerFor(
+                                                      SimpleExtensionUsingSdkApi.class,
+                                                      Thread.currentThread().getContextClassLoader(),
+                                                      "1.0.0-dev");
 
     assertThat(extensionDeclarer.getDeclaration().getResources().size(), is(1));
     assertThat(extensionDeclarer.getDeclaration().getResources().iterator().next(), equalTo("simpleResource.json"));
@@ -67,13 +56,12 @@ public class AbstractExtensionModelLoaderDelegateTestCase {
 
   @Test
   public void verifyImportedTypesFromExtensionUsingTheSdkApi() {
-    DefaultExtensionModelLoaderDelegate defaultExtensionModelLoaderDelegate =
-        new DefaultExtensionModelLoaderDelegate(SimpleExtensionUsingSdkApi.class, "1.0.0-dev");
+    ExtensionDeclarer extensionDeclarer = declarerFor(
+                                                      SimpleExtensionUsingSdkApi.class,
+                                                      Thread.currentThread().getContextClassLoader(),
+                                                      "1.0.0-dev");
 
-    ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
-    ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(currentClassLoader, getDefault(emptySet()));
-
-    ExtensionDeclaration extensionDeclaration = defaultExtensionModelLoaderDelegate.declare(ctx).getDeclaration();
+    ExtensionDeclaration extensionDeclaration = extensionDeclarer.getDeclaration();
     ObjectType importedType = ((ImportedTypeModel) ((TreeSet) extensionDeclaration.getImportedTypes()).first()).getImportedType();
 
     assertThat(extensionDeclaration.getImportedTypes().size(), is(1));
@@ -83,13 +71,12 @@ public class AbstractExtensionModelLoaderDelegateTestCase {
 
   @Test
   public void verifyImportedTypesFromExtensionUsingTheLegacyApi() {
-    DefaultExtensionModelLoaderDelegate defaultExtensionModelLoaderDelegate =
-        new DefaultExtensionModelLoaderDelegate(SimpleExtensionUsingLegacyApi.class, "1.0.0-dev");
+    ExtensionDeclarer extensionDeclarer = declarerFor(
+                                                      SimpleExtensionUsingSdkApi.class,
+                                                      Thread.currentThread().getContextClassLoader(),
+                                                      "1.0.0-dev");
 
-    ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
-    ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(currentClassLoader, getDefault(emptySet()));
-
-    ExtensionDeclaration extensionDeclaration = defaultExtensionModelLoaderDelegate.declare(ctx).getDeclaration();
+    ExtensionDeclaration extensionDeclaration = extensionDeclarer.getDeclaration();
     ObjectType importedType = ((ImportedTypeModel) ((TreeSet) extensionDeclaration.getImportedTypes()).first()).getImportedType();
 
     assertThat(extensionDeclaration.getImportedTypes().size(), is(1));
