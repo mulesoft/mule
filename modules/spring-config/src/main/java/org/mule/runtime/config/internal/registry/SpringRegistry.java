@@ -23,12 +23,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 public class SpringRegistry extends AbstractSpringRegistry {
 
-  public static final String REGISTRY_ID = "org.mule.Registry.Spring";
-
-  /**
-   * Key used to lookup Spring Application Context from SpringRegistry via Mule's Registry interface.
-   */
-  public static final String SPRING_APPLICATION_CONTEXT = "springApplicationContext";
   private final BeanDependencyResolver beanDependencyResolver;
 
   private ApplicationContext baseApplicationContext;
