@@ -72,12 +72,11 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
                                                   ArtifactType artifactType,
                                                   OptionalObjectsController optionalObjectsController,
                                                   BeanDefinitionRegistry beanDefinitionRegistry,
-                                                  SpringConfigurationComponentLocator componentLocator,
                                                   Registry serviceLocator,
-                                                  org.mule.runtime.core.internal.registry.Registry originalRegistry,
                                                   ResourceLocator resourceLocator) {
-    super(muleContext, configurationProperties, artifactType, optionalObjectsController, beanDefinitionRegistry, componentLocator,
-          serviceLocator, originalRegistry, resourceLocator);
+    super(muleContext, configurationProperties, artifactProperties, artifactType, optionalObjectsController,
+          beanDefinitionRegistry,
+          serviceLocator, resourceLocator);
     this.lazyComponentInitializer = lazyComponentInitializer;
     this.artifactProperties = artifactProperties;
     this.runtimeLockFactory = runtimeLockFactory;

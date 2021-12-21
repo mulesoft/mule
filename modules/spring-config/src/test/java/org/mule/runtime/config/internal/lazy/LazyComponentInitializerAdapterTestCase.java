@@ -56,10 +56,13 @@ import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegist
 import org.mule.runtime.config.internal.LazyMuleArtifactContext;
 import org.mule.runtime.config.internal.ObjectProviderAwareBeanFactory;
 import org.mule.runtime.config.internal.OptionalObjectsController;
+import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
+import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -232,8 +235,10 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
   private LazyMuleArtifactContext createLazyMuleArtifactContextStub(ObjectProviderAwareBeanFactory beanFactory) {
     LazyMuleArtifactContext muleArtifactContext =
         new LazyMuleArtifactContext(muleContext, toArtifactast(getSimpleApp(), getExtensions(muleContext.getExtensionManager())),
-                                    optionalObjectsController, empty(), emptyMap(), APP,
-                                    empty(), lockFactory,
+                                    optionalObjectsController, empty(),
+                                    new BaseConfigurationComponentLocator(),
+                                    new ContributedErrorTypeRepository(), new ContributedErrorTypeLocator(),
+                                    emptyMap(), APP, empty(), lockFactory,
                                     new DefaultComponentBuildingDefinitionRegistryFactory(),
                                     mock(FeatureFlaggingService.class)) {
 

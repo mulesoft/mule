@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.core.internal.registry;
 
-import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.getInstance;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_HANDLER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 
+import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+
 import org.mule.runtime.api.config.FeatureFlaggingService;
-import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -31,7 +31,6 @@ import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.map.RegistryMap;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.endpoint.LegacyImmutableEndpoint;
-import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.InjectProcessor;
 import org.mule.runtime.core.privileged.registry.ObjectProcessor;
 import org.mule.runtime.core.privileged.registry.PreInitProcessor;
@@ -63,8 +62,6 @@ public abstract class TransientRegistry extends AbstractRegistry {
       defaultEntries.put(OBJECT_REGISTRY, new DefaultRegistry(muleContext));
       defaultEntries.put("_muleContextProcessor", new MuleContextProcessor(muleContext));
       defaultEntries.put("_registryProcessor", new RegistryProcessor(muleContext));
-      defaultEntries.put(ErrorTypeRepository.class.getName(), muleContext.getErrorTypeRepository());
-      defaultEntries.put(ErrorTypeLocator.class.getName(), ((PrivilegedMuleContext) muleContext).getErrorTypeLocator());
       defaultEntries.put(OBJECT_NOTIFICATION_HANDLER, ((PrivilegedMuleContext) muleContext).getNotificationManager());
       // Initial feature flagging service setup
       FeatureFlaggingRegistry ffRegistry = getInstance();

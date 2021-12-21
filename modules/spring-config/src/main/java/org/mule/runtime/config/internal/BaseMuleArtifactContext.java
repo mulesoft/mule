@@ -14,6 +14,8 @@ import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
+import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
+import org.mule.runtime.core.internal.registry.Registry;
 
 import java.io.IOException;
 
@@ -31,6 +33,7 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
 
   private final DefaultRegistry serviceDiscoverer;
   private final MuleContextWithRegistry muleContext;
+  private final Registry originalRegistry;
 
   /**
    * Configures the context.
@@ -39,6 +42,7 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
    */
   public BaseMuleArtifactContext(MuleContext muleContext) {
     this.muleContext = (MuleContextWithRegistry) muleContext;
+    this.originalRegistry = ((MuleRegistryHelper) (((MuleContextWithRegistry) muleContext).getRegistry())).getDelegate();
     this.serviceDiscoverer = new DefaultRegistry(muleContext);
   }
 
@@ -60,7 +64,9 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
     super.customizeBeanFactory(beanFactory);
     new BaseSpringMuleContextServiceConfigurator(muleContext,
                                                  beanFactory,
-                                                 serviceDiscoverer).createArtifactServices();
+                                                 serviceDiscoverer,
+                                                 originalRegistry)
+                                                     .createArtifactServices();
   }
 
   private void registerInjectorProcessor(ConfigurableListableBeanFactory beanFactory) {

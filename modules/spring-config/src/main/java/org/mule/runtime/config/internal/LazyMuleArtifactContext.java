@@ -48,6 +48,7 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
+import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
@@ -56,6 +57,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
+import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
+import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
@@ -118,6 +121,10 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    *                                                   org.mule.runtime.config.internal.SpringRegistry
    * @param parentConfigurationProperties              the resolver for properties from the parent artifact to be used as fallback
    *                                                   in this artifact.
+   * @param baseConfigurationComponentLocator          indirection to the actual ConfigurationComponentLocator in the full
+   *                                                   registry
+   * @param errorTypeRepository                        repository where the errors of the artifact will be registered.
+   * @param errorTypeLocator                           locator where the errors of the artifact will be registered.
    * @param artifactProperties                         map of properties that can be referenced from the
    *                                                   {@code artifactConfigResources} as external configuration values
    * @param artifactType                               the type of artifact to determine the base objects of the created context.
@@ -130,6 +137,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   public LazyMuleArtifactContext(MuleContext muleContext, ArtifactAst artifactAst,
                                  OptionalObjectsController optionalObjectsController,
                                  Optional<ConfigurationProperties> parentConfigurationProperties,
+                                 BaseConfigurationComponentLocator baseConfigurationComponentLocator,
+                                 ContributedErrorTypeRepository errorTypeRepository,
+                                 ContributedErrorTypeLocator errorTypeLocator,
                                  Map<String, String> artifactProperties, ArtifactType artifactType,
                                  Optional<ComponentModelInitializer> parentComponentModelInitializer,
                                  LockFactory runtimeLockFactory,
@@ -137,6 +147,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                  FeatureFlaggingService featureFlaggingService)
       throws BeansException {
     super(muleContext, artifactAst, optionalObjectsController, parentConfigurationProperties,
+          baseConfigurationComponentLocator, errorTypeRepository, errorTypeLocator,
           artifactProperties, artifactType, componentBuildingDefinitionRegistryFactory, featureFlaggingService);
 
     // Changes the component locator in order to allow accessing any component by location even when they are prototype
@@ -166,9 +177,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                                         getArtifactType(),
                                                         getOptionalObjectsController(),
                                                         beanFactory,
-                                                        componentLocator,
                                                         getServiceDiscoverer(),
-                                                        getOriginalRegistry(),
                                                         getResourceLocator());
   }
 

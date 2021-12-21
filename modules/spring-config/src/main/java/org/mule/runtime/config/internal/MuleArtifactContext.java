@@ -65,6 +65,7 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResult;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
+import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
@@ -85,7 +86,6 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.api.transformer.Converter;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
@@ -94,9 +94,7 @@ import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
 import org.mule.runtime.core.internal.util.DefaultResourceLocator;
-import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
-import org.mule.runtime.dsl.api.ConfigResource;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -123,9 +121,6 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.context.annotation.ContextAnnotationAutowireCandidateResolver;
 import org.springframework.context.support.AbstractRefreshableConfigApplicationContext;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 
 /**
  * <code>MuleArtifactContext</code> is a simple extension application context that allows resources to be loaded from the
@@ -145,16 +140,12 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final MuleContextWithRegistry muleContext;
   private final BeanDefinitionFactory beanDefinitionFactory;
   private final ArtifactType artifactType;
-  protected SpringConfigurationComponentLocator componentLocator = new SpringConfigurationComponentLocator(componentName -> {
-    try {
-      BeanDefinition beanDefinition = getBeanFactory().getBeanDefinition(componentName);
-      return beanDefinition.isPrototype();
-    } catch (NoSuchBeanDefinitionException e) {
-      return false;
-    }
-  });
+  private final BaseConfigurationComponentLocator baseComponentLocator;
+  protected SpringConfigurationComponentLocator componentLocator;
+  private final ContributedErrorTypeRepository errorTypeRepository;
+  private final ContributedErrorTypeLocator errorTypeLocator;
+  private final Map<String, String> artifactProperties;
   protected List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
-  private org.mule.runtime.core.internal.registry.Registry originalRegistry;
   private final ExtensionManager extensionManager;
 
   /**
@@ -167,6 +158,10 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
    *                                                   org.mule.runtime.config.internal.SpringRegistry
    * @param parentConfigurationProperties              the resolver for properties from the parent artifact to be used as fallback
    *                                                   in this artifact.
+   * @param baseConfigurationComponentLocator          indirection to the actual ConfigurationComponentLocator in the full
+   *                                                   registry
+   * @param errorTypeRepository                        repository where the errors of the artifact will be registered.
+   * @param errorTypeLocator                           locator where the errors of the artifact will be registered.
    * @param artifactProperties                         map of properties that can be referenced from the
    *                                                   {@code artifactConfigResources} as external configuration values
    * @param artifactType                               the type of artifact to determine the base objects of the created context.
@@ -176,6 +171,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   public MuleArtifactContext(MuleContext muleContext, ArtifactAst artifactAst,
                              OptionalObjectsController optionalObjectsController,
                              Optional<ConfigurationProperties> parentConfigurationProperties,
+                             BaseConfigurationComponentLocator baseConfigurationComponentLocator,
+                             ContributedErrorTypeRepository errorTypeRepository,
+                             ContributedErrorTypeLocator errorTypeLocator,
                              Map<String, String> artifactProperties, ArtifactType artifactType,
                              ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory,
                              FeatureFlaggingService featureFlaggingService) {
@@ -185,9 +183,21 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     this.artifactType = artifactType;
     this.serviceDiscoverer = new DefaultRegistry(muleContext);
     this.resourceLocator = new DefaultResourceLocator();
-    originalRegistry = ((MuleRegistryHelper) getMuleRegistry()).getDelegate();
+    this.baseComponentLocator = baseConfigurationComponentLocator;
+    this.errorTypeRepository = errorTypeRepository;
+    this.errorTypeLocator = errorTypeLocator;
+    this.artifactProperties = artifactProperties;
 
     extensionManager = muleContext.getExtensionManager();
+
+    componentLocator = new SpringConfigurationComponentLocator(componentName -> {
+      try {
+        BeanDefinition beanDefinition = getBeanFactory().getBeanDefinition(componentName);
+        return beanDefinition.isPrototype();
+      } catch (NoSuchBeanDefinitionException e) {
+        return false;
+      }
+    });
 
     // TODO (MULE-19608) remove this and make it into a component building definition
     this.beanDefinitionFactory =
@@ -277,8 +287,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     // Because instances of the repository and locator may be already created and injected into another objects, those instances
     // cannot just be set into the registry, and this contributing layer is needed to ensure the correct functioning of the DI
     // mechanism.
-    ((ContributedErrorTypeRepository) muleContext.getErrorTypeRepository()).setDelegate(errorTypeRepository);
-    ((ContributedErrorTypeLocator) ((PrivilegedMuleContext) muleContext).getErrorTypeLocator()).setDelegate(errorTypeLocator);
+    this.errorTypeRepository.setDelegate(errorTypeRepository);
+    this.errorTypeLocator.setDelegate(errorTypeLocator);
   }
 
   public void initialize() {
@@ -357,23 +367,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       super.close();
       disposeIfNeeded(configurationProperties.getConfigurationPropertiesResolver(), LOGGER);
     }
-  }
-
-  public static Resource[] convert(ConfigResource[] resources) {
-    Resource[] configResources = new Resource[resources.length];
-    for (int i = 0; i < resources.length; i++) {
-      ConfigResource resource = resources[i];
-      if (resource.getUrl() != null) {
-        configResources[i] = new UrlResource(resource.getUrl());
-      } else {
-        try {
-          configResources[i] = new ByteArrayResource(IOUtils.toByteArray(resource.getInputStream()), resource.getResourceName());
-        } catch (IOException e) {
-          throw new RuntimeException(e);
-        }
-      }
-    }
-    return configResources;
   }
 
   @Override
@@ -530,20 +523,18 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   @Override
   protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
     super.customizeBeanFactory(beanFactory);
+    baseComponentLocator.setDelegate(componentLocator);
     createServiceConfigurator(beanFactory).createArtifactServices();
-
-    originalRegistry = null;
   }
 
   protected SpringMuleContextServiceConfigurator createServiceConfigurator(DefaultListableBeanFactory beanFactory) {
     return new SpringMuleContextServiceConfigurator(muleContext,
                                                     getConfigurationProperties(),
+                                                    artifactProperties,
                                                     getArtifactType(),
                                                     getOptionalObjectsController(),
                                                     beanFactory,
-                                                    componentLocator,
                                                     getServiceDiscoverer(),
-                                                    originalRegistry,
                                                     getResourceLocator());
   }
 
@@ -643,10 +634,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   public Registry getRegistry() {
     return getMuleContext().getRegistry().get(OBJECT_REGISTRY);
-  }
-
-  protected org.mule.runtime.core.internal.registry.Registry getOriginalRegistry() {
-    return originalRegistry;
   }
 
   @Override

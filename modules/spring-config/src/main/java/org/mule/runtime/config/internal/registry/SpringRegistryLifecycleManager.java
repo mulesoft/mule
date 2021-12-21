@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal;
+package org.mule.runtime.config.internal.registry;
 
 import static org.mule.runtime.config.internal.MuleArtifactContext.INNER_BEAN_PREFIX;
 
@@ -51,7 +51,7 @@ import java.util.Map;
 
 public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
-  public SpringRegistryLifecycleManager(String id, SpringRegistry springRegistry, MuleContext muleContext,
+  public SpringRegistryLifecycleManager(String id, Registry springRegistry, MuleContext muleContext,
                                         LifecycleInterceptor lifecycleInterceptor) {
     super(id, springRegistry, muleContext, lifecycleInterceptor);
   }
