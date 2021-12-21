@@ -8,6 +8,7 @@ package org.mule.runtime.feature.internal.togglz.state;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.feature.internal.togglz.scope.MuleTogglzFeatureScope;
+
 import org.togglz.core.Feature;
 import org.togglz.core.repository.FeatureState;
 
@@ -39,7 +40,7 @@ public class MuleTogglzFeatureState extends FeatureState implements Disposable {
   public MuleTogglzFeatureState(FeatureState defaultFeatureState,
                                 MuleTogglzFeatureStateRepository stateRepository,
                                 MuleTogglzFeatureScope scope) {
-    super(defaultFeatureState.getFeature());
+    super(defaultFeatureState.getFeature(), defaultFeatureState.isEnabled());
     this.scope = scope;
     this.stateRepository = stateRepository;
   }

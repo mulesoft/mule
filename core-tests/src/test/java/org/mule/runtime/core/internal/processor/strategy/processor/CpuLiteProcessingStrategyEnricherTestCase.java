@@ -7,7 +7,6 @@
 
 package org.mule.runtime.core.internal.processor.strategy.processor;
 
-import static org.mockito.Answers.RETURNS_MOCKS;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
@@ -50,7 +49,7 @@ public class CpuLiteProcessingStrategyEnricherTestCase extends AbstractEnrichedR
   @Mock
   private CoreEvent coreEvent;
 
-  @Mock(answer = RETURNS_MOCKS)
+  @Mock
   private CoreProfilingService profilingService;
 
   @Before

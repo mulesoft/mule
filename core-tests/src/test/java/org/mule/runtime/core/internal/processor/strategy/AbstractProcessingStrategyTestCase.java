@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.util.Collections.singleton;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -697,7 +698,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   }
 
   protected void assertProcessingStrategyProfiling() {
-    if (enableProfilingServiceProperty.getValue().equals("true")) {
+    if (parseBoolean(enableProfilingServiceProperty.getValue())) {
       InOrder profilingDataConsumerAssertions = inOrder(profilingDataConsumer);
       profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
           .onProfilingEvent(eq(STARTING_FLOW_EXECUTION), any(ComponentProcessingStrategyProfilingEventContext.class));

@@ -23,6 +23,9 @@ import java.util.function.Predicate;
 import org.slf4j.Logger;
 import com.google.gson.Gson;
 
+/**
+ * A {@link ProfilingDataConsumer} that logs task scheduling profiling events.
+ */
 public class TaskSchedulingLoggerDataConsumer implements ProfilingDataConsumer<TaskSchedulingProfilingEventContext> {
 
   private static final Logger LOGGER = getLogger(TaskSchedulingLoggerDataConsumer.class);
@@ -45,6 +48,7 @@ public class TaskSchedulingLoggerDataConsumer implements ProfilingDataConsumer<T
 
   @Override
   public Predicate<TaskSchedulingProfilingEventContext> getEventContextFilter() {
+    // Events without a tracing context are excluded because they do not add much information.
     return taskSchedulingProfilingEventContext -> taskSchedulingProfilingEventContext.getTaskTracingContext().isPresent();
   }
 

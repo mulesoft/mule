@@ -59,6 +59,12 @@ public class ProfilingTestUtils {
 
     when(coreProfilingService.enrichWithProfilingEventMono(any(), any(), any()))
         .thenAnswer(i -> ((Mono<CoreEvent>) i.getArgument(0)));
+
+    when(coreProfilingService.setCurrentExecutionContext(any(Flux.class), any()))
+        .thenAnswer(i -> i.getArgument(0));
+
+    when(coreProfilingService.setCurrentExecutionContext(any(Mono.class), any()))
+        .thenAnswer(i -> i.getArgument(0));
   }
 
   /**
