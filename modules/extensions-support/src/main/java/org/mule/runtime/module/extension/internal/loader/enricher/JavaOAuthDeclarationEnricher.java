@@ -131,7 +131,6 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
             }
 
             enrichOAuthParameters(declaration);
-            extractImplementingType(declaration).ifPresent(type -> enrichCallbackValues(declaration, type));
           });
         }
       }.walk(extensionDeclaration);
@@ -173,15 +172,6 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
                                                                            parameter.getName(),
                                                                            provider.getName()));
 
-      }
-    }
-
-    private void enrichCallbackValues(ConnectionProviderDeclaration declaration, Class type) {
-      Map<Field, String> values = getAnnotatedFields(type, OAuthCallbackValue.class).stream()
-          .collect(toMap(identity(), field -> field.getAnnotation(OAuthCallbackValue.class).expression()));
-
-      if (!values.isEmpty()) {
-        declaration.addModelProperty(new OAuthCallbackValuesModelProperty(values));
       }
     }
 

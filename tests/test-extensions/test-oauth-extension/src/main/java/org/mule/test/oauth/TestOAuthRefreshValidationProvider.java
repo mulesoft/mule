@@ -13,8 +13,8 @@ import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.connectivity.oauth.AuthorizationCode;
 import org.mule.runtime.extension.api.connectivity.oauth.AccessTokenExpiredException;
+import org.mule.sdk.api.annotation.connectivity.oauth.AuthorizationCode;
 
 @AuthorizationCode(accessTokenUrl = TestOAuthConnectionProvider.ACCESS_TOKEN_URL,
     authorizationUrl = TestOAuthConnectionProvider.AUTH_URL)

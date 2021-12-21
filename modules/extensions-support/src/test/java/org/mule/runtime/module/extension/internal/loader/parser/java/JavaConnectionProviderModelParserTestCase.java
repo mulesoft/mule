@@ -89,18 +89,34 @@ public class JavaConnectionProviderModelParserTestCase {
   @Test
   public void bothAuthorizationCodeSupport() {
     expectedException.expect(IllegalParameterModelDefinitionException.class);
-    Optional<OAuthModelProperty> oAuthModelProperty =
-        parseOAuthModelPropertyFromConnectionProviderClass(BothAuthorizationCodeConnectionProvider.class);
+    parseOAuthModelPropertyFromConnectionProviderClass(BothAuthorizationCodeConnectionProvider.class);
   }
 
   @Test
-  public void clientCredentialsSupport() {}
+  public void clientCredentialsSupport() {
+    Optional<OAuthModelProperty> oAuthModelProperty =
+        parseOAuthModelPropertyFromConnectionProviderClass(ClientCredentialsConnectionProvider.class);
+    assertThat(oAuthModelProperty.isPresent(), is(true));
+    assertThat(oAuthModelProperty.get().getGrantTypes(), hasSize(1));
+    assertThat(oAuthModelProperty.get().getGrantTypes().get(0), instanceOf(ClientCredentialsGrantType.class));
+    oAuthModelProperty.get().getGrantTypes().get(0).accept(VALIDATION_O_AUTH_GRANT_TYPE_VISITOR);
+  }
 
   @Test
-  public void sdkClientCredentialsSupport() {}
+  public void sdkClientCredentialsSupport() {
+    Optional<OAuthModelProperty> oAuthModelProperty =
+        parseOAuthModelPropertyFromConnectionProviderClass(SdkClientCredentialsConnectionProvider.class);
+    assertThat(oAuthModelProperty.isPresent(), is(true));
+    assertThat(oAuthModelProperty.get().getGrantTypes(), hasSize(1));
+    assertThat(oAuthModelProperty.get().getGrantTypes().get(0), instanceOf(ClientCredentialsGrantType.class));
+    oAuthModelProperty.get().getGrantTypes().get(0).accept(VALIDATION_O_AUTH_GRANT_TYPE_VISITOR);
+  }
 
   @Test
-  public void bothClientCredentialsSupport() {}
+  public void bothClientCredentialsSupport() {
+    expectedException.expect(IllegalParameterModelDefinitionException.class);
+    parseOAuthModelPropertyFromConnectionProviderClass(BothClientCredentialsConnectionProvider.class);
+  }
 
   private static class ValidationOAuthGrantTypeVisitor implements OAuthGrantTypeVisitor {
 
@@ -118,7 +134,11 @@ public class JavaConnectionProviderModelParserTestCase {
 
     @Override
     public void visit(ClientCredentialsGrantType grantType) {
-
+      assertThat(grantType.getAccessTokenExpr(), is(ACCESS_TOKEN_EXPR));
+      assertThat(grantType.getCredentialsPlacement(), is(CREDENTIALS_PLACEMENT));
+      assertThat(grantType.getDefaultScopes().get(), is(DEFAULT_SCOPES));
+      assertThat(grantType.getExpirationRegex(), is(EXPIRATION_EXPR));
+      assertThat(grantType.getTokenUrl(), is(TOKEN_URL));
     }
 
     @Override

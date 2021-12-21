@@ -10,6 +10,8 @@ import static java.lang.String.format;
 import static java.util.Objects.hash;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.function.UnaryOperator.identity;
+import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
@@ -25,6 +27,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.conn
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLibModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -36,6 +39,7 @@ import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.AuthorizationCode;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.ClientCredentials;
+import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthCallbackValue;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
@@ -48,6 +52,7 @@ import org.mule.runtime.module.extension.internal.loader.java.DefaultConnectionP
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.oauth.OAuthCallbackValuesModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
@@ -55,9 +60,11 @@ import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelF
 import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
 import org.mule.sdk.api.connectivity.NoConnectivityTest;
 
+import java.lang.reflect.Field;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -201,9 +208,9 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
                                                                                                         clientCredentialsAnnotationValueFetcher
                                                                                                             .getStringValue(org.mule.sdk.api.annotation.connectivity.oauth.ClientCredentials::accessTokenExpr),
                                                                                                         clientCredentialsAnnotationValueFetcher
-                                                                                                            .getStringValue(org.mule.sdk.api.annotation.connectivity.oauth.ClientCredentials::defaultScopes),
-                                                                                                        clientCredentialsAnnotationValueFetcher
                                                                                                             .getStringValue(org.mule.sdk.api.annotation.connectivity.oauth.ClientCredentials::expirationExpr),
+                                                                                                        clientCredentialsAnnotationValueFetcher
+                                                                                                            .getStringValue(org.mule.sdk.api.annotation.connectivity.oauth.ClientCredentials::defaultScopes),
                                                                                                         clientCredentialsAnnotationValueFetcher
                                                                                                             .getEnumValue(clientCredentials -> from(clientCredentials
                                                                                                                 .credentialsPlacement()))))
@@ -239,7 +246,23 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
 
     additionalModelProperties.add(new ConnectionTypeModelProperty(providerGenerics.get(0)));
     element.getDeclaringClass().ifPresent(clazz -> additionalModelProperties.add(new ImplementingTypeModelProperty(clazz)));
+    element.getDeclaringClass()
+        .ifPresent(clazz -> getOAuthCallbackValuesModelProperty(clazz).ifPresent(additionalModelProperties::add));
     additionalModelProperties.add(new ExtensionTypeDescriptorModelProperty(element));
+  }
+
+  private Optional<OAuthCallbackValuesModelProperty> getOAuthCallbackValuesModelProperty(Class<?> clazz) {
+    Map<Field, String> values = getAnnotatedFields(clazz, OAuthCallbackValue.class).stream()
+        .collect(toMap(identity(), field -> field.getAnnotation(OAuthCallbackValue.class).expression()));
+
+    values.putAll(getAnnotatedFields(clazz, org.mule.sdk.api.annotation.connectivity.oauth.OAuthCallbackValue.class).stream()
+        .collect(toMap(identity(), field -> field
+            .getAnnotation(org.mule.sdk.api.annotation.connectivity.oauth.OAuthCallbackValue.class).expression())));
+
+    if (!values.isEmpty()) {
+      of(new OAuthCallbackValuesModelProperty(values));
+    }
+    return empty();
   }
 
   @Override
