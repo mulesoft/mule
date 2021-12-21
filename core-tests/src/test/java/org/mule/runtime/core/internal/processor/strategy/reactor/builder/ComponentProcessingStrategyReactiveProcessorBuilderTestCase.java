@@ -68,7 +68,7 @@ public class ComponentProcessingStrategyReactiveProcessorBuilderTestCase extends
   @Mock
   private CoreEvent coreEvent;
 
-  @Mock(answer = RETURNS_MOCKS)
+  @Mock
   private CoreProfilingService profilingService;
 
   @Mock
