@@ -7,10 +7,9 @@
 
 package org.mule.runtime.module.artifact.api.classloader.exception;
 
-import static org.mule.runtime.api.exception.MuleException.MULE_VERBOSE_EXCEPTIONS;
-
 import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
+import static org.mule.runtime.api.exception.MuleException.MULE_VERBOSE_EXCEPTIONS;
 
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
@@ -22,7 +21,7 @@ import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 @NoInstantiate
 public final class ClassNotFoundInRegionException extends ClassNotFoundException {
 
-  private static final long serialVersionUID = -2800293812538208279L;
+  private static final long serialVersionUID = -2800293812538208276L;
 
   private final String className;
   private final String regionName;
@@ -30,7 +29,7 @@ public final class ClassNotFoundInRegionException extends ClassNotFoundException
 
   /**
    * Builds the exception.
-   * 
+   *
    * @param className the name of the class that was trying to be loaded.
    * @param regionName the name of the region the class was being loaded from.
    */
@@ -42,7 +41,7 @@ public final class ClassNotFoundInRegionException extends ClassNotFoundException
 
   /**
    * Builds the exception.
-   * 
+   *
    * @param className the name of the class that was trying to be loaded.
    * @param regionName the name of the region the class was being loaded from.
    * @param artifactName the name of the artifact in the region the class was being loaded from.
