@@ -7,8 +7,9 @@
 
 package org.mule.runtime.module.artifact.api.classloader.exception;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
-import static org.mule.runtime.api.exception.MuleException.isVerboseExceptions;
+import static org.mule.runtime.api.exception.MuleException.MULE_VERBOSE_EXCEPTIONS;
 
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
@@ -20,15 +21,15 @@ import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 @NoInstantiate
 public final class ClassNotFoundInRegionException extends ClassNotFoundException {
 
-  private static final long serialVersionUID = -2800293812538208279L;
+  private static final long serialVersionUID = -2800293812538208276L;
 
-  private String className;
-  private String regionName;
+  private final String className;
+  private final String regionName;
   private String artifactName;
 
   /**
    * Builds the exception.
-   * 
+   *
    * @param className the name of the class that was trying to be loaded.
    * @param regionName the name of the region the class was being loaded from.
    */
@@ -40,7 +41,7 @@ public final class ClassNotFoundInRegionException extends ClassNotFoundException
 
   /**
    * Builds the exception.
-   * 
+   *
    * @param className the name of the class that was trying to be loaded.
    * @param regionName the name of the region the class was being loaded from.
    * @param artifactName the name of the artifact in the region the class was being loaded from.
@@ -77,7 +78,9 @@ public final class ClassNotFoundInRegionException extends ClassNotFoundException
 
   @Override
   public synchronized Throwable fillInStackTrace() {
-    if (isVerboseExceptions()) {
+    // This might happen during logger initialization,
+    // so the implementation from MuleException cannot be used since it requires a logger.
+    if (getBoolean(MULE_VERBOSE_EXCEPTIONS)) {
       return super.fillInStackTrace();
     } else {
       return this;
