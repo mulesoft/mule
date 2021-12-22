@@ -27,6 +27,25 @@ import reactor.core.publisher.Mono;
  */
 public class NoOpProfilingService implements CoreProfilingService {
 
+  private final TracingService noOpTracingService = new TracingService() {
+
+    @Override
+    public ExecutionContext getCurrentExecutionContext() {
+      return null;
+    }
+
+    @Override
+    public void deleteCurrentExecutionContext() {
+      // No op
+    }
+
+    @Override
+    public ExecutionContext setCurrentExecutionContext(ExecutionContext executionContext) {
+      return null;
+    }
+
+  };
+
   @SuppressWarnings("rawtypes")
   private final ProfilingDataProducer<?, ?> profilingDataProducer = new ProfilingDataProducer() {
 
@@ -70,7 +89,7 @@ public class NoOpProfilingService implements CoreProfilingService {
 
   @Override
   public TracingService getTracingService() {
-    throw new UnsupportedOperationException();
+    return noOpTracingService;
   }
 
   @Override
