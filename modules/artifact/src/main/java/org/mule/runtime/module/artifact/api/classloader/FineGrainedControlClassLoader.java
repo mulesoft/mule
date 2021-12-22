@@ -56,11 +56,11 @@ public class FineGrainedControlClassLoader extends URLClassLoader
     super(urls, parent, new NonCachingURLStreamHandlerFactory());
     checkArgument(lookupPolicy != null, "Lookup policy cannot be null");
     this.lookupPolicy = lookupPolicy;
-    verboseLogging = valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING));
+    verboseLogging = LOGGER.isDebugEnabled() || isVerboseLoggingEnabled();
   }
 
-  private boolean isVerboseLogging() {
-    return verboseLogging || LOGGER.isDebugEnabled();
+  private boolean isVerboseLoggingEnabled() {
+    return LOGGER.isInfoEnabled() && valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING));
   }
 
   @Override
@@ -76,7 +76,7 @@ public class FineGrainedControlClassLoader extends URLClassLoader
       throw new NullPointerException(format("Unable to find a lookup strategy for '%s' from %s", name, this));
     }
 
-    if (isVerboseLogging()) {
+    if (verboseLogging) {
       logLoadingClass(name, lookupStrategy, "Loading class '%s' with '%s' on '%s'", this);
     }
 
@@ -101,13 +101,13 @@ public class FineGrainedControlClassLoader extends URLClassLoader
     if (result == null) {
       final CompositeClassNotFoundException compositeClassNotFoundException =
           new CompositeClassNotFoundException(name, lookupStrategy, exceptions);
-      if (isVerboseLogging()) {
+      if (verboseLogging) {
         LOGGER.warn(compositeClassNotFoundException.getMessage());
       }
       throw compositeClassNotFoundException;
     }
 
-    if (isVerboseLogging()) {
+    if (verboseLogging) {
       logLoadedClass(name, result);
     }
 
