@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.module.artifact.api.classloader.exception;
 
-import static org.mule.runtime.api.exception.MuleException.MULE_VERBOSE_EXCEPTIONS;
-
 import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.exception.MuleException.MULE_VERBOSE_EXCEPTIONS;
 
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.util.LazyValue;
@@ -27,7 +26,7 @@ import java.util.List;
 @NoInstantiate
 public final class CompositeClassNotFoundException extends ClassNotFoundException {
 
-  private static final long serialVersionUID = -6941980241656380059L;
+  private static final long serialVersionUID = -6941980241656380056L;
 
   private final String className;
   private final LookupStrategy lookupStrategy;
@@ -36,7 +35,7 @@ public final class CompositeClassNotFoundException extends ClassNotFoundExceptio
 
   /**
    * Builds the exception.
-   * 
+   *
    * @param className the name of the class that was trying to be loaded.
    * @param lookupStrategy the lookupStrategy that was used to load the class.
    * @param exceptions the exceptions thrown by each individual classloader that was used for the loading.

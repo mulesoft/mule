@@ -6,14 +6,13 @@
  */
 package org.mule.runtime.module.artifact.api.classloader.exception;
 
-import static org.mule.runtime.api.exception.MuleException.MULE_VERBOSE_EXCEPTIONS;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
-
 import static java.lang.Boolean.getBoolean;
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.lang.System.lineSeparator;
+import static org.mule.runtime.api.exception.MuleException.MULE_VERBOSE_EXCEPTIONS;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
@@ -31,7 +30,7 @@ public final class NotExportedClassException extends ClassNotFoundException {
 
   private static final Logger logger = LoggerFactory.getLogger(NotExportedClassException.class);
 
-  private static final long serialVersionUID = 2510347069070514569L;
+  private static final long serialVersionUID = 2510347069070514572L;
 
   private final String className;
   private final String artifactName;
@@ -39,7 +38,7 @@ public final class NotExportedClassException extends ClassNotFoundException {
 
   /**
    * Builds the exception.
-   * 
+   *
    * @param className the name of the class that was trying to be loaded.
    * @param artifactName the name of the artifact the class was being loaded from.
    * @param filter the applied filter for the artifact.
