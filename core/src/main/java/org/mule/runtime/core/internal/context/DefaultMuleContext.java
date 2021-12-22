@@ -1310,8 +1310,8 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureEnforceRequiredExpressionValidation() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ENFORCE_REQUIRED_EXPRESSION_VALIDATION,
-            featureContext -> featureContext.getArtifactMinMuleVersion()
-                    .filter(muleVersion -> muleVersion.atLeast("4.5.0")).isPresent());
+                                                featureContext -> featureContext.getArtifactMinMuleVersion()
+                                                    .filter(muleVersion -> muleVersion.atLeast("4.5.0")).isPresent());
   }
 
 }

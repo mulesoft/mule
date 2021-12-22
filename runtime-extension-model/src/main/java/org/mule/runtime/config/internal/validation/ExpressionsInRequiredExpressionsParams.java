@@ -67,8 +67,8 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
     // must be defined by an expression, but this was not enforced. This check is needed to avoid breaking on
     // legacy cases
     return featureFlaggingService.map(ffs -> ffs.isEnabled(ENFORCE_REQUIRED_EXPRESSION_VALIDATION)).orElse(true)
-            ? ERROR
-            : WARN;
+        ? ERROR
+        : WARN;
   }
 
   @Override
