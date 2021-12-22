@@ -17,8 +17,8 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.FileUtils.toFile;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.mule.runtime.container.internal.ContainerClassLoaderFactory.SYSTEM_PACKAGES;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.test.runner.RunnerConfiguration.TEST_RUNNER_ARTIFACT_ID;
@@ -562,7 +562,8 @@ public class IsolatedClassLoaderFactory {
   }
 
   /**
-   * Logs the message with info severity if {@link MULE_LOG_VERBOSE_CLASSLOADING} is set or trace severity
+   * Logs the message with info severity if {@link org.mule.runtime.core.api.config.MuleProperties#MULE_LOG_VERBOSE_CLASSLOADING}
+   * is set or trace severity
    *
    * @param message the message to be logged
    */
@@ -575,7 +576,7 @@ public class IsolatedClassLoaderFactory {
   }
 
   /**
-   * @return true if {@link MULE_LOG_VERBOSE_CLASSLOADING} is set to true
+   * @return true if {@link org.mule.runtime.core.api.config.MuleProperties#MULE_LOG_VERBOSE_CLASSLOADING} is set to true
    */
   private Boolean isVerboseClassLoading() {
     return valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING));
