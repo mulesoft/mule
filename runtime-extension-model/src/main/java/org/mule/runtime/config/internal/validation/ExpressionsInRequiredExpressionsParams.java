@@ -11,7 +11,6 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_REQUIRED_EX
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
-import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getGroupAndParametersPairs;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
@@ -66,9 +65,7 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
     // According to the extension model, no collections or target-value for foreach, parallel-foreach, etc...
     // must be defined by an expression, but this was not enforced. This check is needed to avoid breaking on
     // legacy cases
-    return featureFlaggingService.map(ffs -> ffs.isEnabled(ENFORCE_REQUIRED_EXPRESSION_VALIDATION)).orElse(true)
-        ? ERROR
-        : WARN;
+    return ERROR;
   }
 
   @Override
@@ -99,6 +96,9 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
 
             if (!stringValue.startsWith(DEFAULT_EXPRESSION_PREFIX)
                 || !stringValue.endsWith(DEFAULT_EXPRESSION_SUFFIX)) {
+              if (param.getModel().getName().equals("targetValue")) {
+                return featureFlaggingService.map(ffs -> ffs.isEnabled(ENFORCE_REQUIRED_EXPRESSION_VALIDATION)).orElse(true);
+              }
               return true;
             }
           }
