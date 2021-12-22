@@ -1303,9 +1303,9 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   }
 
   /**
-   * Configures the {@link MuleRuntimeFeature#DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING} feature flag.
+   * Configures the {@link MuleRuntimeFeature#ENFORCE_REQUIRED_EXPRESSION_VALIDATION} feature flag.
    *
-   * @since 4.5.0, 4.4.1, 4.3.1
+   * @since 4.4.0-202202
    */
   private static void configureEnforceRequiredExpressionValidation() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();

@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.validation;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_REQUIRED_EXPRESSION_VALIDATION;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
@@ -20,6 +21,7 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -28,6 +30,7 @@ import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.module.extension.api.loader.java.property.AllowsExpressionWithoutMarkersModelProperty;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
@@ -41,6 +44,12 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
 
   protected static final ComponentIdentifier CONFIGURATION_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(CONFIGURATION_NAME).build();
+
+  private final Optional<FeatureFlaggingService> featureFlaggingService;
+
+  public ExpressionsInRequiredExpressionsParams(Optional<FeatureFlaggingService> featureFlaggingService) {
+    this.featureFlaggingService = featureFlaggingService;
+  }
 
   @Override
   public String getName() {
@@ -57,7 +66,9 @@ public class ExpressionsInRequiredExpressionsParams implements Validation {
     // According to the extension model, no collections or target-value for foreach, parallel-foreach, etc...
     // must be defined by an expression, but this was not enforced. This check is needed to avoid breaking on
     // legacy cases
-    return WARN;
+    return featureFlaggingService.map(ffs -> ffs.isEnabled(ENFORCE_REQUIRED_EXPRESSION_VALIDATION)).orElse(true)
+            ? ERROR
+            : WARN;
   }
 
   @Override
