@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.processor.strategy;
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Collections.singleton;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
@@ -718,11 +717,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   }
 
   protected void assertProcessingStrategyTracing() {
-    if (enableProfilingServiceProperty.getValue().equals("true")) {
-      Assert.assertThat(profilingService.getTracingService().getCurrentExecutionContext(), notNullValue());
-    } else {
-      Assert.assertThat(profilingService.getTracingService().getCurrentExecutionContext(), nullValue());
-    }
+    Assert.assertThat(profilingService.getTracingService().getCurrentExecutionContext(), notNullValue());
   }
 
   protected interface TransactionAwareProcessingStrategyTestCase {
