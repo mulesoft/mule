@@ -24,6 +24,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -56,6 +57,7 @@ public class LoggerContextCacheTestCase {
   }
 
   @Test
+  @Ignore("MULE-20010")
   public void whenRecursiveMuleLoggerContextInstantiationExpectRecursiveLoggerContextInstantiationExceptionAndRecovery() {
     LoggerContext expectedLoggerContext = mock(MuleLoggerContext.class);
     when(contextSelector.buildContext(currentClassLoader))
