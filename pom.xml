@@ -254,7 +254,7 @@
         <muleMetadataExtensionTestVersion>4.1.5-20211222</muleMetadataExtensionTestVersion>
         <muleVeganExtensionTestVersion>4.1.5-20211222</muleVeganExtensionTestVersion>
         <muleHeisenbergExtensionTestVersion>4.1.5-20211222</muleHeisenbergExtensionTestVersion>
-        <muleMarvelExtensionTestVersion>4.1.5-HF-SNAPSHOT</muleMarvelExtensionTestVersion>
+        <muleMarvelExtensionTestVersion>4.1.5-20211222</muleMarvelExtensionTestVersion>
         <mulePetstoreExtensionTestVersion>4.1.5-HF-SNAPSHOT</mulePetstoreExtensionTestVersion>
         <muleSubtypesExtensionTestVersion>4.1.5-HF-SNAPSHOT</muleSubtypesExtensionTestVersion>
 
