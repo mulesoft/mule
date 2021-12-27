@@ -11,6 +11,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDL
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_ERROR_TYPES_VALIDATION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_REQUIRED_EXPRESSION_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
@@ -305,6 +306,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureRemoveShadowedImplicitInputs();
       configureEnforceErrorTypesValidation();
       configureDefaultErrorHandlerNotRollbackingEveryTx();
+      configureEnforceRequiredExpressionValidation();
     }
   }
 
@@ -1306,6 +1308,18 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureDefaultErrorHandlerNotRollbackingEveryTx() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING,
+                                                featureContext -> featureContext.getArtifactMinMuleVersion()
+                                                    .filter(muleVersion -> muleVersion.atLeast("4.5.0")).isPresent());
+  }
+
+  /**
+   * Configures the {@link MuleRuntimeFeature#ENFORCE_REQUIRED_EXPRESSION_VALIDATION} feature flag.
+   *
+   * @since 4.4.0-202202
+   */
+  private static void configureEnforceRequiredExpressionValidation() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(ENFORCE_REQUIRED_EXPRESSION_VALIDATION,
                                                 featureContext -> featureContext.getArtifactMinMuleVersion()
                                                     .filter(muleVersion -> muleVersion.atLeast("4.5.0")).isPresent());
   }
