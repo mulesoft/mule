@@ -749,4 +749,13 @@ public interface AllureConstants {
 
   }
 
+  interface LazyInitializationFeature {
+
+    String LAZY_INITIALIZATION = "Lazy Initialization";
+  }
+
+  interface ObjectSerializer {
+
+    String CUSTOM_OBJECT_SERIALIZER = "Custom object serializer";
+  }
 }

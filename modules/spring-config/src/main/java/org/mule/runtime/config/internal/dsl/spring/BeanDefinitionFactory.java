@@ -312,7 +312,8 @@ public class BeanDefinitionFactory {
       });
       String defaultObjectSerializer = componentModel.getRawParameters().get("defaultObjectSerializer-ref");
       if (defaultObjectSerializer != null) {
-        if (defaultObjectSerializer != DEFAULT_OBJECT_SERIALIZER_NAME) {
+        if (!defaultObjectSerializer.equals(DEFAULT_OBJECT_SERIALIZER_NAME)
+            && !registry.isAlias(DEFAULT_OBJECT_SERIALIZER_NAME)) {
           registry.removeBeanDefinition(DEFAULT_OBJECT_SERIALIZER_NAME);
           registry.registerAlias(defaultObjectSerializer, DEFAULT_OBJECT_SERIALIZER_NAME);
         }
