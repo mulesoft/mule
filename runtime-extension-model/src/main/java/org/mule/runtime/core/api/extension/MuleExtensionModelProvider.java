@@ -20,6 +20,7 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.util.LazyValue;
@@ -38,6 +39,8 @@ import java.util.Properties;
  * @since 4.0
  */
 public final class MuleExtensionModelProvider {
+
+  private static final MuleVersion PARSED_MULE_VERSION;
 
   public static final String MULE_NAME = CORE_PREFIX;
   public static final String MULE_VERSION;
@@ -66,6 +69,8 @@ public final class MuleExtensionModelProvider {
     } catch (IOException e) {
       throw new MuleRuntimeException(e);
     }
+
+    PARSED_MULE_VERSION = new MuleVersion(MULE_VERSION);
   }
 
   private static MetadataType loadPrimitive(String id) {
@@ -95,5 +100,12 @@ public final class MuleExtensionModelProvider {
    */
   public static ExtensionModel getTlsExtensionModel() {
     return TLS_EXTENSION_MODEL.get();
+  }
+
+  /**
+   * @return the parsed {@link MuleVersion} from the build properties.
+   */
+  public static MuleVersion getMuleVersion() {
+    return PARSED_MULE_VERSION;
   }
 }
