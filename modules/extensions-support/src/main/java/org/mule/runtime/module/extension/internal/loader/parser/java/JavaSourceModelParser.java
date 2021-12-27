@@ -61,6 +61,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelF
 import org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.source.JavaParserSourceUtils;
+import org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils;
 import org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils;
 import org.mule.runtime.module.extension.internal.runtime.source.DefaultSdkSourceFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
@@ -221,11 +222,12 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
   }
 
   private void resolveOutputTypes() {
-    final MetadataType returnMetadataType = sourceElement.getReturnMetadataType();
 
     // TODO: Should be possible to parse dynamic types right here
-    outputType = new DefaultOutputModelParser(returnMetadataType, false);
-    outputAttributesType = new DefaultOutputModelParser(sourceElement.getAttributesMetadataType(), false);
+    outputType = new DefaultOutputModelParser(CustomStaticTypeUtils
+        .getSourceOutputType(sourceElement), false);
+    outputAttributesType = new DefaultOutputModelParser(CustomStaticTypeUtils
+        .getSourceOutputType(sourceElement), false);
   }
 
   private void validateLifecycle(SourceElement sourceType, Class<?> lifecycleType) {

@@ -106,7 +106,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
         getStereotypeModelLoaderDelegate().addAllowedStereotypes(chain, chainDeclarer);
       });
 
-      loader.registerOutputTypes(operation.getDeclaration());
+      // loader.registerOutputTypes(operation.getDeclaration());
       declareErrorModels(operation, parser);
       getStereotypeModelLoaderDelegate().addStereotypes(
                                                         parser,

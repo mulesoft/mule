@@ -91,7 +91,7 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
       parser.getMediaTypeModelProperty().ifPresent(sourceDeclarer::withModelProperty);
       parser.getExceptionHandlerModelProperty().ifPresent(sourceDeclarer::withModelProperty);
-      loader.registerOutputTypes(sourceDeclarer.getDeclaration());
+      // loader.registerOutputTypes(sourceDeclarer.getDeclaration());
 
       addSemanticTerms(sourceDeclarer.getDeclaration(), parser);
       declareEmittedNotifications(parser, sourceDeclarer, loader::getNotificationModel);

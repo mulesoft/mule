@@ -66,6 +66,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelF
 import org.mule.runtime.module.extension.internal.loader.parser.java.connection.JavaConnectionProviderModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils;
+import org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils;
 import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
@@ -247,8 +248,10 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   private void parseBlockingOperation() {
     // TODO: Should be possible to parse dynamic types right here
-    outputType = new DefaultOutputModelParser(operationElement.getReturnMetadataType(), false);
-    outputAttributesType = new DefaultOutputModelParser(operationElement.getAttributesMetadataType(), false);
+    outputType = new DefaultOutputModelParser(CustomStaticTypeUtils
+        .getOperationOutputType(operationElement), false);
+    outputAttributesType = new DefaultOutputModelParser(CustomStaticTypeUtils
+        .getOperationAttributesType(operationElement), false);
 
     if (autoPaging = JavaExtensionModelParserUtils.isAutoPaging(operationElement)) {
       parseAutoPaging();

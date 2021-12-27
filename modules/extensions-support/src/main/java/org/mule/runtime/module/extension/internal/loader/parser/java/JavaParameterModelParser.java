@@ -79,6 +79,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.property.Exte
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser.ExclusiveOptionalDescriptor;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
+import org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
 
@@ -111,7 +112,7 @@ public class JavaParameterModelParser implements ParameterModelParser {
     this.parameter = parameter;
     this.context = context;
     this.exclusiveOptionals = exclusiveOptionals;
-    type = parameter.getType().asMetadataType();
+    type = CustomStaticTypeUtils.getParameterType(parameter);
 
     parserStructure();
     collectAdditionalModelProperties();
