@@ -26,7 +26,7 @@ public class DefaultJavaExtensionModelLoader extends AbstractJavaExtensionModelL
 
   public static final String JAVA_LOADER_ID = "java";
 
-  private List<DeclarationEnricher> customEnrichers = asList(new CustomStaticTypeDeclarationEnricher());
+  private List<DeclarationEnricher> customEnrichers = asList();
 
   public DefaultJavaExtensionModelLoader() {
     super(JAVA_LOADER_ID, (ModelLoaderDelegateFactory) DefaultJavaModelLoaderDelegate::new);

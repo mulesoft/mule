@@ -6285,12 +6285,7 @@
                 "value": "DifferedKnockableDoor"
               },
               "stereotype": {
-                "allowedStereotypes": [
-                  {
-                    "type": "DIFFERED_KNOCKABLE_DOOR",
-                    "namespace": "HEISENBERG"
-                  }
-                ]
+                "allowedStereotypes": []
               }
             },
             "fields": [

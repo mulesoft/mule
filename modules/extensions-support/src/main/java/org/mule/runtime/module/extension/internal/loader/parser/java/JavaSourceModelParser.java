@@ -227,7 +227,7 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
     outputType = new DefaultOutputModelParser(CustomStaticTypeUtils
         .getSourceOutputType(sourceElement), false);
     outputAttributesType = new DefaultOutputModelParser(CustomStaticTypeUtils
-        .getSourceOutputType(sourceElement), false);
+        .getSourceAttributesType(sourceElement), false);
   }
 
   private void validateLifecycle(SourceElement sourceType, Class<?> lifecycleType) {

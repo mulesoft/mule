@@ -6200,12 +6200,7 @@
                 "value": "Door"
               },
               "stereotype": {
-                "allowedStereotypes": [
-                  {
-                    "type": "DOOR",
-                    "namespace": "SUBTYPES"
-                  }
-                ]
+                "allowedStereotypes": []
               }
             },
             "fields": []
@@ -6378,12 +6373,7 @@
                 "value": "Door"
               },
               "stereotype": {
-                "allowedStereotypes": [
-                  {
-                    "type": "DOOR",
-                    "namespace": "SUBTYPES"
-                  }
-                ]
+                "allowedStereotypes": []
               }
             },
             "fields": []
@@ -6423,12 +6413,7 @@
                 "value": "Square"
               },
               "stereotype": {
-                "allowedStereotypes": [
-                  {
-                    "type": "SQUARE",
-                    "namespace": "SUBTYPES"
-                  }
-                ]
+                "allowedStereotypes": []
               }
             },
             "fields": [
@@ -6563,12 +6548,7 @@
                 "value": "Ricin"
               },
               "stereotype": {
-                "allowedStereotypes": [
-                  {
-                    "type": "RICIN",
-                    "namespace": "HEISENBERG"
-                  }
-                ]
+                "allowedStereotypes": []
               }
             },
             "fields": [
@@ -6634,12 +6614,7 @@
                       "value": "door"
                     },
                     "stereotype": {
-                      "allowedStereotypes": [
-                        {
-                          "type": "KNOCKEABLE_DOOR",
-                          "namespace": "HEISENBERG"
-                        }
-                      ]
+                      "allowedStereotypes": []
                     }
                   },
                   "fields": [
@@ -6724,12 +6699,7 @@
                 "value": "Weapon"
               },
               "stereotype": {
-                "allowedStereotypes": [
-                  {
-                    "type": "WEAPON",
-                    "namespace": "HEISENBERG"
-                  }
-                ]
+                "allowedStereotypes": []
               }
             },
             "fields": []
@@ -7074,12 +7044,7 @@
                   "value": "Weapon"
                 },
                 "stereotype": {
-                  "allowedStereotypes": [
-                    {
-                      "type": "WEAPON",
-                      "namespace": "HEISENBERG"
-                    }
-                  ]
+                  "allowedStereotypes": []
                 }
               },
               "fields": []
@@ -7136,12 +7101,7 @@
                   "value": "Weapon"
                 },
                 "stereotype": {
-                  "allowedStereotypes": [
-                    {
-                      "type": "WEAPON",
-                      "namespace": "HEISENBERG"
-                    }
-                  ]
+                  "allowedStereotypes": []
                 }
               },
               "fields": []
