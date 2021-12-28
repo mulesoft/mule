@@ -889,4 +889,9 @@ public interface AllureConstants {
       String OBJECT_PROPERTIES = "Object properties";
     }
   }
+
+  interface ObjectSerializer {
+
+    String CUSTOM_OBJECT_SERIALIZER = "Custom object serializer";
+  }
 }
