@@ -19062,7 +19062,12 @@
           "value": "Fruit"
         },
         "stereotype": {
-          "allowedStereotypes": []
+          "allowedStereotypes": [
+            {
+              "type": "FRUIT",
+              "namespace": "VEGAN"
+            }
+          ]
         }
       },
       "fields": []
@@ -19270,7 +19275,12 @@
                 "value": "HealthyFood"
               },
               "stereotype": {
-                "allowedStereotypes": []
+                "allowedStereotypes": [
+                  {
+                    "type": "HEALTHY_FOOD",
+                    "namespace": "VEGAN"
+                  }
+                ]
               }
             },
             "fields": [
@@ -19464,7 +19474,12 @@
                 "value": "HealthyFood"
               },
               "stereotype": {
-                "allowedStereotypes": []
+                "allowedStereotypes": [
+                  {
+                    "type": "HEALTHY_FOOD",
+                    "namespace": "VEGAN"
+                  }
+                ]
               }
             },
             "fields": [
