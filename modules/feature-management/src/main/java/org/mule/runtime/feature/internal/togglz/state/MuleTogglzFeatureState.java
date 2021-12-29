@@ -39,7 +39,7 @@ public class MuleTogglzFeatureState extends FeatureState implements Disposable {
   public MuleTogglzFeatureState(FeatureState defaultFeatureState,
                                 MuleTogglzFeatureStateRepository stateRepository,
                                 MuleTogglzFeatureScope scope) {
-    super(defaultFeatureState.getFeature());
+    super(defaultFeatureState.getFeature(), defaultFeatureState.isEnabled());
     this.scope = scope;
     this.stateRepository = stateRepository;
   }
