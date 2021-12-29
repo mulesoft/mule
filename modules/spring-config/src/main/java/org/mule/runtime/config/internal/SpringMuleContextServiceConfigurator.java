@@ -15,6 +15,7 @@ import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SER
 import static org.mule.runtime.config.api.LazyComponentInitializer.LAZY_COMPONENT_INITIALIZER_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_LOCK_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEMORY_MANAGEMENT_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_COMPONENT_INITIAL_STATE_MANAGER;
@@ -71,6 +72,7 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.notification.ConnectionNotification;
 import org.mule.runtime.api.notification.ConnectionNotificationListener;
 import org.mule.runtime.api.notification.CustomNotification;
@@ -102,6 +104,7 @@ import org.mule.runtime.config.internal.factories.TransactionManagerFactoryBean;
 import org.mule.runtime.config.internal.processor.MuleObjectNameProcessor;
 import org.mule.runtime.config.internal.registry.SpringRegistryBootstrap;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
@@ -256,6 +259,7 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
   private final ConfigurationProperties configurationProperties;
   private final Map<String, String> artifactProperties;
   private final Registry serviceLocator;
+  private final MemoryManagementService memoryManagementService;
 
   public SpringMuleContextServiceConfigurator(MuleContextWithRegistry muleContext,
                                               ConfigurationProperties configurationProperties,
@@ -264,7 +268,8 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
                                               OptionalObjectsController optionalObjectsController,
                                               BeanDefinitionRegistry beanDefinitionRegistry,
                                               Registry serviceLocator,
-                                              ResourceLocator resourceLocator) {
+                                              ResourceLocator resourceLocator,
+                                              MemoryManagementService memoryManagementService) {
     super((CustomServiceRegistry) muleContext.getCustomizationService(), beanDefinitionRegistry, serviceLocator);
 
     this.muleContext = muleContext;
@@ -276,6 +281,7 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
     this.beanDefinitionRegistry = beanDefinitionRegistry;
     this.serviceLocator = serviceLocator;
     this.resourceLocator = resourceLocator;
+    this.memoryManagementService = memoryManagementService;
   }
 
   private BeanDefinition getBeanDefinitionForProfilingService() {
@@ -291,6 +297,7 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
     registerConstantBeanDefinition(OBJECT_REGISTRY, serviceLocator);
     registerConstantBeanDefinition(OBJECT_STATISTICS, muleContext.getStatistics());
     registerConstantBeanDefinition(OBJECT_RESOURCE_LOCATOR, resourceLocator);
+    registerConstantBeanDefinition(MULE_MEMORY_MANAGEMENT_SERVICE, memoryManagementService);
     loadServiceConfigurators();
 
     defaultContextServices.entrySet().stream()

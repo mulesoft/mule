@@ -25,6 +25,7 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.SystemUtils;
@@ -128,7 +129,7 @@ public class MuleContainer {
     container.start(true);
   }
 
-  public MuleContainer(String[] args) {
+  public MuleContainer(String[] args) throws InitialisationException {
     init(args);
 
     this.serviceManager = artifactResourcesRegistry.getServiceManager();
@@ -156,7 +157,8 @@ public class MuleContainer {
 
   public MuleContainer(DeploymentService deploymentService, RepositoryService repositoryService, ToolingService toolingService,
                        MuleCoreExtensionManagerServer coreExtensionManager, ServiceManager serviceManager,
-                       ExtensionModelLoaderManager extensionModelLoaderManager, TroubleshootingService troubleshootingService) {
+                       ExtensionModelLoaderManager extensionModelLoaderManager, TroubleshootingService troubleshootingService)
+      throws InitialisationException {
     this(new String[0], deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager,
          extensionModelLoaderManager, troubleshootingService);
   }
@@ -168,7 +170,7 @@ public class MuleContainer {
                        ToolingService toolingService, MuleCoreExtensionManagerServer coreExtensionManager,
                        ServiceManager serviceManager, ExtensionModelLoaderManager extensionModelLoaderManager,
                        TroubleshootingService troubleshootingService)
-      throws IllegalArgumentException {
+      throws IllegalArgumentException, InitialisationException {
     // TODO(pablo.kraan): remove the args argument and use the already existing setters to set everything needed
     init(args);
 
@@ -181,7 +183,7 @@ public class MuleContainer {
     this.troubleshootingService = troubleshootingService;
   }
 
-  protected void init(String[] args) throws IllegalArgumentException {
+  protected void init(String[] args) throws IllegalArgumentException, InitialisationException {
     // TODO(pablo.kraan): move initialization of others classes outside this method
     Map<String, Object> commandlineOptions = getCommandLineOptions(args);
 
@@ -203,6 +205,8 @@ public class MuleContainer {
       }
       setProperty(DEPLOYMENT_APPLICATION_PROPERTY, appOption);
     }
+
+    artifactResourcesRegistry.getMemoryManagementService().initialise();
   }
 
   /**

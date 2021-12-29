@@ -16,6 +16,7 @@ import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClas
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleDomainsDir;
 
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
@@ -70,9 +71,10 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
                               DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory,
                               ExtensionModelLoaderManager extensionModelLoaderManager,
                               LicenseValidator licenseValidator,
-                              LockFactory runtimeLockFactory) {
+                              LockFactory runtimeLockFactory,
+                              MemoryManagementService memoryManagementService) {
 
-    super(licenseValidator, runtimeLockFactory);
+    super(licenseValidator, runtimeLockFactory, memoryManagementService);
 
     checkArgument(domainDescriptorFactory != null, "domainDescriptorFactory cannot be null");
     checkArgument(domainManager != null, "Domain manager cannot be null");
@@ -161,7 +163,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
 
     DefaultMuleDomain defaultMuleDomain =
         new DefaultMuleDomain(domainDescriptor, domainClassLoader, classLoaderRepository, serviceRepository, artifactPlugins,
-                              extensionModelLoaderManager, getRuntimeLockFactory());
+                              extensionModelLoaderManager, getRuntimeLockFactory(), memoryManagementService);
 
     DomainWrapper domainWrapper = new DomainWrapper(defaultMuleDomain, this);
     domainManager.addDomain(domainWrapper);

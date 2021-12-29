@@ -33,6 +33,7 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.Notification.Action;
@@ -92,6 +93,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
   private final ClassLoaderRepository classLoaderRepository;
   private final File location;
+  private final MemoryManagementService memoryManagementService;
   private ApplicationStatus status;
 
   protected MuleContextListener muleContextListener;
@@ -109,7 +111,8 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
                                 ExtensionModelLoaderRepository extensionModelLoaderRepository, File location,
                                 ClassLoaderRepository classLoaderRepository,
                                 ApplicationPolicyProvider applicationPolicyProvider,
-                                LockFactory runtimeLockFactory) {
+                                LockFactory runtimeLockFactory,
+                                MemoryManagementService memoryManagementService) {
     super("app", "application", deploymentClassLoader);
     this.descriptor = descriptor;
     this.domainRepository = domainRepository;
@@ -120,6 +123,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
     this.location = location;
     this.policyManager = applicationPolicyProvider;
     this.runtimeLockFactory = runtimeLockFactory;
+    this.memoryManagementService = memoryManagementService;
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
     if (this.deploymentClassLoader == null) {
       throw new IllegalArgumentException("Classloader cannot be null");
@@ -225,7 +229,8 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
               .setProperties(ofNullable(resolveDeploymentProperties(descriptor.getDataFolderName(),
                                                                     descriptor.getDeploymentProperties())))
               .setPolicyProvider(policyManager)
-              .setRuntimeLockFactory(runtimeLockFactory);
+              .setRuntimeLockFactory(runtimeLockFactory)
+              .setMemoryMaangementService(memoryManagementService);
 
       Domain domain = getApplicationDomain(domainRepository, descriptor);
       if (domain.getArtifactContext() != null) {

@@ -61,6 +61,7 @@ import static org.mockito.Mockito.verify;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -101,6 +102,7 @@ import org.junit.Test;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
+import javax.inject.Inject;
 
 /**
  * Contains test for domain deployment
@@ -424,6 +426,23 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertNotNull(domain);
     assertNotNull(domain.getArtifactContext().getRegistry());
     assertDomainAnchorFileExists(emptyDomainFileBuilder.getId());
+  }
+
+  @Test
+  public void memoryManagementCanBeInjectedInDomain() throws Exception {
+    addPackedDomainFromBuilder(emptyDomainFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
+
+    assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, emptyDomainFileBuilder.getId()}, true);
+
+    final Domain domain = findADomain(emptyDomainFileBuilder.getId());
+    InjectedMemoryManagement injectedMemoryManagement = new InjectedMemoryManagement();
+    domain.getArtifactContext().getMuleContext().getInjector().inject(injectedMemoryManagement);
+
+    assertThat(injectedMemoryManagement.getMemoryManagementService(), is(notNullValue()));
   }
 
   @Test
@@ -2213,6 +2232,19 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
       deploymentService.redeployDomain(id);
     } else {
       deploymentService.redeployDomain(id, deploymentProperties);
+    }
+  }
+
+  /**
+   * Class to test injection of memory management.
+   */
+  private static class InjectedMemoryManagement {
+
+    @Inject
+    private MemoryManagementService memoryManagementService;
+
+    public MemoryManagementService getMemoryManagementService() {
+      return memoryManagementService;
     }
   }
 

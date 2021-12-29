@@ -27,7 +27,7 @@ public class DefaultServiceDiscoverer implements ServiceDiscoverer {
   private final ServiceProviderDiscoverer serviceProviderDiscoverer;
 
   public DefaultServiceDiscoverer(ServiceProviderDiscoverer serviceProviderDiscoverer) {
-    this(serviceProviderDiscoverer, new ReflectionServiceResolver(new ServiceRegistry()));
+    this(serviceProviderDiscoverer, new ReflectionServiceResolver(new ServiceRegistry(), null));
   }
 
   /**

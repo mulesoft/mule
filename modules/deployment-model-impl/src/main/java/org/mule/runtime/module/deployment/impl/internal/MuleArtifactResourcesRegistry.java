@@ -10,6 +10,7 @@ import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEMORY_MANAGEMENT_SERVICE;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.applicationClassLoaderFactory;
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
@@ -17,11 +18,15 @@ import static org.mule.runtime.module.license.api.LicenseValidatorProvider.disco
 
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.internal.lock.ServerLockFactory;
+import org.mule.runtime.core.internal.registry.SimpleRegistry;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepositoryFactory;
@@ -38,6 +43,7 @@ import org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescri
 import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.deployment.model.internal.artifact.extension.MuleExtensionModelLoaderManager;
 import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderFactory;
+import org.mule.runtime.internal.memory.management.DefaultMemoryManagementService;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
@@ -72,7 +78,7 @@ import org.mule.runtime.module.service.internal.manager.ServiceRegistry;
  *
  * @since 4.0
  */
-public class MuleArtifactResourcesRegistry {
+public class MuleArtifactResourcesRegistry extends SimpleRegistry {
 
   private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
   private final DefaultDomainManager domainManager;
@@ -93,6 +99,7 @@ public class MuleArtifactResourcesRegistry {
   private final RegionPluginClassLoadersFactory pluginClassLoadersFactory;
   private final AbstractDeployableDescriptorFactory<MuleApplicationModel, ApplicationDescriptor> toolingApplicationDescriptorFactory;
   private final ServerLockFactory runtimeLockFactory;
+  private final MemoryManagementService memoryManagementService;
 
   /**
    * Builds a {@link MuleArtifactResourcesRegistry} instance
@@ -124,14 +131,25 @@ public class MuleArtifactResourcesRegistry {
         moduleRepository = new DefaultModuleRepository(new ContainerModuleDiscoverer(getClass().getClassLoader()));
       }
 
-      return new MuleArtifactResourcesRegistry(moduleRepository);
+      try {
+        return new MuleArtifactResourcesRegistry(moduleRepository);
+      } catch (RegistrationException e) {
+        throw new MuleRuntimeException(e);
+      }
     }
   }
 
   /**
    * Creates a repository for resources required for mule artifacts.
    */
-  private MuleArtifactResourcesRegistry(ModuleRepository moduleRepository) {
+  private MuleArtifactResourcesRegistry(ModuleRepository moduleRepository) throws RegistrationException {
+    // Creates a registry to be used as an injector.
+    super(null, null);
+
+    this.memoryManagementService = DefaultMemoryManagementService.getInstance();
+
+    // Registers the memory management so that this can be injected.
+    registerObject(MULE_MEMORY_MANAGEMENT_SERVICE, memoryManagementService);
     runtimeLockFactory = new ServerLockFactory();
 
     containerClassLoader = createContainerClassLoader(moduleRepository, getClass().getClassLoader());
@@ -172,7 +190,7 @@ public class MuleArtifactResourcesRegistry {
                                                                                                    trackArtifactClassLoaderFactory(serviceClassLoaderFactory),
                                                                                                    descriptorLoaderRepository,
                                                                                                    artifactDescriptorValidatorBuilder),
-                                                           new ReflectionServiceResolver(new ServiceRegistry())));
+                                                           new ReflectionServiceResolver(new ServiceRegistry(), this)));
     extensionModelLoaderManager = new MuleExtensionModelLoaderManager(containerClassLoader);
 
     pluginDependenciesResolver =
@@ -181,7 +199,8 @@ public class MuleArtifactResourcesRegistry {
                                              artifactClassLoaderManager, serviceManager,
                                              pluginDependenciesResolver, domainClassLoaderBuilderFactory,
                                              extensionModelLoaderManager, licenseValidator,
-                                             runtimeLockFactory);
+                                             runtimeLockFactory,
+                                             memoryManagementService);
 
     DeployableArtifactClassLoaderFactory<PolicyTemplateDescriptor> policyClassLoaderFactory =
         trackDeployableArtifactClassLoaderFactory(new PolicyTemplateClassLoaderFactory());
@@ -195,7 +214,8 @@ public class MuleArtifactResourcesRegistry {
                                                        pluginDependenciesResolver,
                                                        artifactPluginDescriptorLoader,
                                                        licenseValidator,
-                                                       runtimeLockFactory);
+                                                       runtimeLockFactory,
+                                                       memoryManagementService);
     toolingApplicationDescriptorFactory =
         new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
                                          artifactDescriptorValidatorBuilder);
@@ -302,10 +322,17 @@ public class MuleArtifactResourcesRegistry {
   }
 
   /**
-   * @return a {@link RuntimeLockFactory} that can be shared between deployable artifacts.
+   * @return a {@link ServerLockFactory} that can be shared between deployable artifacts.
    */
   public ServerLockFactory getRuntimeLockFactory() {
     return runtimeLockFactory;
+  }
+
+  /**
+   * @return a {@link MemoryManagementService} that can be shared between deployable artifacts.
+   */
+  public MemoryManagementService getMemoryManagementService() {
+    return memoryManagementService;
   }
 
 }

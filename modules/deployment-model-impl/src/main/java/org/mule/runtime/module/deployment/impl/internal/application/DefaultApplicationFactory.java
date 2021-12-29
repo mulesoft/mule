@@ -15,6 +15,7 @@ import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClas
 import static org.mule.runtime.module.deployment.impl.internal.application.DefaultMuleApplication.getApplicationDomain;
 
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -81,8 +82,9 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
                                    PluginDependenciesResolver pluginDependenciesResolver,
                                    ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,
                                    LicenseValidator licenseValidator,
-                                   LockFactory runtimeLockFactory) {
-    super(licenseValidator, runtimeLockFactory);
+                                   LockFactory runtimeLockFactory,
+                                   MemoryManagementService memoryManagementService) {
+    super(licenseValidator, runtimeLockFactory, memoryManagementService);
     checkArgument(applicationClassLoaderBuilderFactory != null, "Application classloader builder factory cannot be null");
     checkArgument(applicationDescriptorFactory != null, "Application descriptor factory cannot be null");
     checkArgument(domainRepository != null, "Domain repository cannot be null");
@@ -92,6 +94,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     checkArgument(policyTemplateClassLoaderBuilderFactory != null, "policyClassLoaderBuilderFactory cannot be null");
     checkArgument(pluginDependenciesResolver != null, "pluginDependenciesResolver cannot be null");
     checkArgument(artifactPluginDescriptorLoader != null, "artifactPluginDescriptorLoader cannot be null");
+    checkArgument(memoryManagementService != null, "memoryManagementService cannot be null");
 
     this.classLoaderRepository = classLoaderRepository;
     this.applicationClassLoaderBuilderFactory = applicationClassLoaderBuilderFactory;
@@ -161,7 +164,8 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     DefaultMuleApplication delegate =
         new DefaultMuleApplication(descriptor, applicationClassLoader, artifactPlugins, domainRepository,
                                    serviceRepository, extensionModelLoaderRepository, descriptor.getArtifactLocation(),
-                                   classLoaderRepository, applicationPolicyProvider, getRuntimeLockFactory());
+                                   classLoaderRepository, applicationPolicyProvider, getRuntimeLockFactory(),
+                                   memoryManagementService);
 
     applicationPolicyProvider.setApplication(delegate);
     return new ApplicationWrapper(delegate);

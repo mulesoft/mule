@@ -21,6 +21,7 @@ import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRu
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -83,7 +84,8 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
                                     classLoaderRepository, policyTemplateClassLoaderBuilderFactory, pluginDependenciesResolver,
                                     artifactPluginDescriptorLoader,
                                     discoverLicenseValidator(getClass().getClassLoader()),
-                                    getRuntimeLockFactory());
+                                    getRuntimeLockFactory(),
+                                    mock(MemoryManagementService.class));
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
