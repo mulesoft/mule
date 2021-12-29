@@ -29,7 +29,7 @@ public class MuleTogglzFeatureMetadata implements FeatureMetaData {
   private final FeatureState defaultFeatureState;
 
   public MuleTogglzFeatureMetadata(Feature newFeature) {
-    this(newFeature, newFeature.name().startsWith("org.mule.runtime.core.internal.profiling.consumer"));
+    this(newFeature, false);
   }
 
   public MuleTogglzFeatureMetadata(Feature newFeature, boolean enabled) {
