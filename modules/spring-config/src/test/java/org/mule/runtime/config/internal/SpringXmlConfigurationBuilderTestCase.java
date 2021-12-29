@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal;
 
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -24,6 +25,8 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -121,6 +124,20 @@ public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase 
     assertThat(componentAst.getMetadata().getFileName(), is(of("simple.xml")));
   }
 
+  @Test
+  public void memoryManagementCanBeInjectedInBean() throws MuleException, IOException {
+    copyResourceToTemp("simple.xml");
+    final SpringXmlConfigurationBuilder configurationBuilder =
+        xmlConfigurationBuilderRelativeToPath(tempFolder.getRoot(), new String[] {"simple.xml"});
+
+    configurationBuilder.configure(muleContext);
+    final ArtifactContext artifactContext = configurationBuilder.createArtifactContext();
+    MemoryManagementInjected memoryManagementInjected = new MemoryManagementInjected();
+    artifactContext.getMuleContext().getInjector().inject(memoryManagementInjected);
+
+    assertThat(memoryManagementInjected.getMemoryManagementService(), is(notNullValue()));
+  }
+
   private void copyResourceToTemp(String resourceName) throws IOException {
     final URL originalResource = Thread.currentThread().getContextClassLoader().getResource(resourceName);
     final File simpleAppFileOutsideClassPath = new File(tempFolder.getRoot(), resourceName);
@@ -140,6 +157,20 @@ public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase 
     @Override
     public String generate(ExtensionModel extensionModel, DslResolvingContext context) {
       return "";
+    }
+  }
+
+
+  /**
+   * Class to test the injection of a {@link MemoryManagementService}
+   */
+  private static class MemoryManagementInjected {
+
+    @Inject
+    private MemoryManagementService memoryManagementService;
+
+    public MemoryManagementService getMemoryManagementService() {
+      return memoryManagementService;
     }
   }
 }

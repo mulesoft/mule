@@ -22,6 +22,7 @@ import static org.mule.tck.mockito.answer.BuilderAnswer.BUILDER_ANSWER;
 
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
@@ -132,7 +133,7 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
                           List<ArtifactPlugin> artifactPlugins, ExtensionModelLoaderManager extensionModelLoaderManager,
                           LockFactory runtimeLockFactory) {
       super(descriptor, deploymentClassLoader, classLoaderRepository, serviceRepository, artifactPlugins,
-            extensionModelLoaderManager, runtimeLockFactory);
+            extensionModelLoaderManager, runtimeLockFactory, mock(MemoryManagementService.class));
     }
 
     @Override

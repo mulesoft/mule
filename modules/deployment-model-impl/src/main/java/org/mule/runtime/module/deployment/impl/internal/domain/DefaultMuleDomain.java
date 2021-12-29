@@ -28,6 +28,7 @@ import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.api.value.ValueProviderService;
@@ -64,6 +65,7 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
   private final ExtensionModelLoaderManager extensionModelLoaderManager;
   private final ClassLoaderRepository classLoaderRepository;
   private final LockFactory runtimeLockFactory;
+  private final MemoryManagementService memoryManagementService;
 
   private MuleContextListener muleContextListener;
 
@@ -72,7 +74,8 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
                            ServiceRepository serviceRepository,
                            List<ArtifactPlugin> artifactPlugins,
                            ExtensionModelLoaderManager extensionModelLoaderManager,
-                           LockFactory runtimeLockFactory) {
+                           LockFactory runtimeLockFactory,
+                           MemoryManagementService memoryManagementService) {
     super("domain", "domain", deploymentClassLoader);
     this.classLoaderRepository = classLoaderRepository;
     this.descriptor = descriptor;
@@ -80,6 +83,7 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
     this.artifactPlugins = artifactPlugins;
     this.extensionModelLoaderManager = extensionModelLoaderManager;
     this.runtimeLockFactory = runtimeLockFactory;
+    this.memoryManagementService = memoryManagementService;
   }
 
   @Override
@@ -179,7 +183,8 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
           .setProperties(ofNullable(resolveDeploymentProperties(descriptor.getDataFolderName(),
                                                                 descriptor.getDeploymentProperties())))
           .setServiceRepository(serviceRepository)
-          .setRuntimeLockFactory(runtimeLockFactory);
+          .setRuntimeLockFactory(runtimeLockFactory)
+          .setMemoryMaangementService(memoryManagementService);
 
       if (!descriptor.getConfigResources().isEmpty()) {
         validateConfigurationFileDoNotUsesCoreNamespace();

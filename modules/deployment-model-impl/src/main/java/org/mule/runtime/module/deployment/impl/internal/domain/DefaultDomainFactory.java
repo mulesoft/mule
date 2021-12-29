@@ -163,7 +163,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
 
     DefaultMuleDomain defaultMuleDomain =
         new DefaultMuleDomain(domainDescriptor, domainClassLoader, classLoaderRepository, serviceRepository, artifactPlugins,
-                              extensionModelLoaderManager, getRuntimeLockFactory());
+                              extensionModelLoaderManager, getRuntimeLockFactory(), memoryManagementService);
 
     DomainWrapper domainWrapper = new DomainWrapper(defaultMuleDomain, this);
     domainManager.addDomain(domainWrapper);

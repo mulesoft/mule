@@ -73,6 +73,7 @@ import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -106,6 +107,7 @@ import org.junit.Test;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
+import javax.inject.Inject;
 
 /**
  * Contains test for application deployment on the default domain
@@ -175,6 +177,25 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     // Checks that the configuration's ID was properly configured
     assertThat(app.getArtifactContext().getRegistry().<MuleConfiguration>lookupByName(OBJECT_MULE_CONFIGURATION).get().getId(),
                equalTo(dummyAppDescriptorFileBuilder.getId()));
+  }
+
+  @Test
+  public void memoryManagementCanBeInjectedInApplication() throws Exception {
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
+    assertApplicationAnchorFileExists(dummyAppDescriptorFileBuilder.getId());
+
+    // just assert no privileged entries were put in the registry
+    final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
+
+    InjectedMemoryManagement injectedMemoryManagementService = new InjectedMemoryManagement();
+    app.getArtifactContext().getMuleContext().getInjector().inject(injectedMemoryManagementService);
+
+    assertThat(injectedMemoryManagementService.getMemoryManagementService(), is(notNullValue()));
   }
 
   @Test
@@ -1761,6 +1782,19 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   private void assertIfFlowsHaveStarted(Application app, boolean started) {
     for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       assertThat(flow.getLifecycleState().isStarted(), is(started));
+    }
+  }
+
+  /**
+   * Class to test injection of memory management.
+   */
+  private static class InjectedMemoryManagement {
+
+    @Inject
+    private MemoryManagementService memoryManagementService;
+
+    public MemoryManagementService getMemoryManagementService() {
+      return memoryManagementService;
     }
   }
 }

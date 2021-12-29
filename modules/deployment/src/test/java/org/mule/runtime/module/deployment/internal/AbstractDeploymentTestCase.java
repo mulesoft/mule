@@ -98,6 +98,7 @@ import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -1143,7 +1144,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                                                                                                    emptySet())),
                                              new DomainDescriptor(DEFAULT_DOMAIN_NAME), emptyList()),
                                  artifactClassLoaderManager, serviceManager, emptyList(), extensionModelLoaderManager,
-                                 getRuntimeLockFactory());
+                                 getRuntimeLockFactory(),
+                                 mock(MemoryManagementService.class));
   }
 
   /**
