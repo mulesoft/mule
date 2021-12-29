@@ -21,10 +21,12 @@ import static org.mule.runtime.core.api.profiling.ProcessingStrategyDataConsumer
 import static org.mule.runtime.core.api.profiling.ProcessingStrategyDataConsumersTestCase.ARTIFACT_TYPE;
 import static org.mule.runtime.core.api.profiling.ProcessingStrategyDataConsumersTestCase.PROFILING_EVENT_TIMESTAMP;
 import static org.mule.runtime.core.api.profiling.ProcessingStrategyDataConsumersTestCase.THREAD_NAME;
+import static org.mule.runtime.core.internal.processor.rector.profiling.ProfilingTestUtils.enableProfilingFeatureTestConsumer;
 import static org.mule.runtime.core.internal.profiling.consumer.ComponentProfilingUtils.getTaskSchedulingInfoMap;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
 
+import org.junit.After;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -34,7 +36,6 @@ import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.TaskSchedulingProfilingEventContext;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.tracing.DefaultComponentMetadata;
 import org.mule.runtime.core.internal.profiling.tracing.DefaultExecutionContext;
@@ -87,7 +88,6 @@ public class TaskSchedulingLoggerDataConsumerTestCase extends AbstractMuleContex
   @Mock
   private ComponentLocation location;
 
-
   public TaskSchedulingLoggerDataConsumerTestCase(ProfilingEventType<TaskSchedulingProfilingEventContext> profilingEventType) {
     this.profilingEventType = profilingEventType;
   }
@@ -113,6 +113,22 @@ public class TaskSchedulingLoggerDataConsumerTestCase extends AbstractMuleContex
                                                                                                                                ARTIFACT_ID,
                                                                                                                                ARTIFACT_TYPE,
                                                                                                                                location))));
+    setProfilingFeatureStatus(true);
+  }
+
+  @After
+  public void after() throws Exception {
+    setProfilingFeatureStatus(false);
+  }
+
+  private void setProfilingFeatureStatus(boolean status) {
+    eventTypes().forEach(eventType -> {
+      try {
+        enableProfilingFeatureTestConsumer(muleContext, eventType, status);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    });
   }
 
   private ProfilingService getTestProfilingService() throws MuleException {
