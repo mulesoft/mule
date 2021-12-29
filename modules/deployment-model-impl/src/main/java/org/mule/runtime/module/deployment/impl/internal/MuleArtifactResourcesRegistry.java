@@ -146,7 +146,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     // Creates a registry to be used as an injector.
     super(null, null);
 
-    this.memoryManagementService = new DefaultMemoryManagementService();
+    this.memoryManagementService = DefaultMemoryManagementService.getInstance();
 
     // Registers the memory management so that this can be injected.
     registerObject(MULE_MEMORY_MANAGEMENT_SERVICE, memoryManagementService);

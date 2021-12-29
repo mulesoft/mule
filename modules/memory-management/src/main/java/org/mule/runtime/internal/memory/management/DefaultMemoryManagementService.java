@@ -16,6 +16,13 @@ import org.mule.runtime.api.memory.provider.ByteBufferProviderConfiguration;
  */
 public class DefaultMemoryManagementService implements MemoryManagementService {
 
+  private static DefaultMemoryManagementService INSTANCE = new DefaultMemoryManagementService();
+
+  public static DefaultMemoryManagementService getInstance() {
+    return INSTANCE;
+  }
+
+  private DefaultMemoryManagementService() {};
 
   @Override
   public void dispose() {
