@@ -14,6 +14,11 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.producer.TaskSchedulingProfilingDataProducer;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
+/**
+ * A {@link ProfilingDataProducerProvider} that provides {@link TaskSchedulingDataProducerProvider}
+ *
+ * @since 4.5.0
+ */
 public class TaskSchedulingDataProducerProvider
     implements ProfilingDataProducerProvider<TaskSchedulingProfilingEventContext, CoreEvent> {
 
