@@ -14,6 +14,7 @@ import static java.util.Optional.of;
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -43,6 +44,7 @@ public final class ArtifactContextConfiguration {
   private Optional<ArtifactContext> parentArtifactContext = empty();
   private ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
   private LockFactory runtimeLockFactory;
+  private MemoryManagementService memoryManagementService;
 
   private ArtifactContextConfiguration() {}
 
@@ -144,12 +146,17 @@ public final class ArtifactContextConfiguration {
     return runtimeLockFactory;
   }
 
+  public MemoryManagementService getMemoryManagementService() {
+    return memoryManagementService;
+  }
+
   /**
    * Builder for {@code ArtifactContextConfiguration}.
    */
   public static class ArtifactContextConfigurationBuilder {
 
     private final ArtifactContextConfiguration artifactContextConfiguration = new ArtifactContextConfiguration();
+    private MemoryManagementService memoryManagementService;
 
 
     /**
@@ -243,7 +250,7 @@ public final class ArtifactContextConfiguration {
     }
 
     /**
-     * @param parentContext the parent {@link MuleContext} of the {@link ArtifactContext} to be created.
+     * @param parentArtifactContext the parent {@link MuleContext} of the {@link ArtifactContext} to be created.
      * @return {@code this} builder
      */
     public ArtifactContextConfigurationBuilder setParentArtifactContext(ArtifactContext parentArtifactContext) {
@@ -281,5 +288,9 @@ public final class ArtifactContextConfiguration {
       return artifactContextConfiguration;
     }
 
+    public ArtifactContextConfigurationBuilder setMemoryManagementService(MemoryManagementService memoryManagementService) {
+      artifactContextConfiguration.memoryManagementService = memoryManagementService;
+      return this;
+    }
   }
 }

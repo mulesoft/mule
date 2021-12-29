@@ -57,6 +57,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.ioc.ObjectProvider;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.api.util.Pair;
@@ -136,6 +137,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final DefaultRegistry serviceDiscoverer;
   private final DefaultResourceLocator resourceLocator;
   private final PropertiesResolverConfigurationProperties configurationProperties;
+  protected final MemoryManagementService memoryManagementService;
   private ArtifactAst applicationModel;
   private final MuleContextWithRegistry muleContext;
   private final BeanDefinitionFactory beanDefinitionFactory;
@@ -176,6 +178,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                              ContributedErrorTypeLocator errorTypeLocator,
                              Map<String, String> artifactProperties, ArtifactType artifactType,
                              ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory,
+                             MemoryManagementService memoryManagementService,
                              FeatureFlaggingService featureFlaggingService) {
     checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
     this.muleContext = (MuleContextWithRegistry) muleContext;
@@ -187,6 +190,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     this.errorTypeRepository = errorTypeRepository;
     this.errorTypeLocator = errorTypeLocator;
     this.artifactProperties = artifactProperties;
+    this.memoryManagementService = memoryManagementService;
 
     extensionManager = muleContext.getExtensionManager();
 
@@ -535,7 +539,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                                     getOptionalObjectsController(),
                                                     beanFactory,
                                                     getServiceDiscoverer(),
-                                                    getResourceLocator());
+                                                    getResourceLocator(),
+                                                    memoryManagementService);
   }
 
   @Override

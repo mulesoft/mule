@@ -31,6 +31,7 @@ import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -76,6 +77,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class SpringXmlConfigurationBuilder extends AbstractResourceConfigurationBuilder
     implements ParentMuleContextAwareConfigurationBuilder, ArtifactContextFactory {
 
+  private MemoryManagementService memoryManagementService;
   private ArtifactDeclaration artifactDeclaration;
   private boolean enableLazyInit = false;
   private boolean disableXmlValidations = false;
@@ -140,6 +142,18 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     this(configurationFiles, artifactProperties, artifactType, enableLazyInitialisation, disableXmlValidations,
          runtimeLockFactory);
     this.artifactDeclaration = artifactDeclaration;
+  }
+
+  public SpringXmlConfigurationBuilder(String[] configurationFiles, ArtifactDeclaration artifactDeclaration,
+                                       Map<String, String> artifactProperties, ArtifactType artifactType,
+                                       boolean enableLazyInitialisation, boolean disableXmlValidations,
+                                       LockFactory runtimeLockFactory,
+                                       MemoryManagementService memoryManagementService)
+      throws ConfigurationException {
+    this(configurationFiles, artifactDeclaration, artifactProperties, artifactType, enableLazyInitialisation,
+         disableXmlValidations,
+         runtimeLockFactory);
+    this.memoryManagementService = memoryManagementService;
   }
 
   @Override
@@ -229,6 +243,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                         resolveComponentModelInitializer(),
                                                         runtimeLockFactory,
                                                         componentBuildingDefinitionRegistryFactory,
+                                                        memoryManagementService,
                                                         featureFlaggingService);
     } else {
       muleArtifactContext = new MuleArtifactContext(muleContext, artifactAst,
@@ -238,6 +253,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                     errorTypeRepository, errorTypeLocator,
                                                     getArtifactProperties(), artifactType,
                                                     componentBuildingDefinitionRegistryFactory,
+                                                    memoryManagementService,
                                                     featureFlaggingService);
       muleArtifactContext.initialize();
     }

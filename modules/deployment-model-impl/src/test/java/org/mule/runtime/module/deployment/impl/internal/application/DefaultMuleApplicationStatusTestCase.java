@@ -22,6 +22,7 @@ import static org.mule.runtime.core.api.context.notification.MuleContextNotifica
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.core.api.MuleContext;
@@ -74,7 +75,8 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
                                              null, mock(ServiceRepository.class),
                                              mock(ExtensionModelLoaderRepository.class),
                                              appLocation, null, null,
-                                             getRuntimeLockFactory());
+                                             getRuntimeLockFactory(),
+                                             mock(MemoryManagementService.class));
     application.setArtifactContext(mockArtifactContext);
 
     muleContext.getInjector().inject(this);
@@ -119,7 +121,7 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
 
     DefaultMuleApplication application =
         new DefaultMuleApplication(descriptor, mock(MuleApplicationClassLoader.class), emptyList(), null,
-                                   null, null, appLocation, null, null, null);
+                                   null, null, appLocation, null, null, null, null);
     application.install();
     assertThat(application.getDeploymentClassLoader(), is(notNullValue()));
     application.dispose();

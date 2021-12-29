@@ -31,6 +31,7 @@ import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.core.api.MuleContext;
@@ -116,6 +117,7 @@ public class ArtifactContextBuilder {
   private Optional<Properties> properties = empty();
   private String dataFolderName;
   private LockFactory runtimeLockFactory;
+  private MemoryManagementService memoryManagementService;
 
   private ArtifactContextBuilder() {}
 
@@ -443,7 +445,8 @@ public class ArtifactContextBuilder {
                     .setEnableLazyInitialization(enableLazyInit)
                     .setDisableXmlValidations(disableXmlValidations)
                     .setServiceConfigurators(serviceConfigurators)
-                    .setRuntimeLockFactory(runtimeLockFactory);
+                    .setRuntimeLockFactory(runtimeLockFactory)
+                    .setMemoryManagementService(memoryManagementService);
 
             if (parentArtifact != null && parentArtifact.getArtifactContext() != null) {
               artifactContextConfigurationBuilder.setParentArtifactContext(parentArtifact.getArtifactContext());
@@ -523,4 +526,8 @@ public class ArtifactContextBuilder {
     return this;
   }
 
+  public ArtifactContextBuilder setMemoryMaangementService(MemoryManagementService memoryManagementService) {
+    this.memoryManagementService = memoryManagementService;
+    return this;
+  }
 }

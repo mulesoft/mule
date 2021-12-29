@@ -43,6 +43,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -144,11 +145,13 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                  Optional<ComponentModelInitializer> parentComponentModelInitializer,
                                  LockFactory runtimeLockFactory,
                                  ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory,
+                                 MemoryManagementService memoryManagementService,
                                  FeatureFlaggingService featureFlaggingService)
       throws BeansException {
     super(muleContext, artifactAst, optionalObjectsController, parentConfigurationProperties,
           baseConfigurationComponentLocator, errorTypeRepository, errorTypeLocator,
-          artifactProperties, artifactType, componentBuildingDefinitionRegistryFactory, featureFlaggingService);
+          artifactProperties, artifactType, componentBuildingDefinitionRegistryFactory, memoryManagementService,
+          featureFlaggingService);
 
     // Changes the component locator in order to allow accessing any component by location even when they are prototype
     this.componentLocator = new SpringConfigurationComponentLocator();
@@ -178,7 +181,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                                         getOptionalObjectsController(),
                                                         beanFactory,
                                                         getServiceDiscoverer(),
-                                                        getResourceLocator());
+                                                        getResourceLocator(),
+                                                        memoryManagementService);
   }
 
   @Override

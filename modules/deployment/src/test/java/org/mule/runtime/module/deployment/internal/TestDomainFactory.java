@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
 
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil;
@@ -92,7 +93,8 @@ public class TestDomainFactory extends DefaultDomainFactory {
           classLoaderRepository, serviceRepository,
           pluginDependenciesResolver, domainClassLoaderBuilderFactory,
           extensionModelLoaderManager, mock(LicenseValidator.class),
-          RuntimeLockFactoryUtil.getRuntimeLockFactory());
+          RuntimeLockFactoryUtil.getRuntimeLockFactory(),
+          mock(MemoryManagementService.class));
   }
 
   @Override

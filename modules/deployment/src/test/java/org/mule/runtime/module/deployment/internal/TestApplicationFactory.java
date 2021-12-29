@@ -14,6 +14,7 @@ import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactCl
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil;
@@ -68,7 +69,8 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
           serviceRepository, extensionModelLoaderRepository, classLoaderRepository, policyTemplateClassLoaderBuilderFactory,
           pluginDependenciesResolver, artifactPluginDescriptorLoader,
           discoverLicenseValidator(TestApplicationFactory.class.getClassLoader()),
-          RuntimeLockFactoryUtil.getRuntimeLockFactory());
+          RuntimeLockFactoryUtil.getRuntimeLockFactory(),
+          mock(MemoryManagementService.class));
   }
 
   public static TestApplicationFactory createTestApplicationFactory(DomainManager domainManager,

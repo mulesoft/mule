@@ -16,6 +16,7 @@ import static org.mule.runtime.config.internal.LazyConnectivityTestingService.NO
 import static org.mule.runtime.config.internal.LazyMuleArtifactContext.SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH;
 import static org.mule.runtime.config.internal.LazySampleDataService.NON_LAZY_SAMPLE_DATA_SERVICE;
 import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEMORY_MANAGEMENT_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTER_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER;
 import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
@@ -26,12 +27,14 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.util.ResourceLocator;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.config.internal.lazy.LazyDataWeaveExtendedExpressionLanguageAdaptorFactoryBean;
 import org.mule.runtime.config.internal.lazy.NoOpConnectivityTesterFactory;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.data.sample.SampleDataService;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
@@ -63,6 +66,7 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
   private final LazyComponentInitializerAdapter lazyComponentInitializer;
   private final Map<String, String> artifactProperties;
   private final LockFactory runtimeLockFactory;
+  private final MemoryManagementService memoryManagementService;
 
   public LazySpringMuleContextServiceConfigurator(LazyComponentInitializerAdapter lazyComponentInitializer,
                                                   Map<String, String> artifactProperties,
@@ -73,13 +77,15 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
                                                   OptionalObjectsController optionalObjectsController,
                                                   BeanDefinitionRegistry beanDefinitionRegistry,
                                                   Registry serviceLocator,
-                                                  ResourceLocator resourceLocator) {
+                                                  ResourceLocator resourceLocator,
+                                                  MemoryManagementService memoryManagementService) {
     super(muleContext, configurationProperties, artifactProperties, artifactType, optionalObjectsController,
           beanDefinitionRegistry,
-          serviceLocator, resourceLocator);
+          serviceLocator, resourceLocator, memoryManagementService);
     this.lazyComponentInitializer = lazyComponentInitializer;
     this.artifactProperties = artifactProperties;
     this.runtimeLockFactory = runtimeLockFactory;
+    this.memoryManagementService = memoryManagementService;
   }
 
   @Override
@@ -89,6 +95,7 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
     registerBeanDefinition(OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER,
                            getBeanDefinition(LazyDataWeaveExtendedExpressionLanguageAdaptorFactoryBean.class));
     registerBeanDefinition(OBJECT_CONNECTIVITY_TESTER_FACTORY, getBeanDefinition(NoOpConnectivityTesterFactory.class));
+    registerConstantBeanDefinition(MULE_MEMORY_MANAGEMENT_SERVICE, memoryManagementService);
 
     registerConstantBeanDefinition(CONNECTIVITY_TESTING_SERVICE_KEY,
                                    new LazyConnectivityTestingService(lazyComponentInitializer, () -> getRegistry()

@@ -45,6 +45,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -240,6 +241,7 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
                                     new ContributedErrorTypeRepository(), new ContributedErrorTypeLocator(),
                                     emptyMap(), APP, empty(), lockFactory,
                                     new DefaultComponentBuildingDefinitionRegistryFactory(),
+                                    mock(MemoryManagementService.class),
                                     mock(FeatureFlaggingService.class)) {
 
           @Override

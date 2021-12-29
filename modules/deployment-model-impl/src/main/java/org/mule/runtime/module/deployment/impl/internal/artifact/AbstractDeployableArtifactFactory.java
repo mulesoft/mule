@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.validateArtifactLicense;
 
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.module.license.api.LicenseValidator;
@@ -30,20 +31,22 @@ public abstract class AbstractDeployableArtifactFactory<T extends DeployableArti
 
   private final LicenseValidator licenseValidator;
   private final LockFactory runtimeLockFactory;
+  protected final MemoryManagementService memoryManagementService;
 
   /**
    * Creates a new {@link AbstractDeployableArtifactFactory}
    * 
-   * @param licenseValidator                           the license validator to use for plugins.
-   * @param runtimeComponentBuildingDefinitionProvider provider for the runtime
-   *                                                   {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
-   * @param runtimeLockFactory                         {@link LockFactory} for Runtime, a unique and shared lock factory to be
-   *                                                   used between different artifacts.
+   * @param licenseValidator        the license validator to use for plugins.
+   * @param runtimeLockFactory      {@link LockFactory} for Runtime, a unique and shared lock factory to be used between different
+   *                                artifacts.
+   * @param memoryManagementService the memory management service.
    */
   public AbstractDeployableArtifactFactory(LicenseValidator licenseValidator,
-                                           LockFactory runtimeLockFactory) {
+                                           LockFactory runtimeLockFactory,
+                                           MemoryManagementService memoryManagementService) {
     this.licenseValidator = licenseValidator;
     this.runtimeLockFactory = runtimeLockFactory;
+    this.memoryManagementService = memoryManagementService;
   }
 
   @Override

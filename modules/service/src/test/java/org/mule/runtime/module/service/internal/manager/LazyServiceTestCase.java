@@ -60,7 +60,7 @@ public class LazyServiceTestCase extends AbstractMuleTestCase {
     actualService = spy(new TestServiceImpl());
     when(serviceProvider.getServiceDefinition()).thenReturn(new ServiceDefinition(TestService.class, actualService));
 
-    lazyService = (TestService) LazyServiceProxy.from(assembly, serviceRegistry);
+    lazyService = (TestService) LazyServiceProxy.from(assembly, serviceRegistry, null);
   }
 
   @Test
