@@ -6,17 +6,30 @@
  */
 package org.mule.runtime.internal.memory.management;
 
+import static org.mule.runtime.internal.memory.bytebuffer.ByteBufferProviderBuilder.buildByteBufferProviderFrom;
+
+import static java.lang.String.format;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
+import org.mule.runtime.api.memory.provider.ByteBufferPoolConfiguration;
 import org.mule.runtime.api.memory.provider.ByteBufferProvider;
-import org.mule.runtime.api.memory.provider.ByteBufferProviderConfiguration;
+import org.mule.runtime.api.memory.provider.type.ByteBufferType;
+
+import java.nio.ByteBuffer;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A Default Implementation of {@link MemoryManagementService}
  */
 public class DefaultMemoryManagementService implements MemoryManagementService {
 
-  private static DefaultMemoryManagementService INSTANCE = new DefaultMemoryManagementService();
+  public static final String DUPLICATE_BYTE_BUFFER_PROVIDER_NAME = "A ByteBuffer Provider is already registered with name '%s'.";
+
+  private static final DefaultMemoryManagementService INSTANCE = new DefaultMemoryManagementService();
+
+  private final Map<String, ByteBufferProvider<ByteBuffer>> byteBufferProviders = new ConcurrentHashMap<>();
 
   public static DefaultMemoryManagementService getInstance() {
     return INSTANCE;
@@ -26,17 +39,50 @@ public class DefaultMemoryManagementService implements MemoryManagementService {
 
   @Override
   public void dispose() {
-    // TODO EE-8096 Default ByteBufferProvider implementation in memory management
+    byteBufferProviders.values().forEach(ByteBufferProvider::dispose);
+    byteBufferProviders.clear();
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    // TODO EE-8096 Default ByteBufferProvider implementation in memory management
+    // Nothing to do.
   }
 
   @Override
-  public ByteBufferProvider getByteBufferProvider(String name, ByteBufferProviderConfiguration configuration) {
-    // TODO EE-8096 Default ByteBufferProvider implementation in memory management
-    return null;
+  public ByteBufferProvider<ByteBuffer> getByteBufferProvider(String name, ByteBufferType byteBufferType, int maxBufferSize,
+                                                              ByteBufferPoolConfiguration poolConfiguration) {
+    if (byteBufferProviders.containsKey(name)) {
+      throw new IllegalArgumentException(format(DUPLICATE_BYTE_BUFFER_PROVIDER_NAME, name));
+    }
+
+    ByteBufferProvider<ByteBuffer> byteBufferProvider = buildByteBufferProviderFrom(byteBufferType)
+        .withMaxBufferSize(maxBufferSize)
+        .withPoolConfiguration(poolConfiguration)
+        .build();
+
+    byteBufferProviders.put(name, byteBufferProvider);
+
+    return byteBufferProvider;
   }
+
+  @Override
+  public ByteBufferProvider<ByteBuffer> getByteBufferProvider(String name, ByteBufferType byteBufferType) {
+    if (byteBufferProviders.containsKey(name)) {
+      throw new IllegalArgumentException(format(DUPLICATE_BYTE_BUFFER_PROVIDER_NAME, name));
+    }
+
+    ByteBufferProvider<ByteBuffer> byteBufferProvider = buildByteBufferProviderFrom(byteBufferType)
+        .build();
+
+    byteBufferProviders.put(name, byteBufferProvider);
+
+    return byteBufferProvider;
+  }
+
+  @Override
+  public void disposeByteBufferProvider(String name) {
+    byteBufferProviders.get(name).dispose();
+    byteBufferProviders.remove(name);
+  }
+
 }
