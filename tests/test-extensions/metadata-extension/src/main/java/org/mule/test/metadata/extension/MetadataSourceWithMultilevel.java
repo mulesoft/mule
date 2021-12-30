@@ -12,12 +12,10 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.tck.message.StringAttributes;
 import org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver;
-import org.mule.test.metadata.extension.resolver.TestOutputAnyTypeResolver;
 import org.mule.test.metadata.extension.resolver.TestPartialMultiLevelKeyResolver;
 
 import java.util.Map;

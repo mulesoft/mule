@@ -49,6 +49,7 @@ public class SomeOps {
    * @param value the value for the operation to consume
    * @return a byte array representation of <it>value</it>
    */
+  @MediaType(TEXT_PLAIN)
   public Result<InputStream, Object> inputStreamConsumingOperation(@Content TypedValue<InputStream> value) {
     LOGGER.info("A new message is passing through 'inputStreamConsumingOperation': {}", value.getValue());
     return Result.<InputStream, Object>builder().output(value.getValue()).attributes(null).build();
