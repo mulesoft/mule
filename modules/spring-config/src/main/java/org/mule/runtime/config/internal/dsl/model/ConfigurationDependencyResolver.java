@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.generateFor;
+
+import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -63,9 +64,8 @@ public class ConfigurationDependencyResolver {
         .map(ComponentAst::getComponentId)
         .filter(Optional::isPresent)
         .map(Optional::get)
-        .collect(toList()); // todo: return pairs like the declaredDependenciesResolver
+        .collect(toList());
   }
-
 
   static class ComponentNamePredicate implements Predicate<ComponentAst> {
 

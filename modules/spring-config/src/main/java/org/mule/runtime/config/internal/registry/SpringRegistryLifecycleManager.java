@@ -150,7 +150,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
       DummyDependencyResolver dummyResolver =
           new DummyDependencyResolver(configurationDependencyResolver, declaredDependencyResolver,
                                       autoDiscoveredDependencyResolver, getSpringRegistry());
-      return new DummySpringLifecycleObjectSorter(dummyResolver);
+      return new DummySpringLifecycleObjectSorter(dummyResolver, orderedLifecycleTypes);
     }
   }
 

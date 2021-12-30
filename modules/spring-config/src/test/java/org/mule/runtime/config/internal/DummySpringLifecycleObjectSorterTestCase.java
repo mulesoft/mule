@@ -11,6 +11,14 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.mule.runtime.api.el.ExpressionLanguage;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.store.ObjectStore;
+import org.mule.runtime.core.api.config.Config;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.security.SecurityManager;
+import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.util.Arrays;
 
@@ -25,7 +33,18 @@ public class DummySpringLifecycleObjectSorterTestCase {
   @Before
   public void setUp() throws Exception {
     resolver = Mockito.mock(DummyDependencyResolver.class);
-    sorter = new DummySpringLifecycleObjectSorter(resolver);
+    sorter = new DummySpringLifecycleObjectSorter(resolver, new Class<?>[] {
+        StreamingManager.class,
+        ObjectStore.class,
+        ExpressionLanguage.class,
+        ConfigurationProvider.class,
+        Config.class,
+        SecurityManager.class,
+        FlowConstruct.class,
+        Initialisable.class,
+        String.class,
+        VertexWrapper.class
+    });
   }
 
 
@@ -133,5 +152,7 @@ public class DummySpringLifecycleObjectSorterTestCase {
 
     assertThat(sorter.getSortedObjects().size(), Matchers.is(2));
   }
+
+  // todo:find addVertex and replace input with VertexWrapper
 
 }

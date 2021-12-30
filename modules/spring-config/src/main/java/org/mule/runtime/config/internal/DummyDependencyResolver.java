@@ -6,26 +6,26 @@
  */
 package org.mule.runtime.config.internal;
 
+import static java.util.stream.Collectors.toList;
+
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.registry.BeanDependencyResolver;
 import org.mule.runtime.config.internal.registry.SpringContextRegistry;
 import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.config.BeanDefinition;
-
-import javax.inject.Inject;
 
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import javax.inject.Inject;
 
-import static java.util.stream.Collectors.toList;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.config.BeanDefinition;
 
 public class DummyDependencyResolver implements BeanDependencyResolver {
 
   private final SpringContextRegistry springRegistry;
-  private Set<String> processedKey;
+  private final Set<String> processedKey;
   private final ConfigurationDependencyResolver configurationDependencyResolver;
   private final DeclaredDependencyResolver declaredDependencyResolver;
   private final AutoDiscoveredDependencyResolver autoDiscoveredDependencyResolver;
@@ -51,7 +51,7 @@ public class DummyDependencyResolver implements BeanDependencyResolver {
     Object currentObject = springRegistry.get(beanName);
     final DependencyNode currentNode = new DependencyNode(currentObject);
 
-    addDirectDependency(beanName, currentObject, currentNode);
+    addDirectDependency(beanName, currentObject, currentNode, processedKey);
 
     return currentNode.getChildren()
         .stream()
@@ -59,9 +59,18 @@ public class DummyDependencyResolver implements BeanDependencyResolver {
         .collect(toList());
   }
 
-  private void addDirectDependency(String key, Object currentObject, DependencyNode currentNode) {
-    addDirectDependency(key, currentObject, currentNode, processedKey);
+  public List<Pair<Object, String>> getDirectBeanDependencies(String beanName) {
+    Object currentObject = springRegistry.get(beanName);
+    final DependencyNode currentNode = new DependencyNode(currentObject, beanName);
+
+    addDirectDependency(beanName, currentObject, currentNode, processedKey);
+
+    return currentNode.getChildren()
+        .stream()
+        .map(DependencyNode::getObjectKeyPair)
+        .collect(toList());
   }
+
 
   private void addDirectDependency(String key, Object object, DependencyNode node, Set<String> processedKeys) {
     addDirectAutoDiscoveredDependencies(key, processedKeys, node);
@@ -76,17 +85,6 @@ public class DummyDependencyResolver implements BeanDependencyResolver {
     declaredDependencyResolver.getDeclaredDirectDependencies(object)
         .forEach(pair -> addDirectChild(node, pair.getFirst(), pair.getSecond(), processedKeys));
   }
-  // private void addDirectDeclaredDependencies(Object object, Set<String> processedKeys, DependencyNode node) {
-  // if (object instanceof InjectedDependenciesProvider) {
-  // ((InjectedDependenciesProvider) object).getInjectedDependencies()
-  // .forEach(dependency -> dependency
-  // .reduce(type -> Stream.of(springRegistry.applicationContext.getBeanNamesForType(dependency.getLeft()))
-  // .map(name -> new Pair<>(name, springRegistry.get(name)))
-  // .collect(toList()), name -> asList(new Pair<>(name, springRegistry.get(name))))
-  // .forEach(pair -> addDirectChild(node, pair.getFirst(), pair.getSecond(), processedKeys)));
-  // }
-  //
-  // }
 
   /**
    * These are obtained through the {@link #configurationDependencyResolver}
@@ -112,21 +110,16 @@ public class DummyDependencyResolver implements BeanDependencyResolver {
    */
   private void addDirectAutoDiscoveredDependencies(String key, Set<String> processedKeys, DependencyNode node) {
     autoDiscoveredDependencyResolver.getAutoDiscoveredDependencies(key)
+        .stream().filter(x -> !x.getValue().equals(node.getValue()))
         .forEach(dependency -> addDirectChild(node, dependency.getKey(), dependency.getValue(), processedKeys));
   }
-  // private void addDirectAutoDiscoveredDependencies(String key, Set<String> processedKeys, DependencyNode node) {
-  // for (Map.Entry<String, Object> dependency : springRegistry.getDependencies(key).entrySet()) {
-  // addDirectChild(node, dependency.getKey(), dependency.getValue(), processedKeys);
-  // }
-  // }
-  // todo: move this to sorter (tree related part)
+
 
   private void addDirectChild(DependencyNode parent, String key, Object childObject, Set<String> processedKeys) {
-    if (!processedKeys.add(key))
-      return; // A relies on B, D, E, G and new
-    DependencyNode childNode = new DependencyNode(childObject);
-    parent.addChild(childNode);
-
+    if (!processedKeys.add(key)) {
+      return;
+    }
+    parent.addChild(new DependencyNode(childObject, key));
   }
 
 
