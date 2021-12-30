@@ -12,6 +12,7 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.mule.runtime.core.internal.lifecycle.phases.LifecycleObjectSorter;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.reverse;
@@ -27,12 +28,15 @@ public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
     this.resolver = resolver;
   }
 
+  // vertices
   @Override
   public void addObject(String name, Object currentObject) {
     // null check
     requireNonNull(currentObject, "currentObject cannot be null");
     // add vertex
-    dependencyGraph.addVertex(currentObject);
+    VertexWrapper currentVertex = new VertexWrapper(currentObject);
+    dependencyGraph.addVertex(currentVertex);
+
 
     // get prerequisite objects for the current object
     List<Object> prerequisiteObjects = resolver.getDirectDependencies(name);
@@ -43,8 +47,9 @@ public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
     }
     prerequisiteObjects.forEach(
                                 (prerequisite) -> {
-                                  dependencyGraph.addVertex(prerequisite);
-                                  dependencyGraph.addEdge(currentObject, prerequisite);
+                                  VertexWrapper preReqVertex = new VertexWrapper(prerequisite);
+                                  dependencyGraph.addVertex(preReqVertex);
+                                  dependencyGraph.addEdge(currentVertex, preReqVertex);
                                 });
   }
 
@@ -71,8 +76,7 @@ public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
   public List<Object> getSortedObjects() {
     List<Object> sortedObjects = newArrayList(new TopologicalOrderIterator<>(dependencyGraph));
     reverse(sortedObjects);
-
-    return sortedObjects;
+    return sortedObjects.stream().map(x -> ((VertexWrapper) x).getOriginalObject()).collect(Collectors.toList());
   }
 
 }
