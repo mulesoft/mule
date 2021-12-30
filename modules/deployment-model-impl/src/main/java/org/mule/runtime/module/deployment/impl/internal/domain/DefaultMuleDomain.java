@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
-import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
@@ -184,7 +183,7 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
                                                                 descriptor.getDeploymentProperties())))
           .setServiceRepository(serviceRepository)
           .setRuntimeLockFactory(runtimeLockFactory)
-          .setMemoryMaangementService(memoryManagementService);
+          .setMemoryManagementService(memoryManagementService);
 
       if (!descriptor.getConfigResources().isEmpty()) {
         validateConfigurationFileDoNotUsesCoreNamespace();

@@ -45,6 +45,7 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
+import org.mule.runtime.internal.memory.management.DefaultMemoryManagementService;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
@@ -116,7 +117,8 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
             .setArtifactPlugins(getFeatureFlaggedArtifactPlugins(template.getDescriptor()))
             .setParentArtifact(application)
             .setExtensionManagerFactory(getFeatureFlaggedExtensionManagerFactory())
-            .setMuleContextListener(muleContextListener);
+            .setMuleContextListener(muleContextListener)
+            .setMemoryManagementService(DefaultMemoryManagementService.getInstance());
 
     artifactBuilder.withServiceConfigurator(customizationService -> {
       Registry applicationRegistry = application.getArtifactContext().getRegistry();
