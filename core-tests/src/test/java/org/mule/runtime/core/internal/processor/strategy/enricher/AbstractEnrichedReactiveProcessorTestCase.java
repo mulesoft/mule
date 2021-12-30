@@ -12,7 +12,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
-import reactor.test.publisher.TestPublisher;
 
 /**
  * General test logic for an enriched {@link ReactiveProcessor}
@@ -26,12 +25,9 @@ public class AbstractEnrichedReactiveProcessorTestCase {
   protected static final ReactiveProcessor reactiveProcessor = p -> p;
 
   protected void createAndExecuteEnrichedTransformer(ReactiveProcessor transform, CoreEvent coreEvent) {
-    TestPublisher<CoreEvent> testPublisher = TestPublisher.create();
-
-    Flux<CoreEvent> flux = testPublisher.flux().transform(transform);
+    Flux<CoreEvent> flux = Flux.just(coreEvent, coreEvent, coreEvent).transform(transform);
 
     StepVerifier.create(flux)
-        .then(() -> testPublisher.emit(coreEvent, coreEvent, coreEvent))
         .expectNextCount(3)
         .verifyComplete();
   }

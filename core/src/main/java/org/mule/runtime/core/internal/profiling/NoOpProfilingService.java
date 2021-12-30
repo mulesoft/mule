@@ -10,11 +10,14 @@ import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
+import org.mule.runtime.api.profiling.tracing.ExecutionContext;
+import org.mule.runtime.api.profiling.tracing.TracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.function.Function;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * A Profiling Service that disables all data production. The {@link ProfilingDataProducer} implements operations that do not
@@ -23,6 +26,25 @@ import java.util.function.Function;
  * @since 4.5.0
  */
 public class NoOpProfilingService implements CoreProfilingService {
+
+  private final TracingService noOpTracingService = new TracingService() {
+
+    @Override
+    public ExecutionContext getCurrentExecutionContext() {
+      return null;
+    }
+
+    @Override
+    public void deleteCurrentExecutionContext() {
+      // No op
+    }
+
+    @Override
+    public ExecutionContext setCurrentExecutionContext(ExecutionContext executionContext) {
+      return null;
+    }
+
+  };
 
   @SuppressWarnings("rawtypes")
   private final ProfilingDataProducer<?, ?> profilingDataProducer = new ProfilingDataProducer() {
@@ -66,6 +88,11 @@ public class NoOpProfilingService implements CoreProfilingService {
   }
 
   @Override
+  public TracingService getTracingService() {
+    return noOpTracingService;
+  }
+
+  @Override
   public <T extends ProfilingEventContext, S> Mono<S> enrichWithProfilingEventMono(Mono<S> original,
                                                                                    ProfilingDataProducer<T, S> dataProducer,
                                                                                    Function<S, T> transformer) {
@@ -76,6 +103,16 @@ public class NoOpProfilingService implements CoreProfilingService {
   public <T extends ProfilingEventContext, S> Flux<S> enrichWithProfilingEventFlux(Flux<S> original,
                                                                                    ProfilingDataProducer<T, S> dataProducer,
                                                                                    Function<S, T> transformer) {
+    return original;
+  }
+
+  @Override
+  public <S> Mono<S> setCurrentExecutionContext(Mono<S> original, Function<S, ExecutionContext> executionContextSupplier) {
+    return original;
+  }
+
+  @Override
+  public <S> Flux<S> setCurrentExecutionContext(Flux<S> original, Function<S, ExecutionContext> executionContextSupplier) {
     return original;
   }
 }

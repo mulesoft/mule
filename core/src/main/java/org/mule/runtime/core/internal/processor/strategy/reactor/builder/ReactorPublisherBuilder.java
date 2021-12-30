@@ -10,20 +10,22 @@ package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscription;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.util.context.Context;
 
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscription;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
 
 /**
  * Builder of a {@link Publisher} with common operations in {@link Mono} and {@link Flux}.
@@ -83,6 +85,9 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
                                                             ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> dataProducer,
                                                             Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transformer);
 
+  ReactorPublisherBuilder<T> setTracingContext(CoreProfilingService profilingService,
+                                               Function<CoreEvent, ExecutionContext> executionContextSupplier);
+
   T build();
 
   /**
@@ -139,6 +144,12 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
       return this;
     }
 
+    @Override
+    public ReactorPublisherBuilder<Mono<CoreEvent>> setTracingContext(CoreProfilingService profilingService,
+                                                                      Function<CoreEvent, ExecutionContext> executionContextSupplier) {
+      mono = profilingService.setCurrentExecutionContext(mono, executionContextSupplier);
+      return this;
+    }
 
   }
 
@@ -194,6 +205,13 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
                                                                                    ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> dataProducer,
                                                                                    Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transformer) {
       flux = profilingService.enrichWithProfilingEventFlux(flux, dataProducer, transformer);
+      return this;
+    }
+
+    @Override
+    public ReactorPublisherBuilder<Flux<CoreEvent>> setTracingContext(CoreProfilingService profilingService,
+                                                                      Function<CoreEvent, ExecutionContext> executionContextSupplier) {
+      flux = profilingService.setCurrentExecutionContext(flux, executionContextSupplier);
       return this;
     }
 

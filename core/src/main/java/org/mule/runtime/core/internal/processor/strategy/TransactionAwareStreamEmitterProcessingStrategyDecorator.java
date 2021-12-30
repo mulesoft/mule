@@ -38,6 +38,8 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
+import org.mule.runtime.core.internal.profiling.tracing.DefaultComponentMetadata;
+import org.mule.runtime.core.internal.profiling.tracing.DefaultExecutionContext;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
 import java.util.concurrent.ScheduledExecutorService;
@@ -91,8 +93,8 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
     String artifactId = getArtifactId(muleContext);
     String artifactType = getArtifactType(muleContext);
 
-    Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transfomer =
-        coreEvent -> new DefaultComponentProcessingStrategyProfilingEventContext(coreEvent, getLocation(pipeline),
+    Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transformer =
+        coreEvent -> new DefaultComponentProcessingStrategyProfilingEventContext(coreEvent, location,
                                                                                  Thread.currentThread().getName(), artifactId,
                                                                                  artifactType, currentTimeMillis());
 
@@ -102,18 +104,21 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
             // The profiling events related to the processing strategy scheduling are triggered independently of this being
             // a blocking processing strategy that does not involve a thread switch.
             return buildFlux(pub)
+                .setTracingContext(profilingService,
+                                   coreEvent -> new DefaultExecutionContext(new DefaultComponentMetadata(coreEvent
+                                       .getCorrelationId(), artifactId, artifactType, location)))
                 .profileProcessingStrategyEvent(profilingService,
                                                 getDataProducer(PS_SCHEDULING_FLOW_EXECUTION),
-                                                transfomer)
+                                                transformer)
                 .profileProcessingStrategyEvent(profilingService,
                                                 getDataProducer(
                                                                 STARTING_FLOW_EXECUTION),
-                                                transfomer)
+                                                transformer)
                 .transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onPipeline(pipeline))
                 .profileProcessingStrategyEvent(profilingService,
                                                 getDataProducer(
                                                                 FLOW_EXECUTED),
-                                                transfomer)
+                                                transformer)
                 .build();
           } else {
             return from(pub).transform(delegate.onPipeline(pipeline));
@@ -132,8 +137,8 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
     String artifactId = muleContext.getConfiguration().getId();
     String artifactType = muleContext.getArtifactType().getAsString();
 
-    Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transfomer =
-        coreEvent -> new DefaultComponentProcessingStrategyProfilingEventContext(coreEvent, getLocation(processor),
+    Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transformer =
+        coreEvent -> new DefaultComponentProcessingStrategyProfilingEventContext(coreEvent, location,
                                                                                  Thread.currentThread().getName(), artifactId,
                                                                                  artifactType, currentTimeMillis());
 
@@ -143,21 +148,24 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
             // The profiling events related to the processing strategy scheduling are triggered independently of this being
             // a blocking processing strategy that does not involve a thread switch.
             return buildFlux(pub)
+                .setTracingContext(profilingService,
+                                   coreEvent -> new DefaultExecutionContext(new DefaultComponentMetadata(coreEvent
+                                       .getCorrelationId(), artifactId, artifactType, location)))
                 .profileProcessingStrategyEvent(profilingService,
                                                 getDataProducer(PS_SCHEDULING_OPERATION_EXECUTION),
-                                                transfomer)
+                                                transformer)
                 .profileProcessingStrategyEvent(profilingService,
                                                 getDataProducer(PS_STARTING_OPERATION_EXECUTION),
-                                                transfomer)
+                                                transformer)
                 .transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onProcessor(processor))
                 .profileProcessingStrategyEvent(profilingService,
                                                 getDataProducer(
                                                                 PS_OPERATION_EXECUTED),
-                                                transfomer)
+                                                transformer)
                 .profileProcessingStrategyEvent(profilingService,
                                                 getDataProducer(
                                                                 PS_FLOW_MESSAGE_PASSING),
-                                                transfomer)
+                                                transformer)
                 .build();
           } else {
             return from(pub).transform(delegate.onProcessor(processor));

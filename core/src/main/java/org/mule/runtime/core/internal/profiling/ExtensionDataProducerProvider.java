@@ -36,9 +36,9 @@ public class ExtensionDataProducerProvider
 
   @Override
   public <T extends ProfilingEventContext, S> ResettableProfilingDataProducer<T, S> getProfilingDataProducer(
-                                                                                                             ProfilingProducerScope producerContext) {
+                                                                                                             ProfilingProducerScope profilingProducerScope) {
     return (ResettableProfilingDataProducer<T, S>) new ExtensionProfilingDataProducer(profilingService, profilingEventType,
-                                                                                      producerContext,
+                                                                                      profilingProducerScope,
                                                                                       featureFlaggingService);
   }
 }

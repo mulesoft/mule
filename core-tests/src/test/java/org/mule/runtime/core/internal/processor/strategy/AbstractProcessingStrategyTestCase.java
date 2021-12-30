@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.util.Collections.singleton;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
@@ -71,7 +74,6 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
-import org.mockito.InOrder;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -81,6 +83,8 @@ import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.api.notification.MessageProcessorNotificationListener;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
+import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -98,6 +102,7 @@ import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.util.rx.RetrySchedulerWrapper;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
@@ -145,7 +150,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
+import org.junit.Assert;
+import org.mockito.InOrder;
 import reactor.core.publisher.Flux;
 
 @RunWith(Parameterized.class)
@@ -232,6 +238,14 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     @Override
     public ProcessingType getProcessingType() {
       return IO_RW;
+    }
+  };
+
+  protected final ProfilingService profilingService = new DefaultProfilingService() {
+
+    @Override
+    public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
+      return () -> singleton(profilingDataConsumer);
     }
   };
 
@@ -683,7 +697,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   }
 
   protected void assertProcessingStrategyProfiling() {
-    if (enableProfilingServiceProperty.getValue().equals("true")) {
+    if (parseBoolean(enableProfilingServiceProperty.getValue())) {
       InOrder profilingDataConsumerAssertions = inOrder(profilingDataConsumer);
       profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
           .onProfilingEvent(eq(STARTING_FLOW_EXECUTION), any(ComponentProcessingStrategyProfilingEventContext.class));
@@ -700,6 +714,10 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     } else {
       verify(profilingDataConsumer, never()).onProfilingEvent(any(), any());
     }
+  }
+
+  protected void assertProcessingStrategyTracing() {
+    Assert.assertThat(profilingService.getTracingService().getCurrentExecutionContext(), notNullValue());
   }
 
   protected interface TransactionAwareProcessingStrategyTestCase {

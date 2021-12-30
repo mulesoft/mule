@@ -972,6 +972,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     startFlow();
     processFlow(newEvent());
     assertProcessingStrategyProfiling();
+    assertProcessingStrategyTracing();
   }
 
   private void spySchedulers() {

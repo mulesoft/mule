@@ -8,7 +8,6 @@
 package org.mule.runtime.core.internal.profiling;
 
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
-
 import static java.util.Optional.empty;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -17,12 +16,15 @@ import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
+import org.mule.runtime.api.profiling.tracing.ExecutionContext;
+import org.mule.runtime.api.profiling.tracing.TracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.discovery.DefaultProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.producer.provider.ProfilingDataProducerResolver;
 import org.mule.runtime.core.internal.profiling.threading.JvmThreadSnapshotCollector;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
+import org.mule.runtime.core.internal.profiling.tracing.ThreadLocalTracingService;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -32,10 +34,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import javax.inject.Inject;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-
 
 /**
  * Default diagnostic service for the runtime.
@@ -51,10 +52,11 @@ public class DefaultProfilingService extends AbstractProfilingService {
 
   private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies = empty();
 
-  private ThreadSnapshotCollector threadSnapshotCollector = new JvmThreadSnapshotCollector();
+  private final TracingService tracingService = new ThreadLocalTracingService();
+
+  private final ThreadSnapshotCollector threadSnapshotCollector = new JvmThreadSnapshotCollector();
 
   private ProfilingDataProducerResolver profilingDataProducerResolver;
-
 
   private final Map<ProfilingEventType<?>, Map<ProfilingProducerScope, ResettableProfilingDataProducer<?, ?>>> profilingDataProducers =
       new ConcurrentHashMap<>();
@@ -66,7 +68,7 @@ public class DefaultProfilingService extends AbstractProfilingService {
         .computeIfAbsent(profilingEventType,
                          profEventType -> new ConcurrentHashMap<>())
         .put(new ArtifactProfilingProducerScope(getArtifactId(muleContext)),
-             new ResettableProfilingDataProducerDelegate<T, S>(profilingDataProducer, profDataProducer -> {
+             new ResettableProfilingDataProducerDelegate<>(profilingDataProducer, profDataProducer -> {
                if (profDataProducer instanceof ResettableProfilingDataProducer) {
                  ((ResettableProfilingDataProducer<T, S>) profDataProducer).reset();
                }
@@ -89,6 +91,11 @@ public class DefaultProfilingService extends AbstractProfilingService {
   @Override
   public ThreadSnapshotCollector getThreadSnapshotCollector() {
     return threadSnapshotCollector;
+  }
+
+  @Override
+  public TracingService getTracingService() {
+    return tracingService;
   }
 
   @Override
@@ -144,5 +151,15 @@ public class DefaultProfilingService extends AbstractProfilingService {
                                                                                    ProfilingDataProducer<T, S> dataProducer,
                                                                                    Function<S, T> transformer) {
     return original.doOnNext(s -> dataProducer.triggerProfilingEvent(s, transformer));
+  }
+
+  @Override
+  public <S> Mono<S> setCurrentExecutionContext(Mono<S> original, Function<S, ExecutionContext> executionContextSupplier) {
+    return original.doOnNext(s -> getTracingService().setCurrentExecutionContext(executionContextSupplier.apply(s)));
+  }
+
+  @Override
+  public <S> Flux<S> setCurrentExecutionContext(Flux<S> original, Function<S, ExecutionContext> executionContextSupplier) {
+    return original.doOnNext(s -> getTracingService().setCurrentExecutionContext(executionContextSupplier.apply(s)));
   }
 }

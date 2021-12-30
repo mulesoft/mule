@@ -4,39 +4,40 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.core.internal.profiling.producer;
 
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.TaskSchedulingProfilingEventContext;
+import org.mule.runtime.api.profiling.type.TaskSchedulingProfilingEventType;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.ResettableProfilingDataProducer;
-import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
-import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingDataProducerStatus;
+import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
 import java.util.function.Function;
 
 /**
- * Default {@link ProfilingDataProducer} returned by a diagnostic service.
+ * A {@link ProfilingDataProducer} for producing data related to task scheduling.
  *
- * @since 4.4
+ * @see TaskSchedulingProfilingEventType
+ * @see Scheduler
+ * @since 4.5
  */
-public class ComponentProcessingStrategyProfilingDataProducer
-    implements
-    ResettableProfilingDataProducer<DefaultComponentProcessingStrategyProfilingEventContext, CoreEvent> {
+public class TaskSchedulingProfilingDataProducer
+    implements ResettableProfilingDataProducer<TaskSchedulingProfilingEventContext, CoreEvent> {
 
   private final DefaultProfilingService defaultProfilingService;
-  private final ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType;
+  private final ProfilingEventType<TaskSchedulingProfilingEventContext> profilingEventType;
   private final ProfilingDataProducerStatus profilingProducerStatus;
 
-  public ComponentProcessingStrategyProfilingDataProducer(DefaultProfilingService defaultProfilingService,
-                                                          ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType,
-                                                          ProfilingProducerScope profilingProducerScope,
-                                                          ProfilingFeatureFlaggingService featureFlaggingService) {
+  public TaskSchedulingProfilingDataProducer(DefaultProfilingService defaultProfilingService,
+                                             ProfilingEventType<TaskSchedulingProfilingEventContext> profilingEventType,
+                                             ProfilingProducerScope profilingProducerScope,
+                                             ProfilingFeatureFlaggingService featureFlaggingService) {
     this.defaultProfilingService = defaultProfilingService;
     this.profilingEventType = profilingEventType;
     this.profilingProducerStatus =
@@ -44,15 +45,15 @@ public class ComponentProcessingStrategyProfilingDataProducer
   }
 
   @Override
-  public void triggerProfilingEvent(DefaultComponentProcessingStrategyProfilingEventContext profilingEventContext) {
+  public void triggerProfilingEvent(TaskSchedulingProfilingEventContext profilerEventContext) {
     if (profilingProducerStatus.isEnabled()) {
-      defaultProfilingService.notifyEvent(profilingEventContext, profilingEventType);
+      defaultProfilingService.notifyEvent(profilerEventContext, profilingEventType);
     }
   }
 
   @Override
   public void triggerProfilingEvent(CoreEvent sourceData,
-                                    Function<CoreEvent, DefaultComponentProcessingStrategyProfilingEventContext> transformation) {
+                                    Function<CoreEvent, TaskSchedulingProfilingEventContext> transformation) {
     if (profilingProducerStatus.isEnabled()) {
       defaultProfilingService.notifyEvent(transformation.apply(sourceData), profilingEventType);
     }

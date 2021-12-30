@@ -17,8 +17,11 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.SCHEDULING_TASK_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_TASK_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TASK_EXECUTED;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getFullyQualifiedProfilingEventTypeIdentifier;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -29,9 +32,10 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.internal.profiling.ComponentThreadingDataProducerProvider;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.ExtensionDataProducerProvider;
-import org.mule.runtime.core.internal.profiling.ProcessingStratetegyDataProducerProvider;
+import org.mule.runtime.core.internal.profiling.ProcessingStrategyDataProducerProvider;
 import org.mule.runtime.core.internal.profiling.ProfilingDataProducerProvider;
 import org.mule.runtime.core.internal.profiling.ResettableProfilingDataProducer;
+import org.mule.runtime.core.internal.profiling.TaskSchedulingDataProducerProvider;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
 import java.util.HashMap;
@@ -67,39 +71,39 @@ public class ProfilingDataProducerResolver {
   }
 
   private void defineProfilerDataProducersProviders() {
-    profilingDataProducerProviders.put(FLOW_EXECUTED, new ProcessingStratetegyDataProducerProvider(profilingService,
-                                                                                                   FLOW_EXECUTED,
-                                                                                                   featureFlaggingService));
+    profilingDataProducerProviders.put(FLOW_EXECUTED, new ProcessingStrategyDataProducerProvider(profilingService,
+                                                                                                 FLOW_EXECUTED,
+                                                                                                 featureFlaggingService));
 
     profilingDataProducerProviders
-        .put(PS_SCHEDULING_FLOW_EXECUTION, new ProcessingStratetegyDataProducerProvider(profilingService,
-                                                                                        PS_SCHEDULING_FLOW_EXECUTION,
-                                                                                        featureFlaggingService));
+        .put(PS_SCHEDULING_FLOW_EXECUTION, new ProcessingStrategyDataProducerProvider(profilingService,
+                                                                                      PS_SCHEDULING_FLOW_EXECUTION,
+                                                                                      featureFlaggingService));
 
     profilingDataProducerProviders
-        .put(STARTING_FLOW_EXECUTION, new ProcessingStratetegyDataProducerProvider(profilingService,
-                                                                                   STARTING_FLOW_EXECUTION,
-                                                                                   featureFlaggingService));
-
-    profilingDataProducerProviders
-        .put(PS_FLOW_MESSAGE_PASSING, new ProcessingStratetegyDataProducerProvider(profilingService,
-                                                                                   PS_FLOW_MESSAGE_PASSING,
-                                                                                   featureFlaggingService));
-
-    profilingDataProducerProviders
-        .put(PS_OPERATION_EXECUTED, new ProcessingStratetegyDataProducerProvider(profilingService,
-                                                                                 PS_OPERATION_EXECUTED,
+        .put(STARTING_FLOW_EXECUTION, new ProcessingStrategyDataProducerProvider(profilingService,
+                                                                                 STARTING_FLOW_EXECUTION,
                                                                                  featureFlaggingService));
 
     profilingDataProducerProviders
-        .put(PS_SCHEDULING_OPERATION_EXECUTION, new ProcessingStratetegyDataProducerProvider(profilingService,
-                                                                                             PS_SCHEDULING_OPERATION_EXECUTION,
-                                                                                             featureFlaggingService));
+        .put(PS_FLOW_MESSAGE_PASSING, new ProcessingStrategyDataProducerProvider(profilingService,
+                                                                                 PS_FLOW_MESSAGE_PASSING,
+                                                                                 featureFlaggingService));
 
     profilingDataProducerProviders
-        .put(PS_STARTING_OPERATION_EXECUTION, new ProcessingStratetegyDataProducerProvider(profilingService,
-                                                                                           PS_STARTING_OPERATION_EXECUTION,
+        .put(PS_OPERATION_EXECUTED, new ProcessingStrategyDataProducerProvider(profilingService,
+                                                                               PS_OPERATION_EXECUTED,
+                                                                               featureFlaggingService));
+
+    profilingDataProducerProviders
+        .put(PS_SCHEDULING_OPERATION_EXECUTION, new ProcessingStrategyDataProducerProvider(profilingService,
+                                                                                           PS_SCHEDULING_OPERATION_EXECUTION,
                                                                                            featureFlaggingService));
+
+    profilingDataProducerProviders
+        .put(PS_STARTING_OPERATION_EXECUTION, new ProcessingStrategyDataProducerProvider(profilingService,
+                                                                                         PS_STARTING_OPERATION_EXECUTION,
+                                                                                         featureFlaggingService));
 
     profilingDataProducerProviders
         .put(STARTING_OPERATION_EXECUTION, new ComponentThreadingDataProducerProvider(profilingService,
@@ -122,6 +126,17 @@ public class ProfilingDataProducerResolver {
     profilingDataProducerProviders.put(EXTENSION_PROFILING_EVENT, new ExtensionDataProducerProvider(profilingService,
                                                                                                     EXTENSION_PROFILING_EVENT,
                                                                                                     featureFlaggingService));
+
+    profilingDataProducerProviders
+        .put(SCHEDULING_TASK_EXECUTION,
+             new TaskSchedulingDataProducerProvider(profilingService, SCHEDULING_TASK_EXECUTION, featureFlaggingService));
+
+    profilingDataProducerProviders
+        .put(STARTING_TASK_EXECUTION,
+             new TaskSchedulingDataProducerProvider(profilingService, STARTING_TASK_EXECUTION, featureFlaggingService));
+
+    profilingDataProducerProviders
+        .put(TASK_EXECUTED, new TaskSchedulingDataProducerProvider(profilingService, TASK_EXECUTED, featureFlaggingService));
 
   }
 

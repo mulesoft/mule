@@ -17,12 +17,12 @@ import org.mule.runtime.api.profiling.ProfilingProducerScope;
 public interface ProfilingDataProducerProvider<T extends ProfilingEventContext, O> {
 
   /**
-   * @param producerContext the {@link ProfilingProducerScope} that determines the profiling data producer to provide
-   * @param <T>             the {@link ProfilingEventContext} for the provided @{link
-   *                        {@link org.mule.runtime.api.profiling.ProfilingDataProducer}
+   * @param profilingProducerScope the {@link ProfilingProducerScope} that determines the profiling data producer to provide
+   * @param <T>                    the {@link ProfilingEventContext} for the provided @{link
+   *                               {@link org.mule.runtime.api.profiling.ProfilingDataProducer}
    * @return the profiling data producer.
    */
   <T extends ProfilingEventContext, S> ResettableProfilingDataProducer<T, S> getProfilingDataProducer(
-                                                                                                      ProfilingProducerScope producerContext);
+                                                                                                      ProfilingProducerScope profilingProducerScope);
 
 }

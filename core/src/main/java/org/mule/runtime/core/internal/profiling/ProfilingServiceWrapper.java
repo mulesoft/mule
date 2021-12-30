@@ -21,12 +21,15 @@ import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
+import org.mule.runtime.api.profiling.tracing.ExecutionContext;
+import org.mule.runtime.api.profiling.tracing.TracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.util.function.Function;
 
 import javax.inject.Inject;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -49,28 +52,33 @@ public class ProfilingServiceWrapper implements CoreProfilingService, Lifecycle 
   @Override
   public <T extends ProfilingEventContext, S> ProfilingDataProducer<T, S> getProfilingDataProducer(
                                                                                                    ProfilingEventType<T> profilingEventType) {
-    return getProfilingDataProducer().getProfilingDataProducer(profilingEventType);
+    return getProfilingService().getProfilingDataProducer(profilingEventType);
   }
 
   @Override
   public <T extends ProfilingEventContext, S> ProfilingDataProducer<T, S> getProfilingDataProducer(
                                                                                                    ProfilingEventType<T> profilingEventType,
                                                                                                    ProfilingProducerScope producerScope) {
-    return getProfilingDataProducer().getProfilingDataProducer(profilingEventType, producerScope);
+    return getProfilingService().getProfilingDataProducer(profilingEventType, producerScope);
   }
 
   @Override
   public <T extends ProfilingEventContext, S> void registerProfilingDataProducer(ProfilingEventType<T> profilingEventType,
                                                                                  ProfilingDataProducer<T, S> profilingDataProducer) {
-    getProfilingDataProducer().registerProfilingDataProducer(profilingEventType, profilingDataProducer);
+    getProfilingService().registerProfilingDataProducer(profilingEventType, profilingDataProducer);
   }
 
   @Override
   public ThreadSnapshotCollector getThreadSnapshotCollector() {
-    return getProfilingDataProducer().getThreadSnapshotCollector();
+    return getProfilingService().getThreadSnapshotCollector();
   }
 
-  public CoreProfilingService getProfilingDataProducer() throws MuleRuntimeException {
+  @Override
+  public TracingService getTracingService() {
+    return getProfilingService().getTracingService();
+  }
+
+  public CoreProfilingService getProfilingService() throws MuleRuntimeException {
     if (profilingService != null) {
       return profilingService;
     }
@@ -105,6 +113,16 @@ public class ProfilingServiceWrapper implements CoreProfilingService, Lifecycle 
                                                                                    ProfilingDataProducer<T, S> dataProducer,
                                                                                    Function<S, T> transformer) {
     return profilingService.enrichWithProfilingEventFlux(original, dataProducer, transformer);
+  }
+
+  @Override
+  public <S> Mono<S> setCurrentExecutionContext(Mono<S> original, Function<S, ExecutionContext> executionContextSupplier) {
+    return profilingService.setCurrentExecutionContext(original, executionContextSupplier);
+  }
+
+  @Override
+  public <S> Flux<S> setCurrentExecutionContext(Flux<S> original, Function<S, ExecutionContext> executionContextSupplier) {
+    return profilingService.setCurrentExecutionContext(original, executionContextSupplier);
   }
 
   @Override

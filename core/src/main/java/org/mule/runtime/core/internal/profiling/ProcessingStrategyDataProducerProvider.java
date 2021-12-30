@@ -21,16 +21,16 @@ import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggi
  *
  * @since 4.5.0
  */
-public class ProcessingStratetegyDataProducerProvider
+public class ProcessingStrategyDataProducerProvider
     implements ProfilingDataProducerProvider<DefaultComponentProcessingStrategyProfilingEventContext, CoreEvent> {
 
   private final DefaultProfilingService profilingService;
   private final ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType;
   private final ProfilingFeatureFlaggingService featureFlaggingService;
 
-  public ProcessingStratetegyDataProducerProvider(DefaultProfilingService profilingService,
-                                                  ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType,
-                                                  ProfilingFeatureFlaggingService featureFlaggingService) {
+  public ProcessingStrategyDataProducerProvider(DefaultProfilingService profilingService,
+                                                ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType,
+                                                ProfilingFeatureFlaggingService featureFlaggingService) {
     this.profilingService = profilingService;
     this.profilingEventType = profilingEventType;
     this.featureFlaggingService = featureFlaggingService;
@@ -39,10 +39,10 @@ public class ProcessingStratetegyDataProducerProvider
 
   @Override
   public <T extends ProfilingEventContext, S> ResettableProfilingDataProducer<T, S> getProfilingDataProducer(
-                                                                                                             ProfilingProducerScope producerScope) {
+                                                                                                             ProfilingProducerScope profilingProducerScope) {
     return (ResettableProfilingDataProducer<T, S>) new ComponentProcessingStrategyProfilingDataProducer(profilingService,
                                                                                                         profilingEventType,
-                                                                                                        producerScope,
+                                                                                                        profilingProducerScope,
                                                                                                         featureFlaggingService);
   }
 }

@@ -30,14 +30,16 @@ import org.mule.runtime.core.internal.processor.strategy.enricher.ReactiveProces
 import org.mule.runtime.core.internal.processor.strategy.enricher.ProcessingTypeBasedReactiveProcessorEnricher;
 import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.slf4j.Logger;
 
-import javax.inject.Inject;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
+
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 
 public abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamProcessingStrategy
     implements Lifecycle {
