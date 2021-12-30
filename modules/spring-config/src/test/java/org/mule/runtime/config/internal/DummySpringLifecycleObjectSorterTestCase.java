@@ -134,4 +134,6 @@ public class DummySpringLifecycleObjectSorterTestCase {
     assertThat(sorter.getSortedObjects().size(), Matchers.is(2));
   }
 
+  // todo:find addVertex and replace input with VertexWrapper
+
 }

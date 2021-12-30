@@ -112,6 +112,7 @@ public class DummyDependencyResolver implements BeanDependencyResolver {
    */
   private void addDirectAutoDiscoveredDependencies(String key, Set<String> processedKeys, DependencyNode node) {
     autoDiscoveredDependencyResolver.getAutoDiscoveredDependencies(key)
+        .stream().filter(x -> !x.getValue().equals(node.getValue())) // todo: write test for this case
         .forEach(dependency -> addDirectChild(node, dependency.getKey(), dependency.getValue(), processedKeys));
   }
   // private void addDirectAutoDiscoveredDependencies(String key, Set<String> processedKeys, DependencyNode node) {
