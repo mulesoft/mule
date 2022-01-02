@@ -58,14 +58,20 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * ADD JDOC
+ * Util class that resolves the static types of parameter, outputs and attributes from sources and operartions in Java based
+ * extensions.
+ *
+ * @since 4.5
  */
 public class CustomStaticTypeUtils {
 
   private static final MetadataTypeEnricher enricher = new MetadataTypeEnricher();
 
   /**
-   * ADD JDOC
+   * resolves the output type of a given operation.
+   *
+   * @param operationElement operation to resolve the output
+   * @return the output type of the operation
    */
   public static MetadataType getOperationOutputType(OperationElement operationElement) {
     MetadataType declarationType = operationElement.getOperationReturnMetadataType();
@@ -74,7 +80,10 @@ public class CustomStaticTypeUtils {
   }
 
   /**
-   * ADD JDOC
+   * resolves the attributes type of a given operation.
+   *
+   * @param operationElement operation to resolve the attributes
+   * @return the attributes type of the operation
    */
   public static MetadataType getOperationAttributesType(OperationElement operationElement) {
     MetadataType declarationType = operationElement.getAttributesMetadataType();
@@ -83,7 +92,10 @@ public class CustomStaticTypeUtils {
   }
 
   /**
-   * ADD JDOC
+   * resolves type of a given parameter.
+   *
+   * @param parameterElement parameter to resolve the type
+   * @return the type of the parameter
    */
   public static MetadataType getParameterType(ExtensionParameter parameterElement) {
     MetadataType declarationType = parameterElement.getType().asMetadataType();
@@ -92,7 +104,10 @@ public class CustomStaticTypeUtils {
   }
 
   /**
-   * ADD JDOC
+   * resolves the output type of a given source.
+   *
+   * @param sourceElement source to resolve the output
+   * @return the output type of the source
    */
   public static MetadataType getSourceOutputType(SourceElement sourceElement) {
     MetadataType declarationType = sourceElement.getReturnMetadataType();
@@ -101,7 +116,10 @@ public class CustomStaticTypeUtils {
   }
 
   /**
-   * ADD JDOC
+   * resolves the attribute type of a given source.
+   *
+   * @param sourceElement source to resolve the attributes
+   * @return the attributes type of the source
    */
   public static MetadataType getSourceAttributesType(SourceElement sourceElement) {
     MetadataType declarationType = sourceElement.getAttributesMetadataType();
