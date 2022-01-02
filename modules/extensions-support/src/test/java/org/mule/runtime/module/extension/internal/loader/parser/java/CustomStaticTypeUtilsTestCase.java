@@ -28,6 +28,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.resolving.AttributesStaticTypeResolver;
 import org.mule.runtime.api.metadata.resolving.InputStaticTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputStaticTypeResolver;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.metadata.fixed.AttributesJsonType;
@@ -58,7 +59,6 @@ public class CustomStaticTypeUtilsTestCase {
   private static final String TEST_PARAMETER_METHOD = "testParameterMethod";
   private static final MetadataType CUSTOM_STATIC_METADATATYPE =
       BaseTypeBuilder.create(MetadataFormat.JAVA).objectType().id("custom-java").build();
-
 
   @Test
   public void xmlInputStaticType() throws Exception {
@@ -117,7 +117,7 @@ public class CustomStaticTypeUtilsTestCase {
 
   @Test
   public void customOutputStaticTypeSource() {
-
+    assertCustomType(getSourceOutputType(getSourceElementWithClass(CustomOutputStaticTypeSource.class)));
   }
 
   @Test
@@ -132,7 +132,7 @@ public class CustomStaticTypeUtilsTestCase {
 
   @Test
   public void customAttributesStaticTypeSource() {
-
+    assertCustomType(getSourceAttributesType(getSourceElementWithClass(CustomAttributesStaticTypeSource.class)));
   }
 
   @Test
@@ -192,7 +192,7 @@ public class CustomStaticTypeUtilsTestCase {
 
   @Test
   public void sdkCustomOutputStaticTypeSource() {
-
+    assertCustomType(getSourceOutputType(getSourceElementWithClass(SdkCustomOutputStaticTypeSource.class)));
   }
 
   @Test
@@ -207,7 +207,7 @@ public class CustomStaticTypeUtilsTestCase {
 
   @Test
   public void sdkCustomAttributesStaticTypeSource() {
-
+    assertCustomType(getSourceAttributesType(getSourceElementWithClass(SdkCustomAttributesStaticTypeSource.class)));
   }
 
   private SourceElement getSourceElementWithClass(Class<? extends Source> sourceClass) {
@@ -384,6 +384,16 @@ public class CustomStaticTypeUtilsTestCase {
 
   }
 
+  @MetadataScope(outputResolver = TestOutputStaticTypeResolver.class)
+  private static class CustomOutputStaticTypeSource extends BaseSource {
+
+  }
+
+  @org.mule.sdk.api.annotation.metadata.MetadataScope(outputResolver = SdkTestOutputStaticTypeResolver.class)
+  private static class SdkCustomOutputStaticTypeSource extends BaseSource {
+
+  }
+
   @AttributesXmlType(schema = "order.xsd", qname = "shiporder")
   private static class XmlAttributesStaticTypeSource extends BaseSource {
 
@@ -401,6 +411,16 @@ public class CustomStaticTypeUtilsTestCase {
 
   @org.mule.sdk.api.annotation.metadata.fixed.AttributesJsonType(schema = "person-schema.json")
   private static class SdkJsonAttributesStaticTypeSource extends BaseSource {
+
+  }
+
+  @MetadataScope(attributesResolver = TestAttributesStaticTypeResolver.class)
+  private static class CustomAttributesStaticTypeSource extends BaseSource {
+
+  }
+
+  @org.mule.sdk.api.annotation.metadata.MetadataScope(attributesResolver = SdkTestAttributesStaticTypeResolver.class)
+  private static class SdkCustomAttributesStaticTypeSource extends BaseSource {
 
   }
 
