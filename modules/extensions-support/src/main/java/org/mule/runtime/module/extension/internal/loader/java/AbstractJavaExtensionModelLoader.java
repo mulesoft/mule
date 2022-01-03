@@ -6,16 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_SDK_IGNORE_COMPONENT;
-import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_SDK_POLLING_SOURCE_LIMIT;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_COMPONENT_IGNORE;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENABLE_POLLING_SOURCE_LIMIT_PARAMETER;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserFactory.getExtensionElement;
 
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -23,16 +18,11 @@ import org.mule.runtime.extension.api.annotation.privileged.DeclarationEnrichers
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
-import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
-import org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateFactory;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
 import org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateFactory;
 import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
-import org.mule.runtime.module.extension.internal.loader.validator.ConfigurationModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validator.ConnectionProviderModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validator.DeprecationModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validator.ParameterPluralNameModelValidator;
+import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.DefaultEncodingDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.DynamicMetadataDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.ExtensionDescriptionsEnricher;
@@ -67,16 +57,18 @@ import org.mule.runtime.module.extension.internal.loader.java.validation.Paramet
 import org.mule.runtime.module.extension.internal.loader.java.validation.PojosModelValidator;
 import org.mule.runtime.module.extension.internal.loader.java.validation.PrivilegedApiValidator;
 import org.mule.runtime.module.extension.internal.loader.java.validation.SourceCallbacksModelValidator;
+import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserFactory;
+import org.mule.runtime.module.extension.internal.loader.validator.ConfigurationModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validator.ConnectionProviderModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validator.DeprecationModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validator.ParameterPluralNameModelValidator;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;
 
 public abstract class AbstractJavaExtensionModelLoader extends AbstractExtensionModelLoader {
-
-  private static final boolean IGNORE_DISABLED = getProperty(DISABLE_SDK_IGNORE_COMPONENT) != null;
-  private static final boolean ENABLE_POLLING_SOURCE_LIMIT = getProperty(ENABLE_SDK_POLLING_SOURCE_LIMIT) != null;
 
   public static final String TYPE_PROPERTY_NAME = "type";
   public static final String EXTENSION_TYPE = "EXTENSION_TYPE";
@@ -159,15 +151,11 @@ public abstract class AbstractJavaExtensionModelLoader extends AbstractExtension
    */
   @Override
   protected void configureContextBeforeDeclaration(ExtensionLoadingContext context) {
+    super.configureContextBeforeDeclaration(context);
+
     context.addCustomValidators(customValidators);
     context.addCustomDeclarationEnrichers(customDeclarationEnrichers);
     context.addCustomDeclarationEnrichers(getPrivilegedDeclarationEnrichers(context));
-    if (IGNORE_DISABLED) {
-      context.addParameter(DISABLE_COMPONENT_IGNORE, true);
-    }
-    if (ENABLE_POLLING_SOURCE_LIMIT) {
-      context.addParameter(ENABLE_POLLING_SOURCE_LIMIT_PARAMETER, true);
-    }
   }
 
   /**
@@ -178,8 +166,9 @@ public abstract class AbstractJavaExtensionModelLoader extends AbstractExtension
     return new JavaExtensionModelParserFactory();
   }
 
-  protected ModelLoaderDelegate getModelLoaderDelegate(String version) {
-    return modelLoaderDelegateFactory.getLoader(null, version);
+  @Override
+  protected ModelLoaderDelegate getModelLoaderDelegate(ExtensionLoadingContext context, String version) {
+    return modelLoaderDelegateFactory.getLoader(getExtensionElement(context), version);
   }
 
   private Collection<DeclarationEnricher> getPrivilegedDeclarationEnrichers(ExtensionLoadingContext context) {

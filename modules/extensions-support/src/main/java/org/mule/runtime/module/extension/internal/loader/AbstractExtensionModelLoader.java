@@ -66,10 +66,10 @@ public abstract class AbstractExtensionModelLoader extends ExtensionModelLoader 
         context.<String>getParameter(VERSION).orElseThrow(() -> new IllegalArgumentException("version not specified"));
 
     ExtensionModelParserFactory parserFactory = getExtensionModelParserFactory(context);
-    getModelLoaderDelegate(version).declare(parserFactory, context);
+    getModelLoaderDelegate(context, version).declare(parserFactory, context);
   }
 
-  protected ModelLoaderDelegate getModelLoaderDelegate(String version) {
+  protected ModelLoaderDelegate getModelLoaderDelegate(ExtensionLoadingContext context, String version) {
     return new DefaultExtensionModelLoaderDelegate(version);
   }
 }
