@@ -76,8 +76,7 @@ public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
   public List<Object> getSortedObjects() {
     List<Object> sortedObjects = newArrayList(new TopologicalOrderIterator<>(dependencyGraph));
     reverse(sortedObjects);
-    //return sortedObjects.stream().map(x -> ((VertexWrapper) x).getOriginalObject()).collect(Collectors.toList());
-    return sortedObjects.stream().map(x -> ((VertexWrapper) x).getOriginalObject()).distinct().collect(Collectors.toList());
+    return sortedObjects.stream().map(x -> ((VertexWrapper) x).getOriginalObject()).collect(Collectors.toList());
   }
 
 }
