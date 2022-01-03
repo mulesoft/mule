@@ -126,8 +126,8 @@ public class CustomStaticMetadataOperations {
   }
 
   public List<InputStream> jsonInputList(@org.mule.sdk.api.annotation.metadata.fixed.InputJsonType(
-      schema = "person-schema.json") List<InputStream> jsonList) {
-    return jsonList;
+      schema = "person-schema.json") List<InputStream> persons) {
+    return persons;
   }
 
   @OutputResolver(output = CsvInputStaticTypeResolver.class)
