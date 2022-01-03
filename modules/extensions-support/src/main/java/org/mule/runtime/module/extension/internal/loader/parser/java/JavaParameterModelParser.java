@@ -34,6 +34,7 @@ import static org.mule.runtime.module.extension.internal.loader.java.contributor
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addTermIfPresent;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.SdkStereotypeDefinitionAdapter.from;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getParameterType;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIG;
 
 import org.mule.metadata.api.model.ArrayType;
@@ -111,7 +112,7 @@ public class JavaParameterModelParser implements ParameterModelParser {
     this.parameter = parameter;
     this.context = context;
     this.exclusiveOptionals = exclusiveOptionals;
-    type = parameter.getType().asMetadataType();
+    type = getParameterType(parameter);
 
     parserStructure();
     collectAdditionalModelProperties();

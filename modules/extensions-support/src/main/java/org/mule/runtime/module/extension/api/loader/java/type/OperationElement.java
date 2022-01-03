@@ -44,4 +44,21 @@ public interface OperationElement extends MethodElement<OperationContainerElemen
     return IntrospectionUtils.getReturnType(returnType);
   }
 
+  default MetadataType getOperationAttributesMetadataType() {
+    Type returnType;
+    if (isNonBlocking(this)) {
+      returnType = getParameters().stream()
+          .filter(JavaExtensionModelParserUtils::isCompletionCallbackParameter)
+          .findAny()
+          .get()
+          .getType();
+      List<TypeGeneric> generics = returnType.getGenerics();
+      if (generics.isEmpty()) {
+        return BaseTypeBuilder.create(JAVA).anyType().build();
+      }
+      return generics.get(1).getConcreteType().asMetadataType();
+    } else {
+      return getAttributesMetadataType();
+    }
+  }
 }

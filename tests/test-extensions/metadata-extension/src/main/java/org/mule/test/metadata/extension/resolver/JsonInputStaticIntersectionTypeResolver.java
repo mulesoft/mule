@@ -12,7 +12,7 @@ import org.mule.metadata.api.builder.IntersectionTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.metadata.resolving.InputStaticTypeResolver;
+import org.mule.sdk.api.metadata.resolving.InputStaticTypeResolver;
 
 public class JsonInputStaticIntersectionTypeResolver extends InputStaticTypeResolver {
 

@@ -24,6 +24,8 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Para
 import static org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils.parseOperationErrorModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getOperationAttributesType;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getOperationOutputType;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getRoutes;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 
@@ -247,8 +249,8 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   private void parseBlockingOperation() {
     // TODO: Should be possible to parse dynamic types right here
-    outputType = new DefaultOutputModelParser(operationElement.getReturnMetadataType(), false);
-    outputAttributesType = new DefaultOutputModelParser(operationElement.getAttributesMetadataType(), false);
+    outputType = new DefaultOutputModelParser(getOperationOutputType(operationElement), false);
+    outputAttributesType = new DefaultOutputModelParser(getOperationAttributesType(operationElement), false);
 
     if (autoPaging = JavaExtensionModelParserUtils.isAutoPaging(operationElement)) {
       parseAutoPaging();
@@ -289,24 +291,9 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
                                                                 CompletionCallback.class.getSimpleName()));
     }
 
-    ExtensionParameter callbackParameter = callbackParameters.get(0);
-
-    List<MetadataType> genericTypes = callbackParameter.getType()
-        .getGenerics()
-        .stream()
-        .map(generic -> generic.getConcreteType().asMetadataType())
-        .collect(toList());
-
-    if (genericTypes.isEmpty()) {
-      // This is an invalid state, but is better to fail when executing the Extension Model Validators
-      MetadataType anyType = PRIMITIVE_TYPES.get("ANY");
-      genericTypes.add(anyType);
-      genericTypes.add(anyType);
-    }
-
     // TODO: SHould be possible to parse dynamic types right here?
-    outputType = new DefaultOutputModelParser(genericTypes.get(0), false);
-    outputAttributesType = new DefaultOutputModelParser(genericTypes.get(1), false);
+    outputType = new DefaultOutputModelParser(getOperationOutputType(operationElement), false);
+    outputAttributesType = new DefaultOutputModelParser(getOperationAttributesType(operationElement), false);
   }
 
   @Override

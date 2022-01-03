@@ -15,14 +15,14 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.metadata.fixed.AttributesJsonType;
-import org.mule.runtime.extension.api.annotation.metadata.fixed.AttributesXmlType;
 import org.mule.runtime.extension.api.annotation.metadata.fixed.InputJsonType;
-import org.mule.runtime.extension.api.annotation.metadata.fixed.InputXmlType;
 import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputJsonType;
 import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputXmlType;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.sdk.api.annotation.metadata.fixed.AttributesXmlType;
+import org.mule.sdk.api.annotation.metadata.fixed.InputXmlType;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.test.metadata.extension.resolver.CsvInputStaticTypeResolver;
 import org.mule.test.metadata.extension.resolver.JavaOutputStaticTypeResolver;
@@ -50,13 +50,13 @@ public class CustomStaticMetadataOperations {
     return cl.getResourceAsStream("order.xml");
   }
 
-  @OutputXmlType(schema = "orderWithImport.xsd", qname = "shiporder")
   @MediaType(value = APPLICATION_XML, strict = false)
+  @org.mule.sdk.api.annotation.metadata.fixed.OutputXmlType(schema = "orderWithImport.xsd", qname = "shiporder")
   public InputStream xmlOutputSchemaWithImport() {
     return cl.getResourceAsStream("order.xml");
   }
 
-  @OutputXmlType(schema = "order.xsd", qname = "shiporder")
+  @org.mule.sdk.api.annotation.metadata.fixed.OutputXmlType(schema = "order.xsd", qname = "shiporder")
   public List<InputStream> xmlOutputList() {
     ArrayList xmlList = new ArrayList();
     xmlList.add(cl.getResourceAsStream("order.xml"));
@@ -76,8 +76,8 @@ public class CustomStaticMetadataOperations {
     return new ByteArrayInputStream(JSON_VALUE.getBytes());
   }
 
-  @OutputJsonType(schema = "persons-schema.json")
   @MediaType(value = APPLICATION_JSON, strict = false)
+  @org.mule.sdk.api.annotation.metadata.fixed.OutputJsonType(schema = "persons-schema.json")
   public InputStream jsonOutputArray() {
     return new ByteArrayInputStream(JSON_ARRAY_VALUE.getBytes());
   }
@@ -87,7 +87,7 @@ public class CustomStaticMetadataOperations {
     return new ArrayList<>();
   }
 
-  @OutputJsonType(schema = "person-schema.json")
+  @org.mule.sdk.api.annotation.metadata.fixed.OutputJsonType(schema = "person-schema.json")
   public PagingProvider<MetadataConnection, String> jsonOutputPagingProvider() {
     return new PagingProvider<MetadataConnection, String>() {
 
@@ -120,11 +120,13 @@ public class CustomStaticMetadataOperations {
   }
 
   @MediaType(value = APPLICATION_JSON)
-  public String jsonInputStream(@InputJsonType(schema = "person-schema.json") InputStream json) {
+  public String jsonInputStream(@org.mule.sdk.api.annotation.metadata.fixed.InputJsonType(
+      schema = "person-schema.json") InputStream json) {
     return IOUtils.toString(json);
   }
 
-  public List<InputStream> jsonInputList(@InputJsonType(schema = "person-schema.json") List<InputStream> persons) {
+  public List<InputStream> jsonInputList(@org.mule.sdk.api.annotation.metadata.fixed.InputJsonType(
+      schema = "person-schema.json") List<InputStream> persons) {
     return persons;
   }
 
@@ -161,7 +163,7 @@ public class CustomStaticMetadataOperations {
   }
 
   @MediaType(APPLICATION_JSON)
-  public String customIntersectionTypeInput(@TypeResolver(JsonInputStaticIntersectionTypeResolver.class) InputStream data) {
+  public String customIntersectionTypeInput(@org.mule.sdk.api.annotation.metadata.TypeResolver(JsonInputStaticIntersectionTypeResolver.class) InputStream data) {
     return IOUtils.toString(data);
   }
 
@@ -181,12 +183,12 @@ public class CustomStaticMetadataOperations {
     return Result.<Integer, InputStream>builder().output(1).build();
   }
 
-  @AttributesJsonType(schema = "person-schema.json")
+  @org.mule.sdk.api.annotation.metadata.fixed.AttributesJsonType(schema = "person-schema.json")
   public Result<Integer, InputStream> jsonAttributes() {
     return Result.<Integer, InputStream>builder().output(1).build();
   }
 
-  @AttributesJsonType(schema = "persons-schema.json")
+  @org.mule.sdk.api.annotation.metadata.fixed.AttributesJsonType(schema = "persons-schema.json")
   public Result<Integer, InputStream> jsonArrayAttributes() {
     return Result.<Integer, InputStream>builder().output(1).build();
   }
