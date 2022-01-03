@@ -19,6 +19,8 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.AuthorizationCode;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.ClientCredentials;
+import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthCallbackValue;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantTypeVisitor;
@@ -29,8 +31,11 @@ import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionE
 import org.mule.runtime.extension.api.security.CredentialsPlacement;
 import org.mule.runtime.module.extension.api.loader.java.type.ConnectionProviderElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
+import org.mule.runtime.module.extension.internal.loader.java.property.oauth.OAuthCallbackValuesModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ConnectionProviderTypeWrapper;
 
+import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.Rule;
@@ -55,6 +60,8 @@ public class JavaConnectionProviderModelParserTestCase {
   private static final String TOKEN_URL = "tokenUrl";
   private static final ValidationOAuthGrantTypeVisitor VALIDATION_O_AUTH_GRANT_TYPE_VISITOR =
       new ValidationOAuthGrantTypeVisitor();
+  private static final String CALLBACK_EXPRESSION = "#[payload.callback]";
+  private static final String SDK_CALLBACK_EXPRESSION = "#[payload.sdkCallback]";
 
   @Rule
   public ExpectedException expectedException = none();
@@ -118,6 +125,24 @@ public class JavaConnectionProviderModelParserTestCase {
     parseOAuthModelPropertyFromConnectionProviderClass(BothClientCredentialsConnectionProvider.class);
   }
 
+  @Test
+  public void oauthCallbackValues() {
+    Optional<OAuthCallbackValuesModelProperty> oAuthCallbackValuesModelProperty =
+        parseOAuthCallbackValuesModelPropertyFromConnectionProviderClass(OAuthCallbackValuesConnectionProvider.class);
+    assertThat(oAuthCallbackValuesModelProperty.isPresent(), is(true));
+    Map<Field, String> callbackValues = oAuthCallbackValuesModelProperty.get().getCallbackValues();
+    assertThat(callbackValues.size(), is(2));
+
+
+  }
+
+  @Test
+  public void noOauthCallbackValues() {
+    Optional<OAuthCallbackValuesModelProperty> oAuthCallbackValuesModelProperty =
+        parseOAuthCallbackValuesModelPropertyFromConnectionProviderClass(OAuthCallbackValuesConnectionProvider.class);
+    assertThat(oAuthCallbackValuesModelProperty.isPresent(), is(false));
+  }
+
   private static class ValidationOAuthGrantTypeVisitor implements OAuthGrantTypeVisitor {
 
     @Override
@@ -150,6 +175,13 @@ public class JavaConnectionProviderModelParserTestCase {
   private Optional<OAuthModelProperty> parseOAuthModelPropertyFromConnectionProviderClass(Class<?> connectionProviderClass) {
     mockConnectionProviderWithClass(connectionProviderClass);
     return parser.getOAuthModelProperty();
+  }
+
+  private Optional<OAuthCallbackValuesModelProperty> parseOAuthCallbackValuesModelPropertyFromConnectionProviderClass(Class<?> connectionProviderClass) {
+    mockConnectionProviderWithClass(connectionProviderClass);
+    return parser.getAdditionalModelProperties().stream()
+        .filter(modelProperty -> modelProperty instanceof OAuthCallbackValuesModelProperty)
+        .map(OAuthCallbackValuesModelProperty.class::cast).findFirst();
   }
 
   private void mockConnectionProviderWithClass(Class<?> connectionProviderClass) {
@@ -229,6 +261,25 @@ public class JavaConnectionProviderModelParserTestCase {
       expirationExpr = EXPIRATION_EXPR, defaultScopes = DEFAULT_SCOPES,
       credentialsPlacement = org.mule.sdk.api.security.CredentialsPlacement.QUERY_PARAMS)
   private static class BothClientCredentialsConnectionProvider extends BaseTestConnectionProvider {
+
+  }
+
+
+  @AuthorizationCode(accessTokenUrl = ACCESS_TOKEN_URL, authorizationUrl = AUTHORIZATION_URL, accessTokenExpr = ACCESS_TOKEN_EXPR,
+      expirationExpr = EXPIRATION_EXPR, refreshTokenExpr = REFRESH_TOKEN_EXPR, defaultScopes = DEFAULT_SCOPES,
+      credentialsPlacement = QUERY_PARAMS,
+      includeRedirectUriInRefreshTokenRequest = INCLUDE_REDIRECT_URI_IN_REFRESH_TOKEN_REQUEST)
+  private static class OAuthCallbackValuesConnectionProvider extends BaseTestConnectionProvider {
+
+    @OAuthCallbackValue(expression = CALLBACK_EXPRESSION)
+    private String callbackValue;
+
+    @org.mule.sdk.api.annotation.connectivity.oauth.OAuthCallbackValue(expression = SDK_CALLBACK_EXPRESSION)
+    private String sdkCallbackValue;
+
+    @Parameter
+    private String nonCallbackValue;
+
 
   }
 }
