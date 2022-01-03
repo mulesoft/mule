@@ -12,7 +12,6 @@ import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegateFactory;
-import org.mule.runtime.module.extension.internal.loader.enricher.CustomStaticTypeDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
 
 import java.util.List;

@@ -86,7 +86,7 @@ public class CustomStaticTypeUtils {
    * @return the attributes type of the operation
    */
   public static MetadataType getOperationAttributesType(OperationElement operationElement) {
-    MetadataType declarationType = operationElement.getAttributesMetadataType();
+    MetadataType declarationType = operationElement.getOperationAttributesMetadataType();
     return getAttributesType(operationElement, declarationType, "operation", operationElement.getName())
         .map(customType -> enrichCustomType(declarationType, customType)).orElse(declarationType);
   }

@@ -291,24 +291,9 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
                                                                 CompletionCallback.class.getSimpleName()));
     }
 
-    ExtensionParameter callbackParameter = callbackParameters.get(0);
-
-    List<MetadataType> genericTypes = callbackParameter.getType()
-        .getGenerics()
-        .stream()
-        .map(generic -> generic.getConcreteType().asMetadataType())
-        .collect(toList());
-
-    if (genericTypes.isEmpty()) {
-      // This is an invalid state, but is better to fail when executing the Extension Model Validators
-      MetadataType anyType = PRIMITIVE_TYPES.get("ANY");
-      genericTypes.add(anyType);
-      genericTypes.add(anyType);
-    }
-
     // TODO: SHould be possible to parse dynamic types right here?
-    outputType = new DefaultOutputModelParser(genericTypes.get(0), false);
-    outputAttributesType = new DefaultOutputModelParser(genericTypes.get(1), false);
+    outputType = new DefaultOutputModelParser(getOperationOutputType(operationElement), false);
+    outputAttributesType = new DefaultOutputModelParser(getOperationAttributesType(operationElement), false);
   }
 
   @Override
