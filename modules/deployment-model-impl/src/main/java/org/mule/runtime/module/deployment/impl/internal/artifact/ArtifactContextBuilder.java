@@ -526,7 +526,7 @@ public class ArtifactContextBuilder {
     return this;
   }
 
-  public ArtifactContextBuilder setMemoryMaangementService(MemoryManagementService memoryManagementService) {
+  public ArtifactContextBuilder setMemoryManagementService(MemoryManagementService memoryManagementService) {
     this.memoryManagementService = memoryManagementService;
     return this;
   }

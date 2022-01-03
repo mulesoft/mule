@@ -230,7 +230,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
                                                                     descriptor.getDeploymentProperties())))
               .setPolicyProvider(policyManager)
               .setRuntimeLockFactory(runtimeLockFactory)
-              .setMemoryMaangementService(memoryManagementService);
+              .setMemoryManagementService(memoryManagementService);
 
       Domain domain = getApplicationDomain(domainRepository, descriptor);
       if (domain.getArtifactContext() != null) {
