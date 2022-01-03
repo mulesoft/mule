@@ -15,6 +15,7 @@ import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
+import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 
 import java.util.List;
 import java.util.Optional;
@@ -105,5 +106,10 @@ public interface ParameterModelParser extends SemanticTermsParser, AllowedStereo
    * @return the parameter's {@link DisplayModel}
    */
   Optional<DisplayModel> getDisplayModel();
+
+  /**
+   * @return the parameter's {@link OAuthParameterModelProperty}
+   */
+  Optional<OAuthParameterModelProperty> getOAuthParameterModelProperty();
 
 }
