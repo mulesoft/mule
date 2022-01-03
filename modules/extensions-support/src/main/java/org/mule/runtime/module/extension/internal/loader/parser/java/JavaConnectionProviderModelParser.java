@@ -260,7 +260,7 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
             .getAnnotation(org.mule.sdk.api.annotation.connectivity.oauth.OAuthCallbackValue.class).expression())));
 
     if (!values.isEmpty()) {
-      of(new OAuthCallbackValuesModelProperty(values));
+      return of(new OAuthCallbackValuesModelProperty(values));
     }
     return empty();
   }

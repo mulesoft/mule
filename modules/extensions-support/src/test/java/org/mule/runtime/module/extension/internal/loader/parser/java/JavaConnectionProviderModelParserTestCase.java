@@ -35,6 +35,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.oauth.OAu
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ConnectionProviderTypeWrapper;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -60,8 +61,20 @@ public class JavaConnectionProviderModelParserTestCase {
   private static final String TOKEN_URL = "tokenUrl";
   private static final ValidationOAuthGrantTypeVisitor VALIDATION_O_AUTH_GRANT_TYPE_VISITOR =
       new ValidationOAuthGrantTypeVisitor();
+
+  private static final String CALLBACK_FIELD_NAME = "callbackValue";
+  private static final String SDK_CALLBACK_FIELD_NAME = "sdkCallbackValue";
+
   private static final String CALLBACK_EXPRESSION = "#[payload.callback]";
   private static final String SDK_CALLBACK_EXPRESSION = "#[payload.sdkCallback]";
+
+  private static final Map<String, String> CALLBACK_BINDING = new HashMap<String, String>() {
+
+    {
+      put(CALLBACK_EXPRESSION, CALLBACK_FIELD_NAME);
+      put(SDK_CALLBACK_EXPRESSION, SDK_CALLBACK_FIELD_NAME);
+    }
+  };
 
   @Rule
   public ExpectedException expectedException = none();
@@ -132,14 +145,15 @@ public class JavaConnectionProviderModelParserTestCase {
     assertThat(oAuthCallbackValuesModelProperty.isPresent(), is(true));
     Map<Field, String> callbackValues = oAuthCallbackValuesModelProperty.get().getCallbackValues();
     assertThat(callbackValues.size(), is(2));
-
-
+    callbackValues.entrySet().stream()
+        .forEach(fieldStringEntry -> assertThat(fieldStringEntry.getKey().getName(),
+                                                is(CALLBACK_BINDING.get(fieldStringEntry.getValue()))));
   }
 
   @Test
   public void noOauthCallbackValues() {
     Optional<OAuthCallbackValuesModelProperty> oAuthCallbackValuesModelProperty =
-        parseOAuthCallbackValuesModelPropertyFromConnectionProviderClass(OAuthCallbackValuesConnectionProvider.class);
+        parseOAuthCallbackValuesModelPropertyFromConnectionProviderClass(AuthorizationCodeConnectionProvider.class);
     assertThat(oAuthCallbackValuesModelProperty.isPresent(), is(false));
   }
 
