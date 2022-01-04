@@ -247,7 +247,7 @@ class DeclarationBasedElementModelFactory {
 
       } else {
         DslElementModel<Object> nestedComponentElement =
-            create(nestedComponentDeclaration).orElseGet(() -> create(model, nestedComponentDeclaration).get());
+            create(nestedComponentDeclaration).orElseGet(() -> create(model, nestedComponentDeclaration).orElse(null));
         if (nestedComponentElement != null) {
           nestedComponentElement.getConfiguration().ifPresent(configuration::withNestedComponent);
           componentElement.containing(nestedComponentElement);
