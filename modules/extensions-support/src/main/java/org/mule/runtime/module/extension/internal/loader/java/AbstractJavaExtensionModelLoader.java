@@ -31,7 +31,6 @@ import org.mule.runtime.module.extension.internal.loader.java.enricher.JavaMimeT
 import org.mule.runtime.module.extension.internal.loader.java.enricher.JavaOAuthDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.JavaObjectStoreParameterDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.ParameterAllowedStereotypesDeclarionEnricher;
-import org.mule.runtime.module.extension.internal.loader.java.enricher.ParameterLayoutOrderDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.PollingSourceDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.RefNameDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.RequiredForMetadataDeclarationEnricher;
@@ -115,7 +114,6 @@ public abstract class AbstractJavaExtensionModelLoader extends AbstractExtension
                                                                                                new ValueProvidersParameterDeclarationEnricher(),
                                                                                                new SampleDataDeclarationEnricher(),
                                                                                                new ParameterAllowedStereotypesDeclarionEnricher(),
-                                                                                               new ParameterLayoutOrderDeclarationEnricher(),
                                                                                                new JavaObjectStoreParameterDeclarationEnricher(),
                                                                                                new PollingSourceDeclarationEnricher()));
 
