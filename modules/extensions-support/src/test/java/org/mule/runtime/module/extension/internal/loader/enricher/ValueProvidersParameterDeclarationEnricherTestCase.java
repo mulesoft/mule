@@ -18,7 +18,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getNamedObject;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.declarerFor;
+import static org.mule.test.module.extension.internal.util.ExtensionDeclarationTestUtils.declarerFor;
 
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;

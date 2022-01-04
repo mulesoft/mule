@@ -20,7 +20,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.javaDeclarerFor;
+import static org.mule.test.module.extension.internal.util.ExtensionDeclarationTestUtils.javaDeclarerFor;
 
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataType;
