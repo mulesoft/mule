@@ -8,10 +8,17 @@ package org.mule.runtime.module.extension.internal.loader.parser.java.connection
 
 import org.mule.runtime.extension.api.security.CredentialsPlacement;
 
-// ADD JDOC
+/**
+ * Helper class to handle credential placement.
+ *
+ * @since 4.5.0
+ */
 public class SdkCredentialPlacementUtils {
 
-  // ADD JDOC
+  /**
+   * @param credentialsPlacement the credential placement to translate to the extensions-api enum.
+   * @return the corresponding credential placement from the extensions-api that derives the given one.
+   */
   public static CredentialsPlacement from(org.mule.sdk.api.security.CredentialsPlacement credentialsPlacement) {
     switch (credentialsPlacement) {
       case BODY:

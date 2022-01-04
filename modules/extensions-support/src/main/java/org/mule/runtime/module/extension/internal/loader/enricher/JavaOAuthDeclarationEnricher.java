@@ -148,20 +148,8 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
 
     private void enrichOAuthParameters(ConnectionProviderDeclaration declaration) {
       declaration.getAllParameters().forEach(p -> p.getModelProperty(OAuthParameterModelProperty.class).ifPresent(
-                                                                                                                  oAuthParameterModelProperty -> {
-                                                                                                                    if (!p
-                                                                                                                        .getExpressionSupport()
-                                                                                                                        .equals(NOT_SUPPORTED)) {
-                                                                                                                      throw new IllegalConnectionProviderModelDefinitionException(format(
-                                                                                                                                                                                         "Parameter '%s' in Connection Provider '%s' is marked as supporting expressions. Expressions are not supported "
-                                                                                                                                                                                             + "in OAuth parameters",
-                                                                                                                                                                                         p.getName(),
-                                                                                                                                                                                         declaration
-                                                                                                                                                                                             .getName()));
-                                                                                                                    } else {
-                                                                                                                      p.setExpressionSupport(NOT_SUPPORTED);
-                                                                                                                    }
-                                                                                                                  }));
+                                                                                                                  oAuthParameterModelProperty -> p
+                                                                                                                      .setExpressionSupport(NOT_SUPPORTED)));
     }
 
 

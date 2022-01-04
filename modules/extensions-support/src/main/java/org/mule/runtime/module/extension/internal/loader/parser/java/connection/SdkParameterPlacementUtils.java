@@ -8,10 +8,17 @@ package org.mule.runtime.module.extension.internal.loader.parser.java.connection
 
 import org.mule.runtime.extension.api.runtime.parameter.HttpParameterPlacement;
 
-// ADD JDOC
+/**
+ * Helper class to handle http parameter placements.
+ *
+ * @since 4.5.0
+ */
 public class SdkParameterPlacementUtils {
 
-  // ADD JDOC
+  /**
+   * @param parameterPlacement the http parameter placement to translate to the extensions-api enum.
+   * @return the corresponding http parameter placement from the extensions-api that derives the given one.
+   */
   public static HttpParameterPlacement from(org.mule.sdk.api.runtime.parameter.HttpParameterPlacement parameterPlacement) {
     switch (parameterPlacement) {
       case QUERY_PARAMS:
