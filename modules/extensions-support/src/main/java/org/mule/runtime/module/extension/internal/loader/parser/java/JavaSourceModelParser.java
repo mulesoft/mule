@@ -19,11 +19,9 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.Java
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getSourceParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forSource;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.source.JavaSourceModelParserUtils.fromLegacySourceClusterSupport;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.source.JavaSourceModelParserUtils.fromSdkBackPressureMode;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.source.JavaParserSourceUtils.fromLegacySourceClusterSupport;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.source.JavaParserSourceUtils.fromSdkBackPressureMode;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getSourceAttributesType;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getSourceOutputType;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_ALL_NODES;
@@ -41,9 +39,9 @@ import org.mule.runtime.extension.api.annotation.source.ClusterSupport;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.extension.api.property.SourceClusterSupportModelProperty;
 import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
-import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
@@ -270,7 +268,7 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
                                                                                               new LinkedHashSet<BackPressureMode>(sdkAnnotation
                                                                                                   .getEnumArrayValue(org.mule.sdk.api.annotation.source.BackPressure::supportedModes)
                                                                                                   .stream()
-                                                                                                  .map(JavaParserSourceUtils::fromSdkBackPressureMode)
+                                                                                                  .map(JavaSourceModelParserUtils::fromSdkBackPressureMode)
                                                                                                   .collect(toList()))));
   }
 
