@@ -7,6 +7,7 @@
 
 package org.mule.runtime.deployment.model.internal.artifact.extension;
 
+import static com.google.common.collect.Maps.newHashMap;
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Objects.requireNonNull;
@@ -14,25 +15,18 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.DESCRIBER_ID;
-import static org.mule.runtime.module.extension.api.loader.java.CraftedExtensionModelLoader.CRAFTED_LOADER_ID;
-import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.plugin.LoaderDescriber;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.extension.api.loader.java.CraftedExtensionModelLoader;
-import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -49,16 +43,12 @@ import org.slf4j.Logger;
 public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderManager {
 
   private static final Logger LOGGER = getLogger(MuleExtensionModelLoaderManager.class);
+
   private static final Class<ExtensionModelLoader> PROVIDER_CLASS = ExtensionModelLoader.class;
 
-  private final Map<String, ExtensionModelLoader> extensionModelLoaders = new SmallMap<>();
-  private Supplier<Collection<ExtensionModelLoader>> extModelLoadersLookup = Collections::emptyList;
+  private final Map<String, ExtensionModelLoader> extensionModelLoaders = newHashMap();
 
-  public MuleExtensionModelLoaderManager() {
-    extensionModelLoaders.put(JAVA_LOADER_ID, new DefaultJavaExtensionModelLoader());
-    extensionModelLoaders.put(CRAFTED_LOADER_ID, new CraftedExtensionModelLoader());
-    extensionModelLoaders.put(DESCRIBER_ID, new XmlExtensionModelLoader());
-  }
+  private Supplier<Collection<ExtensionModelLoader>> extModelLoadersLookup;
 
   /**
    * Creates an instance of the manager.
@@ -66,7 +56,6 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
    * @param containerClassLoader {@link ClassLoader} from the container.
    */
   public MuleExtensionModelLoaderManager(ArtifactClassLoader containerClassLoader) {
-    this();
     requireNonNull(containerClassLoader, "containerClassLoader cannot be null");
     this.extModelLoadersLookup =
         () -> new SpiServiceRegistry().lookupProviders(PROVIDER_CLASS, containerClassLoader.getClassLoader());
@@ -93,7 +82,7 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
   @Override
   public void start() throws MuleException {
     final Collection<ExtensionModelLoader> extensionModelLoaders = extModelLoadersLookup.get();
-    validateLoaderLookupUniqueness(extensionModelLoaders);
+    assertLoaderLookupUniqueness(extensionModelLoaders);
 
     extensionModelLoaders.forEach(loader -> this.extensionModelLoaders.put(loader.getId(), loader));
 
@@ -102,7 +91,7 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
     }
   }
 
-  private void validateLoaderLookupUniqueness(Collection<ExtensionModelLoader> extensionModelLoaders) {
+  private void assertLoaderLookupUniqueness(Collection<ExtensionModelLoader> extensionModelLoaders) {
     final StringBuilder sb = new StringBuilder();
     extensionModelLoaders.stream().collect(groupingBy(ExtensionModelLoader::getId))
         .entrySet().stream().filter(entry -> entry.getValue().size() > 1)
@@ -115,7 +104,7 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
                    sb.append(lineSeparator()).append("ID [").append(entry.getKey())
                        .append("] is being returned by the following classes [").append(classes).append("]");
                  });
-    if (sb.length() > 0) {
+    if (isNotBlank(sb.toString())) {
       throw new MuleRuntimeException(createStaticMessage(format(
                                                                 "There are several loaders that return the same identifier when looking up providers for '%s'. Full error list: %s",
                                                                 PROVIDER_CLASS.getName(), sb)));

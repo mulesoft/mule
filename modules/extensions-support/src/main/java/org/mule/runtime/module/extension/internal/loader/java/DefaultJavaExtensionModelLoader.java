@@ -6,15 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
-
-import org.mule.runtime.extension.api.loader.DeclarationEnricher;
-import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.java.enricher.CustomStaticTypeDeclarationEnricher;
-
-import java.util.List;
-
 /**
  * Loads an extension by introspecting a class which uses the Extensions API annotations
  *
@@ -24,18 +15,7 @@ public class DefaultJavaExtensionModelLoader extends AbstractJavaExtensionModelL
 
   public static final String JAVA_LOADER_ID = "java";
 
-  private final List<DeclarationEnricher> customEnrichers = unmodifiableList(asList(new CustomStaticTypeDeclarationEnricher()));
-
   public DefaultJavaExtensionModelLoader() {
     super(JAVA_LOADER_ID);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected void configureContextBeforeDeclaration(ExtensionLoadingContext context) {
-    super.configureContextBeforeDeclaration(context);
-    context.addCustomDeclarationEnrichers(customEnrichers);
   }
 }
