@@ -35,7 +35,7 @@ import static org.mule.test.metadata.extension.resolver.TestOutputAnyTypeResolve
 import static org.mule.test.metadata.extension.resolver.TestOutputResolverWithKeyResolver.TEST_OUTPUT_RESOLVER_WITH_KEY_RESOLVER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.declarerFor;
+import static org.mule.test.module.extension.internal.util.ExtensionDeclarationTestUtils.declarerFor;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
 import org.mule.metadata.api.model.MetadataType;

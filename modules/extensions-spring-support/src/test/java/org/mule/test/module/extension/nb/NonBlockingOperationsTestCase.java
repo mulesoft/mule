@@ -37,10 +37,9 @@ import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import java.util.HashSet;
 import java.util.Set;
 
+import io.qameta.allure.Issue;
 import org.junit.Rule;
 import org.junit.Test;
-
-import io.qameta.allure.Issue;
 
 public class NonBlockingOperationsTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -99,7 +98,7 @@ public class NonBlockingOperationsTestCase extends AbstractExtensionFunctionalTe
     probe(1000, 1000, () -> FLIGHT_PLAN.equals(ironMan.getFlightPlan()));
   }
 
-  private IronMan getIronMan(String name) throws Exception {
+  private IronMan getIronMan(String name) {
     CoreEvent initialiserEvent = null;
     try {
       initialiserEvent = getInitialiserEvent(muleContext);

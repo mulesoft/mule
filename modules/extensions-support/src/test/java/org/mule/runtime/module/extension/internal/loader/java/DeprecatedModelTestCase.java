@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.declarerFor;
+import static org.mule.test.module.extension.internal.util.ExtensionDeclarationTestUtils.declarerFor;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;

@@ -22,7 +22,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.NAME_PARAM_DESCR
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.declarerFor;
+import static org.mule.test.module.extension.internal.util.ExtensionDeclarationTestUtils.declarerFor;
 
 import org.mule.runtime.api.meta.DescribedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -238,7 +238,7 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
 
         assertThat(extension, instanceOf(TypeElement.class));
         ctx = new DefaultExtensionLoadingContext(currentThread().getContextClassLoader(), getDefault(emptySet()));
-        declarerFor(extensionClass, "1.0.0-dev", ctx);
+        declaration = declarerFor(extensionClass, "1.0.0-dev", ctx).getDeclaration();
         documenter.document(declaration, (TypeElement) extension);
       }
       return false;

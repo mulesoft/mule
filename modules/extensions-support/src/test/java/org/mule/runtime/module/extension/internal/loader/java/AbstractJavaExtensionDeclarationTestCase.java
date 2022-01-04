@@ -29,7 +29,7 @@ import org.mule.runtime.extension.api.declaration.type.RedeliveryPolicyTypeBuild
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
+import org.mule.test.module.extension.internal.util.ExtensionDeclarationTestUtils;
 
 import java.util.List;
 
@@ -46,11 +46,11 @@ public abstract class AbstractJavaExtensionDeclarationTestCase extends AbstractM
   }
 
   protected ExtensionDeclarer declarerFor(final Class<?> type) {
-    return ExtensionsTestUtils.declarerFor(type, getProductVersion());
+    return ExtensionDeclarationTestUtils.declarerFor(type, getProductVersion());
   }
 
   protected ExtensionDeclarer declarerFor(final Class<?> type, String version) {
-    return ExtensionsTestUtils.declarerFor(type, version);
+    return ExtensionDeclarationTestUtils.declarerFor(type, version);
   }
 
   protected ExtensionDeclarer declarerFor(Class<?> type, ExtensionLoadingContext ctx) {
@@ -58,7 +58,7 @@ public abstract class AbstractJavaExtensionDeclarationTestCase extends AbstractM
   }
 
   protected ExtensionDeclarer declarerFor(Class<?> type, String version, ExtensionLoadingContext ctx) {
-    return ExtensionsTestUtils.declarerFor(type, version, ctx);
+    return ExtensionDeclarationTestUtils.declarerFor(type, version, ctx);
   }
 
   protected ExtensionDeclarer declareExtension() {
