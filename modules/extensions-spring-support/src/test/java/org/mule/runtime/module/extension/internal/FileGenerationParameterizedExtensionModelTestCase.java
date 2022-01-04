@@ -66,7 +66,7 @@ public abstract class FileGenerationParameterizedExtensionModelTestCase extends 
 
         for (root = root.getParentFile(); !root.getName().equals("target"); root = root.getParentFile());
         root = root.getParentFile();
-        
+
         File testDir = new File(root, "src/test/resources/" + getExpectedFilesDir());
         File target = new File(testDir, expectedFilePath);
         stringToFile(target.getAbsolutePath(), actual);
