@@ -105,6 +105,9 @@
                 <parameter name="streamingStrategy">
                     <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
                 </parameter>
+                <parameter name="redeliveryPolicy">
+                    <description><![CDATA[Defines a policy for processing the redelivery of the same message]]></description>
+                </parameter>
             </parameters>
         </source>
     </sources>
