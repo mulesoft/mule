@@ -67,6 +67,8 @@ public class MVELExpressionLanguageObjectFactory extends AbstractComponentFactor
       mvel.setImports(importsMap);
     }
 
+    // Refresh with the updated bindings
+    mvel.initialise();
     return mvel;
   }
 }

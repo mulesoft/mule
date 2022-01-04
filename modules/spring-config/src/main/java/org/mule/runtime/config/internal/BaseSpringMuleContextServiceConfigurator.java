@@ -7,17 +7,22 @@
 package org.mule.runtime.config.internal;
 
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_POOLS_CONFIG;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
+import org.mule.runtime.api.scheduler.SchedulerContainerPoolsConfig;
 import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
+import org.mule.runtime.core.internal.profiling.NoOpProfilingService;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
 import java.util.Map;
@@ -63,6 +68,12 @@ class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContext
     final ContributedErrorTypeLocator contributedErrorTypeLocator = new ContributedErrorTypeLocator();
     contributedErrorTypeLocator.setDelegate(createDefaultErrorTypeLocator(contributedErrorTypeRepository));
     registerConstantBeanDefinition(ErrorTypeLocator.class.getName(), contributedErrorTypeLocator);
+
+    registerBeanDefinition(OBJECT_SCHEDULER_POOLS_CONFIG,
+                           getConstantObjectBeanDefinition(SchedulerContainerPoolsConfig.getInstance()));
+    registerBeanDefinition(OBJECT_SCHEDULER_BASE_CONFIG, getBeanDefinition(SchedulerBaseConfigFactory.class));
+
+    registerBeanDefinition(MULE_PROFILING_SERVICE_KEY, getBeanDefinition(NoOpProfilingService.class));
 
     createRuntimeServices();
     absorbOriginalRegistry();
