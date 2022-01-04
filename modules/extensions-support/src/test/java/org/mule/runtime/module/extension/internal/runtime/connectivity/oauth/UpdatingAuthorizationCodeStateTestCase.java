@@ -15,7 +15,6 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,7 +47,6 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
   private static final String REFRESH_TOKEN = "myRefreshToken";
   private static final String NEW_TOKEN = "newToken";
   private static final String NEW_REFRESH_TOKEN = "newRefresh";
-  private static final String RESOURCE_OWNER_ID = "id";
 
   private AuthorizationCodeConfig oAuthConfig;
 
@@ -70,15 +68,13 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
                                               emptyMap(),
                                               new AuthorizationCodeGrantType("url", "url", "#[s]", "reg", "#[x]", "sd"),
                                               mock(OAuthCallbackConfig.class),
-                                              "key", "secret", "url", "url", "scope", RESOURCE_OWNER_ID, null, null);
+                                              "key", "secret", "url", "url", "scope", "id", null, null);
 
     when(initialContext.getAccessToken()).thenReturn(ACCESS_TOKEN);
     when(initialContext.getRefreshToken()).thenReturn(REFRESH_TOKEN);
-    when(initialContext.getResourceOwnerId()).thenReturn(RESOURCE_OWNER_ID);
 
     when(refreshedContext.getAccessToken()).thenReturn(NEW_TOKEN);
     when(refreshedContext.getRefreshToken()).thenReturn(NEW_REFRESH_TOKEN);
-    when(refreshedContext.getResourceOwnerId()).thenReturn(RESOURCE_OWNER_ID);
   }
 
   @Test
@@ -91,7 +87,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
                                                                               initialContext,
                                                                               newContext::set);
 
-    verify(dancer).addListener(anyString(), listenerCaptor.capture());
+    verify(dancer).addListener(listenerCaptor.capture());
 
     assertThat(state.getAccessToken(), equalTo(ACCESS_TOKEN));
     assertThat(state.getRefreshToken().get(), equalTo(REFRESH_TOKEN));
@@ -110,7 +106,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
                                                                               initialContext,
                                                                               newContext::set);
 
-    verify(dancer).addListener(anyString(), listenerCaptor.capture());
+    verify(dancer).addListener(listenerCaptor.capture());
 
     assertThat(state.getAccessToken(), equalTo(ACCESS_TOKEN));
     assertThat(state.getRefreshToken().get(), equalTo(REFRESH_TOKEN));
@@ -138,7 +134,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
                                                                               initialContext,
                                                                               newContext::set);
 
-    verify(dancer).addListener(anyString(), listenerCaptor.capture());
+    verify(dancer).addListener(listenerCaptor.capture());
 
     assertThat(state.getAccessToken(), equalTo(ACCESS_TOKEN));
     assertThat(state.getRefreshToken().get(), equalTo(REFRESH_TOKEN));
@@ -167,7 +163,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
                                                                               initialContext,
                                                                               newContext::set);
 
-    verify(dancer).addListener(anyString(), listenerCaptor.capture());
+    verify(dancer).addListener(listenerCaptor.capture());
 
     assertThat(state.getAccessToken(), equalTo(ACCESS_TOKEN));
     assertThat(state.getRefreshToken().get(), equalTo(REFRESH_TOKEN));
