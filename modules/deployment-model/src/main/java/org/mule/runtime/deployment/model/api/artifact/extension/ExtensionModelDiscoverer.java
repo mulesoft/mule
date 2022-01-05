@@ -6,17 +6,14 @@
  */
 package org.mule.runtime.deployment.model.api.artifact.extension;
 
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
-
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.synchronizedSet;
 import static java.util.stream.Collectors.toSet;
-
-import static com.google.common.collect.ImmutableSet.of;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -38,7 +35,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
-
 import org.jgrapht.alg.TransitiveReduction;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
@@ -49,8 +45,6 @@ import org.jgrapht.graph.SimpleDirectedGraph;
  * @since 4.0
  */
 public class ExtensionModelDiscoverer {
-
-  private static final Set<String> LOADER_IDS_NOT_REQUIRING_DEPENDENCIES_DSL = of("crafted", "java", "soap");
 
   /**
    * For each artifactPlugin discovers the {@link ExtensionModel}.

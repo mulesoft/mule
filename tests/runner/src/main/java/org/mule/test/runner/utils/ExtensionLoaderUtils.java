@@ -10,21 +10,14 @@ import static java.lang.Thread.currentThread;
 
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
 
 public class ExtensionLoaderUtils {
 
   public static ExtensionModelLoader getLoaderById(String id) {
-    final SpiServiceRegistry registry = new SpiServiceRegistry();
-    final List<ExtensionModelLoader> extensionModelLoaders = new ArrayList<>(5);
-
-    extensionModelLoaders
-        .addAll(registry.lookupProviders(ExtensionModelLoader.class, ExtensionModelLoader.class.getClassLoader()));
-    extensionModelLoaders.addAll(registry.lookupProviders(ExtensionModelLoader.class, currentThread().getContextClassLoader()));
-
-    return extensionModelLoaders.stream()
+    return new SpiServiceRegistry().lookupProviders(ExtensionModelLoaderProvider.class, currentThread().getContextClassLoader())
+        .stream()
+        .flatMap(p -> p.getExtensionModelLoaders().stream())
         .filter(extensionModelLoader -> extensionModelLoader.getId().equals(id))
         .findAny()
         .orElseThrow(() -> new RuntimeException("No loader found for id:{" + id + "}"));
