@@ -130,7 +130,6 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
               return;
             }
 
-            enrichOAuthParameters(declaration);
           });
         }
       }.walk(extensionDeclaration);
@@ -144,12 +143,6 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
 
       OperationDeclaration unauthorize = buildUnauthorizeOperation(supportsAuthCode.get());
       configs.forEach(c -> c.addOperation(unauthorize));
-    }
-
-    private void enrichOAuthParameters(ConnectionProviderDeclaration declaration) {
-      declaration.getAllParameters().forEach(p -> p.getModelProperty(OAuthParameterModelProperty.class).ifPresent(
-                                                                                                                  oAuthParameterModelProperty -> p
-                                                                                                                      .setExpressionSupport(NOT_SUPPORTED)));
     }
 
 

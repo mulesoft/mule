@@ -14,7 +14,6 @@ import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.oauth.OAuthCallbackValuesModelProperty;
 
 import java.util.List;
 import java.util.Optional;
