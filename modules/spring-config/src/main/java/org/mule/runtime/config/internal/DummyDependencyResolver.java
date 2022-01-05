@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal;
 
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.registry.BeanDependencyResolver;
 import org.mule.runtime.config.internal.registry.SpringContextRegistry;
@@ -58,6 +59,20 @@ public class DummyDependencyResolver implements BeanDependencyResolver {
         .map(DependencyNode::getValue)
         .collect(toList());
   }
+
+  public List<Pair<Object, String>> resolveBeanDependencies(String beanName, boolean includeBeanName) {
+    Object currentObject = springRegistry.get(beanName);
+    final DependencyNode currentNode = new DependencyNode(currentObject, beanName);
+
+    addDirectDependency(beanName, currentObject, currentNode);
+
+    return currentNode.getChildren()
+        .stream()
+        .map(DependencyNode::getObjectKeyPair)
+        .collect(toList());
+  }
+
+
 
   private void addDirectDependency(String key, Object currentObject, DependencyNode currentNode) {
     addDirectDependency(key, currentObject, currentNode, processedKey);
@@ -125,7 +140,8 @@ public class DummyDependencyResolver implements BeanDependencyResolver {
   private void addDirectChild(DependencyNode parent, String key, Object childObject, Set<String> processedKeys) {
     if (!processedKeys.add(key))
       return; // A relies on B, D, E, G and new
-    DependencyNode childNode = new DependencyNode(childObject);
+    // DependencyNode childNode = new DependencyNode(childObject);
+    DependencyNode childNode = new DependencyNode(childObject, key);
     parent.addChild(childNode);
 
   }

@@ -11,6 +11,7 @@ import java.util.Objects;
 public class VertexWrapper {
 
   Object originalObject;
+  String beanName;
 
   public VertexWrapper(Object o) {
     Objects.requireNonNull(o, "bean should not be null");
@@ -21,7 +22,7 @@ public class VertexWrapper {
     return originalObject;
   }
 
-  @Override // command + n : auto generate shortcut (getter,setter, etc)
+  @Override
   public boolean equals(Object obj) {
     if (originalObject.equals(obj))
       return true;
