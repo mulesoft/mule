@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.extension.api.loader.xml;
+package org.mule.runtime.extension.internal.loader;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -18,7 +18,6 @@ import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
-import org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate;
 import org.mule.runtime.extension.internal.loader.enricher.StereotypesDiscoveryDeclarationEnricher;
 import org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator;
 import org.mule.runtime.extension.internal.loader.validator.ForbiddenConfigurationPropertiesValidator;
