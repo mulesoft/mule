@@ -18,12 +18,10 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.extension.api.annotation.connectivity.oauth.AuthorizationCode;
-import org.mule.runtime.extension.api.annotation.connectivity.oauth.ClientCredentials;
+import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsState;
-import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
@@ -31,7 +29,6 @@ import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -59,7 +56,8 @@ public class OAuthConnectionProviderModelValidator implements ExtensionModelVali
         Optional<OAuthModelProperty> optionalOAuthModelProperty = model.getModelProperty(OAuthModelProperty.class);
 
         boolean supportsAuthCode = optionalOAuthModelProperty.map(oAuthModelProperty -> oAuthModelProperty.getGrantTypes()
-            .stream().filter(oAuthGrantType -> oAuthGrantType instanceof OAuthGrantType).findFirst().isPresent()).orElse(false);
+            .stream().filter(oAuthGrantType -> oAuthGrantType instanceof AuthorizationCodeGrantType).findFirst().isPresent())
+            .orElse(false);
 
         boolean supportsClientCredentials = optionalOAuthModelProperty
             .map(oAuthModelProperty -> oAuthModelProperty.getGrantTypes().stream()
