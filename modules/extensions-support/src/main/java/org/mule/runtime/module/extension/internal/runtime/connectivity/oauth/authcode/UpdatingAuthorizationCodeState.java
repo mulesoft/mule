@@ -31,7 +31,7 @@ public class UpdatingAuthorizationCodeState implements AuthorizationCodeState {
                                         ResourceOwnerOAuthContext initialContext,
                                         Consumer<ResourceOwnerOAuthContext> onUpdate) {
     delegate = toAuthorizationCodeState(config, initialContext);
-    dancer.addListener(new AuthorizationCodeListener() {
+    dancer.addListener(initialContext.getResourceOwnerId(), new AuthorizationCodeListener() {
 
       @Override
       public void onAuthorizationCompleted(ResourceOwnerOAuthContext context) {
