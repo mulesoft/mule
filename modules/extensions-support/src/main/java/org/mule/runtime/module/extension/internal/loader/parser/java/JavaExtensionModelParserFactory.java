@@ -41,8 +41,16 @@ public class JavaExtensionModelParserFactory implements ExtensionModelParserFact
             throw new IllegalArgumentException("Unsupported declaration class type: " + type.getClass().getName());
           }
         })
-        .orElseGet(() -> context.<Class<?>>getParameter(EXTENSION_TYPE)
-            .map(type -> new ExtensionTypeWrapper(type, getDefault().createTypeLoader()))
+        .orElseGet(() -> context.getParameter(EXTENSION_TYPE)
+            .map(type -> {
+              if (type instanceof ExtensionTypeWrapper) {
+                return (ExtensionTypeWrapper) type;
+              } else if (type instanceof Class) {
+                return new ExtensionTypeWrapper((Class) type, getDefault().createTypeLoader());
+              } else {
+                throw new IllegalArgumentException("Unsupported extension type: " + type);
+              }
+            })
             .orElseGet(() -> {
               String type = (String) context.getParameter(TYPE_PROPERTY_NAME).get();
               try {
