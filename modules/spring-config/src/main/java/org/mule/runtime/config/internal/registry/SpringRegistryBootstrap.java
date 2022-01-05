@@ -13,7 +13,6 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
-import org.mule.runtime.config.internal.OptionalObjectsController;
 import org.mule.runtime.config.internal.factories.BootstrapObjectFactoryBean;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.core.api.MuleContext;

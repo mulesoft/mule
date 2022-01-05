@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.config.internal.processor;
 
-import java.beans.PropertyDescriptor;
+import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 
-import org.mule.runtime.config.internal.OptionalObjectsController;
+import java.beans.PropertyDescriptor;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;

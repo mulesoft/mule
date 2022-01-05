@@ -41,12 +41,19 @@ import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.config.api.ArtifactContextFactory;
 import org.mule.runtime.config.internal.artifact.SpringArtifactContext;
 import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
+import org.mule.runtime.config.internal.context.BaseMuleArtifactContext;
+import org.mule.runtime.config.internal.context.MuleArtifactContext;
+import org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.StaticConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
+import org.mule.runtime.config.internal.model.ComponentModelInitializer;
 import org.mule.runtime.config.internal.registry.BaseSpringRegistry;
+import org.mule.runtime.config.internal.registry.CompositeOptionalObjectsController;
+import org.mule.runtime.config.internal.registry.DefaultOptionalObjectsController;
+import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.config.internal.registry.SpringRegistry;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -187,8 +194,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   }
 
   private BaseMuleArtifactContext createBaseContext(MuleContext muleContext,
-                                                      OptionalObjectsController applicationObjectController,
-                                                      Optional<ConfigurationProperties> parentConfigurationProperties) {
+                                                    OptionalObjectsController applicationObjectController,
+                                                    Optional<ConfigurationProperties> parentConfigurationProperties) {
     final BaseMuleArtifactContext baseMuleArtifactContext = new BaseMuleArtifactContext(muleContext,
                                                                                         applicationObjectController,
                                                                                         parentConfigurationProperties,

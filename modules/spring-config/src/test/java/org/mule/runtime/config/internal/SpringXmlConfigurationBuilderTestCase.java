@@ -7,7 +7,7 @@
 package org.mule.runtime.config.internal;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
-import static org.mule.runtime.config.internal.BaseSpringMuleContextServiceConfigurator.DIABLE_EXPRESSIONS_SUPPORT;
+import static org.mule.runtime.config.internal.context.BaseSpringMuleContextServiceConfigurator.DIABLE_EXPRESSIONS_SUPPORT;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
