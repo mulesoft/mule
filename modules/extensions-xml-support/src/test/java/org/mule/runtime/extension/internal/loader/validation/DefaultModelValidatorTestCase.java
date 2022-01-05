@@ -18,7 +18,7 @@ import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.TARGET_TYPE;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
-import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
+import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator.EMPTY_TYPE_FORMAT_MESSAGE;
 import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator.TYPE_RAISE_ERROR_ATTRIBUTE;
 import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator.WRONG_VALUE_FORMAT_MESSAGE;
@@ -31,7 +31,7 @@ import static org.mule.runtime.module.extension.internal.loader.java.AbstractJav
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
+import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;

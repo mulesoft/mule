@@ -10,12 +10,12 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
-import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
-import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.VALIDATE_XML;
+import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
+import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.VALIDATE_XML;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
+import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
 import org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

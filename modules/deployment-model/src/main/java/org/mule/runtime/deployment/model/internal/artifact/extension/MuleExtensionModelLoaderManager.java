@@ -15,6 +15,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -24,6 +25,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.plugin.LoaderDescriber;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
 import java.util.Collection;
@@ -44,7 +46,7 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
 
   private static final Logger LOGGER = getLogger(MuleExtensionModelLoaderManager.class);
 
-  private static final Class<ExtensionModelLoader> PROVIDER_CLASS = ExtensionModelLoader.class;
+  private static final Class<ExtensionModelLoaderProvider> PROVIDER_CLASS = ExtensionModelLoaderProvider.class;
 
   private final Map<String, ExtensionModelLoader> extensionModelLoaders = newHashMap();
 
@@ -57,8 +59,13 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
    */
   public MuleExtensionModelLoaderManager(ArtifactClassLoader containerClassLoader) {
     requireNonNull(containerClassLoader, "containerClassLoader cannot be null");
-    this.extModelLoadersLookup =
-        () -> new SpiServiceRegistry().lookupProviders(PROVIDER_CLASS, containerClassLoader.getClassLoader());
+    this.extModelLoadersLookup = () -> lookupLoadersFromSpi(containerClassLoader);
+  }
+
+  private Collection<ExtensionModelLoader> lookupLoadersFromSpi(ArtifactClassLoader containerClassLoader) {
+    return new SpiServiceRegistry().lookupProviders(PROVIDER_CLASS, containerClassLoader.getClassLoader()).stream()
+        .flatMap(provider -> provider.getExtensionModelLoaders().stream())
+        .collect(toList());
   }
 
   public void setExtensionModelLoadersLookup(Supplier<Collection<ExtensionModelLoader>> extModelLoadersLookup) {
@@ -130,5 +137,4 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
   public String toString() {
     return format("%s[extensionModelLoaders=%s]", getClass().getName(), printExtensionModelLoaderIDs());
   }
-
 }
