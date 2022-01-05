@@ -438,7 +438,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("timeZone", fromSimpleParameter("timeZone").build()).build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("configuration")
-        .withTypeDefinition(fromType(MuleConfiguration.class)).withObjectFactoryType(MuleConfigurationConfigurator.class)
+        .withTypeDefinition(fromType(MuleConfiguration.class))
+        .withObjectFactoryType(MuleConfigurationConfigurator.class)
         .withSetterParameterDefinition("defaultErrorHandlerName",
                                        fromSimpleParameter("defaultErrorHandler-ref").build())
         .withSetterParameterDefinition("defaultResponseTimeout", fromSimpleParameter("defaultResponseTimeout").build())
