@@ -1,4 +1,18 @@
 {
+  "4.5.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader",
+          "package": "org.mule.runtime.extension.api.loader.xml",
+          "classSimpleName": "XmlExtensionModelLoader",
+          "elementKind": "class",
+          "justification": "API is impossible to implement nor consume"
+        }
+      ]
+    }
+  },
   "4.1.3": {
     "revapi": {
       "ignore": [

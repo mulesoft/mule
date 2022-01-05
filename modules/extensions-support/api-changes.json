@@ -33,6 +33,14 @@
           "classSimpleName": "DefaultJavaExtensionModelLoader",
           "elementKind": "class",
           "justification": "API is impossible to implement nor consume"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.extension.api.loader.java.CraftedExtensionModelLoader",
+          "package": "org.mule.runtime.module.extension.api.loader.java",
+          "classSimpleName": "CraftedExtensionModelLoader",
+          "elementKind": "class",
+          "justification": "API is impossible to implement nor consume"
         }
       ]
     }
