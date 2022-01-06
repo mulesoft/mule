@@ -17,6 +17,7 @@ import org.mule.runtime.api.memory.provider.ByteBufferProvider;
 import org.mule.runtime.api.memory.provider.type.ByteBufferType;
 
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,7 +30,7 @@ public class DefaultMemoryManagementService implements MemoryManagementService {
 
   private static final DefaultMemoryManagementService INSTANCE = new DefaultMemoryManagementService();
 
-  private final Map<String, ByteBufferProvider<ByteBuffer>> byteBufferProviders = new ConcurrentHashMap<>();
+  private final Map<String, ByteBufferProvider<ByteBuffer>> byteBufferProviders = new HashMap<>();
 
   public static DefaultMemoryManagementService getInstance() {
     return INSTANCE;
@@ -49,8 +50,8 @@ public class DefaultMemoryManagementService implements MemoryManagementService {
   }
 
   @Override
-  public ByteBufferProvider<ByteBuffer> getByteBufferProvider(String name, ByteBufferType byteBufferType,
-                                                              ByteBufferPoolConfiguration poolConfiguration) {
+  public synchronized ByteBufferProvider<ByteBuffer> getByteBufferProvider(String name, ByteBufferType byteBufferType,
+                                                                           ByteBufferPoolConfiguration poolConfiguration) {
     if (byteBufferProviders.containsKey(name)) {
       throw new IllegalArgumentException(format(DUPLICATE_BYTE_BUFFER_PROVIDER_NAME, name));
     }
@@ -62,7 +63,7 @@ public class DefaultMemoryManagementService implements MemoryManagementService {
   }
 
   @Override
-  public ByteBufferProvider<ByteBuffer> getByteBufferProvider(String name, ByteBufferType byteBufferType) {
+  public synchronized ByteBufferProvider<ByteBuffer> getByteBufferProvider(String name, ByteBufferType byteBufferType) {
     if (byteBufferProviders.containsKey(name)) {
       throw new IllegalArgumentException(format(DUPLICATE_BYTE_BUFFER_PROVIDER_NAME, name));
     }
