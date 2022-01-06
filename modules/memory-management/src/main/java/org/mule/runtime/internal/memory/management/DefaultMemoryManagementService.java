@@ -55,13 +55,10 @@ public class DefaultMemoryManagementService implements MemoryManagementService {
       throw new IllegalArgumentException(format(DUPLICATE_BYTE_BUFFER_PROVIDER_NAME, name));
     }
 
-    ByteBufferProvider<ByteBuffer> byteBufferProvider = buildByteBufferProviderFrom(byteBufferType)
+    return byteBufferProviders.computeIfAbsent(name, n -> buildByteBufferProviderFrom(byteBufferType)
         .withPoolConfiguration(poolConfiguration)
-        .build();
+        .build());
 
-    byteBufferProviders.put(name, byteBufferProvider);
-
-    return byteBufferProvider;
   }
 
   @Override
