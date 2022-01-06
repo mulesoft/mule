@@ -10,12 +10,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mule.util.xmlsecurity.XMLSecureFactories.EXTERNAL_ENTITIES_PROPERTY;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -30,6 +32,10 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXParseException;
 
 import org.mule.util.IOUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -109,6 +115,45 @@ public class SchemaValidationTestCase extends AbstractMuleTestCase
         filter.setErrorHandler(errorHandler);
         assertThat(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream(INVALID_XML_FILE), muleContext)), is(false));
         assertThat(errorHandler.exception, is(notNullValue()));
+    }
+
+    @Test
+    public void testConcurrentSchemaValidationFilterCreation() throws InterruptedException
+    {
+        int threadsNum = 5;
+        final AtomicInteger errors = new AtomicInteger();
+        List<Thread> threads = new ArrayList<>();
+        Runnable runnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                SchemaValidationFilter filter = new SchemaValidationFilter();
+                filter.setSchemaLocations(INCLUDE_SCHEMA);
+                try
+                {
+                    filter.initialise();
+                }
+                catch (InitialisationException e)
+                {
+                    errors.incrementAndGet();
+                }
+            }
+        };
+
+        for (int i = 0; i < threadsNum; i++)
+        {
+            Thread t = new Thread(runnable);
+            t.start();
+            threads.add(t);
+        }
+
+        for (Thread t : threads)
+        {
+            t.join();
+        }
+
+        assertEquals(0, errors.get());
     }
 
     private class TestErrorHandler implements ErrorHandler

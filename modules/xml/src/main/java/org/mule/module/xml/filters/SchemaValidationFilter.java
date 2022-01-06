@@ -45,6 +45,7 @@ import org.xml.sax.SAXException;
 public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter, Initialisable
 {
     public static final String DEFAULT_SCHEMA_LANGUAGE = "http://www.w3.org/2001/XMLSchema";
+    private static final Object schemaFactoryLock = new Object();
 
     protected transient Log logger = LogFactory.getLog(getClass());
     private String schemaLocations;
@@ -231,37 +232,40 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
 
                 schemas[i] = new StreamSource(schemaStream, IOUtils.getResourceAsUrl(split[i], getClass()).toString());
             }
-            
-            SchemaFactory schemaFactory = XMLSecureFactories.createDefault().getSchemaFactory(getSchemaLanguage());
 
-            if (logger.isInfoEnabled())
+            synchronized(schemaFactoryLock)
             {
-                logger.info("Schema factory implementation: " + schemaFactory);
-            }
+                SchemaFactory schemaFactory = XMLSecureFactories.createDefault().getSchemaFactory(getSchemaLanguage());
 
-            if (this.errorHandler != null)
-            {
-                schemaFactory.setErrorHandler(this.errorHandler);
-            }
+                if (logger.isInfoEnabled())
+                {
+                    logger.info("Schema factory implementation: " + schemaFactory);
+                }
 
-            if (this.resourceResolver == null)
-            {
-                this.resourceResolver = new MuleResourceResolver();
-            }
+                if (this.errorHandler != null)
+                {
+                    schemaFactory.setErrorHandler(this.errorHandler);
+                }
 
-            schemaFactory.setResourceResolver(this.resourceResolver);
+                if (this.resourceResolver == null)
+                {
+                    this.resourceResolver = new MuleResourceResolver();
+                }
 
-            Schema schema;
-            try
-            {
-                schema = schemaFactory.newSchema(schemas);
-            }
-            catch (SAXException e)
-            {
-                throw new InitialisationException(e, this);
-            }
+                schemaFactory.setResourceResolver(this.resourceResolver);
 
-            setSchemaObject(schema);
+                Schema schema;
+                try
+                {
+                    schema = schemaFactory.newSchema(schemas);
+                }
+                catch (SAXException e)
+                {
+                    throw new InitialisationException(e, this);
+                }
+
+                setSchemaObject(schema);
+            }
         }
 
         if (getSchemaObject() == null)
