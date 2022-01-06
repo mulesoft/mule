@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.config.internal;
+package org.mule.runtime.config.internal.context.service;
 
 import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isPublic;

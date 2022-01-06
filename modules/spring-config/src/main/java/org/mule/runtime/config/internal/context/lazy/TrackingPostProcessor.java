@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal;
+package org.mule.runtime.config.internal.context.lazy;
 
 import static org.mule.runtime.core.api.util.StringUtils.ifNotBlank;
 

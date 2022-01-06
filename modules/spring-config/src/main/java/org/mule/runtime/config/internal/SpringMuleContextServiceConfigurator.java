@@ -51,8 +51,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_RESOURCE_LO
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STATISTICS;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_GHOST_BUSTER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_FACTORY_LOCATOR;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
@@ -68,7 +66,6 @@ import static org.mule.runtime.feature.api.management.FeatureFlaggingManagementS
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.notification.ConnectionNotification;
@@ -88,7 +85,6 @@ import org.mule.runtime.api.notification.SecurityNotification;
 import org.mule.runtime.api.notification.SecurityNotificationListener;
 import org.mule.runtime.api.notification.TransactionNotification;
 import org.mule.runtime.api.notification.TransactionNotificationListener;
-import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.util.ResourceLocator;
 import org.mule.runtime.config.internal.NotificationConfig.EnabledNotificationConfig;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultComponentInitialStateManager;
@@ -105,10 +101,7 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.event.EventContextService;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
-import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.internal.cluster.DefaultClusterService;
-import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
 import org.mule.runtime.core.internal.config.DefaultFeatureManagementService;
 import org.mule.runtime.core.internal.connection.DefaultConnectivityTesterFactory;
@@ -133,7 +126,6 @@ import org.mule.runtime.core.internal.processor.interceptor.DefaultProcessorInte
 import org.mule.runtime.core.internal.profiling.ProfilingServiceWrapper;
 import org.mule.runtime.core.internal.registry.TypeBasedTransformerResolver;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
-import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 import org.mule.runtime.core.internal.time.LocalTimeSupplier;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.internal.transformer.DefaultTransformersRegistry;
@@ -237,8 +229,6 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
       .put(OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER, getBeanDefinition(MessageProcessingFlowTraceManager.class))
       .put(CONNECTIVITY_TESTING_SERVICE_KEY, getBeanDefinition(DefaultConnectivityTestingService.class))
       .put(OBJECT_COMPONENT_INITIAL_STATE_MANAGER, getBeanDefinition(DefaultComponentInitialStateManager.class))
-      .put(OBJECT_STREAMING_MANAGER, getBeanDefinition(DefaultStreamingManager.class))
-      .put(OBJECT_STREAMING_GHOST_BUSTER, getBeanDefinition(StreamingGhostBuster.class))
       .put(OBJECT_TRANSFORMATION_SERVICE, getBeanDefinition(ExtendedTransformationService.class))
       .put(OBJECT_TRANSFORMER_RESOLVER, getBeanDefinition(TypeBasedTransformerResolver.class))
       .put(OBJECT_TRANSFORMERS_REGISTRY, getBeanDefinition(DefaultTransformersRegistry.class))
@@ -292,7 +282,6 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
     registerConstantBeanDefinition(OBJECT_STATISTICS, muleContext.getStatistics());
     registerConstantBeanDefinition(OBJECT_RESOURCE_LOCATOR, resourceLocator);
     registerConstantBeanDefinition(MULE_MEMORY_MANAGEMENT_SERVICE, memoryManagementService);
-    loadServiceConfigurators();
 
     defaultContextServices.entrySet().stream()
         .filter(service -> !APPLICATION_ONLY_SERVICES.contains(service.getKey()) || artifactType.equals(APP)
@@ -303,34 +292,8 @@ class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServ
     createLocalObjectStoreBeanDefinitions();
     createLocalLockFactoryBeanDefinitions();
     createQueueManagerBeanDefinitions();
-    createCustomServices();
 
     artifactProperties.forEach((k, v) -> registerConstantBeanDefinition(k, v));
-  }
-
-  private void loadServiceConfigurators() {
-    new SpiServiceRegistry()
-        .lookupProviders(ServiceConfigurator.class, Service.class.getClassLoader())
-        .forEach(customizer -> customizer.configure(customServiceRegistry));
-  }
-
-  private void createCustomServices() {
-    final Map<String, CustomService> customServices = customServiceRegistry.getCustomServices();
-    for (String serviceName : customServices.keySet()) {
-
-      if (beanDefinitionRegistry.containsBeanDefinition(serviceName)) {
-        throw new IllegalStateException("There is already a bean definition registered with key: " + serviceName);
-      }
-
-      final CustomService customService = customServices.get(serviceName);
-
-      // TODO MULE-19927 avoid this filter
-      if (!isServiceRuntimeProvided(customService)) {
-        final BeanDefinition beanDefinition = getCustomServiceBeanDefinition(customService, serviceName);
-
-        registerBeanDefinition(serviceName, beanDefinition);
-      }
-    }
   }
 
   private void createQueueManagerBeanDefinitions() {

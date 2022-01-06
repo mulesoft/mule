@@ -61,7 +61,6 @@ import org.mule.runtime.config.api.dsl.ConfigurableInstanceFactory;
 import org.mule.runtime.config.api.dsl.ConfigurableObjectFactory;
 import org.mule.runtime.config.internal.CustomEncryptionStrategyDelegate;
 import org.mule.runtime.config.internal.CustomSecurityProviderDelegate;
-import org.mule.runtime.config.internal.MuleConfigurationConfigurator;
 import org.mule.runtime.config.internal.NotificationConfig;
 import org.mule.runtime.config.internal.ServerNotificationManagerConfigurator;
 import org.mule.runtime.config.internal.dsl.processor.EnvironmentPropertyObjectFactory;
@@ -75,6 +74,7 @@ import org.mule.runtime.config.internal.factories.EnrichedErrorMappingsFactoryBe
 import org.mule.runtime.config.internal.factories.ErrorHandlerFactoryBean;
 import org.mule.runtime.config.internal.factories.ExpirationPolicyObjectFactory;
 import org.mule.runtime.config.internal.factories.FlowRefFactoryBean;
+import org.mule.runtime.config.internal.factories.MuleConfigurationConfigurator;
 import org.mule.runtime.config.internal.factories.OnErrorFactoryBean;
 import org.mule.runtime.config.internal.factories.ProcessorExpressionRouteFactoryBean;
 import org.mule.runtime.config.internal.factories.ProcessorRouteFactoryBean;

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.internal;
 
-import static org.mule.runtime.config.internal.InjectParamsFromContextServiceProxy.createInjectProviderParamsServiceProxy;
+import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceProxy.createInjectProviderParamsServiceProxy;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 
 import static java.lang.reflect.Proxy.getInvocationHandler;
@@ -16,6 +16,7 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.service.Service;
+import org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceMethodInvoker;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.config.internal.factories.FixedTypeConstantFactoryBean;
 import org.mule.runtime.core.internal.config.CustomService;

@@ -11,6 +11,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceMethodInvoker;
 import org.mule.runtime.config.utils.Utils.AmbiguousAugmentedMethodService;
 import org.mule.runtime.config.utils.Utils.AugmentedMethodService;
 import org.mule.runtime.config.utils.Utils.AugmentedSubclassMethodService;
@@ -26,7 +27,6 @@ import org.mule.runtime.config.utils.Utils.MyBean;
 import org.mule.runtime.config.utils.Utils.MyPreferredBean;
 import org.mule.runtime.config.utils.Utils.NamedAugmentedMethodService;
 import org.mule.runtime.config.utils.Utils.OverloadedAugmentedMethodService;
-import org.mule.runtime.config.internal.InjectParamsFromContextServiceMethodInvoker;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -40,8 +40,9 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.config.internal.InjectParamsFromContextServiceMethodInvoker.MANY_CANDIDATES_ERROR_MSG_TEMPLATE;
-import static org.mule.runtime.config.internal.InjectParamsFromContextServiceMethodInvoker.NO_OBJECT_FOUND_FOR_PARAM;
+
+import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceMethodInvoker.MANY_CANDIDATES_ERROR_MSG_TEMPLATE;
+import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceMethodInvoker.NO_OBJECT_FOUND_FOR_PARAM;
 import static org.mule.runtime.config.utils.Utils.augmentedParam;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
 

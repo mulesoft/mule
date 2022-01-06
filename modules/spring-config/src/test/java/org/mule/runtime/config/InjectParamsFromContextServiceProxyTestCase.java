@@ -12,9 +12,10 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.config.internal.InjectParamsFromContextServiceProxy.MANY_CANDIDATES_ERROR_MSG_TEMPLATE;
-import static org.mule.runtime.config.internal.InjectParamsFromContextServiceProxy.NO_OBJECT_FOUND_FOR_PARAM;
-import static org.mule.runtime.config.internal.InjectParamsFromContextServiceProxy.createInjectProviderParamsServiceProxy;
+
+import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceProxy.MANY_CANDIDATES_ERROR_MSG_TEMPLATE;
+import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceProxy.NO_OBJECT_FOUND_FOR_PARAM;
+import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceProxy.createInjectProviderParamsServiceProxy;
 import static org.mule.runtime.config.utils.Utils.augmentedParam;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
 

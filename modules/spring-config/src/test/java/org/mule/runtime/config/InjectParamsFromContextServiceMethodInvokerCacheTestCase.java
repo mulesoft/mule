@@ -8,7 +8,7 @@ package org.mule.runtime.config;
 
 import org.junit.Test;
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.config.internal.InjectParamsFromContextServiceMethodInvoker;
+import org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceMethodInvoker;
 import org.mule.runtime.config.utils.Utils;
 import org.mule.runtime.config.utils.Utils.AugmentedMethodService;
 import org.mule.runtime.config.utils.Utils.BaseService;
