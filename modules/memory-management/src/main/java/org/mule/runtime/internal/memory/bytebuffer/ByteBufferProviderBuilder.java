@@ -6,12 +6,19 @@
  */
 package org.mule.runtime.internal.memory.bytebuffer;
 
+import static org.mule.runtime.api.memory.provider.type.ByteBufferType.DIRECT;
+
 import org.mule.runtime.api.memory.provider.ByteBufferPoolConfiguration;
 import org.mule.runtime.api.memory.provider.ByteBufferProvider;
 import org.mule.runtime.api.memory.provider.type.ByteBufferType;
 
 import java.nio.ByteBuffer;
 
+/**
+ * A Builder for a {@link ByteBufferProvider<ByteBuffer>}
+ *
+ * @since 4.5.0
+ */
 public class ByteBufferProviderBuilder {
 
   private final boolean isDirect;
@@ -25,7 +32,7 @@ public class ByteBufferProviderBuilder {
   }
 
   public static ByteBufferProviderBuilder buildByteBufferProviderFrom(ByteBufferType byteBufferType) {
-    return new ByteBufferProviderBuilder(byteBufferType.equals(ByteBufferType.DIRECT));
+    return new ByteBufferProviderBuilder(byteBufferType.equals(DIRECT));
   }
 
   public ByteBufferProvider<ByteBuffer> build() {
