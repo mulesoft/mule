@@ -958,6 +958,18 @@ public interface AllureConstants {
     }
   }
 
+  interface MemoryManagement {
+
+    String MEMORY_MANAGEMENT = "Memory Management";
+
+    interface MemoryManagementServiceStory {
+
+      String DEFAULT_MEMORY_MANAGEMENT_SERVICE = "Default Memory Management Service";
+
+      String BYTE_BUFFER_PROVIDER = "Byte Buffer Provider";
+    }
+  }
+
   interface ObjectTag {
 
     String OBJECT_TAG_FEATURE = "Object";
