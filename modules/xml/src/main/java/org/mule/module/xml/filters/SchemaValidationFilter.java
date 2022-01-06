@@ -45,7 +45,6 @@ import org.xml.sax.SAXException;
 public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter, Initialisable
 {
     public static final String DEFAULT_SCHEMA_LANGUAGE = "http://www.w3.org/2001/XMLSchema";
-    private static final Object schemaFactoryLock = new Object();
 
     protected transient Log logger = LogFactory.getLog(getClass());
     private String schemaLocations;
@@ -233,9 +232,12 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
                 schemas[i] = new StreamSource(schemaStream, IOUtils.getResourceAsUrl(split[i], getClass()).toString());
             }
 
-            synchronized(schemaFactoryLock)
+            SchemaFactory schemaFactory = XMLSecureFactories.createDefault().getSchemaFactory(getSchemaLanguage());
+            Schema schema;
+
+            // only one instance of the schema factory obtained exists, so it's safe to synchronize on it
+            synchronized(schemaFactory)
             {
-                SchemaFactory schemaFactory = XMLSecureFactories.createDefault().getSchemaFactory(getSchemaLanguage());
 
                 if (logger.isInfoEnabled())
                 {
@@ -253,8 +255,6 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
                 }
 
                 schemaFactory.setResourceResolver(this.resourceResolver);
-
-                Schema schema;
                 try
                 {
                     schema = schemaFactory.newSchema(schemas);
@@ -263,9 +263,9 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
                 {
                     throw new InitialisationException(e, this);
                 }
-
-                setSchemaObject(schema);
             }
+
+            setSchemaObject(schema);
         }
 
         if (getSchemaObject() == null)
