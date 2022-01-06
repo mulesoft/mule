@@ -53,17 +53,9 @@ public class OAuthConnectionProviderModelValidator implements ExtensionModelVali
           return;
         }
 
-        Optional<OAuthModelProperty> optionalOAuthModelProperty = model.getModelProperty(OAuthModelProperty.class);
+        boolean supportsAuthCode = supportsAuthorizationCode(model);
 
-        boolean supportsAuthCode = optionalOAuthModelProperty.map(oAuthModelProperty -> oAuthModelProperty.getGrantTypes()
-            .stream().filter(oAuthGrantType -> oAuthGrantType instanceof AuthorizationCodeGrantType).findFirst().isPresent())
-            .orElse(false);
-
-        boolean supportsClientCredentials = optionalOAuthModelProperty
-            .map(oAuthModelProperty -> oAuthModelProperty.getGrantTypes().stream()
-                .filter(oAuthGrantType -> oAuthGrantType instanceof ClientCredentialsGrantType).findFirst().isPresent())
-            .orElse(false);
-
+        boolean supportsClientCredentials = supportsClientCredentials(model);
 
         if (supportsAuthCode && supportsClientCredentials) {
           throw new IllegalConnectionProviderModelDefinitionException(format(
@@ -80,18 +72,23 @@ public class OAuthConnectionProviderModelValidator implements ExtensionModelVali
           validateStateField(implementingType, ClientCredentialsState.class, "client credentials");
         }
 
-        model
-            .getAllParameterModels().stream().filter(
-                                                     parameterModel -> parameterModel
-                                                         .getModelProperty(OAuthParameterModelProperty.class).isPresent())
-            .forEach(
-                     parameterModel -> parameterModel.getModelProperty(DeclaringMemberModelProperty.class)
-                         .map(DeclaringMemberModelProperty::getDeclaringField).ifPresent(field -> validateExpressionSupport(model,
-                                                                                                                            parameterModel,
-                                                                                                                            field,
-                                                                                                                            problemsReporter)));
+        validateOAuthParameters(model, problemsReporter);
       }
     }.walk(model);
+  }
+
+  private void validateOAuthParameters(ConnectionProviderModel connectionProviderModel, ProblemsReporter problemsReporter) {
+    connectionProviderModel
+        .getAllParameterModels().stream().filter(
+                                                 parameterModel -> parameterModel
+                                                     .getModelProperty(OAuthParameterModelProperty.class).isPresent())
+        .forEach(
+                 parameterModel -> parameterModel.getModelProperty(DeclaringMemberModelProperty.class)
+                     .map(DeclaringMemberModelProperty::getDeclaringField)
+                     .ifPresent(field -> validateExpressionSupport(connectionProviderModel,
+                                                                   parameterModel,
+                                                                   field,
+                                                                   problemsReporter)));
   }
 
   private void validateExpressionSupport(ConnectionProviderModel provider,
@@ -124,4 +121,19 @@ public class OAuthConnectionProviderModelValidator implements ExtensionModelVali
                                                                          stateFields.size()));
     }
   }
+
+  private boolean supportsAuthorizationCode(ConnectionProviderModel connectionProviderModel) {
+    return connectionProviderModel.getModelProperty(OAuthModelProperty.class)
+        .map(oAuthModelProperty -> oAuthModelProperty.getGrantTypes()
+            .stream().filter(oAuthGrantType -> oAuthGrantType instanceof AuthorizationCodeGrantType).findFirst().isPresent())
+        .orElse(false);
+  }
+
+  private boolean supportsClientCredentials(ConnectionProviderModel connectionProviderModel) {
+    return connectionProviderModel.getModelProperty(OAuthModelProperty.class)
+        .map(oAuthModelProperty -> oAuthModelProperty.getGrantTypes().stream()
+            .filter(oAuthGrantType -> oAuthGrantType instanceof ClientCredentialsGrantType).findFirst().isPresent())
+        .orElse(false);
+  }
+
 }
