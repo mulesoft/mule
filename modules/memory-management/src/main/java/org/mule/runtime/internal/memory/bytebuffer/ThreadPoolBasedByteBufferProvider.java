@@ -169,6 +169,7 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
     if (newByteBuffer == null) {
       throw new IllegalStateException(format("It was not possible to allocate reallocate a buffer with size '%s'", newSize));
     }
+
     oldByteBuffer.flip();
     return newByteBuffer.put(oldByteBuffer);
   }
