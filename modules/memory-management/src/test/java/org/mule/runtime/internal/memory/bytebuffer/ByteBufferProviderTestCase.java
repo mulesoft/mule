@@ -18,6 +18,8 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
 import java.nio.ByteBuffer;
 import java.util.List;
 
@@ -26,7 +28,6 @@ import io.qameta.allure.Story;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.Test;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 
 @Feature(MEMORY_MANAGEMENT)
 @Story(BYTE_BUFFER_PROVIDER)
