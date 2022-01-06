@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.internal.model;
 
+import static com.google.common.collect.Lists.newLinkedList;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -22,9 +24,13 @@ import java.util.Set;
  */
 public interface ApplicationModelAstPostProcessor {
 
-  public LazyValue<Iterable<ApplicationModelAstPostProcessor>> AST_POST_PROCESSORS =
-      new LazyValue<>(() -> ServiceLoader.load(ApplicationModelAstPostProcessor.class,
-                                               ApplicationModelAstPostProcessor.class.getClassLoader()));
+  /*
+   * MULE-20020: convert the ServiceLoader to a list since Instances of ServiceLoader are not safe for use by multiple concurrent
+   * threads.
+   */
+  LazyValue<Iterable<ApplicationModelAstPostProcessor>> AST_POST_PROCESSORS =
+      new LazyValue<>(() -> newLinkedList(ServiceLoader.load(ApplicationModelAstPostProcessor.class,
+                                                             ApplicationModelAstPostProcessor.class.getClassLoader())));
 
   /**
    * Create a new {@link ArtifactAst} based on the provided one, with any required changes applied.
