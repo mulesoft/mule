@@ -27,7 +27,7 @@ public class HeapByteBufferProvider extends ThreadPoolBasedByteBufferProvider {
   }
 
   @Override
-  ByteBuffer doAllocate(int size) {
+  protected ByteBuffer doAllocate(int size) {
     return ByteBuffer.allocate(size);
   }
 }

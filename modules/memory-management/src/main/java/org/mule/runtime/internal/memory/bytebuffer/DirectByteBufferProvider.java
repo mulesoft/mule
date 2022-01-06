@@ -8,6 +8,8 @@ package org.mule.runtime.internal.memory.bytebuffer;
 
 import java.nio.ByteBuffer;
 
+import static java.nio.ByteBuffer.allocateDirect;
+
 /**
  * A {@link org.mule.runtime.api.memory.provider.ByteBufferProvider} implementation that can be used to retrieve direct
  * {@link ByteBuffer}'s.
@@ -27,7 +29,7 @@ public class DirectByteBufferProvider extends ThreadPoolBasedByteBufferProvider 
   }
 
   @Override
-  ByteBuffer doAllocate(int size) {
-    return ByteBuffer.allocateDirect(size);
+  protected ByteBuffer doAllocate(int size) {
+    return allocateDirect(size);
   }
 }

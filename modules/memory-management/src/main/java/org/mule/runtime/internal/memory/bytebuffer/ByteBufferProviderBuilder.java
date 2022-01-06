@@ -19,33 +19,31 @@ import java.nio.ByteBuffer;
  *
  * @since 4.5.0
  */
-public class ByteBufferProviderBuilder {
+public final class ByteBufferProviderBuilder {
 
   private final boolean isDirect;
 
   private ByteBufferPoolConfiguration poolConfiguration;
-
-  private int maxBufferSize;
 
   private ByteBufferProviderBuilder(boolean isDirect) {
     this.isDirect = isDirect;
   }
 
   public static ByteBufferProviderBuilder buildByteBufferProviderFrom(ByteBufferType byteBufferType) {
-    return new ByteBufferProviderBuilder(byteBufferType.equals(DIRECT));
+    return new ByteBufferProviderBuilder(DIRECT.equals(byteBufferType));
   }
 
   public ByteBufferProvider<ByteBuffer> build() {
     if (isDirect) {
       if (poolConfiguration != null) {
-        return new DirectByteBufferProvider(maxBufferSize, poolConfiguration.getBaseByteBufferSize(),
+        return new DirectByteBufferProvider(poolConfiguration.getMaxBufferSize(), poolConfiguration.getBaseByteBufferSize(),
                                             poolConfiguration.getGrowthFactor(), poolConfiguration.getNumberOfPools());
       } else {
         return new DirectByteBufferProvider();
       }
     } else {
       if (poolConfiguration != null) {
-        return new HeapByteBufferProvider(maxBufferSize, poolConfiguration.getBaseByteBufferSize(),
+        return new HeapByteBufferProvider(poolConfiguration.getMaxBufferSize(), poolConfiguration.getBaseByteBufferSize(),
                                           poolConfiguration.getGrowthFactor(), poolConfiguration.getNumberOfPools());
       } else {
         return new HeapByteBufferProvider();
@@ -53,14 +51,8 @@ public class ByteBufferProviderBuilder {
     }
   }
 
-
   public ByteBufferProviderBuilder withPoolConfiguration(ByteBufferPoolConfiguration poolConfiguration) {
     this.poolConfiguration = poolConfiguration;
-    return this;
-  }
-
-  public ByteBufferProviderBuilder withMaxBufferSize(int maxBufferSize) {
-    this.maxBufferSize = maxBufferSize;
     return this;
   }
 }

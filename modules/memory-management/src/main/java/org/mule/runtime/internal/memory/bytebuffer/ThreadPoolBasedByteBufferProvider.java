@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.internal.memory.bytebuffer;
 
+import static java.lang.String.format;
 import static java.util.Arrays.fill;
 
 import org.mule.runtime.api.memory.provider.ByteBufferProvider;
@@ -29,11 +30,28 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
 
   private final ThreadLocalPool<ByteBuffer>[] pools;
 
-  public ThreadPoolBasedByteBufferProvider() {
+  protected ThreadPoolBasedByteBufferProvider() {
     this(DEFAULT_MAX_BUFFER_SIZE, DEFAULT_BASE_BYTE_BUFFER_SIZE, DEFAULT_GROWTH_FACTOR, DEFAULT_NUMBER_OF_FIX_SIZED_POOLS);
   }
 
-  public ThreadPoolBasedByteBufferProvider(int maxBufferSize, int baseByteBufferSize, int growthFactor, int numberOfPools) {
+  protected ThreadPoolBasedByteBufferProvider(int maxBufferSize, int baseByteBufferSize, int growthFactor, int numberOfPools) {
+
+    if (maxBufferSize <= 0) {
+      throw new IllegalArgumentException("maxBufferSize must be greater than zero");
+    }
+
+    if (baseByteBufferSize <= 0) {
+      throw new IllegalArgumentException("baseByteBufferSize must be greater than zero");
+    }
+
+    if (numberOfPools < 0) {
+      throw new IllegalArgumentException("baseByteBufferSize must be greater than zero");
+    }
+
+    if (!isPowerOfTwo(baseByteBufferSize) || !isPowerOfTwo(growthFactor)) {
+      throw new IllegalArgumentException("minBufferSize and growthFactor must be a power of two");
+    }
+
     this.maxBufferSize = maxBufferSize;
 
     pools = new ThreadLocalPool[numberOfPools + 1];
@@ -44,7 +62,11 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
     pools[numberOfPools] = new ThreadLocalByteBufferWrapper(maxBufferSize);
   }
 
-  abstract ByteBuffer doAllocate(int size);
+  private boolean isPowerOfTwo(int valueToCheck) {
+    return (valueToCheck & valueToCheck - 1) == 0;
+  }
+
+  protected abstract ByteBuffer doAllocate(int size);
 
   @Override
   public ByteBuffer allocate(int size) {
@@ -143,6 +165,10 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
       }
     }
     ByteBuffer newByteBuffer = allocateByteBuffer(newSize);
+
+    if (newByteBuffer == null) {
+      throw new IllegalStateException(format("It was not possible to allocate reallocate a buffer with size '%s'", newSize));
+    }
     oldByteBuffer.flip();
     return newByteBuffer.put(oldByteBuffer);
   }
@@ -224,7 +250,7 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
 
     @Override
     public void dispose() {
-      delegate.set(null);
+      delegate.remove();
     }
 
     private ThreadLocalPool<ByteBuffer> getDelegate() {

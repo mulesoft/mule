@@ -49,14 +49,13 @@ public class DefaultMemoryManagementService implements MemoryManagementService {
   }
 
   @Override
-  public ByteBufferProvider<ByteBuffer> getByteBufferProvider(String name, ByteBufferType byteBufferType, int maxBufferSize,
+  public ByteBufferProvider<ByteBuffer> getByteBufferProvider(String name, ByteBufferType byteBufferType,
                                                               ByteBufferPoolConfiguration poolConfiguration) {
     if (byteBufferProviders.containsKey(name)) {
       throw new IllegalArgumentException(format(DUPLICATE_BYTE_BUFFER_PROVIDER_NAME, name));
     }
 
     ByteBufferProvider<ByteBuffer> byteBufferProvider = buildByteBufferProviderFrom(byteBufferType)
-        .withMaxBufferSize(maxBufferSize)
         .withPoolConfiguration(poolConfiguration)
         .build();
 
@@ -81,8 +80,7 @@ public class DefaultMemoryManagementService implements MemoryManagementService {
 
   @Override
   public void disposeByteBufferProvider(String name) {
-    byteBufferProviders.get(name).dispose();
-    byteBufferProviders.remove(name);
+    byteBufferProviders.remove(name).dispose();
   }
 
 }
