@@ -239,6 +239,11 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
                 logger.info("Schema factory implementation: " + schemaFactory);
             }
 
+            if (this.resourceResolver == null)
+            {
+                this.resourceResolver = new MuleResourceResolver();
+            }
+
             Schema schema;
 
             // only one instance of the schema factory obtained exists, so it's safe to synchronize on it
@@ -250,12 +255,8 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
                     schemaFactory.setErrorHandler(this.errorHandler);
                 }
 
-                if (this.resourceResolver == null)
-                {
-                    this.resourceResolver = new MuleResourceResolver();
-                }
-
                 schemaFactory.setResourceResolver(this.resourceResolver);
+
                 try
                 {
                     schema = schemaFactory.newSchema(schemas);
