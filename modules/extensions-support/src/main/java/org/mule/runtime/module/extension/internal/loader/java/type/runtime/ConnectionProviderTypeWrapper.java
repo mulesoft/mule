@@ -15,9 +15,10 @@ import org.mule.runtime.module.extension.api.loader.java.type.ParameterizableTyp
  *
  * @since 4.0
  */
-class ConnectionProviderTypeWrapper<T> extends TypeWrapper implements ConnectionProviderElement, ParameterizableTypeElement {
+public class ConnectionProviderTypeWrapper<T> extends TypeWrapper
+    implements ConnectionProviderElement, ParameterizableTypeElement {
 
-  ConnectionProviderTypeWrapper(Class<T> aClass, ClassTypeLoader classTypeLoader) {
+  public ConnectionProviderTypeWrapper(Class<T> aClass, ClassTypeLoader classTypeLoader) {
     super(aClass, classTypeLoader);
   }
 }

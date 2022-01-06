@@ -52,6 +52,7 @@ import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.annotation.ConfigReferences;
+import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthParameter;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.Content;
@@ -62,6 +63,7 @@ import org.mule.runtime.extension.api.annotation.param.reference.FlowReference;
 import org.mule.runtime.extension.api.annotation.param.reference.ObjectStoreReference;
 import org.mule.runtime.extension.api.annotation.param.stereotype.AllowedStereotypes;
 import org.mule.runtime.extension.api.annotation.param.stereotype.ComponentId;
+import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.model.parameter.ImmutableExclusiveParametersModel;
@@ -80,6 +82,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.property.Exte
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser.ExclusiveOptionalDescriptor;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
+import org.mule.runtime.module.extension.internal.loader.parser.java.connection.SdkParameterPlacementUtils;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
 
@@ -306,6 +309,22 @@ public class JavaParameterModelParser implements ParameterModelParser {
     return terms;
   }
 
+  @Override
+  public Optional<OAuthParameterModelProperty> getOAuthParameterModelProperty() {
+    return mapReduceSingleAnnotation(parameter,
+                                     "parameter",
+                                     parameter.getName(),
+                                     OAuthParameter.class,
+                                     org.mule.sdk.api.annotation.connectivity.oauth.OAuthParameter.class,
+                                     oAuthParameterAnnotationValueFetcher -> new OAuthParameterModelProperty(oAuthParameterAnnotationValueFetcher
+                                         .getStringValue(OAuthParameter::requestAlias), oAuthParameterAnnotationValueFetcher.getEnumValue(OAuthParameter::placement)),
+                                     oAuthParameterAnnotationValueFetcher -> new OAuthParameterModelProperty(oAuthParameterAnnotationValueFetcher
+                                         .getStringValue(org.mule.sdk.api.annotation.connectivity.oauth.OAuthParameter::requestAlias),
+                                                                                                             SdkParameterPlacementUtils
+                                                                                                                 .from(oAuthParameterAnnotationValueFetcher
+                                                                                                                     .getEnumValue(org.mule.sdk.api.annotation.connectivity.oauth.OAuthParameter::placement))));
+  }
+
   private void collectAdditionalModelProperties() {
     additionalModelProperties.add(new ExtensionParameterDescriptorModelProperty(parameter));
     collectImplementingTypeProperties();
@@ -457,4 +476,5 @@ public class JavaParameterModelParser implements ParameterModelParser {
       }
     }
   }
+
 }
