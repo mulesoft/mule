@@ -73,7 +73,7 @@ public class DefaultMemoryManagementService implements MemoryManagementService {
   }
 
   @Override
-  public void disposeByteBufferProvider(String name) {
+  public synchronized void disposeByteBufferProvider(String name) {
     byteBufferProviders.remove(name).dispose();
   }
 
