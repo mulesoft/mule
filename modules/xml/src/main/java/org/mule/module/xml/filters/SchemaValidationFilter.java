@@ -249,7 +249,6 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
             // only one instance of the schema factory obtained exists, so it's safe to synchronize on it
             synchronized(schemaFactory)
             {
-
                 if (this.errorHandler != null)
                 {
                     schemaFactory.setErrorHandler(this.errorHandler);
