@@ -17,7 +17,7 @@ import java.nio.ByteBuffer;
  *
  * @since 4.5.0
  */
-public interface ThreadLocalPool<T extends ByteBuffer> {
+public interface ByteBufferPool<T extends ByteBuffer> {
 
   /**
    * Creates a new Buffer with a set size and assigns it the data that was held in the old one as long as the given size is not

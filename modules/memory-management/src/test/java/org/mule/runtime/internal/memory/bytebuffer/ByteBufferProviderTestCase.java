@@ -18,16 +18,15 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-
 import java.nio.ByteBuffer;
 import java.util.List;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.junit.Test;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 @Feature(MEMORY_MANAGEMENT)
 @Story(BYTE_BUFFER_PROVIDER)
@@ -67,7 +66,7 @@ public class ByteBufferProviderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testDefaultStatus() {
-    ThreadLocalPool<ByteBuffer>[] pools = defaultByteBufferProvider.getThreadLocalPools();
+    ByteBufferPool<ByteBuffer>[] pools = defaultByteBufferProvider.getThreadLocalPools();
     assertThat(pools.length, is(1));
     assertThat(defaultByteBufferProvider, instanceOf(getType(isDirect)));
     assertThat(pools[0].getMaxBufferSize(), is(DEFAULT_MAX_BUFFER_SIZE));
@@ -78,7 +77,7 @@ public class ByteBufferProviderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testCustomDefaultStatus() {
-    ThreadLocalPool<ByteBuffer>[] pools = customByteBufferProvider.getThreadLocalPools();
+    ByteBufferPool<ByteBuffer>[] pools = customByteBufferProvider.getThreadLocalPools();
     assertThat(pools.length, is(5));
     int bufferSize = TEST_BASE_BYTE_BUFFER_SIZE;
     for (int i = 0; i < TEST_NUMBER_OF_POOLS; i++) {
@@ -95,7 +94,7 @@ public class ByteBufferProviderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testAllocationTest() throws Exception {
-    ThreadLocalPool<ByteBuffer>[] pools = customByteBufferProvider.getThreadLocalPools();
+    ByteBufferPool<ByteBuffer>[] pools = customByteBufferProvider.getThreadLocalPools();
 
     ByteBuffer smallByteBuffer = customByteBufferProvider.allocate(1);
 

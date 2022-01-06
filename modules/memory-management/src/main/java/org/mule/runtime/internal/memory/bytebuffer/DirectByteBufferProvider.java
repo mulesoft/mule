@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.internal.memory.bytebuffer;
 
-import java.nio.ByteBuffer;
-
 import static java.nio.ByteBuffer.allocateDirect;
+
+import java.nio.ByteBuffer;
 
 /**
  * A {@link org.mule.runtime.api.memory.provider.ByteBufferProvider} implementation that can be used to retrieve direct

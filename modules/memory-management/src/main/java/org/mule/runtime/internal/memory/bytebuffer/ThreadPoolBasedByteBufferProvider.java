@@ -28,7 +28,7 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
 
   protected final int maxBufferSize;
 
-  private final ThreadLocalPool<ByteBuffer>[] pools;
+  private final ByteBufferPool<ByteBuffer>[] pools;
 
   protected ThreadPoolBasedByteBufferProvider() {
     this(DEFAULT_MAX_BUFFER_SIZE, DEFAULT_BASE_BYTE_BUFFER_SIZE, DEFAULT_GROWTH_FACTOR, DEFAULT_NUMBER_OF_FIX_SIZED_POOLS);
@@ -54,7 +54,7 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
 
     this.maxBufferSize = maxBufferSize;
 
-    pools = new ThreadLocalPool[numberOfPools + 1];
+    pools = new ByteBufferPool[numberOfPools + 1];
     for (int i = 0, bufferSize = baseByteBufferSize; i < numberOfPools; i++, bufferSize <<= growthFactor) {
       pools[i] = new ThreadLocalByteBufferWrapper(bufferSize);
     }
@@ -78,7 +78,7 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
       return doAllocate(size);
     }
 
-    final ThreadLocalPool<ByteBuffer> threadLocalCache = getByteBufferThreadLocalPool(size);
+    final ByteBufferPool<ByteBuffer> threadLocalCache = getByteBufferThreadLocalPool(size);
     if (threadLocalCache != null) {
       final int remaining = threadLocalCache.remaining();
 
@@ -93,7 +93,7 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
     }
   }
 
-  private Object allocateFromPool(ThreadLocalPool<ByteBuffer> threadLocalCache, int size) {
+  private Object allocateFromPool(ByteBufferPool<ByteBuffer> threadLocalCache, int size) {
     if (threadLocalCache.remaining() >= size) {
       return threadLocalCache.allocate(size);
     }
@@ -104,14 +104,14 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
   private void reallocatePoolBuffer(int size) {
     final ByteBuffer byteBuffer = doAllocate(size);
 
-    final ThreadLocalPool<ByteBuffer> threadLocalCache = getByteBufferThreadLocalPool(size);
+    final ByteBufferPool<ByteBuffer> threadLocalCache = getByteBufferThreadLocalPool(size);
     if (threadLocalCache != null) {
       threadLocalCache.reset(byteBuffer);
     }
   }
 
-  private ThreadLocalPool<ByteBuffer> getByteBufferThreadLocalPool(final int size) {
-    for (final ThreadLocalPool<ByteBuffer> pool : pools) {
+  private ByteBufferPool<ByteBuffer> getByteBufferThreadLocalPool(final int size) {
+    for (final ByteBufferPool<ByteBuffer> pool : pools) {
       if (pool.getMaxBufferSize() >= size) {
         return pool;
       }
@@ -131,7 +131,7 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
       return doAllocate(size);
     }
 
-    final ThreadLocalPool<ByteBuffer> threadLocalCache = getByteBufferThreadLocalPool(size);
+    final ByteBufferPool<ByteBuffer> threadLocalCache = getByteBufferThreadLocalPool(size);
     if (threadLocalCache != null) {
       int remaining = threadLocalCache.remaining();
 
@@ -156,7 +156,7 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
       return oldByteBuffer;
     }
 
-    final ThreadLocalPool<ByteBuffer> memoryPool = getByteBufferThreadLocalPool(newSize);
+    final ByteBufferPool<ByteBuffer> memoryPool = getByteBufferThreadLocalPool(newSize);
     if (memoryPool != null) {
       final ByteBuffer newBuffer = memoryPool.reallocate(oldByteBuffer, newSize);
 
@@ -176,7 +176,7 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
 
   @Override
   public void release(ByteBuffer byteBuffer) {
-    ThreadLocalPool<ByteBuffer> memoryPool = getByteBufferThreadLocalPool(byteBuffer.limit());
+    ByteBufferPool<ByteBuffer> memoryPool = getByteBufferThreadLocalPool(byteBuffer.limit());
     if (memoryPool != null) {
       memoryPool.release((ByteBuffer) byteBuffer.clear());
     }
@@ -189,21 +189,21 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
 
   @Override
   public void dispose() {
-    for (ThreadLocalPool<ByteBuffer> pool : pools) {
+    for (ByteBufferPool<ByteBuffer> pool : pools) {
       pool.dispose();
     }
   }
 
 
-  protected ThreadLocalPool<ByteBuffer>[] getThreadLocalPools() {
+  protected ByteBufferPool<ByteBuffer>[] getThreadLocalPools() {
     return pools;
   }
 
-  private static final class ThreadLocalByteBufferWrapper implements ThreadLocalPool<ByteBuffer> {
+  private static final class ThreadLocalByteBufferWrapper implements ByteBufferPool<ByteBuffer> {
 
     private final int bufferSize;
 
-    private final ThreadLocal<ThreadLocalPool<ByteBuffer>> delegate = new ThreadLocal<>();
+    private final ThreadLocal<ByteBufferPool<ByteBuffer>> delegate = new ThreadLocal<>();
 
     public ThreadLocalByteBufferWrapper(final int bufferSize) {
       this.bufferSize = bufferSize;
@@ -254,7 +254,7 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
       delegate.remove();
     }
 
-    private ThreadLocalPool<ByteBuffer> getDelegate() {
+    private ByteBufferPool<ByteBuffer> getDelegate() {
       if (delegate.get() == null) {
         delegate.set(new ByteBufferThreadLocalPool(bufferSize));
       }
@@ -265,7 +265,7 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
   /**
    * Information about thread associated memory pool.
    */
-  private static final class ByteBufferThreadLocalPool implements ThreadLocalPool<ByteBuffer> {
+  private static final class ByteBufferThreadLocalPool implements ByteBufferPool<ByteBuffer> {
 
     /**
      * Memory pool
