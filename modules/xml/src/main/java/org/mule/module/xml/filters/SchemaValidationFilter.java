@@ -233,16 +233,17 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
             }
 
             SchemaFactory schemaFactory = XMLSecureFactories.createDefault().getSchemaFactory(getSchemaLanguage());
+
+            if (logger.isInfoEnabled())
+            {
+                logger.info("Schema factory implementation: " + schemaFactory);
+            }
+
             Schema schema;
 
             // only one instance of the schema factory obtained exists, so it's safe to synchronize on it
             synchronized(schemaFactory)
             {
-
-                if (logger.isInfoEnabled())
-                {
-                    logger.info("Schema factory implementation: " + schemaFactory);
-                }
 
                 if (this.errorHandler != null)
                 {
