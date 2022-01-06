@@ -85,7 +85,9 @@ public interface AuthorizationCodeOAuthDancer {
    * @param listener the {@link AuthorizationCodeListener} to be added
    * @throws IllegalArgumentException if the {@code listener} is {@code null}
    * @since 4.2.0
+   * @deprecated since 4.3.1
    */
+  @Deprecated
   void addListener(AuthorizationCodeListener listener);
 
   /**
@@ -94,7 +96,35 @@ public interface AuthorizationCodeOAuthDancer {
    * @param listener the {@link AuthorizationCodeListener} to be removed
    * @throws IllegalArgumentException if the {@code listener} is {@code null}
    * @since 4.2.0
+   * @deprecated since 4.3.1
    */
+  @Deprecated
   void removeListener(AuthorizationCodeListener listener);
+
+  /**
+   * Adds the {@code listener}. Listeners will be invoked in the same order as they were added
+   *
+   * @param resourceOwnerId id of the user who the listener corresponds to
+   * @param listener        the {@link AuthorizationCodeListener} to be added
+   * @throws IllegalArgumentException if the {@code listener} is {@code null}
+   *
+   * @since 4.3.1
+   */
+  default void addListener(String resourceOwnerId, AuthorizationCodeListener listener) {
+    addListener(listener);
+  }
+
+  /**
+   * Removes the {@code listener}. Nothing happens if it wasn't part of {@code this} dancer.
+   *
+   * @param resourceOwnerId id of the user who the listener corresponds to
+   * @param listener        the {@link AuthorizationCodeListener} to be removed
+   * @throws IllegalArgumentException if the {@code listener} is {@code null}
+   *
+   * @since 4.3.1
+   */
+  default void removeListener(String resourceOwnerId, AuthorizationCodeListener listener) {
+    removeListener(listener);
+  }
 
 }

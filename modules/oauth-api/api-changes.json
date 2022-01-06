@@ -1,4 +1,28 @@
 {
+  "4.3.1": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method void org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer::addListener(java.lang.String, org.mule.runtime.oauth.api.listener.AuthorizationCodeListener)",
+          "package": "org.mule.runtime.oauth.api",
+          "classSimpleName": "AuthorizationCodeOAuthDancer",
+          "methodName": "addListener",
+          "elementKind": "method",
+          "justification": "MULE-20019: In-memory OAuth Authorization Code Grant type credentials are overwritten"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method void org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer::removeListener(java.lang.String, org.mule.runtime.oauth.api.listener.AuthorizationCodeListener)",
+          "package": "org.mule.runtime.oauth.api",
+          "classSimpleName": "AuthorizationCodeOAuthDancer",
+          "methodName": "removeListener",
+          "elementKind": "method",
+          "justification": "MULE-20019: In-memory OAuth Authorization Code Grant type credentials are overwritten"
+        }
+      ]
+    }
+  },
   "4.3.0": {
     "revapi": {
       "ignore": [
