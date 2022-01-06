@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.internal.memory.bytebuffer;
 
+import static java.util.Arrays.fill;
+
 import org.mule.runtime.api.memory.provider.ByteBufferProvider;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-
-import static java.util.Arrays.fill;
 
 /**
  * Common logic for the different implementations for {@link ByteBufferProvider}
