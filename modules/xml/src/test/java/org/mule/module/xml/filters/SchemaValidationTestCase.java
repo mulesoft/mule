@@ -35,10 +35,13 @@ import org.xml.sax.SAXParseException;
 import org.mule.util.IOUtils;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -128,7 +131,7 @@ public class SchemaValidationTestCase extends AbstractMuleTestCase
 
         final Latch executeLatch = new Latch();
         final CountDownLatch readyForExecutionLatch = new CountDownLatch(threadsNum);
-        final AtomicInteger errors = new AtomicInteger();
+        final List<String> errors = new CopyOnWriteArrayList<>();
 
         for (int i = 0; i < threadsNum; i++)
         {
@@ -147,11 +150,11 @@ public class SchemaValidationTestCase extends AbstractMuleTestCase
                     }
                     catch (InitialisationException e)
                     {
-                        errors.incrementAndGet();
+                        errors.add(e.getDetailedMessage());
                     }
                     catch (InterruptedException e)
                     {
-                        fail("An error occurred waiting for the latch to be released: " + Arrays.toString(e.getStackTrace()));
+                        errors.add(e.getMessage());
                     }
                 }
             });
@@ -171,7 +174,7 @@ public class SchemaValidationTestCase extends AbstractMuleTestCase
             fail("Tasks didn't finish running");
         }
 
-        assertEquals(0, errors.get());
+        assertEquals("Executions failed:\n" + errors, 0, errors.size());
     }
 
     private class TestErrorHandler implements ErrorHandler
