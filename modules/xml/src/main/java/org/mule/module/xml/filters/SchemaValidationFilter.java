@@ -231,7 +231,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
 
                 schemas[i] = new StreamSource(schemaStream, IOUtils.getResourceAsUrl(split[i], getClass()).toString());
             }
-            
+
             SchemaFactory schemaFactory = XMLSecureFactories.createDefault().getSchemaFactory(getSchemaLanguage());
 
             if (logger.isInfoEnabled())
@@ -239,26 +239,31 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
                 logger.info("Schema factory implementation: " + schemaFactory);
             }
 
-            if (this.errorHandler != null)
-            {
-                schemaFactory.setErrorHandler(this.errorHandler);
-            }
-
             if (this.resourceResolver == null)
             {
                 this.resourceResolver = new MuleResourceResolver();
             }
 
-            schemaFactory.setResourceResolver(this.resourceResolver);
-
             Schema schema;
-            try
+
+            // only one instance of the schema factory obtained exists, so it's safe to synchronize on it
+            synchronized(schemaFactory)
             {
-                schema = schemaFactory.newSchema(schemas);
-            }
-            catch (SAXException e)
-            {
-                throw new InitialisationException(e, this);
+                if (this.errorHandler != null)
+                {
+                    schemaFactory.setErrorHandler(this.errorHandler);
+                }
+
+                schemaFactory.setResourceResolver(this.resourceResolver);
+
+                try
+                {
+                    schema = schemaFactory.newSchema(schemas);
+                }
+                catch (SAXException e)
+                {
+                    throw new InitialisationException(e, this);
+                }
             }
 
             setSchemaObject(schema);

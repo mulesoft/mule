@@ -6,11 +6,14 @@
  */
 package org.mule.module.xml.filters;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mule.util.xmlsecurity.XMLSecureFactories.EXTERNAL_ENTITIES_PROPERTY;
 import org.mule.DefaultMuleMessage;
@@ -26,10 +29,21 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mule.util.concurrent.Latch;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXParseException;
 
 import org.mule.util.IOUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -109,6 +123,50 @@ public class SchemaValidationTestCase extends AbstractMuleTestCase
         filter.setErrorHandler(errorHandler);
         assertThat(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream(INVALID_XML_FILE), muleContext)), is(false));
         assertThat(errorHandler.exception, is(notNullValue()));
+    }
+
+    @Test
+    public void testConcurrentSchemaValidationFilterCreation() throws InterruptedException, ExecutionException, TimeoutException {
+        int threadsNum = 2;
+        ExecutorService executorService = Executors.newFixedThreadPool(threadsNum);
+
+        final Latch executeLatch = new Latch();
+        final CountDownLatch readyForExecutionLatch = new CountDownLatch(threadsNum);
+        final List<Future<Object>> futures = new ArrayList<>();
+
+        for (int i = 0; i < threadsNum; i++)
+        {
+            futures.add(executorService.submit(new Callable<Object>()
+            {
+                @Override
+                public Object call() throws Exception
+                {
+                    SchemaValidationFilter filter = new SchemaValidationFilter();
+                    filter.setSchemaLocations(INCLUDE_SCHEMA);
+
+                    readyForExecutionLatch.countDown();
+                    executeLatch.await();
+
+                    filter.initialise();
+
+                    return null;
+                }
+            }));
+        }
+
+        if (!readyForExecutionLatch.await(5, SECONDS))
+        {
+            fail("Tasks aren't ready to run");
+        }
+
+        executeLatch.release();
+
+        executorService.shutdown();
+
+        for (Future<Object> future : futures)
+        {
+            assertNull(future.get(5, SECONDS));
+        }
     }
 
     private class TestErrorHandler implements ErrorHandler
