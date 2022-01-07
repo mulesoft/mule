@@ -109,7 +109,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 
 @SmallTest
@@ -344,7 +343,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     Callable<Void> parallelFlowRefEvents = sendEventsThroughFlowRefAsynchronously(threadCountdown, parallelFlowRefFactoryBean);
     ExecutorService executorService = Executors.newFixedThreadPool(2);
     try {
-      executorService.invokeAll(asList(flowRefEvents, parallelFlowRefEvents), 1, TimeUnit.SECONDS);
+      executorService.invokeAll(asList(flowRefEvents, parallelFlowRefEvents));
     } finally {
       executorService.shutdown();
     }
