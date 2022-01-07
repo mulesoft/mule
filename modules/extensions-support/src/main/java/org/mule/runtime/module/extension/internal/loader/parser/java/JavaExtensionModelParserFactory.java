@@ -42,15 +42,7 @@ public class JavaExtensionModelParserFactory implements ExtensionModelParserFact
           }
         })
         .orElseGet(() -> context.getParameter(EXTENSION_TYPE)
-            .map(type -> {
-              if (type instanceof ExtensionTypeWrapper) {
-                return (ExtensionTypeWrapper) type;
-              } else if (type instanceof Class) {
-                return new ExtensionTypeWrapper((Class) type, getDefault().createTypeLoader());
-              } else {
-                throw new IllegalArgumentException("Unsupported extension type: " + type);
-              }
-            })
+            .map(type -> toExtensionElement(type))
             .orElseGet(() -> {
               String type = (String) context.getParameter(TYPE_PROPERTY_NAME).get();
               try {
@@ -62,5 +54,15 @@ public class JavaExtensionModelParserFactory implements ExtensionModelParserFact
                 throw new RuntimeException(format("Class '%s' cannot be loaded", type), e);
               }
             }));
+  }
+
+  private static ExtensionElement toExtensionElement(Object type) {
+    if (type instanceof ExtensionElement) {
+      return (ExtensionElement) type;
+    } else if (type instanceof Class) {
+      return new ExtensionTypeWrapper((Class) type, getDefault().createTypeLoader());
+    } else {
+      throw new IllegalArgumentException("Unsupported extension type: " + type);
+    }
   }
 }

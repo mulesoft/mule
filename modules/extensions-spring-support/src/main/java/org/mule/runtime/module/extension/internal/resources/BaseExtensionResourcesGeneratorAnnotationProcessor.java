@@ -15,11 +15,13 @@ import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.util.MuleSystemProperties.FORCE_EXTENSION_VALIDATION_PROPERTY_NAME;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
+import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.getLoaderById;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -82,6 +84,8 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
 
   private final SpiServiceRegistry serviceRegistry = new SpiServiceRegistry();
 
+  private final LazyValue<ExtensionModelLoader> javaExtensionModelLoader = new LazyValue<>(() -> getLoaderById("java"));
+
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
     log("Starting Resources generator for Extensions");
@@ -114,6 +118,10 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
       processingEnv.getMessager().printMessage(ERROR, format("%s\n%s", e.getMessage(), getStackTrace(e)));
       throw e;
     }
+  }
+
+  protected ExtensionModelLoader fetchJavaExtensionModelLoader() {
+    return javaExtensionModelLoader.get();
   }
 
   private ExtensionModel parseExtension(TypeElement extensionElement, ExtensionElement extension,
