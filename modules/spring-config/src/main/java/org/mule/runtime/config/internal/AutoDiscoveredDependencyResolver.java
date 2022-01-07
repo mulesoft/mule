@@ -20,10 +20,10 @@ public class AutoDiscoveredDependencyResolver {
     this.springRegistry = springRegistry;
   }
 
-  public List<Pair<String, Object>> getAutoDiscoveredDependencies(String beanName) {
+  public List<VertexWrapper> getAutoDiscoveredDependencies(String beanName) {
     return springRegistry.getDependencies(beanName).entrySet()
         .stream()
-        .map(x -> new Pair<>(x.getKey(), x.getValue()))
+        .map(x -> new VertexWrapper(x.getKey(), x.getValue()))
         .collect(Collectors.toList());
   }
 

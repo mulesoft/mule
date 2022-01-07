@@ -18,9 +18,7 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.internal.lifecycle.phases.LifecycleObjectSorter;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
@@ -30,13 +28,11 @@ public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
 
   private List<DefaultDirectedGraph<VertexWrapper, DefaultEdge>> dependencyGraphs;
   private DummyDependencyResolver resolver;
-  private Set<Integer> hashcodeSet;
   protected Class<?>[] orderedLifecycleTypes;
 
   public DummySpringLifecycleObjectSorter(DummyDependencyResolver resolver, Class<?>[] orderedLifecycleTypes) {
     this.dependencyGraphs = new ArrayList<>();
     this.resolver = resolver;
-    this.hashcodeSet = new HashSet<>();
     this.orderedLifecycleTypes = orderedLifecycleTypes;
     for (int i = 0; i < orderedLifecycleTypes.length; i++) {
       dependencyGraphs.add(new DefaultDirectedGraph<>(DefaultEdge.class));
@@ -53,9 +49,12 @@ public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
       return;
     }
 
-    DefaultDirectedGraph<VertexWrapper, DefaultEdge> directedGraph = getDependencyGraphForLifecycleType(currentObject);
-    VertexWrapper currentVertex = addVertex(beanName, currentObject, directedGraph);
+    DefaultDirectedGraph<VertexWrapper, DefaultEdge> dependencyGraph = getDependencyGraphForLifecycleType(currentObject);
 
+    VertexWrapper currentVertex = new VertexWrapper(beanName, currentObject);
+    dependencyGraph.addVertex(currentVertex);
+
+    // todo: VertexWrapper -> xxx
     // get (direct) prerequisite objects for the current object
     List<Pair<String, Object>> prerequisiteObjects = resolver.getDirectBeanDependencies(beanName);
 
@@ -67,11 +66,13 @@ public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
                                 (prerequisite) -> {
                                   String preReqName = prerequisite.getFirst();
                                   Object preReqObject = prerequisite.getSecond();
-                                  VertexWrapper preReqVertex =
-                                      addVertex(preReqName, preReqObject, directedGraph);
+
+                                  VertexWrapper preReqVertex = new VertexWrapper(preReqName, preReqObject);
+                                  dependencyGraph.addVertex(preReqVertex);
+
                                   // todo: update the cycle check part below
-                                  if (!directedGraph.containsEdge(preReqVertex, currentVertex)) {
-                                    directedGraph.addEdge(currentVertex, preReqVertex);
+                                  if (!dependencyGraph.containsEdge(preReqVertex, currentVertex)) {
+                                    dependencyGraph.addEdge(currentVertex, preReqVertex);
                                   }
                                 });
   }
@@ -85,31 +86,21 @@ public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
     return dependencyGraphs.get(getDependencyGraphIndex(currentObject));
   }
 
-  private VertexWrapper addVertex(String name, Object currentObject,
-                                  DefaultDirectedGraph<VertexWrapper, DefaultEdge> directedGraph) {
-
-    VertexWrapper currentVertex = new VertexWrapper(name, currentObject);
-    // todo: duplicate check? (example: same objects being added to same class bucket, can we prevent it with this impl?)
-    directedGraph.addVertex(currentVertex);
-
-    return currentVertex;
-  }
-
   @Override
   public List<Object> getSortedObjects() {
     return dependencyGraphs.stream().map(x -> {
-      List<Object> sortedObjects = newArrayList(new TopologicalOrderIterator<>(x));
+      List<VertexWrapper> sortedObjects = newArrayList(new TopologicalOrderIterator<>(x));
       reverse(sortedObjects);
-      return sortedObjects.stream().map(v -> ((VertexWrapper) v).getWrappedObject()).collect(toList());
+      // return sortedObjects.stream().map(v -> ((VertexWrapper) v).getWrappedObject()).collect(toList());
+      return sortedObjects;
     }).reduce(new ArrayList<>(), (sortedObjectList, b) -> {
-      for (Object o : b) {
-        if (!hashcodeSet.contains(o.hashCode())) {
-          sortedObjectList.add(o);
-          hashcodeSet.add(o.hashCode());
+      for (VertexWrapper v : b) {
+        if (!sortedObjectList.contains(v)) {
+          sortedObjectList.add(v);
         }
       }
       return sortedObjectList;
-    });
+    }).stream().map(VertexWrapper::getWrappedObject).collect(toList());
   }
 
 

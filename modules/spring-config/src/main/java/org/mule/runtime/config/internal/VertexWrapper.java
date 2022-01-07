@@ -40,7 +40,6 @@ public class VertexWrapper {
 
   @Override
   public int hashCode() {
-    // todo: proxy has the same hashcode with the wrapped one? check!
     return wrappedObject.hashCode();
   }
 }

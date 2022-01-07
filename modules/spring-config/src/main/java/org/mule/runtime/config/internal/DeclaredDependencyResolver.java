@@ -25,15 +25,28 @@ public class DeclaredDependencyResolver {
     this.springRegistry = springRegistry;
   }
 
-  public List<Pair<String, Object>> getDeclaredDependencies(Object object) {
-    List<Pair<String, Object>> declaredDependencies = new ArrayList<>();
+  // public List<Pair<String, Object>> getDeclaredDependencies(Object object) {
+  // List<Pair<String, Object>> declaredDependencies = new ArrayList<>();
+  // if (object instanceof InjectedDependenciesProvider) {
+  // ((InjectedDependenciesProvider) object).getInjectedDependencies()
+  // .forEach(dependency -> dependency
+  // .reduce(type -> Stream.of(springRegistry.getBeanNamesForType(dependency.getLeft()))
+  // .map(name -> new Pair<>(name, springRegistry.get(name)))
+  // .collect(toList()), name -> asList(new Pair<>(name, springRegistry.get(name))))
+  // .forEach(pair -> declaredDependencies.add(pair)));
+  // }
+  // return declaredDependencies;
+  // }
+
+  public List<VertexWrapper> getDeclaredDependencies(Object object) {
+    List<VertexWrapper> declaredDependencies = new ArrayList<>();
     if (object instanceof InjectedDependenciesProvider) {
       ((InjectedDependenciesProvider) object).getInjectedDependencies()
           .forEach(dependency -> dependency
               .reduce(type -> Stream.of(springRegistry.getBeanNamesForType(dependency.getLeft()))
-                  .map(name -> new Pair<>(name, springRegistry.get(name)))
-                  .collect(toList()), name -> asList(new Pair<>(name, springRegistry.get(name))))
-              .forEach(pair -> declaredDependencies.add(pair)));
+                  .map(beanName -> new VertexWrapper(beanName, springRegistry.get(beanName)))
+                  .collect(toList()), beanName -> asList(new VertexWrapper(beanName, springRegistry.get(beanName))))
+              .forEach(v -> declaredDependencies.add(v)));
     }
     return declaredDependencies;
   }

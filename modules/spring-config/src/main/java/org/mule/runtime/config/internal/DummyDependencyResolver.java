@@ -79,8 +79,8 @@ public class DummyDependencyResolver implements BeanDependencyResolver {
    */
   private void addDirectDeclaredDependencies(Object object, Set<String> processedKeys, DependencyNode node) {
     declaredDependencyResolver.getDeclaredDependencies(object)
-        .forEach(beanNameObjectPair -> addDirectChild(beanNameObjectPair.getFirst(), beanNameObjectPair.getSecond(), node,
-                                                      processedKeys));
+        .forEach(v -> addDirectChild(v.getBeanName(), v.getWrappedObject(), node,
+                                     processedKeys));
   }
 
   /**
@@ -108,9 +108,9 @@ public class DummyDependencyResolver implements BeanDependencyResolver {
   private void addDirectAutoDiscoveredDependencies(String beanName, Set<String> processedKeys, DependencyNode node) {
     autoDiscoveredDependencyResolver.getAutoDiscoveredDependencies(beanName)
         .stream()
-        .filter(beanNameObjectPair -> !beanNameObjectPair.getSecond().equals(node.getObject())) // todo: get second or first?
-        .forEach(beanNameObjectPair -> addDirectChild(beanNameObjectPair.getFirst(), beanNameObjectPair.getSecond(), node,
-                                                      processedKeys));
+        .filter(v -> !v.getWrappedObject().equals(node.getObject()))
+        .forEach(v -> addDirectChild(v.getBeanName(), v.getWrappedObject(), node,
+                                     processedKeys));
   }
 
 
