@@ -11,13 +11,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mule.util.xmlsecurity.XMLSecureFactories.EXTERNAL_ENTITIES_PROPERTY;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -34,11 +35,9 @@ import org.xml.sax.SAXParseException;
 
 import org.mule.util.IOUtils;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -121,40 +120,32 @@ public class SchemaValidationTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void testConcurrentSchemaValidationFilterCreation() throws InterruptedException
-    {
+    public void testConcurrentSchemaValidationFilterCreation() throws InterruptedException, ExecutionException, TimeoutException {
         int threadsNum = 2;
         ExecutorService executorService = Executors.newFixedThreadPool(threadsNum);
 
         final Latch executeLatch = new Latch();
         final CountDownLatch readyForExecutionLatch = new CountDownLatch(threadsNum);
-        final List<String> errors = new CopyOnWriteArrayList<>();
+        final List<Future<Object>> futures = new ArrayList<>();
 
         for (int i = 0; i < threadsNum; i++)
         {
-            executorService.submit(new Runnable()
+            futures.add(executorService.submit(new Callable<Object>()
             {
                 @Override
-                public void run()
+                public Object call() throws Exception
                 {
                     SchemaValidationFilter filter = new SchemaValidationFilter();
                     filter.setSchemaLocations(INCLUDE_SCHEMA);
-                    try
-                    {
-                        readyForExecutionLatch.countDown();
-                        executeLatch.await();
-                        filter.initialise();
-                    }
-                    catch (InitialisationException e)
-                    {
-                        errors.add(e.getDetailedMessage());
-                    }
-                    catch (InterruptedException e)
-                    {
-                        errors.add(e.getMessage());
-                    }
+
+                    readyForExecutionLatch.countDown();
+                    executeLatch.await();
+
+                    filter.initialise();
+
+                    return null;
                 }
-            });
+            }));
         }
 
         if (!readyForExecutionLatch.await(5, SECONDS))
@@ -166,12 +157,10 @@ public class SchemaValidationTestCase extends AbstractMuleTestCase
 
         executorService.shutdown();
 
-        if (!executorService.awaitTermination(5, SECONDS))
+        for (Future<Object> future : futures)
         {
-            fail("Tasks didn't finish running");
+            assertNull(future.get(5, SECONDS));
         }
-
-        assertEquals("Executions failed:\n" + errors, 0, errors.size());
     }
 
     private class TestErrorHandler implements ErrorHandler
