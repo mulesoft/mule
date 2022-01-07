@@ -69,7 +69,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
   @Override
   protected Map<String, Object> lookupObjectsForLifecycle() {
-    if (getExecutingPhase().equals(Initialisable.PHASE_NAME)) {
+    if (Initialisable.PHASE_NAME.equals(getExecutingPhase())) {
       // Initialise has already been done for the objects in the base registry
       return getSpringRegistry().lookupEntriesForLifecycle(Object.class);
     } else {

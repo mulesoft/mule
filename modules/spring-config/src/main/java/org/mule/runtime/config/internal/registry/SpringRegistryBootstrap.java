@@ -63,22 +63,6 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
     this.beanDefinitionRegister = beanDefinitionRegister;
   }
 
-  /**
-   * @param artifactType              type of artifact. Bootstrap entries may be associated to an specific type of artifact. If
-   *                                  it's not associated to the related artifact it will be ignored.
-   * @param muleContext               the {@code MuleContext} of the artifact.
-   * @param optionalObjectsController a controller for objects that may be optional. When an object can be optional and mule it's
-   *                                  not able to create it, then it gets ignored.
-   * @param beanDefinitionRegister    a {@link BiConsumer} on which the bean definitions are registered
-   */
-  public SpringRegistryBootstrap(ArtifactType artifactType, MuleContext muleContext,
-                                 OptionalObjectsController optionalObjectsController,
-                                 BiConsumer<String, BeanDefinition> beanDefinitionRegister) {
-    super(artifactType, muleContext, k -> true);
-    this.optionalObjectsController = optionalObjectsController;
-    this.beanDefinitionRegister = beanDefinitionRegister;
-  }
-
   @Override
   protected void doRegisterTransformer(TransformerBootstrapProperty bootstrapProperty, Class<?> returnClass,
                                        Class<? extends Transformer> transformerClass)

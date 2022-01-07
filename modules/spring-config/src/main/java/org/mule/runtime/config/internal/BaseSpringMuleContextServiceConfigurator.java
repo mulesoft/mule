@@ -65,8 +65,9 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServiceConfigurator {
 
   // This is needed just for some unit test scenarios
+  // TODO MULE-20028 remove this
   @Deprecated
-  public static final String DISABLE_TRANSFORMERS_SUPPORT =
+  static final String DISABLE_TRANSFORMERS_SUPPORT =
       BaseSpringMuleContextServiceConfigurator.class.getName() + ".disableTransformersSupport";
 
   private final MuleContext muleContext;
