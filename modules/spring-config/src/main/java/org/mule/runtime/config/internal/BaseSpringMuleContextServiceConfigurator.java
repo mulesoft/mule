@@ -111,14 +111,14 @@ class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContext
       registerBeanDefinition(OBJECT_TRANSFORMERS_REGISTRY, getBeanDefinition(DefaultTransformersRegistry.class));
     }
 
-      registerBeanDefinition(OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER,
-                             getBeanDefinition(DataWeaveExtendedExpressionLanguageAdaptorFactoryBean.class));
-      registerBeanDefinition(OBJECT_EXPRESSION_LANGUAGE, getBeanDefinition(MVELExpressionLanguage.class));
-      registerBeanDefinition(OBJECT_EXPRESSION_MANAGER, getBeanDefinition(DefaultExpressionManagerFactoryBean.class));
+    registerBeanDefinition(OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER,
+                           getBeanDefinition(DataWeaveExtendedExpressionLanguageAdaptorFactoryBean.class));
+    registerBeanDefinition(OBJECT_EXPRESSION_LANGUAGE, getBeanDefinition(MVELExpressionLanguage.class));
+    registerBeanDefinition(OBJECT_EXPRESSION_MANAGER, getBeanDefinition(DefaultExpressionManagerFactoryBean.class));
 
-      registerBeanDefinition(OBJECT_SCHEDULER_POOLS_CONFIG,
-                             getConstantObjectBeanDefinition(SchedulerContainerPoolsConfig.getInstance()));
-      registerBeanDefinition(OBJECT_SCHEDULER_BASE_CONFIG, getBeanDefinition(SchedulerBaseConfigFactory.class));
+    registerBeanDefinition(OBJECT_SCHEDULER_POOLS_CONFIG,
+                           getConstantObjectBeanDefinition(SchedulerContainerPoolsConfig.getInstance()));
+    registerBeanDefinition(OBJECT_SCHEDULER_BASE_CONFIG, getBeanDefinition(SchedulerBaseConfigFactory.class));
 
     registerConstantBeanDefinition(OBJECT_REGISTRY, getServiceLocator());
 
