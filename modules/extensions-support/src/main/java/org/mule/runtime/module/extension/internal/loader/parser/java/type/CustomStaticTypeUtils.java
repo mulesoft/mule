@@ -15,7 +15,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.metadata.xml.api.SchemaCollector.getInstance;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
-import static org.mule.runtime.module.extension.internal.loader.delegate.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 
 import org.mule.metadata.api.annotation.TypeAnnotation;
 import org.mule.metadata.api.builder.ArrayTypeBuilder;
