@@ -10,7 +10,7 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
-import static org.mule.runtime.module.extension.internal.loader.delegate.MuleExtensionAnnotationParser.getExtensionInfo;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.getExtensionInfo;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getXmlDslModel;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapExtensionTypeFactory.getSoapExtensionType;
 

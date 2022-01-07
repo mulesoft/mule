@@ -14,6 +14,7 @@ import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.extension.api.loader.ExtensionLoadingRequest.builder;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getNamedObject;
 import static org.mule.test.module.extension.internal.util.ExtensionDeclarationTestUtils.declarerFor;
 
@@ -36,8 +37,10 @@ public class TargetParameterDeclarationEnricherTestCase {
   @Before
   public void setUp() {
     ExtensionDeclarer declarer = declarerFor(HeisenbergExtension.class, getProductVersion());
-    new TargetParameterDeclarationEnricher()
-        .enrich(new DefaultExtensionLoadingContext(declarer, this.getClass().getClassLoader(), getDefault(emptySet())));
+    new TargetParameterDeclarationEnricher().enrich(
+                                                    new DefaultExtensionLoadingContext(declarer,
+                                                                                       builder(getClass().getClassLoader(),
+                                                                                               getDefault(emptySet())).build()));
     declaration = declarer.getDeclaration();
   }
 

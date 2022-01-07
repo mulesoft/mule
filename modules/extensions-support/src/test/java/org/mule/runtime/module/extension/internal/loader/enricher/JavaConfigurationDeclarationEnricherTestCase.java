@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.extension.api.loader.ExtensionLoadingRequest.builder;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.checkIsPresent;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getDeclaration;
 import static org.mule.test.module.extension.internal.util.ExtensionDeclarationTestUtils.declarerFor;
@@ -36,8 +37,11 @@ public class JavaConfigurationDeclarationEnricherTestCase {
   @Before
   public void setUp() {
     ExtensionDeclarer declarer = declarerFor(HeisenbergExtension.class, getProductVersion());
-    new JavaConfigurationDeclarationEnricher()
-        .enrich(new DefaultExtensionLoadingContext(declarer, this.getClass().getClassLoader(), getDefault(emptySet())));
+    new JavaConfigurationDeclarationEnricher().enrich(
+                                                      new DefaultExtensionLoadingContext(declarer,
+                                                                                         builder(getClass().getClassLoader(),
+                                                                                                 getDefault(emptySet()))
+                                                                                                     .build()));
     declaration = declarer.getDeclaration();
   }
 
