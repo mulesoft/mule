@@ -9,18 +9,15 @@ package org.mule.runtime.module.extension.internal.resources;
 import static java.lang.Thread.currentThread;
 import static javax.lang.model.SourceVersion.RELEASE_8;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
-import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingRequest;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
 import org.mule.runtime.module.extension.internal.capability.xml.description.DescriptionDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.resources.validator.ExportedPackagesValidator;
 
 import javax.annotation.processing.SupportedAnnotationTypes;
@@ -41,20 +38,16 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends ClassExtensi
   private LazyValue<ExtensionModelLoader> extensionModelLoader = new LazyValue<>(this::fetchJavaExtensionModelLoader);
 
   @Override
-  protected ExtensionModelLoader getExtensionModelLoader() {
-    return withContextClassLoader(ExtensionModelLoader.class.getClassLoader(), () -> new DefaultJavaExtensionModelLoader() {
+  protected void configureLoadingRequest(ExtensionLoadingRequest.Builder requestBuilder) {
+    super.configureLoadingRequest(requestBuilder);
 
-      @Override
-      protected void configureContextBeforeDeclaration(ExtensionLoadingContext context) {
-        super.configureContextBeforeDeclaration(context);
-        context.addCustomDeclarationEnricher(new DescriptionDeclarationEnricher());
-        context.addCustomValidator(new ExportedPackagesValidator());
-      }
-    });
+    requestBuilder.addEnricher(new DescriptionDeclarationEnricher());
+    requestBuilder.addValidator(new ExportedPackagesValidator());
   }
 
-  private ExtensionModelLoader lookupExtensionModelLoader() {
-    fetchJavaExtensionModelLoader().loadExtensionModel()
+  @Override
+  protected ExtensionModelLoader getExtensionModelLoader() {
+    return extensionModelLoader.get();
   }
 
   private ExtensionModelLoader fetchJavaExtensionModelLoader() {
@@ -65,6 +58,4 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends ClassExtensi
         .findFirst()
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("java ExtensionModelLoader not found")));
   }
-}
-
 }
