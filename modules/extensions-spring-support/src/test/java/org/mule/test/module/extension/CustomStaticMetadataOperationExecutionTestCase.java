@@ -6,34 +6,30 @@
  */
 package org.mule.test.module.extension;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.metadata.extension.CustomStaticMetadataOperations.CSV_VALUE;
 import static org.mule.test.metadata.extension.CustomStaticMetadataOperations.JSON_VALUE;
 import static org.mule.test.metadata.extension.CustomStaticMetadataOperations.XML_VALUE;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.tck.junit4.FlakinessDetectorTestRunner;
 import org.mule.test.metadata.extension.CustomStaticMetadataSource;
-import org.mule.test.runner.RunnerDelegateTo;
 
 import java.io.IOException;
 
 import javax.inject.Inject;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-@RunnerDelegateTo(FlakinessDetectorTestRunner.class)
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+
 public class CustomStaticMetadataOperationExecutionTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Inject
@@ -89,7 +85,7 @@ public class CustomStaticMetadataOperationExecutionTestCase extends AbstractExte
   @Test
   public void onErrorCustomType() throws MuleException {
     onErrorCustomType.start();
-    probe(RECEIVE_TIMEOUT, 20, () -> {
+    probe(5000, 20, () -> {
       if (CustomStaticMetadataSource.onErrorResult != null) {
         JsonParser parser = new JsonParser();
         JsonElement payloadTree = parser.parse(CustomStaticMetadataSource.onErrorResult);
@@ -108,7 +104,7 @@ public class CustomStaticMetadataOperationExecutionTestCase extends AbstractExte
         + "  <age>12</age>\n"
         + "</person>";
     onSuccessCustomType.start();
-    probe(RECEIVE_TIMEOUT, 20, () -> {
+    probe(5000, 20, () -> {
       if (CustomStaticMetadataSource.onSuccessResult != null) {
         if (CustomStaticMetadataSource.onSuccessResult.equals(expected)) {
           return true;
