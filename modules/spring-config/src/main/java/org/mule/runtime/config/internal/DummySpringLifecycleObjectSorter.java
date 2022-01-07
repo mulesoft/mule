@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal;
 
+import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Collections.reverse;
 import static java.util.Objects.requireNonNull;
@@ -16,6 +17,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.internal.lifecycle.phases.LifecycleObjectSorter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,13 +29,17 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 
 public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
 
-  private DefaultDirectedGraph<VertexWrapper, DefaultEdge> dependencyGraph;
+  private List<DefaultDirectedGraph<VertexWrapper, DefaultEdge>> dependencyGraphs;
   private DummyDependencyResolver resolver;
   private Map<String, Integer> keyHashcodeMap;
   protected Class<?>[] orderedLifecycleTypes;
 
   public DummySpringLifecycleObjectSorter(DummyDependencyResolver resolver, Class<?>[] orderedLifecycleTypes) {
-    this.dependencyGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
+    this.dependencyGraphs = new ArrayList<>();
+    for (int i = 0; i < 12; i++) {
+      dependencyGraphs.add(new DefaultDirectedGraph<>(DefaultEdge.class));
+    }
+
     this.resolver = resolver;
     this.keyHashcodeMap = new HashMap<>();
     this.orderedLifecycleTypes = orderedLifecycleTypes;
@@ -48,11 +54,8 @@ public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
     if (stream(orderedLifecycleTypes).noneMatch(x -> x.isInstance(currentObject))) {
       return;
     }
-    doAddObject(name, currentObject);
-  }
-
-  private void doAddObject(String name, Object currentObject) {
-    VertexWrapper currentVertex = addVertex(name, currentObject);
+    DefaultDirectedGraph<VertexWrapper, DefaultEdge> directedGraph = getDirectedGraph(currentObject);
+    VertexWrapper currentVertex = addVertex(name, currentObject, getDirectedGraph(currentObject));
 
     // get prerequisite objects for the current object
     List<Pair<Object, String>> prerequisiteObjects = resolver.getDirectBeanDependencies(name);
@@ -63,25 +66,32 @@ public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
     }
     prerequisiteObjects.forEach(
                                 (prerequisite) -> {
-                                  VertexWrapper preReqVertex = addVertex(prerequisite.getSecond(), prerequisite.getFirst());
+                                  VertexWrapper preReqVertex =
+                                      addVertex(prerequisite.getSecond(), prerequisite.getFirst(), directedGraph);
                                   // todo: fix below later (interdependent vertices)
-                                  if (!dependencyGraph.containsEdge(preReqVertex, currentVertex)) {
-                                    dependencyGraph.addEdge(currentVertex, preReqVertex);
+                                  if (!directedGraph.containsEdge(preReqVertex, currentVertex)) {
+                                    directedGraph.addEdge(currentVertex, preReqVertex);
                                   }
                                 });
   }
 
-  private VertexWrapper addVertex(String name, Object currentObject) {
+  private int getBucketIndex(Object currentObject) {
+    Class<?> clazz = asList(orderedLifecycleTypes).stream().filter(x -> x.isInstance(currentObject)).findFirst().get();
+    return asList(orderedLifecycleTypes).indexOf(clazz);
+  }
+
+  private VertexWrapper addVertex(String name, Object currentObject,
+                                  DefaultDirectedGraph<VertexWrapper, DefaultEdge> directedGraph) {
+
     VertexWrapper currentVertex = new VertexWrapper(currentObject);
 
-    if (keyHashcodeMap.containsKey(name) && keyHashcodeMap.containsValue(currentObject.hashCode())) {
-      currentVertex = dependencyGraph.vertexSet().stream()
-          .filter(isSameVertex(currentVertex)).collect(toList()).get(0);
-    } else {
-      dependencyGraph.addVertex(currentVertex);
-      keyHashcodeMap.put(name, currentObject.hashCode());
-    }
+    directedGraph.addVertex(currentVertex);
+
     return currentVertex;
+  }
+
+  private DefaultDirectedGraph<VertexWrapper, DefaultEdge> getDirectedGraph(Object currentObject) {
+    return dependencyGraphs.get(getBucketIndex(currentObject));
   }
 
   private Predicate<VertexWrapper> isSameVertex(VertexWrapper currentVertex) {
@@ -90,9 +100,18 @@ public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
 
   @Override
   public List<Object> getSortedObjects() {
-    List<Object> sortedObjects = newArrayList(new TopologicalOrderIterator<>(dependencyGraph));
-    reverse(sortedObjects);
-    return sortedObjects.stream().map(x -> ((VertexWrapper) x).getWrappedObject()).collect(toList());
+    return dependencyGraphs.stream().map(x -> {
+      List<Object> sortedObjects = newArrayList(new TopologicalOrderIterator<>(x));
+      reverse(sortedObjects);
+      return sortedObjects.stream().map(v -> ((VertexWrapper) v).getWrappedObject()).collect(toList());
+    }).reduce(new ArrayList<>(), (sortedObjectList, b) -> {
+      for (Object o : b) {
+        if (!sortedObjectList.contains(o)) {
+          sortedObjectList.add(o);
+        }
+      }
+      return sortedObjectList;
+    });
   }
 
 
@@ -101,8 +120,10 @@ public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
   public void addObject(String name, Object currentObject, List<Object> prerequisiteObjects) {
     // null check
     requireNonNull(currentObject, "currentObject cannot be null");
+
+    DefaultDirectedGraph<VertexWrapper, DefaultEdge> directedGraph = getDirectedGraph(currentObject);
     // add vertex
-    dependencyGraph.addVertex((VertexWrapper) currentObject);
+    directedGraph.addVertex((VertexWrapper) currentObject);
 
     // add children & edge
     if (prerequisiteObjects.isEmpty()) {
@@ -110,8 +131,8 @@ public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
     }
     prerequisiteObjects.forEach(
                                 (prerequisite) -> {
-                                  dependencyGraph.addVertex((VertexWrapper) prerequisite);
-                                  dependencyGraph.addEdge((VertexWrapper) currentObject, (VertexWrapper) prerequisite);
+                                  directedGraph.addVertex((VertexWrapper) prerequisite);
+                                  directedGraph.addEdge((VertexWrapper) currentObject, (VertexWrapper) prerequisite);
                                 });
 
   }
