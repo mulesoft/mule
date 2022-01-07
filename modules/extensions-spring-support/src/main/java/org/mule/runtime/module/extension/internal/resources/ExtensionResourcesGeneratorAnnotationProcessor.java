@@ -6,17 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.resources;
 
-import static java.lang.Thread.currentThread;
 import static javax.lang.model.SourceVersion.RELEASE_8;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.getLoaderById;
 import static org.mule.runtime.module.extension.internal.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
 
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingRequest;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
 import org.mule.runtime.module.extension.internal.capability.xml.description.DescriptionDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.resources.validator.ExportedPackagesValidator;
 
@@ -35,7 +31,7 @@ import javax.annotation.processing.SupportedSourceVersion;
 @SupportedOptions(EXTENSION_VERSION)
 public class ExtensionResourcesGeneratorAnnotationProcessor extends ClassExtensionResourcesGeneratorAnnotationProcessor {
 
-  private LazyValue<ExtensionModelLoader> extensionModelLoader = new LazyValue<>(this::fetchJavaExtensionModelLoader);
+  private LazyValue<ExtensionModelLoader> extensionModelLoader = new LazyValue<>(() -> getLoaderById("java"));
 
   @Override
   protected void configureLoadingRequest(ExtensionLoadingRequest.Builder requestBuilder) {
@@ -48,14 +44,5 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends ClassExtensi
   @Override
   protected ExtensionModelLoader getExtensionModelLoader() {
     return extensionModelLoader.get();
-  }
-
-  private ExtensionModelLoader fetchJavaExtensionModelLoader() {
-    return new SpiServiceRegistry().lookupProviders(ExtensionModelLoaderProvider.class, currentThread().getContextClassLoader())
-        .stream()
-        .flatMap(p -> p.getExtensionModelLoaders().stream())
-        .filter(loader -> "java".equals(loader.getId()))
-        .findFirst()
-        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("java ExtensionModelLoader not found")));
   }
 }
