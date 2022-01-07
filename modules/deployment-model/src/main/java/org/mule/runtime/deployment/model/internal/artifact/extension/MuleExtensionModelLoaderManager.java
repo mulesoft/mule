@@ -18,11 +18,11 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.lookupExtensionModelLoaders;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.plugin.LoaderDescriber;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
@@ -46,8 +46,6 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
 
   private static final Logger LOGGER = getLogger(MuleExtensionModelLoaderManager.class);
 
-  private static final Class<ExtensionModelLoaderProvider> PROVIDER_CLASS = ExtensionModelLoaderProvider.class;
-
   private final Map<String, ExtensionModelLoader> extensionModelLoaders = newHashMap();
 
   private Supplier<Collection<ExtensionModelLoader>> extModelLoadersLookup;
@@ -63,9 +61,7 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
   }
 
   private Collection<ExtensionModelLoader> lookupLoadersFromSpi(ArtifactClassLoader containerClassLoader) {
-    return new SpiServiceRegistry().lookupProviders(PROVIDER_CLASS, containerClassLoader.getClassLoader()).stream()
-        .flatMap(provider -> provider.getExtensionModelLoaders().stream())
-        .collect(toList());
+    return lookupExtensionModelLoaders(containerClassLoader.getClassLoader()).collect(toList());
   }
 
   public void setExtensionModelLoadersLookup(Supplier<Collection<ExtensionModelLoader>> extModelLoadersLookup) {
@@ -114,7 +110,7 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
     if (isNotBlank(sb.toString())) {
       throw new MuleRuntimeException(createStaticMessage(format(
                                                                 "There are several loaders that return the same identifier when looking up providers for '%s'. Full error list: %s",
-                                                                PROVIDER_CLASS.getName(), sb)));
+                                                                ExtensionModelLoaderProvider.class.getName(), sb)));
     }
   }
 

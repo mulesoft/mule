@@ -7,16 +7,21 @@
 package org.mule.test.functional;
 
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.getLoaderById;
+import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCES_PATHS;
+import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_DECLARATION;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate;
+import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,6 +36,8 @@ import java.util.Set;
  * @since 4.0
  */
 public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends MuleArtifactFunctionalTestCase {
+
+  private static final LazyValue<ExtensionModelLoader> LOADER = new LazyValue<>(() -> getLoaderById("xml-based"));
 
   /**
    * @return a path pointing to an extension built with XML. If null, defaults to the {@link #getModulePaths()}
@@ -74,11 +81,12 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
           params.put(XmlExtensionModelLoader.VALIDATE_XML, shouldValidateXml());
           // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
           params.put("COMPILATION_MODE", true);
-          operationsOutputPath().ifPresent(path -> params.put(XmlExtensionModelLoader.RESOURCE_DECLARATION, path));
-          resourcesPaths().ifPresent(resourcesPaths -> params.put(XmlExtensionModelLoader.RESOURCES_PATHS, resourcesPaths));
+          operationsOutputPath().ifPresent(path -> params.put(RESOURCE_DECLARATION, path));
+          resourcesPaths().ifPresent(resourcesPaths -> params.put(RESOURCES_PATHS, resourcesPaths));
           final DslResolvingContext dslResolvingContext = getDefault(extensions);
-          final ExtensionModel extensionModel =
-              new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(), dslResolvingContext, params);
+          final ExtensionModel extensionModel = LOADER.get().loadExtensionModel(
+                                                                                getClass().getClassLoader(), dslResolvingContext,
+                                                                                params);
           extensions.add(extensionModel);
           extensionManager.registerExtension(extensionModel);
         }

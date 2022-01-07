@@ -341,7 +341,6 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(allParameterModels.get(0).getName(), is("paramWithDoc"));
     assertThat(allParameterModels.get(0).getDescription(), is("Documentation for the parameter"));
     assertThat(allParameterModels.get(0).getLayoutModel().get().getTabName().get(), is(Placement.DEFAULT_TAB));
-    assertThat(allParameterModels.get(0).getLayoutModel().get().getOrder().isPresent(), is(false));
 
     assertThat(allParameterModels.get(1).getName(), is("hiddenParamWithDoc"));
     assertThat(allParameterModels.get(1).getDescription(),
