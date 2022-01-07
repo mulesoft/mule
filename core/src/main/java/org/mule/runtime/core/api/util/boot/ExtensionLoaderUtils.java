@@ -12,29 +12,57 @@ import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
 
+import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
+/**
+ * Utilities for loading Extensions
+ *
+ * @since 4.5.0
+ */
 public final class ExtensionLoaderUtils {
 
+  /**
+   * @return a {@link Stream} with all the {@link ExtensionModelLoader} available on the current context {@link ClassLoader}
+   */
   public static Stream<ExtensionModelLoader> lookupExtensionModelLoaders() {
     return lookupExtensionModelLoaders(currentThread().getContextClassLoader());
   }
 
+  /**
+   * @param classLoader the classloader owning the search space
+   * @return a {@link Stream} with all the {@link ExtensionModelLoader} available to the given {@code classloader}
+   */
   public static Stream<ExtensionModelLoader> lookupExtensionModelLoaders(ClassLoader classLoader) {
     return new SpiServiceRegistry().lookupProviders(ExtensionModelLoaderProvider.class, classLoader)
         .stream()
         .flatMap(p -> p.getExtensionModelLoaders().stream());
   }
 
+  /**
+   * Finds an {@link ExtensionModelLoader} with a matching {@code id} using the current context {@link ClassLoader}
+   *
+   * @param id the wanted loader's id
+   * @return the found {@link ExtensionModelLoader}
+   * @throws NoSuchElementException if no matching loader is found
+   */
   public static ExtensionModelLoader getLoaderById(String id) {
     return getLoaderById(currentThread().getContextClassLoader(), id);
   }
 
+  /**
+   * Finds an {@link ExtensionModelLoader} with a matching {@code id} in the context of the given {@link ClassLoader}
+   *
+   * @param classLoader the classloader owning the search space
+   * @param id          the wanted loader's id
+   * @return the found {@link ExtensionModelLoader}
+   * @throws NoSuchElementException if no matching loader is found
+   */
   public static ExtensionModelLoader getLoaderById(ClassLoader classLoader, String id) {
     return lookupExtensionModelLoaders(classLoader)
         .filter(extensionModelLoader -> extensionModelLoader.getId().equals(id))
         .findAny()
-        .orElseThrow(() -> new RuntimeException("No loader found for id:{" + id + "}"));
+        .orElseThrow(() -> new NoSuchElementException("No loader found for id:{" + id + "}"));
   }
 
   private ExtensionLoaderUtils() {}

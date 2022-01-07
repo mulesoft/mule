@@ -14,6 +14,11 @@ import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensi
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Implementation of {@link ExtensionModelLoaderProvider} which yields the main {@link ExtensionModelLoader} instances
+ *
+ * @since 4.5.0
+ */
 public class DefaultExtensionModelLoaderProvider implements ExtensionModelLoaderProvider {
 
   @Override

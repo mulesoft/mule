@@ -14,6 +14,7 @@ import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.spy;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
+import static org.mule.test.module.extension.internal.util.ExtensionDeclarationTestUtils.declarerFor;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -30,7 +31,6 @@ import org.mule.runtime.internal.dsl.DefaultDslResolvingContext;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.config.dsl.config.extension.SimpleExtension;
 import org.mule.tck.classlaoder.TestClassLoader;
-import org.mule.test.module.extension.internal.util.ExtensionDeclarationTestUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -53,7 +53,7 @@ public class ConfigurationDefinitionParserTestCase {
       Builder<?> definitionBuilder = new Builder<>().withIdentifier("test").withNamespace("namespace");
 
       ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(classLoader, getDefault(emptySet()));
-      ExtensionDeclarationTestUtils.declarerFor(SimpleExtension.class, "1.0.0-dev", ctx);
+      declarerFor(SimpleExtension.class, "1.0.0-dev", ctx);
       ExtensionModelFactory factory = new ExtensionModelFactory();
       ExtensionModel extensionModel = factory.create(ctx);
       ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);

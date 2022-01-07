@@ -68,6 +68,7 @@ public final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
   /**
    * {@inheritDoc}
    */
+  @Override
   public ExtensionDeclarer declare(ExtensionLoadingContext context) {
     JavaExtensionModelParser parser = new JavaExtensionModelParser(extensionElement, context);
     ExtensionDeclarer extensionDeclarer = getExtensionDeclarer(context);

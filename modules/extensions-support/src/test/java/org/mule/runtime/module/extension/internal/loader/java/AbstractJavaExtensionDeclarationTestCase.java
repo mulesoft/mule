@@ -65,10 +65,6 @@ public abstract class AbstractJavaExtensionDeclarationTestCase extends AbstractM
     return declarer;
   }
 
-  // protected ExtensionDeclarer declareExtension(ExtensionLoadingContext context) {
-  // return getDeclarer().declare(context);
-  // }
-
   protected ConfigurationDeclaration getConfiguration(ExtensionDeclaration extensionDeclaration, final String configurationName) {
     return extensionDeclaration.getConfigurations()
         .stream()

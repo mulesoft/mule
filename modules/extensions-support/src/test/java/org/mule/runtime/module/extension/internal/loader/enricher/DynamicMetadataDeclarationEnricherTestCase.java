@@ -18,7 +18,6 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
-import static org.mule.runtime.extension.api.loader.ExtensionLoadingRequest.builder;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.checkIsPresent;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getDeclaration;
 import static org.mule.test.metadata.extension.resolver.TestInputAndOutputResolverWithKeyResolver.TEST_INPUT_AND_OUTPUT_RESOLVER_WITH_KEY_RESOLVER;
@@ -79,10 +78,8 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
   @Before
   public void setUp() {
     ExtensionDeclarer declarer = declarerFor(MetadataExtension.class, getProductVersion());
-    new DynamicMetadataDeclarationEnricher().enrich(
-                                                    new DefaultExtensionLoadingContext(declarer,
-                                                                                       builder(getClass().getClassLoader(),
-                                                                                               getDefault(emptySet())).build()));
+    new DynamicMetadataDeclarationEnricher()
+        .enrich(new DefaultExtensionLoadingContext(declarer, getClass().getClassLoader(), getDefault(emptySet())));
     declaration = declarer.getDeclaration();
   }
 

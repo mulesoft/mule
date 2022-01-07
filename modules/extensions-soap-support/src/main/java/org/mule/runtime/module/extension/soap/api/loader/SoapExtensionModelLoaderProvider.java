@@ -14,6 +14,11 @@ import org.mule.runtime.module.extension.soap.internal.loader.SoapExtensionModel
 
 import java.util.Set;
 
+/**
+ * {@link ExtensionModelLoaderProvider} yielding loaders for SOAP based extensions
+ *
+ * @since 4.5.0
+ */
 public class SoapExtensionModelLoaderProvider implements ExtensionModelLoaderProvider {
 
   @Override

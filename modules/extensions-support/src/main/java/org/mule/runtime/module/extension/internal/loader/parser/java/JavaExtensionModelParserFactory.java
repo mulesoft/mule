@@ -22,6 +22,11 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeW
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
 
+/**
+ * {@link ExtensionModelParserFactory} implementation for Java based extensions
+ *
+ * @since 4.5.0
+ */
 public class JavaExtensionModelParserFactory implements ExtensionModelParserFactory {
 
   @Override
@@ -29,6 +34,12 @@ public class JavaExtensionModelParserFactory implements ExtensionModelParserFact
     return new JavaExtensionModelParser(getExtensionElement(context), context);
   }
 
+  /**
+   * Extracts the {@link ExtensionElement} from the given {@code context}
+   *
+   * @param context the loading context
+   * @return an {@link ExtensionElement}
+   */
   public static ExtensionElement getExtensionElement(ExtensionLoadingContext context) {
     return context.getExtensionDeclarer().getDeclaration().getModelProperty(ExtensionTypeDescriptorModelProperty.class)
         .map(p -> {
