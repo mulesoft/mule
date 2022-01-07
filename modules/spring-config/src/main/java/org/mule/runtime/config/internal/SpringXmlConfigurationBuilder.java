@@ -187,8 +187,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   }
 
   private BaseMuleArtifactContext createBaseContext(MuleContext muleContext,
-                                                      OptionalObjectsController applicationObjectController,
-                                                      Optional<ConfigurationProperties> parentConfigurationProperties) {
+                                                    OptionalObjectsController applicationObjectController,
+                                                    Optional<ConfigurationProperties> parentConfigurationProperties) {
     final BaseMuleArtifactContext baseMuleArtifactContext = new BaseMuleArtifactContext(muleContext,
                                                                                         applicationObjectController,
                                                                                         parentConfigurationProperties,

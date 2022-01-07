@@ -62,7 +62,6 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
 
   private MuleContext muleContext;
   private TransformersRegistry transformersRegistry;
-  private StreamingManager streamingManager;
 
   private ExtendedExpressionLanguageAdaptor expressionLanguage;
   // Default style parser
@@ -115,7 +114,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
                                  ComponentLocation componentLocation,
                                  BindingContext context) {
     return updateTypedValueForStreaming(expressionLanguage.evaluate(expression, event, eventBuilder, componentLocation, context),
-                                        event, streamingManager);
+                                        event, getStreamingManager());
   }
 
   @Override
@@ -144,7 +143,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
       throws ExpressionRuntimeException {
     return updateTypedValueForStreaming(expressionLanguage.evaluate(expression, outputType, event, componentLocation, context,
                                                                     failOnNull),
-                                        event, streamingManager);
+                                        event, getStreamingManager());
   }
 
   private TypedValue<?> transform(TypedValue<?> target, DataType sourceType, DataType outputType) throws TransformerException {
@@ -377,9 +376,8 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
     this.transformersRegistry = transformersRegistry;
   }
 
-  @Inject
-  public void setStreamingManager(StreamingManager streamingManager) {
-    this.streamingManager = streamingManager;
+  public StreamingManager getStreamingManager() {
+    return muleContext.getStreamingManager();
   }
 
   public void setExpressionLanguage(ExtendedExpressionLanguageAdaptor expressionLanguage) {

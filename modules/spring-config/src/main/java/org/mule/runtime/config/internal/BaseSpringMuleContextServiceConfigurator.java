@@ -8,7 +8,6 @@ package org.mule.runtime.config.internal;
 
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
@@ -16,8 +15,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_POOLS_CONFIG;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_GHOST_BUSTER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMERS_REGISTRY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMER_RESOLVER;
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.BINDING_PROVIDER_PREDICATE;
@@ -38,15 +35,12 @@ import org.mule.runtime.config.internal.el.DefaultExpressionManagerFactoryBean;
 import org.mule.runtime.config.internal.registry.SpringRegistryBootstrap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
-import org.mule.runtime.core.internal.profiling.NoOpProfilingService;
 import org.mule.runtime.core.internal.registry.TypeBasedTransformerResolver;
-import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 import org.mule.runtime.core.internal.transformer.DefaultTransformersRegistry;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
@@ -72,8 +66,8 @@ class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContext
 
   // This is needed just for some unit test scenarios
   @Deprecated
-  public static final String DIABLE_EXPRESSIONS_SUPPORT =
-      BaseSpringMuleContextServiceConfigurator.class.getName() + ".disableExpressionsSupport";
+  public static final String DISABLE_TRANSFORMERS_SUPPORT =
+      BaseSpringMuleContextServiceConfigurator.class.getName() + ".disableTransformersSupport";
 
   private final MuleContext muleContext;
   private final ArtifactType artifactType;
@@ -112,24 +106,19 @@ class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContext
 
     registerConstantBeanDefinition(OBJECT_CONFIGURATION_PROPERTIES, configurationProperties);
 
-    if (!getBoolean(DIABLE_EXPRESSIONS_SUPPORT)) {
-      registerBeanDefinition(OBJECT_STREAMING_MANAGER, getBeanDefinition(DefaultStreamingManager.class));
-      registerBeanDefinition(OBJECT_STREAMING_GHOST_BUSTER, getBeanDefinition(StreamingGhostBuster.class));
-
+    if (!getBoolean(DISABLE_TRANSFORMERS_SUPPORT)) {
       registerBeanDefinition(OBJECT_TRANSFORMER_RESOLVER, getBeanDefinition(TypeBasedTransformerResolver.class));
       registerBeanDefinition(OBJECT_TRANSFORMERS_REGISTRY, getBeanDefinition(DefaultTransformersRegistry.class));
+    }
 
       registerBeanDefinition(OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER,
                              getBeanDefinition(DataWeaveExtendedExpressionLanguageAdaptorFactoryBean.class));
       registerBeanDefinition(OBJECT_EXPRESSION_LANGUAGE, getBeanDefinition(MVELExpressionLanguage.class));
       registerBeanDefinition(OBJECT_EXPRESSION_MANAGER, getBeanDefinition(DefaultExpressionManagerFactoryBean.class));
-    }
 
-    registerBeanDefinition(OBJECT_SCHEDULER_POOLS_CONFIG,
-                           getConstantObjectBeanDefinition(SchedulerContainerPoolsConfig.getInstance()));
-    registerBeanDefinition(OBJECT_SCHEDULER_BASE_CONFIG, getBeanDefinition(SchedulerBaseConfigFactory.class));
-
-    registerBeanDefinition(MULE_PROFILING_SERVICE_KEY, getBeanDefinition(NoOpProfilingService.class));
+      registerBeanDefinition(OBJECT_SCHEDULER_POOLS_CONFIG,
+                             getConstantObjectBeanDefinition(SchedulerContainerPoolsConfig.getInstance()));
+      registerBeanDefinition(OBJECT_SCHEDULER_BASE_CONFIG, getBeanDefinition(SchedulerBaseConfigFactory.class));
 
     registerConstantBeanDefinition(OBJECT_REGISTRY, getServiceLocator());
 

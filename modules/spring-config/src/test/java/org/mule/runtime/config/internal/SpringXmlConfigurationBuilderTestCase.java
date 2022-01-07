@@ -7,7 +7,7 @@
 package org.mule.runtime.config.internal;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
-import static org.mule.runtime.config.internal.BaseSpringMuleContextServiceConfigurator.DIABLE_EXPRESSIONS_SUPPORT;
+import static org.mule.runtime.config.internal.BaseSpringMuleContextServiceConfigurator.DISABLE_TRANSFORMERS_SUPPORT;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
@@ -33,7 +33,6 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -73,12 +72,11 @@ public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase 
   public ExpectedException expectedException = none();
 
   @Rule
-  public SystemProperty disableExpressionsSupport = new SystemProperty(DIABLE_EXPRESSIONS_SUPPORT, "true");
+  public SystemProperty disableExpressionsSupport = new SystemProperty(DISABLE_TRANSFORMERS_SUPPORT, "true");
 
   @Before
   public void setUp() throws Exception {
     muleContext = mockContextWithServices();
-    MuleRegistry registry = muleContext.getRegistry();
     muleContext.getInjector().inject(this);
     configurationBuilderWithUsedInvalidSchema =
         new SpringXmlConfigurationBuilder(new String[] {"invalid-schema.xml"}, new HashMap<>(), APP, false, false);

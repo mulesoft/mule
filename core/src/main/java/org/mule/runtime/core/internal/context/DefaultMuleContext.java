@@ -115,6 +115,7 @@ import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.management.stats.ProcessingTimeWatcher;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.api.util.queue.Queue;
@@ -277,6 +278,9 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private final Object errorTypeLocatorLock = new Object();
   private ErrorTypeRepository errorTypeRepository;
   private final Object errorTypeRepositoryLock = new Object();
+
+  private StreamingManager streamingManager;
+  private final Object streamingManagerLock = new Object();
 
   private ConfigurationComponentLocator componentLocator;
 
@@ -1152,6 +1156,23 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     }
 
     return errorTypeRepository;
+  }
+
+  @Override
+  public StreamingManager getStreamingManager() {
+    if (streamingManager == null) {
+      synchronized (streamingManagerLock) {
+        if (streamingManager == null) {
+          try {
+            streamingManager = getRegistry().lookupObject(StreamingManager.class);
+          } catch (RegistrationException e) {
+            throw new IllegalStateException("Could not get 'StreamingManager' instance from registry.", e);
+          }
+        }
+      }
+    }
+
+    return streamingManager;
   }
 
   @Override
