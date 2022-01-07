@@ -3,6 +3,15 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.addedToInterface",
+          "new": "method org.mule.runtime.core.api.streaming.StreamingManager org.mule.runtime.core.api.MuleContext::getStreamingManager()",
+          "package": "org.mule.runtime.core.api",
+          "classSimpleName": "MuleContext",
+          "methodName": "getStreamingManager",
+          "elementKind": "method",
+          "justification": "MULE-19934: Needed to soften dependency between expressionLanguage and streamingManager."
+        },
+        {
           "code": "java.class.noLongerInheritsFromClass",
           "old": "class org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
           "new": "class org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
