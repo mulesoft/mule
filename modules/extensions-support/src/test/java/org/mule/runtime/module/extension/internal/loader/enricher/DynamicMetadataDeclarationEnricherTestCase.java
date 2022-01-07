@@ -80,7 +80,9 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
   public void setUp() {
     ExtensionDeclarer declarer = declarerFor(MetadataExtension.class, getProductVersion());
     new DynamicMetadataDeclarationEnricher().enrich(
-        new DefaultExtensionLoadingContext(declarer, builder(getClass().getClassLoader(), getDefault(emptySet())).build()));
+                                                    new DefaultExtensionLoadingContext(declarer,
+                                                                                       builder(getClass().getClassLoader(),
+                                                                                               getDefault(emptySet())).build()));
     declaration = declarer.getDeclaration();
   }
 
