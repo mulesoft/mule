@@ -7,10 +7,8 @@
 package org.mule.runtime.module.extension.internal.resources;
 
 import static javax.lang.model.SourceVersion.RELEASE_8;
-import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.getLoaderById;
 import static org.mule.runtime.module.extension.internal.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
 
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingRequest;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.capability.xml.description.DescriptionDeclarationEnricher;
@@ -31,8 +29,6 @@ import javax.annotation.processing.SupportedSourceVersion;
 @SupportedOptions(EXTENSION_VERSION)
 public class ExtensionResourcesGeneratorAnnotationProcessor extends ClassExtensionResourcesGeneratorAnnotationProcessor {
 
-  private LazyValue<ExtensionModelLoader> extensionModelLoader = new LazyValue<>(() -> getLoaderById("java"));
-
   @Override
   protected void configureLoadingRequest(ExtensionLoadingRequest.Builder requestBuilder) {
     super.configureLoadingRequest(requestBuilder);
@@ -43,6 +39,6 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends ClassExtensi
 
   @Override
   protected ExtensionModelLoader getExtensionModelLoader() {
-    return extensionModelLoader.get();
+    return fetchJavaExtensionModelLoader();
   }
 }
