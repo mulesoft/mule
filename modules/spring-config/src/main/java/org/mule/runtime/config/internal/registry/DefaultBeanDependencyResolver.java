@@ -18,7 +18,6 @@ import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolve
 import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
 
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,7 +59,7 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
 
     return stream(forTree(DependencyNode::getChildren).depthFirstPostOrder(root).spliterator(), false)
         .filter(node -> node != root)
-        .map(DependencyNode::getValue)
+        .map(DependencyNode::getObject)
         .collect(toList());
   }
 

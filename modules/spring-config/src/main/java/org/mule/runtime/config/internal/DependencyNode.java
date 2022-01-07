@@ -13,17 +13,17 @@ import java.util.List;
 
 public class DependencyNode {
 
-  private final Object value;
+  private final Object object;
   private final List<DependencyNode> children = new LinkedList<>();
-  private String key;
+  private String name;
 
-  public DependencyNode(Object value) {
-    this.value = value;
+  public DependencyNode(Object object) {
+    this.object = object;
   }
 
-  public DependencyNode(Object value, String key) {
-    this.value = value;
-    this.key = key;
+  public DependencyNode(String name, Object object) {
+    this.name = name;
+    this.object = object;
   }
 
   public DependencyNode addChild(DependencyNode child) {
@@ -35,15 +35,15 @@ public class DependencyNode {
     return children;
   }
 
-  public Object getValue() {
-    return value;
+  public Object getObject() {
+    return object;
   }
 
-  public String getKey() {
-    return key;
+  public String getName() {
+    return name;
   }
 
-  public Pair<Object, String> getObjectKeyPair() {
-    return new Pair<>(value, key);
+  public Pair<String, Object> getKeyObjectPair() {
+    return new Pair<>(name, object);
   }
 }

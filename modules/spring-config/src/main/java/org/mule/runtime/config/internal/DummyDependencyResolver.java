@@ -42,9 +42,6 @@ public class DummyDependencyResolver implements BeanDependencyResolver {
     processedKey = new HashSet<>();
   }
 
-  public List<Object> getDirectDependencies(String name) {
-    return resolveBeanDependencies(name);
-  }
 
   @Override
   public List<Object> resolveBeanDependencies(String beanName) {
@@ -55,26 +52,25 @@ public class DummyDependencyResolver implements BeanDependencyResolver {
 
     return currentNode.getChildren()
         .stream()
-        .map(DependencyNode::getValue)
+        .map(DependencyNode::getObject)
         .collect(toList());
   }
 
-  public List<Pair<Object, String>> getDirectBeanDependencies(String beanName) {
+  public List<Pair<String, Object>> getDirectBeanDependencies(String beanName) {
     Object currentObject = springRegistry.get(beanName);
-    final DependencyNode currentNode = new DependencyNode(currentObject, beanName);
+    final DependencyNode currentNode = new DependencyNode(beanName, currentObject);
 
     addDirectDependency(beanName, currentObject, currentNode, processedKey);
 
     return currentNode.getChildren()
         .stream()
-        .map(DependencyNode::getObjectKeyPair)
+        .map(DependencyNode::getKeyObjectPair)
         .collect(toList());
   }
 
-
-  private void addDirectDependency(String key, Object object, DependencyNode node, Set<String> processedKeys) {
-    addDirectAutoDiscoveredDependencies(key, processedKeys, node);
-    addDirectConfigurationDependencies(key, processedKeys, node);
+  private void addDirectDependency(String beanName, Object object, DependencyNode node, Set<String> processedKeys) {
+    addDirectAutoDiscoveredDependencies(beanName, processedKeys, node);
+    addDirectConfigurationDependencies(beanName, node, processedKeys);
     addDirectDeclaredDependencies(object, processedKeys, node);
   }
 
@@ -82,21 +78,22 @@ public class DummyDependencyResolver implements BeanDependencyResolver {
    * If the target object implements {@link InjectedDependenciesProvider}, then the custom dependencies declared by it are added.
    */
   private void addDirectDeclaredDependencies(Object object, Set<String> processedKeys, DependencyNode node) {
-    declaredDependencyResolver.getDeclaredDirectDependencies(object)
-        .forEach(pair -> addDirectChild(node, pair.getFirst(), pair.getSecond(), processedKeys));
+    declaredDependencyResolver.getDeclaredDependencies(object)
+        .forEach(beanNameObjectPair -> addDirectChild(beanNameObjectPair.getFirst(), beanNameObjectPair.getSecond(), node,
+                                                      processedKeys));
   }
 
   /**
    * These are obtained through the {@link #configurationDependencyResolver}
    */
-  private void addDirectConfigurationDependencies(String key, Set<String> processedKeys, DependencyNode node) {
+  private void addDirectConfigurationDependencies(String beanName, DependencyNode node, Set<String> processedKeys) {
     if (configurationDependencyResolver == null) {
       return;
     }
-    for (String dependency : configurationDependencyResolver.getDirectComponentDependencies(key)) {
+    for (String name : configurationDependencyResolver.getDirectComponentDependencies(beanName)) {
       try {
-        if (springRegistry.isSingleton(dependency)) { // to use it, configResolver, make it static..
-          addDirectChild(node, dependency, springRegistry.get(dependency), processedKeys);
+        if (springRegistry.isSingleton(name)) {
+          addDirectChild(name, springRegistry.get(name), node, processedKeys);
         }
       } catch (NoSuchBeanDefinitionException e) {
         // we're starting in lazy mode... disregard.
@@ -108,18 +105,20 @@ public class DummyDependencyResolver implements BeanDependencyResolver {
    * Adds the dependencies that are explicit on the {@link BeanDefinition}. These were inferred from introspecting fields
    * annotated with {@link Inject} or were programmatically added to the definition
    */
-  private void addDirectAutoDiscoveredDependencies(String key, Set<String> processedKeys, DependencyNode node) {
-    autoDiscoveredDependencyResolver.getAutoDiscoveredDependencies(key)
-        .stream().filter(x -> !x.getValue().equals(node.getValue()))
-        .forEach(dependency -> addDirectChild(node, dependency.getKey(), dependency.getValue(), processedKeys));
+  private void addDirectAutoDiscoveredDependencies(String beanName, Set<String> processedKeys, DependencyNode node) {
+    autoDiscoveredDependencyResolver.getAutoDiscoveredDependencies(beanName)
+        .stream()
+        .filter(beanNameObjectPair -> !beanNameObjectPair.getSecond().equals(node.getObject())) // todo: get second or first?
+        .forEach(beanNameObjectPair -> addDirectChild(beanNameObjectPair.getFirst(), beanNameObjectPair.getSecond(), node,
+                                                      processedKeys));
   }
 
 
-  private void addDirectChild(DependencyNode parent, String key, Object childObject, Set<String> processedKeys) {
+  private void addDirectChild(String key, Object childObject, DependencyNode parent, Set<String> processedKeys) {
     if (!processedKeys.add(key)) {
       return;
     }
-    parent.addChild(new DependencyNode(childObject, key));
+    parent.addChild(new DependencyNode(key, childObject));
   }
 
 

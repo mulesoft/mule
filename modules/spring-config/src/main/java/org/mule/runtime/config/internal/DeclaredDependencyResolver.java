@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.config.internal;
 
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.config.internal.registry.SpringContextRegistry;
 import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
-
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
 
 public class DeclaredDependencyResolver {
 
@@ -24,7 +25,7 @@ public class DeclaredDependencyResolver {
     this.springRegistry = springRegistry;
   }
 
-  public List<Pair<String, Object>> getDeclaredDirectDependencies(Object object) {
+  public List<Pair<String, Object>> getDeclaredDependencies(Object object) {
     List<Pair<String, Object>> declaredDependencies = new ArrayList<>();
     if (object instanceof InjectedDependenciesProvider) {
       ((InjectedDependenciesProvider) object).getInjectedDependencies()
@@ -32,7 +33,7 @@ public class DeclaredDependencyResolver {
               .reduce(type -> Stream.of(springRegistry.getBeanNamesForType(dependency.getLeft()))
                   .map(name -> new Pair<>(name, springRegistry.get(name)))
                   .collect(toList()), name -> asList(new Pair<>(name, springRegistry.get(name))))
-              .forEach(pair -> declaredDependencies.add(pair))); // todo: moving things from one list to another
+              .forEach(pair -> declaredDependencies.add(pair)));
     }
     return declaredDependencies;
   }

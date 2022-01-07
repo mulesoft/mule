@@ -9,14 +9,9 @@ package org.mule.runtime.config.internal;
 import io.qameta.allure.Description;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mule.runtime.config.internal.registry.SpringContextRegistry;
 import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
-
-import javax.swing.*;
-
-import static org.junit.Assert.*;
 
 public class DeclaredDependencyResolverTestCase {
 
@@ -34,7 +29,7 @@ public class DeclaredDependencyResolverTestCase {
   @Test
   @Description("check if getDeclaredDirectDependencies properly interacts with InjectedDependencyProvider")
   public void getDeclaredDirectDependenciesTest() {
-    declaredDependencyResolver.getDeclaredDirectDependencies(object);
+    declaredDependencyResolver.getDeclaredDependencies(object);
     Mockito.verify(object, Mockito.atLeastOnce()).getInjectedDependencies();
   }
 }

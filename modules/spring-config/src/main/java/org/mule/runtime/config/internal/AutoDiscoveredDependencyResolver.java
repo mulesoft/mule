@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.config.internal;
 
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.config.internal.registry.SpringContextRegistry;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class AutoDiscoveredDependencyResolver {
 
@@ -19,8 +20,12 @@ public class AutoDiscoveredDependencyResolver {
     this.springRegistry = springRegistry;
   }
 
-  public Set<Map.Entry<String, Object>> getAutoDiscoveredDependencies(String key) {
-    return springRegistry.getDependencies(key).entrySet();
-    // todo: map , transform the keys & values to pairs
+  public List<Pair<String, Object>> getAutoDiscoveredDependencies(String beanName) {
+    return springRegistry.getDependencies(beanName).entrySet()
+        .stream()
+        .map(x -> new Pair<>(x.getKey(), x.getValue()))
+        .collect(Collectors.toList());
   }
+
+
 }

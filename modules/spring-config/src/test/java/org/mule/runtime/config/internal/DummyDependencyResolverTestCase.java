@@ -13,8 +13,6 @@ import org.mockito.Mockito;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.registry.SpringContextRegistry;
 
-import java.util.HashSet;
-
 import static org.mockito.Mockito.*;
 
 
@@ -43,7 +41,7 @@ public class DummyDependencyResolverTestCase {
     String beanName = "component";
     Object currentObject = springRegistry.get(beanName);
     DependencyNode currentNode = new DependencyNode(currentObject);
-    resolver.getDirectDependencies(beanName);
+    resolver.getDirectBeanDependencies(beanName);
     // resolver.addDirectAutoDiscoveredDependencies(beanName, new HashSet<>(), currentNode);
     verify(autoDiscoveredDependencyResolver, times(1)).getAutoDiscoveredDependencies(("component"));
   }
@@ -55,7 +53,7 @@ public class DummyDependencyResolverTestCase {
     Object currentObject = springRegistry.get(beanName);
     DependencyNode currentNode = new DependencyNode(currentObject);
     // resolver.addDirectDeclaredDependencies(currentObject, new HashSet<>(), currentNode);
-    verify(declaredDependencyResolver, times(1)).getDeclaredDirectDependencies(currentObject);
+    verify(declaredDependencyResolver, times(1)).getDeclaredDependencies(currentObject);
   }
 
   @Test

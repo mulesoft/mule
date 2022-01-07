@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.mule.runtime.config.internal.registry.SpringContextRegistry;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.times;
 
 public class AutoDiscoveredDependencyResolverTestCase {

@@ -18,12 +18,9 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.internal.lifecycle.phases.LifecycleObjectSorter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
@@ -33,14 +30,12 @@ public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
 
   private List<DefaultDirectedGraph<VertexWrapper, DefaultEdge>> dependencyGraphs;
   private DummyDependencyResolver resolver;
-  private Map<String, Integer> keyHashcodeMap;
   private Set<Integer> hashcodeSet;
   protected Class<?>[] orderedLifecycleTypes;
 
   public DummySpringLifecycleObjectSorter(DummyDependencyResolver resolver, Class<?>[] orderedLifecycleTypes) {
     this.dependencyGraphs = new ArrayList<>();
     this.resolver = resolver;
-    this.keyHashcodeMap = new HashMap<>();
     this.hashcodeSet = new HashSet<>();
     this.orderedLifecycleTypes = orderedLifecycleTypes;
     for (int i = 0; i < orderedLifecycleTypes.length; i++) {
@@ -48,9 +43,9 @@ public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
     }
   }
 
-
+  // building a single dependency graph for each lifecycle type during initialization phase
   @Override
-  public void addObject(String name, Object currentObject) {
+  public void addObject(String beanName, Object currentObject) {
 
     requireNonNull(currentObject, "currentObject cannot be null");
 
@@ -58,22 +53,22 @@ public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
       return;
     }
 
-    DefaultDirectedGraph<VertexWrapper, DefaultEdge> directedGraph = getDirectedGraph(currentObject);
-    Map<String, Object> singleKeyHashcodeMap = new HashMap<>();
-    VertexWrapper currentVertex = addVertex(name, currentObject, getDirectedGraph(currentObject), singleKeyHashcodeMap);
+    DefaultDirectedGraph<VertexWrapper, DefaultEdge> directedGraph = getDependencyGraphForLifecycleType(currentObject);
+    VertexWrapper currentVertex = addVertex(beanName, currentObject, directedGraph);
 
-    // get prerequisite objects for the current object
-    List<Pair<Object, String>> prerequisiteObjects = resolver.getDirectBeanDependencies(name);
+    // get (direct) prerequisite objects for the current object
+    List<Pair<String, Object>> prerequisiteObjects = resolver.getDirectBeanDependencies(beanName);
 
-    // add children & edge
+    // add direct prerequisites to the graph & edges
     if (prerequisiteObjects.isEmpty()) {
       return;
     }
     prerequisiteObjects.forEach(
                                 (prerequisite) -> {
+                                  String preReqName = prerequisite.getFirst();
+                                  Object preReqObject = prerequisite.getSecond();
                                   VertexWrapper preReqVertex =
-                                      addVertex(prerequisite.getSecond(), prerequisite.getFirst(), directedGraph,
-                                                singleKeyHashcodeMap);
+                                      addVertex(preReqName, preReqObject, directedGraph);
                                   // todo: update the cycle check part below
                                   if (!directedGraph.containsEdge(preReqVertex, currentVertex)) {
                                     directedGraph.addEdge(currentVertex, preReqVertex);
@@ -81,37 +76,23 @@ public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
                                 });
   }
 
-
-
-  private int getGraphIndex(Object currentObject) {
-    Class<?> clazz = asList(orderedLifecycleTypes).stream().filter(x -> x.isInstance(currentObject)).findFirst().get();
+  private int getDependencyGraphIndex(Object currentObject) {
+    Class<?> clazz = stream(orderedLifecycleTypes).filter(x -> x.isInstance(currentObject)).findFirst().get();
     return asList(orderedLifecycleTypes).indexOf(clazz);
   }
 
+  private DefaultDirectedGraph<VertexWrapper, DefaultEdge> getDependencyGraphForLifecycleType(Object currentObject) {
+    return dependencyGraphs.get(getDependencyGraphIndex(currentObject));
+  }
+
   private VertexWrapper addVertex(String name, Object currentObject,
-                                  DefaultDirectedGraph<VertexWrapper, DefaultEdge> directedGraph,
-                                  Map<String, Object> singleKeyHashcodeMap) {
+                                  DefaultDirectedGraph<VertexWrapper, DefaultEdge> directedGraph) {
 
     VertexWrapper currentVertex = new VertexWrapper(name, currentObject);
-
-    if (singleKeyHashcodeMap.containsKey(name) && singleKeyHashcodeMap.containsValue(currentObject.hashCode())) {
-      currentVertex = directedGraph.vertexSet().stream()
-          .filter(isSameVertex(currentVertex)).collect(toList()).get(0);
-    } else {
-      directedGraph.addVertex(currentVertex);
-      singleKeyHashcodeMap.put(name, currentObject.hashCode());
-    }
-    // directedGraph.addVertex(currentVertex);
+    // todo: duplicate check? (example: same objects being added to same class bucket, can we prevent it with this impl?)
+    directedGraph.addVertex(currentVertex);
 
     return currentVertex;
-  }
-
-  private DefaultDirectedGraph<VertexWrapper, DefaultEdge> getDirectedGraph(Object currentObject) {
-    return dependencyGraphs.get(getGraphIndex(currentObject));
-  }
-
-  private Predicate<VertexWrapper> isSameVertex(VertexWrapper currentVertex) {
-    return x -> x.equals(currentVertex);
   }
 
   @Override
