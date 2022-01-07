@@ -34,7 +34,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
-import static org.mule.runtime.extension.api.loader.ExtensionLoadingRequest.builder;
+import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.TNS_PREFIX;

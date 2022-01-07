@@ -27,7 +27,7 @@ import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.loader.ExtensionLoadingRequest;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
@@ -83,7 +83,6 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
   public static final String COMPILATION_MODE = "COMPILATION_MODE";
 
   private final SpiServiceRegistry serviceRegistry = new SpiServiceRegistry();
-
   private final LazyValue<ExtensionModelLoader> javaExtensionModelLoader = new LazyValue<>(() -> getLoaderById("java"));
 
   @Override
@@ -120,6 +119,9 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
     }
   }
 
+  /**
+   * @return the {@link ExtensionModelLoader} for loading Java based Extensions
+   */
   protected ExtensionModelLoader fetchJavaExtensionModelLoader() {
     return javaExtensionModelLoader.get();
   }
@@ -181,18 +183,17 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
     return ImmutableList.<GeneratedResourceFactory>builder()
         .addAll(serviceRegistry.lookupProviders(GeneratedResourceFactory.class, getClass().getClassLoader()))
         .addAll(serviceRegistry.lookupProviders(DslResourceFactory.class, getClass().getClassLoader())).build();
-
   }
 
   /**
    * During compile-time, some model validations will be performed over the plugin being compiled that are different from the ones
    * executed at execution-time for the same plugin (being the runtime validations a subset of the ones executed at compile-time).
-   *
+   * <p>
    * Ir order to skip the compile-time-only validations and load the plugin as if it was loaded on an application deploy, the user
    * can flag the compilation as a "runtime simulation". For example, a plugin that has been developed using a 1.0 version of the
    * SDK and fails its compilation when moving to the 1.1 version of the SDK, should never fail when using the "runtime
    * simulation" loading mode (otherwise runtime backwards compatibility would've been broken).
-   *
+   * <p>
    * This simulation mode should be treated as an internal, test-only configuration.
    *
    * @return {@code true} if {@code modelLoader.runtimeMode} configuration property was provided
@@ -206,8 +207,19 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
 
   protected abstract ExtensionModelLoader getExtensionModelLoader();
 
-  protected void configureLoadingRequest(ExtensionLoadingRequest.Builder requestBuilder) {
-
+  /**
+   * Override this method for the chance of adding custom parameterization into the {@code requestBuilder}.
+   * <p>
+   * The same builder will later be used to create the {@link ExtensionModelLoadingRequest} used in the
+   * {@link ExtensionModelLoader#loadExtensionModel(ExtensionModelLoadingRequest)} invocation.
+   * <p>
+   * This default implementation is no-op
+   *
+   * @param requestBuilder a {@link ExtensionModelLoadingRequest.Builder}
+   * @since 4.5.0
+   */
+  protected void configureLoadingRequest(ExtensionModelLoadingRequest.Builder requestBuilder) {
+    // no-op
   }
 
   /**

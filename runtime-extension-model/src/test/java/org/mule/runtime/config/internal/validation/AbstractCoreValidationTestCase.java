@@ -12,7 +12,7 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.recursiveStreamWithHierarchy;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULESOFT_VENDOR;
-import static org.mule.runtime.extension.api.loader.ExtensionLoadingRequest.builder;
+import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.XmlDslModel;

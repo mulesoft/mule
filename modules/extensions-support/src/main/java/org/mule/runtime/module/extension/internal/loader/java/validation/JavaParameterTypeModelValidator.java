@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.ClassUtils.isPrimitiveWrapper;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
+import static org.mule.runtime.module.extension.internal.loader.java.validation.ModelValidationUtils.isCompiletime;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BooleanType;
@@ -49,7 +50,7 @@ public final class JavaParameterTypeModelValidator implements ExtensionModelVali
 
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
-    if (!ModelValidationUtils.isCompiletime(extensionModel)) {
+    if (!isCompiletime(extensionModel)) {
       // TODO MULE-14517: Validations for types will be added to 4.2,
       // so we need to keep backwards compatibility somehow for now.
       return;

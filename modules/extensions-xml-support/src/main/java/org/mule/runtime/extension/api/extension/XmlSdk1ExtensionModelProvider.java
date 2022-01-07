@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.extension.api.extension;
 
-import static org.mule.runtime.extension.api.loader.ExtensionLoadingRequest.builder;
+import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.meta.model.ExtensionModel;

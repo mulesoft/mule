@@ -15,6 +15,7 @@ import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
+import static org.mule.runtime.module.extension.internal.loader.java.validation.ModelValidationUtils.isCompiletime;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 
 import org.mule.metadata.api.TypeLoader;
@@ -112,7 +113,7 @@ public final class NullSafeModelValidator implements ExtensionModelValidator {
                     .map(MetadataTypeUtils::getLocalPart)
                     .collect(joining(", "));
 
-                if (!isBlank(requiredFields) && ModelValidationUtils.isCompiletime(extensionModel)) {
+                if (!isBlank(requiredFields) && isCompiletime(extensionModel)) {
                   // TODO MULE-14517: until a mechanism for adding validations per version is available,
                   // we need to keep backwards compatibility somehow for now.
                   problemsReporter

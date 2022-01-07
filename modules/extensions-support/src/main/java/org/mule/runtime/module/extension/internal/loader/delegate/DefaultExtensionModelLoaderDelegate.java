@@ -69,6 +69,9 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
     this.version = version;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   @Deprecated
   public ExtensionDeclarer declare(ExtensionLoadingContext context) {

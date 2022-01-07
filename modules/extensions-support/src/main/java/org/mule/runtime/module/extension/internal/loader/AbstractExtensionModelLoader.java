@@ -27,6 +27,11 @@ import org.mule.runtime.module.extension.internal.loader.validator.ParameterPlur
 
 import java.util.List;
 
+/**
+ * Base implementation for an {@link ExtensionModelLoader}
+ *
+ * @since 4.5.0
+ */
 public abstract class AbstractExtensionModelLoader extends ExtensionModelLoader {
 
   private static final boolean IGNORE_DISABLED = getProperty(DISABLE_SDK_IGNORE_COMPONENT) != null;
@@ -55,6 +60,10 @@ public abstract class AbstractExtensionModelLoader extends ExtensionModelLoader 
     }
   }
 
+  /**
+   * @param context the loading context
+   * @return the {@link ExtensionModelParserFactory} to be used
+   */
   protected abstract ExtensionModelParserFactory getExtensionModelParserFactory(ExtensionLoadingContext context);
 
   /**

@@ -6,17 +6,31 @@
  */
 package org.mule.runtime.module.extension.internal.loader;
 
+import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 
+/**
+ * Utility methods for {@link ModelLoaderDelegate} implementations
+ *
+ * @since 4.5.0
+ */
 public final class ModelLoaderDelegateUtils {
 
   public ModelLoaderDelegateUtils() {}
 
+  /**
+   * @param parser a {@link SourceModelParser}
+   * @return whether the given {@code parser} represents a source which requires a config to function
+   */
   public static boolean requiresConfig(SourceModelParser parser) {
     return parser.hasConfig() || parser.isConnected();
   }
 
+  /**
+   * @param parser a {@link OperationModelParser}
+   * @return whether the given {@code parser} represents an operation which requires a config to function
+   */
   public static boolean requiresConfig(OperationModelParser parser) {
     return parser.hasConfig() || parser.isConnected() || parser.isAutoPaging();
   }

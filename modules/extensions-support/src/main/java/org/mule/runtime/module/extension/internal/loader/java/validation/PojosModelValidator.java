@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.java.validation;
 
 import static java.lang.String.format;
+import static org.mule.runtime.module.extension.internal.loader.java.validation.ModelValidationUtils.isCompiletime;
 
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
@@ -39,7 +40,7 @@ public class PojosModelValidator implements ExtensionModelValidator {
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
 
-    if (!ModelValidationUtils.isCompiletime(extensionModel)) {
+    if (!isCompiletime(extensionModel)) {
       return;
     }
 

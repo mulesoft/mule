@@ -22,10 +22,18 @@ public interface ModelLoaderDelegate {
    *
    * @param context an {@link ExtensionLoadingContext} instance.
    * @return a built {@link ExtensionDeclarer}.
+   * @deprecated since 4.5.0. Use {@link #declare(ExtensionModelParserFactory, ExtensionLoadingContext)} instead.
    */
   @Deprecated
   ExtensionDeclarer declare(ExtensionLoadingContext context);
 
+  /**
+   * Creates and populates an {@link ExtensionDeclarer} using the given {@code context} and {@code parserFactory}
+   *
+   * @param parserFactory the {@link ExtensionModelParserFactory} used to read the extension's declaration
+   * @param context       an {@link ExtensionLoadingContext} instance.
+   * @return a built {@link ExtensionDeclarer}.
+   */
   default ExtensionDeclarer declare(ExtensionModelParserFactory parserFactory, ExtensionLoadingContext context) {
     return declare(context);
   }

@@ -15,7 +15,6 @@ import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDel
  * @since 4.1
  */
 @FunctionalInterface
-@Deprecated
 public interface ModelLoaderDelegateFactory {
 
   /**

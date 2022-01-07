@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.java.validation;
 
 import static java.lang.String.format;
+import static org.mule.runtime.module.extension.internal.loader.java.validation.ModelValidationUtils.isCompiletime;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -37,7 +38,7 @@ public class IgnoredExtensionParameterModelValidator implements ExtensionModelVa
 
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
-    if (!ModelValidationUtils.isCompiletime(extensionModel)) {
+    if (!isCompiletime(extensionModel)) {
       return;
     }
 
