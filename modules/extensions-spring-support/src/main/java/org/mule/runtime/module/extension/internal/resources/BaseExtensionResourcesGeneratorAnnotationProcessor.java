@@ -25,6 +25,7 @@ import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingRequest;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
@@ -196,6 +197,10 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
   public abstract ExtensionElement toExtensionElement(TypeElement typeElement, ProcessingEnvironment processingEnvironment);
 
   protected abstract ExtensionModelLoader getExtensionModelLoader();
+
+  protected void configureLoadingRequest(ExtensionLoadingRequest.Builder requestBuilder) {
+
+  }
 
   /**
    * @return a boolean indicating if the annotation processor is able to process or not with the current context.
