@@ -13,6 +13,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATI
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_FACTORY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_POOLS_CONFIG;
@@ -48,6 +50,8 @@ import org.mule.runtime.core.internal.config.CustomServiceRegistry;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
+import org.mule.runtime.core.internal.lock.MuleLockFactory;
+import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
 import org.mule.runtime.core.internal.profiling.NoOpProfilingService;
 import org.mule.runtime.core.internal.registry.TypeBasedTransformerResolver;
 import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
@@ -117,6 +121,9 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
     registerConstantBeanDefinition(OBJECT_CONFIGURATION_PROPERTIES, configurationProperties);
 
     loadServiceConfigurators();
+
+    registerBeanDefinition(OBJECT_LOCK_FACTORY, getBeanDefinition(MuleLockFactory.class));
+    registerBeanDefinition(OBJECT_LOCK_PROVIDER, getBeanDefinition(SingleServerLockProvider.class));
 
     if (!getBoolean(DIABLE_EXPRESSIONS_SUPPORT)) {
       registerBeanDefinition(OBJECT_STREAMING_MANAGER, getBeanDefinition(DefaultStreamingManager.class));

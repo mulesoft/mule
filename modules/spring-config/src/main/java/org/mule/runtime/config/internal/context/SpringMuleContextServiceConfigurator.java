@@ -31,7 +31,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCAL_QUEUE
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCAL_STORE_IN_MEMORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCAL_STORE_PERSISTENT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_FACTORY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
@@ -112,8 +111,6 @@ import org.mule.runtime.core.internal.context.notification.MessageProcessingFlow
 import org.mule.runtime.core.internal.event.DefaultEventContextService;
 import org.mule.runtime.core.internal.exception.MessagingExceptionLocationProvider;
 import org.mule.runtime.core.internal.execution.MuleMessageProcessingManager;
-import org.mule.runtime.core.internal.lock.MuleLockFactory;
-import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
 import org.mule.runtime.core.internal.management.stats.DefaultProcessingTimeWatcher;
 import org.mule.runtime.core.internal.management.stats.PayloadStatisticsCursorDecoratorFactory;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
@@ -213,8 +210,6 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER, getBeanDefinition(MuleMessageProcessingManager.class))
       .put(OBJECT_MULE_STREAM_CLOSER_SERVICE, getBeanDefinition(DefaultStreamCloserService.class))
       .put(OBJECT_CONVERTER_RESOLVER, getBeanDefinition(DynamicDataTypeConversionResolver.class))
-      .put(OBJECT_LOCK_FACTORY, getBeanDefinition(MuleLockFactory.class))
-      .put(OBJECT_LOCK_PROVIDER, getBeanDefinition(SingleServerLockProvider.class))
       .put(OBJECT_PROCESSING_TIME_WATCHER, getBeanDefinition(DefaultProcessingTimeWatcher.class))
       .put(OBJECT_PAYLOAD_STATISTICS_DECORATOR_FACTORY, getBeanDefinition(PayloadStatisticsCursorDecoratorFactory.class))
       .put(OBJECT_EXCEPTION_LOCATION_PROVIDER, getBeanDefinition(MessagingExceptionLocationProvider.class))
