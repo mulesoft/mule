@@ -6,20 +6,25 @@
  */
 package org.mule.runtime.config.internal;
 
-import java.net.Proxy;
 import java.util.Objects;
 
 public class VertexWrapper {
 
   final Object wrappedObject;
+  final String beanName;
 
-  public VertexWrapper(Object o) {
+  public VertexWrapper(String beanName, Object o) {
     Objects.requireNonNull(o, "bean should not be null");
+    this.beanName = beanName;
     this.wrappedObject = o;
   }
 
   public Object getWrappedObject() {
     return wrappedObject;
+  }
+
+  public String getBeanName() {
+    return beanName;
   }
 
   @Override
