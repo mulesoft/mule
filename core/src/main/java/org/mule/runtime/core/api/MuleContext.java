@@ -347,8 +347,12 @@ public interface MuleContext extends Lifecycle {
 
   /**
    * @return the streamingManager used in this artifact.
+   * 
+   * @since 4.5
    */
-  StreamingManager getStreamingManager();
+  default StreamingManager getStreamingManager() {
+    return null;
+  }
 
   /**
    * Sets application wide instance of {@link BootstrapServiceDiscoverer}
