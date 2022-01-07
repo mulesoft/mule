@@ -57,14 +57,15 @@ public class ConfigurationDependencyResolver {
    * @return the direct dependencies of the component with component name {@code #componentName}. An empty collection if there is
    *         no component with such name.
    */
+
   public Collection<String> getDirectComponentDependencies(String componentName) {
     return appModelDependencyGraph
-        .getRequiredComponents(new ComponentNamePredicate(componentName))
-        .stream()
-        .map(ComponentAst::getComponentId)
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .collect(toList());
+            .getRequiredComponents(componentName)
+            .stream()
+            .map(ComponentAst::getComponentId)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(toList());
   }
 
   static class ComponentNamePredicate implements Predicate<ComponentAst> {
