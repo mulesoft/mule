@@ -10,6 +10,8 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
+import static org.mule.runtime.extension.api.ExtensionConstants.XML_SDK_LOADER_ID;
+import static org.mule.runtime.extension.api.ExtensionConstants.XML_SDK_RESOURCE_PROPERTY_NAME;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -46,7 +48,7 @@ public class XmlExtensionModelLoader extends ExtensionModelLoader {
   /**
    * Attribute to look for in the parametrized attributes picked up from the descriptor.
    */
-  public static final String RESOURCE_XML = "resource-xml";
+  public static final String RESOURCE_XML = XML_SDK_RESOURCE_PROPERTY_NAME;
 
   /**
    * Attribute to look for in the parametrized attributes picked up from the descriptor. If present, with a boolean value,
@@ -71,7 +73,7 @@ public class XmlExtensionModelLoader extends ExtensionModelLoader {
    * 
    * @see MulePluginModel#getExtensionModelLoaderDescriptor()
    */
-  public static final String DESCRIBER_ID = "xml-based";
+  public static final String DESCRIBER_ID = XML_SDK_LOADER_ID;
 
   @Override
   public String getId() {

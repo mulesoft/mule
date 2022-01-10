@@ -8,6 +8,7 @@ package org.mule.test.functional;
 
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.getLoaderById;
+import static org.mule.runtime.extension.api.ExtensionConstants.XML_SDK_LOADER_ID;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCES_PATHS;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_DECLARATION;
 
@@ -37,7 +38,7 @@ import java.util.Set;
  */
 public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends MuleArtifactFunctionalTestCase {
 
-  private static final LazyValue<ExtensionModelLoader> LOADER = new LazyValue<>(() -> getLoaderById("xml-based"));
+  private static final LazyValue<ExtensionModelLoader> LOADER = new LazyValue<>(() -> getLoaderById(XML_SDK_LOADER_ID));
 
   /**
    * @return a path pointing to an extension built with XML. If null, defaults to the {@link #getModulePaths()}
