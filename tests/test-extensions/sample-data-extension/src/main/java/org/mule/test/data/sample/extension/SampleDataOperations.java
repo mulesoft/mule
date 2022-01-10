@@ -29,6 +29,7 @@ import org.mule.test.data.sample.extension.provider.ComplexActingParameterSample
 import org.mule.test.data.sample.extension.provider.ComplexTypeSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.ConfigAwareTestSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.ConnectedTestSampleDataProvider;
+import org.mule.test.data.sample.extension.provider.FailingTestSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.GroupTestSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.MoreComplexTypeSampleDataProvider;
 import org.mule.test.data.sample.extension.provider.MuleContextAwareSampleDataProvider;
@@ -251,4 +252,10 @@ public class SampleDataOperations {
     return connectionLess(complex.getPayload(), complex.getAttributes());
   }
 
+  @SampleData(FailingTestSampleDataProvider.class)
+  @MediaType(TEXT_PLAIN)
+  public Result<String, String> failingOperation(String payload, String attributes, boolean useCustomSampleDataException,
+                                                 boolean withExceptionCause) {
+    return null;
+  }
 }

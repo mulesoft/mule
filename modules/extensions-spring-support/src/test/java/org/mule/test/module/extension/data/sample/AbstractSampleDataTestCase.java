@@ -8,7 +8,9 @@ package org.mule.test.module.extension.data.sample;
 
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
@@ -106,6 +108,18 @@ public abstract class AbstractSampleDataTestCase extends MuleArtifactFunctionalT
   protected void expectSampleDataException(String failureCode) {
     expectedException.expect(SampleDataException.class);
     expectedException.expect(exceptionMatcher(failureCode));
+  }
+
+  protected void expectSampleDataException(Class<? extends SampleDataException> sampleDataExceptionClass, String failureCode,
+                                           String errorMessage, Optional<Class<? extends Throwable>> causeClass) {
+    expectedException.expect(sampleDataExceptionClass);
+    expectedException.expect(exceptionMatcher(failureCode));
+    expectedException.expectMessage(errorMessage);
+    if (causeClass.isPresent()) {
+      expectedException.expectCause(instanceOf(causeClass.get()));
+    } else {
+      expectedException.expectCause(nullValue(Throwable.class));
+    }
   }
 
   protected Map<String, Object> getDefaultParameters() {

@@ -17,6 +17,7 @@ import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.ne
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
@@ -513,14 +514,10 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                          (CheckedSupplier<Object>) () -> context.getConfig().orElse(null),
                          (CheckedSupplier<ConnectionProvider>) () -> context.getConnectionProvider().orElse(null))));
     } catch (MuleRuntimeException e) {
-      Throwable rootException = getRootException(e);
-      if (rootException instanceof SampleDataException) {
-        throw (SampleDataException) rootException;
-      } else {
-        throw new SampleDataException("An unknown error occurred trying to obtain Sample Data. " + e.getCause().getMessage(),
-                                      SampleDataException.UNKNOWN, e);
-      }
-
+      throw extractOfType(e, SampleDataException.class).orElseGet(
+                                                                  () -> new SampleDataException("An unknown error occurred trying to obtain Sample Data. "
+                                                                      + e.getCause().getMessage(),
+                                                                                                SampleDataException.UNKNOWN, e));
     } catch (Exception e) {
       throw new SampleDataException("An unknown error occurred trying to obtain Sample Data. " + e.getCause().getMessage(),
                                     SampleDataException.UNKNOWN, e);

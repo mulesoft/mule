@@ -9,6 +9,13 @@ package org.mule.test.module.extension.data.sample;
 import static org.mule.sdk.api.data.sample.SampleDataException.MISSING_REQUIRED_PARAMETERS;
 import static org.mule.test.allure.AllureConstants.SampleData.SAMPLE_DATA;
 import static org.mule.test.allure.AllureConstants.SampleData.SampleDataStory.RESOLVE_BY_LOCATION;
+import static org.mule.test.data.sample.extension.provider.FailingTestSampleDataProvider.CUSTOM_SAMPLE_DATA_EXCEPTION_ERROR_MSG;
+import static org.mule.test.data.sample.extension.provider.FailingTestSampleDataProvider.SAMPLE_DATA_EXCEPTION_ERROR_MSG;
+import static org.mule.test.data.sample.extension.provider.FailingTestSampleDataProvider.SAMPLE_DATA_EXCEPTION_FAILURE;
+
+import org.mule.sdk.api.data.sample.SampleDataException;
+
+import java.util.Optional;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -155,6 +162,34 @@ public class OperationSampleDataByLocationTestCase extends AbstractSampleDataTes
   public void boundActingParameterFromPojoFieldWithDsl() throws Exception {
     assertMessage(getOperationSampleByLocation("boundActingParameterFromPojoFieldWithExpression"), EXPECTED_PAYLOAD,
                   EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void sampleDataExceptionWithErrorCause() throws Exception {
+    expectSampleDataException(SampleDataException.class, SAMPLE_DATA_EXCEPTION_FAILURE, SAMPLE_DATA_EXCEPTION_ERROR_MSG,
+                              Optional.of(IllegalStateException.class));
+    getOperationSampleByLocation("sampleDataExceptionWithErrorCause");
+  }
+
+  @Test
+  public void sampleDataExceptionWithoutErrorCause() throws Exception {
+    expectSampleDataException(SampleDataException.class, SAMPLE_DATA_EXCEPTION_FAILURE, SAMPLE_DATA_EXCEPTION_ERROR_MSG,
+                              Optional.empty());
+    getOperationSampleByLocation("sampleDataExceptionWithoutErrorCause");
+  }
+
+  @Test
+  public void customSampleDataExceptionWithErrorCause() throws Exception {
+    expectSampleDataException(SampleDataException.class, SAMPLE_DATA_EXCEPTION_FAILURE, CUSTOM_SAMPLE_DATA_EXCEPTION_ERROR_MSG,
+                              Optional.of(IllegalStateException.class));
+    getOperationSampleByLocation("customSampleDataExceptionWithErrorCause");
+  }
+
+  @Test
+  public void customSampleDataExceptionWithoutErrorCause() throws Exception {
+    expectSampleDataException(SampleDataException.class, SAMPLE_DATA_EXCEPTION_FAILURE, CUSTOM_SAMPLE_DATA_EXCEPTION_ERROR_MSG,
+                              Optional.empty());
+    getOperationSampleByLocation("customSampleDataExceptionWithoutErrorCause");
   }
 
 }
