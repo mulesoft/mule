@@ -32,7 +32,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 
@@ -61,7 +60,16 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
   }
 
   private Collection<ExtensionModelLoader> lookupLoadersFromSpi(ArtifactClassLoader containerClassLoader) {
-    return lookupExtensionModelLoaders(containerClassLoader.getClassLoader()).collect(toList());
+    Collection<ExtensionModelLoader> loaders = lookupExtensionModelLoaders(containerClassLoader.getClassLoader())
+        .collect(toList());
+
+    if (LOGGER.isErrorEnabled()) {
+      LOGGER.error("The following {} were discovered: [{}]",
+                   ExtensionModelLoader.class.getSimpleName(),
+                   loaders.stream().map(l -> l.getId()).collect(joining(", ")));
+    }
+
+    return loaders;
   }
 
   public void setExtensionModelLoadersLookup(Supplier<Collection<ExtensionModelLoader>> extModelLoadersLookup) {
@@ -103,7 +111,7 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
                    // At this point we are sure there are at least 2 classes that return the same ID, we will append it to the
                    // builder
                    final String classes = entry.getValue().stream()
-                       .map(extensionModelLoader -> extensionModelLoader.getClass().getName()).collect(Collectors.joining(", "));
+                       .map(extensionModelLoader -> extensionModelLoader.getClass().getName()).collect(joining(", "));
                    sb.append(lineSeparator()).append("ID [").append(entry.getKey())
                        .append("] is being returned by the following classes [").append(classes).append("]");
                  });
