@@ -27,7 +27,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.java.enricher.JavaConfigurationDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.SampleDataDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.test.data.sample.extension.SampleDataExtension;
 
@@ -43,7 +43,7 @@ public class SampleDataDeclarationEnricherTestCase {
   @Before
   public void setUp() {
     ExtensionDeclarer declarer = declarerFor(SampleDataExtension.class, getProductVersion());
-    new JavaConfigurationDeclarationEnricher()
+    new SampleDataDeclarationEnricher()
         .enrich(new DefaultExtensionLoadingContext(declarer, getClass().getClassLoader(), getDefault(emptySet())));
     this.declaration = declarer.getDeclaration();
   }
