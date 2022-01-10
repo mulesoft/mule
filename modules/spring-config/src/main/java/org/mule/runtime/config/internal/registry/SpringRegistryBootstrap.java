@@ -27,6 +27,7 @@ import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.core.privileged.transformer.TransformerUtils;
 
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -55,8 +56,9 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
    */
   public SpringRegistryBootstrap(ArtifactType artifactType, MuleContext muleContext,
                                  OptionalObjectsController optionalObjectsController,
-                                 BiConsumer<String, BeanDefinition> beanDefinitionRegister) {
-    super(artifactType, muleContext);
+                                 BiConsumer<String, BeanDefinition> beanDefinitionRegister,
+                                 Predicate<String> propertyKeyfilter) {
+    super(artifactType, muleContext, propertyKeyfilter);
     this.optionalObjectsController = optionalObjectsController;
     this.beanDefinitionRegister = beanDefinitionRegister;
   }

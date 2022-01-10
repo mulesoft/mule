@@ -34,7 +34,6 @@ import org.mule.runtime.api.util.ResourceLocator;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.config.internal.lazy.LazyDataWeaveExtendedExpressionLanguageAdaptorFactoryBean;
 import org.mule.runtime.config.internal.lazy.NoOpConnectivityTesterFactory;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.data.sample.SampleDataService;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;

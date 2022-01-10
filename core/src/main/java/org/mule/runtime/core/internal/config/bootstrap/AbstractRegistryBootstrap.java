@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,25 +113,33 @@ public abstract class AbstractRegistryBootstrap implements Initialisable {
   public static final String OBJECT_KEY = ".object.";
   public static final String SINGLE_TX = ".singletx.";
 
+  /**
+   * Indicates if a propertyKey is a property that declares a transformer
+   */
+  public static final Predicate<String> TRANSFORMER_PREDICATE =
+      propertyKey -> propertyKey.contains(TRANSFORMER_KEY);
+  /**
+   * Indicates if a propertyKey is a property that declares a bindingProvider to use in the expressions language
+   */
+  public static final Predicate<String> BINDING_PROVIDER_PREDICATE =
+      propertyKey -> propertyKey.endsWith(".binding.provider") || propertyKey.endsWith(".FunctionsProvider");
+
   protected ArtifactType artifactType = APP;
   protected final transient Logger logger = LoggerFactory.getLogger(getClass());
   protected MuleContext muleContext;
+  private final Predicate<String> propertyKeyfilter;
 
   /**
    * @param artifactType type of artifact. Bootstrap entries may be associated to an specific type of artifact. If it's not
    *                     associated to the related artifact it will be ignored.
    * @param muleContext  the {@code MuleContext} of the artifact.
    */
-  public AbstractRegistryBootstrap(ArtifactType artifactType, MuleContext muleContext) {
+  public AbstractRegistryBootstrap(ArtifactType artifactType, MuleContext muleContext, Predicate<String> propertyKeyfilter) {
     this.artifactType = artifactType;
     this.muleContext = muleContext;
+    this.propertyKeyfilter = propertyKeyfilter;
   }
 
-  /**
-   * TODO Optimize me! MULE-9343
-   *
-   * {@inheritDoc}
-   */
   @Override
   public void initialise() throws InitialisationException {
     List<BootstrapService> bootstrapServices;
@@ -143,6 +152,7 @@ public abstract class AbstractRegistryBootstrap implements Initialisable {
     // Merge and process properties
     int objectCounter = 1;
     List<TransformerBootstrapProperty> transformers = new LinkedList<>();
+    List<ObjectBootstrapProperty> bindingProviders = new LinkedList<>();
     List<ObjectBootstrapProperty> namedObjects = new LinkedList<>();
     List<ObjectBootstrapProperty> unnamedObjects = new LinkedList<>();
     List<TransactionFactoryBootstrapProperty> singleTransactionFactories = new LinkedList<>();
@@ -154,16 +164,22 @@ public abstract class AbstractRegistryBootstrap implements Initialisable {
         final String propertyKey = (String) entry.getKey();
         final String propertyValue = (String) entry.getValue();
 
+        if (!propertyKeyfilter.test(propertyKey)) {
+          continue;
+        }
+
         if (propertyKey.contains(OBJECT_KEY)) {
           String newKey = propertyKey.substring(0, propertyKey.lastIndexOf(".")) + objectCounter++;
           unnamedObjects.add(createObjectBootstrapProperty(bootstrapService, newKey, propertyValue));
-        } else if (propertyKey.contains(TRANSFORMER_KEY)) {
+        } else if (TRANSFORMER_PREDICATE.test(propertyKey)) {
           transformers.add(createTransformerBootstrapProperty(bootstrapService, propertyValue));
         } else if (propertyKey.contains(SINGLE_TX)) {
           if (!propertyKey.contains(TRANSACTION_RESOURCE_SUFFIX)) {
             singleTransactionFactories.add(createTransactionFactoryBootstrapProperty(bootstrapService, bootstrapProperties,
                                                                                      propertyKey, propertyValue));
           }
+        } else if (BINDING_PROVIDER_PREDICATE.test(propertyKey)) {
+          bindingProviders.add(createObjectBootstrapProperty(bootstrapService, propertyKey, propertyValue));
         } else {
           namedObjects.add(createObjectBootstrapProperty(bootstrapService, propertyKey, propertyValue));
         }
@@ -173,6 +189,7 @@ public abstract class AbstractRegistryBootstrap implements Initialisable {
     try {
       registerUnnamedObjects(unnamedObjects);
       registerTransformers(transformers);
+      registerObjects(bindingProviders);
       registerObjects(namedObjects);
       registerTransactionFactories(singleTransactionFactories, muleContext);
     } catch (Exception e1) {

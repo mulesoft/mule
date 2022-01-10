@@ -41,11 +41,11 @@ public class SpringRegistry extends AbstractSpringRegistry {
   protected void doInitialise() throws InitialisationException {
     addBeanFactoryPostProcessor(createBeforeInitialisationRegisteredObjectsPostProcessor());
 
+    super.doInitialise();
+
     // This is used to track the Spring context lifecycle since there is no way to confirm the lifecycle phase from the
     // application context
     springContextInitialised.set(true);
-
-    super.doInitialise();
   }
 
   private BeanDefinitionRegistryPostProcessor createBeforeInitialisationRegisteredObjectsPostProcessor() {
@@ -74,11 +74,15 @@ public class SpringRegistry extends AbstractSpringRegistry {
     baseApplicationContext = null;
   }
 
-  <T> Map<String, T> lookupEntriesForLifecycleIncludingAncestors(Class<T> type) {
+  @Override
+  protected <T> Map<String, T> lookupEntriesForLifecycleIncludingAncestors(Class<T> type) {
     // respect the order in which spring had resolved the beans
     Map<String, T> objects = new LinkedHashMap<>();
     objects.putAll(internalLookupByTypeWithoutAncestorsAndObjectProviders(type, false, false, baseApplicationContext));
-    objects.putAll(internalLookupByTypeWithoutAncestorsAndObjectProviders(type, false, false, getApplicationContext()));
+    // avoid trying to reinitialize any bean that may have already failed
+    if (springContextInitialised.get()) {
+      objects.putAll(internalLookupByTypeWithoutAncestorsAndObjectProviders(type, false, false, getApplicationContext()));
+    }
     return objects;
   }
 

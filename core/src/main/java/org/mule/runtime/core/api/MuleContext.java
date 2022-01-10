@@ -35,6 +35,7 @@ import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.management.stats.ProcessingTimeWatcher;
 import org.mule.runtime.core.api.security.SecurityManager;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.api.util.queue.QueueManager;
@@ -343,6 +344,15 @@ public interface MuleContext extends Lifecycle {
    *         artifact.
    */
   ErrorTypeRepository getErrorTypeRepository();
+
+  /**
+   * @return the streamingManager used in this artifact.
+   * 
+   * @since 4.5
+   */
+  default StreamingManager getStreamingManager() {
+    return null;
+  }
 
   /**
    * Sets application wide instance of {@link BootstrapServiceDiscoverer}

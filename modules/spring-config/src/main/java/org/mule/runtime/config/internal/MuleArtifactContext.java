@@ -210,6 +210,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     this.applicationModel = artifactAst;
 
+    // TODO MULE-18786 create the providers that depend on the AST only, and for the rest delegate on the resolver from the base
+    // context
     this.configurationProperties = createConfigurationAttributeResolver(applicationModel, parentConfigurationProperties,
                                                                         artifactProperties,
                                                                         new ClassLoaderResourceProvider(muleContext
