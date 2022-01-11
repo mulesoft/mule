@@ -6,14 +6,17 @@
  */
 package org.mule.runtime.deployment.model.api.artifact.extension;
 
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.synchronizedSet;
 import static java.util.stream.Collectors.toSet;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -35,9 +38,11 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
+
 import org.jgrapht.alg.TransitiveReduction;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
+import org.slf4j.Logger;
 
 /**
  * Discover the {@link ExtensionModel} based on the {@link ExtensionModelLoader} type.
@@ -45,6 +50,8 @@ import org.jgrapht.graph.SimpleDirectedGraph;
  * @since 4.0
  */
 public class ExtensionModelDiscoverer {
+
+  private static final Logger LOGGER = getLogger(ExtensionModelDiscoverer.class);
 
   /**
    * For each artifactPlugin discovers the {@link ExtensionModel}.
@@ -114,16 +121,25 @@ public class ExtensionModelDiscoverer {
               .forEach(dep -> depsGraph.addEdge(apd.getBundleDescriptor(), dep.getDescriptor(), new DefaultEdge())));
       TransitiveReduction.INSTANCE.reduce(depsGraph);
 
+      LOGGER.debug("Dependencies graph: {}", depsGraph);
+
       while (!depsGraph.vertexSet().isEmpty()) {
+        Set<BundleDescriptor> processedDependencies = synchronizedSet(new HashSet<>());
+
         discoveryRequest.getArtifactPlugins()
             .parallelStream()
             .filter(artifactPlugin -> depsGraph.vertexSet().contains(artifactPlugin.getFirst().getBundleDescriptor())
                 && depsGraph.outDegreeOf(artifactPlugin.getFirst().getBundleDescriptor()) == 0)
             .forEach(artifactPlugin -> {
-              depsGraph.removeVertex(artifactPlugin.getFirst().getBundleDescriptor());
+              LOGGER.debug("discoverPluginExtensionModel(parallel): {}", artifactPlugin.toString());
 
+              // need this auxiliary structure because the graph does not support concurrent modifications
+              processedDependencies.add(artifactPlugin.getFirst().getBundleDescriptor());
               discoverPluginExtensionModel(discoveryRequest, descriptorsWithExtensions, artifactPlugin);
             });
+
+        processedDependencies.forEach(depsGraph::removeVertex);
+        LOGGER.debug("discoverPluginsExtensionModels(parallel): next iteration on the depsGraph...");
       }
     } else {
       discoveryRequest.getArtifactPlugins()
