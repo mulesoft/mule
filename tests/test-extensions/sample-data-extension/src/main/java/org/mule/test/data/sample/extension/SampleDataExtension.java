@@ -18,6 +18,7 @@ import org.mule.test.data.sample.extension.source.AliasedParameterGroupListener;
 import org.mule.test.data.sample.extension.source.ComplexParameterGroupListener;
 import org.mule.test.data.sample.extension.source.ConfigTestSampleDataListener;
 import org.mule.test.data.sample.extension.source.ConnectedTestSampleDataListener;
+import org.mule.test.data.sample.extension.source.FailingTestSampleDataListener;
 import org.mule.test.data.sample.extension.source.MuleContextAwareTestSampleDataListener;
 import org.mule.test.data.sample.extension.source.ParameterGroupListener;
 import org.mule.test.data.sample.extension.source.ShowInDslParameterGroupListener;
@@ -31,7 +32,7 @@ import org.mule.test.data.sample.extension.source.SimpleTestSampleDataListenerWi
 @Sources({SimpleTestSampleDataListener.class, ConnectedTestSampleDataListener.class, ConfigTestSampleDataListener.class,
     ParameterGroupListener.class, ShowInDslParameterGroupListener.class, AliasedParameterGroupListener.class,
     ComplexParameterGroupListener.class, MuleContextAwareTestSampleDataListener.class,
-    SimpleTestSampleDataListenerWithTwoBoundActingParameters.class
+    SimpleTestSampleDataListenerWithTwoBoundActingParameters.class, FailingTestSampleDataListener.class
 })
 public class SampleDataExtension {
 
