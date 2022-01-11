@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.construct;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
+import static java.util.Arrays.stream;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.function.Function.identity;
@@ -84,7 +85,6 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -225,7 +225,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doInitialise() throws MuleException {
-    this.backPressureExceptions = unmodifiableMap(Arrays.stream(BackPressureReason.values())
+    this.backPressureExceptions = unmodifiableMap(stream(BackPressureReason.values())
         .collect(toMap(identity(), backPressureReason -> createFlowBackPressureException(this, backPressureReason))));
 
     super.doInitialise();
