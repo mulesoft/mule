@@ -9,10 +9,12 @@ package org.mule.runtime.core.internal.construct;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
+import static java.util.Arrays.stream;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
@@ -20,14 +22,11 @@ import static org.mule.runtime.api.notification.PipelineMessageNotification.PROC
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
-import static org.mule.runtime.core.api.construct.BackPressureReason.EVENTS_ACCUMULATED;
-import static org.mule.runtime.core.api.construct.BackPressureReason.MAX_CONCURRENCY_EXCEEDED;
-import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY;
-import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
+import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createFlowBackPressureException;
 import static org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter.createInterceptors;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.KEY_ON_NEXT_ERROR_STRATEGY;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.ON_NEXT_FAILURE_STRATEGY;
@@ -86,7 +85,6 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -227,18 +225,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doInitialise() throws MuleException {
-    final Map<BackPressureReason, FlowBackPressureException> backPressureExceptions = new HashMap<>();
-
-    backPressureExceptions.put(EVENTS_ACCUMULATED,
-                               new FlowBackPressureEventsAccumulatedException(this, EVENTS_ACCUMULATED));
-    backPressureExceptions.put(MAX_CONCURRENCY_EXCEEDED,
-                               new FlowBackPressureMaxConcurrencyExceededException(this, EVENTS_ACCUMULATED));
-    backPressureExceptions.put(REQUIRED_SCHEDULER_BUSY,
-                               new FlowBackPressureRequiredSchedulerBusyException(this, EVENTS_ACCUMULATED));
-    backPressureExceptions.put(REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER,
-                               new FlowBackPressureRequiredSchedulerBusyWithFullBufferException(this, EVENTS_ACCUMULATED));
-
-    this.backPressureExceptions = unmodifiableMap(backPressureExceptions);
+    this.backPressureExceptions = unmodifiableMap(stream(BackPressureReason.values())
+        .collect(toMap(identity(), backPressureReason -> createFlowBackPressureException(this, backPressureReason))));
 
     super.doInitialise();
 

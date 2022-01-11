@@ -441,7 +441,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
   public void backpressureCheckFailure() throws MuleException {
     when(template.getFailedExecutionResponseParametersFunction()).thenReturn(coreEvent -> emptyMap());
     final ArgumentCaptor<CoreEvent> eventCaptor = ArgumentCaptor.forClass(CoreEvent.class);
-    doThrow(propagate(new FlowBackPressureMaxConcurrencyExceededException(flow, MAX_CONCURRENCY_EXCEEDED))).when(flow)
+    doThrow(propagate(new FlowBackPressureMaxConcurrencyExceededException(flow))).when(flow)
         .checkBackpressure(eventCaptor.capture());
 
     flowProcessMediator.process(template, context);
