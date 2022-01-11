@@ -40,7 +40,7 @@ public class ExtensionModelDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test
   @Issue("MULE-19858")
-  @Description("Check that not only 'mule' extension is loaded dor xml sdk extension model generation, but all runtime ext models are (for instance: ee)")
+  @Description("Check that not only 'mule' extension is loaded for xml sdk extension model generation, but all runtime ext models are (for instance: ee)")
   public void allRuntimeExtModelsDiscoveredForExtensionLoading() {
     ArtifactPluginDescriptor descriptor = new ArtifactPluginDescriptor("myPlugin");
     LoaderDescriber loaderDescriber = new LoaderDescriber("test");
