@@ -15,7 +15,7 @@ import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasParametersDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
-import org.mule.runtime.connectivity.api.platform.schema.extension.ExcludeFromConnectivitySchemaModelProperty;
+import org.mule.runtime.extension.api.property.ExcludeFromConnectivitySchemaModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 
 import java.util.LinkedList;

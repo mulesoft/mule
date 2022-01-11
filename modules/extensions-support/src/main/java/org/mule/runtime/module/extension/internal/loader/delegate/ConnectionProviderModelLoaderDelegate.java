@@ -12,7 +12,7 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoade
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasConnectionProviderDeclarer;
-import org.mule.runtime.connectivity.api.platform.schema.extension.ExcludeFromConnectivitySchemaModelProperty;
+import org.mule.runtime.extension.api.property.ExcludeFromConnectivitySchemaModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
 
 import java.util.HashMap;
