@@ -98,9 +98,7 @@ import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
 import org.custommonkey.xmlunit.XMLUnit;
-
 import org.hamcrest.Matcher;
-
 import org.mockito.Mockito;
 
 public final class ExtensionsTestUtils {
@@ -234,14 +232,12 @@ public final class ExtensionsTestUtils {
     });
   }
 
-  public static <C> C getConfigurationFromRegistry(String key, CoreEvent muleEvent, MuleContext muleContext)
-      throws Exception {
+  public static <C> C getConfigurationFromRegistry(String key, CoreEvent muleEvent, MuleContext muleContext) {
     return (C) getConfigurationInstanceFromRegistry(key, muleEvent, muleContext).getValue();
   }
 
   public static ConfigurationInstance getConfigurationInstanceFromRegistry(String key, CoreEvent muleEvent,
-                                                                           MuleContext muleContext)
-      throws Exception {
+                                                                           MuleContext muleContext) {
     ExtensionManager extensionManager = muleContext.getExtensionManager();
     return extensionManager.getConfiguration(key, muleEvent);
   }
@@ -271,7 +267,7 @@ public final class ExtensionsTestUtils {
         diffLines.append(difference.toString() + '\n');
       }
 
-      throw new IllegalArgumentException("Actual XML differs from expected: \n" + diffLines.toString());
+      throw new IllegalArgumentException("Actual XML differs from expected: \n" + diffLines);
     }
   }
 
@@ -398,4 +394,5 @@ public final class ExtensionsTestUtils {
         .findAny()
         .orElse(null);
   }
+
 }

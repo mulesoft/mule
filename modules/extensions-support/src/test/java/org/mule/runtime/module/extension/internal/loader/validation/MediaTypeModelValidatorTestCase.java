@@ -38,6 +38,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.property.Exte
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.SourceTypeWrapper;
+import org.mule.runtime.module.extension.internal.loader.java.validation.MediaTypeModelValidator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.InputStream;

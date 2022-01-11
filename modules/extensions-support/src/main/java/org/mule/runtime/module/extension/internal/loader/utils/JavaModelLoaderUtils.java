@@ -43,7 +43,12 @@ public class JavaModelLoaderUtils {
   public static XmlDslModel getXmlDslModel(ExtensionElement extensionElement,
                                            String version,
                                            Optional<XmlDslConfiguration> xmlDslAnnotationConfiguration) {
-    String extensionName = extensionElement.getName();
+    return getXmlDslModel(extensionElement.getName(), version, xmlDslAnnotationConfiguration);
+  }
+
+  public static XmlDslModel getXmlDslModel(String extensionName,
+                                           String version,
+                                           Optional<XmlDslConfiguration> xmlDslAnnotationConfiguration) {
     Optional<String> prefix = empty();
     Optional<String> namespace = empty();
 

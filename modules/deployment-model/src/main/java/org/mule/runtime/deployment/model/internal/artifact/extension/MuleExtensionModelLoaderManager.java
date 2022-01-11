@@ -7,8 +7,7 @@
 
 package org.mule.runtime.deployment.model.internal.artifact.extension;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-
+import static com.google.common.collect.Maps.newHashMap;
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Objects.requireNonNull;
@@ -16,25 +15,25 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
-
-import static com.google.common.collect.Maps.newHashMap;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.lookupExtensionModelLoaders;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.plugin.LoaderDescriber;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link MuleExtensionModelLoaderManager} that uses SPI to look for the {@link ExtensionModelLoader} available
@@ -44,9 +43,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderManager {
 
-  protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-  private static final Class<ExtensionModelLoader> PROVIDER_CLASS = ExtensionModelLoader.class;
+  private static final Logger LOGGER = getLogger(MuleExtensionModelLoaderManager.class);
 
   private final Map<String, ExtensionModelLoader> extensionModelLoaders = newHashMap();
 
@@ -59,8 +56,20 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
    */
   public MuleExtensionModelLoaderManager(ArtifactClassLoader containerClassLoader) {
     requireNonNull(containerClassLoader, "containerClassLoader cannot be null");
-    this.extModelLoadersLookup =
-        () -> new SpiServiceRegistry().lookupProviders(PROVIDER_CLASS, containerClassLoader.getClassLoader());
+    this.extModelLoadersLookup = () -> lookupLoadersFromSpi(containerClassLoader);
+  }
+
+  private Collection<ExtensionModelLoader> lookupLoadersFromSpi(ArtifactClassLoader containerClassLoader) {
+    Collection<ExtensionModelLoader> loaders = lookupExtensionModelLoaders(containerClassLoader.getClassLoader())
+        .collect(toList());
+
+    if (LOGGER.isErrorEnabled()) {
+      LOGGER.error("The following {} were discovered: [{}]",
+                   ExtensionModelLoader.class.getSimpleName(),
+                   loaders.stream().map(l -> l.getId()).collect(joining(", ")));
+    }
+
+    return loaders;
   }
 
   public void setExtensionModelLoadersLookup(Supplier<Collection<ExtensionModelLoader>> extModelLoadersLookup) {
@@ -84,6 +93,16 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
   @Override
   public void start() throws MuleException {
     final Collection<ExtensionModelLoader> extensionModelLoaders = extModelLoadersLookup.get();
+    assertLoaderLookupUniqueness(extensionModelLoaders);
+
+    extensionModelLoaders.forEach(loader -> this.extensionModelLoaders.put(loader.getId(), loader));
+
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("ExtensionModelLoader registered identifiers: {}", printExtensionModelLoaderIDs());
+    }
+  }
+
+  private void assertLoaderLookupUniqueness(Collection<ExtensionModelLoader> extensionModelLoaders) {
     final StringBuilder sb = new StringBuilder();
     extensionModelLoaders.stream().collect(groupingBy(ExtensionModelLoader::getId))
         .entrySet().stream().filter(entry -> entry.getValue().size() > 1)
@@ -92,20 +111,14 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
                    // At this point we are sure there are at least 2 classes that return the same ID, we will append it to the
                    // builder
                    final String classes = entry.getValue().stream()
-                       .map(extensionModelLoader -> extensionModelLoader.getClass().getName()).collect(Collectors.joining(", "));
+                       .map(extensionModelLoader -> extensionModelLoader.getClass().getName()).collect(joining(", "));
                    sb.append(lineSeparator()).append("ID [").append(entry.getKey())
                        .append("] is being returned by the following classes [").append(classes).append("]");
                  });
     if (isNotBlank(sb.toString())) {
       throw new MuleRuntimeException(createStaticMessage(format(
                                                                 "There are several loaders that return the same identifier when looking up providers for '%s'. Full error list: %s",
-                                                                PROVIDER_CLASS.getName(), sb.toString())));
-    }
-
-    extensionModelLoaders.stream()
-        .forEach(extensionModelLoader -> this.extensionModelLoaders.put(extensionModelLoader.getId(), extensionModelLoader));
-    if (logger.isDebugEnabled()) {
-      logger.debug("ExtensionModelLoader registered identifiers: {}", printExtensionModelLoaderIDs());
+                                                                ExtensionModelLoaderProvider.class.getName(), sb)));
     }
   }
 
@@ -128,5 +141,4 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
   public String toString() {
     return format("%s[extensionModelLoaders=%s]", getClass().getName(), printExtensionModelLoaderIDs());
   }
-
 }

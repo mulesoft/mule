@@ -11,22 +11,19 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
-import static org.mule.runtime.module.extension.api.loader.java.CraftedExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.CraftedExtensionModelLoader.TYPE_PROPERTY_NAME;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
-import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingDelegate;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.module.extension.api.loader.java.CraftedExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -65,15 +62,6 @@ public class CraftedExtensionModelLoaderTestCase extends AbstractMuleTestCase {
     ExtensionModel extensionModel = loader.loadExtensionModel(classLoader, dslResolvingContext, attributes);
     assertThat(extensionModel, is(notNullValue()));
     assertThat(extensionModel.getName(), is(EXTENSION_NAME));
-  }
-
-  @Test
-  public void spiDiscoverable() throws Exception {
-    ServiceRegistry registry = new SpiServiceRegistry();
-    Optional<ExtensionModelLoader> craftedLoader = registry.lookupProviders(ExtensionModelLoader.class, classLoader).stream()
-        .filter(p -> p instanceof CraftedExtensionModelLoader)
-        .findAny();
-    assertThat(craftedLoader.isPresent(), is(true));
   }
 
   @Test

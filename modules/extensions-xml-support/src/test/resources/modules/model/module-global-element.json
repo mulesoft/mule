@@ -51,6 +51,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 1,
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
@@ -81,6 +82,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "General"
               },
               "allowedStereotypeModels": [],
@@ -106,6 +108,12 @@
                 "allowsInlineDefinition": false,
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -224,6 +232,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -245,6 +254,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
           "showInDsl": false,
           "name": "General",
           "description": "",
@@ -329,6 +344,12 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 4
+                  },
                   "allowedStereotypeModels": [
                     {
                       "type": "CONFIG",
@@ -346,6 +367,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 0
+              },
               "showInDsl": false,
               "name": "General",
               "description": "",
@@ -374,6 +401,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 1,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -407,6 +435,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -420,6 +449,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -520,6 +555,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
@@ -544,6 +580,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Error Mappings",
               "description": "",
@@ -632,6 +674,12 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 4
+                  },
                   "allowedStereotypeModels": [
                     {
                       "type": "CONFIG",
@@ -649,6 +697,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 0
+              },
               "showInDsl": false,
               "name": "General",
               "description": "",
@@ -677,6 +731,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 1,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -710,6 +765,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -723,6 +779,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -823,6 +885,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
@@ -847,6 +910,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Error Mappings",
               "description": "",
@@ -923,6 +992,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 1,
                     "tabName": "General"
                   },
                   "allowedStereotypeModels": [],
@@ -965,6 +1035,12 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 2
+                  },
                   "allowedStereotypeModels": [
                     {
                       "type": "CONFIG",
@@ -982,6 +1058,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
               "showInDsl": false,
               "name": "General",
               "description": "",
@@ -1010,6 +1092,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1043,6 +1126,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1056,6 +1140,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -1156,6 +1246,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 5,
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
@@ -1180,6 +1271,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
               "showInDsl": false,
               "name": "Error Mappings",
               "description": "",

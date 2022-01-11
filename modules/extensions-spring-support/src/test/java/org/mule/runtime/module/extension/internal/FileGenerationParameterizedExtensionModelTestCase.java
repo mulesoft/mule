@@ -62,8 +62,11 @@ public abstract class FileGenerationParameterizedExtensionModelTestCase extends 
       assertEquals(expectedContent, actual);
     } catch (Throwable t) {
       if (shouldUpdateExpectedFilesOnError()) {
-        File root = new File(getResourceAsUrl(getExpectedFilesDir() + expectedFilePath, getClass()).toURI()).getParentFile()
-            .getParentFile().getParentFile().getParentFile();
+        File root = new File(getResourceAsUrl(getExpectedFilesDir() + expectedFilePath, getClass()).toURI());
+
+        for (root = root.getParentFile(); !root.getName().equals("target"); root = root.getParentFile());
+        root = root.getParentFile();
+
         File testDir = new File(root, "src/test/resources/" + getExpectedFilesDir());
         File target = new File(testDir, expectedFilePath);
         stringToFile(target.getAbsolutePath(), actual);

@@ -27,7 +27,7 @@ public class ExclusiveOptionalModelTestCase extends AbstractJavaExtensionDeclara
 
   @Before
   public void setUp() {
-    setLoader(loaderFor(VeganExtension.class));
+    setDeclarer(declarerFor(VeganExtension.class));
     extensionDeclaration = declareExtension().getDeclaration();
   }
 

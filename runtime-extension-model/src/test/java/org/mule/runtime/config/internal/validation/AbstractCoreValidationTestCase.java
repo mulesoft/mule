@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static org.mule.runtime.api.meta.Category.COMMUNITY;
-import static org.mule.runtime.ast.api.util.MuleAstUtils.recursiveStreamWithHierarchy;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULESOFT_VENDOR;
-
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.meta.Category.COMMUNITY;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.recursiveStreamWithHierarchy;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULESOFT_VENDOR;
+import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
-
 import org.apache.commons.io.input.ReaderInputStream;
 
 public abstract class AbstractCoreValidationTestCase {
@@ -78,8 +77,8 @@ public abstract class AbstractCoreValidationTestCase {
         .withExtensionModel(MuleExtensionModelProvider.getExtensionModel())
         .withExtensionModel(new ExtensionModelFactory()
             .create(new DefaultExtensionLoadingContext(extensionDeclarer,
-                                                       AbstractCoreValidationTestCase.class.getClassLoader(),
-                                                       new NullDslResolvingContext())))
+                                                       builder(AbstractCoreValidationTestCase.class.getClassLoader(),
+                                                               new NullDslResolvingContext()).build())))
         .withSchemaValidationsDisabled()
         .build();
   }

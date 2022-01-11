@@ -6,22 +6,8 @@
  */
 package org.mule.runtime.extension.internal.loader;
 
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
-import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
-import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
-import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
-import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
-import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
-import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
-import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.TNS_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
-
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Math.max;
 import static java.lang.Runtime.getRuntime;
@@ -37,10 +23,23 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.Sets.newHashSet;
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
+import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
+import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
+import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
+import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
+import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.TNS_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -72,7 +71,6 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
@@ -111,7 +109,6 @@ import org.mule.runtime.properties.api.ConfigurationProperty;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -128,7 +125,6 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import com.google.common.collect.ImmutableMap;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.jgrapht.Graph;
@@ -562,18 +558,6 @@ public final class XmlExtensionLoaderDelegate {
     }
   }
 
-  private void recursiveStreamWithHierarchy(final List<Pair<ComponentAst, List<ComponentAst>>> ret, ComponentAst cm,
-                                            final List<ComponentAst> currentContext) {
-    cm.directChildrenStream().forEach(cmi -> {
-      final List<ComponentAst> currentContextI = new ArrayList<>(currentContext);
-
-      ret.add(new Pair<>(cmi, new ArrayList<>(currentContextI)));
-      currentContextI.add(cmi);
-
-      recursiveStreamWithHierarchy(ret, cmi, currentContextI);
-    });
-  }
-
   private ComponentAst enrichRecursively(final ComponentAst moduleAst, ExtensionModel result) {
     return copyComponentTreeRecursively(moduleAst, comp -> {
       if (TNS_PREFIX.equals(comp.getIdentifier().getNamespace())) {
@@ -637,9 +621,10 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private ExtensionModel createExtensionModel(ExtensionDeclarer declarer) {
-    return new ExtensionModelFactory()
-        .create(new DefaultExtensionLoadingContext(declarer, currentThread().getContextClassLoader(),
-                                                   new NullDslResolvingContext()));
+    return new ExtensionModelFactory().create(
+                                              new DefaultExtensionLoadingContext(declarer,
+                                                                                 builder(currentThread().getContextClassLoader(),
+                                                                                         new NullDslResolvingContext()).build()));
   }
 
   private void fillDeclarer(ExtensionDeclarer declarer, String name, String version, String category, String vendor,

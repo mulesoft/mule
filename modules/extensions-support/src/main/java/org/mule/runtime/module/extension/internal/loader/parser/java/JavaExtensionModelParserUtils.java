@@ -12,8 +12,8 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceAnnotation;
-import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -43,7 +43,6 @@ import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
-import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.ComponentElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ConnectionProviderElement;
@@ -58,6 +57,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.api.loader.java.type.WithOperationContainers;
 import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
+import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
@@ -75,6 +75,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import com.google.common.base.Enums;
 
@@ -125,23 +126,21 @@ public final class JavaExtensionModelParserUtils {
   }
 
 
-  public static List<OperationModelParser> getOperationParsers(JavaExtensionModelParser extensionModelParser,
-                                                               ExtensionElement extensionElement,
-                                                               WithOperationContainers operationContainers,
-                                                               ExtensionLoadingContext loadingContext) {
+  public static Stream<OperationModelParser> getOperationParsers(JavaExtensionModelParser extensionModelParser,
+                                                                 ExtensionElement extensionElement,
+                                                                 WithOperationContainers operationContainers,
+                                                                 ExtensionLoadingContext loadingContext) {
     return operationContainers.getOperationContainers().stream()
         .flatMap(container -> container.getOperations().stream()
             .map(method -> new JavaOperationModelParser(extensionModelParser, extensionElement, container, method,
-                                                        loadingContext)))
-        .collect(toList());
+                                                        loadingContext)));
   }
 
-  public static List<SourceModelParser> getSourceParsers(ExtensionElement extensionElement,
-                                                         List<SourceElement> sources,
-                                                         ExtensionLoadingContext loadingContext) {
+  public static Stream<SourceModelParser> getSourceParsers(ExtensionElement extensionElement,
+                                                           List<SourceElement> sources,
+                                                           ExtensionLoadingContext loadingContext) {
     return sources.stream()
-        .map(source -> new JavaSourceModelParser(extensionElement, source, loadingContext))
-        .collect(toList());
+        .map(source -> new JavaSourceModelParser(extensionElement, source, loadingContext));
   }
 
   public static List<ConnectionProviderModelParser> getConnectionProviderModelParsers(

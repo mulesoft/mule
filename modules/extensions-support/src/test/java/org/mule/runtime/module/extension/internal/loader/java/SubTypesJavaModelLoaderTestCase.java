@@ -20,6 +20,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mule.test.module.extension.internal.util.ExtensionDeclarationTestUtils.javaDeclarerFor;
 
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataType;
@@ -48,8 +49,8 @@ public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
 
   private static final String BASE_TYPE_ID = BaseType.class.getName();
   private static final String SUBTYPE_ID = SubType.class.getName();
+  private static final String VERSION = "1.0.0";
 
-  private DefaultJavaModelLoaderDelegate loader;
   private ExtensionDeclarer pluginDeclarer;
   private ObjectType baseMetadataType;
   private ObjectType subMetadataType;
@@ -89,8 +90,6 @@ public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
     when(pluginCtx.getExtensionDeclarer()).thenReturn(pluginDeclarer);
     when(pluginCtx.getDslResolvingContext()).thenReturn(dslResolvingCtx);
     when(pluginCtx.getExtensionClassLoader()).thenReturn(getClass().getClassLoader());
-
-    loader = new DefaultJavaModelLoaderDelegate(extensionElement, "1.0.0");
   }
 
   @Test
@@ -107,7 +106,7 @@ public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
 
     when(typeCatalog.getType(any())).thenReturn(empty());
 
-    loader.declare(pluginCtx);
+    javaDeclarerFor(VERSION, pluginCtx);
     verify(pluginDeclarer, never()).withImportedType(any());
   }
 
@@ -126,7 +125,7 @@ public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
     when(typeCatalog.getType(BASE_TYPE_ID)).thenReturn(of(baseMetadataType));
     when(typeCatalog.getType(SUBTYPE_ID)).thenReturn(of(subMetadataType));
 
-    loader.declare(pluginCtx);
+    javaDeclarerFor(VERSION, pluginCtx);
     verify(pluginDeclarer, times(2)).withImportedType(any());
   }
 
