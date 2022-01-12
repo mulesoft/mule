@@ -79,8 +79,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import io.qameta.allure.Issue;
 import org.junit.Test;
+
+import io.qameta.allure.Issue;
 
 public class CoreExtensionModelTestCase {
 
