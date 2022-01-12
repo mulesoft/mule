@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.internal.processor;
 
-import static org.mule.runtime.config.internal.MuleArtifactContext.INNER_BEAN_PREFIX;
+import static org.mule.runtime.config.internal.context.MuleArtifactContext.INNER_BEAN_PREFIX;
 
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;

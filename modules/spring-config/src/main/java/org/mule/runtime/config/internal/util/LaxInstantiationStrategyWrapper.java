@@ -8,8 +8,8 @@ package org.mule.runtime.config.internal.util;
 
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
-import org.mule.runtime.config.internal.OptionalObjectsController;
 import org.mule.runtime.config.internal.processor.DiscardedOptionalBeanPostProcessor;
+import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
