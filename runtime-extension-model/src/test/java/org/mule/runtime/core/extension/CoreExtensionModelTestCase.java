@@ -79,9 +79,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.junit.Test;
-
 import io.qameta.allure.Issue;
+import org.junit.Test;
 
 public class CoreExtensionModelTestCase {
 
@@ -152,7 +151,7 @@ public class CoreExtensionModelTestCase {
     assertThat(coreExtensionModel.getErrorModels(),
                hasItem(newError(TRANSFORMATION).withParent(errorMuleAny).build()));
 
-    assertThat(coreExtensionModel.getTypes(), hasSize(6));
+    assertThat(coreExtensionModel.getTypes(), hasSize(5));
   }
 
   @Test

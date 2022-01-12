@@ -117,6 +117,7 @@ import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotation;
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
+import org.mule.runtime.extension.api.property.NoRedeliveryPolicyModelProperty;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
@@ -264,7 +265,8 @@ class MuleExtensionModelDeclarer {
   private void declareScheduler(ExtensionDeclarer extensionDeclarer) {
     SourceDeclarer scheduler = extensionDeclarer.withMessageSource("scheduler")
         .hasResponse(false)
-        .describedAs("Source that schedules periodic execution of a flow.");
+        .describedAs("Source that schedules periodic execution of a flow.")
+        .withModelProperty(NoRedeliveryPolicyModelProperty.INSTANCE);
 
     scheduler.withOutput().ofType(ANY_TYPE);
     scheduler.withOutputAttributes().ofType(ANY_TYPE);
