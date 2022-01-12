@@ -20,6 +20,7 @@ import org.mule.runtime.core.internal.lifecycle.phases.LifecycleObjectSorter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jgrapht.alg.cycle.CycleDetector;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.traverse.TopologicalOrderIterator;
@@ -27,15 +28,19 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
 
   private List<DefaultDirectedGraph<VertexWrapper, DefaultEdge>> dependencyGraphs;
+  private List<CycleDetector> cycleDetectors;
   private DummyDependencyResolver resolver;
   protected Class<?>[] orderedLifecycleTypes;
 
   public DummySpringLifecycleObjectSorter(DummyDependencyResolver resolver, Class<?>[] orderedLifecycleTypes) {
     this.dependencyGraphs = new ArrayList<>();
+    this.cycleDetectors = new ArrayList<>();
     this.resolver = resolver;
     this.orderedLifecycleTypes = orderedLifecycleTypes;
     for (int i = 0; i < orderedLifecycleTypes.length; i++) {
-      dependencyGraphs.add(new DefaultDirectedGraph<>(DefaultEdge.class));
+      DefaultDirectedGraph<VertexWrapper, DefaultEdge> graph = new DefaultDirectedGraph(DefaultEdge.class);
+      dependencyGraphs.add(graph);
+      cycleDetectors.add(new CycleDetector(graph));
     }
   }
 
@@ -50,6 +55,7 @@ public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
     }
 
     DefaultDirectedGraph<VertexWrapper, DefaultEdge> dependencyGraph = getDependencyGraphForLifecycleType(currentObject);
+    CycleDetector cycleDetector = getCycleDetector(currentObject);
 
     VertexWrapper currentVertex = new VertexWrapper(beanName, currentObject);
     dependencyGraph.addVertex(currentVertex);
@@ -70,9 +76,13 @@ public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
                                   VertexWrapper preReqVertex = new VertexWrapper(preReqName, preReqObject);
                                   dependencyGraph.addVertex(preReqVertex);
 
-                                  // todo: update the cycle check part below
+                                  // todo: update the cycle check part below, cyclecheck after adding edge
                                   if (!dependencyGraph.containsEdge(preReqVertex, currentVertex)) {
                                     dependencyGraph.addEdge(currentVertex, preReqVertex);
+                                    if (cycleDetector.detectCycles()) {
+                                      System.out.println(cycleDetector.findCycles());
+                                      // dependencyGraph.removeEdge(currentVertex, preReqVertex);
+                                    }
                                   }
                                 });
   }
@@ -86,12 +96,15 @@ public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
     return dependencyGraphs.get(getDependencyGraphIndex(currentObject));
   }
 
+  private CycleDetector getCycleDetector(Object currentObject) {
+    return cycleDetectors.get(getDependencyGraphIndex(currentObject));
+  }
+
   @Override
   public List<Object> getSortedObjects() {
     return dependencyGraphs.stream().map(x -> {
       List<VertexWrapper> sortedObjects = newArrayList(new TopologicalOrderIterator<>(x));
       reverse(sortedObjects);
-      // return sortedObjects.stream().map(v -> ((VertexWrapper) v).getWrappedObject()).collect(toList());
       return sortedObjects;
     }).reduce(new ArrayList<>(), (sortedObjectList, b) -> {
       for (VertexWrapper v : b) {

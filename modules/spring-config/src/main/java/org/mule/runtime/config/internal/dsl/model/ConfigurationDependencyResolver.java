@@ -60,12 +60,12 @@ public class ConfigurationDependencyResolver {
 
   public Collection<String> getDirectComponentDependencies(String componentName) {
     return appModelDependencyGraph
-            .getRequiredComponents(componentName)
-            .stream()
-            .map(ComponentAst::getComponentId)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .collect(toList());
+        .getRequiredComponents(componentName)
+        .stream()
+        .map(ComponentAst::getComponentId)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .collect(toList());
   }
 
   static class ComponentNamePredicate implements Predicate<ComponentAst> {

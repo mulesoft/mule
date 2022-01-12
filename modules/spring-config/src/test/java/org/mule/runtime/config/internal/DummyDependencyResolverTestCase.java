@@ -34,15 +34,23 @@ public class DummyDependencyResolverTestCase {
                                            autoDiscoveredDependencyResolver, springRegistry);
   }
 
-  // todo: test with the resolveBeanDependencies, getDirectDependencies (only public ones)
+  @Test
+  @Description("check if it calls three different resolvers")
+  public void getDirectBeanDependenciesTest() {
+    String beanName = "component";
+    Object currentObject = springRegistry.get(beanName);
+    resolver.getDirectBeanDependencies(beanName);
+    verify(autoDiscoveredDependencyResolver, times(1)).getAutoDiscoveredDependencies(("component"));
+    verify(declaredDependencyResolver, times(1)).getDeclaredDependencies(currentObject);
+    verify(configurationDependencyResolver, times(1)).getDirectComponentDependencies(beanName);
+  }
+
+  // todo: test other parts of the getDirectBeanDependencies except for the addDependencies
   @Test
   @Description("delegate dependency resolution to autoDiscoveredDependencyResolver")
   public void addAutoDiscoveredDependenciesTest() {
     String beanName = "component";
-    Object currentObject = springRegistry.get(beanName);
-    DependencyNode currentNode = new DependencyNode(currentObject);
     resolver.getDirectBeanDependencies(beanName);
-    // resolver.addDirectAutoDiscoveredDependencies(beanName, new HashSet<>(), currentNode);
     verify(autoDiscoveredDependencyResolver, times(1)).getAutoDiscoveredDependencies(("component"));
   }
 
@@ -51,8 +59,7 @@ public class DummyDependencyResolverTestCase {
   public void addDirectDeclaredDependenciesTest() {
     String beanName = "component";
     Object currentObject = springRegistry.get(beanName);
-    DependencyNode currentNode = new DependencyNode(currentObject);
-    // resolver.addDirectDeclaredDependencies(currentObject, new HashSet<>(), currentNode);
+    resolver.getDirectBeanDependencies(beanName);
     verify(declaredDependencyResolver, times(1)).getDeclaredDependencies(currentObject);
   }
 
@@ -60,9 +67,7 @@ public class DummyDependencyResolverTestCase {
   @Description("delegate dependency resolution to configurationDependencyResolver")
   public void addDirectConfigurationDependenciesTest() {
     String beanName = "component";
-    Object currentObject = springRegistry.get(beanName);
-    DependencyNode currentNode = new DependencyNode(currentObject);
-    // resolver.addDirectConfigurationDependencies(beanName, new HashSet<>(), currentNode);
+    resolver.getDirectBeanDependencies(beanName);
     verify(configurationDependencyResolver, times(1)).getDirectComponentDependencies(beanName);
   }
 
