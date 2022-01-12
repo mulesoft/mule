@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.internal.registry;
 
-import static org.mule.runtime.config.internal.MuleArtifactContext.INNER_BEAN_PREFIX;
+import static org.mule.runtime.config.internal.context.MuleArtifactContext.INNER_BEAN_PREFIX;
 
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;

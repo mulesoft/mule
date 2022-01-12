@@ -7,7 +7,7 @@
 package org.mule.runtime.config.internal.processor;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.config.internal.SpringConfigurationComponentLocator;
+import org.mule.runtime.config.internal.context.SpringConfigurationComponentLocator;
 import org.mule.runtime.dsl.api.component.ComponentFactory;
 
 import org.springframework.beans.BeansException;
