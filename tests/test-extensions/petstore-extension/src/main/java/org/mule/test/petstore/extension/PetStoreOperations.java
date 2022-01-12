@@ -173,6 +173,13 @@ public class PetStoreOperations {
     throw new IllegalStateException("The operation failed!");
   }
 
+  public List<String> getPetsWithIntermitentConnectionProblemAndClosingTypedValueStream(@Connection PetStoreClient client,
+                                                                              @Config PetStoreConnector config,
+                                                                              String ownerName,
+                                                                              @Optional TypedValue<InputStream> ownerSignature) throws IOException {
+    return getPetsWithIntermitentConnectionProblemAndClosingStream(client, config, ownerName, ownerSignature.getValue());
+  }
+
   public List<String> getPetsWithIntermitentConnectionProblemAndClosingStream(@Connection PetStoreClient client,
                                                                               @Config PetStoreConnector config,
                                                                               String ownerName,
