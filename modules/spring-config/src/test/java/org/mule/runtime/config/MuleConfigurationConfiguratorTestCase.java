@@ -12,10 +12,14 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.CONFIGURATION_PROPERTIES;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.ComponentConfigurationAttributesStory.COMPONENT_CONFIGURATION_PROPERTIES_STORY;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.DAYS;
 
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -31,6 +35,7 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.transformer.simple.ObjectToInputStream;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -100,5 +105,13 @@ public class MuleConfigurationConfiguratorTestCase extends AbstractMuleTestCase 
     // This is done so that the timeSupplier is invoked.
     configuration.getDynamicConfigExpiration().getExpirationPolicy().isExpired(0L, DAYS);
     verify(timeSupplier).getAsLong();
+  }
+
+  @Test
+  @Issue("MULE-20031")
+  public void muleContextInjectedIntoTransformers() throws Exception {
+    ObjectToInputStream o2isTransformer = muleContext.getRegistry().lookupObject(ObjectToInputStream.class);
+
+    assertThat(o2isTransformer.doTransform(singletonMap("key", "value"), UTF_8), not(nullValue()));
   }
 }

@@ -72,6 +72,7 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
     super.prepareBeanFactory(beanFactory);
     beanFactory.setBeanExpressionResolver(null);
     registerInjectorProcessor(beanFactory);
+    beanFactory.addBeanPostProcessor(new MuleContextPostProcessor(muleContext));
     beanFactory.registerSingleton(OBJECT_MULE_CONTEXT, muleContext);
   }
 
