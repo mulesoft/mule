@@ -94,6 +94,7 @@ public class SpringRegistry extends AbstractSpringRegistry {
     return beanDependencyResolver;
   }
 
+  @Override
   public ConfigurationDependencyResolver getConfigurationDependencyResolver() {
     return configurationDependencyResolver;
   }
