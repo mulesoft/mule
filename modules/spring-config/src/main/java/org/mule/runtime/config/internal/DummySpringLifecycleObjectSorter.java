@@ -80,8 +80,7 @@ public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
                                   if (!dependencyGraph.containsEdge(preReqVertex, currentVertex)) {
                                     dependencyGraph.addEdge(currentVertex, preReqVertex);
                                     if (cycleDetector.detectCycles()) {
-                                      System.out.println(cycleDetector.findCycles());
-                                      // dependencyGraph.removeEdge(currentVertex, preReqVertex);
+                                      dependencyGraph.removeEdge(currentVertex, preReqVertex);
                                     }
                                   }
                                 });
