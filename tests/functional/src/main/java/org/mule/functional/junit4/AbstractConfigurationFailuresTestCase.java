@@ -60,7 +60,8 @@ import org.junit.Rule;
 public abstract class AbstractConfigurationFailuresTestCase extends AbstractMuleTestCase {
 
   @Rule
-  public TestServicesConfigurationBuilder testServicesConfigurationBuilder = new TestServicesConfigurationBuilder();
+  public TestServicesConfigurationBuilder testServicesConfigurationBuilder =
+      new TestServicesConfigurationBuilder(true, mockExpressionExecutor());
 
   protected void loadConfiguration(String configuration) throws MuleException, InterruptedException {
 
@@ -89,6 +90,8 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
     muleConfiguration.setId(AbstractConfigurationFailuresTestCase.class.getSimpleName());
     applyConfiguration(muleConfiguration);
     contextBuilder.setMuleConfiguration(muleConfiguration);
+    // Simulate the classloader for the app
+    contextBuilder.setExecutionClassLoader(new ClassLoader(currentThread().getContextClassLoader()) {});
     MuleContextWithRegistry muleContext =
         (MuleContextWithRegistry) muleContextFactory.createMuleContext(builders, contextBuilder);
     final AtomicReference<Latch> contextStartedLatch = new AtomicReference<>();
@@ -128,6 +131,10 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
 
   protected boolean enableLazyInit() {
     return false;
+  }
+
+  protected boolean mockExpressionExecutor() {
+    return true;
   }
 
   protected List<ExtensionModel> getRequiredExtensions() {
