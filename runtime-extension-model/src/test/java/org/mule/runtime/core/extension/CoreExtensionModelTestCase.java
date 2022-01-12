@@ -151,7 +151,7 @@ public class CoreExtensionModelTestCase {
     assertThat(coreExtensionModel.getErrorModels(),
                hasItem(newError(TRANSFORMATION).withParent(errorMuleAny).build()));
 
-    assertThat(coreExtensionModel.getTypes(), hasSize(5));
+    assertThat(coreExtensionModel.getTypes(), hasSize(6));
   }
 
   @Test
