@@ -234,6 +234,13 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
     assertThat(payload, is("pull2"));
   }
 
+  @Test
+  public void kill() throws Exception {
+    final Object payload = flowRunner("kill").run().getMessage().getPayload().getValue();
+
+    assertThat(payload, is("BANG"));
+  }
+
   private void assertRicin(Object payload, Long micrograms, String victim) {
     assertThat(payload, instanceOf(Ricin.class));
     assertThat(((Ricin) payload).getMicrogramsPerKilo(), is(micrograms));
