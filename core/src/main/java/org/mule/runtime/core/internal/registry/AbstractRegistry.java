@@ -147,13 +147,15 @@ public abstract class AbstractRegistry implements Registry {
   public final Object unregisterObject(String key) throws RegistrationException {
     Object object = doUnregisterObject(key);
 
-    if (object != null) {
-      try {
-        getLifecycleManager().applyPhase(object, getLifecycleManager().getCurrentPhase(), Disposable.PHASE_NAME);
-      } catch (Exception e) {
-        if (logger.isWarnEnabled()) {
-          logger.warn(format("Could not apply shutdown lifecycle to object '%s' after being unregistered.", key), e);
-        }
+    if (object == null) {
+      return null;
+    }
+
+    try {
+      getLifecycleManager().applyPhase(object, getLifecycleManager().getCurrentPhase(), Disposable.PHASE_NAME);
+    } catch (Exception e) {
+      if (logger.isWarnEnabled()) {
+        logger.warn(format("Could not apply shutdown lifecycle to object '%s' after being unregistered.", key), e);
       }
     }
 
