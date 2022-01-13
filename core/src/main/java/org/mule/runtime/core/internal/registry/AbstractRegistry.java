@@ -8,6 +8,8 @@ package org.mule.runtime.core.internal.registry;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
+import static java.lang.String.format;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -145,11 +147,15 @@ public abstract class AbstractRegistry implements Registry {
   public final Object unregisterObject(String key) throws RegistrationException {
     Object object = doUnregisterObject(key);
 
+    if (object == null) {
+      return null;
+    }
+
     try {
       getLifecycleManager().applyPhase(object, getLifecycleManager().getCurrentPhase(), Disposable.PHASE_NAME);
     } catch (Exception e) {
       if (logger.isWarnEnabled()) {
-        logger.warn(String.format("Could not apply shutdown lifecycle to object '%s' after being unregistered.", key), e);
+        logger.warn(format("Could not apply shutdown lifecycle to object '%s' after being unregistered.", key), e);
       }
     }
 
