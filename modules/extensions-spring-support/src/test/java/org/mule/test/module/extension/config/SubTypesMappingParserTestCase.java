@@ -235,10 +235,17 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
   }
 
   @Test
-  public void kill() throws Exception {
-    final Object payload = flowRunner("kill").run().getMessage().getPayload().getValue();
+  public void killWithRevolver() throws Exception {
+    final Object payload = flowRunner("killWithRevolver").run().getMessage().getPayload().getValue();
 
     assertThat(payload, is("BANG"));
+  }
+
+  @Test
+  public void killWithRicin() throws Exception {
+    final Object payload = flowRunner("killWithRicin").run().getMessage().getPayload().getValue();
+
+    assertThat(payload, is("You have been killed with Ricin"));
   }
 
   private void assertRicin(Object payload, Long micrograms, String victim) {
