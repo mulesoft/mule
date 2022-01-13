@@ -6,14 +6,19 @@
  */
 package org.mule.runtime.core.internal.config.bootstrap;
 
-import static java.lang.String.format;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
+import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.BINDING_PROVIDER_PREDICATE;
+
+import static java.lang.String.format;
+
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
@@ -29,6 +34,8 @@ import java.util.Properties;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import io.qameta.allure.Issue;
 
 public class SimpleRegistryBootstrapTestCase extends AbstractMuleContextTestCase {
 
@@ -95,4 +102,11 @@ public class SimpleRegistryBootstrapTestCase extends AbstractMuleContextTestCase
     return simpleRegistryBootstrap;
   }
 
+  @Test
+  @Issue("MULE-20041")
+  public void bindingProviderPredicate() {
+    assertThat(BINDING_PROVIDER_PREDICATE.test("someFunctionsProvider"), is(true));
+    assertThat(BINDING_PROVIDER_PREDICATE.test("my.bindings.provider"), is(false));
+    assertThat(BINDING_PROVIDER_PREDICATE.test("someRandomEntry"), is(false));
+  }
 }
