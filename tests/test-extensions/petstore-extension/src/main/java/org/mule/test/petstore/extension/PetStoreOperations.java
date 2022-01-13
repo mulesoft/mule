@@ -174,9 +174,10 @@ public class PetStoreOperations {
   }
 
   public List<String> getPetsWithIntermitentConnectionProblemAndClosingTypedValueStream(@Connection PetStoreClient client,
-                                                                              @Config PetStoreConnector config,
-                                                                              String ownerName,
-                                                                              @Optional TypedValue<InputStream> ownerSignature) throws IOException {
+                                                                                        @Config PetStoreConnector config,
+                                                                                        String ownerName,
+                                                                                        @Optional TypedValue<InputStream> ownerSignature)
+      throws IOException {
     return getPetsWithIntermitentConnectionProblemAndClosingStream(client, config, ownerName, ownerSignature.getValue());
   }
 
