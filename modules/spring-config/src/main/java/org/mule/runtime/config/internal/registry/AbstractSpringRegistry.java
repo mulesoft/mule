@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.beans.FatalBeanException;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -443,7 +444,14 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
 
     @Override
     public Object unregisterObject(String key) throws RegistrationException {
-      Object object = applicationContext.getBean(key);
+      Object object;
+      try {
+        object = applicationContext.getBean(key);
+      } catch (BeanCreationException e) {
+        // we might be trying to unregister a bean which had failed with a BeanCreationException
+        // In that case, we must be aware that it will fail again here as well.
+        object = null;
+      }
 
       if (applicationContext.getBeanFactory().containsBeanDefinition(key)) {
         ((BeanDefinitionRegistry) applicationContext.getBeanFactory()).removeBeanDefinition(key);
