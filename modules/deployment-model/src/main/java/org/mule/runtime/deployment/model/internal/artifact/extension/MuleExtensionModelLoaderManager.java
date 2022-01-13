@@ -63,8 +63,8 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
     Collection<ExtensionModelLoader> loaders = lookupExtensionModelLoaders(containerClassLoader.getClassLoader())
         .collect(toList());
 
-    if (LOGGER.isErrorEnabled()) {
-      LOGGER.error("The following {} were discovered: [{}]",
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("The following {} were discovered: [{}]",
                    ExtensionModelLoader.class.getSimpleName(),
                    loaders.stream().map(l -> l.getId()).collect(joining(", ")));
     }
