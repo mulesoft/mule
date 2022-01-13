@@ -7,6 +7,7 @@
 
 package org.mule.test.some.extension;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -49,7 +50,7 @@ public class SomeOps {
    * @param value the value for the operation to consume
    * @return a byte array representation of <it>value</it>
    */
-  @MediaType(TEXT_PLAIN)
+  @MediaType(ANY)
   public Result<InputStream, Object> inputStreamConsumingOperation(@Content TypedValue<InputStream> value) {
     LOGGER.info("A new message is passing through 'inputStreamConsumingOperation': {}", value.getValue());
     return Result.<InputStream, Object>builder().output(value.getValue()).attributes(null).build();
