@@ -7,6 +7,11 @@
 
 package org.mule.module.cxf.support;
 
+import static org.mule.api.config.MuleProperties.MULE_CXF_PROXY_DISABLE_BINDING_OPERATION_INFO_OVERWRITE;
+
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
+
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.apache.cxf.binding.soap.SoapBindingConstants.SOAP_ACTION;
 
@@ -32,6 +37,8 @@ import org.apache.cxf.staxutils.StaxUtils;
  */
 public class ProxyAddBindingOperationInfoInterceptor extends AbstractInDatabindingInterceptor
 {
+    private boolean bindingOperationInfoOverwriteDisabled = parseBoolean(getProperty(MULE_CXF_PROXY_DISABLE_BINDING_OPERATION_INFO_OVERWRITE, "true"));;
+
     public ProxyAddBindingOperationInfoInterceptor()
     {
         super(Phase.UNMARSHAL);
@@ -82,7 +89,7 @@ public class ProxyAddBindingOperationInfoInterceptor extends AbstractInDatabindi
         // In case there already exists an action or the binding was already added, the binding operation should
         // not be added.
         String action = (String) message.get(SOAP_ACTION);
-        if (!isEmpty(action) || message.getExchange().get(BindingOperationInfo.class) != null)
+        if (!isEmpty(action) || (message.getExchange().get(BindingOperationInfo.class) != null && bindingOperationInfoOverwriteDisabled))
         {
             return;
         }
