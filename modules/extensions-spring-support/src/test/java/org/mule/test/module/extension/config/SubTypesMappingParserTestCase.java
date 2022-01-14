@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
+import io.qameta.allure.Issue;
 
 public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase {
 
@@ -235,6 +236,7 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
   }
 
   @Test
+  @Issue("SDK-26")
   public void killWithRevolver() throws Exception {
     final Object payload = flowRunner("killWithRevolver").run().getMessage().getPayload().getValue();
 
@@ -242,6 +244,7 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
   }
 
   @Test
+  @Issue("SDK-26")
   public void killWithRicin() throws Exception {
     final Object payload = flowRunner("killWithRicin").run().getMessage().getPayload().getValue();
 
