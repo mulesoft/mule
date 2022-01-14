@@ -50,7 +50,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
@@ -109,7 +108,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.SourceResultA
 import org.mule.runtime.module.extension.internal.runtime.resolver.StreamingHelperArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.VoidCallbackArgumentResolver;
-import org.mule.runtime.module.extension.internal.runtime.streaming.UnclosableCursorStream;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 
@@ -427,11 +425,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
     @Override
     protected Object decorate(Object value, String eventCorrelationId) {
-      if (value instanceof CursorStream) {
-        return componentDecoratorFactory.decorateInput(new UnclosableCursorStream((CursorStream) value), eventCorrelationId);
-      } else {
-        return componentDecoratorFactory.decorateInput((InputStream) value, eventCorrelationId);
-      }
+      return decorateInput(value, eventCorrelationId, componentDecoratorFactory);
     }
   }
 
