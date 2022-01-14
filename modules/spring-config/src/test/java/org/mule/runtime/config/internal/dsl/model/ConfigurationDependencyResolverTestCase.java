@@ -6,28 +6,24 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
+import static java.util.Optional.of;
+
+import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.graph.internal.DefaultArtifactAstDependencyGraph;
+
+import java.util.Collection;
+import java.util.Set;
+
 import com.google.common.collect.Sets;
 import io.qameta.allure.Description;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.mule.runtime.ast.api.ArtifactAst;
-import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
-import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory;
-import org.mule.runtime.ast.graph.internal.DefaultArtifactAstDependencyGraph;
-import org.mule.runtime.config.internal.DependencyNode;
-
-import java.util.*;
-import java.util.function.Predicate;
-
-import static java.util.Optional.*;
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.when;
-import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.generateFor;
 
 public class ConfigurationDependencyResolverTestCase {
 

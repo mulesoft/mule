@@ -56,6 +56,11 @@ public class DummyDependencyResolver implements BeanDependencyResolver {
         .collect(toList());
   }
 
+  @Override
+  public ConfigurationDependencyResolver getConfigurationDependencyResolver() {
+    return configurationDependencyResolver;
+  }
+
   public List<Pair<String, Object>> getDirectBeanDependencies(String beanName) {
     Object currentObject = springRegistry.get(beanName);
     final DependencyNode currentNode = new DependencyNode(beanName, currentObject);

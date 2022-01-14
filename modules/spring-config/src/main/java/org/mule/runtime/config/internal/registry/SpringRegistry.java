@@ -27,7 +27,7 @@ public class SpringRegistry extends AbstractSpringRegistry {
   private final BeanDependencyResolver beanDependencyResolver;
 
   private ApplicationContext baseApplicationContext;
-  private ConfigurationDependencyResolver configurationDependencyResolver;
+  // private ConfigurationDependencyResolver configurationDependencyResolver;
 
   public SpringRegistry(ApplicationContext baseApplicationContext,
                         ApplicationContext applicationContext,
@@ -37,7 +37,7 @@ public class SpringRegistry extends AbstractSpringRegistry {
     super(applicationContext, muleContext, lifecycleInterceptor);
     this.baseApplicationContext = baseApplicationContext;
     this.beanDependencyResolver = new DefaultBeanDependencyResolver(dependencyResolver, this);
-    this.configurationDependencyResolver = dependencyResolver;
+    // this.configurationDependencyResolver = dependencyResolver;
   }
 
   @Override
@@ -96,7 +96,8 @@ public class SpringRegistry extends AbstractSpringRegistry {
 
   @Override
   public ConfigurationDependencyResolver getConfigurationDependencyResolver() {
-    return configurationDependencyResolver;
+    // return configurationDependencyResolver;
+    return beanDependencyResolver.getConfigurationDependencyResolver();
   }
 
 }

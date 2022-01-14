@@ -26,16 +26,16 @@ public class DummyDependencyResolverTestCase {
 
   @Before
   public void setUp() throws Exception {
-    configurationDependencyResolver = Mockito.mock(ConfigurationDependencyResolver.class);
-    declaredDependencyResolver = Mockito.mock(DeclaredDependencyResolver.class);
-    autoDiscoveredDependencyResolver = Mockito.mock(AutoDiscoveredDependencyResolver.class);
-    springRegistry = Mockito.mock(SpringContextRegistry.class);
+    configurationDependencyResolver = mock(ConfigurationDependencyResolver.class);
+    declaredDependencyResolver = mock(DeclaredDependencyResolver.class);
+    autoDiscoveredDependencyResolver = mock(AutoDiscoveredDependencyResolver.class);
+    springRegistry = mock(SpringContextRegistry.class);
     resolver = new DummyDependencyResolver(configurationDependencyResolver, declaredDependencyResolver,
                                            autoDiscoveredDependencyResolver, springRegistry);
   }
 
   @Test
-  @Description("check if it calls three different resolvers")
+  @Description("check if getDirectBeanDependencies calls three different resolvers")
   public void getDirectBeanDependenciesTest() {
     String beanName = "component";
     Object currentObject = springRegistry.get(beanName);

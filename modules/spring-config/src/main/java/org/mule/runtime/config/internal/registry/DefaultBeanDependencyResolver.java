@@ -126,5 +126,9 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
     }
   }
 
+  public ConfigurationDependencyResolver getConfigurationDependencyResolver() {
+    return configurationDependencyResolver;
+  }
+
 
 }

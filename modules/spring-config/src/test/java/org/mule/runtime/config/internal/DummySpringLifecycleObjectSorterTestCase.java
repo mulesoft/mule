@@ -69,7 +69,13 @@ public class DummySpringLifecycleObjectSorterTestCase {
     assertThat(sorter.getSortedObjects(), contains(streamingManager));
   }
 
-  // todo: addObject w/ different classes
+  @Test
+  @Description("components that are not eligible shouldn't be added")
+  public void ignoreComponentTest() {
+    String object = "str";
+    sorter.addObject("string", object);
+    assertThat(sorter.getSortedObjects(), empty());
+  }
 
   @Test
   @Description("sort components after adding no component")

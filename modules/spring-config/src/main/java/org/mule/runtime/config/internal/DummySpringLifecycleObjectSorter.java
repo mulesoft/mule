@@ -27,6 +27,8 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 
 public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
 
+  //todo: sorter name : BeanGraphLifecycleObjectSorter
+
   private List<DefaultDirectedGraph<VertexWrapper, DefaultEdge>> dependencyGraphs;
   private List<CycleDetector> cycleDetectors;
   private DummyDependencyResolver resolver;
@@ -60,7 +62,7 @@ public class DummySpringLifecycleObjectSorter implements LifecycleObjectSorter {
     VertexWrapper currentVertex = new VertexWrapper(beanName, currentObject);
     dependencyGraph.addVertex(currentVertex);
 
-    // todo: VertexWrapper -> xxx
+    // todo: VertexWrapper -> BeanVertexWrapper
     // get (direct) prerequisite objects for the current object
     List<Pair<String, Object>> prerequisiteObjects = resolver.getDirectBeanDependencies(beanName);
 
