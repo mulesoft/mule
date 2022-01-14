@@ -57,6 +57,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-artifact-ast-serialization</artifactId>
+        </dependency>
+        <dependency>
             <!--for the extensions configuration builder-->
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-extensions-api</artifactId>
