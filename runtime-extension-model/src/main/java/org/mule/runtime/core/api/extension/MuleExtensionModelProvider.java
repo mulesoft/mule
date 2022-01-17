@@ -85,8 +85,8 @@ public final class MuleExtensionModelProvider {
 
   private static final LazyValue<ExtensionModel> APP_OPERATION_EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
       .create(new DefaultExtensionLoadingContext(
-          new AppOperationExtensionModelDeclarer().declareExtensionModel(),
-          loadingRequest())));
+                                                 new AppOperationExtensionModelDeclarer().declareExtensionModel(),
+                                                 loadingRequest())));
 
   private static ExtensionModelLoadingRequest loadingRequest() {
     return ExtensionModelLoadingRequest.builder(MuleExtensionModelProvider.class.getClassLoader(), new NullDslResolvingContext())

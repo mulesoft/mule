@@ -295,7 +295,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       return;
     }
 
-    
+
   }
 
   protected void registerErrors(final ArtifactAst artifactAst) {

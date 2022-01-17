@@ -50,6 +50,7 @@ import java.util.stream.Stream;
 public class AppExtensionModelDeclarer {
 
   private ApplicationTypeLoader typeLoader;
+  
 
   public void declare(ArtifactDescriptor artifactDescriptor, ArtifactType artifactType, ArtifactAst ast) {
     ExtensionDeclarer declarer = new ExtensionDeclarer();
