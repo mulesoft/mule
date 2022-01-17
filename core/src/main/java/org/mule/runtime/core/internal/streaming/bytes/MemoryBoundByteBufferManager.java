@@ -13,12 +13,19 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_MAX_MEMORY;
 import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.MAX_STREAMING_MEMORY_PERCENTAGE;
 
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
+import org.mule.runtime.api.memory.provider.ByteBufferProvider;
+import org.mule.runtime.api.memory.provider.type.ByteBufferType;
 import org.mule.runtime.api.util.MuleSystemProperties;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.ManagedByteBufferWrapper;
 import org.mule.runtime.core.internal.streaming.DefaultMemoryManager;
 import org.mule.runtime.core.internal.streaming.MemoryManager;
 
+import javax.inject.Inject;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -37,10 +44,13 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @since 4.3.0
  */
-public abstract class MemoryBoundByteBufferManager implements ByteBufferManager {
+public abstract class MemoryBoundByteBufferManager implements ByteBufferManager, Initialisable {
 
   private final AtomicLong streamingMemory = new AtomicLong(0);
   private final long maxStreamingMemory;
+  @Inject
+  private MemoryManagementService memoryManagementService;
+  private ByteBufferProvider<ByteBuffer> byteBufferProvider;
 
   /**
    * Creates a new instance
@@ -58,6 +68,12 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager 
     maxStreamingMemory = calculateMaxStreamingMemory(memoryManager);
   }
 
+  @Override
+  public void initialise() throws InitialisationException {
+    this.byteBufferProvider =
+        memoryManagementService.getByteBufferProvider(MuleProperties.OBJECT_STREAMING_MANAGER, ByteBufferType.HEAP);
+  }
+
   /**
    * Tries to allocate a {@link ManagedByteBufferWrapper} of the given {@code capacity}.
    * <p>
@@ -69,7 +85,7 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager 
    */
   protected final ByteBuffer allocateIfFits(int capacity) {
     if (streamingMemory.addAndGet(capacity) <= maxStreamingMemory) {
-      return ByteBuffer.allocate(capacity);
+      return byteBufferProvider.allocate(capacity);
     }
 
     streamingMemory.addAndGet(-capacity);
@@ -109,6 +125,7 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager 
    * @param byteBuffer a {@link ByteBuffer}
    */
   protected void doDeallocate(ByteBuffer byteBuffer) {
+    byteBufferProvider.release(byteBuffer);
     streamingMemory.addAndGet(-byteBuffer.capacity());
   }
 

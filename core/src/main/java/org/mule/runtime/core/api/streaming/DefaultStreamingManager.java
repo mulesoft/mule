@@ -108,8 +108,9 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
                                                                    BUFFER_MANAGER_FACTORY_CLASS)),
                                         e, this);
     }
-
-    return factory.create();
+    ByteBufferManager byteBufferManager = factory.create();
+    initialiseIfNeeded(byteBufferManager, muleContext);
+    return byteBufferManager;
   }
 
   private MutableStreamingStatistics createStatistics() {

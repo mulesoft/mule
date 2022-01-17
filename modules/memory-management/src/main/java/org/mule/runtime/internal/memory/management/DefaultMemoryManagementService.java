@@ -19,7 +19,6 @@ import org.mule.runtime.api.memory.provider.type.ByteBufferType;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A Default Implementation of {@link MemoryManagementService}
