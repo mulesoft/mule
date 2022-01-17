@@ -8,10 +8,8 @@ package org.mule.runtime.config.internal;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
-import static org.mule.runtime.config.internal.ApplicationFilteredFromPolicyArtifactAst.applicationFilteredFromPolicyArtifactAst;
 import static org.mule.runtime.config.internal.registry.AbstractSpringRegistry.SPRING_APPLICATION_CONTEXT;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 
@@ -67,7 +65,6 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
 
   private final ArtifactAst artifactAst;
   private final Map<String, String> artifactProperties;
-  private ArtifactAst parentArtifactAst;
   private ApplicationContext parentContext;
   private MuleArtifactContext muleArtifactContext;
   private final ArtifactType artifactType;
@@ -216,13 +213,6 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
     return muleArtifactContext;
   }
 
-  protected ArtifactAst resolveParentArtifact(FeatureFlaggingService featureFlaggingService) {
-    if (POLICY.equals(artifactType)) {
-      return applicationFilteredFromPolicyArtifactAst(parentArtifactAst, featureFlaggingService);
-    }
-    return parentArtifactAst;
-  }
-
   private Optional<ConfigurationProperties> resolveParentConfigurationProperties() {
     Optional<ConfigurationProperties> parentConfigurationProperties = empty();
     if (parentContext != null) {
@@ -288,7 +278,6 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
   @Override
   public void setParentContext(MuleContext domainContext, ArtifactAst parentAst) {
     this.parentContext = ((MuleContextWithRegistry) domainContext).getRegistry().get(SPRING_APPLICATION_CONTEXT);
-    this.parentArtifactAst = parentAst;
   }
 
   @Override
