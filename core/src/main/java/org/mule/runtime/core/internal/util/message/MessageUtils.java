@@ -25,6 +25,7 @@ import org.mule.runtime.core.api.management.stats.PayloadStatistics;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.management.stats.InputDecoratedCursorStreamProvider;
 import org.mule.runtime.core.internal.util.collection.TransformingIterator;
+import org.mule.runtime.core.internal.util.message.stream.UnclosableCursorStream;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.sdk.api.runtime.operation.Result;
 
@@ -528,6 +529,9 @@ public final class MessageUtils {
     if (v instanceof byte[]) {
       componentDecoratorFactory.computeInputByteCount((byte[]) v);
       return v;
+    } else if (v instanceof CursorStream) {
+      return componentDecoratorFactory.decorateInput((InputStream) new UnclosableCursorStream((CursorStream) v),
+                                                     eventCorrelationId);
     } else if (v instanceof InputStream) {
       return componentDecoratorFactory.decorateInput((InputStream) v, eventCorrelationId);
     } else if (v instanceof Collection) {

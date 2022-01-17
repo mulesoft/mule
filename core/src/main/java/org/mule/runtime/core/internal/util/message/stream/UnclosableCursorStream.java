@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.streaming;
+package org.mule.runtime.core.internal.util.message.stream;
+
+import java.io.IOException;
 
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
-
-import java.io.IOException;
 
 /**
  * Implementation of {@link CursorStream} that decorates a {@link CursorStream} so that it cannot be closed . For example, this
