@@ -66,6 +66,15 @@ public class ReconnectionWithStreamingTestCase extends AbstractExtensionFunction
   }
 
   @Test
+  public void cursorWrappedInTypedValueIsNotAffectedIfCloseIsCalled() throws Exception {
+    shouldFailWithConnectionException = true;
+    operationExecutionCounter.set(0);
+    CoreEvent response = flowRunner("streamingTypedValueReconnectWithClosedStream").withVariable("signature", "hn").run();
+    assertThat(response.getMessage().getPayload().getValue(), is("SUCCESS"));
+    assertThat(operationExecutionCounter.get(), greaterThanOrEqualTo(2));
+  }
+
+  @Test
   public void cursorInParameterGroupIsResetOnReconnection() throws Exception {
     CursorStream cursor = createMockCursor(ORIGINAL_POSITION, "hn");
     assertReconnection("streamingReconnectWithParameterGroup", cursor, cursor);
