@@ -29,6 +29,13 @@
         <set-payload value="SUCCESS"/>
     </flow>
 
+    <flow name="streamingTypedValueReconnectWithClosedStream">
+        <petstore:get-streamed-signature signature="#[vars.signature]"/>
+        <petstore:get-pets-with-intermitent-connection-problem-and-closing-typed-value-stream config-ref="petstore" ownerName="jo"
+                                                                                  ownerSignature="#[payload]"/>
+        <set-payload value="SUCCESS"/>
+    </flow>
+
     <flow name="streamingReconnectWithParameterGroup">
         <petstore:get-pets-with-parameter-group config-ref="petstore" name="jo" signature="#[vars.signature]"/>
     </flow>
