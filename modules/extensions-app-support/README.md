@@ -1,4 +1,4 @@
-mule-module-extensions-support
+mule-module-extensions-app-support
 -------------------------
 
-This module contains classes to support functionality of the APIs defined in the extensions-api artifact
+This module allows treating a Mule applications as an extension 

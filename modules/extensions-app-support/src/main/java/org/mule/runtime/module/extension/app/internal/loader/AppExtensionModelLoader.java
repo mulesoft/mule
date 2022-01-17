@@ -7,9 +7,11 @@
 package org.mule.runtime.module.extension.app.internal.loader;
 
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.module.extension.app.internal.loader.parser.AppExtensionModelParserFactory;
+import org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
 
-public class AppExtensionModelLoader extends ExtensionModelLoader {
+public class AppExtensionModelLoader extends AbstractExtensionModelLoader {
 
   public static final String APP_EXTENSION_LOADER_ID = "app";
 
@@ -19,7 +21,7 @@ public class AppExtensionModelLoader extends ExtensionModelLoader {
   }
 
   @Override
-  protected void declareExtension(ExtensionLoadingContext context) {
-
+  protected ExtensionModelParserFactory getExtensionModelParserFactory(ExtensionLoadingContext context) {
+    return new AppExtensionModelParserFactory();
   }
 }
