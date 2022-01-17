@@ -22,9 +22,9 @@ import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.core.api.streaming.iterator.Consumer;
 import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
 import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.runtime.core.internal.streaming.AbstractStreamingTestCase;
 
-public abstract class AbstractObjectStreamingTestCase extends AbstractMuleContextTestCase {
+public abstract class AbstractObjectStreamingTestCase extends AbstractStreamingTestCase {
 
   protected final List<Object> data;
 

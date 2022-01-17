@@ -16,6 +16,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.streaming.bytes.ManagedByteBufferWrapper;
 import org.mule.runtime.core.internal.streaming.DefaultMemoryManager;
 import org.mule.runtime.core.internal.streaming.MemoryManager;
@@ -49,6 +50,7 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
   private static final Logger LOGGER = getLogger(PoolingByteBufferManager.class);
 
   private final int size;
+  private final int bufferSize;
 
   private BufferPool defaultSizePool;
 
@@ -86,6 +88,12 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
   public PoolingByteBufferManager(MemoryManager memoryManager, int size, int bufferSize) {
     super(memoryManager);
     this.size = size;
+    this.bufferSize = bufferSize;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    super.initialise();
     defaultSizePool = newBufferPool(bufferSize);
   }
 

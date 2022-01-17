@@ -25,14 +25,14 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
 
 @RunWith(Parameterized.class)
-public abstract class AbstractTroubleshootCursorProviderTestCase extends AbstractMuleTestCase {
+public abstract class AbstractTroubleshootCursorProviderTestCase extends AbstractStreamingTestCase {
 
   @Rule
   public ExpectedException expectedException = none();
@@ -58,9 +58,8 @@ public abstract class AbstractTroubleshootCursorProviderTestCase extends Abstrac
   }
 
   @Before
-  public void before() throws NoSuchFieldException, IllegalAccessException {
+  public void before() throws NoSuchFieldException, IllegalAccessException, InitialisationException {
     componentLocation = setComponentLocation ? from("log") : null;
-
     cursorProvider = createCursorProvider();
   }
 

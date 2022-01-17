@@ -15,10 +15,12 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.util.DataUnit.BYTE;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.util.DataSize;
@@ -79,8 +81,9 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   }
 
   @Before
-  public void before() {
+  public void before() throws InitialisationException {
     bufferManager = new PoolingByteBufferManager();
+    initialiseIfNeeded(bufferManager, muleContext);
     final InputStream dataStream = createDataStream();
     streamProvider = createStreamProvider(bufferSize, maxBufferSize, dataStream);
   }

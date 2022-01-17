@@ -8,10 +8,13 @@
 package org.mule.runtime.core.internal.streaming.bytes;
 
 import static org.mule.runtime.api.util.DataUnit.BYTE;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.TROUBLESHOOTING;
 
 import org.junit.After;
+import org.junit.Before;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.util.DataSize;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
@@ -30,7 +33,13 @@ public class TroubleshootCursorStreamProviderTestCase extends AbstractTroublesho
 
   private static final byte[] DATA = "Hello".getBytes();
 
-  private PoolingByteBufferManager bufferManager;
+  private final PoolingByteBufferManager bufferManager = new PoolingByteBufferManager();
+
+  @Before
+  public void before() throws InitialisationException, NoSuchFieldException, IllegalAccessException {
+    initialiseIfNeeded(bufferManager, muleContext);
+    super.before();
+  }
 
   @After
   public void after() {
@@ -42,8 +51,6 @@ public class TroubleshootCursorStreamProviderTestCase extends AbstractTroublesho
     int bufferSize = 10;
     int maxBufferSize = 20;
     InputStream dataStream = new ByteArrayInputStream(DATA);
-
-    bufferManager = new PoolingByteBufferManager();
 
     InMemoryCursorStreamConfig config =
         new InMemoryCursorStreamConfig(new DataSize(bufferSize, BYTE),
