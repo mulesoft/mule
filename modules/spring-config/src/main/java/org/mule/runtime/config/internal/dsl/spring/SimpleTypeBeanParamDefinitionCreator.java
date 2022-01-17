@@ -6,6 +6,12 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+import static org.mule.runtime.dsl.api.xml.parser.XmlApplicationParser.IS_CDATA;
+
+import static java.lang.Boolean.TRUE;
+
 import org.mule.runtime.ast.api.ComponentParameterAst;
 
 /**
@@ -18,11 +24,33 @@ import org.mule.runtime.ast.api.ComponentParameterAst;
  */
 class SimpleTypeBeanParamDefinitionCreator extends SimpleTypeBeanBaseDefinitionCreator<CreateParamBeanDefinitionRequest> {
 
+  private final boolean disableTrimWhitespaces;
+
+  public SimpleTypeBeanParamDefinitionCreator(boolean disableTrimWhitespaces) {
+    this.disableTrimWhitespaces = disableTrimWhitespaces;
+  }
+
+  @Override
   protected boolean doHandleRequest(CreateParamBeanDefinitionRequest createBeanDefinitionRequest, Class<?> type) {
     final ComponentParameterAst param = createBeanDefinitionRequest.getParam();
     this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type,
-                                      (String) param.getValue().mapLeft(expr -> "#[" + expr + "]").getValue().orElse(null));
+                                      (String) resolveParamValue(param, disableTrimWhitespaces));
     return true;
+  }
+
+  static Object resolveParamValue(final ComponentParameterAst param, boolean disableTrimWhitespaces) {
+    return param.getValue()
+        .mapLeft(expr -> DEFAULT_EXPRESSION_PREFIX + expr + DEFAULT_EXPRESSION_POSTFIX)
+        .mapRight(value -> {
+          if (value instanceof String && !disableTrimWhitespaces
+              && !TRUE.equals(param.getMetadata().map(m -> m.getParserAttributes().get(IS_CDATA)).orElse(false))) {
+            return ((String) value).trim();
+          } else {
+            return value;
+          }
+        })
+        .getValue()
+        .orElse(null);
   }
 
 }

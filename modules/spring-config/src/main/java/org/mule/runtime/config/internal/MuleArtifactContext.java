@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.ast.api.util.AstTraversalDirection.BOTTOM_UP;
@@ -206,7 +207,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     // TODO (MULE-19608) remove this and make it into a component building definition
     this.beanDefinitionFactory =
         new BeanDefinitionFactory(muleContext.getConfiguration().getId(),
-                                  componentBuildingDefinitionRegistryFactory.create(artifactAst.dependencies()));
+                                  componentBuildingDefinitionRegistryFactory.create(artifactAst.dependencies()),
+                                  featureFlaggingService.isEnabled(DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING));
 
     this.applicationModel = artifactAst;
 

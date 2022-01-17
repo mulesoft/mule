@@ -136,12 +136,13 @@ public class BeanDefinitionFactory {
    *                                            artifact.
    * @param errorTypeRepository
    */
-  public BeanDefinitionFactory(String artifactId, ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry) {
+  public BeanDefinitionFactory(String artifactId, ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry,
+                               boolean disableTrimWhitespaces) {
     this.artifactId = artifactId;
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
-    this.componentProcessor = buildComponentProcessorChainOfResponsability();
-    this.dslParamGroupProcessor = buildDslParamGroupChainOfResponsability();
-    this.paramProcessor = buildParamChainOfResponsability();
+    this.componentProcessor = buildComponentProcessorChainOfResponsability(disableTrimWhitespaces);
+    this.dslParamGroupProcessor = buildDslParamGroupChainOfResponsability(disableTrimWhitespaces);
+    this.paramProcessor = buildParamChainOfResponsability(disableTrimWhitespaces);
     this.ignoredMuleExtensionComponentIdentifiers = new HashSet<>();
 
     registerConfigurationPropertyProviders();
@@ -662,13 +663,13 @@ public class BeanDefinitionFactory {
     }
   }
 
-  private BeanDefinitionCreator<CreateComponentBeanDefinitionRequest> buildComponentProcessorChainOfResponsability() {
+  private BeanDefinitionCreator<CreateComponentBeanDefinitionRequest> buildComponentProcessorChainOfResponsability(boolean disableTrimWhitespaces) {
     EagerObjectCreator eagerObjectCreator = new EagerObjectCreator();
     ObjectBeanDefinitionCreator objectBeanDefinitionCreator = new ObjectBeanDefinitionCreator();
     SimpleTypeBeanComponentDefinitionCreator simpleTypeBeanDefinitionCreator = new SimpleTypeBeanComponentDefinitionCreator();
     MapEntryBeanDefinitionCreator mapEntryBeanDefinitionCreator = new MapEntryBeanDefinitionCreator();
     CommonComponentBeanDefinitionCreator commonComponentModelProcessor =
-        new CommonComponentBeanDefinitionCreator(objectFactoryClassRepository);
+        new CommonComponentBeanDefinitionCreator(objectFactoryClassRepository, disableTrimWhitespaces);
 
     eagerObjectCreator.setNext(objectBeanDefinitionCreator);
     objectBeanDefinitionCreator.setNext(simpleTypeBeanDefinitionCreator);
@@ -678,16 +679,17 @@ public class BeanDefinitionFactory {
     return eagerObjectCreator;
   }
 
-  private BeanDefinitionCreator<CreateDslParamGroupBeanDefinitionRequest> buildDslParamGroupChainOfResponsability() {
-    return new CommonDslParamGroupBeanDefinitionCreator(objectFactoryClassRepository);
+  private BeanDefinitionCreator<CreateDslParamGroupBeanDefinitionRequest> buildDslParamGroupChainOfResponsability(boolean disableTrimWhitespaces) {
+    return new CommonDslParamGroupBeanDefinitionCreator(objectFactoryClassRepository, disableTrimWhitespaces);
   }
 
-  private BeanDefinitionCreator<CreateParamBeanDefinitionRequest> buildParamChainOfResponsability() {
-    SimpleTypeBeanParamDefinitionCreator simpleTypeBeanDefinitionCreator = new SimpleTypeBeanParamDefinitionCreator();
+  private BeanDefinitionCreator<CreateParamBeanDefinitionRequest> buildParamChainOfResponsability(boolean disableTrimWhitespaces) {
+    SimpleTypeBeanParamDefinitionCreator simpleTypeBeanDefinitionCreator =
+        new SimpleTypeBeanParamDefinitionCreator(disableTrimWhitespaces);
     CollectionBeanDefinitionCreator collectionBeanDefinitionCreator = new CollectionBeanDefinitionCreator();
     MapBeanDefinitionCreator mapBeanDefinitionCreator = new MapBeanDefinitionCreator();
     CommonParamBeanDefinitionCreator commonComponentModelProcessor =
-        new CommonParamBeanDefinitionCreator(objectFactoryClassRepository);
+        new CommonParamBeanDefinitionCreator(objectFactoryClassRepository, disableTrimWhitespaces);
 
     simpleTypeBeanDefinitionCreator.setNext(collectionBeanDefinitionCreator);
     collectionBeanDefinitionCreator.setNext(mapBeanDefinitionCreator);

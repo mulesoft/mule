@@ -11,6 +11,7 @@ import static org.mule.runtime.config.internal.dsl.spring.PropertyComponentUtils
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
+
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -40,8 +41,9 @@ class CommonComponentBeanDefinitionCreator extends CommonBeanBaseDefinitionCreat
 
   private final BeanDefinitionPostProcessor beanDefinitionPostProcessor;
 
-  public CommonComponentBeanDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository) {
-    super(objectFactoryClassRepository);
+  public CommonComponentBeanDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository,
+                                              boolean disableTrimWhitespaces) {
+    super(objectFactoryClassRepository, disableTrimWhitespaces);
 
     this.beanDefinitionPostProcessor = resolvePostProcessor();
   }
