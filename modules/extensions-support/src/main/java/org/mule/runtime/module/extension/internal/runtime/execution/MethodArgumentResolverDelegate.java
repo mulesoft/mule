@@ -302,8 +302,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       }
 
       argumentResolvers[i] =
-          addResolverDecorators((ArgumentResolver<Object>) argumentResolver,
-                                annotations.containsKey(Content.class) ? componentDecoratorFactory : NO_OP_INSTANCE, parameter);
+          addResolverDecorators((ArgumentResolver<Object>) argumentResolver, isContentArgument(annotations), parameter);
     }
   }
 
@@ -336,9 +335,16 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     return parameterValues;
   }
 
+  private boolean isContentArgument(Map<Class<? extends Annotation>, Annotation> argumentAnnotations) {
+    return argumentAnnotations.containsKey(Content.class)
+        || argumentAnnotations.containsKey(org.mule.sdk.api.annotation.param.Content.class);
+  }
+
   private ArgumentResolver<Object> addResolverDecorators(ArgumentResolver<Object> resolver,
-                                                         CursorComponentDecoratorFactory componentDecoratorFactory,
+                                                         boolean isContentArgument,
                                                          Parameter parameter) {
+    CursorComponentDecoratorFactory componentDecoratorFactory =
+        isContentArgument ? this.componentDecoratorFactory : NO_OP_INSTANCE;
     Class<?> argumentType = parameter.getType();
     if (argumentType.isPrimitive()) {
       resolver = addPrimitiveTypeDefaultValueDecorator(resolver, argumentType);
@@ -356,8 +362,10 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
           }
         }
       }
-    } else {
+    } else if (Object.class.equals(argumentType)) {
       resolver = new ObjectArgumentResolverDecorator(resolver, componentDecoratorFactory);
+    } else if (isContentArgument) {
+      resolver = new ContentArgumentResolverDecorator(resolver, componentDecoratorFactory);
     }
 
     return resolver;
@@ -490,6 +498,22 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       } else {
         return value;
       }
+    }
+  }
+
+  private static class ContentArgumentResolverDecorator extends ArgumentResolverDecorator {
+
+    private final CursorComponentDecoratorFactory componentDecoratorFactory;
+
+    public ContentArgumentResolverDecorator(ArgumentResolver<Object> decoratee,
+                                            CursorComponentDecoratorFactory componentDecoratorFactory) {
+      super(decoratee);
+      this.componentDecoratorFactory = componentDecoratorFactory;
+    }
+
+    @Override
+    protected Object decorate(Object value, String eventCorrelationId) {
+      return decorateInput(value, eventCorrelationId, componentDecoratorFactory);
     }
   }
 
