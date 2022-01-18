@@ -9,7 +9,7 @@
       http://www.mulesoft.org/schema/mule/vegan http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd
       http://www.mulesoft.org/schema/mule/subtypes http://www.mulesoft.org/schema/mule/subtypes/current/mule-subtypes.xsd">
 
-    <subtypes:config name="config" twoPojos="#[[]]" >
+    <subtypes:config name="config" twoPojos="#[[]]">
         <subtypes:connection>
             <subtypes:abstract-shape>
                 <subtypes:triangle-alias height="2" area="1"/>
@@ -174,7 +174,7 @@
             </subtypes:door-registries>
         </subtypes:process-door>
     </flow>
-    
+
     <flow name="pojosWithCommonNameInnerField">
         <subtypes:pojos-with-common-name-inner-field>
             <subtypes:has-door>
@@ -190,5 +190,27 @@
         </subtypes:pojos-with-common-name-inner-field>
     </flow>
 
-    <subtypes:revolver name="sledgeHammer's" bullets="1" />
+    <flow name="killWithRevolver">
+        <subtypes:kill>
+            <subtypes:deadly>
+                <subtypes:weapon>
+                    <subtypes:revolver bullets="6"/>
+                </subtypes:weapon>
+            </subtypes:deadly>
+        </subtypes:kill>
+    </flow>
+
+    <flow name="killWithRicin">
+        <subtypes:kill>
+            <subtypes:deadly>
+                <subtypes:weapon>
+                    <heisenberg:ricin microgramsPerKilo="20">
+                        <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+                    </heisenberg:ricin>
+                </subtypes:weapon>
+            </subtypes:deadly>
+        </subtypes:kill>
+    </flow>
+
+    <subtypes:revolver name="sledgeHammer's" bullets="1"/>
 </mule>
