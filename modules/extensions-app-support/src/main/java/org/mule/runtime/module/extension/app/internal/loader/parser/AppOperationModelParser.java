@@ -244,5 +244,5 @@ class AppOperationModelParser extends BaseAppExtensionModelParser implements Ope
         .findFirst()
         .orElseThrow(() -> new IllegalOperationModelDefinitionException(format(
             "Operation '%s' is missing its <%s> declaration", getName(), elementName)));
-  }
+  }                     
 }
