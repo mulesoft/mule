@@ -138,11 +138,7 @@ public abstract class AbstractProfilingService implements CoreProfilingService, 
                                                         .atLeast(ENABLE_PROFILING_SERVICE.getEnabledByDefaultSince()))
                                                     .isPresent());
     featureFlaggingRegistry.registerFeatureFlag(FORCE_RUNTIME_PROFILING_CONSUMERS_ENABLEMENT,
-                                                featureContext -> featureContext.getArtifactMinMuleVersion()
-                                                    .filter(muleVersion -> muleVersion
-                                                        .atLeast(FORCE_RUNTIME_PROFILING_CONSUMERS_ENABLEMENT
-                                                            .getEnabledByDefaultSince()))
-                                                    .isPresent());
+                                                featureContext -> false);
   }
 
 }
