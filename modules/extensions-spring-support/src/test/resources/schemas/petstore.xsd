@@ -280,6 +280,7 @@
           <xs:attribute type="mule:expressionDateTime" use="optional" name="openingDate"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="optional" name="closedForHolidays"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="optional" name="discountDates"></xs:attribute>
+          <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="forceConnectionError"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>

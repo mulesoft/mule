@@ -16,10 +16,12 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * Given a {@link ExtensionModel} and another {@link EnrichableModel}, this class will test for a
@@ -48,9 +50,14 @@ public final class ExceptionHandlerManager {
   }
 
   private ErrorType resolveConnectionErrorType(ExtensionModel extensionModel, ErrorTypeRepository errorTypeRepository) {
+    String extensionNamespace = (extensionModel.getName() != null ? extensionModel.getName().toUpperCase() : null);
+    Predicate<ErrorModel> connectivityErrorCondition = errorModel -> errorModel.getType().equals(CONNECTIVITY_ERROR_IDENTIFIER);
+    Predicate<ErrorModel> extensionConnectivityErrorCondition =
+        connectivityErrorCondition.and(errorModel -> errorModel.getNamespace().equals(extensionNamespace));
+
     return extensionModel.getErrorModels().stream()
-        .filter(errorModel -> errorModel.getType().equals(CONNECTIVITY_ERROR_IDENTIFIER))
-        .findFirst()
+        .filter(extensionConnectivityErrorCondition).findFirst().map(Optional::of)
+        .orElseGet(() -> extensionModel.getErrorModels().stream().filter(connectivityErrorCondition).findFirst())
         .map(errorModel -> errorTypeRepository.getErrorType(ComponentIdentifier.builder()
             .namespace(errorModel.getNamespace())
             .name(errorModel.getType())
