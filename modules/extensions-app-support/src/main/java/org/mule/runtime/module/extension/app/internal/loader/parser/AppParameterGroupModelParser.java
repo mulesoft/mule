@@ -7,19 +7,16 @@
 package org.mule.runtime.module.extension.app.internal.loader.parser;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
-import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
-import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.type.ApplicationTypeLoader;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.module.extension.internal.loader.java.property.ExclusiveOptionalModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 
@@ -28,12 +25,17 @@ import java.util.Optional;
 
 class AppParameterGroupModelParser implements ParameterGroupModelParser {
 
-  private final List<ComponentAst> parameters;
-  private final ApplicationTypeLoader typeLoader;
+  private final List<ParameterModelParser> parameters;
 
   public AppParameterGroupModelParser(List<ComponentAst> parameters, ApplicationTypeLoader typeLoader) {
-    this.parameters = parameters;
-    this.typeLoader = typeLoader;
+    this.parameters = doParserParameters(parameters, typeLoader);
+  }
+
+  private List<ParameterModelParser> doParserParameters(List<ComponentAst> parameters, ApplicationTypeLoader typeLoader) {
+    return unmodifiableList(parameters.stream()
+        .map(p -> new AppParameterModelParser(p, typeLoader))
+        .collect(toList())
+    );
   }
 
   @Override
@@ -48,36 +50,8 @@ class AppParameterGroupModelParser implements ParameterGroupModelParser {
 
   @Override
   public List<ParameterModelParser> getParameterParsers() {
-    if (parameters != null) {
-      parameters.forEach(p -> declareParameter(declarer, p));
-    }
+    return parameters;
   }
-
-  private void declareParameter(ParameterizedDeclarer declarer, ComponentAst parameterAst) {
-    final String paramName = requiredString(parameterAst, "name");
-    ParameterDeclarer parameter;
-
-    ComponentParameterAst optionalElement = parameterAst.getParameter("optional");
-
-    if (optionalElement != null) {
-      ComponentAst optional = (ComponentAst) optionalElement.getValue().getRight();
-      parameter = declarer.onDefaultParameterGroup().withOptionalParameter(paramName)
-          .defaultingTo(optionalString(optional, "defaultValue"));
-
-      ComponentParameterAst exclusiveOptional = optional.getParameter("exclusiveOptional");
-      if (exclusiveOptional != null) {
-        parameter.withModelProperty(new ExclusiveOptionalModelProperty(parseExclusiveParametersModel((ComponentAst) exclusiveOptional.getValue().getRight())));
-      }
-    } else {
-      parameter = declarer.onDefaultParameterGroup().withRequiredParameter(paramName);
-    }
-
-    parameter.describedAs(optionalString(parameterAst, "description"))
-        .ofType(typeLoader.load())
-        .withExpressionSupport()
-        .withRole(BEHAVIOUR);
-  }
-
 
   @Override
   public Optional<DisplayModel> getDisplayModel() {

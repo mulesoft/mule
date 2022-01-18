@@ -13,7 +13,6 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
@@ -23,7 +22,6 @@ import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.type.ApplicationTypeLoader;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
@@ -47,13 +45,21 @@ class AppOperationModelParser extends BaseAppExtensionModelParser implements Ope
   private final ComponentAst operation;
   private final ApplicationTypeLoader typeLoader;
 
+  private String name;
+
   public AppOperationModelParser(ComponentAst operation, ApplicationTypeLoader typeLoader) {
     this.operation = operation;
     this.typeLoader = typeLoader;
+
+    parseStructure();
+  }
+
+  private void parseStructure() {
+    name = getParameter(operation, "name");
   }
 
   private OutputModelParser asOutputModelParser(ComponentAst outputTypeElement) {
-    String type = requiredString(outputTypeElement, "type");
+    String type = getParameter(outputTypeElement, "type");
     String mimeType = getMimeTypeFromOutputType(outputTypeElement).orElse("application/java");
 
     return typeLoader.load(type, mimeType)
@@ -67,22 +73,22 @@ class AppOperationModelParser extends BaseAppExtensionModelParser implements Ope
   }
 
   private Optional<String> getMimeTypeFromOutputType(ComponentAst outputTypeElement) {
-    return optionalString(outputTypeElement, "mimeType");
+    return getOptionalParameter(outputTypeElement, "mimeType");
   }
 
   @Override
   public String getName() {
-    return requiredString(operation, "name");
+    return name;
   }
 
   @Override
   public String getDescription() {
-    return optionalString(operation, "description").orElse("");
+    return this.<String>getOptionalParameter(operation, "description").orElse("");
   }
 
   @Override
   public List<ModelProperty> getAdditionalModelProperties() {
-    return null;
+    return emptyList();
   }
 
   @Override
@@ -102,13 +108,9 @@ class AppOperationModelParser extends BaseAppExtensionModelParser implements Ope
 
   @Override
   public List<ParameterGroupModelParser> getParameterGroupModelParsers() {
-    ComponentParameterAst parametersElement = operation.getParameter(DEFAULT_GROUP_NAME, "parameters");
-    if (parametersElement == null) {
-      return emptyList();
-    }
+    List<ComponentAst> parameters = getParameter(operation, "parameters");
 
-    List<ComponentAst> parameters = (List<ComponentAst>) parametersElement.getValue().getRight();
-    return parameters.isEmpty()
+    return parameters == null || parameters.isEmpty()
         ? emptyList()
         : singletonList(new AppParameterGroupModelParser(parameters, typeLoader));
   }
@@ -196,8 +198,8 @@ class AppOperationModelParser extends BaseAppExtensionModelParser implements Ope
 
   @Override
   public Optional<DisplayModel> getDisplayModel() {
-    String summary = optionalString(operation, "summary").orElse(null);
-    String displayName = optionalString(operation, "displayName").orElse(null);
+    String summary = this.<String>getOptionalParameter(operation, "summary").orElse(null);
+    String displayName = this.<String>getOptionalParameter(operation, "displayName").orElse(null);
 
     if (!isBlank(displayName) || !isBlank(summary)) {
       return of(DisplayModel.builder()
