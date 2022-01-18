@@ -42,8 +42,7 @@ class SimpleTypeBeanParamDefinitionCreator extends SimpleTypeBeanBaseDefinitionC
     return param.getValue()
         .mapLeft(expr -> DEFAULT_EXPRESSION_PREFIX + expr + DEFAULT_EXPRESSION_POSTFIX)
         .mapRight(value -> {
-          if (value instanceof String && !disableTrimWhitespaces
-              && !TRUE.equals(param.getMetadata().map(m -> m.getParserAttributes().get(IS_CDATA)).orElse(false))) {
+          if (value instanceof String && !disableTrimWhitespaces && !isCdata(param)) {
             return ((String) value).trim();
           } else {
             return value;
@@ -51,6 +50,10 @@ class SimpleTypeBeanParamDefinitionCreator extends SimpleTypeBeanBaseDefinitionC
         })
         .getValue()
         .orElse(null);
+  }
+
+  private static boolean isCdata(final ComponentParameterAst param) {
+    return TRUE.equals(param.getMetadata().map(m -> m.getParserAttributes().get(IS_CDATA)).orElse(false));
   }
 
 }
