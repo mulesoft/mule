@@ -141,13 +141,6 @@ public class ParameterWhitespaceTrimmingTestCase extends AbstractExtensionFuncti
   }
 
   @Test
-  @Issue("MULE-20048")
-  public void whitespacesAreNotTrimmedForPojoTextCDATA() throws Exception {
-    Object value = flowRunner("pojoTextCDATA").run().getMessage().getPayload().getValue();
-    assertThat(value, is("Hello    Max Mule   !"));
-  }
-
-  @Test
   public void whitespacesForPg() throws Exception {
     Object value = flowRunner("pg").run().getMessage().getPayload().getValue();
     if (this.disableWhitespaceTrimming) {

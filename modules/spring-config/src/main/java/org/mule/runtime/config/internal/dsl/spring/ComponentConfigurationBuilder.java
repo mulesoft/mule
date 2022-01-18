@@ -357,7 +357,7 @@ class ComponentConfigurationBuilder<T> {
         // Account for inconsistency in the extension model. Ref: MULE-18262
         parameterValue = getDefaultSchedulerFixedFrequency();
       } else {
-        parameterValue = resolveParamValue(parameter, disableTrimWhitespaces);
+        parameterValue = resolveParamValue(parameter, disableTrimWhitespaces, false);
 
         if (defaultValue != null && parameterValue == null) {
           LOGGER

@@ -13,6 +13,7 @@ import static org.mule.runtime.dsl.api.xml.parser.XmlApplicationParser.IS_CDATA;
 import static java.lang.Boolean.TRUE;
 
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.ast.api.MetadataTypeObjectFieldTypeAdapter;
 
 /**
  * Bean definition creator for elements that end up representing simple types.
@@ -25,24 +26,30 @@ import org.mule.runtime.ast.api.ComponentParameterAst;
 class SimpleTypeBeanParamDefinitionCreator extends SimpleTypeBeanBaseDefinitionCreator<CreateParamBeanDefinitionRequest> {
 
   private final boolean disableTrimWhitespaces;
+  private final boolean disablePojoCdataTrimWhitespaces;
 
-  public SimpleTypeBeanParamDefinitionCreator(boolean disableTrimWhitespaces) {
+  public SimpleTypeBeanParamDefinitionCreator(boolean disableTrimWhitespaces, boolean disablePojoCdataTrimWhitespaces) {
     this.disableTrimWhitespaces = disableTrimWhitespaces;
+    this.disablePojoCdataTrimWhitespaces = disablePojoCdataTrimWhitespaces;
   }
 
   @Override
   protected boolean doHandleRequest(CreateParamBeanDefinitionRequest createBeanDefinitionRequest, Class<?> type) {
     final ComponentParameterAst param = createBeanDefinitionRequest.getParam();
     this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type,
-                                      (String) resolveParamValue(param, disableTrimWhitespaces));
+                                      (String) resolveParamValue(param, disableTrimWhitespaces, disablePojoCdataTrimWhitespaces));
     return true;
   }
 
-  static Object resolveParamValue(final ComponentParameterAst param, boolean disableTrimWhitespaces) {
+  static Object resolveParamValue(final ComponentParameterAst param, boolean disableTrimWhitespaces,
+                                  boolean disablePojoCdataTrimWhitespaces) {
     return param.getValue()
         .mapLeft(expr -> DEFAULT_EXPRESSION_PREFIX + expr + DEFAULT_EXPRESSION_POSTFIX)
         .mapRight(value -> {
-          if (value instanceof String && !disableTrimWhitespaces && !isCdata(param)) {
+          if (value instanceof String
+              && ((!disableTrimWhitespaces && !isCdata(param))
+                  || (!disablePojoCdataTrimWhitespaces && isCdata(param)
+                      && param.getModel() instanceof MetadataTypeObjectFieldTypeAdapter))) {
             return ((String) value).trim();
           } else {
             return value;

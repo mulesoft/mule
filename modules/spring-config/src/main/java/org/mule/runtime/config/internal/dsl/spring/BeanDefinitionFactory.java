@@ -137,12 +137,12 @@ public class BeanDefinitionFactory {
    * @param errorTypeRepository
    */
   public BeanDefinitionFactory(String artifactId, ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry,
-                               boolean disableTrimWhitespaces) {
+                               boolean disableTrimWhitespaces, boolean disablePojoCdataTrimWhitespaces) {
     this.artifactId = artifactId;
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.componentProcessor = buildComponentProcessorChainOfResponsability(disableTrimWhitespaces);
     this.dslParamGroupProcessor = buildDslParamGroupChainOfResponsability(disableTrimWhitespaces);
-    this.paramProcessor = buildParamChainOfResponsability(disableTrimWhitespaces);
+    this.paramProcessor = buildParamChainOfResponsability(disableTrimWhitespaces, disablePojoCdataTrimWhitespaces);
     this.ignoredMuleExtensionComponentIdentifiers = new HashSet<>();
 
     registerConfigurationPropertyProviders();
@@ -683,9 +683,10 @@ public class BeanDefinitionFactory {
     return new CommonDslParamGroupBeanDefinitionCreator(objectFactoryClassRepository, disableTrimWhitespaces);
   }
 
-  private BeanDefinitionCreator<CreateParamBeanDefinitionRequest> buildParamChainOfResponsability(boolean disableTrimWhitespaces) {
+  private BeanDefinitionCreator<CreateParamBeanDefinitionRequest> buildParamChainOfResponsability(boolean disableTrimWhitespaces,
+                                                                                                  boolean disablePojoCdataTrimWhitespaces) {
     SimpleTypeBeanParamDefinitionCreator simpleTypeBeanDefinitionCreator =
-        new SimpleTypeBeanParamDefinitionCreator(disableTrimWhitespaces);
+        new SimpleTypeBeanParamDefinitionCreator(disableTrimWhitespaces, disablePojoCdataTrimWhitespaces);
     CollectionBeanDefinitionCreator collectionBeanDefinitionCreator = new CollectionBeanDefinitionCreator();
     MapBeanDefinitionCreator mapBeanDefinitionCreator = new MapBeanDefinitionCreator();
     CommonParamBeanDefinitionCreator commonComponentModelProcessor =
