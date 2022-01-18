@@ -356,7 +356,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
           }
         }
       }
-    } else {
+    } else if (Object.class.equals(argumentType)) {
       resolver = new ObjectArgumentResolverDecorator(resolver, componentDecoratorFactory);
     }
 
