@@ -175,8 +175,6 @@ import javax.inject.Inject;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
-
-
 import org.togglz.core.user.FeatureUser;
 
 import reactor.core.publisher.Flux;
@@ -517,7 +515,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         ExecutionContextAdapter operationContext = null;
         try {
           OperationExecutionParams operationExecutionParams =
-              from(event).getOperationExecutionParams(getLocation(), event.getContext().getId());
+              getOperationExecutionParams(event);
 
           if (operationExecutionParams != null) {
             operationContext = operationExecutionParams.getExecutionContextAdapter();
@@ -714,20 +712,23 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       return from(processingStrategy
           .configureInternalPublisher(from(p)
               .transform(processingStrategy.onProcessor(innerProcessor))
-              .doOnNext(result -> {
-                from(result)
-                    .getOperationExecutionParams(getLocation(), result.getContext().getId())
-                    .getCallback().complete(result);
-              })
-              .onErrorContinue((t, result) -> {
-                final CoreEvent event = ((EventProcessingException) t).getEvent();
-
-                from(event)
-                    .getOperationExecutionParams(getLocation(), event.getContext().getId())
-                    .getCallback().error(t.getCause());
-              })));
+              .doOnNext(result -> getOperationExecutionParams(result)
+                  .getCallback().complete(result))
+              .onErrorContinue((t, result) -> getOperationExecutionParams(((EventProcessingException) t).getEvent())
+                  .getCallback().error(t.getCause()))));
     },
                                                 getRuntime().availableProcessors());
+  }
+
+  protected OperationExecutionParams getOperationExecutionParams(final CoreEvent event) {
+    try {
+      return from(event)
+          .getOperationExecutionParams(getLocation(), event.getContext().getId());
+    } catch (NullPointerException npe) {
+      throw propagateWrappingFatal(new EventProcessingException(createStaticMessage("Maybe the non-blocking operation @ '"
+          + getLocation().getLocation() + "' used its callback more than once?"),
+                                                                event, npe));
+    }
   }
 
   private CoreEvent addContextToEvent(CoreEvent event, Context ctx) throws MuleException {
@@ -801,7 +802,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
 
   private void prepareAndExecuteOperation(CoreEvent event, Supplier<ExecutorCallback> callbackSupplier) {
-    OperationExecutionParams oep = from(event).getOperationExecutionParams(getLocation(), event.getContext().getId());
+    OperationExecutionParams oep = getOperationExecutionParams(event);
 
     ExecutionContextAdapter<T> operationContext = oep.getExecutionContextAdapter();
 
