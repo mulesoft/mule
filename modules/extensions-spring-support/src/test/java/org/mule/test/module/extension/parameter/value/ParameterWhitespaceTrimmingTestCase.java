@@ -6,19 +6,32 @@
  */
 package org.mule.test.module.extension.parameter.value;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING_PROPERTY;
+import static org.mule.test.allure.AllureConstants.JavaSdk.JAVA_SDK;
+import static org.mule.test.allure.AllureConstants.JavaSdk.Parameters.PARAMETERS;
+
 import static java.util.Arrays.asList;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING_PROPERTY;
 
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Collection;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+
+@Feature(JAVA_SDK)
+@Story(PARAMETERS)
+@Issue("MULE-19803")
 @RunnerDelegateTo(Parameterized.class)
 public class ParameterWhitespaceTrimmingTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -32,13 +45,14 @@ public class ParameterWhitespaceTrimmingTestCase extends AbstractExtensionFuncti
     });
   }
 
+  @Rule
+  public SystemProperty disableWhitespaceTrimmingRule;
+
   public ParameterWhitespaceTrimmingTestCase(String name, boolean disableWhitespaceTrimming) {
     this.disableWhitespaceTrimming = disableWhitespaceTrimming;
-    if (disableWhitespaceTrimming) {
-      System.setProperty(DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING_PROPERTY, "true");
-    } else {
-      System.clearProperty(DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING_PROPERTY);
-    }
+
+    this.disableWhitespaceTrimmingRule =
+        new SystemProperty(DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING_PROPERTY, "" + disableWhitespaceTrimming);
   }
 
   @Override
@@ -124,12 +138,6 @@ public class ParameterWhitespaceTrimmingTestCase extends AbstractExtensionFuncti
   public void whitespacesAreNotTrimmedForPojoTextExpression() throws Exception {
     Object value = flowRunner("pojoTextExpression").run().getMessage().getPayload().getValue();
     assertThat(value, is("Hello    Max Mule   !"));
-  }
-
-  @Test
-  public void whitespacesAreTrimmedForPojoTextCDATA() throws Exception {
-    Object value = flowRunner("pojoTextCDATA").run().getMessage().getPayload().getValue();
-    assertThat(value, is("Hello Max Mule!"));
   }
 
   @Test

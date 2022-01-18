@@ -6,6 +6,12 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.util.MuleSystemProperties.DEFAULT_SCHEDULER_FIXED_FREQUENCY;
+import static org.mule.runtime.config.internal.dsl.spring.CommonComponentBeanDefinitionCreator.areMatchingTypes;
+import static org.mule.runtime.config.internal.dsl.spring.SimpleTypeBeanParamDefinitionCreator.resolveParamValue;
+import static org.mule.runtime.config.internal.model.ApplicationModel.FIXED_FREQUENCY_STRATEGY_IDENTIFIER;
+
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Optional.empty;
@@ -13,12 +19,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Stream.concat;
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-import static org.mule.runtime.api.util.MuleSystemProperties.DEFAULT_SCHEDULER_FIXED_FREQUENCY;
-import static org.mule.runtime.config.internal.dsl.spring.CommonComponentBeanDefinitionCreator.areMatchingTypes;
-import static org.mule.runtime.config.internal.model.ApplicationModel.FIXED_FREQUENCY_STRATEGY_IDENTIFIER;
-import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
-import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -66,15 +67,19 @@ class ComponentConfigurationBuilder<T> {
   private final ComponentAst component;
   private final CreateBeanDefinitionRequest<T> createBeanDefinitionRequest;
 
+  private final boolean disableTrimWhitespaces;
+
   public ComponentConfigurationBuilder(Map<ComponentAst, SpringComponentModel> springComponentModels,
                                        ComponentAst ownerComponent, ComponentAst component,
                                        CreateBeanDefinitionRequest<T> request,
-                                       BeanDefinitionBuilderHelper beanDefinitionBuilderHelper) {
+                                       BeanDefinitionBuilderHelper beanDefinitionBuilderHelper,
+                                       boolean disableTrimWhitespaces) {
     this.ownerComponent = ownerComponent;
     this.component = request.resolveConfigurationComponent();
     this.createBeanDefinitionRequest = request;
     this.beanDefinitionBuilderHelper = beanDefinitionBuilderHelper;
     this.complexParameters = collectComplexParametersWithTypes(springComponentModels, ownerComponent, component);
+    this.disableTrimWhitespaces = disableTrimWhitespaces;
   }
 
   public void processConfiguration() {
@@ -352,10 +357,7 @@ class ComponentConfigurationBuilder<T> {
         // Account for inconsistency in the extension model. Ref: MULE-18262
         parameterValue = getDefaultSchedulerFixedFrequency();
       } else {
-        parameterValue = parameter.getValue()
-            .mapLeft(expr -> DEFAULT_EXPRESSION_PREFIX + expr + DEFAULT_EXPRESSION_POSTFIX)
-            .getValue()
-            .orElse(null);
+        parameterValue = resolveParamValue(parameter, disableTrimWhitespaces, false);
 
         if (defaultValue != null && parameterValue == null) {
           LOGGER

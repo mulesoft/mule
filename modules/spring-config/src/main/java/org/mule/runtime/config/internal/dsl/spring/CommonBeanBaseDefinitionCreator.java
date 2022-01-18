@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import static java.util.stream.Collectors.toMap;
-import static javax.xml.namespace.QName.valueOf;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
 import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.maskPasswords;
+
+import static java.util.stream.Collectors.toMap;
+
+import static javax.xml.namespace.QName.valueOf;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 
@@ -38,9 +40,12 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionRequest> extends BeanDefinitionCreator<R> {
 
   private final ObjectFactoryClassRepository objectFactoryClassRepository;
+  private final boolean disableTrimWhitespaces;
 
-  public CommonBeanBaseDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository) {
+  public CommonBeanBaseDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository,
+                                         boolean disableTrimWhitespaces) {
     this.objectFactoryClassRepository = objectFactoryClassRepository;
+    this.disableTrimWhitespaces = disableTrimWhitespaces;
   }
 
   @Override
@@ -130,7 +135,7 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
                                                            CreateBeanDefinitionRequest createBeanDefinitionRequest,
                                                            final BeanDefinitionBuilderHelper beanDefinitionBuilderHelper) {
     new ComponentConfigurationBuilder<>(springComponentModels, ownerComponent, componentModel, createBeanDefinitionRequest,
-                                        beanDefinitionBuilderHelper)
+                                        beanDefinitionBuilderHelper, disableTrimWhitespaces)
                                             .processConfiguration();
 
   }
