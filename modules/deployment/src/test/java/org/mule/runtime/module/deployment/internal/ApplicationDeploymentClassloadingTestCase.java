@@ -30,6 +30,8 @@ import static org.mule.runtime.module.deployment.impl.internal.policy.Properties
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.exception.MuleFatalException;
@@ -37,6 +39,7 @@ import org.mule.runtime.module.artifact.builder.TestArtifactDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.util.CompilerUtils;
 import org.mule.tck.util.CompilerUtils.JarCompiler;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
@@ -58,7 +61,18 @@ import io.qameta.allure.Issue;
  * Contains test for application classloading isolation scenarios
  */
 @Feature(CLASSLOADING_ISOLATION)
-public class ApplicationDeploymentClassloadingTestCase extends ApplicationDeploymentTestCase {
+public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicationDeploymentTestCase {
+
+  private static final String OVERWRITTEN_PROPERTY = "configFile";
+  private static final String OVERWRITTEN_PROPERTY_SYSTEM_VALUE = "nonExistent.yaml";
+
+  protected static ApplicationFileBuilder dummyAppDescriptorWithPropsDependencyFileBuilder;
+
+  @Rule
+  public SystemProperty systemProperty = new SystemProperty(OVERWRITTEN_PROPERTY, OVERWRITTEN_PROPERTY_SYSTEM_VALUE);
+
+  @Rule
+  public SystemProperty otherSystemProperty = new SystemProperty("oneProperty", "someValue");
 
   public ApplicationDeploymentClassloadingTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
@@ -68,6 +82,35 @@ public class ApplicationDeploymentClassloadingTestCase extends ApplicationDeploy
   public static List<Boolean> params() {
     // Only run without parallel deployment since this configuration does not affect re-deployment at all
     return asList(false);
+  }
+
+  @Override
+  @Before
+  public void before() {
+    incompleteAppFileBuilder = appFileBuilder("incomplete-app").definedBy("incomplete-app-config.xml");
+    brokenAppFileBuilder = appFileBuilder("broken-app").corrupted();
+    brokenAppWithFunkyNameAppFileBuilder = appFileBuilder("broken-app+", brokenAppFileBuilder);
+    waitAppFileBuilder = appFileBuilder("wait-app").definedBy("wait-app-config.xml");
+    dummyAppDescriptorWithPropsFileBuilder = appFileBuilder("dummy-app-with-props")
+        .definedBy("dummy-app-with-props-config.xml")
+        .dependingOn(callbackExtensionPlugin)
+        .containingClass(echoTestClassFile,
+                         "org/foo/EchoTest.class");
+    dummyAppDescriptorWithPropsDependencyFileBuilder = appFileBuilder("dummy-app-with-props-dependencies")
+        .withMinMuleVersion("4.3.0") // MULE-19038
+        .definedBy("dummy-app-with-props-dependencies-config.xml");
+    dummyAppDescriptorWithStoppedFlowFileBuilder = appFileBuilder("dummy-app-with-stopped-flow-config")
+        .withMinMuleVersion("4.3.0") // MULE-19127
+        .definedBy("dummy-app-with-stopped-flow-config.xml")
+        .dependingOn(callbackExtensionPlugin)
+        .containingClass(echoTestClassFile,
+                         "org/foo/EchoTest.class");
+
+    // Application plugin artifact builders
+    echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
+        .dependingOn(new JarFileBuilder("barUtils1", barUtils1_0JarFile))
+        .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class");
   }
 
   @Test
