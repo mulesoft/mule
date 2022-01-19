@@ -18,6 +18,7 @@ import com.google.gson.Gson;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
+import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInternalProfilingDataConsumer;
 import org.slf4j.Logger;
 
 import java.util.Set;
@@ -26,6 +27,7 @@ import java.util.function.Predicate;
 /**
  * A {@link ProfilingDataConsumer} that logs information regarding the processing strategy for components.
  */
+@RuntimeInternalProfilingDataConsumer
 public class LoggerComponentThreadingDataConsumer
     implements ProfilingDataConsumer<ComponentThreadingProfilingEventContext> {
 
