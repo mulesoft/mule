@@ -113,8 +113,8 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
         }
       }
     });
-    muleContext.start();
     try {
+      muleContext.start();
       assertThat(contextStartedLatch.get().await(20, SECONDS), is(true));
     } finally {
       muleContext.stop();

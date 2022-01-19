@@ -35,6 +35,9 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.http.api.HttpService;
+import org.mule.runtime.http.api.server.HttpServer;
+import org.mule.runtime.http.api.server.HttpServerFactory;
+import org.mule.runtime.http.api.server.ServerCreationException;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
@@ -178,7 +181,16 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
   }
 
   protected HttpService mockHttpService() {
-    return mock(HttpService.class);
+    try {
+      HttpServerFactory httpServerFactory = mock(HttpServerFactory.class);
+      HttpServer httpServer = mock(HttpServer.class);
+      when(httpServerFactory.create(any())).thenReturn(httpServer);
+      HttpService service = mock(HttpService.class);
+      when(service.getServerFactory()).thenReturn(httpServerFactory);
+      return service;
+    } catch (ServerCreationException e) {
+      return null;
+    }
   }
 
   public void stopServices() throws MuleException {
