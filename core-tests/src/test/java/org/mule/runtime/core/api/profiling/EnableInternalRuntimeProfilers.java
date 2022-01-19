@@ -18,11 +18,11 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.feature.internal.togglz.user.MuleTogglzArtifactFeatureUser;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import org.togglz.core.Feature;
-import org.togglz.core.repository.FeatureState;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.togglz.core.Feature;
+import org.togglz.core.repository.FeatureState;
 
 /**
  * Enables the {@link ProfilingDataConsumer}'s as internal runtime profilers so that they will consume profiling data by default
