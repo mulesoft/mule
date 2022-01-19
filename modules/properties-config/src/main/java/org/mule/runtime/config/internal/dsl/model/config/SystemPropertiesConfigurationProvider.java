@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.config.internal.dsl.model.config;
 
-import static java.lang.System.getProperty;
+import static java.lang.System.getProperties;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toMap;
 
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -24,9 +26,15 @@ import java.util.Optional;
  */
 public class SystemPropertiesConfigurationProvider implements ConfigurationPropertiesProvider {
 
+  private final Map<String, String> properties;
+
+  public SystemPropertiesConfigurationProvider() {
+    properties = getProperties().entrySet().stream().collect(toMap(p -> (String) p.getKey(), p -> (String) p.getValue()));
+  }
+
   @Override
   public Optional<ConfigurationProperty> provide(String configurationAttributeKey) {
-    Object value = getProperty(configurationAttributeKey);
+    Object value = properties.get(configurationAttributeKey);
     if (value == null) {
       return empty();
     }
