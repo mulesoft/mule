@@ -9,6 +9,7 @@ package org.mule.runtime.config.api.dsl.artifact;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
 import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
+import org.mule.runtime.config.internal.dsl.artifact.AstArtifactConfigurationProcessor;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.NullDomainMuleContextLifecycleStrategy;
