@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Enables the {@link ProfilingDataConsumer}'s as internal runtime profilers so that they will be enabled by default without using
+ * Enables the {@link ProfilingDataConsumer}'s as internal runtime profilers so that they will consume profiling data by default without using
  * the feature toggling mechanism.
  *
  * The {@link ProfilingDataConsumer}'s are disabled after the test.
