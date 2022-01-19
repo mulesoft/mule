@@ -19,7 +19,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.rules.ExpectedException.none;
 
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
@@ -51,8 +50,6 @@ public class ArtifactAstConfigurationBuilderTestCase extends AbstractMuleTestCas
 
   public static final String SCHEMA_VALIDATION_ERROR =
       "Can't resolve http://www.mulesoft.org/schema/mule/invalid-namespace/current/invalid-schema.xsd, A dependency or plugin might be missing";
-  @Inject
-  private FeatureFlaggingService featureFlaggingService;
 
   private MuleContextWithRegistry muleContext;
 
