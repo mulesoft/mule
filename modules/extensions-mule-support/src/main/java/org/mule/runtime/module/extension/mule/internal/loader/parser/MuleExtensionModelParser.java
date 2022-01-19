@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.app.internal.loader.parser;
+package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -12,6 +12,7 @@ import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
+import static org.mule.sdk.api.annotation.Extension.MULESOFT;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.Category;
@@ -21,8 +22,6 @@ import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.type.ApplicationTypeLoader;
 import org.mule.runtime.ast.api.ArtifactAst;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
@@ -40,22 +39,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-class AppExtensionModelParser implements ExtensionModelParser {
+class MuleExtensionModelParser implements ExtensionModelParser {
 
-  private final ExtensionLoadingContext context;
   private final ArtifactDescriptor artifactDescriptor;
-  private final ArtifactType artifactType;
   private final ArtifactAst ast;
+  private final ApplicationTypeLoader typeLoader;
 
-  private ApplicationTypeLoader typeLoader;
-
-  public AppExtensionModelParser(ExtensionLoadingContext context) {
-    this.context = context;
-
-    //TODO: extract these
-    artifactDescriptor = null;
-    artifactType = null;
-    ast = null;
+  public MuleExtensionModelParser(ArtifactDescriptor artifactDescriptor, ArtifactAst ast, ApplicationTypeLoader typeLoader) {
+    this.artifactDescriptor = artifactDescriptor;
+    this.ast = ast;
+    this.typeLoader = typeLoader;
   }
 
   @Override
@@ -78,7 +71,7 @@ class AppExtensionModelParser implements ExtensionModelParser {
   @Override
   public String getVendor() {
     //TODO: define syntax and default
-    return "User";
+    return MULESOFT;
   }
 
   @Override
@@ -90,7 +83,7 @@ class AppExtensionModelParser implements ExtensionModelParser {
   public List<OperationModelParser> getOperationModelParsers() {
     return ast.topLevelComponentsStream()
         .filter(c -> c.getComponentType() == OPERATION_DEF)
-        .map(c -> new AppOperationModelParser(c, typeLoader))
+        .map(c -> new MuleOperationModelParser(c, typeLoader))
         .collect(toList());
   }
 

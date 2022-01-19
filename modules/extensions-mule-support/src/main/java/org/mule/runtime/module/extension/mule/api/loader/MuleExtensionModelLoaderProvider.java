@@ -4,20 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.app.api.loader;
+package org.mule.runtime.module.extension.mule.api.loader;
 
 import static java.util.Collections.singleton;
 
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
-import org.mule.runtime.module.extension.app.internal.loader.AppExtensionModelLoader;
+import org.mule.runtime.module.extension.mule.internal.loader.MuleExtensionModelLoader;
 
 import java.util.Set;
 
-public class AppExtensionModelLoaderProvider implements ExtensionModelLoaderProvider {
+public class MuleExtensionModelLoaderProvider implements ExtensionModelLoaderProvider {
 
   @Override
   public Set<ExtensionModelLoader> getExtensionModelLoaders() {
-    return singleton(new AppExtensionModelLoader());
+    return singleton(new MuleExtensionModelLoader());
   }
 }

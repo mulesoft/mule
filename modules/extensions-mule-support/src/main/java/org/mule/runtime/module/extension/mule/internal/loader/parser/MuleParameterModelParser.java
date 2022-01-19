@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.app.internal.loader.parser;
+package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -42,7 +42,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class AppParameterModelParser extends BaseAppExtensionModelParser implements ParameterModelParser {
+public class MuleParameterModelParser extends BaseMuleExtensionModelParser implements ParameterModelParser {
 
   private final ComponentAst parameter;
   private final ApplicationTypeLoader typeLoader;
@@ -52,7 +52,7 @@ public class AppParameterModelParser extends BaseAppExtensionModelParser impleme
   private Object defaultValue = null;
   private final List<ModelProperty> modelProperties = new LinkedList<>();
 
-  public AppParameterModelParser(ComponentAst parameter, ApplicationTypeLoader typeLoader) {
+  public MuleParameterModelParser(ComponentAst parameter, ApplicationTypeLoader typeLoader) {
     this.parameter = parameter;
     this.typeLoader = typeLoader;
 

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.app.internal.loader.parser;
+package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -40,14 +40,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-class AppOperationModelParser extends BaseAppExtensionModelParser implements OperationModelParser {
+class MuleOperationModelParser extends BaseMuleExtensionModelParser implements OperationModelParser {
 
   private final ComponentAst operation;
   private final ApplicationTypeLoader typeLoader;
 
   private String name;
 
-  public AppOperationModelParser(ComponentAst operation, ApplicationTypeLoader typeLoader) {
+  public MuleOperationModelParser(ComponentAst operation, ApplicationTypeLoader typeLoader) {
     this.operation = operation;
     this.typeLoader = typeLoader;
 

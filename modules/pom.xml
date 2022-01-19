@@ -27,7 +27,7 @@
         <module>core-mvel</module>
         <module>extensions-support</module>
         <module>extensions-xml-support</module>
-        <module>extensions-app-support</module>
+        <module>extensions-mule-support</module>
         <module>global-config</module>
         <module>javaee</module>
         <module>launcher</module>

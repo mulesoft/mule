@@ -7,11 +7,11 @@
         <artifactId>mule-modules</artifactId>
         <version>4.5.0-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-module-extensions-app-support</artifactId>
+    <artifactId>mule-module-extensions-mule-support</artifactId>
     <name>Mule App Extension Support</name>
     <packaging>jar</packaging>
     <description>
-        Extensions API implementation to enable reuse by leveraging Mule Applications as reusable extensions.
+        Extensions API implementation for writing extensions using the Mule language
     </description>
 
     <properties>
@@ -27,10 +27,6 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-extensions-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-connectivity-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>

@@ -4,24 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.app.internal.loader;
+package org.mule.runtime.module.extension.mule.internal.loader;
+
+import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_LOADER_ID;
 
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.app.internal.loader.parser.AppExtensionModelParserFactory;
 import org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
+import org.mule.runtime.module.extension.mule.internal.loader.parser.MuleExtensionModelParserFactory;
 
-public class AppExtensionModelLoader extends AbstractExtensionModelLoader {
-
-  public static final String APP_EXTENSION_LOADER_ID = "app";
+public class MuleExtensionModelLoader extends AbstractExtensionModelLoader {
 
   @Override
   public String getId() {
-    return APP_EXTENSION_LOADER_ID;
+    return MULE_SDK_LOADER_ID;
   }
 
   @Override
   protected ExtensionModelParserFactory getExtensionModelParserFactory(ExtensionLoadingContext context) {
-    return new AppExtensionModelParserFactory();
+    return new MuleExtensionModelParserFactory();
   }
 }

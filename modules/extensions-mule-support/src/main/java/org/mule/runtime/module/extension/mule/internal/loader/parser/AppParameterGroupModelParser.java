@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.app.internal.loader.parser;
+package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
@@ -33,7 +33,7 @@ class AppParameterGroupModelParser implements ParameterGroupModelParser {
 
   private List<ParameterModelParser> doParserParameters(List<ComponentAst> parameters, ApplicationTypeLoader typeLoader) {
     return unmodifiableList(parameters.stream()
-        .map(p -> new AppParameterModelParser(p, typeLoader))
+        .map(p -> new MuleParameterModelParser(p, typeLoader))
         .collect(toList())
     );
   }
