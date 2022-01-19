@@ -10,11 +10,11 @@ import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PRE
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.ast.internal.serialization.ArtifactAstSerializerFactory.JSON;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
+import static org.mule.runtime.config.internal.ConfigurationPropertiesResolverFactory.createConfigurationPropertiesResolver;
 
 import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
-import static java.util.Optional.empty;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 
@@ -31,15 +31,12 @@ import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.config.api.ArtifactContextFactory;
 import org.mule.runtime.config.internal.ArtifactAstConfigurationBuilder;
 import org.mule.runtime.config.internal.ComponentBuildingDefinitionRegistryFactoryAware;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.dsl.model.config.StaticConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.dsl.api.ConfigResource;
-import org.mule.runtime.dsl.api.xml.parser.ParsingPropertyResolver;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -244,13 +241,6 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
       }
 
       return builder.build();
-    }
-
-    private ParsingPropertyResolver createConfigurationPropertiesResolver(Map<String, String> artifactProperties) {
-      DefaultConfigurationPropertiesResolver resolver =
-          new DefaultConfigurationPropertiesResolver(empty(), new StaticConfigurationPropertiesProvider(artifactProperties));
-
-      return propertyKey -> (String) resolver.resolveValue(propertyKey);
     }
 
     @Override
