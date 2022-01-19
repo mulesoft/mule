@@ -40,11 +40,6 @@ public class EnableInternalRuntimeProfilers extends SystemProperty {
   }
 
   @Override
-  protected void before() throws Throwable {
-    super.before();
-  }
-
-  @Override
   protected void after() {
     super.after();
     for (ProfilingDataConsumer<?> profilingDataConsumer : profilingDataConsumers)
