@@ -77,8 +77,8 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
       }
     });
     ConfigurationBuilder configurationBuilder = new ArtifactAstXmlParserConfigurationBuilder(emptyMap(),
-                                                                                             enableLazyInit(),
                                                                                              disableXmlValidations(),
+                                                                                             enableLazyInit(),
                                                                                              false,
                                                                                              new String[] {configuration});
     configurationBuilder.addServiceConfigurator(testServicesConfigurationBuilder);
