@@ -27,11 +27,13 @@ import com.google.gson.Gson;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInternalProfilingDataConsumer;
 import org.slf4j.Logger;
 
 /**
  * A {@link ProfilingDataConsumer} that logs information regarding the processing strategy for components.
  */
+@RuntimeInternalProfilingDataConsumer
 public class LoggerComponentProcessingStrategyDataConsumer
     implements ProfilingDataConsumer<ComponentProcessingStrategyProfilingEventContext> {
 

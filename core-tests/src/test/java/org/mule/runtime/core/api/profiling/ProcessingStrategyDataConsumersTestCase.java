@@ -15,9 +15,9 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROFILING_SERVICE_PROPERTY;
+import static org.mule.runtime.api.util.MuleSystemProperties.FORCE_RUNTIME_PROFILING_CONSUMERS_ENABLEMENT_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.internal.processor.rector.profiling.ProfilingTestUtils.enableProfilingFeatureTestConsumer;
 import static org.mule.runtime.core.internal.profiling.consumer.ComponentProfilingUtils.getProcessingStrategyComponentInfoMap;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
@@ -28,7 +28,6 @@ import static com.google.common.collect.ImmutableSet.of;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.After;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -42,6 +41,7 @@ import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyPr
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
+import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInternalProfilingDataConsumer;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -78,7 +78,11 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
   public MockitoRule mockitorule = MockitoJUnit.rule();
 
   @Rule
-  public SystemProperty systemProperty = new SystemProperty(ENABLE_PROFILING_SERVICE_PROPERTY, "true");
+  public SystemProperty enableProfilingServiceProperty = new SystemProperty(ENABLE_PROFILING_SERVICE_PROPERTY, "true");
+
+  @Rule
+  public SystemProperty forceRuntimeProfilingConsumersEnablementProperty =
+      new SystemProperty(FORCE_RUNTIME_PROFILING_CONSUMERS_ENABLEMENT_PROPERTY, "true");
 
   @Mock
   private CoreEvent event;
@@ -109,22 +113,6 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
     when(identifier.getName()).thenReturn("test");
     when(identifier.getNamespace()).thenReturn("test");
     profilingService = getTestProfilingService();
-    setProfilingFeatureStatus(true);
-  }
-
-  @After
-  public void after() throws Exception {
-    setProfilingFeatureStatus(false);
-  }
-
-  private void setProfilingFeatureStatus(boolean status) {
-    eventType().forEach(eventType -> {
-      try {
-        enableProfilingFeatureTestConsumer(muleContext, eventType, status);
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-    });
   }
 
   private ProfilingService getTestProfilingService() throws MuleException {
@@ -198,6 +186,7 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
   /**
    * Stub {@link LoggerComponentProcessingStrategyDataConsumer} for injecting a mocked {@link Logger}
    */
+  @RuntimeInternalProfilingDataConsumer
   private static class TestLoggerComponentProcessingStrategyDataConsumer extends LoggerComponentProcessingStrategyDataConsumer {
 
     private final Logger logger;
