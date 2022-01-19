@@ -6,13 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static java.lang.Runtime.getRuntime;
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.beanutils.BeanUtils.setProperty;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -56,6 +49,15 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
+
+import static java.lang.Runtime.getRuntime;
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
+
+import static org.apache.commons.beanutils.BeanUtils.setProperty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
@@ -163,7 +165,6 @@ import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import org.slf4j.MDC;
 
 import reactor.core.publisher.Flux;
@@ -498,7 +499,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         ExecutionContextAdapter operationContext = null;
         try {
           OperationExecutionParams operationExecutionParams =
-              from(event).getOperationExecutionParams(getLocation(), event.getContext().getId());
+              getOperationExecutionParams(event);
 
           if (operationExecutionParams != null) {
             operationContext = operationExecutionParams.getExecutionContextAdapter();
@@ -691,20 +692,23 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       return from(processingStrategy
           .configureInternalPublisher(from(p)
               .transform(processingStrategy.onProcessor(innerProcessor))
-              .doOnNext(result -> {
-                from(result)
-                    .getOperationExecutionParams(getLocation(), result.getContext().getId())
-                    .getCallback().complete(result);
-              })
-              .onErrorContinue((t, result) -> {
-                final CoreEvent event = ((EventProcessingException) t).getEvent();
-
-                from(event)
-                    .getOperationExecutionParams(getLocation(), event.getContext().getId())
-                    .getCallback().error(t.getCause());
-              })));
+              .doOnNext(result -> getOperationExecutionParams(result)
+                  .getCallback().complete(result))
+              .onErrorContinue((t, result) -> getOperationExecutionParams(((EventProcessingException) t).getEvent())
+                  .getCallback().error(t.getCause()))));
     },
                                                 getRuntime().availableProcessors());
+  }
+
+  protected OperationExecutionParams getOperationExecutionParams(final CoreEvent event) {
+    try {
+      return from(event)
+          .getOperationExecutionParams(getLocation(), event.getContext().getId());
+    } catch (NullPointerException npe) {
+      throw propagateWrappingFatal(new EventProcessingException(createStaticMessage("Maybe the non-blocking operation @ '"
+          + getLocation().getLocation() + "' used its callback more than once?"),
+                                                                event, npe));
+    }
   }
 
   private CoreEvent addContextToEvent(CoreEvent event, Context ctx) throws MuleException {
@@ -778,7 +782,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
 
   private void prepareAndExecuteOperation(CoreEvent event, Supplier<ExecutorCallback> callbackSupplier, Context ctx) {
-    OperationExecutionParams oep = from(event).getOperationExecutionParams(getLocation(), event.getContext().getId());
+    OperationExecutionParams oep = getOperationExecutionParams(event);
 
     final Scheduler currentScheduler = (Scheduler) ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY)
         .orElse(IMMEDIATE_SCHEDULER);
