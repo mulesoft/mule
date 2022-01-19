@@ -19,7 +19,6 @@ import static java.util.Optional.empty;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -112,7 +111,8 @@ public final class AstArtifactConfigurationProcessor implements ArtifactConfigur
                                              Map<String, String> artifactProperties,
                                              ArtifactType artifactType,
                                              ArtifactAst parentArtifactAst,
-                                             boolean disableXmlValidations) {
+                                             boolean disableXmlValidations)
+      throws ConfigurationException {
     Set<ExtensionModel> extensions = getExtensions(muleContext.getExtensionManager());
     try {
       final ArtifactAst artifactAst;
@@ -130,10 +130,8 @@ public final class AstArtifactConfigurationProcessor implements ArtifactConfigur
       }
 
       return artifactAst;
-    } catch (MuleRuntimeException e) {
-      throw e;
     } catch (Exception e) {
-      throw new MuleRuntimeException(e);
+      throw new ConfigurationException(e);
     }
   }
 
