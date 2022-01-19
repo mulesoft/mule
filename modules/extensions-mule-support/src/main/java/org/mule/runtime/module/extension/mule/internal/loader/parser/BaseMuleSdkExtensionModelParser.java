@@ -13,7 +13,7 @@ import org.mule.runtime.ast.api.ComponentAst;
 
 import java.util.Optional;
 
-abstract class BaseMuleExtensionModelParser {
+abstract class BaseMuleSdkExtensionModelParser {
 
   protected <T> T getParameter(ComponentAst ast, String paramName) {
     return (T) ast.getParameter(DEFAULT_GROUP_NAME, paramName).getValue().getRight();

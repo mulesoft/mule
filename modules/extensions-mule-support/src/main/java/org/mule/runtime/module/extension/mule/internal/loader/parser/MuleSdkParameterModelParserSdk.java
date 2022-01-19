@@ -16,6 +16,7 @@ import static java.util.stream.Collectors.toCollection;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
+import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ModelProperty;
@@ -26,7 +27,6 @@ import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
-import org.mule.runtime.api.type.ApplicationTypeLoader;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -42,17 +42,17 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class MuleParameterModelParser extends BaseMuleExtensionModelParser implements ParameterModelParser {
+public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelParser implements ParameterModelParser {
 
   private final ComponentAst parameter;
-  private final ApplicationTypeLoader typeLoader;
+  private final TypeLoader typeLoader;
 
   private String name;
   private boolean required = true;
   private Object defaultValue = null;
   private final List<ModelProperty> modelProperties = new LinkedList<>();
 
-  public MuleParameterModelParser(ComponentAst parameter, ApplicationTypeLoader typeLoader) {
+  public MuleSdkParameterModelParserSdk(ComponentAst parameter, TypeLoader typeLoader) {
     this.parameter = parameter;
     this.typeLoader = typeLoader;
 

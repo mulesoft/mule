@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 import static java.lang.String.format;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSION_NAME_PROPERTY_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_TYPE_LOADER_PROPERTY_NAME;
 
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
@@ -16,14 +17,14 @@ import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelPa
 
 import java.util.NoSuchElementException;
 
-public class MuleExtensionModelParserFactory implements ExtensionModelParserFactory {
+public class MuleSdkExtensionModelParserFactory implements ExtensionModelParserFactory {
 
   @Override
   public ExtensionModelParser createParser(ExtensionLoadingContext context) {
-    return new MuleExtensionModelParser(
+    return new MuleSdkExtensionModelParser(
         getProperty(context, MULE_SDK_EXTENSION_NAME_PROPERTY_NAME),
         getProperty(context, MULE_SDK_ARTIFACT_AST_PROPERTY_NAME),
-        null
+        getProperty(context, MULE_SDK_TYPE_LOADER_PROPERTY_NAME)
         );
   }
 

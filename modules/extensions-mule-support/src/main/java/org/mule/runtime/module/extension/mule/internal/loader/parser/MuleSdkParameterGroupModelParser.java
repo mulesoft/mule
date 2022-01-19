@@ -12,10 +12,10 @@ import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 
+import org.mule.metadata.api.TypeLoader;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
-import org.mule.runtime.api.type.ApplicationTypeLoader;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
@@ -23,17 +23,17 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelPa
 import java.util.List;
 import java.util.Optional;
 
-class AppParameterGroupModelParser implements ParameterGroupModelParser {
+class MuleSdkParameterGroupModelParser implements ParameterGroupModelParser {
 
   private final List<ParameterModelParser> parameters;
 
-  public AppParameterGroupModelParser(List<ComponentAst> parameters, ApplicationTypeLoader typeLoader) {
+  public MuleSdkParameterGroupModelParser(List<ComponentAst> parameters, TypeLoader typeLoader) {
     this.parameters = doParserParameters(parameters, typeLoader);
   }
 
-  private List<ParameterModelParser> doParserParameters(List<ComponentAst> parameters, ApplicationTypeLoader typeLoader) {
+  private List<ParameterModelParser> doParserParameters(List<ComponentAst> parameters, TypeLoader typeLoader) {
     return unmodifiableList(parameters.stream()
-        .map(p -> new MuleParameterModelParser(p, typeLoader))
+        .map(p -> new MuleSdkParameterModelParserSdk(p, typeLoader))
         .collect(toList())
     );
   }

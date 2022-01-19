@@ -11,9 +11,9 @@ import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_LOADER_
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
-import org.mule.runtime.module.extension.mule.internal.loader.parser.MuleExtensionModelParserFactory;
+import org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionModelParserFactory;
 
-public class MuleExtensionModelLoader extends AbstractExtensionModelLoader {
+public class MuleSdkExtensionModelLoader extends AbstractExtensionModelLoader {
 
   @Override
   public String getId() {
@@ -22,6 +22,6 @@ public class MuleExtensionModelLoader extends AbstractExtensionModelLoader {
 
   @Override
   protected ExtensionModelParserFactory getExtensionModelParserFactory(ExtensionLoadingContext context) {
-    return new MuleExtensionModelParserFactory();
+    return new MuleSdkExtensionModelParserFactory();
   }
 }

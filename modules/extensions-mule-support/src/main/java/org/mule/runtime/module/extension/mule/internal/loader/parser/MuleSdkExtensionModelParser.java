@@ -14,13 +14,13 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.sdk.api.annotation.Extension.MULESOFT;
 
+import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
-import org.mule.runtime.api.type.ApplicationTypeLoader;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
@@ -38,13 +38,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-class MuleExtensionModelParser implements ExtensionModelParser {
+class MuleSdkExtensionModelParser implements ExtensionModelParser {
 
   private final String extensionName;
   private final ArtifactAst ast;
-  private final ApplicationTypeLoader typeLoader;
+  private final TypeLoader typeLoader;
 
-  public MuleExtensionModelParser(String extensionName, ArtifactAst ast, ApplicationTypeLoader typeLoader) {
+  public MuleSdkExtensionModelParser(String extensionName, ArtifactAst ast, TypeLoader typeLoader) {
     this.extensionName = extensionName;
     this.ast = ast;
     this.typeLoader = typeLoader;
@@ -82,7 +82,7 @@ class MuleExtensionModelParser implements ExtensionModelParser {
   public List<OperationModelParser> getOperationModelParsers() {
     return ast.topLevelComponentsStream()
         .filter(c -> c.getComponentType() == OPERATION_DEF)
-        .map(c -> new MuleOperationModelParser(c, typeLoader))
+        .map(c -> new MuleSdkOperationModelParserSdk(c, typeLoader))
         .collect(toList());
   }
 

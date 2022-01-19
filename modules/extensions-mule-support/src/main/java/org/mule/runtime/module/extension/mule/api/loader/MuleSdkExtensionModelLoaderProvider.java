@@ -10,14 +10,14 @@ import static java.util.Collections.singleton;
 
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
-import org.mule.runtime.module.extension.mule.internal.loader.MuleExtensionModelLoader;
+import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkExtensionModelLoader;
 
 import java.util.Set;
 
-public class MuleExtensionModelLoaderProvider implements ExtensionModelLoaderProvider {
+public class MuleSdkExtensionModelLoaderProvider implements ExtensionModelLoaderProvider {
 
   @Override
   public Set<ExtensionModelLoader> getExtensionModelLoaders() {
-    return singleton(new MuleExtensionModelLoader());
+    return singleton(new MuleSdkExtensionModelLoader());
   }
 }

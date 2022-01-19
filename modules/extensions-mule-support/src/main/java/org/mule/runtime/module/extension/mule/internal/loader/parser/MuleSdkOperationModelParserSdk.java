@@ -15,12 +15,12 @@ import static java.util.Optional.of;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
+import org.mule.metadata.api.TypeLoader;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
-import org.mule.runtime.api.type.ApplicationTypeLoader;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
@@ -40,14 +40,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-class MuleOperationModelParser extends BaseMuleExtensionModelParser implements OperationModelParser {
+class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser implements OperationModelParser {
 
   private final ComponentAst operation;
-  private final ApplicationTypeLoader typeLoader;
+  private final TypeLoader typeLoader;
 
   private String name;
 
-  public MuleOperationModelParser(ComponentAst operation, ApplicationTypeLoader typeLoader) {
+  public MuleSdkOperationModelParserSdk(ComponentAst operation, TypeLoader typeLoader) {
     this.operation = operation;
     this.typeLoader = typeLoader;
 
@@ -112,7 +112,7 @@ class MuleOperationModelParser extends BaseMuleExtensionModelParser implements O
 
     return parameters == null || parameters.isEmpty()
         ? emptyList()
-        : singletonList(new AppParameterGroupModelParser(parameters, typeLoader));
+        : singletonList(new MuleSdkParameterGroupModelParser(parameters, typeLoader));
   }
 
   @Override

@@ -36,6 +36,7 @@ import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.c
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSION_NAME_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_LOADER_ID;
+import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_TYPE_LOADER_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.module.extension.internal.manager.ExtensionErrorsRegistrant.registerErrorMappings;
 
@@ -104,6 +105,7 @@ import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
+import org.mule.runtime.core.internal.type.ApplicationTypeLoader;
 import org.mule.runtime.core.internal.util.DefaultResourceLocator;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
@@ -311,6 +313,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         ExtensionModelLoadingRequest.builder(getRegionClassLoader(), DslResolvingContext.getDefault(extensionManager.getExtensions()))
             .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, applicationModel)
             .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME, muleContext.getConfiguration().getId())
+            .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader())
             .build());
 
     extensionManager.registerExtension(appExtensionModel);
