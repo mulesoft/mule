@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.resources;
 
-import static java.lang.Boolean.getBoolean;
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase.ResourceExtensionUnitTest.newUnitTest;
+
+import static java.lang.Boolean.getBoolean;
+import static java.util.Arrays.asList;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.extension.test.extension.reconnection.ReconnectionExtension;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -23,7 +25,6 @@ import org.mule.test.function.extension.WeaveFunctionExtension;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.implicit.config.extension.extension.api.ImplicitConfigExtension;
 import org.mule.test.marvel.MarvelExtension;
-import org.mule.test.metadata.extension.MetadataExtension;
 import org.mule.test.nonimplicit.config.extension.extension.api.NonImplicitConfigExtension;
 import org.mule.test.oauth.TestOAuthExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
@@ -39,10 +40,11 @@ import org.mule.test.vegan.extension.VeganExtension;
 import java.util.Collection;
 import java.util.List;
 
+import org.skyscreamer.jsonassert.JSONAssert;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.skyscreamer.jsonassert.JSONAssert;
 
 @SmallTest
 @RunWith(Parameterized.class)
@@ -56,7 +58,8 @@ public class ExtensionModelJsonGeneratorTestCase extends FileGenerationParameter
     List<ResourceExtensionUnitTest> extensions;
     extensions = asList(newUnitTest(JAVA_LOADER, VeganExtension.class, "vegan.json"),
                         newUnitTest(JAVA_LOADER, PetStoreConnector.class, "petstore.json"),
-                        newUnitTest(JAVA_LOADER, MetadataExtension.class, "metadata.json"),
+                        // TODO SDK-52 reenable this
+                        // newUnitTest(JAVA_LOADER, MetadataExtension.class, "metadata.json"),
                         newUnitTest(JAVA_LOADER, HeisenbergExtension.class, "heisenberg.json"),
                         newUnitTest(JAVA_LOADER, SubstitutionGroupExtension.class, "substitutiongroup.json"),
                         newUnitTest(JAVA_LOADER, TransactionalExtension.class, "tx-ext.json"),
@@ -76,7 +79,7 @@ public class ExtensionModelJsonGeneratorTestCase extends FileGenerationParameter
     return createExtensionModels(extensions);
   }
 
-  private ExtensionModelJsonSerializer generator = new ExtensionModelJsonSerializer(true);
+  private final ExtensionModelJsonSerializer generator = new ExtensionModelJsonSerializer(true);
 
   @Override
   protected boolean shouldUpdateExpectedFilesOnError() {
