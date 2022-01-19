@@ -22,7 +22,6 @@ import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.type.ApplicationTypeLoader;
 import org.mule.runtime.ast.api.ArtifactAst;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
@@ -41,12 +40,12 @@ import java.util.Optional;
 
 class MuleExtensionModelParser implements ExtensionModelParser {
 
-  private final ArtifactDescriptor artifactDescriptor;
+  private final String extensionName;
   private final ArtifactAst ast;
   private final ApplicationTypeLoader typeLoader;
 
-  public MuleExtensionModelParser(ArtifactDescriptor artifactDescriptor, ArtifactAst ast, ApplicationTypeLoader typeLoader) {
-    this.artifactDescriptor = artifactDescriptor;
+  public MuleExtensionModelParser(String extensionName, ArtifactAst ast, ApplicationTypeLoader typeLoader) {
+    this.extensionName = extensionName;
     this.ast = ast;
     this.typeLoader = typeLoader;
   }
@@ -60,7 +59,7 @@ class MuleExtensionModelParser implements ExtensionModelParser {
 
   @Override
   public String getName() {
-    return artifactDescriptor.getName();
+    return extensionName;
   }
 
   @Override
