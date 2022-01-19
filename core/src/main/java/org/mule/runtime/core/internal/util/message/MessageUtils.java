@@ -24,12 +24,14 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 import org.mule.runtime.core.internal.management.stats.InputDecoratedCursorStreamProvider;
+import org.mule.runtime.core.internal.util.message.stream.UnclosableCursorStream;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
@@ -279,6 +281,9 @@ public final class MessageUtils {
     if (v instanceof byte[]) {
       componentDecoratorFactory.computeInputByteCount((byte[]) v);
       return v;
+    } else if (v instanceof CursorStream) {
+      return componentDecoratorFactory.decorateInput((InputStream) new UnclosableCursorStream((CursorStream) v),
+                                                     eventCorrelationId);
     } else if (v instanceof InputStream) {
       return componentDecoratorFactory.decorateInput((InputStream) v, eventCorrelationId);
     } else if (v instanceof Collection) {
