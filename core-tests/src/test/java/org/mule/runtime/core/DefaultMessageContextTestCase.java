@@ -6,13 +6,16 @@
  */
 package org.mule.runtime.core;
 
-import static java.util.Optional.empty;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
+import static java.util.Optional.empty;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
@@ -25,19 +28,23 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.util.Optional;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.class)
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
 public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
 
   private static final String GENERATED_CORRELATION_ID = "generatedCorrelationIdValue";
   private static final String CUSTOM_CORRELATION_ID = "customCorrelationIdValue";
   private static final String SERVER_ID = "serverId";
 
-  private MuleContext muleContext = mockContextWithServices();
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
+
+  private final MuleContext muleContext = mockContextWithServices();
 
   @Mock(lenient = true)
   private FlowConstruct flow;
