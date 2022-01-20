@@ -109,7 +109,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
     createBaseRegistry(muleContext, baseMuleArtifactContext);
 
     muleArtifactContext = createApplicationContext(muleContext,
-                                                   applicationObjectController, parentConfigurationProperties,
+                                                   applicationObjectController,
                                                    baseMuleArtifactContext.getBean(BaseConfigurationComponentLocator.class),
                                                    baseMuleArtifactContext.getBean(ContributedErrorTypeRepository.class),
                                                    baseMuleArtifactContext.getBean(ContributedErrorTypeLocator.class),
@@ -146,14 +146,13 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
 
   private MuleArtifactContext createApplicationContext(MuleContext muleContext,
                                                        OptionalObjectsController optionalObjectsController,
-                                                       Optional<ConfigurationProperties> parentConfigurationProperties,
                                                        BaseConfigurationComponentLocator baseConfigurationComponentLocator,
                                                        ContributedErrorTypeRepository errorTypeRepository,
                                                        ContributedErrorTypeLocator errorTypeLocator,
                                                        FeatureFlaggingService featureFlaggingService)
       throws Exception {
     // TODO MULE-10084 : Refactor to only accept artifactConfiguration and not artifactConfigResources
-    return doCreateApplicationContext(muleContext, optionalObjectsController, parentConfigurationProperties,
+    return doCreateApplicationContext(muleContext, optionalObjectsController,
                                       baseConfigurationComponentLocator, errorTypeRepository, errorTypeLocator,
                                       featureFlaggingService);
   }
@@ -175,42 +174,40 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
 
   private MuleArtifactContext doCreateApplicationContext(MuleContext muleContext,
                                                          OptionalObjectsController optionalObjectsController,
-                                                         Optional<ConfigurationProperties> parentConfigurationProperties,
                                                          BaseConfigurationComponentLocator baseConfigurationComponentLocator,
                                                          ContributedErrorTypeRepository errorTypeRepository,
                                                          ContributedErrorTypeLocator errorTypeLocator,
                                                          FeatureFlaggingService featureFlaggingService) {
-    ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory =
+    ComponentBuildingDefinitionRegistryFactory resolvedComponentBuildingDefinitionRegistryFactory =
         this.componentBuildingDefinitionRegistryFactory
             .orElse(new DefaultComponentBuildingDefinitionRegistryFactory());
 
-    MuleArtifactContext muleArtifactContext;
     if (enableLazyInit) {
-      muleArtifactContext = new LazyMuleArtifactContext(muleContext, artifactAst,
-                                                        optionalObjectsController,
-                                                        resolveParentConfigurationProperties(),
-                                                        baseConfigurationComponentLocator,
-                                                        errorTypeRepository, errorTypeLocator,
-                                                        getArtifactProperties(), artifactType,
-                                                        resolveComponentModelInitializer(),
-                                                        runtimeLockFactory,
-                                                        componentBuildingDefinitionRegistryFactory,
-                                                        memoryManagementService,
-                                                        featureFlaggingService);
+      return new LazyMuleArtifactContext(muleContext, artifactAst,
+                                         optionalObjectsController,
+                                         resolveParentConfigurationProperties(),
+                                         baseConfigurationComponentLocator,
+                                         errorTypeRepository, errorTypeLocator,
+                                         getArtifactProperties(), artifactType,
+                                         resolveComponentModelInitializer(),
+                                         runtimeLockFactory,
+                                         resolvedComponentBuildingDefinitionRegistryFactory,
+                                         memoryManagementService,
+                                         featureFlaggingService);
     } else {
-      muleArtifactContext = new MuleArtifactContext(muleContext, artifactAst,
-                                                    optionalObjectsController,
-                                                    resolveParentConfigurationProperties(),
-                                                    baseConfigurationComponentLocator,
-                                                    errorTypeRepository, errorTypeLocator,
-                                                    getArtifactProperties(), artifactType,
-                                                    componentBuildingDefinitionRegistryFactory,
-                                                    memoryManagementService,
-                                                    featureFlaggingService);
-      muleArtifactContext.initialize();
+      MuleArtifactContext context;
+      context = new MuleArtifactContext(muleContext, artifactAst,
+                                        optionalObjectsController,
+                                        resolveParentConfigurationProperties(),
+                                        baseConfigurationComponentLocator,
+                                        errorTypeRepository, errorTypeLocator,
+                                        getArtifactProperties(), artifactType,
+                                        resolvedComponentBuildingDefinitionRegistryFactory,
+                                        memoryManagementService,
+                                        featureFlaggingService);
+      context.initialize();
+      return context;
     }
-
-    return muleArtifactContext;
   }
 
   private Optional<ConfigurationProperties> resolveParentConfigurationProperties() {
@@ -224,7 +221,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
 
   private Optional<ComponentModelInitializer> resolveComponentModelInitializer() {
     Optional<ComponentModelInitializer> parentLazyComponentInitializer = empty();
-    if (parentContext != null && parentContext instanceof ComponentModelInitializer) {
+    if (parentContext instanceof ComponentModelInitializer) {
       parentLazyComponentInitializer = of((ComponentModelInitializer) parentContext);
     }
 
@@ -237,7 +234,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
     SpringRegistry registry;
 
     if (parentContext != null) {
-      registry = createRegistryWithParentContext(muleContext, baseApplicationContext, applicationContext, parentContext);
+      registry = createRegistryWithParentContext(muleContext, baseApplicationContext, applicationContext);
     } else {
       registry = new SpringRegistry(baseApplicationContext, applicationContext, muleContext,
                                     new ConfigurationDependencyResolver(applicationContext.getApplicationModel()),
@@ -250,8 +247,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
 
   private SpringRegistry createRegistryWithParentContext(MuleContext muleContext,
                                                          ApplicationContext baseApplicationContext,
-                                                         MuleArtifactContext applicationContext,
-                                                         ApplicationContext parentContext)
+                                                         MuleArtifactContext applicationContext)
       throws ConfigurationException {
     if (baseApplicationContext instanceof ConfigurableApplicationContext) {
       return new SpringRegistry(baseApplicationContext, applicationContext, muleContext,

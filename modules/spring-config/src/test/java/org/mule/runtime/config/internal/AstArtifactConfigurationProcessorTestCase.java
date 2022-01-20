@@ -20,12 +20,12 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.dsl.DslResolvingContext;
-import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -87,15 +87,13 @@ public class AstArtifactConfigurationProcessorTestCase extends AbstractMuleTestC
         .expectMessage(containsString(SCHEMA_VALIDATION_ERROR));
     when(featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)).thenReturn(true);
 
-    ArtifactContextConfiguration artifactContextConfiguration = ArtifactContextConfiguration.builder()
+    configurationBuilder.createArtifactContext(ArtifactContextConfiguration.builder()
         .setConfigResources(new String[] {"invalid-schema.xml"})
         .setArtifactType(APP)
         .setMuleContext(muleContext)
         .setEnableLazyInitialization(false)
         .setDisableXmlValidations(false)
-        .build();
-
-    configurationBuilder.createArtifactContext(artifactContextConfiguration);
+        .build());
   }
 
   @Test
@@ -106,15 +104,13 @@ public class AstArtifactConfigurationProcessorTestCase extends AbstractMuleTestC
         .expectMessage(containsString(SCHEMA_VALIDATION_ERROR));
     when(featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)).thenReturn(false);
 
-    ArtifactContextConfiguration artifactContextConfiguration = ArtifactContextConfiguration.builder()
+    configurationBuilder.createArtifactContext(ArtifactContextConfiguration.builder()
         .setConfigResources(new String[] {"invalid-schema.xml"})
         .setArtifactType(APP)
         .setMuleContext(muleContext)
         .setEnableLazyInitialization(false)
         .setDisableXmlValidations(false)
-        .build();
-
-    configurationBuilder.createArtifactContext(artifactContextConfiguration);
+        .build());
   }
 
   @Test
@@ -122,15 +118,16 @@ public class AstArtifactConfigurationProcessorTestCase extends AbstractMuleTestC
   public void configureWithFailAfterTenErrorsWillSucceedIfSchemaNotUsed() throws ConfigurationException {
     when(featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)).thenReturn(false);
 
-    ArtifactContextConfiguration artifactContextConfiguration = ArtifactContextConfiguration.builder()
+    ArtifactContext context = configurationBuilder.createArtifactContext(ArtifactContextConfiguration.builder()
         .setConfigResources(new String[] {"invalid-schema-not-used.xml"})
         .setArtifactType(APP)
         .setMuleContext(muleContext)
         .setEnableLazyInitialization(false)
         .setDisableXmlValidations(false)
-        .build();
+        .build());
 
-    configurationBuilder.createArtifactContext(artifactContextConfiguration);
+    assertThat(context.getArtifactAst(), not(nullValue()));
+    assertThat(context.getMuleContext(), sameInstance(muleContext));
   }
 
   @Test
@@ -138,17 +135,15 @@ public class AstArtifactConfigurationProcessorTestCase extends AbstractMuleTestC
   public void configureWithResourceOutsideClasspathPreservesResourceName() throws ConfigurationException, IOException {
     copyResourceToTemp("simple.xml");
 
-    ArtifactContextConfiguration artifactContextConfiguration = ArtifactContextConfiguration.builder()
-        .setConfigResources(new String[] {"simple.xml"})
-        .setArtifactType(APP)
-        .setMuleContext(muleContext)
-        .setEnableLazyInitialization(false)
-        .setDisableXmlValidations(false)
-        .build();
-
     final ArtifactContext artifactContext =
         withContextClassLoader(new URLClassLoader(new URL[] {tempFolder.getRoot().toURI().toURL()}, null),
-                               () -> configurationBuilder.createArtifactContext(artifactContextConfiguration));
+                               () -> configurationBuilder.createArtifactContext(ArtifactContextConfiguration.builder()
+                                   .setConfigResources(new String[] {"simple.xml"})
+                                   .setArtifactType(APP)
+                                   .setMuleContext(muleContext)
+                                   .setEnableLazyInitialization(false)
+                                   .setDisableXmlValidations(false)
+                                   .build()));
     final ArtifactAst artifactAst = artifactContext.getArtifactAst();
     final ComponentAst componentAst = artifactAst.topLevelComponents().get(0);
     assertThat(componentAst.getMetadata().getFileName(), is(of("simple.xml")));
@@ -169,17 +164,4 @@ public class AstArtifactConfigurationProcessorTestCase extends AbstractMuleTestC
     }
   }
 
-
-  /**
-   * Class to test the injection of a {@link MemoryManagementService}
-   */
-  private static class MemoryManagementInjected {
-
-    @Inject
-    private MemoryManagementService memoryManagementService;
-
-    public MemoryManagementService getMemoryManagementService() {
-      return memoryManagementService;
-    }
-  }
 }

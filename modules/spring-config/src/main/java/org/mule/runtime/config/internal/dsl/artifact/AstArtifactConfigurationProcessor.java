@@ -73,7 +73,7 @@ public final class AstArtifactConfigurationProcessor implements ArtifactConfigur
                                                                    artifactContextConfiguration.getArtifactProperties(),
                                                                    artifactContextConfiguration.getArtifactType(),
                                                                    artifactContextConfiguration.getParentArtifactContext()
-                                                                       .map(parentContext -> parentContext.getArtifactAst())
+                                                                       .map(ArtifactContext::getArtifactAst)
                                                                        .orElse(emptyArtifact()),
                                                                    artifactContextConfiguration.isDisableXmlValidations()),
                                             artifactContextConfiguration.getArtifactProperties(),
@@ -167,7 +167,7 @@ public final class AstArtifactConfigurationProcessor implements ArtifactConfigur
         builder.withArtifactType(org.mule.runtime.ast.api.ArtifactType.POLICY);
         break;
       default:
-        break;
+        throw new IllegalArgumentException("The provided artifact type '" + artifactType + "' cannot be deployed.");
     }
 
     return builder.build();
