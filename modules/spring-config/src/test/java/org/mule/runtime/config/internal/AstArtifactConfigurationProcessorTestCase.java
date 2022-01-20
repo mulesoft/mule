@@ -12,7 +12,6 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
-import static java.util.Collections.emptyMap;
 import static java.util.Optional.of;
 
 import static org.apache.commons.io.FileUtils.copyURLToFile;
@@ -20,21 +19,21 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.dsl.DslResolvingContext;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.config.internal.dsl.artifact.AstArtifactConfigurationProcessor;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -43,7 +42,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.HashMap;
 
 import javax.inject.Inject;
 
@@ -55,7 +53,7 @@ import org.junit.rules.TemporaryFolder;
 
 import io.qameta.allure.Issue;
 
-public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase {
+public class AstArtifactConfigurationProcessorTestCase extends AbstractMuleTestCase {
 
   @Rule
   public TemporaryFolder tempFolder = new TemporaryFolder();
@@ -65,8 +63,7 @@ public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase 
   @Inject
   private FeatureFlaggingService featureFlaggingService;
 
-  private SpringXmlConfigurationBuilder configurationBuilderWithUsedInvalidSchema;
-  private SpringXmlConfigurationBuilder configurationBuilderWitUnusedInvalidSchema;
+  private AstArtifactConfigurationProcessor configurationBuilder;
   private MuleContextWithRegistry muleContext;
 
   @Rule
@@ -79,11 +76,7 @@ public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase 
   public void setUp() throws Exception {
     muleContext = mockContextWithServices();
     muleContext.getInjector().inject(this);
-    configurationBuilderWithUsedInvalidSchema =
-        new SpringXmlConfigurationBuilder(new String[] {"invalid-schema.xml"}, new HashMap<>(), APP, false, false);
-    configurationBuilderWitUnusedInvalidSchema =
-        new SpringXmlConfigurationBuilder(new String[] {"invalid-schema-not-used.xml"}, new HashMap<>(), APP, false,
-                                          false);
+    configurationBuilder = new AstArtifactConfigurationProcessor();
   }
 
   @Test
@@ -94,7 +87,13 @@ public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase 
         .expectMessage(containsString(SCHEMA_VALIDATION_ERROR));
     when(featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)).thenReturn(true);
 
-    configurationBuilderWithUsedInvalidSchema.configure(muleContext);
+    configurationBuilder.createArtifactContext(ArtifactContextConfiguration.builder()
+        .setConfigResources(new String[] {"invalid-schema.xml"})
+        .setArtifactType(APP)
+        .setMuleContext(muleContext)
+        .setEnableLazyInitialization(false)
+        .setDisableXmlValidations(false)
+        .build());
   }
 
   @Test
@@ -105,7 +104,13 @@ public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase 
         .expectMessage(containsString(SCHEMA_VALIDATION_ERROR));
     when(featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)).thenReturn(false);
 
-    configurationBuilderWithUsedInvalidSchema.configure(muleContext);
+    configurationBuilder.createArtifactContext(ArtifactContextConfiguration.builder()
+        .setConfigResources(new String[] {"invalid-schema.xml"})
+        .setArtifactType(APP)
+        .setMuleContext(muleContext)
+        .setEnableLazyInitialization(false)
+        .setDisableXmlValidations(false)
+        .build());
   }
 
   @Test
@@ -113,35 +118,35 @@ public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase 
   public void configureWithFailAfterTenErrorsWillSucceedIfSchemaNotUsed() throws ConfigurationException {
     when(featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)).thenReturn(false);
 
-    configurationBuilderWitUnusedInvalidSchema.configure(muleContext);
+    ArtifactContext context = configurationBuilder.createArtifactContext(ArtifactContextConfiguration.builder()
+        .setConfigResources(new String[] {"invalid-schema-not-used.xml"})
+        .setArtifactType(APP)
+        .setMuleContext(muleContext)
+        .setEnableLazyInitialization(false)
+        .setDisableXmlValidations(false)
+        .build());
+
+    assertThat(context.getArtifactAst(), not(nullValue()));
+    assertThat(context.getMuleContext(), sameInstance(muleContext));
   }
 
   @Test
   @Issue("MULE-19791")
   public void configureWithResourceOutsideClasspathPreservesResourceName() throws ConfigurationException, IOException {
     copyResourceToTemp("simple.xml");
-    final SpringXmlConfigurationBuilder configurationBuilder =
-        xmlConfigurationBuilderRelativeToPath(tempFolder.getRoot(), new String[] {"simple.xml"});
 
-    configurationBuilder.configure(muleContext);
-    final ArtifactContext artifactContext = configurationBuilder.createArtifactContext();
+    final ArtifactContext artifactContext =
+        withContextClassLoader(new URLClassLoader(new URL[] {tempFolder.getRoot().toURI().toURL()}, null),
+                               () -> configurationBuilder.createArtifactContext(ArtifactContextConfiguration.builder()
+                                   .setConfigResources(new String[] {"simple.xml"})
+                                   .setArtifactType(APP)
+                                   .setMuleContext(muleContext)
+                                   .setEnableLazyInitialization(false)
+                                   .setDisableXmlValidations(false)
+                                   .build()));
     final ArtifactAst artifactAst = artifactContext.getArtifactAst();
     final ComponentAst componentAst = artifactAst.topLevelComponents().get(0);
     assertThat(componentAst.getMetadata().getFileName(), is(of("simple.xml")));
-  }
-
-  @Test
-  public void memoryManagementCanBeInjectedInBean() throws MuleException, IOException {
-    copyResourceToTemp("simple.xml");
-    final SpringXmlConfigurationBuilder configurationBuilder =
-        xmlConfigurationBuilderRelativeToPath(tempFolder.getRoot(), new String[] {"simple.xml"});
-
-    configurationBuilder.configure(muleContext);
-    final ArtifactContext artifactContext = configurationBuilder.createArtifactContext();
-    MemoryManagementInjected memoryManagementInjected = new MemoryManagementInjected();
-    artifactContext.getMuleContext().getInjector().inject(memoryManagementInjected);
-
-    assertThat(memoryManagementInjected.getMemoryManagementService(), is(notNullValue()));
   }
 
   private void copyResourceToTemp(String resourceName) throws IOException {
@@ -149,13 +154,6 @@ public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase 
     final File simpleAppFileOutsideClassPath = new File(tempFolder.getRoot(), resourceName);
     assertThat(originalResource, is(not(nullValue())));
     copyURLToFile(originalResource, simpleAppFileOutsideClassPath);
-  }
-
-  private SpringXmlConfigurationBuilder xmlConfigurationBuilderRelativeToPath(File basePath, String[] resources)
-      throws IOException {
-    return withContextClassLoader(new URLClassLoader(new URL[] {basePath.toURI().toURL()}, null),
-                                  () -> new SpringXmlConfigurationBuilder(resources, emptyMap(), APP, false,
-                                                                          false));
   }
 
   public static final class TestExtensionSchemagenerator implements ExtensionSchemaGenerator {
@@ -166,17 +164,4 @@ public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase 
     }
   }
 
-
-  /**
-   * Class to test the injection of a {@link MemoryManagementService}
-   */
-  private static class MemoryManagementInjected {
-
-    @Inject
-    private MemoryManagementService memoryManagementService;
-
-    public MemoryManagementService getMemoryManagementService() {
-      return memoryManagementService;
-    }
-  }
 }

@@ -12,6 +12,8 @@ import static org.mule.runtime.extension.api.ExtensionConstants.XML_SDK_LOADER_I
 import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCES_PATHS;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_DECLARATION;
 
+import static java.util.Optional.empty;
+
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -107,22 +109,27 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
     return false;
   }
 
+  @Override
+  protected boolean mustRegenerateExtensionModels() {
+    return true;
+  }
+
   /**
    * Parameter to re-type operations' output if exists. It should map to
-   * 
+   *
    * @return the string of the parameter that represents the declaration file.
    */
   protected Optional<String> operationsOutputPath() {
-    return Optional.empty();
+    return empty();
   }
 
   /**
    * Parameter to add resources to the {@link ExtensionModel} generation.
-   * 
+   *
    * @return the collection of resources that must be exported
    */
   protected Optional<List<String>> resourcesPaths() {
-    return Optional.empty();
+    return empty();
   }
 
 }

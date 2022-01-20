@@ -6,11 +6,6 @@
  */
 package org.mule.test.module.extension.source;
 
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.number.OrderingComparison.lessThanOrEqualTo;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENABLE_POLLING_SOURCE_LIMIT_PARAMETER;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
@@ -19,6 +14,14 @@ import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
 import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories.POLLING;
 import static org.mule.test.petstore.extension.WatermarkingPetAdoptionSource.beginLatch;
 import static org.mule.test.petstore.extension.WatermarkingPetAdoptionSource.resetSource;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.number.OrderingComparison.lessThanOrEqualTo;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -29,7 +32,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,13 +48,6 @@ public class PollingSourceRestartingTestCase extends AbstractExtensionFunctional
   private static int PROBER_TIMEOUT = 30000;
   private static int CHECK_NOT_PROBER_TIMEOUT = 5000;
   private static int PROBER_FREQUENCY = 500;
-
-  protected static final Map<String, Object> EXTENSION_LOADER_CONTEXT_ADDITIONAL_PARAMS = new HashMap<String, Object>() {
-
-    {
-      put(ENABLE_POLLING_SOURCE_LIMIT_PARAMETER, true);
-    }
-  };
 
   protected static MultiMap<Integer, String> ADOPTIONS = new MultiMap<>();
 
@@ -76,7 +71,14 @@ public class PollingSourceRestartingTestCase extends AbstractExtensionFunctional
 
   @Override
   protected Map<String, Object> getExtensionLoaderContextAdditionalParameters() {
-    return EXTENSION_LOADER_CONTEXT_ADDITIONAL_PARAMS;
+    return singletonMap(ENABLE_POLLING_SOURCE_LIMIT_PARAMETER, true);
+  }
+
+  // Since the ENABLE_POLLING_SOURCE_LIMIT_PARAMETER changes the extension model generator, we have to make the parsers cache
+  // aware of this property so that each tests uses the expected parser with the expected extension model definition.
+  @Override
+  protected Map<String, String> artifactProperties() {
+    return singletonMap(ENABLE_POLLING_SOURCE_LIMIT_PARAMETER, "true");
   }
 
   @Override

@@ -36,7 +36,7 @@ import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
-final class ApplicationFilteredFromPolicyArtifactAst extends BaseArtifactAst {
+public final class ApplicationFilteredFromPolicyArtifactAst extends BaseArtifactAst {
 
   private final ArtifactAst parentArtifactAst;
   private final FeatureFlaggingService featureFlaggingService;

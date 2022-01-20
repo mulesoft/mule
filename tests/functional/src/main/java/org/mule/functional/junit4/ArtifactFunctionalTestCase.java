@@ -7,23 +7,22 @@
 
 package org.mule.functional.junit4;
 
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
+import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
+
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
-import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
 
 import org.mule.functional.services.NullPolicyProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.service.Service;
+import org.mule.runtime.config.internal.ComponentBuildingDefinitionRegistryFactoryAware;
 import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegistryFactory;
-import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
@@ -208,8 +207,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   @Override
   protected ConfigurationBuilder getBuilder() throws Exception {
     ConfigurationBuilder builder = super.getBuilder();
-    assertThat(builder.getClass().getName(), is("org.mule.runtime.config.internal.SpringXmlConfigurationBuilder"));
-    configureSpringXmlConfigurationBuilder(builder);
+    configureSpringConfigurationBuilder(builder);
     return builder;
   }
 
@@ -227,14 +225,15 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     return service.isPresent() ? (T) service.get() : null;
   }
 
-  protected void configureSpringXmlConfigurationBuilder(ConfigurationBuilder builder) {
+  protected void configureSpringConfigurationBuilder(ConfigurationBuilder builder) {
     builder.addServiceConfigurator(serviceConfigurator);
-    if (builder instanceof SpringXmlConfigurationBuilder) {
-      if (mustRegenerateComponentBuildingDefinitionRegistryFactory() || mustRegenerateExtensionModels()) {
-        ((SpringXmlConfigurationBuilder) builder)
+    if (builder instanceof ComponentBuildingDefinitionRegistryFactoryAware) {
+      if (mustRegenerateComponentBuildingDefinitionRegistryFactory()
+          || mustRegenerateExtensionModels()) {
+        ((ComponentBuildingDefinitionRegistryFactoryAware) builder)
             .setComponentBuildingDefinitionRegistryFactory(new DefaultComponentBuildingDefinitionRegistryFactory());
       } else {
-        ((SpringXmlConfigurationBuilder) builder)
+        ((ComponentBuildingDefinitionRegistryFactoryAware) builder)
             .setComponentBuildingDefinitionRegistryFactory(componentBuildingDefinitionRegistryFactory);
       }
     }
@@ -288,17 +287,6 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
                                                                         new NullPolicyProvider());
       }
     });
-  }
-
-  /**
-   * Subclasses can override this method so that extension models used are regenerated before running its tests. For example, some
-   * part of a extension model might only be created if a certain system property is in place, so the test classes that test that
-   * feature will have to generate the extension model when the property is already set.
-   *
-   * @return whether the tests on this class need for extensions model to be generated again.
-   */
-  protected boolean mustRegenerateExtensionModels() {
-    return false;
   }
 
   /**
