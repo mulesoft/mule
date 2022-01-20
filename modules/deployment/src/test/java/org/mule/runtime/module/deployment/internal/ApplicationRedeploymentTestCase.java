@@ -18,10 +18,13 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.RedeploymentStory.APPLICATION_REDEPLOYMENT;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 
@@ -30,23 +33,62 @@ import java.net.URL;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 import io.qameta.allure.Feature;
-import io.qameta.allure.Flaky;
 import io.qameta.allure.Story;
+import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
+import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 /**
  * Contains test for application re-deployment on the default domain
  */
 @Feature(APP_DEPLOYMENT)
 @Story(APPLICATION_REDEPLOYMENT)
-public class ApplicationRedeploymentTestCase extends ApplicationDeploymentTestCase {
+public class ApplicationRedeploymentTestCase extends AbstractApplicationDeploymentTestCase {
+
+  private static final String OVERWRITTEN_PROPERTY = "configFile";
+  private static final String OVERWRITTEN_PROPERTY_SYSTEM_VALUE = "nonExistent.yaml";
+
+  protected static ApplicationFileBuilder dummyAppDescriptorWithPropsDependencyFileBuilder;
+
+  @Rule
+  public SystemProperty systemProperty = new SystemProperty(OVERWRITTEN_PROPERTY, OVERWRITTEN_PROPERTY_SYSTEM_VALUE);
+
+  @Rule
+  public SystemProperty otherSystemProperty = new SystemProperty("oneProperty", "someValue");
 
   public ApplicationRedeploymentTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
+  }
+
+  @Override
+  @Before
+  public void before() {
+    incompleteAppFileBuilder = appFileBuilder("incomplete-app").definedBy("incomplete-app-config.xml");
+    brokenAppFileBuilder = appFileBuilder("broken-app").corrupted();
+    brokenAppWithFunkyNameAppFileBuilder = appFileBuilder("broken-app+", brokenAppFileBuilder);
+    waitAppFileBuilder = appFileBuilder("wait-app").definedBy("wait-app-config.xml");
+    dummyAppDescriptorWithPropsFileBuilder = appFileBuilder("dummy-app-with-props")
+        .definedBy("dummy-app-with-props-config.xml")
+        .containingClass(echoTestClassFile,
+                         "org/foo/EchoTest.class");
+    dummyAppDescriptorWithPropsDependencyFileBuilder = appFileBuilder("dummy-app-with-props-dependencies")
+        .withMinMuleVersion("4.3.0") // MULE-19038
+        .definedBy("dummy-app-with-props-dependencies-config.xml");
+    dummyAppDescriptorWithStoppedFlowFileBuilder = appFileBuilder("dummy-app-with-stopped-flow-config")
+        .withMinMuleVersion("4.3.0") // MULE-19127
+        .definedBy("dummy-app-with-stopped-flow-config.xml")
+        .containingClass(echoTestClassFile,
+                         "org/foo/EchoTest.class");
+
+    // Application plugin artifact builders
+    echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
+        .dependingOn(new JarFileBuilder("barUtils1", barUtils1_0JarFile))
+        .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class");
   }
 
   @Parameters(name = "Parallel: {0}")
@@ -208,8 +250,6 @@ public class ApplicationRedeploymentTestCase extends ApplicationDeploymentTestCa
   }
 
   @Test
-  @Ignore("MULE-16403")
-  @Flaky
   public void redeploysInvalidExplodedAppAfterSuccessfulDeploymentAfterStartup() throws Exception {
     startDeployment();
 
