@@ -9,7 +9,6 @@ package org.mule.runtime.core.api.profiling;
 
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.EXTENSION_PROFILING_EVENT;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROFILING_SERVICE_PROPERTY;
-import static org.mule.runtime.api.util.MuleSystemProperties.FORCE_RUNTIME_PROFILING_CONSUMERS_ENABLEMENT_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
@@ -64,9 +63,8 @@ public class ExtensionProfilingDataConsumerTestCase extends AbstractMuleContextT
   public SystemProperty enableProfilingServiceProperty = new SystemProperty(ENABLE_PROFILING_SERVICE_PROPERTY, "true");
 
   @Rule
-  public SystemProperty forceRuntimeProfilingConsumersEnablementProperty = new SystemProperty(
-                                                                                              FORCE_RUNTIME_PROFILING_CONSUMERS_ENABLEMENT_PROPERTY,
-                                                                                              "true");
+  public EnableInternalRuntimeProfilers enableInternalRuntimeProfilfers =
+      new EnableInternalRuntimeProfilers(new TestComponentProfilingDataConsumer(null));
 
   @Mock
   private ExtensionProfilingEventContext profilingEventContext;
