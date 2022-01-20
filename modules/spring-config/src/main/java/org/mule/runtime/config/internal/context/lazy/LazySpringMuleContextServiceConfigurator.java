@@ -44,6 +44,7 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.data.sample.SampleDataService;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.metadata.cache.DefaultPersistentMetadataCacheManager;
 import org.mule.runtime.core.internal.metadata.cache.DelegateMetadataCacheManager;
@@ -69,14 +70,13 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
   private static final String LAZY_MULE_OBJECT_STORE_MANAGER = "_muleLazyObjectStoreManager";
 
   private final LazyComponentInitializerAdapter lazyComponentInitializer;
-  private final Map<String, String> artifactProperties;
   private final LockFactory runtimeLockFactory;
-  private final MemoryManagementService memoryManagementService;
 
   public LazySpringMuleContextServiceConfigurator(LazyComponentInitializerAdapter lazyComponentInitializer,
                                                   Map<String, String> artifactProperties,
                                                   LockFactory runtimeLockFactory,
                                                   MuleContextWithRegistry muleContext,
+                                                  MuleFunctionsBindingContextProvider coreFunctionsProvider,
                                                   ConfigurationProperties configurationProperties,
                                                   ArtifactType artifactType,
                                                   OptionalObjectsController optionalObjectsController,
@@ -84,13 +84,12 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
                                                   Registry serviceLocator,
                                                   ResourceLocator resourceLocator,
                                                   MemoryManagementService memoryManagementService) {
-    super(muleContext, configurationProperties, artifactProperties, artifactType, optionalObjectsController,
+    super(muleContext, coreFunctionsProvider, configurationProperties, artifactProperties, artifactType,
+          optionalObjectsController,
           beanDefinitionRegistry,
           serviceLocator, resourceLocator, memoryManagementService);
     this.lazyComponentInitializer = lazyComponentInitializer;
-    this.artifactProperties = artifactProperties;
     this.runtimeLockFactory = runtimeLockFactory;
-    this.memoryManagementService = memoryManagementService;
   }
 
   @Override
@@ -100,7 +99,7 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
     registerBeanDefinition(OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER,
                            getBeanDefinition(LazyDataWeaveExtendedExpressionLanguageAdaptorFactoryBean.class));
     registerBeanDefinition(OBJECT_CONNECTIVITY_TESTER_FACTORY, getBeanDefinition(NoOpConnectivityTesterFactory.class));
-    registerConstantBeanDefinition(MULE_MEMORY_MANAGEMENT_SERVICE, memoryManagementService);
+    registerConstantBeanDefinition(MULE_MEMORY_MANAGEMENT_SERVICE, getMemoryManagementService());
 
     registerConstantBeanDefinition(CONNECTIVITY_TESTING_SERVICE_KEY,
                                    new LazyConnectivityTestingService(lazyComponentInitializer, () -> getRegistry()
@@ -125,7 +124,8 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
 
     registerConstantBeanDefinition(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, lazyComponentInitializer);
 
-    String sharedPartitionedPersistentObjectStorePath = artifactProperties.get(SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH);
+    String sharedPartitionedPersistentObjectStorePath =
+        getArtifactProperties().get(SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH);
     if (sharedPartitionedPersistentObjectStorePath != null) {
       // We need to first define this service so it would be later initialized
       registerBeanDefinition(SHARED_PERSISTENT_OBJECT_STORE_KEY, getBeanDefinition(SharedPartitionedPersistentObjectStore.class));

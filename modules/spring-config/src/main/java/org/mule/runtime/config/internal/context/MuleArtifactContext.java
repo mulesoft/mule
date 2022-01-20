@@ -30,6 +30,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider.CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.module.extension.internal.manager.ExtensionErrorsRegistrant.registerErrorMappings;
@@ -91,6 +92,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
@@ -143,6 +145,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   protected final MemoryManagementService memoryManagementService;
   private ArtifactAst applicationModel;
   private final MuleContextWithRegistry muleContext;
+  private final MuleFunctionsBindingContextProvider coreFunctionsProvider;
   private final BeanDefinitionFactory beanDefinitionFactory;
   private final ArtifactType artifactType;
   private final BaseConfigurationComponentLocator baseComponentLocator;
@@ -152,6 +155,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final Map<String, String> artifactProperties;
   protected List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
   private final ExtensionManager extensionManager;
+
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -185,6 +189,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                              FeatureFlaggingService featureFlaggingService) {
     checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
     this.muleContext = (MuleContextWithRegistry) muleContext;
+    this.coreFunctionsProvider = this.muleContext.getRegistry().get(CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY);
     this.optionalObjectsController = optionalObjectsController;
     this.artifactType = artifactType;
     this.serviceDiscoverer = new DefaultRegistry(muleContext);
@@ -540,6 +545,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   protected SpringMuleContextServiceConfigurator createServiceConfigurator(DefaultListableBeanFactory beanFactory) {
     return new SpringMuleContextServiceConfigurator(muleContext,
+                                                    getCoreFunctionsProvider(),
                                                     getConfigurationProperties(),
                                                     artifactProperties,
                                                     getArtifactType(),
@@ -630,6 +636,10 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   public MuleContextWithRegistry getMuleContext() {
     return muleContext;
+  }
+
+  protected MuleFunctionsBindingContextProvider getCoreFunctionsProvider() {
+    return coreFunctionsProvider;
   }
 
   protected PropertiesResolverConfigurationProperties getConfigurationProperties() {
