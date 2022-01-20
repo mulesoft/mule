@@ -43,10 +43,10 @@ import org.mule.runtime.extension.api.declaration.type.annotation.ExpressionSupp
 import org.mule.runtime.extension.api.declaration.type.annotation.LayoutTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotation;
 
-class AppOperationExtensionModelDeclarer {
+class MuleOperationExtensionModelDeclarer {
 
   private static final String DSL_PREFIX = "operation";
-  private static final String NAMESPACE = format(DEFAULT_NAMESPACE_URI_MASK, DSL_PREFIX);
+  private static final String NAMESPACE = format(DEFAULT_NAMESPACE_URI_MASK, "operation-dsl");
   private static final String SCHEMA_LOCATION =
       "http://www.mulesoft.org/schema/mule/operation-dsl/current/mule-operation-dsl.xsd";
 
@@ -58,7 +58,7 @@ class AppOperationExtensionModelDeclarer {
 
   ExtensionDeclarer declareExtensionModel() {
     ExtensionDeclarer declarer = new ExtensionDeclarer()
-        .named("Application Operations DSL")
+        .named("Mule Operations DSL")
         .describedAs("DSL for declaring Mule Operation")
         .onVersion(MULE_VERSION)
         .fromVendor(MULESOFT_VENDOR)

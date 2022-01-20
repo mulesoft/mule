@@ -67,6 +67,13 @@
                         </xsd:complexType>
                     </xsd:element>
                 </xsd:sequence>
+                <xsd:attribute name="name" use="required" type="mule:nonBlankString">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The parameter's name
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="type" use="required" type="type">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -171,12 +178,17 @@
                             </xsd:annotation>
                         </xsd:element>
                     </xsd:sequence>
-                    <xsd:element name="parameters" type="parameterType" maxOccurs="unbounded" minOccurs="0">
+                    <xsd:element name="parameters" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
                                 The operation's input parameters.
                             </xsd:documentation>
                         </xsd:annotation>
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="parameter" type="parameterType" maxOccurs="unbounded" />
+                            </xsd:sequence>
+                        </xsd:complexType>
                     </xsd:element>
                     <xsd:element name="output" type="resultType" />
                     <xsd:element name="body">
@@ -236,13 +248,14 @@
         </xsd:annotation>
         <xsd:restriction base="xsd:string">
             <!--            TODO: HOW TO REPRESENT ARRAYS?-->
-            <xsd:enumeration value="STRING"/>
-            <xsd:enumeration value="NUMBER"/>
-            <xsd:enumeration value="BINARY"/>
-            <xsd:enumeration value="DATE"/>
-            <xsd:enumeration value="DATE_TIME"/>
-            <xsd:enumeration value="OBJECT"/>
-            <xsd:enumeration value="BOOLEAN"/>
+            <xsd:enumeration value="string"/>
+            <xsd:enumeration value="number"/>
+            <xsd:enumeration value="binary"/>
+            <xsd:enumeration value="date"/>
+            <xsd:enumeration value="datetime"/>
+            <xsd:enumeration value="time"/>
+            <xsd:enumeration value="boolean"/>
+            <xsd:enumeration value="binary"/>
         </xsd:restriction>
     </xsd:simpleType>
 

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:operation="http://www.mulesoft.org/schema/mule/operation"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/operation http://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd">
+
+
+    <flow name="superfluousFlow">
+        <logger message="This flow only exists to make sure that is never referenced from the resulting ExtensionModel"/>
+    </flow>
+
+    <operation:def name="helloWold" displayName="Hello World operation" summary="Returns a polite greeting">
+        <operation:parameters>
+            <operation:parameter name="greeting" type="string" summary="The greeting message">
+                <operation:description>The greeting message appended before the receivers name</operation:description>
+                <operation:optional defaultValue="Hello, " />
+            </operation:parameter>
+            <operation:parameter name="receiver" type="string" summary="The name of the person being greeted" />
+            <operation:parameter name="prefix" type="string" summary="The receiver's prefix">
+                <operation:optional defaultValue="" />
+                <operation:description>The prefix added to the receiver</operation:description>
+            </operation:parameter>
+            <operation:parameter name="suffix" type="string" summary="The receiver's suffix">
+                <operation:optional />
+                <operation:description>The suffix added to the receiver</operation:description>
+            </operation:parameter>
+        </operation:parameters>
+        <operation:output>
+            <operation:payload-type type="string" mimeType="text/plain"/>
+        </operation:output>
+        <operation:body>
+            <set-payload value="#['$(params.greeting) $(params.prefix) $(params.receiver) $(params.suffix)']" />
+        </operation:body>
+    </operation:def>
+
+</mule>
