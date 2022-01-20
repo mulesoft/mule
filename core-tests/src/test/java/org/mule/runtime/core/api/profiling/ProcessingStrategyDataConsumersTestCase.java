@@ -15,7 +15,6 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROFILING_SERVICE_PROPERTY;
-import static org.mule.runtime.api.util.MuleSystemProperties.FORCE_RUNTIME_PROFILING_CONSUMERS_ENABLEMENT_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.internal.profiling.consumer.ComponentProfilingUtils.getProcessingStrategyComponentInfoMap;
@@ -81,8 +80,8 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
   public SystemProperty enableProfilingServiceProperty = new SystemProperty(ENABLE_PROFILING_SERVICE_PROPERTY, "true");
 
   @Rule
-  public SystemProperty forceRuntimeProfilingConsumersEnablementProperty =
-      new SystemProperty(FORCE_RUNTIME_PROFILING_CONSUMERS_ENABLEMENT_PROPERTY, "true");
+  public EnableInternalRuntimeProfilers enableInternalRuntimeProfilers =
+      new EnableInternalRuntimeProfilers(new TestLoggerComponentProcessingStrategyDataConsumer(null));
 
   @Mock
   private CoreEvent event;
