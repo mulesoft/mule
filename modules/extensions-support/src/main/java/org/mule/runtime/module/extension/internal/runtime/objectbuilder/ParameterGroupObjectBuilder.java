@@ -19,9 +19,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
-import org.mule.runtime.core.internal.util.message.MessageUtils;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext;
@@ -32,9 +30,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -109,13 +104,12 @@ public class ParameterGroupObjectBuilder<T> {
     for (FieldElement field : groupDescriptorFields) {
       String name = field.getName();
       if (hasParameter.test(name)) {
-        final boolean isContent = field.isAnnotatedWith(Content.class)
-            || field.isAnnotatedWith(org.mule.sdk.api.annotation.param.Content.class);
         Object resolvedValue = resolveValue(new StaticValueResolver<>(parameters
             .apply(name)), context);
         Object value = context == null || context.resolveCursors()
             ? resolveCursor(resolvedValue,
-                            isContent ? v -> decorateInput(v, context.getEvent().getCorrelationId(), componentDecoratorFactory)
+                            field.isContent()
+                                ? v -> decorateInput(v, context.getEvent().getCorrelationId(), componentDecoratorFactory)
                                 : identity())
             : resolvedValue;
         field.set(object, value);

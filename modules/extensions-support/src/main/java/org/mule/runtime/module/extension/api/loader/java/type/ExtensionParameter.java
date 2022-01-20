@@ -21,6 +21,7 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
@@ -132,6 +133,14 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
       return getDefaultValue(annotation.get());
     }
     return java.util.Optional.empty();
+  }
+
+  /**
+   * @return Whether this parameter is considered content.
+   */
+  default boolean isContent() {
+    return isAnnotatedWith(Content.class)
+        || isAnnotatedWith(org.mule.sdk.api.annotation.param.Content.class);
   }
 
   /**

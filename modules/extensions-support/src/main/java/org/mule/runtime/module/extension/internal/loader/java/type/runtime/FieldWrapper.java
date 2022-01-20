@@ -36,10 +36,14 @@ public class FieldWrapper implements FieldElement {
   private final FieldSetter fieldSetter;
   private final ClassTypeLoader typeLoader;
 
+  /** Cached value for whether this field is considered content (added for performance). */
+  private final boolean isContent;
+
   public FieldWrapper(Field field, ClassTypeLoader typeLoader) {
     this.field = field;
     this.fieldSetter = new FieldSetter<>(field);
     this.typeLoader = typeLoader;
+    this.isContent = FieldElement.super.isContent();
   }
 
   /**
@@ -102,6 +106,12 @@ public class FieldWrapper implements FieldElement {
     return isAnnotatedWith(annotationClass)
         ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, field, typeLoader))
         : empty();
+  }
+
+  @Override
+  public boolean isContent() {
+    // Return a cached value for performance reasons.
+    return isContent;
   }
 
   @Override
