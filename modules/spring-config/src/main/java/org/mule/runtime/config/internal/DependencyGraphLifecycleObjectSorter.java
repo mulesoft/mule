@@ -102,7 +102,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
   public List<Object> getSortedObjects() {
     return dependencyGraphs.stream().map(x -> {
       List<BeanVertexWrapper> sortedObjects = newArrayList(new TopologicalOrderIterator<>(x));
-      reverse(sortedObjects);
+      // reverse(sortedObjects);
       return sortedObjects;
     }).reduce(new ArrayList<>(), (sortedObjectList, b) -> {
       for (BeanVertexWrapper v : b) {
