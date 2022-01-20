@@ -141,19 +141,19 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
     @Override
     public LifecycleObjectSorter newLifecycleObjectSorter() {
-      if (!getSpringRegistry().springContextInitialised.get()) {
-        return new SpringLifecycleObjectSorter(orderedLifecycleTypes, getSpringRegistry());
-      } else {
-        AutoDiscoveredDependencyResolver autoDiscoveredDependencyResolver =
-            new AutoDiscoveredDependencyResolver(getSpringRegistry());
-        DeclaredDependencyResolver declaredDependencyResolver = new DeclaredDependencyResolver(getSpringRegistry());
-        ConfigurationDependencyResolver configurationDependencyResolver =
-            getSpringRegistry().getConfigurationDependencyResolver();
-        DependencyGraphBeanDependencyResolver dependencyGraphBeanDependencyResolver =
-            new DependencyGraphBeanDependencyResolver(configurationDependencyResolver, declaredDependencyResolver,
-                                                      autoDiscoveredDependencyResolver, getSpringRegistry());
-        return new DependencyGraphLifecycleObjectSorter(dependencyGraphBeanDependencyResolver, orderedLifecycleTypes);
-      }
+      // if (!getSpringRegistry().springContextInitialised.get()) {
+      // return new SpringLifecycleObjectSorter(orderedLifecycleTypes, getSpringRegistry());
+      // } else {
+      AutoDiscoveredDependencyResolver autoDiscoveredDependencyResolver =
+          new AutoDiscoveredDependencyResolver(getSpringRegistry());
+      DeclaredDependencyResolver declaredDependencyResolver = new DeclaredDependencyResolver(getSpringRegistry());
+      ConfigurationDependencyResolver configurationDependencyResolver =
+          getSpringRegistry().getConfigurationDependencyResolver();
+      DependencyGraphBeanDependencyResolver dependencyGraphBeanDependencyResolver =
+          new DependencyGraphBeanDependencyResolver(configurationDependencyResolver, declaredDependencyResolver,
+                                                    autoDiscoveredDependencyResolver, getSpringRegistry());
+      return new DependencyGraphLifecycleObjectSorter(dependencyGraphBeanDependencyResolver, orderedLifecycleTypes);
+      // }
     }
   }
 

@@ -30,6 +30,7 @@ import org.mule.runtime.core.internal.registry.Registry;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -71,8 +72,9 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Applying lifecycle phase: {} for registry: {}", phase, object.getClass().getSimpleName());
     }
+    List<Object> list = registryLifecycleManager.getObjectsForPhase(phase);
 
-    doApplyLifecycle(phase, new HashSet<>(), registryLifecycleManager.getObjectsForPhase(phase));
+    doApplyLifecycle(phase, new HashSet<>(), list);
 
     interceptor.onPhaseCompleted(phase);
   }

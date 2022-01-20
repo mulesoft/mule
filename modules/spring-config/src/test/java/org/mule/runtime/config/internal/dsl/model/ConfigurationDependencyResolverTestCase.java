@@ -17,8 +17,10 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.graph.internal.DefaultArtifactAstDependencyGraph;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.qameta.allure.Description;
 import org.hamcrest.Matchers;
