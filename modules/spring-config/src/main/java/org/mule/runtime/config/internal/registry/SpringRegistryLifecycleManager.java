@@ -141,7 +141,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
     @Override
     public LifecycleObjectSorter newLifecycleObjectSorter() {
-      if (Initialisable.PHASE_NAME.equals(getExecutingPhase())) {
+      if (!getSpringRegistry().springContextInitialised.get()) {
         return new SpringLifecycleObjectSorter(orderedLifecycleTypes, getSpringRegistry());
       } else {
         AutoDiscoveredDependencyResolver autoDiscoveredDependencyResolver =
@@ -149,10 +149,10 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
         DeclaredDependencyResolver declaredDependencyResolver = new DeclaredDependencyResolver(getSpringRegistry());
         ConfigurationDependencyResolver configurationDependencyResolver =
             getSpringRegistry().getConfigurationDependencyResolver();
-        DependencyGraphBeanDependencyResolver dummyResolver =
+        DependencyGraphBeanDependencyResolver dependencyGraphBeanDependencyResolver =
             new DependencyGraphBeanDependencyResolver(configurationDependencyResolver, declaredDependencyResolver,
                                                       autoDiscoveredDependencyResolver, getSpringRegistry());
-        return new DependencyGraphLifecycleObjectSorter(dummyResolver, orderedLifecycleTypes);
+        return new DependencyGraphLifecycleObjectSorter(dependencyGraphBeanDependencyResolver, orderedLifecycleTypes);
       }
     }
   }
