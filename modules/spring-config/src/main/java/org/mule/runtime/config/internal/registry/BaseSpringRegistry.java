@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.registry;
 
+import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 
@@ -32,6 +33,11 @@ public class BaseSpringRegistry extends AbstractSpringRegistry {
   @Override
   public BeanDependencyResolver getBeanDependencyResolver() {
     return beanDependencyResolver;
+  }
+
+  @Override
+  public ConfigurationDependencyResolver getConfigurationDependencyResolver() {
+    return beanDependencyResolver.getConfigurationDependencyResolver();
   }
 
   @Override

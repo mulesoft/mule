@@ -13,16 +13,15 @@ import static java.util.stream.StreamSupport.stream;
 import static com.google.common.graph.Traverser.forTree;
 
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.config.internal.DependencyNode;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
 
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
-
 import javax.inject.Inject;
 
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -59,7 +58,7 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
 
     return stream(forTree(DependencyNode::getChildren).depthFirstPostOrder(root).spliterator(), false)
         .filter(node -> node != root)
-        .map(DependencyNode::getValue)
+        .map(DependencyNode::getObject)
         .collect(toList());
   }
 
@@ -126,26 +125,9 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
     }
   }
 
-  private class DependencyNode {
-
-    private final Object value;
-    private final List<DependencyNode> children = new LinkedList<>();
-
-    private DependencyNode(Object value) {
-      this.value = value;
-    }
-
-    public DependencyNode addChild(DependencyNode child) {
-      children.add(child);
-      return this;
-    }
-
-    public List<DependencyNode> getChildren() {
-      return children;
-    }
-
-    public Object getValue() {
-      return value;
-    }
+  public ConfigurationDependencyResolver getConfigurationDependencyResolver() {
+    return configurationDependencyResolver;
   }
+
+
 }

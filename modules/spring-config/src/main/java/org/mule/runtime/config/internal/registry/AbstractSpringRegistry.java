@@ -20,6 +20,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.config.internal.context.ObjectProviderAwareBeanFactory;
+import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
@@ -384,6 +385,8 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
   }
 
   public abstract BeanDependencyResolver getBeanDependencyResolver();
+
+  public abstract ConfigurationDependencyResolver getConfigurationDependencyResolver();
 
   @Override
   public String[] getBeanNamesForType(Class<?> type) {
