@@ -344,7 +344,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     getCustomServiceRegistry().getOverriddenService(OBJECT_LOCK_FACTORY).ifPresent(customService -> {
       customLockFactoryWasDefined.set(true);
       getBeanDefinitionRegistry().registerBeanDefinition(OBJECT_LOCK_FACTORY,
-                                                    getCustomServiceBeanDefinition(customService, OBJECT_LOCK_FACTORY));
+                                                         getCustomServiceBeanDefinition(customService, OBJECT_LOCK_FACTORY));
     });
 
     if (customLockFactoryWasDefined.get()) {
@@ -362,8 +362,8 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
           anyBaseStoreWasRedefined.set(true);
           getBeanDefinitionRegistry().registerBeanDefinition(objectStoreLocal.getKey(),
                                                              getCustomServiceBeanDefinition(customService,
-                                                                                                                  objectStoreLocal
-                                                                                                                      .getKey()));
+                                                                                            objectStoreLocal
+                                                                                                .getKey()));
         }));
 
     if (anyBaseStoreWasRedefined.get()) {
