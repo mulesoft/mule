@@ -84,7 +84,6 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
     return asList(false);
   }
 
-  @Override
   @Before
   public void before() {
     incompleteAppFileBuilder = appFileBuilder("incomplete-app").definedBy("incomplete-app-config.xml");
@@ -93,7 +92,6 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
     waitAppFileBuilder = appFileBuilder("wait-app").definedBy("wait-app-config.xml");
     dummyAppDescriptorWithPropsFileBuilder = appFileBuilder("dummy-app-with-props")
         .definedBy("dummy-app-with-props-config.xml")
-        .dependingOn(callbackExtensionPlugin)
         .containingClass(echoTestClassFile,
                          "org/foo/EchoTest.class");
     dummyAppDescriptorWithPropsDependencyFileBuilder = appFileBuilder("dummy-app-with-props-dependencies")
@@ -102,7 +100,6 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
     dummyAppDescriptorWithStoppedFlowFileBuilder = appFileBuilder("dummy-app-with-stopped-flow-config")
         .withMinMuleVersion("4.3.0") // MULE-19127
         .definedBy("dummy-app-with-stopped-flow-config.xml")
-        .dependingOn(callbackExtensionPlugin)
         .containingClass(echoTestClassFile,
                          "org/foo/EchoTest.class");
 
