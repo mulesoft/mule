@@ -21,15 +21,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Adds lookup/register/unregister methods for Mule-specific entities to the standard Registry interface.
  */
 public class MuleRegistryHelper implements MuleRegistry {
-
-  protected transient Logger logger = LoggerFactory.getLogger(MuleRegistryHelper.class);
 
   /**
    * A reference to Mule's internal registry

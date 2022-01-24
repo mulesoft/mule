@@ -142,6 +142,10 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
     return customServiceRegistry;
   }
 
+  protected BeanDefinitionRegistry getBeanDefinitionRegistry() {
+    return beanDefinitionRegistry;
+  }
+
   protected Registry getServiceLocator() {
     return serviceLocator;
   }
