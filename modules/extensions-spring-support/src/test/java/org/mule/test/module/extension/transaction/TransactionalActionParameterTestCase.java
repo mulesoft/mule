@@ -29,7 +29,11 @@ public class TransactionalActionParameterTestCase extends AbstractExtensionFunct
 
   @Test
   public void injectAlwaysBeginSourceTransactionalAction() throws Exception {
-    assertSourceTransactionalAction("alwaysBeginTxAction", ALWAYS_BEGIN);
+    Reference<SourceTransactionalAction> sourceTransactionalAction = new Reference<>();
+    TransactionalSourceWithTXParameters.responseCallback = tx -> sourceTransactionalAction.set((SourceTransactionalAction) tx);
+    startFlow("alwaysBeginTxAction");
+
+    assertThat(sourceTransactionalAction.get(), is(ALWAYS_BEGIN));
   }
 
   @Test
@@ -60,14 +64,6 @@ public class TransactionalActionParameterTestCase extends AbstractExtensionFunct
         (org.mule.sdk.api.tx.OperationTransactionalAction) flowRunner("sdkInjectInOperationJoinNotSupported").run().getMessage()
             .getPayload().getValue();
     assertThat(value, is(org.mule.sdk.api.tx.OperationTransactionalAction.NOT_SUPPORTED));
-  }
-
-  private void assertSourceTransactionalAction(String flowName, SourceTransactionalAction transactionalAction) throws Exception {
-    Reference<SourceTransactionalAction> sourceTransactionalAction = new Reference<>();
-    TransactionalSourceWithTXParameters.responseCallback = tx -> sourceTransactionalAction.set((SourceTransactionalAction) tx);
-    startFlow(flowName);
-
-    assertThat(sourceTransactionalAction.get(), is(transactionalAction));
   }
 
   private void startFlow(String flowName) throws Exception {

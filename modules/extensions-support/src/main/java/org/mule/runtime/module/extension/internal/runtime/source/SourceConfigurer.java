@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MUL
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.extension.api.ExtensionConstants.POLLING_SOURCE_LIMIT_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.internal.runtime.source.legacy.SourceTransactionalActionUtils.toLegacy;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectComponentLocation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectRefName;
@@ -33,6 +34,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.source.legacy.SdkSourceAdapterFactory;
@@ -40,6 +42,9 @@ import org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSou
 import org.mule.sdk.api.runtime.source.PollingSource;
 import org.mule.sdk.api.runtime.source.Source;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -112,13 +117,13 @@ public final class SourceConfigurer {
 
           @Override
           public Object build(ValueResolvingContext context) throws MuleException {
-            Object source = build(resolverSet.resolve(context));
+            Object builtSource = build(buildResolverSetResult(source, context));
             MuleVersion muleVersion = new MuleVersion(MULE_VERSION);
-            injectDefaultEncoding(model, source, muleContext.getConfiguration().getDefaultEncoding());
-            injectRuntimeVersion(model, source, muleVersion);
-            injectComponentLocation(source, componentLocation);
-            config.ifPresent(c -> injectRefName(source, c.getName(), getReflectionCache()));
-            return source;
+            injectDefaultEncoding(model, builtSource, muleContext.getConfiguration().getDefaultEncoding());
+            injectRuntimeVersion(model, builtSource, muleVersion);
+            injectComponentLocation(builtSource, componentLocation);
+            config.ifPresent(c -> injectRefName(builtSource, c.getName(), getReflectionCache()));
+            return builtSource;
           }
 
         };
@@ -171,5 +176,29 @@ public final class SourceConfigurer {
       }
       return maxItemsPerPoll;
     }
+  }
+
+  private ResolverSetResult buildResolverSetResult(Object source, ValueResolvingContext context) throws MuleException {
+    ResolverSetResult resolverSetResult = resolverSet.resolve(context);
+    Optional<Field> field = Arrays.stream(source.getClass().getDeclaredFields())
+        .filter(f -> f.getType().getName().equals(org.mule.runtime.extension.api.tx.SourceTransactionalAction.class.getName()))
+        .findFirst();
+    if (field.isPresent() && resolverSet.getResolvers().get(field.get().getName()) != null) {
+      return overwriteResolverResult(field.get().getName(), resolverSetResult);
+    } else {
+      return resolverSetResult;
+    }
+  }
+
+  private ResolverSetResult overwriteResolverResult(String fieldName, ResolverSetResult resolverSetResult) {
+    ResolverSetResult.Builder builder = ResolverSetResult.newBuilder();
+    for (Map.Entry<String, Object> entry : resolverSetResult.asMap().entrySet()) {
+      if (entry.getKey().equals(fieldName)) {
+        builder.add(entry.getKey(), toLegacy(entry.getValue()));
+      } else {
+        builder.add(entry.getKey(), entry.getValue());
+      }
+    }
+    return builder.build();
   }
 }

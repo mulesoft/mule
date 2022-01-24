@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
-import static org.mule.runtime.module.extension.internal.runtime.operation.adapter.SdkOperationTransactionalActionUtils.from;
+import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
@@ -20,16 +20,11 @@ import org.mule.sdk.api.tx.OperationTransactionalAction;
  */
 public class SdkOperationTransactionalActionArgumentResolver implements ArgumentResolver<OperationTransactionalAction> {
 
-  private final ArgumentResolver<org.mule.runtime.extension.api.tx.OperationTransactionalAction> operationTransactionalActionArgumentResolver =
-      new OperationTransactionalActionArgumentResolver();
-
   /**
    * {@inheritDoc}
    */
   @Override
   public OperationTransactionalAction resolve(ExecutionContext executionContext) {
-    org.mule.runtime.extension.api.tx.OperationTransactionalAction operationTransactionalAction =
-        operationTransactionalActionArgumentResolver.resolve(executionContext);
-    return operationTransactionalAction == null ? null : from(operationTransactionalAction);
+    return (OperationTransactionalAction) executionContext.getParameter(TRANSACTIONAL_ACTION_PARAMETER_NAME);
   }
 }

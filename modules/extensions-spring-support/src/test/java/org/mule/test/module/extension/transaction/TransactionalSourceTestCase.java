@@ -6,41 +6,63 @@
  */
 package org.mule.test.module.extension.transaction;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 
-import org.junit.Rule;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
+import org.mule.test.runner.RunnerDelegateTo;
+import org.mule.test.transactional.SdkTransactionalSource;
 import org.mule.test.transactional.TransactionalSource;
 import org.mule.test.transactional.connection.MessageStorage;
+import org.mule.test.transactional.connection.SdkTestTransactionalConnection;
 import org.mule.test.transactional.connection.TestTransactionalConnection;
+
+import java.util.Collection;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 import javax.transaction.TransactionManager;
 
+@RunnerDelegateTo(Parameterized.class)
 public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTestCase {
+
+  private boolean isSdkApi;
+  private String configFile;
+
+  @Parameterized.Parameters(name = "{0}")
+  public static Collection<Object[]> data() {
+    return asList(new Object[][] {
+        {"Using Extensions API", false, "source-transaction-config.xml"},
+        {"Using SDK API", true, "sdk-source-transaction-config.xml"}
+    });
+  }
+
+  public TransactionalSourceTestCase(String parametrizationName, boolean isSdkApi, String configFile) {
+    this.isSdkApi = isSdkApi;
+    this.configFile = configFile;
+  }
 
   @Override
   protected String getConfigFile() {
-    return "source-transaction-config.xml";
+    return configFile;
   }
 
   @Before
   public void setUp() throws Exception {
     MessageStorage.clean();
     TransactionalSource.isSuccess = null;
+    SdkTransactionalSource.isSuccess = null;
     muleContext.setTransactionManager(mock(TransactionManager.class));
   }
 
@@ -48,6 +70,7 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
   public void tearDown() {
     MessageStorage.clean();
     TransactionalSource.isSuccess = null;
+    SdkTransactionalSource.isSuccess = null;
   }
 
   @Test
@@ -55,7 +78,7 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
     startFlow("sourceStartsALocalTxAndGetsCommitted");
     validate(() -> !MessageStorage.messages.isEmpty());
 
-    validateSuccessFlow();
+    validateFlow(true);
     validateCommittedTransaction(MessageStorage.messages.poll());
   }
 
@@ -64,7 +87,7 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
     startFlow("sourceStartsALocalTxAndGetsRollBacked");
     validate(() -> !MessageStorage.messages.isEmpty());
 
-    validateErrorFlow();
+    validateFlow(false);
     validateRolledBackedTransaction(MessageStorage.messages.poll());
   }
 
@@ -73,7 +96,7 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
     startFlow("sourceStartsALocalTxAndOperationsCanJointIt");
     validate(() -> MessageStorage.messages.size() == 2);
 
-    validateSuccessFlow();
+    validateFlow(true);
     validateCommittedTransaction(MessageStorage.messages.peek());
   }
 
@@ -83,7 +106,7 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
     validate(() -> MessageStorage.exception != null);
     assertThat(MessageStorage.exception, is(instanceOf(TransactionException.class)));
 
-    validateErrorFlow();
+    validateFlow(false);
     validateRolledBackedTransaction(MessageStorage.messages.poll());
   }
 
@@ -92,7 +115,7 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
     startFlow("nonTxSourceDoesntBeginTx");
     validate(() -> !MessageStorage.messages.isEmpty());
 
-    validateSuccessFlow();
+    validateFlow(true);
     validateNonTxConnection(MessageStorage.messages.poll());
   }
 
@@ -101,7 +124,7 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
     startFlow("nonTxSourceWithNonTxOperation");
     validate(() -> !MessageStorage.messages.isEmpty());
 
-    validateSuccessFlow();
+    validateFlow(true);
     validateNonTxConnection(MessageStorage.messages.poll());
   }
 
@@ -110,7 +133,7 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
     startFlow("nonTxSourceWithTxInside");
     validate(() -> !MessageStorage.messages.isEmpty());
 
-    validateSuccessFlow();
+    validateFlow(true);
     validateNonTxConnection(MessageStorage.messages.poll());
   }
 
@@ -122,31 +145,39 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
     new PollingProber(10000, 100).check(new JUnitLambdaProbe(validation));
   }
 
-  private void validateCommittedTransaction(TestTransactionalConnection connection) {
-    assertThat(connection.isTransactionBegun(), is(true));
-    assertThat(connection.isTransactionCommited(), is(true));
-    assertThat(connection.isTransactionRolledback(), is(false));
+  private void validateCommittedTransaction(Object connection) {
+    assertTransactionConnectionState(connection, true, true, false);
   }
 
-  private void validateRolledBackedTransaction(TestTransactionalConnection connection) {
-    assertThat(connection.isTransactionBegun(), is(true));
-    assertThat(connection.isTransactionCommited(), is(false));
-    assertThat(connection.isTransactionRolledback(), is(true));
+  private void validateRolledBackedTransaction(Object connection) {
+    assertTransactionConnectionState(connection, true, false, true);
   }
 
-  private void validateNonTxConnection(TestTransactionalConnection connection) {
-    assertThat(connection.isTransactionBegun(), is(false));
-    assertThat(connection.isTransactionCommited(), is(false));
-    assertThat(connection.isTransactionRolledback(), is(false));
+  private void validateNonTxConnection(Object connection) {
+    assertTransactionConnectionState(connection, false, false, false);
   }
 
-  private void validateSuccessFlow() {
-    validate(() -> TransactionalSource.isSuccess != null);
-    assertThat(TransactionalSource.isSuccess, is(true));
+  private void validateFlow(boolean succeeded) {
+    if (isSdkApi) {
+      validate(() -> SdkTransactionalSource.isSuccess != null);
+      assertThat(SdkTransactionalSource.isSuccess, is(succeeded));
+    } else {
+      validate(() -> TransactionalSource.isSuccess != null);
+      assertThat(TransactionalSource.isSuccess, is(succeeded));
+    }
   }
 
-  private void validateErrorFlow() {
-    validate(() -> TransactionalSource.isSuccess != null);
-    assertThat(TransactionalSource.isSuccess, is(false));
+  private void assertTransactionConnectionState(Object connection, boolean begun, boolean committed, boolean rolledBack) {
+    if (connection instanceof TestTransactionalConnection) {
+      assertThat(((TestTransactionalConnection) connection).isTransactionBegun(), is(begun));
+      assertThat(((TestTransactionalConnection) connection).isTransactionCommited(), is(committed));
+      assertThat(((TestTransactionalConnection) connection).isTransactionRolledback(), is(rolledBack));
+    } else if (connection instanceof SdkTestTransactionalConnection) {
+      assertThat(((SdkTestTransactionalConnection) connection).isTransactionBegun(), is(begun));
+      assertThat(((SdkTestTransactionalConnection) connection).isTransactionCommited(), is(committed));
+      assertThat(((SdkTestTransactionalConnection) connection).isTransactionRolledback(), is(rolledBack));
+    } else {
+      throw new RuntimeException("Stored object is not a valid type of connection");
+    }
   }
 }
