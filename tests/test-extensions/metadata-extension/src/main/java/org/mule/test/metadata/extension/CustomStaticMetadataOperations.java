@@ -25,10 +25,12 @@ import org.mule.sdk.api.annotation.metadata.fixed.AttributesXmlType;
 import org.mule.sdk.api.annotation.metadata.fixed.InputXmlType;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.test.metadata.extension.resolver.CsvInputStaticTypeResolver;
+import org.mule.test.metadata.extension.resolver.CsvIntegerInputStaticTypeResolver;
 import org.mule.test.metadata.extension.resolver.JavaOutputStaticTypeResolver;
 import org.mule.test.metadata.extension.resolver.JsonInputStaticIntersectionTypeResolver;
 import org.mule.test.metadata.extension.resolver.JsonInputStaticTypeResolver;
 import org.mule.test.metadata.extension.resolver.JsonOutputStaticIntersectionTypeResolver;
+import org.mule.test.metadata.extension.resolver.ObjectCsvInputStaticTypeResolver;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -51,12 +53,12 @@ public class CustomStaticMetadataOperations {
   }
 
   @MediaType(value = APPLICATION_XML, strict = false)
-  @org.mule.sdk.api.annotation.metadata.fixed.OutputXmlType(schema = "orderWithImport.xsd", qname = "shiporder")
+  @org.mule.sdk.api.annotation.metadata.fixed.OutputXmlType(schema = "orderWithImport.xsd", qname = "shiporderImported")
   public InputStream xmlOutputSchemaWithImport() {
     return cl.getResourceAsStream("order.xml");
   }
 
-  @org.mule.sdk.api.annotation.metadata.fixed.OutputXmlType(schema = "order.xsd", qname = "shiporder")
+  @org.mule.sdk.api.annotation.metadata.fixed.OutputXmlType(schema = "order2.xsd", qname = "shiporder2")
   public List<InputStream> xmlOutputList() {
     ArrayList xmlList = new ArrayList();
     xmlList.add(cl.getResourceAsStream("order.xml"));
@@ -64,7 +66,7 @@ public class CustomStaticMetadataOperations {
     return xmlList;
   }
 
-  @OutputXmlType(schema = "order.xsd", qname = "shiporder")
+  @OutputXmlType(schema = "order3.xsd", qname = "shiporder3")
   @MediaType(value = APPLICATION_XML, strict = false)
   public String xmlInput(@InputXmlType(schema = "order.xsd", qname = "shiporder") InputStream xml) {
     return XML_VALUE;
@@ -82,12 +84,12 @@ public class CustomStaticMetadataOperations {
     return new ByteArrayInputStream(JSON_ARRAY_VALUE.getBytes());
   }
 
-  @OutputJsonType(schema = "person-schema.json")
+  @OutputJsonType(schema = "person-schema-list.json")
   public List<String> jsonOutputList() {
     return new ArrayList<>();
   }
 
-  @org.mule.sdk.api.annotation.metadata.fixed.OutputJsonType(schema = "person-schema.json")
+  @org.mule.sdk.api.annotation.metadata.fixed.OutputJsonType(schema = "person-schema-paged.json")
   public PagingProvider<MetadataConnection, String> jsonOutputPagingProvider() {
     return new PagingProvider<MetadataConnection, String>() {
 
@@ -111,7 +113,7 @@ public class CustomStaticMetadataOperations {
     };
   }
 
-  @OutputJsonType(schema = "persons-schema.json")
+  @OutputJsonType(schema = "persons-schema-list.json")
   public List<String> jsonArrayOutputList() {
     ArrayList jsonArrayList = new ArrayList();
     jsonArrayList.add(JSON_ARRAY_VALUE);
@@ -126,7 +128,7 @@ public class CustomStaticMetadataOperations {
   }
 
   public List<InputStream> jsonInputList(@org.mule.sdk.api.annotation.metadata.fixed.InputJsonType(
-      schema = "person-schema.json") List<InputStream> persons) {
+      schema = "person-schema-list.json") List<InputStream> persons) {
     return persons;
   }
 
@@ -139,7 +141,7 @@ public class CustomStaticMetadataOperations {
   }
 
   @MediaType(value = APPLICATION_JSON)
-  public int jsonInputMap(@InputJsonType(schema = "person-schema.json") Map<String, Object> json) {
+  public int jsonInputMap(@InputJsonType(schema = "person-schema-map.json") Map<String, Object> json) {
     return (int) json.get("age");
   }
 
@@ -151,7 +153,7 @@ public class CustomStaticMetadataOperations {
         .build();
   }
 
-  @OutputResolver(output = CsvInputStaticTypeResolver.class)
+  @OutputResolver(output = ObjectCsvInputStaticTypeResolver.class)
   @MediaType(value = APPLICATION_CSV, strict = false)
   public Object customTypeOutput() {
     return CSV_VALUE;
@@ -178,7 +180,7 @@ public class CustomStaticMetadataOperations {
     return Result.<Integer, InputStream>builder().output(1).build();
   }
 
-  @OutputResolver(output = CsvInputStaticTypeResolver.class, attributes = JsonStaticAttributesTypeResolver.class)
+  @OutputResolver(output = CsvIntegerInputStaticTypeResolver.class, attributes = JsonStaticAttributesTypeResolver.class)
   public Result<Integer, InputStream> customAttributesOutput() {
     return Result.<Integer, InputStream>builder().output(1).build();
   }
@@ -193,17 +195,17 @@ public class CustomStaticMetadataOperations {
     return Result.<Integer, InputStream>builder().output(1).build();
   }
 
-  @AttributesJsonType(schema = "person-schema.json")
+  @AttributesJsonType(schema = "person-schema-list.json")
   public Result<Integer, List<InputStream>> jsonAttributesList() {
     return Result.<Integer, List<InputStream>>builder().output(1).build();
   }
 
-  @AttributesJsonType(schema = "persons-schema.json")
+  @AttributesJsonType(schema = "persons-schema-list.json")
   public Result<Integer, ArrayList<InputStream>> jsonArrayAttributesList() {
     return Result.<Integer, ArrayList<InputStream>>builder().output(1).build();
   }
 
-  @AttributesJsonType(schema = "person-schema.json")
+  @AttributesJsonType(schema = "person-schema-paged.json")
   public PagingProvider<MetadataConnection, Result<Integer, InputStream>> jsonAttributesPagingProviderWithResult() {
     return new PagingProvider<MetadataConnection, Result<Integer, InputStream>>() {
 

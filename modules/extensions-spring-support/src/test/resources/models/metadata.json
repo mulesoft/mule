@@ -8597,7 +8597,7 @@
           "outputAttributes": {
             "type": {
               "format": "json",
-              "type": "@ref:http://example.com/example.json"
+              "type": "@ref:http://example.com/paged-example.json"
             },
             "hasDynamicType": false,
             "description": "",
@@ -9306,7 +9306,7 @@
               },
               "item": {
                 "format": "json",
-                "type": "@ref:http://example.com/example.json"
+                "type": "@ref:http://example.com/paged-example.json"
               }
             },
             "hasDynamicType": false,
@@ -23626,7 +23626,7 @@
       "output": {
         "type": {
           "format": "csv",
-          "type": "@ref:csv-object"
+          "type": "@ref:csv-object2"
         },
         "hasDynamicType": false,
         "description": "",
@@ -24317,7 +24317,7 @@
                 },
                 "of": [
                   {
-                    "type": "@ref:json-object1"
+                    "type": "@ref:json-object2"
                   }
                 ]
               },
@@ -25475,7 +25475,7 @@
       "output": {
         "type": {
           "format": "csv",
-          "type": "@ref:csv-object"
+          "type": "@ref:object-csv-object"
         },
         "hasDynamicType": false,
         "description": "",
@@ -28582,7 +28582,7 @@
             "format": "json",
             "type": "Array",
             "annotations": {
-              "typeId": "http://example.com/persons.json"
+              "typeId": "http://example.com/persons-list.json"
             },
             "item": {
               "type": "@ref:http://example.com/example.json"
@@ -28859,7 +28859,7 @@
             "format": "json",
             "type": "Array",
             "annotations": {
-              "typeId": "http://example.com/persons.json"
+              "typeId": "http://example.com/persons-list.json"
             },
             "item": {
               "type": "@ref:http://example.com/example.json"
@@ -29495,7 +29495,7 @@
           },
           "item": {
             "format": "json",
-            "type": "@ref:http://example.com/example.json"
+            "type": "@ref:http://example.com/list-example.json"
           }
         },
         "hasDynamicType": false,
@@ -29843,7 +29843,7 @@
                 },
                 "item": {
                   "format": "json",
-                  "type": "@ref:http://example.com/example.json"
+                  "type": "@ref:http://example.com/list-example.json"
                 }
               },
               "hasDynamicType": false,
@@ -30231,7 +30231,7 @@
             {
               "type": {
                 "format": "json",
-                "type": "@ref:http://example.com/example.json"
+                "type": "@ref:http://example.com/map-example.json"
               },
               "hasDynamicType": false,
               "required": true,
@@ -31910,7 +31910,7 @@
           },
           "item": {
             "format": "json",
-            "type": "@ref:http://example.com/example.json"
+            "type": "@ref:http://example.com/list-example.json"
           }
         },
         "hasDynamicType": false,
@@ -36582,7 +36582,7 @@
       "output": {
         "type": {
           "format": "xml",
-          "type": "@ref:#root:shiporder"
+          "type": "@ref:#root:shiporder3"
         },
         "hasDynamicType": false,
         "description": "",
@@ -37471,7 +37471,7 @@
           },
           "item": {
             "format": "xml",
-            "type": "@ref:#root:shiporder"
+            "type": "@ref:#root:shiporder2"
           }
         },
         "hasDynamicType": false,
@@ -38195,7 +38195,7 @@
       "output": {
         "type": {
           "format": "xml",
-          "type": "@ref:#root:shiporder"
+          "type": "@ref:#root:shiporderImported"
         },
         "hasDynamicType": false,
         "description": "",
@@ -41453,6 +41453,489 @@
       ]
     },
     {
+      "format": "xml",
+      "type": "Object",
+      "annotations": {
+        "typeId": "#root:shiporder2"
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "shiporder2",
+            "attributes": [
+              {
+                "key": {
+                  "name": "orderid",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String"
+                }
+              }
+            ],
+            "required": "true"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "#AnonType_shiporder2"
+            },
+            "ordered": true,
+            "fields": [
+              {
+                "key": {
+                  "name": "orderperson",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String"
+                }
+              },
+              {
+                "key": {
+                  "name": "shipto",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "#AnonType_shiptoshiporder2"
+                  },
+                  "ordered": true,
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "name",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "String"
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "address",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "String"
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "city",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "String"
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "country",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "String"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "name": "item",
+                  "repeated": "true",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "#AnonType_itemshiporder2"
+                  },
+                  "ordered": true,
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "title",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "String"
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "note"
+                      },
+                      "model": {
+                        "type": "String"
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "quantity",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "Number",
+                        "annotations": {
+                          "range": {
+                            "from": 1.0
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "price",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "Number"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "format": "xml",
+      "type": "Object",
+      "annotations": {
+        "typeId": "#root:shiporder3",
+        "classInformation": {
+          "classname": "java.lang.String",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": true,
+          "implementedInterfaces": [
+            "java.io.Serializable",
+            "java.lang.Comparable",
+            "java.lang.CharSequence"
+          ],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "shiporder3",
+            "attributes": [
+              {
+                "key": {
+                  "name": "orderid",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String"
+                }
+              }
+            ],
+            "required": "true"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "#AnonType_shiporder3"
+            },
+            "ordered": true,
+            "fields": [
+              {
+                "key": {
+                  "name": "orderperson",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String"
+                }
+              },
+              {
+                "key": {
+                  "name": "shipto",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "#AnonType_shiptoshiporder3"
+                  },
+                  "ordered": true,
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "name",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "String"
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "address",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "String"
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "city",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "String"
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "country",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "String"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "name": "item",
+                  "repeated": "true",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "#AnonType_itemshiporder3"
+                  },
+                  "ordered": true,
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "title",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "String"
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "note"
+                      },
+                      "model": {
+                        "type": "String"
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "quantity",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "Number",
+                        "annotations": {
+                          "range": {
+                            "from": 1.0
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "price",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "Number"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "format": "xml",
+      "type": "Object",
+      "annotations": {
+        "typeId": "#root:shiporderImported",
+        "classInformation": {
+          "classname": "java.io.InputStream",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": false,
+          "isAbstract": true,
+          "isFinal": false,
+          "implementedInterfaces": [
+            "java.io.Closeable"
+          ],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "shiporderImported",
+            "attributes": [
+              {
+                "key": {
+                  "name": "orderid",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String"
+                }
+              }
+            ],
+            "required": "true"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "#AnonType_shiporderImported"
+            },
+            "ordered": true,
+            "fields": [
+              {
+                "key": {
+                  "name": "orderperson",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String"
+                }
+              },
+              {
+                "key": {
+                  "name": "{http://www.shipping.org}shipto",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "{http://www.shipping.org}#AnonType_shipto"
+                  },
+                  "ordered": true,
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "name",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "String"
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "address",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "String"
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "city",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "String"
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "country",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "String"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "key": {
+                  "name": "item",
+                  "repeated": "true",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "#AnonType_itemshiporderImported"
+                  },
+                  "ordered": true,
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "title",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "String"
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "note"
+                      },
+                      "model": {
+                        "type": "String"
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "quantity",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "Number",
+                        "annotations": {
+                          "range": {
+                            "from": 1.0
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "price",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "Number"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
       "format": "csv",
       "type": "Object",
       "annotations": {
@@ -41468,6 +41951,28 @@
             "java.util.Collection"
           ],
           "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        }
+      },
+      "fields": []
+    },
+    {
+      "format": "csv",
+      "type": "Object",
+      "annotations": {
+        "typeId": "csv-object2",
+        "classInformation": {
+          "classname": "java.lang.Integer",
+          "hasDefaultConstructor": false,
+          "isInterface": false,
+          "isInstantiable": false,
+          "isAbstract": false,
+          "isFinal": true,
+          "implementedInterfaces": [
+            "java.lang.Comparable"
+          ],
+          "parent": "java.lang.Number",
           "genericTypes": [],
           "isMap": false
         }
@@ -41514,6 +42019,153 @@
           "genericTypes": [],
           "isMap": false
         }
+      },
+      "open": {
+        "type": "Any"
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "firstName",
+            "required": "true"
+          },
+          "model": {
+            "type": "String"
+          }
+        },
+        {
+          "key": {
+            "name": "lastName",
+            "required": "true"
+          },
+          "model": {
+            "type": "String"
+          }
+        },
+        {
+          "key": {
+            "name": "age"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "range": {
+                "from": 0
+              },
+              "int": {}
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "json",
+      "type": "Object",
+      "annotations": {
+        "label": "Person",
+        "typeId": "http://example.com/list-example.json"
+      },
+      "open": {
+        "type": "Any"
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "firstName",
+            "required": "true"
+          },
+          "model": {
+            "type": "String"
+          }
+        },
+        {
+          "key": {
+            "name": "lastName",
+            "required": "true"
+          },
+          "model": {
+            "type": "String"
+          }
+        },
+        {
+          "key": {
+            "name": "age"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "range": {
+                "from": 0
+              },
+              "int": {}
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "json",
+      "type": "Object",
+      "annotations": {
+        "label": "Person",
+        "typeId": "http://example.com/map-example.json",
+        "classInformation": {
+          "classname": "java.util.Map",
+          "hasDefaultConstructor": false,
+          "isInterface": true,
+          "isInstantiable": false,
+          "isAbstract": true,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": true
+        }
+      },
+      "open": {
+        "type": "Any"
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "firstName",
+            "required": "true"
+          },
+          "model": {
+            "type": "String"
+          }
+        },
+        {
+          "key": {
+            "name": "lastName",
+            "required": "true"
+          },
+          "model": {
+            "type": "String"
+          }
+        },
+        {
+          "key": {
+            "name": "age"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "range": {
+                "from": 0
+              },
+              "int": {}
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "json",
+      "type": "Object",
+      "annotations": {
+        "label": "Person",
+        "typeId": "http://example.com/paged-example.json"
       },
       "open": {
         "type": "Any"
@@ -41616,6 +42268,51 @@
           }
         }
       ]
+    },
+    {
+      "format": "json",
+      "type": "Object",
+      "annotations": {
+        "typeId": "json-object2"
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "age"
+          },
+          "model": {
+            "type": "Number"
+          }
+        },
+        {
+          "key": {
+            "name": "dni"
+          },
+          "model": {
+            "type": "Number"
+          }
+        }
+      ]
+    },
+    {
+      "format": "csv",
+      "type": "Object",
+      "annotations": {
+        "typeId": "object-csv-object",
+        "classInformation": {
+          "classname": "java.lang.Object",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        }
+      },
+      "fields": []
     },
     {
       "format": "java",

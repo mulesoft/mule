@@ -25,6 +25,7 @@ import org.mule.test.function.extension.WeaveFunctionExtension;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.implicit.config.extension.extension.api.ImplicitConfigExtension;
 import org.mule.test.marvel.MarvelExtension;
+import org.mule.test.metadata.extension.MetadataExtension;
 import org.mule.test.nonimplicit.config.extension.extension.api.NonImplicitConfigExtension;
 import org.mule.test.oauth.TestOAuthExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
@@ -58,8 +59,7 @@ public class ExtensionModelJsonGeneratorTestCase extends FileGenerationParameter
     List<ResourceExtensionUnitTest> extensions;
     extensions = asList(newUnitTest(JAVA_LOADER, VeganExtension.class, "vegan.json"),
                         newUnitTest(JAVA_LOADER, PetStoreConnector.class, "petstore.json"),
-                        // TODO SDK-52 reenable this
-                        // newUnitTest(JAVA_LOADER, MetadataExtension.class, "metadata.json"),
+                        newUnitTest(JAVA_LOADER, MetadataExtension.class, "metadata.json"),
                         newUnitTest(JAVA_LOADER, HeisenbergExtension.class, "heisenberg.json"),
                         newUnitTest(JAVA_LOADER, SubstitutionGroupExtension.class, "substitutiongroup.json"),
                         newUnitTest(JAVA_LOADER, TransactionalExtension.class, "tx-ext.json"),

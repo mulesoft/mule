@@ -19,7 +19,7 @@ public class JsonInputStaticIntersectionTypeResolver extends InputStaticTypeReso
   @Override
   public MetadataType getStaticMetadata() {
     ObjectTypeBuilder object = BaseTypeBuilder.create(MetadataFormat.JSON).objectType();
-    object.id("json-object1");
+    object.id("json-object2");
     object.addField().key("age").value().numberType();
     object.addField().key("dni").value().numberType();
 
