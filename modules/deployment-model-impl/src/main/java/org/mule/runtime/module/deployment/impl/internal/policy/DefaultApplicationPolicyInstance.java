@@ -41,6 +41,7 @@ import org.mule.runtime.core.api.policy.PolicyInstance;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
@@ -74,6 +75,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   private final ClassLoaderRepository classLoaderRepository;
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
   private final MuleContextListener muleContextListener;
+  private final ArtifactConfigurationProcessor artifactConfigurationProcessor;
   private ArtifactContext policyContext;
   private LazyValue<PolicyInstance> policyInstance;
 
@@ -95,7 +97,8 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
                                           ServiceRepository serviceRepository,
                                           ClassLoaderRepository classLoaderRepository,
                                           ExtensionModelLoaderRepository extensionModelLoaderRepository,
-                                          MuleContextListener muleContextListener) {
+                                          MuleContextListener muleContextListener,
+                                          ArtifactConfigurationProcessor artifactConfigurationProcessor) {
     this.application = application;
     this.template = template;
     this.parametrization = parametrization;
@@ -103,6 +106,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
     this.classLoaderRepository = classLoaderRepository;
     this.extensionModelLoaderRepository = extensionModelLoaderRepository;
     this.muleContextListener = muleContextListener;
+    this.artifactConfigurationProcessor = artifactConfigurationProcessor;
   }
 
   private void initPolicyContext() throws InitialisationException {
@@ -110,8 +114,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
         newBuilder().setArtifactType(POLICY)
             .setArtifactProperties(copy(parametrization.getParameters()))
             .setArtifactName(parametrization.getId())
-            // TODO check for policies and domains as well
-            // .setArtifactConfigurationProcessor(descriptor.getArtifactConfigurationProcessor())
+            .setArtifactConfigurationProcessor(artifactConfigurationProcessor)
             .setConfigurationFiles(parametrization.getConfig().getAbsolutePath())
             .setExecutionClassloader(template.getArtifactClassLoader().getClassLoader())
             .setServiceRepository(serviceRepository)
