@@ -255,12 +255,22 @@ public class BeanDefinitionFactory {
                                                                 BeanDefinitionRegistry registry,
                                                                 SpringConfigurationComponentLocator componentLocator) {
     return param.getValue()
-        .reduce(expr -> resolveParamBeanDefinitionSimpleType(springComponentModels, componentHierarchy, paramOwnerComponent,
-                                                             param, registry, componentLocator)
-                                                                 .map(Collections::singletonList)
-                                                                 .orElse(emptyList()),
+        .reduce(expr -> resolveParamBeanDefinitionSimpleTypeAsList(springComponentModels, componentHierarchy, paramOwnerComponent,
+                                                                   param, registry, componentLocator),
                 v -> resolveParamBeanDefinitionFixedValue(springComponentModels, componentHierarchy, paramOwnerComponent,
                                                           param, registry, componentLocator));
+  }
+
+  private List<SpringComponentModel> resolveParamBeanDefinitionSimpleTypeAsList(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                                                                                List<ComponentAst> componentHierarchy,
+                                                                                ComponentAst paramOwnerComponent,
+                                                                                ComponentParameterAst param,
+                                                                                BeanDefinitionRegistry registry,
+                                                                                SpringConfigurationComponentLocator componentLocator) {
+    return resolveParamBeanDefinitionSimpleType(springComponentModels, componentHierarchy, paramOwnerComponent,
+                                                param, registry, componentLocator)
+                                                    .map(Collections::singletonList)
+                                                    .orElse(emptyList());
   }
 
   private List<SpringComponentModel> resolveParamBeanDefinitionFixedValue(Map<ComponentAst, SpringComponentModel> springComponentModels,
@@ -372,7 +382,8 @@ public class BeanDefinitionFactory {
     if (model.get() != null) {
       return singletonList(model.get());
     } else {
-      return emptyList();
+      return resolveParamBeanDefinitionSimpleTypeAsList(springComponentModels, componentHierarchy, paramOwnerComponent, param,
+                                                        registry, componentLocator);
     }
   }
 
