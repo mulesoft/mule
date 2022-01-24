@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
+import static org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider.CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ConfigurationComponentLocatorFeature.CONFIGURATION_COMPONENT_LOCATOR;
@@ -62,6 +63,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
@@ -138,6 +140,7 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractDslModelTes
     when(muleContext.getCustomizationService()).thenReturn(customizationService);
     when(mockedRegistry.lookupObject(MY_FLOW)).thenReturn(messageProcessorChainBuilder);
     when(mockedRegistry.get(OBJECT_REGISTRY)).thenReturn(new DefaultRegistry(muleContext));
+    when(mockedRegistry.get(CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY)).thenReturn(mock(MuleFunctionsBindingContextProvider.class));
 
     when(beanFactory.getSingletonMutex()).thenReturn("mutex");
     doReturn(new String[0]).when(beanFactory).getBeanNamesForType(any(Class.class), anyBoolean(), anyBoolean());
