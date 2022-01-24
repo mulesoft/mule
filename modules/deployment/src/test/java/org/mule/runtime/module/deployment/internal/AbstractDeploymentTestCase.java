@@ -562,7 +562,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     moduleDiscoverer = new TestModuleDiscoverer(getPrivilegedArtifactIds());
     moduleRepository = new DefaultModuleRepository(moduleDiscoverer);
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry =
-        new MuleArtifactResourcesRegistry.Builder().moduleRepository(moduleRepository).build();
+        new MuleArtifactResourcesRegistry.Builder()
+            .moduleRepository(moduleRepository)
+            .artifactConfigurationProcessor(serializedAstWithFallbackArtifactConfigurationProcessor())
+            .build();
     serviceManager = muleArtifactResourcesRegistry.getServiceManager();
     containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();
     extensionModelLoaderManager = muleArtifactResourcesRegistry.getExtensionModelLoaderManager();
