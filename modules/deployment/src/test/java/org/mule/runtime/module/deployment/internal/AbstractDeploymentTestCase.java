@@ -42,6 +42,7 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.correlationIdCount;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
+import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
 
@@ -109,6 +110,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
@@ -1145,7 +1147,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                                              new DomainDescriptor(DEFAULT_DOMAIN_NAME), emptyList()),
                                  artifactClassLoaderManager, serviceManager, emptyList(), extensionModelLoaderManager,
                                  getRuntimeLockFactory(),
-                                 mock(MemoryManagementService.class));
+                                 mock(MemoryManagementService.class),
+                                 serializedAstWithFallbackArtifactConfigurationProcessor());
   }
 
   /**
@@ -1838,9 +1841,9 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
     @Override
     protected DomainArchiveDeployer createDomainArchiveDeployer(DefaultDomainFactory domainFactory,
-                                                                ArtifactDeployer domainMuleDeployer,
+                                                                ArtifactDeployer<Domain> domainMuleDeployer,
                                                                 ObservableList<Domain> domains,
-                                                                DefaultArchiveDeployer<Application> applicationDeployer,
+                                                                DefaultArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer,
                                                                 CompositeDeploymentListener applicationDeploymentListener,
                                                                 DeploymentListener domainDeploymentListener) {
       return new TestDomainArchiveDeployer(new DefaultArchiveDeployer<>(domainMuleDeployer, domainFactory, domains,
@@ -1857,7 +1860,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   private static class TestDomainArchiveDeployer extends DomainArchiveDeployer {
 
-    public TestDomainArchiveDeployer(ArchiveDeployer<Domain> domainDeployer, ArchiveDeployer<Application> applicationDeployer,
+    public TestDomainArchiveDeployer(ArchiveDeployer<DomainDescriptor, Domain> domainDeployer,
+                                     ArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer,
                                      DeploymentService deploymentService) {
       super(domainDeployer, applicationDeployer, deploymentService);
     }

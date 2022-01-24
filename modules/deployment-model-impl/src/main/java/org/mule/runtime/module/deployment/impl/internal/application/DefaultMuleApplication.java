@@ -6,10 +6,6 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
-import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
@@ -28,6 +24,12 @@ import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFA
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager.isCompatibleBundle;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
+
+import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
+
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
@@ -54,6 +56,7 @@ import org.mule.runtime.deployment.model.api.InstallException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -94,6 +97,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   private final ClassLoaderRepository classLoaderRepository;
   private final File location;
   private final MemoryManagementService memoryManagementService;
+  private final ArtifactConfigurationProcessor artifactConfigurationProcessor;
   private ApplicationStatus status;
 
   protected MuleContextListener muleContextListener;
@@ -112,7 +116,8 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
                                 ClassLoaderRepository classLoaderRepository,
                                 ApplicationPolicyProvider applicationPolicyProvider,
                                 LockFactory runtimeLockFactory,
-                                MemoryManagementService memoryManagementService) {
+                                MemoryManagementService memoryManagementService,
+                                ArtifactConfigurationProcessor artifactConfigurationProcessor) {
     super("app", "application", deploymentClassLoader);
     this.descriptor = descriptor;
     this.domainRepository = domainRepository;
@@ -124,6 +129,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
     this.policyManager = applicationPolicyProvider;
     this.runtimeLockFactory = runtimeLockFactory;
     this.memoryManagementService = memoryManagementService;
+    this.artifactConfigurationProcessor = artifactConfigurationProcessor;
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
     if (this.deploymentClassLoader == null) {
       throw new IllegalArgumentException("Classloader cannot be null");
@@ -216,13 +222,22 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
     });
     try {
       ArtifactContextBuilder artifactBuilder =
-          newBuilder().setArtifactProperties(merge(descriptor.getAppProperties(), getProperties())).setArtifactType(APP)
+          newBuilder()
+              .setArtifactProperties(merge(descriptor.getAppProperties(), getProperties()))
+              .setArtifactType(APP)
+              .setArtifactConfigurationProcessor(null)
               .setDataFolderName(descriptor.getDataFolderName())
-              .setArtifactName(descriptor.getName()).setArtifactInstallationDirectory(descriptor.getArtifactLocation())
+              .setArtifactName(descriptor.getName())
+              .setArtifactInstallationDirectory(descriptor.getArtifactLocation())
+              // TODO check for policies and domains as well
+              .setArtifactConfigurationProcessor(artifactConfigurationProcessor)
               .setConfigurationFiles(descriptor.getConfigResources().toArray(new String[descriptor.getConfigResources().size()]))
               .setDefaultEncoding(descriptor.getEncoding())
-              .setArtifactPlugins(artifactPlugins).setExecutionClassloader(deploymentClassLoader.getClassLoader())
-              .setEnableLazyInit(lazy).setDisableXmlValidations(disableXmlValidations).setServiceRepository(serviceRepository)
+              .setArtifactPlugins(artifactPlugins)
+              .setExecutionClassloader(deploymentClassLoader.getClassLoader())
+              .setEnableLazyInit(lazy)
+              .setDisableXmlValidations(disableXmlValidations)
+              .setServiceRepository(serviceRepository)
               .setExtensionModelLoaderRepository(extensionModelLoaderRepository)
               .setClassLoaderRepository(classLoaderRepository)
               .setArtifactDeclaration(descriptor.getArtifactDeclaration())

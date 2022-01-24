@@ -7,21 +7,25 @@
 
 package org.mule.runtime.module.deployment.internal;
 
-import static java.util.Optional.empty;
-import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.io.FilenameUtils.getBaseName;
-import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 
+import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toSet;
+
+import static org.apache.commons.io.FilenameUtils.getBaseName;
+import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
+
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
@@ -46,9 +50,9 @@ public class DomainBundleArchiveDeployer {
   protected static Logger LOGGER = LoggerFactory.getLogger(DomainBundleArchiveDeployer.class);
 
   private final DeploymentListener deploymentListener;
-  private final ArchiveDeployer<Domain> domainDeployer;
+  private final ArchiveDeployer<DomainDescriptor, Domain> domainDeployer;
   private final ObservableList<Domain> domains;
-  private final ArchiveDeployer<Application> applicationDeployer;
+  private final ArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer;
   private final ObservableList<Application> applications;
   private final DeploymentListener domainDeploymentListener;
   private final CompositeDeploymentListener applicationDeploymentListener;
@@ -66,9 +70,10 @@ public class DomainBundleArchiveDeployer {
    * @param applicationDeploymentListener
    * @param deploymentService
    */
-  public DomainBundleArchiveDeployer(DeploymentListener deploymentListener, ArchiveDeployer<Domain> domainDeployer,
+  public DomainBundleArchiveDeployer(DeploymentListener deploymentListener,
+                                     ArchiveDeployer<DomainDescriptor, Domain> domainDeployer,
                                      ObservableList<Domain> domains,
-                                     ArchiveDeployer<Application> applicationDeployer,
+                                     ArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer,
                                      ObservableList<Application> applications,
                                      DeploymentListener domainDeploymentListener,
                                      CompositeDeploymentListener applicationDeploymentListener,

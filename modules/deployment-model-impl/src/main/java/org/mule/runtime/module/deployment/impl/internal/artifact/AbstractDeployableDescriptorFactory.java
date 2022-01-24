@@ -7,10 +7,11 @@
 
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
+
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toSet;
 
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;

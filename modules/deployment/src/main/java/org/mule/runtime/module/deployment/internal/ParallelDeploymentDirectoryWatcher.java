@@ -7,14 +7,17 @@
 
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
+
 import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
-import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 
 import java.util.ArrayList;
@@ -36,10 +39,9 @@ public class ParallelDeploymentDirectoryWatcher extends DeploymentDirectoryWatch
 
   private Scheduler threadPoolExecutor;
 
-  public ParallelDeploymentDirectoryWatcher(
-                                            DomainBundleArchiveDeployer domainBundleDeployer,
-                                            ArchiveDeployer<Domain> domainArchiveDeployer,
-                                            ArchiveDeployer<Application> applicationArchiveDeployer,
+  public ParallelDeploymentDirectoryWatcher(DomainBundleArchiveDeployer domainBundleDeployer,
+                                            ArchiveDeployer<DomainDescriptor, Domain> domainArchiveDeployer,
+                                            ArchiveDeployer<ApplicationDescriptor, Application> applicationArchiveDeployer,
                                             ObservableList<Domain> domains, ObservableList<Application> applications,
                                             Supplier<SchedulerService> schedulerServiceSupplier, ReentrantLock deploymentLock) {
     super(domainBundleDeployer, domainArchiveDeployer, applicationArchiveDeployer, domains, applications,

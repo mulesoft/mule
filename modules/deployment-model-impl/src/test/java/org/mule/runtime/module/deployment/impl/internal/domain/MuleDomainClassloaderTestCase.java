@@ -7,18 +7,20 @@
 
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
+import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
+import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
+import static org.mule.tck.mockito.answer.BuilderAnswer.BUILDER_ANSWER;
+
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
+
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
-import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
-import static org.mule.tck.mockito.answer.BuilderAnswer.BUILDER_ANSWER;
 
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.lock.LockFactory;
@@ -29,6 +31,7 @@ import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
@@ -133,7 +136,8 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
                           List<ArtifactPlugin> artifactPlugins, ExtensionModelLoaderManager extensionModelLoaderManager,
                           LockFactory runtimeLockFactory) {
       super(descriptor, deploymentClassLoader, classLoaderRepository, serviceRepository, artifactPlugins,
-            extensionModelLoaderManager, runtimeLockFactory, mock(MemoryManagementService.class));
+            extensionModelLoaderManager, runtimeLockFactory, mock(MemoryManagementService.class),
+            mock(ArtifactConfigurationProcessor.class));
     }
 
     @Override

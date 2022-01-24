@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.deployment.impl.internal;
 
-import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
@@ -15,6 +14,8 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorF
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.applicationClassLoaderFactory;
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
+
+import static java.lang.Thread.currentThread;
 
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -29,6 +30,7 @@ import org.mule.runtime.core.internal.registry.SimpleRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepositoryFactory;
 import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilderFactory;
@@ -97,6 +99,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
   private final PluginDependenciesResolver pluginDependenciesResolver;
   private final ServiceRegistryDescriptorLoaderRepository descriptorLoaderRepository;
   private final RegionPluginClassLoadersFactory pluginClassLoadersFactory;
+  private final ArtifactConfigurationProcessor artifactConfigurationProcessor;
   private final AbstractDeployableDescriptorFactory<MuleApplicationModel, ApplicationDescriptor> toolingApplicationDescriptorFactory;
   private final ServerLockFactory runtimeLockFactory;
   private final MemoryManagementService memoryManagementService;
@@ -107,6 +110,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
   public static class Builder {
 
     private ModuleRepository moduleRepository;
+    private ArtifactConfigurationProcessor artifactConfigurationProcessor;
 
     /**
      * Configures the {@link ModuleRepository} to use
@@ -121,6 +125,13 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
       return this;
     }
 
+    public Builder artifactConfigurationProcessor(ArtifactConfigurationProcessor artifactConfigurationProcessor) {
+      checkArgument(artifactConfigurationProcessor != null, "artifactConfigurationProcessor cannot be null");
+
+      this.artifactConfigurationProcessor = artifactConfigurationProcessor;
+      return this;
+    }
+
     /**
      * Builds the desired instance
      *
@@ -132,7 +143,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
       }
 
       try {
-        return new MuleArtifactResourcesRegistry(moduleRepository);
+        return new MuleArtifactResourcesRegistry(moduleRepository, artifactConfigurationProcessor);
       } catch (RegistrationException e) {
         throw new MuleRuntimeException(e);
       }
@@ -142,7 +153,9 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
   /**
    * Creates a repository for resources required for mule artifacts.
    */
-  private MuleArtifactResourcesRegistry(ModuleRepository moduleRepository) throws RegistrationException {
+  private MuleArtifactResourcesRegistry(ModuleRepository moduleRepository,
+                                        ArtifactConfigurationProcessor artifactConfigurationProcessor)
+      throws RegistrationException {
     // Creates a registry to be used as an injector.
     super(null, null);
 
@@ -184,6 +197,9 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     domainClassLoaderBuilderFactory =
         new DomainClassLoaderBuilderFactory(containerClassLoader, domainClassLoaderFactory,
                                             pluginClassLoadersFactory);
+
+    this.artifactConfigurationProcessor = artifactConfigurationProcessor;
+
     ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory = new ServiceClassLoaderFactory();
     serviceManager =
         ServiceManager.create(new DefaultServiceDiscoverer(new FileSystemServiceProviderDiscoverer(containerClassLoader,
@@ -200,7 +216,8 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                              pluginDependenciesResolver, domainClassLoaderBuilderFactory,
                                              extensionModelLoaderManager, licenseValidator,
                                              runtimeLockFactory,
-                                             memoryManagementService);
+                                             memoryManagementService,
+                                             artifactConfigurationProcessor);
 
     DeployableArtifactClassLoaderFactory<PolicyTemplateDescriptor> policyClassLoaderFactory =
         trackDeployableArtifactClassLoaderFactory(new PolicyTemplateClassLoaderFactory());
@@ -215,7 +232,8 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                                        artifactPluginDescriptorLoader,
                                                        licenseValidator,
                                                        runtimeLockFactory,
-                                                       memoryManagementService);
+                                                       memoryManagementService,
+                                                       artifactConfigurationProcessor);
     toolingApplicationDescriptorFactory =
         new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
                                          artifactDescriptorValidatorBuilder);
@@ -319,6 +337,13 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
    */
   public PluginDependenciesResolver getPluginDependenciesResolver() {
     return pluginDependenciesResolver;
+  }
+
+  /**
+   * @return the processor to use for building the application model
+   */
+  public ArtifactConfigurationProcessor getArtifactConfigurationProcessor() {
+    return artifactConfigurationProcessor;
   }
 
   /**

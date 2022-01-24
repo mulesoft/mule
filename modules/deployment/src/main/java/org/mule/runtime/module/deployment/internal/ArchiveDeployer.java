@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.module.artifact.api.Artifact;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
@@ -22,7 +23,7 @@ import java.util.Properties;
  *
  * @param <T> type of the artifact to deploy
  */
-public interface ArchiveDeployer<T extends Artifact> {
+public interface ArchiveDeployer<D extends DeployableArtifactDescriptor, T extends Artifact<D>> {
 
   /**
    * Indicates if a previously failed artifact (zombie) configuration was updated on the file system.
@@ -46,7 +47,7 @@ public interface ArchiveDeployer<T extends Artifact> {
 
   Map<String, Map<URI, Long>> getArtifactsZombieMap();
 
-  void setArtifactFactory(ArtifactFactory<T> artifactFactory);
+  void setArtifactFactory(ArtifactFactory<D, T> artifactFactory);
 
   void undeployArtifactWithoutUninstall(T artifact);
 

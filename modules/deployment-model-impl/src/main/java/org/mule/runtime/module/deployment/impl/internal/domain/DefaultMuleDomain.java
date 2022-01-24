@@ -6,10 +6,6 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
-import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
@@ -21,6 +17,12 @@ import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
+
+import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
+
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
@@ -35,6 +37,7 @@ import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.InstallException;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
@@ -65,16 +68,19 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
   private final ClassLoaderRepository classLoaderRepository;
   private final LockFactory runtimeLockFactory;
   private final MemoryManagementService memoryManagementService;
+  private final ArtifactConfigurationProcessor artifactConfigurationProcessor;
 
   private MuleContextListener muleContextListener;
 
-  public DefaultMuleDomain(DomainDescriptor descriptor, ArtifactClassLoader deploymentClassLoader,
+  public DefaultMuleDomain(DomainDescriptor descriptor,
+                           ArtifactClassLoader deploymentClassLoader,
                            ClassLoaderRepository classLoaderRepository,
                            ServiceRepository serviceRepository,
                            List<ArtifactPlugin> artifactPlugins,
                            ExtensionModelLoaderManager extensionModelLoaderManager,
                            LockFactory runtimeLockFactory,
-                           MemoryManagementService memoryManagementService) {
+                           MemoryManagementService memoryManagementService,
+                           ArtifactConfigurationProcessor artifactConfigurationProcessor) {
     super("domain", "domain", deploymentClassLoader);
     this.classLoaderRepository = classLoaderRepository;
     this.descriptor = descriptor;
@@ -83,6 +89,7 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
     this.extensionModelLoaderManager = extensionModelLoaderManager;
     this.runtimeLockFactory = runtimeLockFactory;
     this.memoryManagementService = memoryManagementService;
+    this.artifactConfigurationProcessor = artifactConfigurationProcessor;
   }
 
   @Override
@@ -174,6 +181,8 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
           .setArtifactPlugins(artifactPlugins)
           .setExecutionClassloader(deploymentClassLoader.getClassLoader())
           .setArtifactInstallationDirectory(getArtifactInstallationDirectory())
+          // TODO check for policies and domains as well
+          .setArtifactConfigurationProcessor(artifactConfigurationProcessor)
           .setExtensionModelLoaderRepository(extensionModelLoaderManager)
           .setArtifactType(DOMAIN)
           .setEnableLazyInit(lazy)

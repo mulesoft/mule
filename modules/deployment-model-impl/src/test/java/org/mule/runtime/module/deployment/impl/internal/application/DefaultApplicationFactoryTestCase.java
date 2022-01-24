@@ -7,7 +7,12 @@
 
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
+import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
+
 import static java.util.Optional.empty;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
@@ -17,15 +22,13 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
-import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilder;
 import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilderFactory;
@@ -85,7 +88,8 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
                                     artifactPluginDescriptorLoader,
                                     discoverLicenseValidator(getClass().getClassLoader()),
                                     getRuntimeLockFactory(),
-                                    mock(MemoryManagementService.class));
+                                    mock(MemoryManagementService.class),
+                                    mock(ArtifactConfigurationProcessor.class));
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();

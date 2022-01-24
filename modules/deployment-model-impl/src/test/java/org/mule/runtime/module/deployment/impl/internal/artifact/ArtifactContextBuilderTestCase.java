@@ -7,6 +7,8 @@
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.CLASS_LOADER_REPOSITORY_CANNOT_BE_NULL;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.CLASS_LOADER_REPOSITORY_WAS_NOT_SET;
@@ -25,12 +27,18 @@ import static java.lang.Thread.currentThread;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.config.internal.ArtifactAstConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -61,13 +69,40 @@ public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void emptyBuilder() throws Exception {
+    ArtifactConfigurationProcessor artifactConfigurationProcessor = mock(ArtifactConfigurationProcessor.class);
+    when(artifactConfigurationProcessor.createArtifactContext(any()))
+        .thenAnswer(inv -> {
+          ArtifactContextConfiguration artifactContextConfiguration = inv.getArgument(0, ArtifactContextConfiguration.class);
+
+          ArtifactAstConfigurationBuilder configurationBuilder =
+              new ArtifactAstConfigurationBuilder(emptyArtifact(),
+                                                  artifactContextConfiguration.getArtifactProperties(),
+                                                  artifactContextConfiguration.getArtifactType(),
+                                                  artifactContextConfiguration.isEnableLazyInitialization());
+
+          artifactContextConfiguration.getServiceConfigurators().stream()
+              .forEach(configurationBuilder::addServiceConfigurator);
+          configurationBuilder.configure(artifactContextConfiguration.getMuleContext());
+
+          return configurationBuilder.createArtifactContext();
+        });
+
     MuleContext muleContext =
-        newBuilder(new TestServicesConfigurationBuilder()).setExecutionClassloader(currentThread().getContextClassLoader())
-            .setClassLoaderRepository(mock(ClassLoaderRepository.class)).build().getMuleContext();
+        newBuilder(new TestServicesConfigurationBuilder())
+            .setExecutionClassloader(currentThread().getContextClassLoader())
+            .setClassLoaderRepository(mock(ClassLoaderRepository.class))
+            .setArtifactConfigurationProcessor(artifactConfigurationProcessor)
+            .build().getMuleContext();
     assertThat(muleContext, notNullValue());
     assertThat(muleContext.isInitialised(), is(true));
-    muleContext.start();
-    assertThat(muleContext.isStarted(), is(true));
+
+    try {
+      muleContext.start();
+      assertThat(muleContext.isStarted(), is(true));
+    } finally {
+      muleContext.stop();
+      muleContext.dispose();
+    }
   }
 
   @Test
@@ -125,9 +160,21 @@ public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
   @Story(FEATURE_FLAGGING)
   @Issue("MULE-19402")
   public void buildSettingLegacyFeatureFlag() throws Exception {
+    ArtifactConfigurationProcessor artifactConfigurationProcessor = mock(ArtifactConfigurationProcessor.class);
+    when(artifactConfigurationProcessor.createArtifactContext(any()))
+        .thenAnswer(inv -> {
+          ArtifactContextConfiguration configBuilder = inv.getArgument(0, ArtifactContextConfiguration.class);
+
+          ArtifactContext artifactContext = mock(ArtifactContext.class);
+          when(artifactContext.getRegistry())
+              .thenReturn(((MuleContextWithRegistry) configBuilder.getMuleContext()).getRegistry().get(OBJECT_REGISTRY));
+          return artifactContext;
+        });
+
     ArtifactContext artifactContext = newBuilder(new TestServicesConfigurationBuilder())
         .setExecutionClassloader(currentThread().getContextClassLoader())
         .setClassLoaderRepository(mock(ClassLoaderRepository.class))
+        .setArtifactConfigurationProcessor(artifactConfigurationProcessor)
         .build();
     FeatureFlaggingService featureFlaggingService = (FeatureFlaggingService) artifactContext.getRegistry()
         .lookupByName(FEATURE_FLAGGING_SERVICE_KEY).get();

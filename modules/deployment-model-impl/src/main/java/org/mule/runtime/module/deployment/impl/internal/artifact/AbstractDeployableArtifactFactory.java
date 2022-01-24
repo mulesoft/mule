@@ -12,6 +12,7 @@ import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.File;
@@ -24,14 +25,17 @@ import java.util.Properties;
  * <p/>
  * Handles license validation for the artifact plugins.
  * 
+ * @param <D> the type of the {@link DeployableArtifactDescriptor}
  * @param <T> the type of the {@link DeployableArtifact}
  * @since 4.
  */
-public abstract class AbstractDeployableArtifactFactory<T extends DeployableArtifact> implements ArtifactFactory<T> {
+public abstract class AbstractDeployableArtifactFactory<D extends DeployableArtifactDescriptor, T extends DeployableArtifact<D>>
+    implements ArtifactFactory<D, T> {
 
   private final LicenseValidator licenseValidator;
   private final LockFactory runtimeLockFactory;
-  protected final MemoryManagementService memoryManagementService;
+  private final MemoryManagementService memoryManagementService;
+  private final ArtifactConfigurationProcessor artifactConfigurationProcessor;
 
   /**
    * Creates a new {@link AbstractDeployableArtifactFactory}
@@ -43,10 +47,12 @@ public abstract class AbstractDeployableArtifactFactory<T extends DeployableArti
    */
   public AbstractDeployableArtifactFactory(LicenseValidator licenseValidator,
                                            LockFactory runtimeLockFactory,
-                                           MemoryManagementService memoryManagementService) {
+                                           MemoryManagementService memoryManagementService,
+                                           ArtifactConfigurationProcessor artifactConfigurationProcessor) {
     this.licenseValidator = licenseValidator;
     this.runtimeLockFactory = runtimeLockFactory;
     this.memoryManagementService = memoryManagementService;
+    this.artifactConfigurationProcessor = artifactConfigurationProcessor;
   }
 
   @Override
@@ -81,6 +87,14 @@ public abstract class AbstractDeployableArtifactFactory<T extends DeployableArti
    */
   public LockFactory getRuntimeLockFactory() {
     return runtimeLockFactory;
+  }
+
+  public MemoryManagementService getMemoryManagementService() {
+    return memoryManagementService;
+  }
+
+  public ArtifactConfigurationProcessor getArtifactConfigurationProcessor() {
+    return artifactConfigurationProcessor;
   }
 
 }

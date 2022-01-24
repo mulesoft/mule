@@ -110,6 +110,8 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
         newBuilder().setArtifactType(POLICY)
             .setArtifactProperties(copy(parametrization.getParameters()))
             .setArtifactName(parametrization.getId())
+            // TODO check for policies and domains as well
+            // .setArtifactConfigurationProcessor(descriptor.getArtifactConfigurationProcessor())
             .setConfigurationFiles(parametrization.getConfig().getAbsolutePath())
             .setExecutionClassloader(template.getArtifactClassLoader().getClassLoader())
             .setServiceRepository(serviceRepository)

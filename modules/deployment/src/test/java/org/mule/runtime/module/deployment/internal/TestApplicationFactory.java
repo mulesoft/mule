@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static org.mockito.Mockito.mock;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.applicationClassLoaderFactory;
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.regionPluginClassLoadersFactory;
+import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
+
+import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
@@ -70,7 +72,8 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
           pluginDependenciesResolver, artifactPluginDescriptorLoader,
           discoverLicenseValidator(TestApplicationFactory.class.getClassLoader()),
           RuntimeLockFactoryUtil.getRuntimeLockFactory(),
-          mock(MemoryManagementService.class));
+          mock(MemoryManagementService.class),
+          serializedAstWithFallbackArtifactConfigurationProcessor());
   }
 
   public static TestApplicationFactory createTestApplicationFactory(DomainManager domainManager,
