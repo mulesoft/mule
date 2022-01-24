@@ -222,6 +222,7 @@ public class MuleProperties
     public static final String MULE_DISABLE_DECODE_URL = SYSTEM_PROPERTY_PREFIX + "http.decodeUrl.disable";
     //MULE-19941
     public static final String MULE_DISABLE_SET_VARIABLE_INHERITED_MIME_TYPE = SYSTEM_PROPERTY_PREFIX + "setVariable.inheritedMimeType.disable";
+    public static final String MULE_CXF_PROXY_DISABLE_BINDING_OPERATION_INFO_OVERWRITE = SYSTEM_PROPERTY_PREFIX + "cxf.proxy.bindingOperationInfo.overwrite.disable";
 
 
 }
