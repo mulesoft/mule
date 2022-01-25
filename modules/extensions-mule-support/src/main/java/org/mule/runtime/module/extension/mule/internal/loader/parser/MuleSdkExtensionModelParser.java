@@ -69,7 +69,7 @@ class MuleSdkExtensionModelParser implements ExtensionModelParser {
 
   @Override
   public String getVendor() {
-    //TODO: define syntax and default
+    // TODO: define syntax and default
     return MULESOFT;
   }
 

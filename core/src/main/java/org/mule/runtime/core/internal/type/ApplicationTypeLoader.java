@@ -18,7 +18,7 @@ public class ApplicationTypeLoader implements TypeLoader {
 
   @Override
   public Optional<MetadataType> load(String typeIdentifier) {
-    //TODO: implement app type catalog lookup. Should it include extension exported types?
+    // TODO: implement app type catalog lookup. Should it include extension exported types?
     return primitivesTypeLoader.load(typeIdentifier);
   }
 }

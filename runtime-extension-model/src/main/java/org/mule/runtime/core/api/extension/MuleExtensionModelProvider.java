@@ -13,6 +13,7 @@ import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.BOOLEAN;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.NUMBER;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.STRING;
+import static org.mule.runtime.api.util.MuleSystemProperties.FORCE_EXTENSION_VALIDATION_PROPERTY_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
 
@@ -22,9 +23,11 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
@@ -78,15 +81,20 @@ public final class MuleExtensionModelProvider {
   }
 
   private static final LazyValue<ExtensionModel> EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
-      .create(new DefaultExtensionLoadingContext(new MuleExtensionModelDeclarer().createExtensionModel(), loadingRequest())));
+      .create(contextFor(new MuleExtensionModelDeclarer().createExtensionModel())));
 
   private static final LazyValue<ExtensionModel> TLS_EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
-      .create(new DefaultExtensionLoadingContext(new TlsExtensionModelDeclarer().createExtensionModel(), loadingRequest())));
+      .create(contextFor(new TlsExtensionModelDeclarer().createExtensionModel())));
 
   private static final LazyValue<ExtensionModel> APP_OPERATION_EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
-      .create(new DefaultExtensionLoadingContext(
-                                                 new MuleOperationExtensionModelDeclarer().declareExtensionModel(),
-                                                 loadingRequest())));
+      .create(contextFor(new MuleOperationExtensionModelDeclarer().declareExtensionModel())));
+
+  private static ExtensionLoadingContext contextFor(ExtensionDeclarer declarer) {
+    ExtensionLoadingContext context = new DefaultExtensionLoadingContext(declarer, loadingRequest());
+    context.addParameter(FORCE_EXTENSION_VALIDATION_PROPERTY_NAME, true);
+
+    return context;
+  }
 
   private static ExtensionModelLoadingRequest loadingRequest() {
     return ExtensionModelLoadingRequest.builder(MuleExtensionModelProvider.class.getClassLoader(), new NullDslResolvingContext())

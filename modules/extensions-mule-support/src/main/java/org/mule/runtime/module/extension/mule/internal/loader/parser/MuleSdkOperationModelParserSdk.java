@@ -65,11 +65,11 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
     return typeLoader.load(type, mimeType)
         .map(mt -> new DefaultOutputModelParser(mt, false))
         .orElseThrow(() -> new IllegalModelDefinitionException(format(
-            "Component <%s:%s> defines %s as '%s' with mediaType '%s', but such type is not defined in the application",
-            outputTypeElement.getIdentifier().getNamespace(),
-            outputTypeElement.getIdentifier().getName(),
-            outputTypeElement.getIdentifier().getName(),
-            mimeType)));
+                                                                      "Component <%s:%s> defines %s as '%s' with mediaType '%s', but such type is not defined in the application",
+                                                                      outputTypeElement.getIdentifier().getNamespace(),
+                                                                      outputTypeElement.getIdentifier().getName(),
+                                                                      outputTypeElement.getIdentifier().getName(),
+                                                                      mimeType)));
   }
 
   private Optional<String> getMimeTypeFromOutputType(ComponentAst outputTypeElement) {
@@ -238,11 +238,13 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
     ComponentAst output = operation.directChildrenStreamByIdentifier(null, "output")
         .findFirst()
         .orElseThrow(() -> new IllegalOperationModelDefinitionException(format(
-            "Operation '%s' is missing its <output> declaration", getName())));
+                                                                               "Operation '%s' is missing its <output> declaration",
+                                                                               getName())));
 
     return output.directChildrenStreamByIdentifier(null, elementName)
         .findFirst()
         .orElseThrow(() -> new IllegalOperationModelDefinitionException(format(
-            "Operation '%s' is missing its <%s> declaration", getName(), elementName)));
-  }                     
+                                                                               "Operation '%s' is missing its <%s> declaration",
+                                                                               getName(), elementName)));
+  }
 }

@@ -15,26 +15,23 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.BOO
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULESOFT_VENDOR;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
+import static org.mule.runtime.internal.dsl.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OPERATION_DEF_STEREOTYPE;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OUTPUT_ATTRIBUTES_STEREOTYPE;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OUTPUT_PAYLOAD_STEREOTYPE;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OUTPUT_STEREOTYPE;
-import static org.mule.runtime.internal.dsl.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
 
 import org.mule.metadata.api.annotation.DefaultValueAnnotation;
 import org.mule.metadata.api.annotation.TypeAliasAnnotation;
 import org.mule.metadata.api.annotation.TypeAnnotation;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
-import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.ExpressionSupport;
-import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
-import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.NestedComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
-import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
@@ -78,12 +75,12 @@ class MuleOperationExtensionModelDeclarer {
   }
 
   private void declareOperationDef(ExtensionDeclarer declarer) {
-    ConstructDeclarer construct = declarer.withConstruct("def")
+    ConstructDeclarer def = declarer.withConstruct("def")
         .describedAs("Defines an operation")
         .allowingTopLevelDefinition()
         .withStereotype(OPERATION_DEF_STEREOTYPE);
 
-    ParameterGroupDeclarer parameters = construct.onDefaultParameterGroup();
+    ParameterGroupDeclarer parameters = def.onDefaultParameterGroup();
     parameters.withRequiredParameter("name")
         .describedAs("The operation's name")
         .withDisplayModel(DisplayModel.builder()
@@ -132,132 +129,108 @@ class MuleOperationExtensionModelDeclarer {
             .summary("The operation's name in the GUI")
             .build());
 
-    addParametersDeclaration(construct);
-    declareOutputConstruct(declarer);
+    addParametersDeclaration(def);
+    declareOutputConstruct(def);
 
-    construct.withChain("body")
+    def.withChain("body")
         .describedAs("The operations that makes for the operation's implementation")
         .setRequired(true);
   }
 
-  private void declareOutputConstruct(ExtensionDeclarer declarer) {
-    // TODO: payload-type and attribute-types should be a nested constructs into the parent "output" one but ExtensionModel
-    // doesn't have that capability yet. Same affects the XML SDK and Batch Extension Models. Everybody lies.
-    ComponentDeclarer outputConstruct = declarer.withConstruct("output")
+  private void declareOutputConstruct(ConstructDeclarer def) {
+    NestedComponentDeclarer outputConstruct = def.withComponent("output")
         .describedAs("Defines a operation's output types.")
-        .withStereotype(OUTPUT_STEREOTYPE);
+        .withStereotype(OUTPUT_STEREOTYPE)
+        .withMinOccurs(1)
+        .withMaxOccurs(1);
 
-    outputConstruct.withComponent("payload-type-component")
-        .withAllowedStereotypes(OUTPUT_PAYLOAD_STEREOTYPE)
-        .describedAs("Type definition for the operation's output payload");
-
-    declareOutputTypeParameters(declarer.withConstruct("payload-type")
+    NestedComponentDeclarer payloadType = outputConstruct.withComponent("payload-type")
         .describedAs("Type definition for the operation's output payload")
         .withStereotype(OUTPUT_PAYLOAD_STEREOTYPE)
-        .onDefaultParameterGroup(), "payload");
+        .withMinOccurs(1)
+        .withMaxOccurs(1);
 
-    outputConstruct.withOptionalComponent("attributes-type-component")
-        .withAllowedStereotypes(OUTPUT_ATTRIBUTES_STEREOTYPE)
-        .describedAs("Type definition for the operation's output attributes");
+    declareOutputTypeParameters(payloadType, "payload");
 
-    declareOutputTypeParameters(declarer.withConstruct("attributes-type")
+    NestedComponentDeclarer attributesType = outputConstruct.withOptionalComponent("attributes-type")
         .describedAs("Type definition for the operation's output attributes")
         .withStereotype(OUTPUT_ATTRIBUTES_STEREOTYPE)
-        .onDefaultParameterGroup(), "attributes");
+        .withMinOccurs(0)
+        .withMaxOccurs(1);
+
+    declareOutputTypeParameters(attributesType, "attributes");
   }
 
-  private ParameterGroupDeclarer declareOutputTypeParameters(ParameterGroupDeclarer group, String type) {
-    group.withRequiredParameter("type")
-        .describedAs("The output " + type + " type")
+  private void declareOutputTypeParameters(NestedComponentDeclarer component, String outputRole) {
+    component.onDefaultParameterGroup().withRequiredParameter("type")
+        .describedAs("The output " + outputRole + " type")
         .withDisplayModel(DisplayModel.builder()
-            .displayName(capitalize(type) + " type")
-            .summary("The output " + type + " type")
+            .displayName(capitalize(outputRole) + " type")
+            .summary("The output " + outputRole + " type")
             .example(TYPE_EXAMPLE)
             .build())
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED);
-
-    group.withOptionalParameter("mimeType")
-        .describedAs("The value media type")
-        .withDisplayModel(DisplayModel.builder()
-            .displayName("Media Type")
-            .summary("The value media type")
-            .example("application/json")
-            .build())
-        .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED);
-
-    return group;
   }
 
-  private void addParametersDeclaration(ParameterizedDeclarer declarer) {
-    declarer.onDefaultParameterGroup().withOptionalParameter("parameters")
-        .describedAs("The operation's parameters")
-        .withExpressionSupport(NOT_SUPPORTED)
-        .ofType(getOperationParametersArrayType())
-        .withDsl(ParameterDslConfiguration.builder()
-            .allowsInlineDefinition(true)
-            .allowsReferences(false)
-            .allowTopLevelDefinition(false)
-            .build());
-  }
-
-  private ArrayType getOperationParametersArrayType() {
-    return BASE_TYPE_BUILDER.arrayType()
-        .of(getOperationParameterMetadataType())
-        .description("Groups the operation's parameters")
+  private DisplayModel display(String displayName, String summary) {
+    return DisplayModel.builder()
+        .displayName(displayName)
+        .summary(summary)
         .build();
   }
 
-  private MetadataType getOperationParameterMetadataType() {
-    ObjectTypeBuilder param = BASE_TYPE_BUILDER.objectType()
-        .description("Defines an operation parameter")
-        .id("<operation:parameter>")
-        .with(new TypeDslAnnotation(true, false, "", ""))
-        .with(new TypeAliasAnnotation("parameter"));
+  private DisplayModel display(String displayName, String summary, String example) {
+    return DisplayModel.builder()
+        .displayName(displayName)
+        .summary(summary)
+        .example(example)
+        .build();
+  }
 
-    param.addField()
-        .key("name")
-        .description("The parameter's name")
-        .required()
-        .value(STRING_TYPE)
-        .with(displayAnnotation("Parameter name", "The parameter's name"))
-        .with(expressionSupport(NOT_SUPPORTED));
+  private void addParametersDeclaration(ConstructDeclarer def) {
+    NestedComponentDeclarer parametersDef = def.withOptionalComponent("parameters")
+        .describedAs("The operation's parameters")
+        .withMinOccurs(0)
+        .withMaxOccurs(1);
 
-    param.addField()
-        .key("description")
-        .description("Detailed description of the parameter, it's semantics, usage and effects")
-        .required(false)
-        .value(STRING_TYPE)
-        .with(displayAnnotation("Parameter description",
-                                "Detailed description of the parameter, it's semantics, usage and effects"))
-        .with(expressionSupport(NOT_SUPPORTED))
-        .with(new LayoutTypeAnnotation(LayoutModel.builder().asText().build()));
+    NestedComponentDeclarer parameterDef = parametersDef.withComponent("parameter")
+        .describedAs("Defines an operation parameter")
+        .withMinOccurs(1)
+        .withMaxOccurs(null);
 
-    param.addField()
-        .key("summary")
-        .description("A brief description of the parameter")
-        .required(false)
-        .value(STRING_TYPE)
-        .with(displayAnnotation("Summary", "A brief description of the parameter"))
-        .with(expressionSupport(NOT_SUPPORTED));
+    ParameterGroupDeclarer parameters = parameterDef.onDefaultParameterGroup();
+    parameters.withRequiredParameter("name")
+        .describedAs("The parameter's name")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .withDisplayModel(display("Parameter name", "The parameter's name"));
 
-    param.addField()
-        .key("type")
-        .description("The parameter's type")
-        .required()
-        .value(STRING_TYPE)
-        .with(displayAnnotation("Parameter type", "The Parameter's type", TYPE_EXAMPLE))
-        .with(expressionSupport(NOT_SUPPORTED));
+    parameters.withOptionalParameter("description")
+        .describedAs("Detailed description of the parameter, it's semantics, usage and effects")
+        .ofType(STRING_TYPE)
+        .withDisplayModel(display("Parameter description",
+            "Detailed description of the parameter, it's semantics, usage and effects"))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .withLayout(LayoutModel.builder().asText().build());
 
-    param.addField()
-        .key("optional")
-        .description("Indicates that the parameter is optional")
-        .required(false)
-        .value(getOptionalDeclarationMetadataType())
-        .with(displayAnnotation("Optional", "Indicates that the parameter is optional"))
-        .with(expressionSupport(NOT_SUPPORTED))
-        .with(new TypeDslAnnotation(true, false, "", ""));
+    parameters.withOptionalParameter("summary")
+        .describedAs("A brief description of the parameter")
+        .ofType(STRING_TYPE)
+        .withDisplayModel(display("Summary", "A brief description of the parameter"))
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    parameters.withOptionalParameter("type")
+        .describedAs("The parameter's type")
+        .ofType(STRING_TYPE)
+        .withDisplayModel(display("Parameter type", "The Parameter's type", TYPE_EXAMPLE))
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    parameters.withOptionalParameter("optional")
+        .describedAs("Indicates that the parameter is optional")
+        .withExpressionSupport(NOT_SUPPORTED)
+        .withDisplayModel(display("Optional", "Indicates that the parameter is optional"))
+        .value(getOptionalDeclarationMetadataType());
 
     param.addField()
         .key("expressionSupport")
@@ -322,7 +295,7 @@ class MuleOperationExtensionModelDeclarer {
         .required(false)
         .with(expressionSupport(NOT_SUPPORTED))
         .with(displayAnnotation("Exclusive Optionals",
-                                "References other optional parameters which cannot be set at the same time as this one"));
+            "References other optional parameters which cannot be set at the same time as this one"));
 
     return builder.build();
   }

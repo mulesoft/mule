@@ -106,7 +106,8 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
   public MetadataType getType() {
     final String type = getParameter(parameter, "type");
     return typeLoader.load(type).orElseThrow(() -> new IllegalModelDefinitionException(
-        format("Parameter '%s' references unknown type '%s'", getName(), type)));
+                                                                                       format("Parameter '%s' references unknown type '%s'",
+                                                                                              getName(), type)));
   }
 
   @Override

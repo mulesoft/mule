@@ -22,10 +22,9 @@ public class MuleSdkExtensionModelParserFactory implements ExtensionModelParserF
   @Override
   public ExtensionModelParser createParser(ExtensionLoadingContext context) {
     return new MuleSdkExtensionModelParser(
-        getProperty(context, MULE_SDK_EXTENSION_NAME_PROPERTY_NAME),
-        getProperty(context, MULE_SDK_ARTIFACT_AST_PROPERTY_NAME),
-        getProperty(context, MULE_SDK_TYPE_LOADER_PROPERTY_NAME)
-        );
+                                           getProperty(context, MULE_SDK_EXTENSION_NAME_PROPERTY_NAME),
+                                           getProperty(context, MULE_SDK_ARTIFACT_AST_PROPERTY_NAME),
+                                           getProperty(context, MULE_SDK_TYPE_LOADER_PROPERTY_NAME));
   }
 
   private <T> T getProperty(ExtensionLoadingContext context, String propertyName) {

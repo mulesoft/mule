@@ -57,11 +57,12 @@ public class ApplicationAsExtensionLoaderTestCase extends MuleArtifactFunctional
 
     ArtifactAst ast = parser.parse(artifactName, in);
 
-    return getLoaderById(MULE_SDK_LOADER_ID).loadExtensionModel(builder(getExecutionClassLoader(), getDefault(extensionManager.getExtensions()))
-        .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, artifactName)
-        .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
-        .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader())
-        .build());
+    return getLoaderById(MULE_SDK_LOADER_ID)
+        .loadExtensionModel(builder(getExecutionClassLoader(), getDefault(extensionManager.getExtensions()))
+            .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, artifactName)
+            .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
+            .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader())
+            .build());
   }
 
 }

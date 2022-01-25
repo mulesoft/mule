@@ -34,8 +34,7 @@ class MuleSdkParameterGroupModelParser implements ParameterGroupModelParser {
   private List<ParameterModelParser> doParserParameters(List<ComponentAst> parameters, TypeLoader typeLoader) {
     return unmodifiableList(parameters.stream()
         .map(p -> new MuleSdkParameterModelParserSdk(p, typeLoader))
-        .collect(toList())
-    );
+        .collect(toList()));
   }
 
   @Override
