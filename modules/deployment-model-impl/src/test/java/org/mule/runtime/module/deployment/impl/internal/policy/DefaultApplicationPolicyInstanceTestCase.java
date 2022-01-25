@@ -86,7 +86,7 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
       applicationPolicyInstance.initialise();
     } catch (InitialisationException e) {
       // Initialization is expected to fail because of missing context
-      // But the data to do the assertion on mut have been called already
+      // But the data to do the assertion on must already have been called
     }
 
     verify(muleContextListener).onCreation(muleContextCaptor.capture());

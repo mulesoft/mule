@@ -26,7 +26,7 @@ public interface ArtifactConfigurationProcessor {
    * 
    * @return an {@link ArtifactConfigurationProcessor} discovered using SPI.
    * 
-   * @deprecated Pass the instance it use instead of relying on SPI for discovery.
+   * @deprecated Pass the instance to use instead of relying on SPI for discovery.
    */
   @Deprecated
   static ArtifactConfigurationProcessor discover() {
