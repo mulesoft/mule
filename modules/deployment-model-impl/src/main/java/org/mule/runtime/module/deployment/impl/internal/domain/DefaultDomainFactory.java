@@ -64,6 +64,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
    *                                        depends. Non null.
    * @param domainClassLoaderBuilderFactory creates builders to build the classloaders for each domain. Non null.
    * @param extensionModelLoaderManager     manager capable of resolve {@link ExtensionModel extension models}. Non null.
+   * @param artifactConfigurationProcessor  the processor to use for building the application model. Non null.
    */
   public DefaultDomainFactory(DomainDescriptorFactory domainDescriptorFactory,
                               DomainManager domainManager,

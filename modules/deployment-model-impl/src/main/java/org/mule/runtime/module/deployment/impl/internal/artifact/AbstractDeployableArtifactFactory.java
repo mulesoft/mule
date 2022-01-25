@@ -40,10 +40,11 @@ public abstract class AbstractDeployableArtifactFactory<D extends DeployableArti
   /**
    * Creates a new {@link AbstractDeployableArtifactFactory}
    * 
-   * @param licenseValidator        the license validator to use for plugins.
-   * @param runtimeLockFactory      {@link LockFactory} for Runtime, a unique and shared lock factory to be used between different
-   *                                artifacts.
-   * @param memoryManagementService the memory management service.
+   * @param licenseValidator               the license validator to use for plugins.
+   * @param runtimeLockFactory             {@link LockFactory} for Runtime, a unique and shared lock factory to be used between
+   *                                       different artifacts.
+   * @param memoryManagementService        the memory management service.
+   * @param artifactConfigurationProcessor the processor to use for building the application model.
    */
   public AbstractDeployableArtifactFactory(LicenseValidator licenseValidator,
                                            LockFactory runtimeLockFactory,
@@ -89,10 +90,16 @@ public abstract class AbstractDeployableArtifactFactory<D extends DeployableArti
     return runtimeLockFactory;
   }
 
+  /**
+   * @return the memory management service.
+   */
   public MemoryManagementService getMemoryManagementService() {
     return memoryManagementService;
   }
 
+  /**
+   * @return the processor to use for building the application model.
+   */
   public ArtifactConfigurationProcessor getArtifactConfigurationProcessor() {
     return artifactConfigurationProcessor;
   }

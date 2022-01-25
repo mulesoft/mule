@@ -34,6 +34,7 @@ public class DefaultPolicyInstanceProviderFactory implements PolicyInstanceProvi
    * @param classLoaderRepository          contains the registered classloaders that can be used to load serialized classes. Non
    *                                       null.
    * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
+   * @param artifactConfigurationProcessor the processor to use for building the application model. Non null.
    */
   public DefaultPolicyInstanceProviderFactory(ServiceRepository serviceRepository,
                                               ClassLoaderRepository classLoaderRepository,

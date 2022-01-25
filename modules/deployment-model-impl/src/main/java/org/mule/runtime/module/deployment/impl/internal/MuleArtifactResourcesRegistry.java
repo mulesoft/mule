@@ -125,6 +125,14 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
       return this;
     }
 
+    /**
+     * Configures the {@link ArtifactConfigurationProcessor} to use.
+     * 
+     * @param artifactConfigurationProcessor the processor to use for building the application model.
+     * @return the same builder instance
+     * 
+     * @since 4.5
+     */
     public Builder artifactConfigurationProcessor(ArtifactConfigurationProcessor artifactConfigurationProcessor) {
       checkArgument(artifactConfigurationProcessor != null, "artifactConfigurationProcessor cannot be null");
 

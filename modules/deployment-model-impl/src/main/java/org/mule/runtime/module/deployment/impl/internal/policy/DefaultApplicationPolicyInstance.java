@@ -91,6 +91,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
    * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
    * @param muleContextListener            the listener to execute for specific events that occur on the {@link MuleContext} of
    *                                       the policy. May be {@code null}.
+   * @param artifactConfigurationProcessor the processor to use for building the application model. Non null.
    */
   public DefaultApplicationPolicyInstance(Application application, PolicyTemplate template,
                                           PolicyParametrization parametrization,

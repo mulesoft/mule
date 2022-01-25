@@ -171,6 +171,14 @@ public class ArtifactContextBuilder {
     return this;
   }
 
+  /**
+   * Configures the {@link ArtifactConfigurationProcessor} to use.
+   * 
+   * @param artifactConfigurationProcessor the processor to use for building the application model.
+   * @return the builder
+   * 
+   * @since 4.5
+   */
   public ArtifactContextBuilder setArtifactConfigurationProcessor(ArtifactConfigurationProcessor artifactConfigurationProcessor) {
     this.artifactConfigurationProcessor = artifactConfigurationProcessor;
     return this;
