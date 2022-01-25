@@ -6,19 +6,21 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static java.lang.Boolean.valueOf;
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Arrays.stream;
-import static java.util.Optional.ofNullable;
-import static org.apache.commons.io.FileUtils.deleteDirectory;
-import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
+
+import static java.lang.Boolean.valueOf;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.Optional.ofNullable;
+
+import static org.apache.commons.io.FileUtils.deleteDirectory;
+import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
@@ -49,7 +51,8 @@ import org.slf4j.LoggerFactory;
  * Deployer of an artifact within mule container. - Keeps track of deployed artifacts - Avoid already deployed artifacts to be
  * redeployed - Deploys, undeploys, redeploys packaged and exploded artifacts
  */
-public class DefaultArchiveDeployer<T extends DeployableArtifact> implements ArchiveDeployer<T> {
+public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T extends DeployableArtifact<D>>
+    implements ArchiveDeployer<D, T> {
 
   public static final String ARTIFACT_NAME_PROPERTY = "artifactName";
   public static final String JAR_FILE_SUFFIX = ".jar";
@@ -63,13 +66,13 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   private final File artifactDir;
   private final ObservableList<T> artifacts;
   private final ArtifactDeploymentTemplate deploymentTemplate;
-  private AbstractDeployableArtifactFactory<T> artifactFactory;
+  private AbstractDeployableArtifactFactory<D, T> artifactFactory;
   private DeploymentListener deploymentListener = new NullDeploymentListener();
   private final MuleContextListenerFactory muleContextListenerFactory;
 
 
-  public DefaultArchiveDeployer(final ArtifactDeployer deployer,
-                                final AbstractDeployableArtifactFactory artifactFactory,
+  public DefaultArchiveDeployer(final ArtifactDeployer<T> deployer,
+                                final AbstractDeployableArtifactFactory<D, T> artifactFactory,
                                 final ObservableList<T> artifacts,
                                 ArtifactDeploymentTemplate deploymentTemplate,
                                 MuleContextListenerFactory muleContextListenerFactory) {
@@ -171,12 +174,12 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   @Override
-  public void setArtifactFactory(final ArtifactFactory<T> artifactFactory) {
+  public void setArtifactFactory(final ArtifactFactory<D, T> artifactFactory) {
     if (!(artifactFactory instanceof AbstractDeployableArtifactFactory)) {
       throw new IllegalArgumentException("artifactFactory is expected to be of type "
           + AbstractDeployableArtifactFactory.class.getName());
     }
-    this.artifactFactory = (AbstractDeployableArtifactFactory<T>) artifactFactory;
+    this.artifactFactory = (AbstractDeployableArtifactFactory<D, T>) artifactFactory;
   }
 
   @Override

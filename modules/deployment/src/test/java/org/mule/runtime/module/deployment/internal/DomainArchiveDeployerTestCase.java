@@ -6,19 +6,23 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
+
 import static java.util.Optional.empty;
+
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
 
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -32,6 +36,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -56,13 +61,13 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase {
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   @Mock(lenient = true)
-  private ArchiveDeployer<Domain> mockDomainDeployer;
+  private ArchiveDeployer<DomainDescriptor, Domain> mockDomainDeployer;
 
   @Mock(lenient = true)
   private Domain mockDomain;
 
   @Mock(lenient = true)
-  private ArchiveDeployer<Application> mockApplicationDeployer;
+  private ArchiveDeployer<ApplicationDescriptor, Application> mockApplicationDeployer;
 
   @Mock(lenient = true)
   private DeploymentService mockDeploymentService;

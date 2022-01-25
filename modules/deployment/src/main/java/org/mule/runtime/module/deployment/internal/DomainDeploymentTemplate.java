@@ -6,16 +6,20 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static java.lang.String.valueOf;
-import static java.util.Optional.of;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DEPLOYMENT_FAILED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
-import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
-import org.mule.runtime.module.deployment.api.DeploymentService;
+
+import static java.lang.String.valueOf;
+import static java.util.Collections.emptyList;
+import static java.util.Optional.of;
+
 import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.artifact.api.Artifact;
+import org.mule.runtime.module.deployment.api.DeploymentService;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -29,13 +33,14 @@ import java.util.Properties;
  */
 public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplate {
 
-  private Collection<Application> domainApplications = Collections.emptyList();
+  private Collection<Application> domainApplications = emptyList();
   private Map<Application, ApplicationStatus> appStatusPreRedeployment;
-  private final DefaultArchiveDeployer<Application> applicationDeployer;
+  private final DefaultArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer;
   private final DeploymentService deploymentservice;
   private final CompositeDeploymentListener applicationDeploymentListener;
 
-  public DomainDeploymentTemplate(DefaultArchiveDeployer<Application> applicationDeployer, DeploymentService deploymentservice,
+  public DomainDeploymentTemplate(DefaultArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer,
+                                  DeploymentService deploymentservice,
                                   CompositeDeploymentListener applicationDeploymentListener) {
     this.applicationDeployer = applicationDeployer;
     this.deploymentservice = deploymentservice;

@@ -45,7 +45,6 @@ import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.policy.PolicyProvider;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
@@ -97,6 +96,7 @@ public class ArtifactContextBuilder {
 
   private List<ArtifactPlugin> artifactPlugins = new ArrayList<>();
   private ArtifactType artifactType = APP;
+  private ArtifactConfigurationProcessor artifactConfigurationProcessor;
   private String[] configurationFiles = new String[0];
   private ArtifactDeclaration artifactDeclaration;
   private Map<String, String> artifactProperties = new HashMap<>();
@@ -168,6 +168,19 @@ public class ArtifactContextBuilder {
    */
   public ArtifactContextBuilder setDataFolderName(String folderName) {
     this.dataFolderName = folderName;
+    return this;
+  }
+
+  /**
+   * Configures the {@link ArtifactConfigurationProcessor} to use.
+   * 
+   * @param artifactConfigurationProcessor the processor to use for building the application model.
+   * @return the builder
+   * 
+   * @since 4.5
+   */
+  public ArtifactContextBuilder setArtifactConfigurationProcessor(ArtifactConfigurationProcessor artifactConfigurationProcessor) {
+    this.artifactConfigurationProcessor = artifactConfigurationProcessor;
     return this;
   }
 
@@ -420,9 +433,6 @@ public class ArtifactContextBuilder {
                                                                       extensionManagerFactory));
         builders.add(createConfigurationBuilderFromApplicationProperties());
 
-        // TODO MULE-14289 (elrodro83) pass this object to the builder instead of looking it up here
-        ArtifactConfigurationProcessor artifactConfigurationProcessor = new SpiServiceRegistry()
-            .lookupProvider(ArtifactConfigurationProcessor.class, ArtifactConfigurationProcessor.class.getClassLoader());
         AtomicReference<ArtifactContext> artifactContext = new AtomicReference<>();
         builders.add(new ConfigurationBuilder() {
 

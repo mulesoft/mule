@@ -109,6 +109,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
@@ -134,6 +135,7 @@ import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilde
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultMuleDomain;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory;
+import org.mule.runtime.module.deployment.internal.processor.AstArtifactConfigurationProcessor;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
@@ -560,7 +562,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     moduleDiscoverer = new TestModuleDiscoverer(getPrivilegedArtifactIds());
     moduleRepository = new DefaultModuleRepository(moduleDiscoverer);
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry =
-        new MuleArtifactResourcesRegistry.Builder().moduleRepository(moduleRepository).build();
+        new MuleArtifactResourcesRegistry.Builder()
+            .moduleRepository(moduleRepository)
+            .artifactConfigurationProcessor(new AstArtifactConfigurationProcessor())
+            .build();
     serviceManager = muleArtifactResourcesRegistry.getServiceManager();
     containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();
     extensionModelLoaderManager = muleArtifactResourcesRegistry.getExtensionModelLoaderManager();
@@ -1145,7 +1150,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                                              new DomainDescriptor(DEFAULT_DOMAIN_NAME), emptyList()),
                                  artifactClassLoaderManager, serviceManager, emptyList(), extensionModelLoaderManager,
                                  getRuntimeLockFactory(),
-                                 mock(MemoryManagementService.class));
+                                 mock(MemoryManagementService.class),
+                                 new AstArtifactConfigurationProcessor());
   }
 
   /**
@@ -1838,9 +1844,9 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
     @Override
     protected DomainArchiveDeployer createDomainArchiveDeployer(DefaultDomainFactory domainFactory,
-                                                                ArtifactDeployer domainMuleDeployer,
+                                                                ArtifactDeployer<Domain> domainMuleDeployer,
                                                                 ObservableList<Domain> domains,
-                                                                DefaultArchiveDeployer<Application> applicationDeployer,
+                                                                DefaultArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer,
                                                                 CompositeDeploymentListener applicationDeploymentListener,
                                                                 DeploymentListener domainDeploymentListener) {
       return new TestDomainArchiveDeployer(new DefaultArchiveDeployer<>(domainMuleDeployer, domainFactory, domains,
@@ -1857,7 +1863,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   private static class TestDomainArchiveDeployer extends DomainArchiveDeployer {
 
-    public TestDomainArchiveDeployer(ArchiveDeployer<Domain> domainDeployer, ArchiveDeployer<Application> applicationDeployer,
+    public TestDomainArchiveDeployer(ArchiveDeployer<DomainDescriptor, Domain> domainDeployer,
+                                     ArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer,
                                      DeploymentService deploymentService) {
       super(domainDeployer, applicationDeployer, deploymentService);
     }

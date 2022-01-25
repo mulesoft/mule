@@ -6,11 +6,6 @@
  */
 package org.mule.runtime.module.launcher;
 
-import static java.lang.ClassLoader.getSystemClassLoader;
-import static java.lang.String.format;
-import static java.lang.System.getProperty;
-import static java.lang.System.setProperty;
-import static org.apache.commons.lang3.reflect.MethodUtils.invokeStaticMethod;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
@@ -21,6 +16,13 @@ import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
+
+import static java.lang.ClassLoader.getSystemClassLoader;
+import static java.lang.String.format;
+import static java.lang.System.getProperty;
+import static java.lang.System.setProperty;
+
+import static org.apache.commons.lang3.reflect.MethodUtils.invokeStaticMethod;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -39,6 +41,7 @@ import org.mule.runtime.module.artifact.internal.classloader.DefaultResourceInit
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
+import org.mule.runtime.module.deployment.internal.processor.AstArtifactConfigurationProcessor;
 import org.mule.runtime.module.launcher.coreextension.ClasspathMuleCoreExtensionDiscoverer;
 import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
@@ -97,7 +100,9 @@ public class MuleContainer {
   private final MuleCoreExtensionManagerServer coreExtensionManager;
   private final TroubleshootingService troubleshootingService;
   private ServerLockFactory muleLockFactory;
-  private final MuleArtifactResourcesRegistry artifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder().build();
+  private final MuleArtifactResourcesRegistry artifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder()
+      .artifactConfigurationProcessor(new AstArtifactConfigurationProcessor())
+      .build();
   private static MuleLog4jContextFactory log4jContextFactory;
 
   static {
