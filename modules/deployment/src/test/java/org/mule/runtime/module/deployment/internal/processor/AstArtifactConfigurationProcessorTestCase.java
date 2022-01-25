@@ -52,7 +52,7 @@ import org.junit.rules.TemporaryFolder;
 
 import io.qameta.allure.Issue;
 
-public class AstXmlParserArtifactConfigurationProcessorTestCase extends AbstractMuleTestCase {
+public class AstArtifactConfigurationProcessorTestCase extends AbstractMuleTestCase {
 
   @Rule
   public TemporaryFolder tempFolder = new TemporaryFolder();

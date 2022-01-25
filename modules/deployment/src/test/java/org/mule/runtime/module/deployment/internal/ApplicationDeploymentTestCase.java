@@ -32,6 +32,7 @@ import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWat
 import static org.mule.runtime.module.deployment.internal.FlowStoppedDeploymentPersistenceListener.START_FLOW_ON_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
+import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DeploymentFailureStory.DEPLOYMENT_FAILURE;
@@ -91,7 +92,6 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileB
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
-import org.mule.runtime.module.deployment.internal.processor.AstArtifactConfigurationProcessor;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
@@ -1755,7 +1755,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry =
         new MuleArtifactResourcesRegistry.Builder()
             .moduleRepository(moduleRepository)
-            .artifactConfigurationProcessor(new AstArtifactConfigurationProcessor())
+            .artifactConfigurationProcessor(serializedAstWithFallbackArtifactConfigurationProcessor())
             .build();
 
     serviceManager = muleArtifactResourcesRegistry.getServiceManager();

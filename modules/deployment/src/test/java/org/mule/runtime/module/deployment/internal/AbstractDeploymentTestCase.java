@@ -42,6 +42,8 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.correlationIdCount;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
+import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.SERIALIZED_ARTIFACT_AST_LOCATION;
+import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
 
@@ -135,7 +137,6 @@ import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilde
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultMuleDomain;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory;
-import org.mule.runtime.module.deployment.internal.processor.AstArtifactConfigurationProcessor;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
@@ -451,7 +452,9 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected final ApplicationFileBuilder emptyAppFileBuilder =
       new ApplicationFileBuilder("empty-app").definedBy("empty-config.xml");
   protected final ApplicationFileBuilder dummyAppDescriptorFileBuilder = new ApplicationFileBuilder("dummy-app")
-      .definedBy("dummy-app-config.xml").configuredWith("myCustomProp", "someValue")
+      .definedBy("dummy-app-config.xml")
+      .configuredWith("myCustomProp", "someValue")
+      .containingResource("serialized/dummy-app.ast", SERIALIZED_ARTIFACT_AST_LOCATION)
       .dependingOn(callbackExtensionPlugin)
       .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
   protected final ApplicationFileBuilder dummyFlowErrorAppDescriptorFileBuilder =
@@ -564,7 +567,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry =
         new MuleArtifactResourcesRegistry.Builder()
             .moduleRepository(moduleRepository)
-            .artifactConfigurationProcessor(new AstArtifactConfigurationProcessor())
+            .artifactConfigurationProcessor(serializedAstWithFallbackArtifactConfigurationProcessor())
             .build();
     serviceManager = muleArtifactResourcesRegistry.getServiceManager();
     containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();
@@ -1151,7 +1154,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                                  artifactClassLoaderManager, serviceManager, emptyList(), extensionModelLoaderManager,
                                  getRuntimeLockFactory(),
                                  mock(MemoryManagementService.class),
-                                 new AstArtifactConfigurationProcessor());
+                                 serializedAstWithFallbackArtifactConfigurationProcessor());
   }
 
   /**

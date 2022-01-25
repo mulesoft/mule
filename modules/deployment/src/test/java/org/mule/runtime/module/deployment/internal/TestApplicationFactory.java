@@ -10,6 +10,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.applicationClassLoaderFactory;
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.regionPluginClassLoadersFactory;
+import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 
 import static org.mockito.Mockito.mock;
@@ -38,7 +39,6 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DomainManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
-import org.mule.runtime.module.deployment.internal.processor.AstArtifactConfigurationProcessor;
 
 import java.io.File;
 import java.io.IOException;
@@ -73,7 +73,7 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
           discoverLicenseValidator(TestApplicationFactory.class.getClassLoader()),
           RuntimeLockFactoryUtil.getRuntimeLockFactory(),
           mock(MemoryManagementService.class),
-          new AstArtifactConfigurationProcessor());
+          serializedAstWithFallbackArtifactConfigurationProcessor());
   }
 
   public static TestApplicationFactory createTestApplicationFactory(DomainManager domainManager,
