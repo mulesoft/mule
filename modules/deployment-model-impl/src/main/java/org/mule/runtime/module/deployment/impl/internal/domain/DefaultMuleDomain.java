@@ -181,7 +181,6 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
           .setArtifactPlugins(artifactPlugins)
           .setExecutionClassloader(deploymentClassLoader.getClassLoader())
           .setArtifactInstallationDirectory(getArtifactInstallationDirectory())
-          // TODO check for policies and domains as well
           .setArtifactConfigurationProcessor(artifactConfigurationProcessor)
           .setExtensionModelLoaderRepository(extensionModelLoaderManager)
           .setArtifactType(DOMAIN)

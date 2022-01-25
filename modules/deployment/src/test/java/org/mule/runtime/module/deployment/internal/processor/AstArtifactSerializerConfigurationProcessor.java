@@ -4,11 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.dsl.artifact;
+package org.mule.runtime.module.deployment.internal.processor;
 
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
+import static org.mule.runtime.ast.internal.serialization.ArtifactAstSerializerFactory.JSON;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.config.internal.ApplicationFilteredFromPolicyArtifactAst.applicationFilteredFromPolicyArtifactAst;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
@@ -22,6 +23,8 @@ import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.ast.api.serialization.ArtifactAstSerializer;
+import org.mule.runtime.ast.api.serialization.ArtifactAstSerializerProvider;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.config.internal.ArtifactAstConfigurationBuilder;
@@ -43,17 +46,22 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfigurati
 import org.mule.runtime.deployment.model.internal.artifact.ImmutableArtifactContext;
 import org.mule.runtime.dsl.api.ConfigResource;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
+
 /**
- * Implementation of {@link ArtifactConfigurationProcessor} that parses the XML configuration files and delegates to
- * {@link ArtifactAstConfigurationBuilder} to create registry and populate the {@link MuleContext}.
  *
  * @since 4.5
  */
-public final class AstArtifactConfigurationProcessor implements ArtifactConfigurationProcessor {
+public final class AstArtifactSerializerConfigurationProcessor implements ArtifactConfigurationProcessor {
+
+  private final ArtifactAstSerializer defaultArtifactAstSerializer =
+      new ArtifactAstSerializerProvider().getSerializer(JSON, "1.0");
 
   @Override
   public ArtifactContext createArtifactContext(ArtifactContextConfiguration artifactContextConfiguration)
@@ -66,16 +74,30 @@ public final class AstArtifactConfigurationProcessor implements ArtifactConfigur
       return new ImmutableArtifactContext(artifactContextConfiguration.getMuleContext());
     }
 
+    ArtifactAst applicationModel = createApplicationModel(artifactContextConfiguration.getMuleContext(),
+                                                          artifactContextConfiguration.getArtifactDeclaration(),
+                                                          loadConfigResources(configResources),
+                                                          artifactContextConfiguration.getArtifactProperties(),
+                                                          artifactContextConfiguration.getArtifactType(),
+                                                          artifactContextConfiguration.getParentArtifactContext()
+                                                              .map(ArtifactContext::getArtifactAst)
+                                                              .orElse(emptyArtifact()),
+                                                          artifactContextConfiguration.isDisableXmlValidations());
+    InputStream serialized = defaultArtifactAstSerializer.serialize(applicationModel);
+    try {
+      FileOutputStream fileOutputStream =
+          new FileOutputStream("/Users/rmerino/git/mule4-uber/mule/modules/deployment/src/test/resources/serialized/"
+              + artifactContextConfiguration.getMuleContext().getConfiguration().getId());
+      IOUtils.copy(serialized, fileOutputStream);
+      fileOutputStream.flush();
+      fileOutputStream.close();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
     ArtifactAstConfigurationBuilder configurationBuilder =
-        new ArtifactAstConfigurationBuilder(createApplicationModel(artifactContextConfiguration.getMuleContext(),
-                                                                   artifactContextConfiguration.getArtifactDeclaration(),
-                                                                   loadConfigResources(configResources),
-                                                                   artifactContextConfiguration.getArtifactProperties(),
-                                                                   artifactContextConfiguration.getArtifactType(),
-                                                                   artifactContextConfiguration.getParentArtifactContext()
-                                                                       .map(ArtifactContext::getArtifactAst)
-                                                                       .orElse(emptyArtifact()),
-                                                                   artifactContextConfiguration.isDisableXmlValidations()),
+        new ArtifactAstConfigurationBuilder(applicationModel,
                                             artifactContextConfiguration.getArtifactProperties(),
                                             artifactContextConfiguration.getArtifactType(),
                                             artifactContextConfiguration.isEnableLazyInitialization());
@@ -86,6 +108,8 @@ public final class AstArtifactConfigurationProcessor implements ArtifactConfigur
     artifactContextConfiguration.getServiceConfigurators().stream()
         .forEach(configurationBuilder::addServiceConfigurator);
     configurationBuilder.configure(artifactContextConfiguration.getMuleContext());
+
+
     return configurationBuilder.createArtifactContext();
   }
 

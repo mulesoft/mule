@@ -229,7 +229,6 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
               .setDataFolderName(descriptor.getDataFolderName())
               .setArtifactName(descriptor.getName())
               .setArtifactInstallationDirectory(descriptor.getArtifactLocation())
-              // TODO check for policies and domains as well
               .setArtifactConfigurationProcessor(artifactConfigurationProcessor)
               .setConfigurationFiles(descriptor.getConfigResources().toArray(new String[descriptor.getConfigResources().size()]))
               .setDefaultEncoding(descriptor.getEncoding())
