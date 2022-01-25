@@ -6,9 +6,14 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentStatusTracker.DeploymentState.DEPLOYED;
+import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentStatusTracker.DeploymentState.DEPLOYING;
+import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentStatusTracker.DeploymentState.FAILED;
+
+import static java.util.Collections.unmodifiableMap;
+
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,22 +31,25 @@ public class ArtifactDeploymentStatusTracker implements DeploymentListener {
     DEPLOYED
   }
 
-  protected Map<String, DeploymentState> deploymentStates = new ConcurrentHashMap<String, DeploymentState>();
+  protected Map<String, DeploymentState> deploymentStates = new ConcurrentHashMap<>();
 
   public Map<String, DeploymentState> getDeploymentStates() {
-    return Collections.unmodifiableMap(deploymentStates);
+    return unmodifiableMap(deploymentStates);
   }
 
+  @Override
   public void onDeploymentStart(String artifactName) {
-    deploymentStates.put(artifactName, DeploymentState.DEPLOYING);
+    deploymentStates.put(artifactName, DEPLOYING);
   }
 
+  @Override
   public void onDeploymentSuccess(String artifactName) {
-    deploymentStates.put(artifactName, DeploymentState.DEPLOYED);
+    deploymentStates.put(artifactName, DEPLOYED);
   }
 
+  @Override
   public void onDeploymentFailure(String artifactName, Throwable failureCause) {
-    deploymentStates.put(artifactName, DeploymentState.FAILED);
+    deploymentStates.put(artifactName, FAILED);
   }
 
 }

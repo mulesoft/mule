@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal.processor;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.FORCE_PARSE_CONFIG_XMLS_ON_DEPLOYMENT;
+import static org.mule.runtime.api.util.MuleSystemProperties.FORCE_PARSE_CONFIG_XMLS_ON_DEPLOYMENT_PROPERTY;
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.Thread.currentThread;
@@ -58,7 +58,7 @@ public class SerializedAstArtifactConfigurationProcessor extends AbstractAstConf
   }
 
   public static ArtifactConfigurationProcessor serializedAstWithFallbackArtifactConfigurationProcessor() {
-    if (getBoolean(FORCE_PARSE_CONFIG_XMLS_ON_DEPLOYMENT)) {
+    if (getBoolean(FORCE_PARSE_CONFIG_XMLS_ON_DEPLOYMENT_PROPERTY)) {
       return new AstXmlParserArtifactConfigurationProcessor();
     } else {
       return new FallbackArtifactConfigurationProcessor(new SerializedAstArtifactConfigurationProcessor(),

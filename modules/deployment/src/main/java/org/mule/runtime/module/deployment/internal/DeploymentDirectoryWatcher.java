@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
@@ -13,6 +14,7 @@ import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
 import static java.util.Arrays.sort;
 import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
@@ -23,6 +25,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import static org.apache.commons.io.IOCase.INSENSITIVE;
+import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -77,13 +80,6 @@ public class DeploymentDirectoryWatcher implements Runnable {
       new AndFileFilter(new SuffixFileFilter(JAR_FILE_SUFFIX, INSENSITIVE), FileFileFilter.FILE);
   public static final IOFileFilter ZIP_ARTIFACT_FILTER =
       new AndFileFilter(new SuffixFileFilter(ZIP_FILE_SUFFIX, INSENSITIVE), FileFileFilter.FILE);
-
-  /**
-   * Property used to change the deployment mode to deploy only the indicated applications with no redeployment. mule
-   * -M-Dmule.deploy.applications=app1:app2:app3 This can also be done passing an additional command line option (deprecated)
-   * like: mule -app app1:app2:app3 will restrict deployment only to those specified apps.
-   */
-  public static final String DEPLOYMENT_APPLICATION_PROPERTY = "mule.deploy.applications";
 
   protected static final int DEFAULT_CHANGES_CHECK_INTERVAL_MS = 5000;
 
@@ -148,7 +144,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     deploymentLock.lock();
     deleteAllAnchors();
 
-    String appString = System.getProperty(DEPLOYMENT_APPLICATION_PROPERTY);
+    String appString = getProperty(DEPLOYMENT_APPLICATION_PROPERTY);
 
     try {
       if (appString == null) {
@@ -159,7 +155,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
         // stated applications to launch
         scheduleChangeMonitor();
       } else {
-        String[] explodedDomains = domainsDir.list(DirectoryFileFilter.DIRECTORY);
+        String[] explodedDomains = domainsDir.list(DIRECTORY);
         String[] packagedDomains = domainsDir.list(JAR_ARTIFACT_FILTER);
 
         deployPackedDomains(packagedDomains);
@@ -222,7 +218,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
   private static int getChangesCheckIntervalMs() {
     try {
-      String value = System.getProperty(CHANGE_CHECK_INTERVAL_PROPERTY);
+      String value = getProperty(CHANGE_CHECK_INTERVAL_PROPERTY);
       return Integer.parseInt(value);
     } catch (NumberFormatException e) {
       return DEFAULT_CHANGES_CHECK_INTERVAL_MS;

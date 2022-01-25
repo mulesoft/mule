@@ -47,6 +47,7 @@ import static org.mule.runtime.module.deployment.internal.processor.SerializedAs
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
 
+import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
@@ -55,6 +56,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.joining;
 
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.copyFile;
@@ -69,8 +71,11 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.collection.IsArrayContainingInAnyOrder.arrayContainingInAnyOrder;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertEquals;
@@ -455,6 +460,12 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       .definedBy("dummy-app-config.xml")
       .configuredWith("myCustomProp", "someValue")
       .containingResource("serialized/dummy-app.ast", SERIALIZED_ARTIFACT_AST_LOCATION)
+      .dependingOn(callbackExtensionPlugin)
+      .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
+  protected final ApplicationFileBuilder dummyAppWithBrokenAstDescriptorFileBuilder = new ApplicationFileBuilder("dummy-app")
+      .definedBy("dummy-app-config.xml")
+      .configuredWith("myCustomProp", "someValue")
+      .containingResource("serialized/broken.ast", SERIALIZED_ARTIFACT_AST_LOCATION)
       .dependingOn(callbackExtensionPlugin)
       .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
   protected final ApplicationFileBuilder dummyFlowErrorAppDescriptorFileBuilder =
@@ -1036,8 +1047,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
       @Override
       public String describeFailure() {
-        return String.format("Application %s was expected to be in status %s but was %s instead", application.getArtifactName(),
-                             status.name(), application.getStatus().name());
+        return format("Application %s was expected to be in status %s but was %s instead", application.getArtifactName(),
+                      status.name(), application.getStatus().name());
       }
     });
 
@@ -1129,14 +1140,16 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected Application findApp(final String appName, int totalAppsExpected) {
     // list all apps to validate total count
     final List<Application> apps = deploymentService.getApplications();
-    assertNotNull(apps);
+    assertThat(apps, not(nullValue()));
 
     if (totalAppsExpected >= 0) {
-      assertEquals(totalAppsExpected, apps.size());
+      assertThat(apps.stream().map(a -> a.getArtifactName()).collect(joining()),
+                 apps, hasSize(totalAppsExpected));
     }
 
     final Application app = deploymentService.findApplication(appName);
-    assertNotNull(app);
+    assertThat(appName + " not in " + apps.stream().map(a -> a.getArtifactName()).collect(joining()),
+               app, not(nullValue()));
     return app;
   }
 

@@ -8,6 +8,7 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
+import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
@@ -16,6 +17,7 @@ import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistr
 import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.CREATED;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DEPLOYMENT_FAILED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
@@ -28,7 +30,6 @@ import static org.mule.runtime.module.deployment.impl.internal.policy.Properties
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveArtifactStatusDeploymentProperties;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveFlowDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.FlowStoppedDeploymentPersistenceListener.START_FLOW_ON_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
@@ -46,6 +47,7 @@ import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
@@ -85,6 +87,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
@@ -92,6 +95,7 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileB
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
+import org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
@@ -182,6 +186,35 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     // Checks that the configuration's ID was properly configured
     assertThat(app.getArtifactContext().getRegistry().<MuleConfiguration>lookupByName(OBJECT_MULE_CONFIGURATION).get().getId(),
                equalTo(dummyAppDescriptorFileBuilder.getId()));
+  }
+
+  @Test
+  public void deploysAppZipOnStartupUsingSerializedAst() throws Exception {
+    restartServer(new SerializedAstArtifactConfigurationProcessor());
+
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
+    assertApplicationAnchorFileExists(dummyAppDescriptorFileBuilder.getId());
+  }
+
+  @Test
+  public void deploysAppZipOnStartupUsingSerializedAstFallback() throws Exception {
+    addPackedAppFromBuilder(dummyAppWithBrokenAstDescriptorFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppWithBrokenAstDescriptorFileBuilder.getId());
+    assertAppsDir(NONE, new String[] {dummyAppWithBrokenAstDescriptorFileBuilder.getId()}, true);
+    assertApplicationAnchorFileExists(dummyAppWithBrokenAstDescriptorFileBuilder.getId());
+
+    // just assert no privileged entries were put in the registry
+    final Application app = findApp(dummyAppWithBrokenAstDescriptorFileBuilder.getId(), 1);
+
+    // Checks that the configuration's ID was properly configured
+    assertThat(app.getArtifactContext().getRegistry().<MuleConfiguration>lookupByName(OBJECT_MULE_CONFIGURATION).get().getId(),
+               equalTo(dummyAppWithBrokenAstDescriptorFileBuilder.getId()));
   }
 
   @Test
@@ -612,7 +645,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertArtifactIsRegisteredAsZombie(badConfigAppFileBuilder.getId(), deploymentService.getZombieApplications());
 
     final Application app = findApp(badConfigAppFileBuilder.getId(), 1);
-    assertStatus(app, ApplicationStatus.DEPLOYMENT_FAILED);
+    assertStatus(app, DEPLOYMENT_FAILED);
     assertApplicationAnchorFileDoesNotExists(app.getArtifactName());
 
     reset(applicationDeploymentListener);
@@ -1361,8 +1394,9 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     final ClassLoader appClassLoader = deploymentService.getApplications().get(0).getArtifactClassLoader().getClassLoader();
     final URL appDwlResource = appClassLoader.getResource(dwExportedFile);
     assertThat(appDwlResource, not(nullValue()));
-    final String expectedResource = IOUtils.toString(currentThread().getContextClassLoader().getResource(dwlResourceTestFile));
-    assertThat(IOUtils.toString(appDwlResource), is(expectedResource));
+    final String expectedResource =
+        IOUtils.toString(currentThread().getContextClassLoader().getResource(dwlResourceTestFile), UTF_8);
+    assertThat(IOUtils.toString(appDwlResource, UTF_8), is(expectedResource));
   }
 
   @Test
@@ -1746,6 +1780,10 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   private void restartServer() throws MuleException {
+    restartServer(serializedAstWithFallbackArtifactConfigurationProcessor());
+  }
+
+  private void restartServer(ArtifactConfigurationProcessor artifactConfigurationProcessor) throws MuleException {
     serviceManager.stop();
     extensionModelLoaderManager.stop();
     deploymentService.stop();
@@ -1755,7 +1793,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry =
         new MuleArtifactResourcesRegistry.Builder()
             .moduleRepository(moduleRepository)
-            .artifactConfigurationProcessor(serializedAstWithFallbackArtifactConfigurationProcessor())
+            .artifactConfigurationProcessor(artifactConfigurationProcessor)
             .build();
 
     serviceManager = muleArtifactResourcesRegistry.getServiceManager();
