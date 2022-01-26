@@ -6,8 +6,18 @@
  */
 package org.mule.runtime.config.internal.context;
 
+import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
+import static java.util.Collections.emptySet;
+import static java.util.Comparator.comparing;
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.ast.api.util.AstTraversalDirection.BOTTOM_UP;
@@ -37,19 +47,9 @@ import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFAC
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSION_NAME_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_LOADER_ID;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_TYPE_LOADER_PROPERTY_NAME;
+import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.module.extension.internal.manager.ExtensionErrorsRegistrant.registerErrorMappings;
-
-import static java.lang.String.format;
-import static java.lang.System.lineSeparator;
-import static java.util.Collections.emptySet;
-import static java.util.Comparator.comparing;
-import static java.util.Objects.requireNonNull;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
@@ -59,7 +59,6 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.FeatureFlaggingService;
-import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -105,11 +104,11 @@ import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
-import org.mule.runtime.core.internal.type.ApplicationTypeLoader;
+import org.mule.runtime.core.api.type.catalog.ApplicationTypeLoader;
 import org.mule.runtime.core.internal.util.DefaultResourceLocator;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
+import org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -308,22 +307,14 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       return;
     }
 
-    // TODO: Check that extensions already loaded and core present.
-    ExtensionModel appExtensionModel = getMuleExtensionLoader().loadExtensionModel(
-                                                                                   ExtensionModelLoadingRequest
-                                                                                       .builder(getRegionClassLoader(),
-                                                                                                DslResolvingContext
-                                                                                                    .getDefault(extensionManager
-                                                                                                        .getExtensions()))
-                                                                                       .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME,
-                                                                                                     applicationModel)
-                                                                                       .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME,
-                                                                                                     muleContext
-                                                                                                         .getConfiguration()
-                                                                                                         .getId())
-                                                                                       .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME,
-                                                                                                     new ApplicationTypeLoader())
-                                                                                       .build());
+    ExtensionModel appExtensionModel = getMuleExtensionLoader()
+        .loadExtensionModel(builder(getRegionClassLoader(), getDefault(extensionManager.getExtensions()))
+            // todo: get right version
+            .addParameter(AbstractExtensionModelLoader.VERSION, "1.0.0")
+            .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, applicationModel)
+            .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME, muleContext.getConfiguration().getId())
+            .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader())
+            .build());
 
     extensionManager.registerExtension(appExtensionModel);
   }

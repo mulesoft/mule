@@ -27,7 +27,6 @@
         <module>core-mvel</module>
         <module>extensions-support</module>
         <module>extensions-xml-support</module>
-        <module>extensions-mule-support</module>
         <module>global-config</module>
         <module>javaee</module>
         <module>launcher</module>
@@ -45,6 +44,7 @@
 
         <!-- depends on spring-config so it has to go after it -->
         <module>extensions-spring-support</module>
+        <module>extensions-mule-support</module>
         <module>repository</module>
         <module>tls</module>
         <module>soap-api</module>
