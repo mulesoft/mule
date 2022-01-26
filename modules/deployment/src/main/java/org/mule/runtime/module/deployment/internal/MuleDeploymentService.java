@@ -7,16 +7,18 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
+import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
 import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
-import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.ParallelDeploymentDirectoryWatcher.MAX_APPS_IN_PARALLEL_DEPLOYMENT;
 
 import static java.lang.String.format;
 import static java.lang.System.getProperties;
+import static java.lang.System.getProperty;
+import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -33,11 +35,13 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Preconditions;
+import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.module.artifact.api.Artifact;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.StartupListener;
@@ -52,7 +56,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -144,7 +147,7 @@ public class MuleDeploymentService implements DeploymentService {
   }
 
   private boolean isDeployingSelectedAppsInOrder() {
-    return !isEmpty(System.getProperty(DEPLOYMENT_APPLICATION_PROPERTY));
+    return !isEmpty(getProperty(DEPLOYMENT_APPLICATION_PROPERTY));
   }
 
   @Override
@@ -199,12 +202,12 @@ public class MuleDeploymentService implements DeploymentService {
 
   @Override
   public List<Application> getApplications() {
-    return Collections.unmodifiableList(applications);
+    return unmodifiableList(applications);
   }
 
   @Override
   public List<Domain> getDomains() {
-    return Collections.unmodifiableList(domains);
+    return unmodifiableList(domains);
   }
 
   /**
@@ -352,8 +355,10 @@ public class MuleDeploymentService implements DeploymentService {
 
   }
 
-  private void deployTemplateMethod(final URI artifactArchiveUri, final Optional<Properties> deploymentProperties,
-                                    File artifactDeploymentFolder, ArchiveDeployer archiveDeployer)
+  private <D extends DeployableArtifactDescriptor, T extends Artifact<D>> void deployTemplateMethod(final URI artifactArchiveUri,
+                                                                                                    final Optional<Properties> deploymentProperties,
+                                                                                                    File artifactDeploymentFolder,
+                                                                                                    ArchiveDeployer<D, T> archiveDeployer)
       throws IOException {
     executeSynchronized(() -> {
       try {

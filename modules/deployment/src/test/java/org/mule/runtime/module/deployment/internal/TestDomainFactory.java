@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
+import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
 
 import static org.mockito.Mockito.mock;
 
@@ -39,7 +40,6 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainMana
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.TestDomainWrapper;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
-import org.mule.runtime.module.deployment.internal.processor.AstArtifactConfigurationProcessor;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.File;
@@ -97,7 +97,7 @@ public class TestDomainFactory extends DefaultDomainFactory {
           extensionModelLoaderManager, mock(LicenseValidator.class),
           RuntimeLockFactoryUtil.getRuntimeLockFactory(),
           mock(MemoryManagementService.class),
-          new AstArtifactConfigurationProcessor());
+          serializedAstWithFallbackArtifactConfigurationProcessor());
   }
 
   @Override

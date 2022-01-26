@@ -7,9 +7,17 @@
 
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.SERIALIZED_ARTIFACT_AST_LOCATION;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
+import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.RedeploymentStory.APPLICATION_REDEPLOYMENT;
+
 import static java.io.File.separator;
 import static java.util.Arrays.asList;
+
 import static org.apache.commons.io.FileUtils.copyFile;
+import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -18,29 +26,25 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
-import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
-import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.RedeploymentStory.APPLICATION_REDEPLOYMENT;
 
-import org.junit.Before;
-import org.junit.Rule;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
+import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
+import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
-import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
-import org.mule.tck.junit4.rule.SystemProperty;
 
 /**
  * Contains test for application re-deployment on the default domain
@@ -247,6 +251,8 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
     URL url = getClass().getResource(BROKEN_CONFIG_XML);
     File newConfigFile = new File(url.toURI());
     copyFile(newConfigFile, originalConfigFile);
+    deleteQuietly(new File(appsDir + "/" + dummyAppDescriptorFileBuilder.getDeployedPath(),
+                           getConfigFilePathWithinArtifact(SERIALIZED_ARTIFACT_AST_LOCATION)));
 
     assertApplicationRedeploymentFailure(dummyAppDescriptorFileBuilder.getId());
   }
@@ -268,6 +274,8 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
     URL url = getClass().getResource(BROKEN_CONFIG_XML);
     File newConfigFile = new File(url.toURI());
     copyFile(newConfigFile, originalConfigFile);
+    deleteQuietly(new File(appsDir + "/" + dummyAppDescriptorFileBuilder.getDeployedPath(),
+                           getConfigFilePathWithinArtifact(SERIALIZED_ARTIFACT_AST_LOCATION)));
 
     assertApplicationRedeploymentFailure(dummyAppDescriptorFileBuilder.getId());
   }

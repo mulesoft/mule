@@ -16,8 +16,6 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 
-import static org.apache.commons.lang3.ArrayUtils.isEmpty;
-
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
@@ -32,15 +30,12 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.context.NullDomainMuleContextLifecycleStrategy;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
-import org.mule.runtime.deployment.model.internal.artifact.ImmutableArtifactContext;
 import org.mule.runtime.dsl.api.ConfigResource;
 
 import java.io.IOException;
@@ -53,40 +48,21 @@ import java.util.Set;
  *
  * @since 4.5
  */
-public final class AstArtifactConfigurationProcessor implements ArtifactConfigurationProcessor {
+public final class AstXmlParserArtifactConfigurationProcessor extends AbstractAstConfigurationProcessor {
 
   @Override
-  public ArtifactContext createArtifactContext(ArtifactContextConfiguration artifactContextConfiguration)
+  protected ArtifactAst obtainArtifactAst(ArtifactContextConfiguration artifactContextConfiguration)
       throws ConfigurationException {
-    final String[] configResources = artifactContextConfiguration.getConfigResources();
-
-    if (isEmpty(configResources)) {
-      ((DefaultMuleContext) artifactContextConfiguration.getMuleContext())
-          .setLifecycleStrategy(new NullDomainMuleContextLifecycleStrategy());
-      return new ImmutableArtifactContext(artifactContextConfiguration.getMuleContext());
-    }
-
-    ArtifactAstConfigurationBuilder configurationBuilder =
-        new ArtifactAstConfigurationBuilder(createApplicationModel(artifactContextConfiguration.getMuleContext(),
-                                                                   artifactContextConfiguration.getArtifactDeclaration(),
-                                                                   loadConfigResources(configResources),
-                                                                   artifactContextConfiguration.getArtifactProperties(),
-                                                                   artifactContextConfiguration.getArtifactType(),
-                                                                   artifactContextConfiguration.getParentArtifactContext()
-                                                                       .map(ArtifactContext::getArtifactAst)
-                                                                       .orElse(emptyArtifact()),
-                                                                   artifactContextConfiguration.isDisableXmlValidations()),
-                                            artifactContextConfiguration.getArtifactProperties(),
-                                            artifactContextConfiguration.getArtifactType(),
-                                            artifactContextConfiguration.isEnableLazyInitialization());
-
-    artifactContextConfiguration.getParentArtifactContext()
-        .ifPresent(parentContext -> configurationBuilder.setParentContext(parentContext.getMuleContext(),
-                                                                          parentContext.getArtifactAst()));
-    artifactContextConfiguration.getServiceConfigurators().stream()
-        .forEach(configurationBuilder::addServiceConfigurator);
-    configurationBuilder.configure(artifactContextConfiguration.getMuleContext());
-    return configurationBuilder.createArtifactContext();
+    return createApplicationModel(artifactContextConfiguration.getMuleContext(),
+                                  artifactContextConfiguration.getArtifactDeclaration(),
+                                  loadConfigResources(artifactContextConfiguration
+                                      .getConfigResources()),
+                                  artifactContextConfiguration.getArtifactProperties(),
+                                  artifactContextConfiguration.getArtifactType(),
+                                  artifactContextConfiguration.getParentArtifactContext()
+                                      .map(ArtifactContext::getArtifactAst)
+                                      .orElse(emptyArtifact()),
+                                  artifactContextConfiguration.isDisableXmlValidations());
   }
 
   private Set<ExtensionModel> getExtensions(ExtensionManager extensionManager) {
@@ -185,6 +161,5 @@ public final class AstArtifactConfigurationProcessor implements ArtifactConfigur
     }
     return parentArtifactAst;
   }
-
 
 }
