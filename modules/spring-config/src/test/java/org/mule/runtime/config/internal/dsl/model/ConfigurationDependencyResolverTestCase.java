@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import io.qameta.allure.Description;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -42,8 +43,8 @@ public class ConfigurationDependencyResolverTestCase {
   @Test
   @Description("A set of two components will be returned when there are two required components")
   public void getRequiredComponentsWithIdTestCase() {
-    List<ComponentAst> components = Lists.newArrayList(createComponentWithId("A"),
-                                                       createComponentWithId("B"));
+    Set<ComponentAst> components = Sets.newHashSet(createComponentWithId("A"),
+                                                   createComponentWithId("B"));
     when(graph.getRequiredComponents(any())).thenReturn(components);
     Collection<String> result = configurationDependencyResolver.getDirectComponentDependencies("component");
     assertThat(result.size(), Matchers.is(2));
@@ -52,9 +53,9 @@ public class ConfigurationDependencyResolverTestCase {
   @Test
   @Description("A set of three components will be returned when there are 5 required components, only 3 have id")
   public void getRequiredComponentsWithoutIdTestCase() {
-    List<ComponentAst> components = Lists.newArrayList(createComponentWithId("A"),
-                                                       createComponentWithId("B"), createComponentWithId("C"),
-                                                       createComponentWithoutId("D"), createComponentWithoutId("E"));
+    Set<ComponentAst> components = Sets.newHashSet(createComponentWithId("A"),
+                                                   createComponentWithId("B"), createComponentWithId("C"),
+                                                   createComponentWithoutId("D"), createComponentWithoutId("E"));
     when(graph.getRequiredComponents(any())).thenReturn(components);
     Collection<String> result = configurationDependencyResolver.getDirectComponentDependencies("component");
     assertThat(result.size(), Matchers.is(3));
