@@ -21,7 +21,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureAction.FAIL;
-import static org.mule.runtime.extension.api.tx.SourceTransactionalAction.NONE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.BACK_PRESSURE_ACTION_CONTEXT_PARAM;
 import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.COMPONENT_DECORATOR_FACTORY_KEY;
@@ -29,6 +28,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.fetchConnectionFieldFromSourceObject;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsOfType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
+import static org.mule.sdk.api.tx.SourceTransactionalAction.NONE;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 
@@ -66,7 +66,6 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
-import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
 import org.mule.runtime.extension.internal.property.TransactionalActionModelProperty;
 import org.mule.runtime.extension.internal.property.TransactionalTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
@@ -78,12 +77,14 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.source.legacy.LegacySourceWrapper;
+import org.mule.runtime.module.extension.internal.runtime.source.legacy.SourceTransactionalActionUtils;
 import org.mule.runtime.module.extension.internal.runtime.source.poll.RestartContext;
 import org.mule.runtime.module.extension.internal.runtime.source.poll.Restartable;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 import org.mule.sdk.api.runtime.connectivity.Reconnectable;
 import org.mule.sdk.api.runtime.source.Source;
 import org.mule.sdk.api.runtime.source.SourceCallback;
+import org.mule.sdk.api.tx.SourceTransactionalAction;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -527,16 +528,31 @@ public class SourceAdapter implements Lifecycle, Restartable {
   }
 
   public SourceTransactionalAction getTransactionalAction() {
-    return getNonCallbackParameterValue(getTransactionalActionFieldName(), SourceTransactionalAction.class)
-        .orElse(NONE);
+    Optional<Object> transactionalAction = getNonCallbackParameterValue(getTransactionalActionFieldName());
+    if (transactionalAction.isPresent()) {
+      try {
+        return SourceTransactionalActionUtils.from(transactionalAction.get());
+      } catch (Exception e) {
+        throw new IllegalStateException("The resolved value is not a " + SourceTransactionalAction.class.getSimpleName(), e);
+      }
+    } else {
+      return NONE;
+    }
   }
 
   TransactionType getTransactionalType() {
-    return getNonCallbackParameterValue(getTransactionTypeFieldName(), TransactionType.class)
-        .orElse(LOCAL);
+    Optional<Object> transactionalType = getNonCallbackParameterValue(getTransactionTypeFieldName());
+    if (transactionalType.isPresent()) {
+      if (transactionalType.get() instanceof TransactionType) {
+        return (TransactionType) transactionalType.get();
+      }
+      throw new IllegalStateException("The resolved value is not a " + TransactionType.class.getSimpleName());
+    } else {
+      return LOCAL;
+    }
   }
 
-  private <T> Optional<T> getNonCallbackParameterValue(String fieldName, Class<T> type) {
+  private <T> Optional<T> getNonCallbackParameterValue(String fieldName) {
     ValueResolver<T> valueResolver = (ValueResolver<T>) nonCallbackParameters.getResolvers().get(fieldName);
 
     if (valueResolver == null) {
@@ -549,16 +565,11 @@ public class SourceAdapter implements Lifecycle, Restartable {
     try (ValueResolvingContext context = ValueResolvingContext.builder(initialiserEvent, expressionManager).build()) {
       object = valueResolver.resolve(context);
     } catch (MuleException e) {
-      throw new MuleRuntimeException(createStaticMessage("Unable to get the " + type.getSimpleName()
-          + " value for Message Source"), e);
+      throw new MuleRuntimeException(createStaticMessage("Unable to get the " + fieldName + " value for Message Source"), e);
     } finally {
       if (initialiserEvent != null) {
         ((BaseEventContext) initialiserEvent.getContext()).success();
       }
-    }
-
-    if (!(type.isInstance(object))) {
-      throw new IllegalStateException("The resolved value is not a " + type.getSimpleName());
     }
 
     return of(object);

@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation.adapter;
 
 import static java.lang.String.format;
 
-import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
+import org.mule.sdk.api.tx.OperationTransactionalAction;
 
 /**
  * Utils class for handling {@link OperationTransactionalAction}

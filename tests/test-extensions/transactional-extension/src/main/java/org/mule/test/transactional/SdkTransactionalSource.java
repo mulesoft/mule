@@ -27,42 +27,41 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
 import org.mule.runtime.extension.api.tx.TransactionHandle;
 import org.mule.test.transactional.connection.DummyXaResource;
-import org.mule.test.transactional.connection.TestTransactionalConnection;
+import org.mule.test.transactional.connection.SdkTestTransactionalConnection;
 import org.mule.test.transactional.connection.TestXaTransactionalConnection;
 
 import java.util.concurrent.ExecutorService;
 
 @MetadataScope(outputResolver = TransactionalMetadataResolver.class)
-public class TransactionalSource extends Source<TestTransactionalConnection, Object> {
+public class SdkTransactionalSource extends Source<SdkTestTransactionalConnection, Object> {
 
   private static final String IS_XA = "isXa";
 
   public static Boolean isSuccess;
   public static DummyXaResource xaResource;
 
-  @Parameter
   TransactionType txType;
 
-  private SourceTransactionalAction txAction;
+  SourceTransactionalAction transactionalAction;
 
   @Connection
-  private ConnectionProvider<TestTransactionalConnection> connectionProvider;
+  private ConnectionProvider<SdkTestTransactionalConnection> connectionProvider;
 
   private ExecutorService connectExecutor;
 
-  public TransactionalSource() {
+  public SdkTransactionalSource() {
     isSuccess = null;
     xaResource = null;
   }
 
   @Override
-  public void onStart(SourceCallback<TestTransactionalConnection, Object> sourceCallback) {
+  public void onStart(SourceCallback<SdkTestTransactionalConnection, Object> sourceCallback) {
     connectExecutor = newFixedThreadPool(1, new NamedThreadFactory(TransactionalSource.class.getName()));
     connectExecutor.execute(() -> {
       SourceCallbackContext ctx = sourceCallback.createContext();
       TransactionHandle txHandle = null;
       try {
-        TestTransactionalConnection connection = connectionProvider.connect();
+        SdkTestTransactionalConnection connection = connectionProvider.connect();
 
         boolean isXa = false;
         if (connection instanceof XATransactionalConnection) {
@@ -72,7 +71,7 @@ public class TransactionalSource extends Source<TestTransactionalConnection, Obj
 
         ctx.addVariable(IS_XA, isXa);
         txHandle = ctx.bindConnection(connection);
-        sourceCallback.handle(Result.<TestTransactionalConnection, Object>builder().output(connection).build(), ctx);
+        sourceCallback.handle(Result.<SdkTestTransactionalConnection, Object>builder().output(connection).build(), ctx);
       } catch (ConnectionException e) {
         sourceCallback.onConnectionException(e);
       } catch (Exception e) {
