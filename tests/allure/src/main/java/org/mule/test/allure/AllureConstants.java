@@ -863,6 +863,19 @@ public interface AllureConstants {
       String PARAMETER_AST = "Parameter AST resolution";
     }
 
+    interface ArtifactAstSerialization {
+
+      String AST_SERIALIZATION = "AST serialization";
+      String AST_SERIALIZER_METADATA_SERIALIZATION = "AST metadata serialization";
+      String AST_DTO = "AST serializable representation";
+      String AST_JSON_SERIALIZER = "AST Json serialization";
+      String AST_JSON_DESERIALIZER = "AST Json deserialization";
+      String AST_SERIALIZATION_VERSIONING = "AST serialization versioning";
+      String AST_SERIALIZATION_END_TO_END = "AST serialization end to end tests";
+      String AST_SERIALIZATION_ENRICH = "AST serialization enrichment";
+
+    }
+
   }
 
   interface JavaSdk {

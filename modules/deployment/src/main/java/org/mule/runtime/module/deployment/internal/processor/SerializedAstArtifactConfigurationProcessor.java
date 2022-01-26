@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.module.deployment.internal.processor;
 
-import static java.lang.Thread.currentThread;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.SERIALIZED_ARTIFACT_AST_LOCATION;
+
 import static java.util.Collections.emptySet;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -38,16 +39,16 @@ public class SerializedAstArtifactConfigurationProcessor extends AbstractAstConf
 
   private static final Logger LOGGER = getLogger(FallbackArtifactConfigurationProcessor.class);
 
-  public static final String SERIALIZED_ARTIFACT_AST_LOCATION = "META-INF/mule-artifact/artifact.ast";
-
   private final ArtifactAstDeserializer defaultArtifactAstDeserializer = new ArtifactAstSerializerProvider().getDeserializer();
 
   @Override
   public boolean check(ArtifactContextConfiguration artifactContextConfiguration) {
-    InputStream seralizedAstStream = currentThread().getContextClassLoader().getResourceAsStream(SERIALIZED_ARTIFACT_AST_LOCATION);
+    MuleContext muleContext = artifactContextConfiguration.getMuleContext();
+    InputStream seralizedAstStream =
+        muleContext.getExecutionClassLoader().getResourceAsStream(SERIALIZED_ARTIFACT_AST_LOCATION);
     if (seralizedAstStream == null) {
       LOGGER.info("Serialized AST not avaliable for artifact '"
-          + artifactContextConfiguration.getMuleContext().getConfiguration().getId() + "'");
+          + muleContext.getConfiguration().getId() + "'");
     }
 
     return seralizedAstStream != null;
@@ -57,9 +58,11 @@ public class SerializedAstArtifactConfigurationProcessor extends AbstractAstConf
   protected ArtifactAst obtainArtifactAst(ArtifactContextConfiguration artifactContextConfiguration)
       throws ConfigurationException {
     try {
+      MuleContext muleContext = artifactContextConfiguration.getMuleContext();
       return defaultArtifactAstDeserializer
-          .deserialize(currentThread().getContextClassLoader().getResourceAsStream(SERIALIZED_ARTIFACT_AST_LOCATION),
-                       name -> getExtensions(artifactContextConfiguration.getMuleContext().getExtensionManager())
+          .deserialize(muleContext.getExecutionClassLoader()
+              .getResourceAsStream(SERIALIZED_ARTIFACT_AST_LOCATION),
+                       name -> getExtensions(muleContext.getExtensionManager())
                            .stream()
                            .filter(x -> x.getName().equals(name))
                            .findFirst()

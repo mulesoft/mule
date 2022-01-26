@@ -35,6 +35,7 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+import static org.mule.test.allure.AllureConstants.ArtifactAst.ArtifactAstSerialization.AST_JSON_DESERIALIZER;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DeploymentFailureStory.DEPLOYMENT_FAILURE;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DeploymentSuccessfulStory.DEPLOYMENT_SUCCESS;
@@ -189,6 +190,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(AST_JSON_DESERIALIZER)
   public void deploysAppZipOnStartupUsingSerializedAst() throws Exception {
     restartServer(new SerializedAstArtifactConfigurationProcessor());
 
