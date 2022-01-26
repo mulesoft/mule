@@ -65,17 +65,13 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
   }
 
   private void parseOptional() {
-    ComponentAst optional = getParameter(parameter, "optional");
-
-    if (optional != null) {
+    getSingleChild(parameter, "optional").ifPresent(optional -> {
       required = false;
       defaultValue = getOptionalParameter(optional, "defaultValue").orElse(null);
 
-      ComponentAst exclusiveOptional = getParameter(optional, "exclusiveOptional");
-      if (exclusiveOptional != null) {
-        modelProperties.add(new ExclusiveOptionalModelProperty(parseExclusiveParametersModel(exclusiveOptional)));
-      }
-    }
+      getSingleChild(optional, "exclusiveOptional")
+          .ifPresent(exclusive -> modelProperties.add(new ExclusiveOptionalModelProperty(parseExclusiveParametersModel(exclusive))));
+    });
   }
 
   private ExclusiveParametersModel parseExclusiveParametersModel(ComponentAst componentAst) {

@@ -9,9 +9,9 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
-import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
@@ -36,6 +36,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParse
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -104,11 +105,10 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public List<ParameterGroupModelParser> getParameterGroupModelParsers() {
-    List<ComponentAst> parameters = getParameter(operation, "parameters");
-
-    return parameters == null || parameters.isEmpty()
-        ? emptyList()
-        : singletonList(new MuleSdkParameterGroupModelParser(parameters, typeLoader));
+    return getSingleChild(operation, "parameters")
+        .map(p -> getChilds(p, "parameter").collect(toList()))
+        .map(parameters -> Collections.<ParameterGroupModelParser>singletonList(new MuleSdkParameterGroupModelParser(parameters, typeLoader)))
+        .orElse(emptyList());
   }
 
   @Override

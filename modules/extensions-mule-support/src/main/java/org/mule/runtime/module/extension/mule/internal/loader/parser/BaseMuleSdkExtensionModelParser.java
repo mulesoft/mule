@@ -12,6 +12,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import org.mule.runtime.ast.api.ComponentAst;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 abstract class BaseMuleSdkExtensionModelParser {
 
@@ -22,4 +23,13 @@ abstract class BaseMuleSdkExtensionModelParser {
   protected <T> Optional<T> getOptionalParameter(ComponentAst ast, String paramName) {
     return ofNullable(getParameter(ast, paramName));
   }
+
+  protected Stream<ComponentAst> getChilds(ComponentAst component, String childName) {
+    return component.directChildrenStreamByIdentifier(null, childName);
+  }
+
+  protected Optional<ComponentAst> getSingleChild(ComponentAst component, String childName) {
+    return getChilds(component, childName).findFirst();
+  }
+
 }

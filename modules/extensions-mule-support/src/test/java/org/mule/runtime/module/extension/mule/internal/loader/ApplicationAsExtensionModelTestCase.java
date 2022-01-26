@@ -6,23 +6,29 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
+
+import java.io.InputStream;
 
 import javax.inject.Inject;
 
 import org.junit.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 @ArtifactClassLoaderRunnerConfig(applicationSharedRuntimeLibs = {"org.mule.tests:mule-tests-model"})
-public class ApplicationAsExtensionLoaderTestCase extends MuleArtifactFunctionalTestCase {
+public class ApplicationAsExtensionModelTestCase extends MuleArtifactFunctionalTestCase {
 
   @Inject
   private ExtensionManager extensionManager;
+
+  private ExtensionModelJsonSerializer serializer = new ExtensionModelJsonSerializer();
 
   @Override
   protected String getConfigFile() {
@@ -32,6 +38,16 @@ public class ApplicationAsExtensionLoaderTestCase extends MuleArtifactFunctional
   @Test
   public void loadApplicationExtensionModel() throws Exception {
     ExtensionModel extensionModel = extensionManager.getExtension(muleContext.getConfiguration().getId()).get();
-    assertThat(extensionModel.getOperationModels(), hasSize(1));
+    String json = serializer.serialize(extensionModel);
+    String expected = getResource("/models/app-as-mule-extension.json");
+    JSONAssert.assertEquals(expected, json, true);
+
+  }
+
+  private String getResource(String path) {
+    InputStream in = getClass().getResourceAsStream(path);
+    checkArgument(in != null, "Resource not found: " + path);
+
+    return IOUtils.toString(in);
   }
 }
