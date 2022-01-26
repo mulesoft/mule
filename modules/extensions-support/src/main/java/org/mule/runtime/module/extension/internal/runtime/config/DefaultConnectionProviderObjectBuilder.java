@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.internal.connection.ConnectionUtils.getInjectionTarget;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getMuleVersion;
 import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
 
@@ -80,7 +80,7 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
 
   protected ConnectionProvider<C> doBuild(ResolverSetResult result) throws MuleException {
     ConnectionProvider<C> provider = super.build(result).getFirst();
-    MuleVersion muleVersion = new MuleVersion(MULE_VERSION);
+    MuleVersion muleVersion = getMuleVersion();
     injectFields(providerModel, getInjectionTarget(provider), ownerConfigName,
                  muleContext.getConfiguration().getDefaultEncoding(), muleVersion);
     return provider;

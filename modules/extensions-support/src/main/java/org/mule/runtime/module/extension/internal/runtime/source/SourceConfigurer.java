@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getMuleVersion;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.extension.api.ExtensionConstants.POLLING_SOURCE_LIMIT_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_NAME;
@@ -22,7 +22,6 @@ import static java.lang.String.format;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.core.api.MuleContext;
@@ -118,9 +117,8 @@ public final class SourceConfigurer {
           @Override
           public Object build(ValueResolvingContext context) throws MuleException {
             Object builtSource = build(buildResolverSetResult(source, context));
-            MuleVersion muleVersion = new MuleVersion(MULE_VERSION);
             injectDefaultEncoding(model, builtSource, muleContext.getConfiguration().getDefaultEncoding());
-            injectRuntimeVersion(model, builtSource, muleVersion);
+            injectRuntimeVersion(model, builtSource, getMuleVersion());
             injectComponentLocation(builtSource, componentLocation);
             config.ifPresent(c -> injectRefName(builtSource, c.getName(), getReflectionCache()));
             return builtSource;
