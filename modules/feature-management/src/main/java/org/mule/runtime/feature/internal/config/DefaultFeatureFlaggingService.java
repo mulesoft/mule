@@ -91,4 +91,8 @@ public class DefaultFeatureFlaggingService implements ProfilingFeatureFlaggingSe
       setFeatureState(new FeatureState(feature, status));
     });
   }
+
+  public String getArtfactName() {
+    return featureUser.getName();
+  }
 }
