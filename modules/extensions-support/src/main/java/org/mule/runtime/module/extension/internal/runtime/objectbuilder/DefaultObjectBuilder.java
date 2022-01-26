@@ -12,7 +12,7 @@ import static java.util.function.UnaryOperator.identity;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getMuleVersion;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.decorateInput;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
@@ -145,7 +145,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
                                  : resolvedValue);
     }
 
-    injectFields(object, name, encoding, new MuleVersion(MULE_VERSION), reflectionCache);
+    injectFields(object, name, encoding, getMuleVersion(), reflectionCache);
 
     return object;
   }
