@@ -12,12 +12,13 @@ import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import javax.inject.Inject;
 
 import org.junit.Test;
 
-//@ArtifactClassLoaderRunnerConfig(applicationSharedRuntimeLibs = {"org.mule.tests:mule-tests-model"})
+@ArtifactClassLoaderRunnerConfig(applicationSharedRuntimeLibs = {"org.mule.tests:mule-tests-model"})
 public class ApplicationAsExtensionLoaderTestCase extends MuleArtifactFunctionalTestCase {
 
   @Inject
@@ -30,7 +31,7 @@ public class ApplicationAsExtensionLoaderTestCase extends MuleArtifactFunctional
 
   @Test
   public void loadApplicationExtensionModel() throws Exception {
-    ExtensionModel extensionModel = extensionManager.getExtension(muleContext.getId()).get();
+    ExtensionModel extensionModel = extensionManager.getExtension(muleContext.getConfiguration().getId()).get();
     assertThat(extensionModel.getOperationModels(), hasSize(1));
   }
 }

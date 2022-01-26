@@ -34,11 +34,11 @@ import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProvider
 class MuleOperationExtensionModelDeclarer {
 
   private static final String DSL_PREFIX = "operation";
-  private static final String NAMESPACE = format(DEFAULT_NAMESPACE_URI_MASK, "operation-dsl");
+  private static final String NAMESPACE = format(DEFAULT_NAMESPACE_URI_MASK, "operation");
   private static final String SCHEMA_LOCATION =
-      "http://www.mulesoft.org/schema/mule/operation-dsl/current/mule-operation-dsl.xsd";
+      "http://www.mulesoft.org/schema/mule/operation-dsl/current/mule-operation.xsd";
 
-  private static final String TYPE_EXAMPLE = "STRING or NUMBER or http:request-config";
+  private static final String TYPE_EXAMPLE = "string or number or http:request-config";
 
   private static final MetadataType EXPRESSION_SUPPORT_TYPE = BASE_TYPE_BUILDER.stringType()
       .enumOf("SUPPORTED", "NOT_SUPPORTED", "REQUIRED")

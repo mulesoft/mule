@@ -60,20 +60,14 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   private OutputModelParser asOutputModelParser(ComponentAst outputTypeElement) {
     String type = getParameter(outputTypeElement, "type");
-    String mimeType = getMimeTypeFromOutputType(outputTypeElement).orElse("application/java");
 
-    return typeLoader.load(type, mimeType)
+    return typeLoader.load(type)
         .map(mt -> new DefaultOutputModelParser(mt, false))
         .orElseThrow(() -> new IllegalModelDefinitionException(format(
-                                                                      "Component <%s:%s> defines %s as '%s' with mediaType '%s', but such type is not defined in the application",
+                                                                      "Component <%s:%s> defines %s as '%s' but such type is not defined in the application",
                                                                       outputTypeElement.getIdentifier().getNamespace(),
                                                                       outputTypeElement.getIdentifier().getName(),
-                                                                      outputTypeElement.getIdentifier().getName(),
-                                                                      mimeType)));
-  }
-
-  private Optional<String> getMimeTypeFromOutputType(ComponentAst outputTypeElement) {
-    return getOptionalParameter(outputTypeElement, "mimeType");
+                                                                      outputTypeElement.getIdentifier().getName())));
   }
 
   @Override
@@ -103,7 +97,9 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public OutputModelParser getAttributesOutputType() {
-    return asOutputModelParser(getOutputAttributesTypeElement());
+    return getOutputAttributesTypeElement()
+        .map(this::asOutputModelParser)
+        .orElse(VoidOutputModelParser.INSTANCE);
   }
 
   @Override
@@ -182,8 +178,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public Optional<MediaTypeModelProperty> getMediaTypeModelProperty() {
-    return getMimeTypeFromOutputType(getOutputPayloadTypeElement())
-        .map(mimeType -> new MediaTypeModelProperty(mimeType, true));
+    return empty();
   }
 
   @Override
@@ -227,24 +222,23 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   }
 
   private ComponentAst getOutputPayloadTypeElement() {
-    return getOutputElement("payload-type");
+    final String elementName = "payload-type";
+    return getOutputElement(elementName)
+        .orElseThrow(() -> new IllegalOperationModelDefinitionException(format(
+            "Operation '%s' is missing its <%s> declaration", getName(), elementName)));
   }
 
-  private ComponentAst getOutputAttributesTypeElement() {
+  private Optional<ComponentAst> getOutputAttributesTypeElement() {
     return getOutputElement("attributes-type");
   }
 
-  private ComponentAst getOutputElement(String elementName) {
+  private Optional<ComponentAst> getOutputElement(String elementName) {
     ComponentAst output = operation.directChildrenStreamByIdentifier(null, "output")
         .findFirst()
         .orElseThrow(() -> new IllegalOperationModelDefinitionException(format(
                                                                                "Operation '%s' is missing its <output> declaration",
                                                                                getName())));
 
-    return output.directChildrenStreamByIdentifier(null, elementName)
-        .findFirst()
-        .orElseThrow(() -> new IllegalOperationModelDefinitionException(format(
-                                                                               "Operation '%s' is missing its <%s> declaration",
-                                                                               getName(), elementName)));
+    return output.directChildrenStreamByIdentifier(null, elementName).findFirst();
   }
 }
