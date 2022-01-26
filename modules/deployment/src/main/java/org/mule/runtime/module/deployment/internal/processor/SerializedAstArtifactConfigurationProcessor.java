@@ -6,11 +6,10 @@
  */
 package org.mule.runtime.module.deployment.internal.processor;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.FORCE_PARSE_CONFIG_XMLS_ON_DEPLOYMENT_PROPERTY;
-
-import static java.lang.Boolean.getBoolean;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptySet;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -23,7 +22,10 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
 
+import java.io.InputStream;
 import java.util.Set;
+
+import org.slf4j.Logger;
 
 /**
  * Implementation of {@link ArtifactConfigurationProcessor} that reads the serialized AST available in the artifact and delegates
@@ -31,11 +33,25 @@ import java.util.Set;
  * 
  * @since 4.5
  */
-public class SerializedAstArtifactConfigurationProcessor extends AbstractAstConfigurationProcessor {
+public class SerializedAstArtifactConfigurationProcessor extends AbstractAstConfigurationProcessor
+    implements FallbackAllowedArtifactConfigurationProcessor {
+
+  private static final Logger LOGGER = getLogger(FallbackArtifactConfigurationProcessor.class);
 
   public static final String SERIALIZED_ARTIFACT_AST_LOCATION = "META-INF/mule-artifact/artifact.ast";
 
   private final ArtifactAstDeserializer defaultArtifactAstDeserializer = new ArtifactAstSerializerProvider().getDeserializer();
+
+  @Override
+  public boolean check(ArtifactContextConfiguration artifactContextConfiguration) {
+    InputStream seralizedAstStream = currentThread().getContextClassLoader().getResourceAsStream(SERIALIZED_ARTIFACT_AST_LOCATION);
+    if (seralizedAstStream == null) {
+      LOGGER.info("Serialized AST not avaliable for artifact '"
+          + artifactContextConfiguration.getMuleContext().getConfiguration().getId() + "'");
+    }
+
+    return seralizedAstStream != null;
+  }
 
   @Override
   protected ArtifactAst obtainArtifactAst(ArtifactContextConfiguration artifactContextConfiguration)
@@ -58,11 +74,7 @@ public class SerializedAstArtifactConfigurationProcessor extends AbstractAstConf
   }
 
   public static ArtifactConfigurationProcessor serializedAstWithFallbackArtifactConfigurationProcessor() {
-    if (getBoolean(FORCE_PARSE_CONFIG_XMLS_ON_DEPLOYMENT_PROPERTY)) {
-      return new AstXmlParserArtifactConfigurationProcessor();
-    } else {
-      return new FallbackArtifactConfigurationProcessor(new SerializedAstArtifactConfigurationProcessor(),
-                                                        new AstXmlParserArtifactConfigurationProcessor());
-    }
+    return new FallbackArtifactConfigurationProcessor(new SerializedAstArtifactConfigurationProcessor(),
+                                                      new AstXmlParserArtifactConfigurationProcessor());
   }
 }
