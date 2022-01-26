@@ -72,7 +72,7 @@ public abstract class TransientRegistry extends AbstractRegistry {
       FeatureFlaggingRegistry ffRegistry = getInstance();
       FeatureFlaggingService featureFlaggingService = new FeatureFlaggingServiceBuilder()
           .withContext(muleContext)
-          .withContext(new FeatureContext(muleContext.getConfiguration().getMinMuleVersion().orElse(null), muleContext.getId()))
+          .withContext(new FeatureContext(muleContext.getConfiguration().getMinMuleVersion().orElse(null), resolveArtifactName()))
           .withMuleContextFlags(ffRegistry.getFeatureConfigurations())
           .withFeatureContextFlags(ffRegistry.getFeatureFlagConfigurations())
           .build();
@@ -83,6 +83,14 @@ public abstract class TransientRegistry extends AbstractRegistry {
                        new LifecycleStateInjectorProcessor(getLifecycleManager().getState()));
     defaultEntries.put("_muleLifecycleManager", getLifecycleManager());
     registryMap.putAll(defaultEntries);
+  }
+
+  private String resolveArtifactName() {
+    if (muleContext.getConfiguration() != null) {
+      return muleContext.getConfiguration().getId();
+    } else {
+      return "";
+    }
   }
 
   @Override

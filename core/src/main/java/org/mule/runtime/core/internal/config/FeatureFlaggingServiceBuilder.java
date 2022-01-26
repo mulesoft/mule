@@ -102,21 +102,18 @@ public final class FeatureFlaggingServiceBuilder {
    * @return The {@link FeatureFlaggingService} instance.
    */
   public FeatureFlaggingService build() {
-    String artifactUserId = null;
     Map<Feature, Boolean> features = new HashMap<>();
     LOGGER.debug("Configuring feature flags...");
     if (muleContext != null) {
-      artifactUserId = getArtifactId(muleContext);
       muleContextFlags.forEach((feature, artifactDescriptorPredicate) -> features
           .put(feature, isFeatureFlagEnabled(feature, muleContext, artifactDescriptorPredicate)));
     }
     if (featureContext != null) {
-      artifactUserId = featureContext.getArtifactName();
       featureContextFlags.forEach((feature, artifactDescriptorPredicate) -> features
           .put(feature, isFeatureFlagEnabled(feature, featureContext, artifactDescriptorPredicate)));
     }
 
-    return new DefaultFeatureFlaggingService(artifactUserId, features);
+    return new DefaultFeatureFlaggingService(artifactName, features);
   }
 
   /**
