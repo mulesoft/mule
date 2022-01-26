@@ -55,7 +55,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
     }
 
     DefaultDirectedGraph<BeanVertexWrapper, DefaultEdge> dependencyGraph = getDependencyGraphForLifecycleType(currentObject);
-    CycleDetector cycleDetector = getCycleDetector(currentObject);
+    CycleDetector cycleDetector = new CycleDetector(dependencyGraph);
 
     BeanVertexWrapper currentVertex = new BeanVertexWrapper(beanName, currentObject);
     dependencyGraph.addVertex(currentVertex);
@@ -102,13 +102,15 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
   public List<Object> getSortedObjects() {
     return dependencyGraphs.stream().map(x -> {
       List<BeanVertexWrapper> sortedObjects = newArrayList(new TopologicalOrderIterator<>(x));
-      // reverse(sortedObjects);
+      if (x.equals(dependencyGraphs.get(3)) || x.equals(dependencyGraphs.get(5))) {
+        reverse(sortedObjects);
+      }
       return sortedObjects;
     }).reduce(new ArrayList<>(), (sortedObjectList, b) -> {
       for (BeanVertexWrapper v : b) {
-        if (!sortedObjectList.contains(v)) {
-          sortedObjectList.add(v);
-        }
+        // if (!sortedObjectList.contains(v)) {
+        sortedObjectList.add(v);
+        // }
       }
       return sortedObjectList;
     }).stream().map(BeanVertexWrapper::getWrappedObject).collect(toList());

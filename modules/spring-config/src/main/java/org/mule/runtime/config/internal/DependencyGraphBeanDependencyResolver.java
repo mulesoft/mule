@@ -25,7 +25,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 public class DependencyGraphBeanDependencyResolver implements BeanDependencyResolver {
 
   private final SpringContextRegistry springRegistry;
-  private final Set<String> processedKey;
+  // private final Set<String> processedKey;
   private final ConfigurationDependencyResolver configurationDependencyResolver;
   private final DeclaredDependencyResolver declaredDependencyResolver;
   private final AutoDiscoveredDependencyResolver autoDiscoveredDependencyResolver;
@@ -39,7 +39,7 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
     this.declaredDependencyResolver = declaredDependencyResolver;
     this.autoDiscoveredDependencyResolver = autoDiscoveredDependencyResolver;
     this.springRegistry = springRegistry;
-    processedKey = new HashSet<>();
+    // processedKey = new HashSet<>();
   }
 
 
@@ -48,7 +48,7 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
     Object currentObject = springRegistry.get(beanName);
     final DependencyNode currentNode = new DependencyNode(currentObject);
 
-    addDirectDependency(beanName, currentObject, currentNode, processedKey);
+    addDirectDependency(beanName, currentObject, currentNode, new HashSet<>());
 
     return currentNode.getChildren()
         .stream()
@@ -65,7 +65,7 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
     Object currentObject = springRegistry.get(beanName);
     final DependencyNode currentNode = new DependencyNode(beanName, currentObject);
 
-    addDirectDependency(beanName, currentObject, currentNode, processedKey);
+    addDirectDependency(beanName, currentObject, currentNode, new HashSet<>());
 
     return currentNode.getChildren()
         .stream()
@@ -120,10 +120,10 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
 
 
   private void addDirectChild(String key, Object childObject, DependencyNode parent, Set<String> processedKeys) {
+    parent.addChild(new DependencyNode(key, childObject));
     if (!processedKeys.add(key)) {
       return;
     }
-    parent.addChild(new DependencyNode(key, childObject));
   }
 
 

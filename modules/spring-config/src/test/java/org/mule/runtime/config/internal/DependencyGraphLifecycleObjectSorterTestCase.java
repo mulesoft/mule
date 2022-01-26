@@ -101,9 +101,27 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
   @Description("sort components for a graph with multiple levels " +
       "(When A -> C means A depends on C, A->C and C->B should return a list B - C - A")
   public void sortComponentsTest() {
-    DefaultStreamingManager streamingManagerA = new DefaultStreamingManager();
-    DefaultStreamingManager streamingManagerB = new DefaultStreamingManager();
-    DefaultStreamingManager streamingManagerC = new DefaultStreamingManager();
+    DefaultStreamingManager streamingManagerA = new DefaultStreamingManager() {
+
+      @Override
+      public String toString() {
+        return "A";
+      }
+    };
+    DefaultStreamingManager streamingManagerB = new DefaultStreamingManager() {
+
+      @Override
+      public String toString() {
+        return "B";
+      }
+    };
+    DefaultStreamingManager streamingManagerC = new DefaultStreamingManager() {
+
+      @Override
+      public String toString() {
+        return "C";
+      }
+    };
 
     Mockito.when(resolver.getDirectBeanDependencies("A")).thenReturn(Arrays.asList(new Pair<>("C", streamingManagerC)));
     Mockito.when(resolver.getDirectBeanDependencies("B")).thenReturn(Arrays.asList());
@@ -112,7 +130,7 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
     sorter.addObject("A", streamingManagerA);
     sorter.addObject("B", streamingManagerB);
     sorter.addObject("C", streamingManagerC);
-
+    System.out.println(sorter.getSortedObjects());
     assertThat(sorter.getSortedObjects(), containsInRelativeOrder(streamingManagerB, streamingManagerC, streamingManagerA));
   }
 
@@ -121,9 +139,27 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
   @Description("sort components when two components are sharing same prerequisite: " +
       "A -> C, B -> C: C should come before A and C should come before B")
   public void sortComponentsWithSharedChildTest() {
-    DefaultStreamingManager streamingManagerA = new DefaultStreamingManager();
-    DefaultStreamingManager streamingManagerB = new DefaultStreamingManager();
-    DefaultStreamingManager streamingManagerC = new DefaultStreamingManager();
+    DefaultStreamingManager streamingManagerA = new DefaultStreamingManager() {
+
+      @Override
+      public String toString() {
+        return "A";
+      }
+    };
+    DefaultStreamingManager streamingManagerB = new DefaultStreamingManager() {
+
+      @Override
+      public String toString() {
+        return "B";
+      }
+    };
+    DefaultStreamingManager streamingManagerC = new DefaultStreamingManager() {
+
+      @Override
+      public String toString() {
+        return "C";
+      }
+    };
 
     Mockito.when(resolver.getDirectBeanDependencies("A")).thenReturn(Arrays.asList(new Pair<>("C", streamingManagerC)));
     Mockito.when(resolver.getDirectBeanDependencies("B")).thenReturn(Arrays.asList(new Pair<>("C", streamingManagerC)));
