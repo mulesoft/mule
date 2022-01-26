@@ -107,8 +107,9 @@ public class CaseInsensitiveMultiMap extends AbstractCaseInsensitiveMultiMap {
     private static final long serialVersionUID = -1048913048598100657L;
 
     public ImmutableCaseInsensitiveMultiMap(CaseInsensitiveMultiMap caseInsensitiveMultiMap) {
-      super(caseInsensitiveMultiMap, caseInsensitiveMultiMap.optimized);
-      this.paramsMap = unmodifiableMap(paramsMap);
+      // intentionally avoid passing the delegate paramsMap to the super constructor to avoid the putAll.
+      super(caseInsensitiveMultiMap.optimized);
+      this.paramsMap = unmodifiableMap(caseInsensitiveMultiMap.paramsMap);
     }
 
     @Override
