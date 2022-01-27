@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.transports</groupId>
         <artifactId>mule-transports</artifactId>
-        <version>3.9.1-20220120</version>
+        <version>3.9.1-20220127</version>
     </parent>
     <artifactId>mule-transport-http</artifactId>
     <packaging>jar</packaging>

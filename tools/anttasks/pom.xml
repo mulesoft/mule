@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.tools</groupId>
         <artifactId>mule-tools</artifactId>
-        <version>3.9.1-20220120</version>
+        <version>3.9.1-20220127</version>
     </parent>
     <artifactId>mule-tools-anttasks</artifactId>
     <name>Mule Ant Tasks</name>

@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>3.9.1-20220120</version>
+        <version>3.9.1-20220127</version>
     </parent>
     <artifactId>mule-module-atom</artifactId>
     <packaging>jar</packaging>
