@@ -118,6 +118,7 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
 
   @Override
   public void dispose() {
+    super.dispose();
     try {
       defaultSizePool.close();
     } catch (Exception e) {

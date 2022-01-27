@@ -13,6 +13,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_MAX_MEMORY;
 import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.MAX_STREAMING_MEMORY_PERCENTAGE;
 
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
@@ -44,7 +45,7 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @since 4.3.0
  */
-public abstract class MemoryBoundByteBufferManager implements ByteBufferManager, Initialisable {
+public abstract class MemoryBoundByteBufferManager implements ByteBufferManager, Initialisable, Disposable {
 
   private final AtomicLong streamingMemory = new AtomicLong(0);
   private final long maxStreamingMemory;
@@ -72,6 +73,11 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager,
   public void initialise() throws InitialisationException {
     this.byteBufferProvider =
         memoryManagementService.getByteBufferProvider(MuleProperties.OBJECT_STREAMING_MANAGER, ByteBufferType.HEAP);
+  }
+
+  @Override
+  public void dispose() {
+    byteBufferProvider.dispose();
   }
 
   /**
