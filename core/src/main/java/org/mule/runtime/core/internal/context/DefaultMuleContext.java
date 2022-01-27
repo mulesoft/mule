@@ -15,6 +15,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING;
@@ -302,6 +303,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureStartExtensionComponentsWithArtifactClassloader();
       configureRemoveShadowedImplicitInputs();
       configureDefaultErrorHandlerNotRollbackingEveryTx();
+      configureParallelForeachFlattenMessage();
     }
   }
 
@@ -1290,6 +1292,18 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureDefaultErrorHandlerNotRollbackingEveryTx() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING,
+                                                featureContext -> featureContext.getArtifactMinMuleVersion()
+                                                    .filter(muleVersion -> muleVersion.atLeast("4.5.0")).isPresent());
+  }
+
+  /**
+   * Configures the {@link MuleRuntimeFeature#PARALLEL_FOREACH_FLATTEN_MESSAGE} feature flag.
+   *
+   * @since 4.3.0-202203
+   */
+  private static void configureParallelForeachFlattenMessage() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(PARALLEL_FOREACH_FLATTEN_MESSAGE,
                                                 featureContext -> featureContext.getArtifactMinMuleVersion()
                                                     .filter(muleVersion -> muleVersion.atLeast("4.5.0")).isPresent());
   }
