@@ -7,18 +7,24 @@
 
 package org.mule.runtime.core.internal.routing;
 
-import static java.util.Collections.singletonList;
-import static java.util.Optional.of;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
+import static org.mule.runtime.core.internal.routing.ForeachUtils.manageTypedValueForStreaming;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
+
+import static java.util.Collections.singletonList;
+import static java.util.Optional.of;
+
 import static reactor.core.publisher.Flux.fromIterable;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -49,7 +55,13 @@ import org.reactivestreams.Publisher;
 public class ParallelForEach extends AbstractForkJoinRouter {
 
   @Inject
+  protected ExpressionManager expressionManager;
+
+  @Inject
   protected StreamingManager streamingManager;
+
+  @Inject
+  protected FeatureFlaggingService featureFlaggingService;
 
   private String collectionExpression = DEFAULT_SPLIT_EXPRESSION;
   private SplittingStrategy<CoreEvent, Iterator<TypedValue<?>>> splittingStrategy;
@@ -60,19 +72,27 @@ public class ParallelForEach extends AbstractForkJoinRouter {
   @Override
   public void initialise() throws InitialisationException {
     nestedChain = buildNewChainWithListOfProcessors(of(resolveProcessingStrategy()), messageProcessors);
-    nestedChain.setMuleContext(muleContext);
-    splittingStrategy = new ExpressionSplittingStrategy(muleContext.getExpressionManager(), collectionExpression);
+    splittingStrategy = new ExpressionSplittingStrategy(expressionManager, collectionExpression);
     super.initialise();
   }
 
   @Override
   protected Publisher<ForkJoinStrategy.RoutingPair> getRoutingPairs(CoreEvent event) {
     return fromIterable(() -> splittingStrategy.split(event))
-        .map(partTypedValue -> {
-          TypedValue managedValue = updateTypedValueForStreaming(partTypedValue, event, streamingManager);
-          return CoreEvent.builder(event).message(Message.builder().payload(managedValue).build()).build();
-        })
+        .map(partTypedValue -> CoreEvent.builder(event)
+            .message(Message.builder()
+                .payload(manageTypedValuePayload(partTypedValue, event))
+                .build())
+            .build())
         .map(partEvent -> of(partEvent, nestedChain));
+  }
+
+  protected TypedValue manageTypedValuePayload(TypedValue partTypedValue, CoreEvent event) {
+    if (featureFlaggingService.isEnabled(PARALLEL_FOREACH_FLATTEN_MESSAGE)) {
+      return manageTypedValueForStreaming(partTypedValue, event, streamingManager);
+    } else {
+      return updateTypedValueForStreaming(partTypedValue, event, streamingManager);
+    }
   }
 
   @Override

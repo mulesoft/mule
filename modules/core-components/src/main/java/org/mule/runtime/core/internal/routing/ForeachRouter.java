@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.util.Optional.of;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE;
@@ -15,7 +14,11 @@ import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.internal.routing.ForeachInternalContextManager.addContext;
 import static org.mule.runtime.core.internal.routing.ForeachInternalContextManager.getContext;
 import static org.mule.runtime.core.internal.routing.ForeachInternalContextManager.removeContext;
+import static org.mule.runtime.core.internal.routing.ForeachUtils.manageTypedValueForStreaming;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
+
+import static java.util.Optional.of;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.create;
@@ -209,7 +212,7 @@ class ForeachRouter {
     // For each TypedValue part process the nested chain using the event from the previous part.
     CoreEvent.Builder partEventBuilder = builder(event).itemSequenceInfo(itemSequenceInfo);
     // Update type value for streaming
-    TypedValue managedValue = owner.manageTypeValueForStreaming(currentValue, event);
+    TypedValue managedValue = manageTypedValueForStreaming(currentValue, event, streamingManager);
     if (currentValue.getValue() instanceof EventBuilderConfigurer) {
       // Support EventBuilderConfigurer currently used by Batch Module
       EventBuilderConfigurer configurer = (EventBuilderConfigurer) currentValue.getValue();

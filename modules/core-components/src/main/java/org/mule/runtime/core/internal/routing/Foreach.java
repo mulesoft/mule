@@ -6,20 +6,21 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.util.Collections.singletonList;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
-import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
+import static org.mule.runtime.core.internal.routing.ForeachUtils.manageTypedValueForStreaming;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+
+import static java.util.Collections.singletonList;
+import static java.util.Optional.of;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -27,7 +28,6 @@ import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurer;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerIterator;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerList;
 import org.mule.runtime.core.privileged.processor.Scope;
@@ -166,9 +166,9 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     Iterator<TypedValue<?>> iterator = foreachContext.getIterator();
     if (batchSize > 1) {
       int counter = 0;
-      List currentBatch = new ArrayList<>();
+      List<TypedValue> currentBatch = new ArrayList<>();
       while (iterator.hasNext() && counter < batchSize) {
-        TypedValue managedValue = manageTypeValueForStreaming(iterator.next(), event);
+        TypedValue managedValue = manageTypedValueForStreaming(iterator.next(), event, streamingManager);
         currentBatch.add(managedValue);
         counter++;
       }
@@ -182,20 +182,6 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     }
     return currentValue;
   }
-
-  protected TypedValue manageTypeValueForStreaming(TypedValue typedValue, CoreEvent event) {
-    TypedValue managedValue;
-    if (typedValue.getValue() instanceof EventBuilderConfigurer) {
-      managedValue = typedValue;
-    } else if (typedValue.getValue() instanceof Message) {
-      Message message = (Message) typedValue.getValue();
-      managedValue = updateTypedValueForStreaming(message.getPayload(), event, streamingManager);
-    } else {
-      managedValue = updateTypedValueForStreaming(typedValue, event, streamingManager);
-    }
-    return managedValue;
-  }
-
 
   private static class EventBuilderConfigurerIteratorWrapper implements Iterator<TypedValue<?>> {
 
