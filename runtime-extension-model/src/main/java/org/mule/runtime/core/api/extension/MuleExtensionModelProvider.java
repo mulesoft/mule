@@ -86,7 +86,7 @@ public final class MuleExtensionModelProvider {
   private static final LazyValue<ExtensionModel> TLS_EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
       .create(contextFor(new TlsExtensionModelDeclarer().createExtensionModel())));
 
-  private static final LazyValue<ExtensionModel> APP_OPERATION_EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
+  private static final LazyValue<ExtensionModel> OPERATION_DSL_EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
       .create(contextFor(new MuleOperationExtensionModelDeclarer().declareExtensionModel())));
 
   private static ExtensionLoadingContext contextFor(ExtensionDeclarer declarer) {
@@ -128,13 +128,5 @@ public final class MuleExtensionModelProvider {
    */
   public static MuleVersion getMuleVersion() {
     return PARSED_MULE_VERSION;
-  }
-
-  /**
-   * @return the {@link ExtensionModel} definition containing the namespace declaration for the operation declaration DSL
-   * @since 4.4.0
-   */
-  public static ExtensionModel getAppOperationExtensionModel() {
-    return APP_OPERATION_EXTENSION_MODEL.get();
   }
 }

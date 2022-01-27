@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.extension;
 
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getAppOperationExtensionModel;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getOperationDslExtensionModel;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 
@@ -14,6 +14,6 @@ public final class OperationDslExtensionModelProvider implements RuntimeExtensio
 
   @Override
   public ExtensionModel createExtensionModel() {
-    return getAppOperationExtensionModel();
+    return getOperationDslExtensionModel();
   }
 }

@@ -9,7 +9,7 @@ package org.mule.runtime.core.extension;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getAppOperationExtensionModel;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getOperationDslExtensionModel;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
@@ -18,7 +18,7 @@ import org.junit.Test;
 
 public class OperationDslExtensionModelTestCase {
 
-  private ExtensionModel dslModel = getAppOperationExtensionModel();
+  private ExtensionModel dslModel = getOperationDslExtensionModel();
 
   @Test
   public void assertUndefinedComponents() {

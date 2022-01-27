@@ -13,6 +13,7 @@ import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -59,11 +60,15 @@ public final class ExtensionLoaderUtils {
    * @throws NoSuchElementException if no matching loader is found
    */
   public static ExtensionModelLoader getLoaderById(ClassLoader classLoader, String id) {
-    return lookupExtensionModelLoaders(classLoader)
-        .filter(extensionModelLoader -> extensionModelLoader.getId().equals(id))
-        .findAny()
-        .orElseThrow(() -> new NoSuchElementException("No loader found for id:{" + id + "}"));
+    return getOptionalLoaderById(classLoader, id).orElseThrow(() -> new NoSuchElementException("No loader found for id:{" + id + "}"));
   }
 
-  private ExtensionLoaderUtils() {}
+  public static Optional<ExtensionModelLoader> getOptionalLoaderById(ClassLoader classLoader, String id) {
+    return lookupExtensionModelLoaders(classLoader)
+        .filter(extensionModelLoader -> extensionModelLoader.getId().equals(id))
+        .findFirst();
+  }
+
+  private ExtensionLoaderUtils() {
+  }
 }
