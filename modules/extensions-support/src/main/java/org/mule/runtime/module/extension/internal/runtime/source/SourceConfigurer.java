@@ -110,6 +110,7 @@ public final class SourceConfigurer {
 
           @Override
           public Object build(ValueResolvingContext context) throws MuleException {
+            Object source = build(resolverSet.resolve(context));
             injectDefaultEncoding(model, source, muleContext.getConfiguration().getDefaultEncoding());
             injectRuntimeVersion(model, source, getMuleVersion());
             injectComponentLocation(source, componentLocation);
