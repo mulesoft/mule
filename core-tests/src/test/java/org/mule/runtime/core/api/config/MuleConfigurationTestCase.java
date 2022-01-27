@@ -12,6 +12,7 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -19,11 +20,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.ApplicationConfiguration.APPLICATION_CONFIGURATION;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuilder;
@@ -31,14 +33,13 @@ import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
 
 @SmallTest
 @Feature(DEPLOYMENT_CONFIGURATION)
@@ -85,11 +86,15 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase {
 
     MuleContextBuilder contextBuilder = MuleContextBuilder.builder(APP);
     contextBuilder.setMuleConfiguration(config);
+    final ArtifactCoordinates artifactCoordinates = mock(ArtifactCoordinates.class);
+    contextBuilder.setArtifactCoordinates(artifactCoordinates);
+
     muleContext = new DefaultMuleContextFactory()
         .createMuleContext(asList(testServicesConfigurationBuilder, new DefaultsConfigurationBuilder()), contextBuilder);
     muleContext.start();
 
     verifyConfiguration();
+    assertThat(muleContext.getConfiguration().getArtifactCoordinates().get(), is(sameInstance(artifactCoordinates)));
   }
 
   @Test

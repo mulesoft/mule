@@ -6,15 +6,15 @@
  */
 package org.mule.functional.junit4;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singleton;
 import static org.mule.functional.junit4.FunctionalTestCase.extensionManagerWithMuleExtModelBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singleton;
-
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
@@ -33,6 +33,7 @@ public class ApplicationContextBuilder {
   private String contextId;
   private ArtifactContext domainArtifactContext;
   private String[] applicationResources = new String[0];
+  private ArtifactCoordinates artifactCoordinates;
 
   private TestServicesConfigurationBuilder testServicesConfigBuilder;
 
@@ -50,6 +51,18 @@ public class ApplicationContextBuilder {
 
   public ApplicationContextBuilder setApplicationResources(String... applicationResources) {
     this.applicationResources = applicationResources;
+    return this;
+  }
+
+  /**
+   * Set's the application's {@link ArtifactCoordinates}
+   *
+   * @param artifactCoordinates the app's {@link ArtifactCoordinates}
+   * @return {@code this} builder
+   * @since 4.5.0
+   */
+  public ApplicationContextBuilder setArtifactCoordinates(ArtifactCoordinates artifactCoordinates) {
+    this.artifactCoordinates = artifactCoordinates;
     return this;
   }
 
@@ -76,6 +89,7 @@ public class ApplicationContextBuilder {
       muleConfiguration.setId(contextId);
     }
     muleContextBuilder.setMuleConfiguration(muleConfiguration);
+    muleContextBuilder.setArtifactCoordinates(artifactCoordinates);
     configureMuleContext(muleContextBuilder);
     context = muleContextFactory.createMuleContext(builders, muleContextBuilder);
     return context;

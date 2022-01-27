@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.config.MuleProperties.APP_HOME_DIRECTORY_PROPERTY;
@@ -22,10 +25,6 @@ import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.getMuleContext;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.isConfigLess;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Optional.empty;
-
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
@@ -36,6 +35,7 @@ import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
@@ -120,6 +120,7 @@ public class ArtifactContextBuilder {
   private String dataFolderName;
   private LockFactory runtimeLockFactory;
   private MemoryManagementService memoryManagementService;
+  private ArtifactCoordinates artifactCoordinates;
 
   private ArtifactContextBuilder() {}
 
@@ -387,6 +388,11 @@ public class ArtifactContextBuilder {
     return this;
   }
 
+  public ArtifactContextBuilder setArtifactCoordinates(ArtifactCoordinates artifactCoordinates) {
+    this.artifactCoordinates = artifactCoordinates;
+    return this;
+  }
+
   private Map<String, String> merge(Map<String, String> properties, Properties deploymentProperties) {
     if (deploymentProperties == null) {
       return properties;
@@ -491,6 +497,7 @@ public class ArtifactContextBuilder {
         ArtifactObjectSerializer objectSerializer = new ArtifactObjectSerializer(classLoaderRepository);
         muleContextBuilder.setObjectSerializer(objectSerializer);
         muleContextBuilder.setDeploymentProperties(properties);
+        muleContextBuilder.setArtifactCoordinates(artifactCoordinates);
 
         if (parentArtifact != null) {
           builders.add(new ConnectionManagerConfigurationBuilder(parentArtifact));

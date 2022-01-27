@@ -10,6 +10,7 @@ import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
@@ -179,4 +180,9 @@ public interface MuleConfiguration {
    */
   Optional<CorrelationIdGenerator> getDefaultCorrelationIdGenerator();
 
+  /**
+   * @return Optionally returns the {@link ArtifactCoordinates} for the deployed app
+   * @since 4.5.0
+   */
+  Optional<ArtifactCoordinates> getArtifactCoordinates();
 }

@@ -34,6 +34,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.SystemUtils;
@@ -236,6 +237,30 @@ public abstract class AbstractMuleTestCase {
    */
   protected boolean isFailOnTimeout() {
     return true;
+  }
+
+  /**
+   * @return A dummy instance of {@link ArtifactCoordinates} for the purpose of running tests
+   * @since 4.5.0
+   */
+  protected ArtifactCoordinates getTestArtifactCoordinates() {
+    return new ArtifactCoordinates() {
+
+      @Override
+      public String getGroupId() {
+        return "org.mule.tests";
+      }
+
+      @Override
+      public String getArtifactId() {
+        return "mule-test";
+      }
+
+      @Override
+      public String getVersion() {
+        return "1.0.0";
+      }
+    };
   }
 
   @After

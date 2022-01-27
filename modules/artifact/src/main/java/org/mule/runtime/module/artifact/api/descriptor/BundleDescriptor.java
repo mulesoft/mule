@@ -15,13 +15,15 @@ import static java.util.Optional.ofNullable;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import org.mule.runtime.core.api.artifact.ArtifactCoordinates;
+
 import java.util.Map;
 import java.util.Optional;
 
 /**
  * Describes a bundle by its Maven coordinates.
  */
-public final class BundleDescriptor {
+public final class BundleDescriptor implements ArtifactCoordinates {
 
   public static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
 
@@ -38,10 +40,12 @@ public final class BundleDescriptor {
 
   private BundleDescriptor() {}
 
+  @Override
   public String getGroupId() {
     return this.groupId;
   }
 
+  @Override
   public String getArtifactId() {
     return this.artifactId;
   }
@@ -50,6 +54,7 @@ public final class BundleDescriptor {
     return baseVersion;
   }
 
+  @Override
   public String getVersion() {
     return this.version;
   }
