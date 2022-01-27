@@ -14,6 +14,7 @@ import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
 import static org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory.DIRECT_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.internal.util.rx.Operators.outputToTarget;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -110,7 +111,6 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
   @Override
   public void initialise() throws InitialisationException {
     super.initialise();
-    expressionManager = muleContext.getExpressionManager();
     if (targetValue != null) {
       targetValueExpression = compile(targetValue, expressionManager);
     }
