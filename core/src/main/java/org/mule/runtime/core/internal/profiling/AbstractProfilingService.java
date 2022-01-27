@@ -8,6 +8,7 @@
 package org.mule.runtime.core.internal.profiling;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.FORCE_RUNTIME_PROFILING_CONSUMERS_ENABLEMENT;
 import static org.mule.runtime.core.internal.profiling.notification.ProfilingNotification.getFullyQualifiedProfilingNotificationIdentifier;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -25,6 +26,7 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInternalProfilingDataConsumer;
 import org.mule.runtime.core.internal.profiling.notification.ProfilingNotification;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
@@ -63,10 +65,19 @@ public abstract class AbstractProfilingService implements CoreProfilingService, 
       Set<? extends ProfilingEventType<?>> profilingEventTypes = dataConsumer.getProfilingEventTypes();
       for (ProfilingEventType<?> profilingEventType : profilingEventTypes) {
         featureFlaggingService.registerProfilingFeature(profilingEventType, dataConsumer.getClass().getName());
+        if (featureFlaggingService.isEnabled(FORCE_RUNTIME_PROFILING_CONSUMERS_ENABLEMENT)) {
+          featureFlaggingService.toggleProfilingFeature(profilingEventType, dataConsumer.getClass().getName(),
+                                                        isInternalDataConsumer(dataConsumer));
+        }
+
       }
     }
     registerNotificationListeners(dataConsumers);
     onDataConsumersRegistered();
+  }
+
+  private boolean isInternalDataConsumer(ProfilingDataConsumer<?> dataConsumer) {
+    return dataConsumer.getClass().isAnnotationPresent(RuntimeInternalProfilingDataConsumer.class);
   }
 
   /**
@@ -126,6 +137,8 @@ public abstract class AbstractProfilingService implements CoreProfilingService, 
                                                     .filter(muleVersion -> muleVersion
                                                         .atLeast(ENABLE_PROFILING_SERVICE.getSince()))
                                                     .isPresent());
+    featureFlaggingRegistry.registerFeatureFlag(FORCE_RUNTIME_PROFILING_CONSUMERS_ENABLEMENT,
+                                                featureContext -> false);
   }
 
 }

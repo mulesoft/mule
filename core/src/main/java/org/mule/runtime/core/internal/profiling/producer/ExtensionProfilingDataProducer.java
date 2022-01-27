@@ -13,6 +13,7 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ExtensionProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.ResettableProfilingDataProducer;
+import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInternalProfilingDataConsumer;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingDataProducerStatus;
 
@@ -24,6 +25,7 @@ import java.util.function.Function;
  * @see org.mule.runtime.api.profiling.type.ExtensionProfilingEventType
  * @since 4.4
  */
+@RuntimeInternalProfilingDataConsumer
 public class ExtensionProfilingDataProducer
     implements ResettableProfilingDataProducer<ExtensionProfilingEventContext, Object> {
 

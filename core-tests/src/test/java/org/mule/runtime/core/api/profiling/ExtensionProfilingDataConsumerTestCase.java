@@ -11,7 +11,6 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.EXT
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROFILING_SERVICE_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.internal.processor.rector.profiling.ProfilingTestUtils.enableProfilingFeatureTestConsumer;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
 
@@ -19,7 +18,6 @@ import static com.google.common.collect.ImmutableSet.of;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.After;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
@@ -29,6 +27,7 @@ import org.mule.runtime.api.profiling.type.context.ExtensionProfilingEventContex
 import org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils;
 import org.mule.runtime.core.internal.profiling.ArtifactProfilingProducerScope;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
+import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInternalProfilingDataConsumer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Optional;
@@ -61,7 +60,11 @@ public class ExtensionProfilingDataConsumerTestCase extends AbstractMuleContextT
   public MockitoRule mockitorule = MockitoJUnit.rule();
 
   @Rule
-  public SystemProperty systemProperty = new SystemProperty(ENABLE_PROFILING_SERVICE_PROPERTY, "true");
+  public SystemProperty enableProfilingServiceProperty = new SystemProperty(ENABLE_PROFILING_SERVICE_PROPERTY, "true");
+
+  @Rule
+  public EnableInternalRuntimeProfilers enableInternalRuntimeProfilfers =
+      new EnableInternalRuntimeProfilers(new TestComponentProfilingDataConsumer(null));
 
   @Mock
   private ExtensionProfilingEventContext profilingEventContext;
@@ -79,12 +82,6 @@ public class ExtensionProfilingDataConsumerTestCase extends AbstractMuleContextT
     profilingService = new TestDefaultProfilingService(logger);
     initialiseIfNeeded(profilingService, muleContext);
     startIfNeeded(profilingService);
-    enableProfilingFeatureTestConsumer(muleContext, EXTENSION_PROFILING_EVENT, true);
-  }
-
-  @After
-  public void after() throws Exception {
-    enableProfilingFeatureTestConsumer(muleContext, EXTENSION_PROFILING_EVENT, false);
   }
 
 
@@ -143,6 +140,7 @@ public class ExtensionProfilingDataConsumerTestCase extends AbstractMuleContextT
   /**
    * Stub {@link ProfilingDataConsumer} for consuming component profiling events.
    */
+  @RuntimeInternalProfilingDataConsumer
   private static class TestComponentProfilingDataConsumer implements ProfilingDataConsumer<ExtensionProfilingEventContext> {
 
     private final Logger logger;
