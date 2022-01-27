@@ -92,7 +92,7 @@ import org.mule.runtime.config.internal.processor.PostRegistrationActionsPostPro
 import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.config.internal.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.artifact.descriptor.BundleDescriptor;
+import org.mule.runtime.core.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -309,9 +309,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
 
     final String appId = muleContext.getConfiguration().getId();
-    Optional<BundleDescriptor> bundleDescriptor = muleContext.getConfiguration().getBundleDescriptor();
+    Optional<ArtifactCoordinates> artifactCoordinates = muleContext.getConfiguration().getArtifactCoordinates();
 
-    if (!bundleDescriptor.isPresent()) {
+    if (!artifactCoordinates.isPresent()) {
       if (LOGGER.isWarnEnabled()) {
         LOGGER.warn("No version specified for muleContext {}. ExtensionModel not generated.", appId);
       }
@@ -320,7 +320,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     ExtensionModel appExtensionModel = getMuleExtensionLoader()
         .loadExtensionModel(builder(getRegionClassLoader(), getDefault(extensionManager.getExtensions()))
-            .addParameter(VERSION, bundleDescriptor.get().getVersion())
+            .addParameter(VERSION, artifactCoordinates.get().getVersion())
             .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, applicationModel)
             .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME, appId)
             .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader())
