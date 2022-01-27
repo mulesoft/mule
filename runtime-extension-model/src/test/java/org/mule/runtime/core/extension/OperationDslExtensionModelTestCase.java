@@ -29,9 +29,9 @@ public class OperationDslExtensionModelTestCase {
     assertThat(dslModel.getImportedTypes(), hasSize(0));
     assertThat(dslModel.getSubTypes(), hasSize(0));
 
-    //TODO: review this. Should be a construct?
-//    assertThat(dslModel.getTypes(), hasSize(0));
-    
+    // TODO: review this. Should be a construct?
+    // assertThat(dslModel.getTypes(), hasSize(0));
+
     assertThat(dslModel.getPrivilegedArtifacts(), hasSize(0));
     assertThat(dslModel.getErrorModels(), hasSize(0));
     assertThat(dslModel.getSourceModels(), hasSize(0));

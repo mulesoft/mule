@@ -107,7 +107,8 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   public List<ParameterGroupModelParser> getParameterGroupModelParsers() {
     return getSingleChild(operation, "parameters")
         .map(p -> getChilds(p, "parameter").collect(toList()))
-        .map(parameters -> Collections.<ParameterGroupModelParser>singletonList(new MuleSdkParameterGroupModelParser(parameters, typeLoader)))
+        .map(parameters -> Collections
+            .<ParameterGroupModelParser>singletonList(new MuleSdkParameterGroupModelParser(parameters, typeLoader)))
         .orElse(emptyList());
   }
 
@@ -225,7 +226,8 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
     final String elementName = "payload-type";
     return getOutputElement(elementName)
         .orElseThrow(() -> new IllegalOperationModelDefinitionException(format(
-            "Operation '%s' is missing its <%s> declaration", getName(), elementName)));
+                                                                               "Operation '%s' is missing its <%s> declaration",
+                                                                               getName(), elementName)));
   }
 
   private Optional<ComponentAst> getOutputAttributesTypeElement() {

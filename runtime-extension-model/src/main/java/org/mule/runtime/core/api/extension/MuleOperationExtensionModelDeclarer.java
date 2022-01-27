@@ -201,7 +201,7 @@ class MuleOperationExtensionModelDeclarer {
         .describedAs("Detailed description of the parameter, it's semantics, usage and effects")
         .ofType(STRING_TYPE)
         .withDisplayModel(display("Parameter description",
-            "Detailed description of the parameter, it's semantics, usage and effects"))
+                                  "Detailed description of the parameter, it's semantics, usage and effects"))
         .withExpressionSupport(NOT_SUPPORTED)
         .withLayout(LayoutModel.builder().asText().build());
 
@@ -234,7 +234,7 @@ class MuleOperationExtensionModelDeclarer {
     final NestedComponentDeclarer optionalDef = parameterDef.withOptionalComponent("optional")
         .describedAs("Indicates that the parameter is optional")
         .withMinOccurs(1)
-        //TODO add stereotype
+        // TODO add stereotype
         .withMaxOccurs(1);
 
     final ParameterGroupDeclarer optionalDefParams = optionalDef.onDefaultParameterGroup();

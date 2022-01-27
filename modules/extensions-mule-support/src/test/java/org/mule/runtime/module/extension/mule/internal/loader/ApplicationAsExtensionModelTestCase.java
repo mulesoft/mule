@@ -41,7 +41,6 @@ public class ApplicationAsExtensionModelTestCase extends MuleArtifactFunctionalT
     String json = serializer.serialize(extensionModel);
     String expected = getResource("/models/app-as-mule-extension.json");
     JSONAssert.assertEquals(expected, json, true);
-
   }
 
   private String getResource(String path) {

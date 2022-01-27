@@ -49,6 +49,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_LOADER_
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_TYPE_LOADER_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
+import static org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.manager.ExtensionErrorsRegistrant.registerErrorMappings;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
@@ -91,11 +92,13 @@ import org.mule.runtime.config.internal.processor.PostRegistrationActionsPostPro
 import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.config.internal.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.api.transformer.Converter;
+import org.mule.runtime.core.api.type.catalog.ApplicationTypeLoader;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
@@ -104,11 +107,9 @@ import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
-import org.mule.runtime.core.api.type.catalog.ApplicationTypeLoader;
 import org.mule.runtime.core.internal.util.DefaultResourceLocator;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -307,12 +308,21 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       return;
     }
 
+    final String appId = muleContext.getConfiguration().getId();
+    Optional<BundleDescriptor> bundleDescriptor = muleContext.getConfiguration().getBundleDescriptor();
+
+    if (!bundleDescriptor.isPresent()) {
+      if (LOGGER.isWarnEnabled()) {
+        LOGGER.warn("No version specified for muleContext {}. ExtensionModel not generated.", appId);
+      }
+      return;
+    }
+
     ExtensionModel appExtensionModel = getMuleExtensionLoader()
         .loadExtensionModel(builder(getRegionClassLoader(), getDefault(extensionManager.getExtensions()))
-            // todo: get right version
-            .addParameter(AbstractExtensionModelLoader.VERSION, "1.0.0")
+            .addParameter(VERSION, bundleDescriptor.get().getVersion())
             .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, applicationModel)
-            .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME, muleContext.getConfiguration().getId())
+            .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME, appId)
             .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader())
             .build());
 
