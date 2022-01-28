@@ -6,28 +6,25 @@
  */
 package org.mule.runtime.internal.memory.bytebuffer;
 
-import static org.mule.runtime.internal.memory.bytebuffer.ThreadPoolBasedByteBufferProvider.DEFAULT_MAX_BUFFER_SIZE;
-import static org.mule.test.allure.AllureConstants.MemoryManagement.MEMORY_MANAGEMENT;
-import static org.mule.test.allure.AllureConstants.MemoryManagement.MemoryManagementServiceStory.BYTE_BUFFER_PROVIDER;
-
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.asList;
-
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import static org.mule.runtime.internal.memory.bytebuffer.ThreadPoolBasedByteBufferProvider.DEFAULT_MAX_BUFFER_SIZE;
+import static org.mule.test.allure.AllureConstants.MemoryManagement.MEMORY_MANAGEMENT;
+import static org.mule.test.allure.AllureConstants.MemoryManagement.MemoryManagementServiceStory.BYTE_BUFFER_PROVIDER;
 
 import java.nio.ByteBuffer;
 import java.util.List;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.junit.Test;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 @Feature(MEMORY_MANAGEMENT)
 @Story(BYTE_BUFFER_PROVIDER)

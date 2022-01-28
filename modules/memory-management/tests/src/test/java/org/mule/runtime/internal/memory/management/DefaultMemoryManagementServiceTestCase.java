@@ -12,11 +12,9 @@ import static org.mule.runtime.internal.memory.management.DefaultMemoryManagemen
 import static org.mule.runtime.internal.memory.management.DefaultMemoryManagementService.getInstance;
 import static org.mule.test.allure.AllureConstants.MemoryManagement.MEMORY_MANAGEMENT;
 import static org.mule.test.allure.AllureConstants.MemoryManagement.MemoryManagementServiceStory.DEFAULT_MEMORY_MANAGEMENT_SERVICE;
-
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
-
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.junit.MockitoJUnit.rule;
@@ -26,16 +24,15 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.nio.ByteBuffer;
 
-import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
-import org.mockito.junit.MockitoRule;
-
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.hamcrest.Matchers;
+import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.mockito.junit.MockitoRule;
 
 @Feature(MEMORY_MANAGEMENT)
 @Story(DEFAULT_MEMORY_MANAGEMENT_SERVICE)
