@@ -36,6 +36,7 @@
         <module>logging</module>
         <module>metadata-support</module>
         <module>http-api</module>
+        <module>http2-api</module>
         <module>oauth-api</module>
         <module>reboot</module>
         <module>tanuki-boot</module>
