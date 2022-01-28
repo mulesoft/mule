@@ -60,7 +60,8 @@ public final class ExtensionLoaderUtils {
    * @throws NoSuchElementException if no matching loader is found
    */
   public static ExtensionModelLoader getLoaderById(ClassLoader classLoader, String id) {
-    return getOptionalLoaderById(classLoader, id).orElseThrow(() -> new NoSuchElementException("No loader found for id:{" + id + "}"));
+    return getOptionalLoaderById(classLoader, id)
+        .orElseThrow(() -> new NoSuchElementException("No loader found for id:{" + id + "}"));
   }
 
   public static Optional<ExtensionModelLoader> getOptionalLoaderById(ClassLoader classLoader, String id) {
@@ -69,6 +70,5 @@ public final class ExtensionLoaderUtils {
         .findFirst();
   }
 
-  private ExtensionLoaderUtils() {
-  }
+  private ExtensionLoaderUtils() {}
 }

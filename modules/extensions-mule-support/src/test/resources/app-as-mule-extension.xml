@@ -27,7 +27,7 @@
             </operation:parameter>
         </operation:parameters>
         <operation:output>
-            <operation:payload-type type="string" mimeType="text/plain"/>
+            <operation:payload-type type="string" />
         </operation:output>
         <operation:body>
             <set-payload value="#['$(params.greeting) $(params.prefix) $(params.receiver) $(params.suffix)']" />
