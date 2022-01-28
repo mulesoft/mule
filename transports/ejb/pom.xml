@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.transports</groupId>
         <artifactId>mule-transports</artifactId>
-        <version>3.8.6-20220120</version>
+        <version>3.8.6-20220128</version>
     </parent>
     <artifactId>mule-transport-ejb</artifactId>
     <packaging>jar</packaging>
