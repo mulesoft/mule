@@ -6,12 +6,11 @@
  */
 package org.mule.functional.junit4;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singleton;
 import static org.mule.functional.junit4.FunctionalTestCase.extensionManagerWithMuleExtModelBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
-
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singleton;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -19,6 +18,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactType;
 import org.mule.runtime.config.api.ArtifactContextFactory;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
@@ -36,6 +36,7 @@ public class DomainContextBuilder {
 
   private String contextId;
   private String[] domainConfig = new String[0];
+  private ArtifactCoordinates artifactCoordinates;
 
   private TestServicesConfigurationBuilder testServicesConfigBuilder;
 
@@ -48,6 +49,18 @@ public class DomainContextBuilder {
 
   public DomainContextBuilder setDomainConfig(String... domainConfig) {
     this.domainConfig = domainConfig;
+    return this;
+  }
+
+  /**
+   * Set's the application's {@link ArtifactCoordinates}
+   *
+   * @param artifactCoordinates the app's {@link ArtifactCoordinates}
+   * @return {@code this} builder
+   * @since 4.5.0
+   */
+  public DomainContextBuilder setArtifactCoordinates(ArtifactCoordinates artifactCoordinates) {
+    this.artifactCoordinates = artifactCoordinates;
     return this;
   }
 
@@ -65,6 +78,7 @@ public class DomainContextBuilder {
       muleConfiguration.setId(contextId);
     }
     muleContextBuilder.setMuleConfiguration(muleConfiguration);
+    muleContextBuilder.setArtifactCoordinates(artifactCoordinates);
     DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
     MuleContext domainContext = muleContextFactory.createMuleContext(builders, muleContextBuilder);
     domainContext.start();

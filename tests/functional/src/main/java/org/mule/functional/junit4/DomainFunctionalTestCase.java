@@ -173,6 +173,7 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
         .setContextId(this.getClass().getSimpleName())
         .setDomainArtifactContext(domainArtifactContext)
         .setApplicationResources(configResource)
+        .setArtifactCoordinates(getTestArtifactCoordinates())
         .build();
   }
 

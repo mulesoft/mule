@@ -124,6 +124,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
             .setParentArtifact(application)
             .setExtensionManagerFactory(getFeatureFlaggedExtensionManagerFactory())
             .setMuleContextListener(muleContextListener)
+            .setArtifactCoordinates(template.getDescriptor().getBundleDescriptor())
             .setMemoryManagementService(DefaultMemoryManagementService.getInstance());
 
     artifactBuilder.withServiceConfigurator(customizationService -> {

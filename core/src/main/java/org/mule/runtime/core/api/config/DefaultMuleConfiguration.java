@@ -13,6 +13,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_RESPONSE_TIMEOUT;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENCODING_SYSTEM_PROPERTY;
@@ -33,6 +34,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.component.InternalComponent;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -202,6 +204,13 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
    * @since 4.4.0
    */
   private Optional<CorrelationIdGenerator> correlationIdGenerationExpression = empty();
+
+  /**
+   * The {@link ArtifactCoordinates} for the deployed app
+   * 
+   * @since 4.5.0
+   */
+  private ArtifactCoordinates artifactCoordinates;
 
   /**
    * Mule Registry to initialize this configuration
@@ -386,6 +395,16 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         throw new IllegalArgumentException(initialisationFailure("Invalid working directory").getMessage(), e);
       }
     }
+  }
+
+  /**
+   * Sets the {@link ArtifactCoordinates} for the deployed app
+   *
+   * @param artifactCoordinates the app's {@link ArtifactCoordinates}
+   * @since 4.5.0
+   */
+  public void setArtifactCoordinates(ArtifactCoordinates artifactCoordinates) {
+    this.artifactCoordinates = artifactCoordinates;
   }
 
   @Override
@@ -730,6 +749,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   @Override
   public Optional<CorrelationIdGenerator> getDefaultCorrelationIdGenerator() {
     return correlationIdGenerationExpression;
+  }
+
+  @Override
+  public Optional<ArtifactCoordinates> getArtifactCoordinates() {
+    return ofNullable(artifactCoordinates);
   }
 
   public void setDefaultCorrelationIdGenerator(CorrelationIdGenerator generator) {

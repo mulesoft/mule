@@ -191,7 +191,8 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
                                                                 descriptor.getDeploymentProperties())))
           .setServiceRepository(serviceRepository)
           .setRuntimeLockFactory(runtimeLockFactory)
-          .setMemoryManagementService(memoryManagementService);
+          .setMemoryManagementService(memoryManagementService)
+          .setArtifactCoordinates(descriptor.getBundleDescriptor());
 
       if (!descriptor.getConfigResources().isEmpty()) {
         validateConfigurationFileDoNotUsesCoreNamespace();
