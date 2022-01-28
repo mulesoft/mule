@@ -41,6 +41,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * {@link OperationModelParser} implementation for Mule SDK
+ *
+ * @since 4.5.0
+ */
 class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser implements OperationModelParser {
 
   private final ComponentAst operation;
@@ -88,6 +93,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public List<String> getEmittedNotifications() {
+    // TODO: MULE-20075
     return emptyList();
   }
 
@@ -129,6 +135,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public boolean isBlocking() {
+    // TODO: MULE-20076
     return false;
   }
 
@@ -149,6 +156,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public boolean isConnected() {
+    // TODO: MULE-20077
     return false;
   }
 
@@ -159,21 +167,25 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public boolean supportsStreaming() {
+    // TODO: MULE-20079
     return false;
   }
 
   @Override
   public boolean isTransactional() {
+    // TODO: MULE-20080
     return false;
   }
 
   @Override
   public boolean isAutoPaging() {
+    // TODO: MULE-20081
     return false;
   }
 
   @Override
   public Optional<ExecutionType> getExecutionType() {
+    // TODO: MULE-20082
     return of(CPU_LITE);
   }
 
@@ -189,6 +201,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public Optional<DeprecationModel> getDeprecationModel() {
+    // TODO: MULE-20083
     return empty();
   }
 

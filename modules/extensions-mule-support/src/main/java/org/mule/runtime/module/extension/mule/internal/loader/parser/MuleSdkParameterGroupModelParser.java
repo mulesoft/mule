@@ -23,6 +23,11 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelPa
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * {@link ParameterGroupModelParser} implementation for Mule SDK
+ *
+ * @since 4.5.0
+ */
 class MuleSdkParameterGroupModelParser implements ParameterGroupModelParser {
 
   private final List<ParameterModelParser> parameters;

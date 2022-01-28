@@ -10,6 +10,11 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.get
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 
+/**
+ * Provides the {@link ExtensionModel} for operations Mule DSL
+ *
+ * @since 4.5.0
+ */
 public final class OperationDslExtensionModelProvider implements RuntimeExtensionModelProvider {
 
   @Override

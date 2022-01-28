@@ -42,6 +42,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+/**
+ * {@link ParameterModelParser} implementation for Mule SDK
+ *
+ * @since 4.5.0
+ */
 public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelParser implements ParameterModelParser {
 
   private final ComponentAst parameter;

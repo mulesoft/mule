@@ -31,6 +31,11 @@ import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 
+/**
+ * Builds the {@link ExtensionDeclarer} for the {@code operation} namespace used to define Mule DSL operations
+ *
+ * @since 4.5.0
+ */
 class MuleOperationExtensionModelDeclarer {
 
   private static final String DSL_PREFIX = "operation";

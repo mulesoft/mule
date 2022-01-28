@@ -17,6 +17,11 @@ import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelPa
 
 import java.util.NoSuchElementException;
 
+/**
+ * {@link ExtensionModelParserFactory} implementation for Mule SDK
+ *
+ * @since 4.5.0
+ */
 public class MuleSdkExtensionModelParserFactory implements ExtensionModelParserFactory {
 
   @Override

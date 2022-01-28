@@ -33,11 +33,15 @@ import org.mule.runtime.module.extension.internal.loader.parser.OperationModelPa
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * {@link ExtensionModelParser} implementation for Mule SDK extensions
+ *
+ * @since 4.5.0
+ */
 class MuleSdkExtensionModelParser implements ExtensionModelParser {
 
   private final String extensionName;
@@ -52,9 +56,7 @@ class MuleSdkExtensionModelParser implements ExtensionModelParser {
 
   @Override
   public List<ModelProperty> getAdditionalModelProperties() {
-    List<ModelProperty> properties = new LinkedList<>();
-
-    return properties;
+    return emptyList();
   }
 
   @Override
@@ -64,12 +66,13 @@ class MuleSdkExtensionModelParser implements ExtensionModelParser {
 
   @Override
   public Category getCategory() {
+    // TODO: MULE-20073
     return COMMUNITY;
   }
 
   @Override
   public String getVendor() {
-    // TODO: define syntax and default
+    // TODO: MULE-20074
     return MULESOFT;
   }
 

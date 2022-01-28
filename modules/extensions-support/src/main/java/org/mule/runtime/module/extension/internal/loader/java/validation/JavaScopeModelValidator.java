@@ -22,6 +22,12 @@ import org.mule.runtime.extension.api.dsl.syntax.resolver.SingleExtensionImportT
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 
+/**
+ * Validates Java SDK powered scopes, which per the current implementation, have extra limitations compared to manually defined
+ * ones.
+ *
+ * @since 4.5.0
+ */
 public class JavaScopeModelValidator implements ExtensionModelValidator {
 
   @Override

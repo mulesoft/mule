@@ -14,6 +14,11 @@ import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkExtensionMo
 
 import java.util.Set;
 
+/**
+ * Provides the {@link ExtensionModelLoader} for the Mule SDK
+ *
+ * @since 4.5.0
+ */
 public class MuleSdkExtensionModelLoaderProvider implements ExtensionModelLoaderProvider {
 
   @Override
