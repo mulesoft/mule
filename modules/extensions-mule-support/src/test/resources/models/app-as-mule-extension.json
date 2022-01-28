@@ -1,14 +1,14 @@
 {
   "name": "ApplicationAsExtensionModelTestCase#loadApplicationExtensionModel",
   "description": "",
-  "version": "4.5.0",
+  "version": "1.0.0",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "application-as-extension-model-test-case#load-application-extension-model",
     "namespace": "http://www.mulesoft.org/schema/mule/application-as-extension-model-test-case#load-application-extension-model",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/application-as-extension-model-test-case#load-application-extension-model/current/mule-application-as-extension-model-test-case#load-application-extension-model.xsd",
-    "schemaVersion": "4.5.0",
+    "schemaVersion": "1.0.0",
     "xsdFileName": "mule-application-as-extension-model-test-case#load-application-extension-model.xsd"
   },
   "resources": [],
