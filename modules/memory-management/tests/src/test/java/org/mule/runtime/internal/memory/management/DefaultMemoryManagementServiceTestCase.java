@@ -12,9 +12,11 @@ import static org.mule.runtime.internal.memory.management.DefaultMemoryManagemen
 import static org.mule.runtime.internal.memory.management.DefaultMemoryManagementService.getInstance;
 import static org.mule.test.allure.AllureConstants.MemoryManagement.MEMORY_MANAGEMENT;
 import static org.mule.test.allure.AllureConstants.MemoryManagement.MemoryManagementServiceStory.DEFAULT_MEMORY_MANAGEMENT_SERVICE;
+
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
+
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.junit.MockitoJUnit.rule;
