@@ -26,16 +26,15 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.nio.ByteBuffer;
 
-import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
-import org.mockito.junit.MockitoRule;
-
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.hamcrest.Matchers;
+import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.mockito.junit.MockitoRule;
 
 @Feature(MEMORY_MANAGEMENT)
 @Story(DEFAULT_MEMORY_MANAGEMENT_SERVICE)
