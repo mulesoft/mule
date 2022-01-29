@@ -13,6 +13,7 @@ import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJEC
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEMORY_MANAGEMENT_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
@@ -103,6 +104,7 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
+import org.mule.runtime.internal.memory.management.DefaultMemoryManagementService;
 
 import java.util.Map.Entry;
 
@@ -192,6 +194,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
 
     registerObject(OBJECT_STREAMING_GHOST_BUSTER, new StreamingGhostBuster(), muleContext);
     registerObject(OBJECT_STREAMING_MANAGER, new DefaultStreamingManager(), muleContext);
+    registerObject(MULE_MEMORY_MANAGEMENT_SERVICE, DefaultMemoryManagementService.getInstance(), muleContext);
     DefaultExpressionManager expressionManager = new DefaultExpressionManager();
     DefaultExpressionLanguageFactoryService service = registry.lookupObject(DefaultExpressionLanguageFactoryService.class);
     expressionManager.setExpressionLanguage(new DataWeaveExpressionLanguageAdaptor(muleContext, null, service, null));

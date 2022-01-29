@@ -31,6 +31,12 @@
 
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-memory-management</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-logging</artifactId>
             <version>${project.version}</version>
         </dependency>
