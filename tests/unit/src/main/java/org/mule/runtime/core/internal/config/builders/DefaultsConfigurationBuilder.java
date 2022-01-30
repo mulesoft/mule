@@ -192,9 +192,10 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
       // no mvel in classpath, move on
     }
 
+
+    registerObject(MULE_MEMORY_MANAGEMENT_SERVICE, DefaultMemoryManagementService.getInstance(), muleContext);
     registerObject(OBJECT_STREAMING_GHOST_BUSTER, new StreamingGhostBuster(), muleContext);
     registerObject(OBJECT_STREAMING_MANAGER, new DefaultStreamingManager(), muleContext);
-    registerObject(MULE_MEMORY_MANAGEMENT_SERVICE, DefaultMemoryManagementService.getInstance(), muleContext);
     DefaultExpressionManager expressionManager = new DefaultExpressionManager();
     DefaultExpressionLanguageFactoryService service = registry.lookupObject(DefaultExpressionLanguageFactoryService.class);
     expressionManager.setExpressionLanguage(new DataWeaveExpressionLanguageAdaptor(muleContext, null, service, null));
