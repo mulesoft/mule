@@ -85,8 +85,6 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   @Inject
   private MemoryManagementService memoryManagementService;
 
-  private LazyValue<String> byteBufferName = new LazyValue<>(() -> muleContext.getId().concat(OBJECT_STREAMING_MANAGER));
-
   /**
    * {@inheritDoc}
    */
@@ -118,7 +116,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
                                         e, this);
     }
     ByteBufferManager byteBufferManager = factory.create();
-    byteBufferManager.setByteBufferProvider(memoryManagementService.getByteBufferProvider(byteBufferName.get(), HEAP));
+    byteBufferManager.setByteBufferProvider(memoryManagementService.getByteBufferProvider(getByteBufferProviderName(), HEAP));
     initialiseIfNeeded(bufferManager, muleContext);
     return byteBufferManager;
   }
@@ -146,7 +144,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
     disposeIfNeeded(objectStreamingManager, LOGGER);
     disposeIfNeeded(bufferManager, LOGGER);
     disposeIfNeeded(cursorManager, LOGGER);
-    memoryManagementService.disposeByteBufferProvider(byteBufferName.get());
+    memoryManagementService.disposeByteBufferProvider(getByteBufferProviderName());
 
     initialised = false;
   }
@@ -246,5 +244,9 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
 
   protected ByteBufferManager getBufferManager() {
     return bufferManager;
+  }
+
+  private String getByteBufferProviderName() {
+    return muleContext.getId().concat(OBJECT_STREAMING_MANAGER);
   }
 }
