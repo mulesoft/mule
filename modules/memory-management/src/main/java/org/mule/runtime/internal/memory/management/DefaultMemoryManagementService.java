@@ -35,7 +35,7 @@ public class DefaultMemoryManagementService implements MemoryManagementService {
     return INSTANCE;
   }
 
-  private DefaultMemoryManagementService() {};
+  private DefaultMemoryManagementService() {}
 
   @Override
   public void dispose() {
@@ -73,7 +73,10 @@ public class DefaultMemoryManagementService implements MemoryManagementService {
 
   @Override
   public synchronized void disposeByteBufferProvider(String name) {
-    byteBufferProviders.remove(name).dispose();
+    ByteBufferProvider<?> byteBufferProvider = byteBufferProviders.remove(name);
+    if (byteBufferProvider != null) {
+      byteBufferProvider.dispose();
+    }
   }
 
 }

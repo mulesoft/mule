@@ -28,6 +28,7 @@ import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
 import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -43,7 +44,7 @@ import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
-import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.streaming.bytes.factory.InMemoryCursorStreamProviderFactory;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -71,6 +72,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.slf4j.Logger;
+
+import javax.inject.Inject;
 
 @SmallTest
 public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleContextTestCase {
@@ -102,13 +106,15 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
 
   protected ReturnDelegate delegate;
   protected ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-  protected DefaultStreamingManager streamingManager;
+
+  @Inject
+  protected StreamingManager streamingManager;
+
+  private static final Logger LOGGER = getLogger(ValueReturnDelegateContractTestCase.class);
 
   @Before
   public void before() throws MuleException {
-    streamingManager = new DefaultStreamingManager();
-    LifecycleUtils.initialiseIfNeeded(streamingManager, muleContext);
-
+    muleContext.getInjector().inject(this);
     event = eventBuilder(muleContext).message(Message.builder().value("").attributesValue(attributes).build()).build();
 
     when(outputModel.getType()).thenReturn(BaseTypeBuilder.create(JAVA).voidType().build());
@@ -285,7 +291,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
 
   private void disposeStreamingManager() {
     if (streamingManager != null) {
-      streamingManager.dispose();
+      LifecycleUtils.disposeIfNeeded(streamingManager, LOGGER);
       streamingManager = null;
     }
   }
