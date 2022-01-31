@@ -52,7 +52,7 @@ abstract class BaseMuleSdkExtensionModelParser {
    * @param childName the child element name
    * @return A {@link Stream} with all the direct children with the given {@code childName}
    */
-  protected Stream<ComponentAst> getChilds(ComponentAst component, String childName) {
+  protected Stream<ComponentAst> getChildren(ComponentAst component, String childName) {
     return component.directChildrenStreamByIdentifier(null, childName);
   }
 
@@ -62,7 +62,7 @@ abstract class BaseMuleSdkExtensionModelParser {
    * @return The first direct child (if any) with the given {@code childName}
    */
   protected Optional<ComponentAst> getSingleChild(ComponentAst component, String childName) {
-    return getChilds(component, childName).findFirst();
+    return getChildren(component, childName).findFirst();
   }
 
 }

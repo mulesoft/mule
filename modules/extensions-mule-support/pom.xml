@@ -46,34 +46,11 @@
             <artifactId>mule-module-extensions-support</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-        <!-- Mule Dependencies -->
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-extensions-support</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-dsl-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-tls</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-javaee</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-service-http-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        
+
         <!-- Test dependencies -->
         <dependency>
             <!-- Needed for tests to be able to parse test config files -->

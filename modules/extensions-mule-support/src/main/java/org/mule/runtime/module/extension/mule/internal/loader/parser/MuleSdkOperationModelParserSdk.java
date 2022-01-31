@@ -112,7 +112,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   @Override
   public List<ParameterGroupModelParser> getParameterGroupModelParsers() {
     return getSingleChild(operation, "parameters")
-        .map(p -> getChilds(p, "parameter").collect(toList()))
+        .map(p -> getChildren(p, "parameter").collect(toList()))
         .map(parameters -> Collections
             .<ParameterGroupModelParser>singletonList(new MuleSdkParameterGroupModelParser(parameters, typeLoader)))
         .orElse(emptyList());
