@@ -17,7 +17,7 @@ import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLo
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.module.deployment.impl.internal.policy.ArtifactExtensionManagerFactory;
-import org.mule.runtime.module.deployment.impl.internal.policy.CompositeArtifactExtensionManager;
+import org.mule.runtime.module.extension.internal.manager.CompositeArtifactExtensionManager;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
 
 import java.util.List;

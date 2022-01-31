@@ -110,6 +110,7 @@ import org.mule.runtime.core.internal.registry.TransformerResolver;
 import org.mule.runtime.core.internal.util.DefaultResourceLocator;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.manager.CompositeArtifactExtensionManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -325,7 +326,11 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
               .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader())
               .build());
 
-      extensionManager.registerExtension(appExtensionModel);
+      ExtensionManager appManager = extensionManager instanceof CompositeArtifactExtensionManager
+          ? ((CompositeArtifactExtensionManager) extensionManager).getChildExtensionManager()
+          : extensionManager;
+
+      appManager.registerExtension(appExtensionModel);
     } else {
       logModelNotGenerated("Mule ExtensionModelLoader not found");
       return;

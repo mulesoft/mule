@@ -50,14 +50,15 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-dsl-api</artifactId>
         </dependency>
+
+        <!-- Test dependencies -->
         <dependency>
+            <!-- Not really a test dependency per se, but if missing test runner fails to bootstrap -->
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-service-http-api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
-
-        <!-- Test dependencies -->
         <dependency>
             <!-- Needed for tests to be able to parse test config files -->
             <groupId>org.mule.runtime</groupId>

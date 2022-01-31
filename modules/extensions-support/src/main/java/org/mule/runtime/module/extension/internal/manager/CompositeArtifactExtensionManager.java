@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.deployment.impl.internal.policy;
+package org.mule.runtime.module.extension.internal.manager;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
