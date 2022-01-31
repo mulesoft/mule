@@ -17,6 +17,13 @@ import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -24,15 +31,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.streaming.CursorProvider;
-
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
 
 @RunWith(Parameterized.class)
-public abstract class AbstractTroubleshootCursorProviderTestCase extends AbstractStreamingTestCase {
+public abstract class AbstractTroubleshootCursorProviderTestCase extends AbstractMuleContextTestCase {
 
   @Rule
   public ExpectedException expectedException = none();

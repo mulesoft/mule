@@ -42,7 +42,38 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager 
 
   private final AtomicLong streamingMemory = new AtomicLong(0);
   private final long maxStreamingMemory;
-  private ByteBufferProvider<ByteBuffer> byteBufferProvider;
+  private ByteBufferProvider<ByteBuffer> byteBufferProvider = new ByteBufferProvider<ByteBuffer>() {
+
+    @Override
+    public ByteBuffer allocate(int size) {
+      return ByteBuffer.allocate(size);
+    }
+
+    @Override
+    public ByteBuffer allocateAtLeast(int size) {
+      return ByteBuffer.allocate(size);
+    }
+
+    @Override
+    public ByteBuffer reallocate(ByteBuffer oldBuffer, int newSize) {
+      return ByteBuffer.allocate(newSize);
+    }
+
+    @Override
+    public void release(ByteBuffer buffer) {
+      // Nothing to do.
+    }
+
+    @Override
+    public byte[] getByteArray(int size) {
+      return new byte[size];
+    }
+
+    @Override
+    public void dispose() {
+      // Nothing to do.
+    }
+  };
 
   /**
    * Creates a new instance

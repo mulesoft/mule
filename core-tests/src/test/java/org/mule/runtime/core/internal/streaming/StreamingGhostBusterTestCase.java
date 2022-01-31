@@ -20,10 +20,6 @@ import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.STREAM_MANAGEMENT;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
-import org.junit.Test;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
@@ -33,15 +29,21 @@ import org.mule.runtime.api.memory.provider.type.ByteBufferType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+import org.junit.Test;
+
 @Feature(STREAMING)
 @Story(STREAM_MANAGEMENT)
-public class StreamingGhostBusterTestCase extends AbstractStreamingTestCase {
+public class StreamingGhostBusterTestCase extends AbstractMuleContextTestCase {
 
   private static final int GC_POLLING_TIMEOUT = 10000;
 

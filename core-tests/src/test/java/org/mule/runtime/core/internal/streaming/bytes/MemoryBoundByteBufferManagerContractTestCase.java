@@ -21,20 +21,19 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.DEFAULT_BUFFER_BUCKET_SIZE;
 import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.MAX_STREAMING_MEMORY_PERCENTAGE;
 
-import org.junit.Before;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.streaming.bytes.ManagedByteBufferWrapper;
-import org.mule.runtime.core.internal.streaming.AbstractStreamingTestCase;
 import org.mule.runtime.core.internal.streaming.MemoryManager;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public abstract class MemoryBoundByteBufferManagerContractTestCase extends AbstractStreamingTestCase {
+public abstract class MemoryBoundByteBufferManagerContractTestCase extends AbstractMuleContextTestCase {
 
   private static final int CAPACITY = 100;
   private static final int OTHER_CAPACITY = CAPACITY + 1;

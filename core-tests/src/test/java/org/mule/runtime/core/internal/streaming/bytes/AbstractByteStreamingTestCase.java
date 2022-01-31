@@ -14,7 +14,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import org.mule.runtime.core.internal.streaming.AbstractStreamingTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +23,7 @@ import java.nio.charset.Charset;
 
 import org.apache.commons.io.IOUtils;
 
-public abstract class AbstractByteStreamingTestCase extends AbstractStreamingTestCase {
+public abstract class AbstractByteStreamingTestCase extends AbstractMuleContextTestCase {
 
   protected static final int KB_256 = 256 * 1024;
   protected static final int MB_1 = 1024 * 1024;

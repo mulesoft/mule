@@ -804,7 +804,6 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
   @Description("Check that managing a decorator of a cursor provider returns the same instance instead of attempting to manage it again.")
   public void managedProviderNotManagedTwice() throws MuleException {
     final DefaultStreamingManager streamingManager = new DefaultStreamingManager();
-    initialiseIfNeeded(streamingManager, muleContext);
 
     final ManagedCursorStreamProvider provider = mock(ManagedCursorStreamProvider.class);
     when(provider.isManaged()).thenCallRealMethod();
