@@ -7,7 +7,9 @@
 package org.mule.runtime.core.api.streaming;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.memory.provider.type.ByteBufferType.HEAP;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STREAMING_STATISTICS;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
@@ -26,8 +28,10 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -78,6 +82,11 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   @Inject
   private StreamingGhostBuster ghostBuster;
 
+  @Inject
+  private MemoryManagementService memoryManagementService;
+
+  private LazyValue<String> byteBufferName = new LazyValue<>(() -> muleContext.getId().concat(OBJECT_STREAMING_MANAGER));
+
   /**
    * {@inheritDoc}
    */
@@ -109,7 +118,8 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
                                         e, this);
     }
     ByteBufferManager byteBufferManager = factory.create();
-    initialiseIfNeeded(byteBufferManager, muleContext);
+    byteBufferManager.setByteBufferProvider(memoryManagementService.getByteBufferProvider(byteBufferName.get(), HEAP));
+    initialiseIfNeeded(bufferManager, muleContext);
     return byteBufferManager;
   }
 
@@ -136,6 +146,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
     disposeIfNeeded(objectStreamingManager, LOGGER);
     disposeIfNeeded(bufferManager, LOGGER);
     disposeIfNeeded(cursorManager, LOGGER);
+    memoryManagementService.disposeByteBufferProvider(byteBufferName.get());
 
     initialised = false;
   }

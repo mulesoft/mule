@@ -6,6 +6,7 @@
  */
 package org.mule.tck.core.streaming;
 
+import org.mule.runtime.api.memory.provider.ByteBufferProvider;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.ManagedByteBufferWrapper;
 
@@ -26,6 +27,11 @@ public class DummyByteBufferManager implements ByteBufferManager {
 
   @Override
   public void deallocate(ByteBuffer byteBuffer) {
+
+  }
+
+  @Override
+  public void setByteBufferProvider(ByteBufferProvider<ByteBuffer> byteBufferProvider) {
 
   }
 }

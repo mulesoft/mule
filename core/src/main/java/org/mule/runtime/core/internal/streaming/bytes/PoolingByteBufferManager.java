@@ -16,6 +16,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.streaming.bytes.ManagedByteBufferWrapper;
 import org.mule.runtime.core.internal.streaming.DefaultMemoryManager;
@@ -45,7 +46,7 @@ import org.vibur.objectpool.util.MultithreadConcurrentQueueCollection;
  *
  * @since 4.0
  */
-public class PoolingByteBufferManager extends MemoryBoundByteBufferManager implements Disposable {
+public class PoolingByteBufferManager extends MemoryBoundByteBufferManager implements Initialisable, Disposable {
 
   private static final Logger LOGGER = getLogger(PoolingByteBufferManager.class);
 
@@ -93,7 +94,6 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
 
   @Override
   public void initialise() throws InitialisationException {
-    super.initialise();
     defaultSizePool = newBufferPool(bufferSize);
   }
 
@@ -118,7 +118,6 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
 
   @Override
   public void dispose() {
-    super.dispose();
     try {
       defaultSizePool.close();
     } catch (Exception e) {

@@ -13,20 +13,13 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_MAX_MEMORY;
 import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.MAX_STREAMING_MEMORY_PERCENTAGE;
 
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.memory.provider.ByteBufferProvider;
-import org.mule.runtime.api.memory.provider.type.ByteBufferType;
 import org.mule.runtime.api.util.MuleSystemProperties;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.ManagedByteBufferWrapper;
 import org.mule.runtime.core.internal.streaming.DefaultMemoryManager;
 import org.mule.runtime.core.internal.streaming.MemoryManager;
 
-import javax.inject.Inject;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -45,12 +38,10 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @since 4.3.0
  */
-public abstract class MemoryBoundByteBufferManager implements ByteBufferManager, Initialisable, Disposable {
+public abstract class MemoryBoundByteBufferManager implements ByteBufferManager {
 
   private final AtomicLong streamingMemory = new AtomicLong(0);
   private final long maxStreamingMemory;
-  @Inject
-  private MemoryManagementService memoryManagementService;
   private ByteBufferProvider<ByteBuffer> byteBufferProvider;
 
   /**
@@ -67,17 +58,6 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager,
    */
   public MemoryBoundByteBufferManager(MemoryManager memoryManager) {
     maxStreamingMemory = calculateMaxStreamingMemory(memoryManager);
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    this.byteBufferProvider =
-        memoryManagementService.getByteBufferProvider(MuleProperties.OBJECT_STREAMING_MANAGER, ByteBufferType.HEAP);
-  }
-
-  @Override
-  public void dispose() {
-    byteBufferProvider.dispose();
   }
 
   /**
@@ -148,5 +128,10 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager,
                                                   maxMemoryProperty));
       }
     }
+  }
+
+  @Override
+  public void setByteBufferProvider(ByteBufferProvider<ByteBuffer> byteBufferProvider) {
+    this.byteBufferProvider = byteBufferProvider;
   }
 }
