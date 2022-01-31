@@ -34,7 +34,7 @@
         </operation:body>
     </operation:def>
 
-    <operation:def name="introduceMyself" summary="Returns an introductary message. Like a sir.">
+    <operation:def name="introduceMyself" summary="Returns an introductory message. Like a sir.">
         <operation:parameters>
             <operation:parameter name="name" type="string" summary="The gentleman's name"/>
             <operation:parameter name="nationalID" type="string" summary="The gentelman's identification"/>

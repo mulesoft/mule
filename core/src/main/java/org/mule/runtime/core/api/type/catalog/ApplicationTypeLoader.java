@@ -25,7 +25,7 @@ public class ApplicationTypeLoader implements TypeLoader {
 
   @Override
   public Optional<MetadataType> load(String typeIdentifier) {
-    //TODO: MULE-20071 - implement app type catalog lookup.
+    // TODO: MULE-20071 - implement app type catalog lookup.
     return primitivesTypeLoader.load(typeIdentifier);
   }
 }
