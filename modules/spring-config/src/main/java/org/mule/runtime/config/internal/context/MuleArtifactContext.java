@@ -47,8 +47,6 @@ import static java.util.stream.Collectors.toSet;
 
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
-import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
-import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -115,7 +113,6 @@ import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -123,8 +120,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
-import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.context.annotation.ContextAnnotationAutowireCandidateResolver;
 import org.springframework.context.support.AbstractRefreshableConfigApplicationContext;
 
@@ -568,10 +563,10 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   private void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry, ConfigurableListableBeanFactory beanFactory) {
-    registerAnnotationConfigProcessor(registry, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME,
-                                      ConfigurationClassPostProcessor.class, null);
-    registerAnnotationConfigProcessor(registry, REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME,
-                                      RequiredAnnotationBeanPostProcessor.class, null);
+    // registerAnnotationConfigProcessor(registry, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME,
+    // ConfigurationClassPostProcessor.class, null);
+    // registerAnnotationConfigProcessor(registry, REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME,
+    // RequiredAnnotationBeanPostProcessor.class, null);
     registerInjectorProcessor(beanFactory);
   }
 
@@ -586,16 +581,16 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
   }
 
-  private void registerAnnotationConfigProcessor(BeanDefinitionRegistry registry, String key, Class<?> type, Object source) {
-    RootBeanDefinition beanDefinition = new RootBeanDefinition(type);
-    beanDefinition.setSource(source);
-    registerPostProcessor(registry, beanDefinition, key);
-  }
-
-  protected void registerPostProcessor(BeanDefinitionRegistry registry, RootBeanDefinition definition, String beanName) {
-    definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-    registry.registerBeanDefinition(beanName, definition);
-  }
+  // private void registerAnnotationConfigProcessor(BeanDefinitionRegistry registry, String key, Class<?> type, Object source) {
+  // RootBeanDefinition beanDefinition = new RootBeanDefinition(type);
+  // beanDefinition.setSource(source);
+  // registerPostProcessor(registry, beanDefinition, key);
+  // }
+  //
+  // protected void registerPostProcessor(BeanDefinitionRegistry registry, RootBeanDefinition definition, String beanName) {
+  // definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+  // registry.registerBeanDefinition(beanName, definition);
+  // }
 
   @Override
   protected DefaultListableBeanFactory createBeanFactory() {
