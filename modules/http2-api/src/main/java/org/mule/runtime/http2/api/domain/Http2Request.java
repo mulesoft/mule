@@ -6,5 +6,9 @@
  */
 package org.mule.runtime.http2.api.domain;
 
+import java.io.InputStream;
+
 public interface Http2Request {
+
+  InputStream getInputStream();
 }
