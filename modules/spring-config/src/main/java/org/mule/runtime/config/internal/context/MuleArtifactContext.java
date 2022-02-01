@@ -27,6 +27,7 @@ import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.NOTIFICATIONS_IDENTIFIER;
+import static org.mule.runtime.config.internal.context.AbstractSpringMuleContextServiceConfigurator.getBeanDefinitionBuilder;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
 import static org.mule.runtime.config.internal.model.ApplicationModel.findComponentDefinitionModel;
 import static org.mule.runtime.config.internal.model.ApplicationModel.prepareAstForRuntime;
@@ -71,12 +72,31 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
+import org.mule.runtime.api.notification.ConnectionNotification;
+import org.mule.runtime.api.notification.ConnectionNotificationListener;
+import org.mule.runtime.api.notification.CustomNotification;
+import org.mule.runtime.api.notification.CustomNotificationListener;
+import org.mule.runtime.api.notification.ExceptionNotification;
+import org.mule.runtime.api.notification.ExceptionNotificationListener;
+import org.mule.runtime.api.notification.ExtensionNotification;
+import org.mule.runtime.api.notification.ExtensionNotificationListener;
+import org.mule.runtime.api.notification.ManagementNotification;
+import org.mule.runtime.api.notification.ManagementNotificationListener;
+import org.mule.runtime.api.notification.Notification;
+import org.mule.runtime.api.notification.NotificationListener;
+import org.mule.runtime.api.notification.SecurityNotification;
+import org.mule.runtime.api.notification.SecurityNotificationListener;
+import org.mule.runtime.api.notification.TransactionNotification;
+import org.mule.runtime.api.notification.TransactionNotificationListener;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResult;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
+import org.mule.runtime.config.internal.bean.NotificationConfig;
+import org.mule.runtime.config.internal.bean.NotificationConfig.EnabledNotificationConfig;
+import org.mule.runtime.config.internal.bean.ServerNotificationManagerConfigurator;
 import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
@@ -97,6 +117,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.context.notification.MuleContextNotification;
+import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.api.transformer.Converter;
@@ -125,6 +147,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor;
@@ -627,9 +650,31 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
 
     Optional<ComponentAst> notificationsOptional = findComponentDefinitionModel(applicationModel, NOTIFICATIONS_IDENTIFIER);
-    if (notificationsOptional.isPresent()) {
+    if (!notificationsOptional.isPresent()) {
       BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
-      beanDefinitionRegistry.removeBeanDefinition(OBJECT_NOTIFICATION_MANAGER);
+      beanDefinitionRegistry
+          .registerBeanDefinition(OBJECT_NOTIFICATION_MANAGER,
+                                  getBeanDefinitionBuilder(ServerNotificationManagerConfigurator.class)
+                                      .addPropertyValue("enabledNotifications", ImmutableList
+                                          .<NotificationConfig<? extends Notification, ? extends NotificationListener>>builder()
+                                          .add(new EnabledNotificationConfig<>(MuleContextNotificationListener.class,
+                                                                               MuleContextNotification.class))
+                                          .add(new EnabledNotificationConfig<>(SecurityNotificationListener.class,
+                                                                               SecurityNotification.class))
+                                          .add(new EnabledNotificationConfig<>(ManagementNotificationListener.class,
+                                                                               ManagementNotification.class))
+                                          .add(new EnabledNotificationConfig<>(ConnectionNotificationListener.class,
+                                                                               ConnectionNotification.class))
+                                          .add(new EnabledNotificationConfig<>(CustomNotificationListener.class,
+                                                                               CustomNotification.class))
+                                          .add(new EnabledNotificationConfig<>(ExceptionNotificationListener.class,
+                                                                               ExceptionNotification.class))
+                                          .add(new EnabledNotificationConfig<>(TransactionNotificationListener.class,
+                                                                               TransactionNotification.class))
+                                          .add(new EnabledNotificationConfig<>(ExtensionNotificationListener.class,
+                                                                               ExtensionNotification.class))
+                                          .build())
+                                      .getBeanDefinition());
     }
   }
 

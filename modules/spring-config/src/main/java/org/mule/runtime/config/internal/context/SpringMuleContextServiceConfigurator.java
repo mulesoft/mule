@@ -38,7 +38,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEX
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_DISPATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_HANDLER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_OBJECT_NAME_PROCESSOR;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PAYLOAD_STATISTICS_DECORATOR_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_MANAGER;
@@ -69,28 +68,9 @@ import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
-import org.mule.runtime.api.notification.ConnectionNotification;
-import org.mule.runtime.api.notification.ConnectionNotificationListener;
-import org.mule.runtime.api.notification.CustomNotification;
-import org.mule.runtime.api.notification.CustomNotificationListener;
-import org.mule.runtime.api.notification.ExceptionNotification;
-import org.mule.runtime.api.notification.ExceptionNotificationListener;
-import org.mule.runtime.api.notification.ExtensionNotification;
-import org.mule.runtime.api.notification.ExtensionNotificationListener;
-import org.mule.runtime.api.notification.ManagementNotification;
-import org.mule.runtime.api.notification.ManagementNotificationListener;
-import org.mule.runtime.api.notification.Notification;
-import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
-import org.mule.runtime.api.notification.SecurityNotification;
-import org.mule.runtime.api.notification.SecurityNotificationListener;
-import org.mule.runtime.api.notification.TransactionNotification;
-import org.mule.runtime.api.notification.TransactionNotificationListener;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.util.ResourceLocator;
-import org.mule.runtime.config.internal.bean.NotificationConfig;
-import org.mule.runtime.config.internal.bean.NotificationConfig.EnabledNotificationConfig;
-import org.mule.runtime.config.internal.bean.ServerNotificationManagerConfigurator;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultComponentInitialStateManager;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.config.internal.factories.ExtensionManagerFactoryBean;
@@ -101,8 +81,6 @@ import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.config.internal.registry.SpringRegistryBootstrap;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.api.context.notification.MuleContextNotification;
-import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
@@ -145,13 +123,10 @@ import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataServ
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import javax.inject.Inject;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -201,7 +176,6 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(OBJECT_OBJECT_NAME_PROCESSOR, getBeanDefinition(MuleObjectNameProcessor.class))
       .put(OBJECT_POLICY_MANAGER, getBeanDefinition(DefaultPolicyManager.class))
       .put(INTERCEPTOR_MANAGER_REGISTRY_KEY, getBeanDefinition(DefaultProcessorInterceptorManager.class))
-      .put(OBJECT_NOTIFICATION_MANAGER, createNotificationManagerBeanDefinition())
       .put(OBJECT_NOTIFICATION_DISPATCHER, getBeanDefinition(DefaultNotificationDispatcher.class))
       .put(NotificationListenerRegistry.REGISTRY_KEY, getBeanDefinition(DefaultNotificationListenerRegistry.class))
       .put(EventContextService.REGISTRY_KEY, getBeanDefinition(DefaultEventContextService.class))
@@ -376,22 +350,6 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     } else {
       getBeanDefinitionRegistry().registerAlias(OBJECT_STORE_MANAGER, LOCAL_OBJECT_STORE_MANAGER);
     }
-  }
-
-  private static BeanDefinition createNotificationManagerBeanDefinition() {
-    return getBeanDefinitionBuilder(ServerNotificationManagerConfigurator.class)
-        .addPropertyValue("enabledNotifications", ImmutableList
-            .<NotificationConfig<? extends Notification, ? extends NotificationListener>>builder()
-            .add(new EnabledNotificationConfig<>(MuleContextNotificationListener.class, MuleContextNotification.class))
-            .add(new EnabledNotificationConfig<>(SecurityNotificationListener.class, SecurityNotification.class))
-            .add(new EnabledNotificationConfig<>(ManagementNotificationListener.class, ManagementNotification.class))
-            .add(new EnabledNotificationConfig<>(ConnectionNotificationListener.class, ConnectionNotification.class))
-            .add(new EnabledNotificationConfig<>(CustomNotificationListener.class, CustomNotification.class))
-            .add(new EnabledNotificationConfig<>(ExceptionNotificationListener.class, ExceptionNotification.class))
-            .add(new EnabledNotificationConfig<>(TransactionNotificationListener.class, TransactionNotification.class))
-            .add(new EnabledNotificationConfig<>(ExtensionNotificationListener.class, ExtensionNotification.class))
-            .build())
-        .getBeanDefinition();
   }
 
   private BeanDefinition createMuleContextDefinition() {
