@@ -621,7 +621,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     Optional<ComponentAst> configurationOptional = findComponentDefinitionModel(applicationModel, CONFIGURATION_IDENTIFIER);
     if (!configurationOptional.isPresent()) {
       BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
-      beanDefinitionRegistry.registerBeanDefinition(OBJECT_MULE_CONFIGURATION, genericBeanDefinition(MuleConfigurationConfigurator.class).getBeanDefinition());
+      beanDefinitionRegistry
+          .registerBeanDefinition(OBJECT_MULE_CONFIGURATION,
+                                  genericBeanDefinition(MuleConfigurationConfigurator.class).getBeanDefinition());
     }
 
     Optional<ComponentAst> notificationsOptional = findComponentDefinitionModel(applicationModel, NOTIFICATIONS_IDENTIFIER);
