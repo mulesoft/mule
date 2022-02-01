@@ -6,5 +6,9 @@
  */
 package org.mule.runtime.http2.api.server;
 
+import org.mule.runtime.http2.api.domain.Http2Request;
+
 public interface Http2RequestHandler {
+
+  void handle(Http2Request request);
 }
