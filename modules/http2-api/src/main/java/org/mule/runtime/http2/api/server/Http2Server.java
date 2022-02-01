@@ -47,11 +47,11 @@ public interface Http2Server {
   /**
    * Adds a {@link Http2RequestHandler} on the given path and for all methods.
    *
-   * @param path           the path to match
-   * @param requestHandler the handler to execute upon a matching request
-   * @return a {@link Http2RequestHandlerManager} for the handler
+   * @param path           the path to match.
+   * @param requestHandler the handler to execute upon a matching request.
+   * @return the {@link Http2RequestHandler} added.
    */
   // TODO: Should the path be a new class instead of an String?
-  Http2RequestHandlerManager addRequestHandler(final String path, final Http2RequestHandler requestHandler)
+  Http2RequestHandler addRequestHandler(final String path, final Http2RequestHandler requestHandler)
       throws RequestHandlerAlreadyPresentException;
 }
