@@ -7,7 +7,7 @@
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
                 schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"/>
-    
+
     <xsd:element name="parameter" type="parameterType">
         <xsd:annotation>
             <xsd:documentation>
@@ -27,44 +27,12 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element name="optional" minOccurs="0">
+                    <xsd:element name="optional" minOccurs="0" type="optionalParameterType">
                         <xsd:annotation>
                             <xsd:documentation>
                                 Indicates that the parameter is optional
                             </xsd:documentation>
                         </xsd:annotation>
-                        <xsd:complexType>
-                            <xsd:attribute name="defaultValue" type="xsd:string">
-                                <xsd:annotation>
-                                    <xsd:documentation>
-                                        The parameter's default value if not provided.
-                                    </xsd:documentation>
-                                </xsd:annotation>
-                            </xsd:attribute>
-                            <xsd:sequence>
-                                <xsd:element name="exclusive-optional" minOccurs="0">
-                                    <xsd:annotation>
-                                        <xsd:documentation>
-                                            References other optional parameters which cannot be set at the same time as this one
-                                        </xsd:documentation>
-                                    </xsd:annotation>
-                                    <xsd:attribute name="parameters" type="mule:nonBlankString" use="required">
-                                        <xsd:annotation>
-                                            <xsd:documentation>
-                                                Comma separated list of parameters that this element is optional against
-                                            </xsd:documentation>
-                                        </xsd:annotation>
-                                    </xsd:attribute>
-                                    <xsd:attribute name="oneRequired" default="false" type="xsd:boolean">
-                                        <xsd:annotation>
-                                            <xsd:documentation>
-                                                Enforces that one of the parameters must be set at any given time
-                                            </xsd:documentation>
-                                        </xsd:annotation>
-                                    </xsd:attribute>
-                                </xsd:element>
-                            </xsd:sequence>
-                        </xsd:complexType>
                     </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="name" use="required" type="mule:nonBlankString">
@@ -107,6 +75,52 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:complexType name="optionalParameterType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Marks that a certain parameter is optional
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="exclusive-optional" minOccurs="0" type="exclusiveOptionalType">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        References other optional parameters which cannot be set at the same time as this one
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="defaultValue" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The parameter's default value if not provided.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="exclusiveOptionalType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Configures an optional parameter as exclusive optional
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute name="parameters" type="mule:nonBlankString" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Comma separated list of parameters that this element is optional against
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="oneRequired" default="false" type="xsd:boolean">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Enforces that one of the parameters must be set at any given time
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
     <xsd:element name="def" type="operationDefType">
         <xsd:annotation>
             <xsd:documentation>
@@ -122,15 +136,17 @@
                 one for the output payload and another one for the attributes (see: ResultType)
             </xsd:documentation>
         </xsd:annotation>
-        <xsd:extension base="mule:annotatedType">
-            <xsd:attribute name="type" type="type" use="required">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        The output payload's type.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:attribute>
-        </xsd:extension>
+        <xsd:complexContent>
+            <xsd:extension base="mule:annotatedType">
+                <xsd:attribute name="type" type="type" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The output payload's type.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:complexType name="resultType">
@@ -179,11 +195,11 @@
                         </xsd:annotation>
                         <xsd:complexType>
                             <xsd:sequence>
-                                <xsd:element name="parameter" type="parameterType" maxOccurs="unbounded" />
+                                <xsd:element name="parameter" type="parameterType" maxOccurs="unbounded"/>
                             </xsd:sequence>
                         </xsd:complexType>
                     </xsd:element>
-                    <xsd:element name="output" type="resultType" />
+                    <xsd:element name="output" type="resultType"/>
                     <xsd:element name="body">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -230,7 +246,7 @@
     </xsd:complexType>
 
     <xsd:simpleType name="type">
-        <xsd:union memberTypes="basicTypes mule:nonBlankString" />
+        <xsd:union memberTypes="basicTypes mule:nonBlankString"/>
     </xsd:simpleType>
 
     <xsd:simpleType name="basicTypes">

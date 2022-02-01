@@ -66,7 +66,7 @@ public class ApplicationAsExtensionModelTestCase extends MuleArtifactFunctionalT
   }
 
   @Test
-  public void flowIsIgnored() throws Exception {
+  public void flowIsIgnored() {
     ExtensionModel extensionModel = getAppExtensionModel();
 
     new ExtensionWalker() {
