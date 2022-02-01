@@ -44,6 +44,7 @@ import org.mule.runtime.module.extension.internal.loader.java.validation.JavaInp
 import org.mule.runtime.module.extension.internal.loader.java.validation.JavaOAuthConnectionProviderModelValidator;
 import org.mule.runtime.module.extension.internal.loader.java.validation.JavaParameterTypeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.java.validation.JavaSampleDataModelValidator;
+import org.mule.runtime.module.extension.internal.loader.java.validation.JavaScopeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.java.validation.JavaSubtypesModelValidator;
 import org.mule.runtime.module.extension.internal.loader.java.validation.JavaValueProviderModelValidator;
 import org.mule.runtime.module.extension.internal.loader.java.validation.MediaTypeModelValidator;
@@ -97,7 +98,8 @@ public abstract class AbstractJavaExtensionModelLoader extends AbstractExtension
                                                                                          new PrivilegedApiValidator(),
                                                                                          new ComponentLocationModelValidator(),
                                                                                          new InjectedFieldsModelValidator(),
-                                                                                         new IgnoredExtensionParameterModelValidator()));
+                                                                                         new IgnoredExtensionParameterModelValidator(),
+                                                                                         new JavaScopeModelValidator()));
 
   private final List<DeclarationEnricher> customDeclarationEnrichers = unmodifiableList(asList(
                                                                                                new RefNameDeclarationEnricher(),

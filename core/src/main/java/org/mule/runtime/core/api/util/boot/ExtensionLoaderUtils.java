@@ -13,6 +13,7 @@ import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -40,29 +41,43 @@ public final class ExtensionLoaderUtils {
   }
 
   /**
-   * Finds an {@link ExtensionModelLoader} with a matching {@code id} using the current context {@link ClassLoader}
+   * Finds an {@link ExtensionModelLoader} with a matching {@code id} using the current context {@code classLoader}
    *
    * @param id the wanted loader's id
    * @return the found {@link ExtensionModelLoader}
    * @throws NoSuchElementException if no matching loader is found
+   * @since 4.5.0
    */
   public static ExtensionModelLoader getLoaderById(String id) {
     return getLoaderById(currentThread().getContextClassLoader(), id);
   }
 
   /**
-   * Finds an {@link ExtensionModelLoader} with a matching {@code id} in the context of the given {@link ClassLoader}
+   * Finds an {@link ExtensionModelLoader} with a matching {@code id} in the context of the given {@code classLoader}
    *
    * @param classLoader the classloader owning the search space
    * @param id          the wanted loader's id
    * @return the found {@link ExtensionModelLoader}
    * @throws NoSuchElementException if no matching loader is found
+   * @since 4.5.0
    */
   public static ExtensionModelLoader getLoaderById(ClassLoader classLoader, String id) {
+    return getOptionalLoaderById(classLoader, id)
+        .orElseThrow(() -> new NoSuchElementException("No loader found for id:{" + id + "}"));
+  }
+
+  /**
+   * Looks for an {@link ExtensionModelLoader} with a matching {@code id} in the context of the given {@code classLoader}
+   *
+   * @param classLoader the classloader owning the search space
+   * @param id          the wanted loader's id
+   * @return An optional {@link ExtensionModelLoader}
+   * @since 4.5.0
+   */
+  public static Optional<ExtensionModelLoader> getOptionalLoaderById(ClassLoader classLoader, String id) {
     return lookupExtensionModelLoaders(classLoader)
         .filter(extensionModelLoader -> extensionModelLoader.getId().equals(id))
-        .findAny()
-        .orElseThrow(() -> new NoSuchElementException("No loader found for id:{" + id + "}"));
+        .findFirst();
   }
 
   private ExtensionLoaderUtils() {}

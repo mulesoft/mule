@@ -44,6 +44,7 @@
 
         <!-- depends on spring-config so it has to go after it -->
         <module>extensions-spring-support</module>
+        <module>extensions-mule-support</module>
         <module>repository</module>
         <module>tls</module>
         <module>soap-api</module>
