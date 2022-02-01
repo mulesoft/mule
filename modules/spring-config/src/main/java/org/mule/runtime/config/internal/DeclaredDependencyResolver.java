@@ -9,7 +9,7 @@ package org.mule.runtime.config.internal;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
-import org.mule.runtime.config.internal.registry.SpringContextRegistry;
+import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
 import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
 
 import java.util.ArrayList;
@@ -18,9 +18,9 @@ import java.util.stream.Stream;
 
 public class DeclaredDependencyResolver {
 
-  private final SpringContextRegistry springRegistry;
+  private AbstractSpringRegistry springRegistry;
 
-  public DeclaredDependencyResolver(SpringContextRegistry springRegistry) {
+  public DeclaredDependencyResolver(AbstractSpringRegistry springRegistry) {
     this.springRegistry = springRegistry;
   }
 

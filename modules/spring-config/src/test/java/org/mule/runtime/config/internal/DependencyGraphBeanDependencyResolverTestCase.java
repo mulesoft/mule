@@ -11,7 +11,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
-import org.mule.runtime.config.internal.registry.SpringContextRegistry;
+import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
 
 import io.qameta.allure.Description;
 import org.junit.Before;
@@ -24,14 +24,14 @@ public class DependencyGraphBeanDependencyResolverTestCase {
   private ConfigurationDependencyResolver configurationDependencyResolver;
   private DeclaredDependencyResolver declaredDependencyResolver;
   private AutoDiscoveredDependencyResolver autoDiscoveredDependencyResolver;
-  private SpringContextRegistry springRegistry;
+  private AbstractSpringRegistry springRegistry;
 
   @Before
   public void setUp() throws Exception {
     configurationDependencyResolver = mock(ConfigurationDependencyResolver.class);
     declaredDependencyResolver = mock(DeclaredDependencyResolver.class);
     autoDiscoveredDependencyResolver = mock(AutoDiscoveredDependencyResolver.class);
-    springRegistry = mock(SpringContextRegistry.class);
+    springRegistry = mock(AbstractSpringRegistry.class);
     resolver = new DependencyGraphBeanDependencyResolver(configurationDependencyResolver, declaredDependencyResolver,
                                                          autoDiscoveredDependencyResolver, springRegistry);
   }

@@ -29,6 +29,8 @@ import org.mule.runtime.core.internal.el.mvel.ExpressionLanguageExtension;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.qameta.allure.Description;
 import org.junit.Before;
@@ -58,6 +60,11 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
         MuleConfiguration.class,
         Initialisable.class
     });
+    Map<String, Integer> objectNameOrderMap = new HashMap<>();
+    objectNameOrderMap.put("A", 1);
+    objectNameOrderMap.put("B", 2);
+    objectNameOrderMap.put("C", 3);
+    sorter.setLifeCycleObjectNameOrderMap(objectNameOrderMap);
   }
 
 
@@ -161,6 +168,8 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
       }
     };
 
+
+
     Mockito.when(resolver.getDirectBeanDependencies("A")).thenReturn(Arrays.asList(new Pair<>("C", streamingManagerC)));
     Mockito.when(resolver.getDirectBeanDependencies("B")).thenReturn(Arrays.asList(new Pair<>("C", streamingManagerC)));
     Mockito.when(resolver.getDirectBeanDependencies("C")).thenReturn(Arrays.asList());
@@ -168,6 +177,8 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
     sorter.addObject("A", streamingManagerA);
     sorter.addObject("B", streamingManagerB);
     sorter.addObject("C", streamingManagerC);
+
+    System.out.println(sorter.getSortedObjects());
 
     assertThat(sorter.getSortedObjects(), anyOf(containsInRelativeOrder(streamingManagerC, streamingManagerA),
                                                 containsInRelativeOrder(streamingManagerC, streamingManagerB)));

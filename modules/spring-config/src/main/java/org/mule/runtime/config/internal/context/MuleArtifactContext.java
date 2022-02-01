@@ -16,6 +16,7 @@ import static org.mule.runtime.ast.api.util.MuleAstUtils.validatorBuilder;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.NOTIFICATIONS_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
 import static org.mule.runtime.config.internal.model.ApplicationModel.findComponentDefinitionModel;
 import static org.mule.runtime.config.internal.model.ApplicationModel.prepareAstForRuntime;
@@ -24,6 +25,7 @@ import static org.mule.runtime.config.internal.model.properties.PropertiesResolv
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
@@ -556,15 +558,32 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                                     memoryManagementService);
   }
 
+  // @Override
+  // protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+  // Optional<ComponentAst> configurationOptional = findComponentDefinitionModel(applicationModel, CONFIGURATION_IDENTIFIER);
+  // if (configurationOptional.isPresent()) {
+  // return;
+  // }
+  // BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
+  // beanDefinitionRegistry.registerBeanDefinition(OBJECT_MULE_CONFIGURATION,
+  // genericBeanDefinition(MuleConfigurationConfigurator.class).getBeanDefinition());
+  // }
+
   @Override
   protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
     Optional<ComponentAst> configurationOptional = findComponentDefinitionModel(applicationModel, CONFIGURATION_IDENTIFIER);
-    if (configurationOptional.isPresent()) {
-      return;
+    if (!configurationOptional.isPresent()) {
+      BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
+      beanDefinitionRegistry
+          .registerBeanDefinition(OBJECT_MULE_CONFIGURATION,
+                                  genericBeanDefinition(MuleConfigurationConfigurator.class).getBeanDefinition());
     }
-    BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
-    beanDefinitionRegistry.registerBeanDefinition(OBJECT_MULE_CONFIGURATION,
-                                                  genericBeanDefinition(MuleConfigurationConfigurator.class).getBeanDefinition());
+
+    Optional<ComponentAst> notificationsOptional = findComponentDefinitionModel(applicationModel, NOTIFICATIONS_IDENTIFIER);
+    if (notificationsOptional.isPresent()) {
+      BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
+      beanDefinitionRegistry.removeBeanDefinition(OBJECT_NOTIFICATION_MANAGER);
+    }
   }
 
   private void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry, ConfigurableListableBeanFactory beanFactory) {

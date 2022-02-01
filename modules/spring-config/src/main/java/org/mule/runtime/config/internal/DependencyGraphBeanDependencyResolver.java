@@ -10,8 +10,8 @@ import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
+import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
 import org.mule.runtime.config.internal.registry.BeanDependencyResolver;
-import org.mule.runtime.config.internal.registry.SpringContextRegistry;
 import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
 
 import java.util.HashSet;
@@ -24,8 +24,8 @@ import org.springframework.beans.factory.config.BeanDefinition;
 
 public class DependencyGraphBeanDependencyResolver implements BeanDependencyResolver {
 
-  private final SpringContextRegistry springRegistry;
-  // private final Set<String> processedKey;
+  private AbstractSpringRegistry springRegistry;
+  // private final Set<Pair<String, Object>> processedKey;
   private final ConfigurationDependencyResolver configurationDependencyResolver;
   private final DeclaredDependencyResolver declaredDependencyResolver;
   private final AutoDiscoveredDependencyResolver autoDiscoveredDependencyResolver;
@@ -34,7 +34,7 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
   public DependencyGraphBeanDependencyResolver(ConfigurationDependencyResolver configurationDependencyResolver,
                                                DeclaredDependencyResolver declaredDependencyResolver,
                                                AutoDiscoveredDependencyResolver autoDiscoveredDependencyResolver,
-                                               SpringContextRegistry springRegistry) {
+                                               AbstractSpringRegistry springRegistry) {
     this.configurationDependencyResolver = configurationDependencyResolver;
     this.declaredDependencyResolver = declaredDependencyResolver;
     this.autoDiscoveredDependencyResolver = autoDiscoveredDependencyResolver;
@@ -73,7 +73,7 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
         .collect(toList());
   }
 
-  private void addDirectDependency(String beanName, Object object, DependencyNode node, Set<String> processedKeys) {
+  private void addDirectDependency(String beanName, Object object, DependencyNode node, Set<Pair<String, Object>> processedKeys) {
     addDirectAutoDiscoveredDependencies(beanName, processedKeys, node);
     addDirectConfigurationDependencies(beanName, node, processedKeys);
     addDirectDeclaredDependencies(object, processedKeys, node);
@@ -82,7 +82,7 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
   /**
    * If the target object implements {@link InjectedDependenciesProvider}, then the custom dependencies declared by it are added.
    */
-  private void addDirectDeclaredDependencies(Object object, Set<String> processedKeys, DependencyNode node) {
+  private void addDirectDeclaredDependencies(Object object, Set<Pair<String, Object>> processedKeys, DependencyNode node) {
     declaredDependencyResolver.getDeclaredDependencies(object)
         .forEach(v -> addDirectChild(v.getBeanName(), v.getWrappedObject(), node,
                                      processedKeys));
@@ -91,7 +91,7 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
   /**
    * These are obtained through the {@link #configurationDependencyResolver}
    */
-  private void addDirectConfigurationDependencies(String beanName, DependencyNode node, Set<String> processedKeys) {
+  private void addDirectConfigurationDependencies(String beanName, DependencyNode node, Set<Pair<String, Object>> processedKeys) {
     if (configurationDependencyResolver == null) {
       return;
     }
@@ -110,7 +110,8 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
    * Adds the dependencies that are explicit on the {@link BeanDefinition}. These were inferred from introspecting fields
    * annotated with {@link Inject} or were programmatically added to the definition
    */
-  private void addDirectAutoDiscoveredDependencies(String beanName, Set<String> processedKeys, DependencyNode node) {
+  private void addDirectAutoDiscoveredDependencies(String beanName, Set<Pair<String, Object>> processedKeys,
+                                                   DependencyNode node) {
     autoDiscoveredDependencyResolver.getAutoDiscoveredDependencies(beanName)
         .stream()
         .filter(v -> !v.getWrappedObject().equals(node.getObject()))
@@ -119,8 +120,8 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
   }
 
 
-  private void addDirectChild(String key, Object childObject, DependencyNode parent, Set<String> processedKeys) {
-    if (!processedKeys.add(key)) {
+  private void addDirectChild(String key, Object childObject, DependencyNode parent, Set<Pair<String, Object>> processedKeys) {
+    if (!processedKeys.add(new Pair<String, Object>(key, childObject))) {
       return;
     }
     parent.addChild(new DependencyNode(key, childObject));

@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.config.internal;
 
-import org.mule.runtime.config.internal.registry.SpringContextRegistry;
+import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class AutoDiscoveredDependencyResolver {
 
-  private final SpringContextRegistry springRegistry;
+  private AbstractSpringRegistry springRegistry;
 
-  public AutoDiscoveredDependencyResolver(SpringContextRegistry springRegistry) {
+  public AutoDiscoveredDependencyResolver(AbstractSpringRegistry springRegistry) {
     this.springRegistry = springRegistry;
   }
 

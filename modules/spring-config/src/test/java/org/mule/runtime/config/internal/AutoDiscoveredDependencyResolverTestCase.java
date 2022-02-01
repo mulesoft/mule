@@ -8,7 +8,7 @@ package org.mule.runtime.config.internal;
 
 import static org.mockito.Mockito.times;
 
-import org.mule.runtime.config.internal.registry.SpringContextRegistry;
+import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
 
 import io.qameta.allure.Description;
 import org.junit.Before;
@@ -18,11 +18,11 @@ import org.mockito.Mockito;
 public class AutoDiscoveredDependencyResolverTestCase {
 
   AutoDiscoveredDependencyResolver autoDiscoveredDependencyResolver;
-  private SpringContextRegistry springRegistry;
+  private AbstractSpringRegistry springRegistry;
 
   @Before
   public void setUp() throws Exception {
-    springRegistry = Mockito.mock(SpringContextRegistry.class);
+    springRegistry = Mockito.mock(AbstractSpringRegistry.class);
     autoDiscoveredDependencyResolver = new AutoDiscoveredDependencyResolver(springRegistry);
   }
 

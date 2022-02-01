@@ -7,9 +7,11 @@
 package org.mule.runtime.core.internal.lifecycle.phases;
 
 import static java.util.Collections.emptyList;
+
 import org.mule.runtime.api.lifecycle.Initialisable;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * This lifecycle phase marks the 'pre-lifecycle' phase of an object. The default phase before any other phase has been executed
@@ -36,6 +38,12 @@ public class NotInLifecyclePhase extends DefaultLifecyclePhase {
       public List<Object> getSortedObjects() {
         return emptyList();
       }
+
+      @Override
+      public void setLifeCycleObjectNameOrderMap(Map<String, Integer> lifecycleObjectNameOrderMap) {
+        //
+      }
+
     };
   }
 }

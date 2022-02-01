@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.internal;
 
-import org.mule.runtime.config.internal.registry.SpringContextRegistry;
+import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
 import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
 
 import io.qameta.allure.Description;
@@ -17,12 +17,12 @@ import org.mockito.Mockito;
 public class DeclaredDependencyResolverTestCase {
 
   DeclaredDependencyResolver declaredDependencyResolver;
-  private SpringContextRegistry springRegistry;
+  private AbstractSpringRegistry springRegistry;
   private InjectedDependenciesProvider object;
 
   @Before
   public void setUp() throws Exception {
-    springRegistry = Mockito.mock(SpringContextRegistry.class);
+    springRegistry = Mockito.mock(AbstractSpringRegistry.class);
     object = Mockito.mock(InjectedDependenciesProvider.class);
     declaredDependencyResolver = new DeclaredDependencyResolver(springRegistry);
   }

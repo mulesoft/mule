@@ -18,7 +18,10 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.internal.lifecycle.phases.LifecycleObjectSorter;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jgrapht.alg.cycle.CycleDetector;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -31,6 +34,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
   private List<CycleDetector> cycleDetectors;
   private DependencyGraphBeanDependencyResolver resolver;
   protected Class<?>[] orderedLifecycleTypes;
+  private Map<String, Integer> lifecycleObjectNameOrderMap;
 
   public DependencyGraphLifecycleObjectSorter(DependencyGraphBeanDependencyResolver resolver, Class<?>[] orderedLifecycleTypes) {
     this.dependencyGraphs = new ArrayList<>();
@@ -42,6 +46,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
       dependencyGraphs.add(graph);
       cycleDetectors.add(new CycleDetector(graph));
     }
+    lifecycleObjectNameOrderMap = new HashMap<>();
   }
 
   // building a single dependency graph for each lifecycle type during initialization phase
@@ -101,19 +106,38 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
   @Override
   public List<Object> getSortedObjects() {
     return dependencyGraphs.stream().map(x -> {
-      List<BeanVertexWrapper> sortedObjects = newArrayList(new TopologicalOrderIterator<>(x));
-      //if(!x.equals(dependencyGraphs.get(11))){
-        reverse(sortedObjects);
-      //}
+      List<BeanVertexWrapper> sortedObjects = newArrayList(new TopologicalOrderIterator<>(x, new Comparator<BeanVertexWrapper>() {
+
+        @Override
+        public int compare(BeanVertexWrapper o1, BeanVertexWrapper o2) {
+          if (getLifeCycleObjectNameOrderMap().get(o1.getBeanName()) < getLifeCycleObjectNameOrderMap().get(o2.getBeanName())) {
+            return 1;
+          } else {
+            return -1;
+          }
+        }
+      }));
+      reverse(sortedObjects);
+
       return sortedObjects;
     }).reduce(new ArrayList<>(), (sortedObjectList, b) -> {
       for (BeanVertexWrapper v : b) {
-         if (!sortedObjectList.contains(v)) {
-        sortedObjectList.add(v);
-         }
+        if (!sortedObjectList.contains(v)) {
+          sortedObjectList.add(v);
+        }
       }
       return sortedObjectList;
     }).stream().map(BeanVertexWrapper::getWrappedObject).collect(toList());
+
+  }
+
+
+  public void setLifeCycleObjectNameOrderMap(Map<String, Integer> lifecycleObjectNameOrderMap) {
+    this.lifecycleObjectNameOrderMap = lifecycleObjectNameOrderMap;
+  }
+
+  public Map<String, Integer> getLifeCycleObjectNameOrderMap() {
+    return lifecycleObjectNameOrderMap;
   }
 
 
