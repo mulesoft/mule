@@ -203,7 +203,7 @@
         <jodaTimeVersion>2.9.1</jodaTimeVersion>
         <jsonVersion>20140107</jsonVersion>
         <junitVersion>4.12</junitVersion>
-        <log4jVersion>2.17.0</log4jVersion>
+        <log4jVersion>2.17.1</log4jVersion>
         <disruptorVersion>3.3.7</disruptorVersion>
         <mockitoVersion>2.26.0</mockitoVersion>
         <byteBuddyVersion>1.9.10</byteBuddyVersion>
