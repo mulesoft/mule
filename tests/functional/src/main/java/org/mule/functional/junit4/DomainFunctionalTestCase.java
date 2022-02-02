@@ -9,6 +9,7 @@ package org.mule.functional.junit4;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -130,7 +131,7 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
     ApplicationConfig[] applicationConfigs = getConfigResources();
 
     for (ApplicationConfig applicationConfig : applicationConfigs) {
-      MuleContext muleContext = createAppMuleContext(applicationConfig.applicationResources, domainArtifactContext);
+      MuleContext muleContext = createAppMuleContext(applicationConfig, domainArtifactContext);
       muleContexts.put(applicationConfig.applicationName, muleContext);
 
       ArtifactInstanceInfrastructure appInfrasturcture = new ArtifactInstanceInfrastructure();
@@ -162,7 +163,8 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
     domainInfrastructure = null;
   }
 
-  private MuleContext createAppMuleContext(String[] configResource, ArtifactContext domainArtifactContext) throws Exception {
+  private MuleContext createAppMuleContext(ApplicationConfig applicationConfig, ArtifactContext domainArtifactContext)
+      throws Exception {
     return new ApplicationContextBuilder() {
 
       @Override
@@ -170,9 +172,9 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
         return DomainFunctionalTestCase.this.getExtensionModels();
       }
     }
-        .setContextId(this.getClass().getSimpleName())
+        .setContextId(this.getClass().getSimpleName() + "#" + name.getMethodName() + "_" + applicationConfig.applicationName)
         .setDomainArtifactContext(domainArtifactContext)
-        .setApplicationResources(configResource)
+        .setApplicationResources(applicationConfig.applicationResources)
         .setArtifactCoordinates(getTestArtifactCoordinates())
         .build();
   }

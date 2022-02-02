@@ -31,7 +31,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -117,7 +116,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
     }
     ByteBufferManager byteBufferManager = factory.create();
     byteBufferManager.setByteBufferProvider(memoryManagementService.getByteBufferProvider(getByteBufferProviderName(), HEAP));
-    initialiseIfNeeded(bufferManager, muleContext);
+    initialiseIfNeeded(byteBufferManager, muleContext);
     return byteBufferManager;
   }
 
