@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.http2.api.server;
 
+import static org.mule.runtime.app.declaration.internal.utils.Preconditions.checkArgument;
+
 import java.net.InetSocketAddress;
 
 public class Http2ServerConfiguration {
 
-  private InetSocketAddress socketAddress;
+  private InetSocketAddress serverAddress;
 
   public static Builder builder() {
     return new Builder();
@@ -18,8 +20,8 @@ public class Http2ServerConfiguration {
 
   private Http2ServerConfiguration() {}
 
-  public InetSocketAddress getSocketAddress() {
-    return socketAddress;
+  public InetSocketAddress getServerAddress() {
+    return serverAddress;
   }
 
   public static class Builder {
@@ -30,12 +32,13 @@ public class Http2ServerConfiguration {
       product = new Http2ServerConfiguration();
     }
 
-    public Builder withSocketAddress(InetSocketAddress socketAddress) {
-      product.socketAddress = socketAddress;
+    public Builder withServerAddress(InetSocketAddress socketAddress) {
+      product.serverAddress = socketAddress;
       return this;
     }
 
     public Http2ServerConfiguration build() {
+      checkArgument(product.serverAddress != null, "Server address can't be null");
       return product;
     }
   }
