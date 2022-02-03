@@ -6,44 +6,51 @@
  */
 package org.mule.runtime.core.internal.construct.operation;
 
-import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Operation;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.FlowExceptionHandler;
-import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.internal.construct.AbstractPipeline;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
-import java.util.List;
-import java.util.Optional;
+import org.reactivestreams.Publisher;
 
-public class DefaultOperation extends AbstractPipeline implements Operation {
+public class DefaultOperation implements Operation {
 
-  public DefaultOperation(String name,
-                          MuleContext muleContext,
-                          MessageSource source,
-                          List<Processor> processors,
-                          Optional<FlowExceptionHandler> exceptionListener,
-                          Optional<ProcessingStrategyFactory> processingStrategyFactory,
-                          String initialState,
-                          Integer maxConcurrency,
-                          FlowConstructStatistics flowConstructStatistics,
-                          ComponentInitialStateManager componentInitialStateManager) {
-    super(name, muleContext, source, processors, exceptionListener, processingStrategyFactory, initialState, maxConcurrency, flowConstructStatistics, componentInitialStateManager);
-  }
+  private MessageProcessorChain chain;
 
   @Override
-  public OperationModel getModel() {
-    return null;
+  public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+    return chain.apply(publisher);
   }
 
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
+    return chain.process(event);
+  }
+
+  @Override
+  public void dispose() {
+
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+
+  }
+
+  @Override
+  public void start() throws MuleException {
+
+  }
+
+  @Override
+  public void stop() throws MuleException {
+
+  }
+
+  @Override
+  public OperationModel getModel() {
     return null;
   }
 }
