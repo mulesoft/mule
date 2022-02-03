@@ -85,9 +85,4 @@ public class DefaultLifecycleObjectSorter implements LifecycleObjectSorter {
     return sorted;
   }
 
-  @Override
-  public void setLifeCycleObjectNameOrderMap(Map<String, Object> lookupObjectsForLifecycle) {
-
-  }
-
 }

@@ -37,5 +37,5 @@ public interface LifecycleObjectSorter {
    * 
    * @param lookupObjectsForLifecycle lifecycle object list which is ordered based on the type
    */
-  void setLifeCycleObjectNameOrderMap(Map<String, Object> lookupObjectsForLifecycle);
+  default void setLifeCycleObjectNameOrderMap(Map<String, Object> lookupObjectsForLifecycle) {};
 }

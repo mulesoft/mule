@@ -39,11 +39,6 @@ public class NotInLifecyclePhase extends DefaultLifecyclePhase {
         return emptyList();
       }
 
-      @Override
-      public void setLifeCycleObjectNameOrderMap(Map<String, Object> lookupObjectsForLifecycle) {
-
-      }
-
     };
   }
 }
