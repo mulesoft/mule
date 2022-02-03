@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
+import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LIFECYCLE_AND_DEPENDENCY_INJECTION;
+import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LifecyclePhaseStory.LIFECYCLE_PHASE_STORY;
+
 import static java.util.Optional.of;
 
 import static org.junit.Assert.assertThat;
@@ -15,19 +18,27 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.graph.internal.DefaultArtifactAstDependencyGraph;
+import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
 
 import java.util.Collection;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
 import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
+
+@Issue("MULE-19984")
+@Feature(LIFECYCLE_AND_DEPENDENCY_INJECTION)
+@Story(LIFECYCLE_PHASE_STORY)
 public class ConfigurationDependencyResolverTestCase {
 
-  ConfigurationDependencyResolver configurationDependencyResolver;
+  private ConfigurationDependencyResolver configurationDependencyResolver;
   private DefaultArtifactAstDependencyGraph graph;
 
   @Before

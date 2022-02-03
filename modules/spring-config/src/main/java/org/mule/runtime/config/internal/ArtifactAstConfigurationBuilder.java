@@ -30,7 +30,7 @@ import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocato
 import org.mule.runtime.config.internal.context.BaseMuleArtifactContext;
 import org.mule.runtime.config.internal.context.MuleArtifactContext;
 import org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext;
-import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
+import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.model.ComponentModelInitializer;
 import org.mule.runtime.config.internal.registry.BaseSpringRegistry;

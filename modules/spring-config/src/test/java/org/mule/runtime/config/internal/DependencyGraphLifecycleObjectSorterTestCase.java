@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.config.internal;
 
+import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LIFECYCLE_AND_DEPENDENCY_INJECTION;
+import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LifecyclePhaseStory.LIFECYCLE_PHASE_STORY;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.contains;
@@ -20,6 +23,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.config.internal.resolvers.DependencyGraphBeanDependencyResolver;
 import org.mule.runtime.core.api.config.Config;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -35,10 +39,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
 
-
+@Issue("MULE-19984")
+@Feature(LIFECYCLE_AND_DEPENDENCY_INJECTION)
+@Story(LIFECYCLE_PHASE_STORY)
 public class DependencyGraphLifecycleObjectSorterTestCase {
 
   DependencyGraphLifecycleObjectSorter sorter;

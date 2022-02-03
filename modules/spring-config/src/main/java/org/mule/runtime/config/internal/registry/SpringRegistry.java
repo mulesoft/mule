@@ -7,7 +7,7 @@
 package org.mule.runtime.config.internal.registry;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
+import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 

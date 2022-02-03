@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.internal.registry;
 
-import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
+import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
 
 import java.util.List;
 
@@ -25,6 +25,11 @@ public interface BeanDependencyResolver {
    */
   List<Object> resolveBeanDependencies(String beanName);
 
+  /**
+   * @return a resolver that provides configuration dependencies
+   *
+   * @since 4.5.0
+   */
   ConfigurationDependencyResolver getConfigurationDependencyResolver();
 
 }

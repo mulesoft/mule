@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal;
+package org.mule.runtime.config.internal.resolvers;
 
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
+import org.mule.runtime.config.internal.DependencyNode;
 import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
 import org.mule.runtime.config.internal.registry.BeanDependencyResolver;
 import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
@@ -22,6 +22,12 @@ import javax.inject.Inject;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
 
+/**
+ * A {@link BeanDependencyResolver} to resolve direct dependencies based on spring
+ * {@link org.springframework.beans.factory.config.BeanDefinition}s and dependencies in the configuration.
+ *
+ * @since 4.5
+ */
 public class DependencyGraphBeanDependencyResolver implements BeanDependencyResolver {
 
   private AbstractSpringRegistry springRegistry;
@@ -145,7 +151,5 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
     }
     parent.addChild(new DependencyNode(key, childObject));
   }
-
-
 
 }

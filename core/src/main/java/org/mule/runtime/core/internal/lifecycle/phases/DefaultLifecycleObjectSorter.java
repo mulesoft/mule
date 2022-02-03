@@ -11,7 +11,6 @@ import org.mule.runtime.core.internal.registry.Registry;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Default implementation of {@link LifecycleObjectSorter}.

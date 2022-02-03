@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.dsl.model;
+package org.mule.runtime.config.internal.resolvers;
 
 import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.generateFor;
 
@@ -19,6 +19,9 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+/**
+ * Provides dependencies based on the information from the ArtifactAstDependencyGraph
+ */
 public class ConfigurationDependencyResolver {
 
   private final ArtifactAstDependencyGraph appModelDependencyGraph;

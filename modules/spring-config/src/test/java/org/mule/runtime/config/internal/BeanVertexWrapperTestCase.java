@@ -6,13 +6,22 @@
  */
 package org.mule.runtime.config.internal;
 
+import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LIFECYCLE_AND_DEPENDENCY_INJECTION;
+import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LifecyclePhaseStory.LIFECYCLE_PHASE_STORY;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+@Issue("MULE-19984")
+@Feature(LIFECYCLE_AND_DEPENDENCY_INJECTION)
+@Story(LIFECYCLE_PHASE_STORY)
 public class BeanVertexWrapperTestCase {
 
   @Rule
@@ -76,7 +85,7 @@ public class BeanVertexWrapperTestCase {
   @Test
   public void nullInWrapperTest() {
     exceptionRule.expect(NullPointerException.class);
-    exceptionRule.expectMessage("bean should not be null");
+    exceptionRule.expectMessage("bean must not be null");
     new BeanVertexWrapper("null", null);
   }
 

@@ -18,7 +18,7 @@ public class BeanVertexWrapper {
   final String beanName;
 
   public BeanVertexWrapper(String beanName, Object o) {
-    requireNonNull(o, "bean should not be null");
+    requireNonNull(o, "bean must not be null");
     this.beanName = beanName;
     this.wrappedObject = o;
   }

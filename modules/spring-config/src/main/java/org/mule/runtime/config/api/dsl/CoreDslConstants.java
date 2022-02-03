@@ -68,6 +68,8 @@ public interface CoreDslConstants {
       builder().namespace(CORE_PREFIX).name(NOTIFICATIONS_ELEMENT).build();
   ComponentIdentifier CHOICE_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(CHOICE_ELEMENT).build();
+  ComponentIdentifier NOTIFICATIONS_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(NOTIFICATIONS_ELEMENT).build();
   ComponentIdentifier ROUTE_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(ROUTE_ELEMENT).build();
   ComponentIdentifier UNTIL_SUCCESSFUL_IDENTIFIER =

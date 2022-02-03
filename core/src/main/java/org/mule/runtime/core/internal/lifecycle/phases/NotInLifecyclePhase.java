@@ -11,7 +11,6 @@ import static java.util.Collections.emptyList;
 import org.mule.runtime.api.lifecycle.Initialisable;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * This lifecycle phase marks the 'pre-lifecycle' phase of an object. The default phase before any other phase has been executed

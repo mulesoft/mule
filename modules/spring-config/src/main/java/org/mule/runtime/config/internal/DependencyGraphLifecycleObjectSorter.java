@@ -15,6 +15,9 @@ import static java.util.stream.Collectors.toList;
 import static com.google.common.collect.Lists.newArrayList;
 
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
+import org.mule.runtime.config.internal.resolvers.DependencyGraphBeanDependencyResolver;
+import org.mule.runtime.core.internal.lifecycle.phases.DefaultLifecycleObjectSorter;
 import org.mule.runtime.core.internal.lifecycle.phases.LifecycleObjectSorter;
 
 import java.util.ArrayList;
@@ -22,12 +25,22 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
 
 import org.jgrapht.alg.cycle.CycleDetector;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.traverse.TopologicalOrderIterator;
+import org.springframework.beans.factory.config.BeanDefinition;
 
+/**
+ * Specialization of {@link DefaultLifecycleObjectSorter} which uses an {@link AbstractSpringRegistry} to not only consider the
+ * provided objects but the beans on which that object depends on. This is accomplished by introspecting the
+ * {@link BeanDefinition} that was derived from the {@link Inject} annotations. This sorter was introduced to replace
+ * SpringLifecycleObjectSorter.
+ *
+ * @since 4.5.0
+ */
 public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSorter {
 
   private List<DefaultDirectedGraph<BeanVertexWrapper, DefaultEdge>> dependencyGraphs;
@@ -75,7 +88,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
       return;
     }
     prerequisiteObjects.forEach(
-                                (prerequisite) -> {
+                                prerequisite -> {
                                   String preReqName = prerequisite.getFirst();
                                   Object preReqObject = prerequisite.getSecond();
 
@@ -124,7 +137,6 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
     return dependencyGraphs.stream().map(x -> {
       List<BeanVertexWrapper> sortedObjects = newArrayList(new TopologicalOrderIterator<>(x, new Comparator<BeanVertexWrapper>() {
 
-        //
         @Override
         public int compare(BeanVertexWrapper o1, BeanVertexWrapper o2) {
           if (getLifeCycleObjectNameOrderMap().get(o1.getBeanName()) <= getLifeCycleObjectNameOrderMap().get(o2.getBeanName())) {

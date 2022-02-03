@@ -14,7 +14,7 @@ import static com.google.common.graph.Traverser.forTree;
 
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.config.internal.DependencyNode;
-import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
+import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
 import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
 
 import java.util.HashSet;

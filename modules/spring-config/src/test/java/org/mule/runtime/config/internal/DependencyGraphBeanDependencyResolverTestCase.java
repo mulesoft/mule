@@ -6,18 +6,29 @@
  */
 package org.mule.runtime.config.internal;
 
+import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LIFECYCLE_AND_DEPENDENCY_INJECTION;
+import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LifecyclePhaseStory.LIFECYCLE_PHASE_STORY;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
+import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
+import org.mule.runtime.config.internal.resolvers.AutoDiscoveredDependencyResolver;
+import org.mule.runtime.config.internal.resolvers.DeclaredDependencyResolver;
+import org.mule.runtime.config.internal.resolvers.DependencyGraphBeanDependencyResolver;
 
 import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
 
-
+@Issue("MULE-19984")
+@Feature(LIFECYCLE_AND_DEPENDENCY_INJECTION)
+@Story(LIFECYCLE_PHASE_STORY)
 public class DependencyGraphBeanDependencyResolverTestCase {
 
   DependencyGraphBeanDependencyResolver resolver;
