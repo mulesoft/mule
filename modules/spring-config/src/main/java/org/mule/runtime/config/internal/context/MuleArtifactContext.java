@@ -641,41 +641,47 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   @Override
   protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
-    Optional<ComponentAst> configurationOptional = findComponentDefinitionModel(applicationModel, CONFIGURATION_IDENTIFIER);
-    if (!configurationOptional.isPresent()) {
-      BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
-      beanDefinitionRegistry
-          .registerBeanDefinition(OBJECT_MULE_CONFIGURATION,
-                                  genericBeanDefinition(MuleConfigurationConfigurator.class).getBeanDefinition());
+    BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
+
+    if (!findComponentDefinitionModel(applicationModel, CONFIGURATION_IDENTIFIER).isPresent()) {
+      registerMuleConfigurationBean(beanDefinitionRegistry);
     }
 
-    Optional<ComponentAst> notificationsOptional = findComponentDefinitionModel(applicationModel, NOTIFICATIONS_IDENTIFIER);
-    if (!notificationsOptional.isPresent()) {
-      BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
-      beanDefinitionRegistry
-          .registerBeanDefinition(OBJECT_NOTIFICATION_MANAGER,
-                                  getBeanDefinitionBuilder(ServerNotificationManagerConfigurator.class)
-                                      .addPropertyValue("enabledNotifications", ImmutableList
-                                          .<NotificationConfig<? extends Notification, ? extends NotificationListener>>builder()
-                                          .add(new EnabledNotificationConfig<>(MuleContextNotificationListener.class,
-                                                                               MuleContextNotification.class))
-                                          .add(new EnabledNotificationConfig<>(SecurityNotificationListener.class,
-                                                                               SecurityNotification.class))
-                                          .add(new EnabledNotificationConfig<>(ManagementNotificationListener.class,
-                                                                               ManagementNotification.class))
-                                          .add(new EnabledNotificationConfig<>(ConnectionNotificationListener.class,
-                                                                               ConnectionNotification.class))
-                                          .add(new EnabledNotificationConfig<>(CustomNotificationListener.class,
-                                                                               CustomNotification.class))
-                                          .add(new EnabledNotificationConfig<>(ExceptionNotificationListener.class,
-                                                                               ExceptionNotification.class))
-                                          .add(new EnabledNotificationConfig<>(TransactionNotificationListener.class,
-                                                                               TransactionNotification.class))
-                                          .add(new EnabledNotificationConfig<>(ExtensionNotificationListener.class,
-                                                                               ExtensionNotification.class))
-                                          .build())
-                                      .getBeanDefinition());
+    if (!findComponentDefinitionModel(applicationModel, NOTIFICATIONS_IDENTIFIER).isPresent()) {
+      registerNotificationManagerBean(beanDefinitionRegistry);
     }
+  }
+
+  private void registerNotificationManagerBean(BeanDefinitionRegistry beanDefinitionRegistry) {
+    beanDefinitionRegistry
+        .registerBeanDefinition(OBJECT_NOTIFICATION_MANAGER,
+                                getBeanDefinitionBuilder(ServerNotificationManagerConfigurator.class)
+                                    .addPropertyValue("enabledNotifications", ImmutableList
+                                        .<NotificationConfig<? extends Notification, ? extends NotificationListener>>builder()
+                                        .add(new EnabledNotificationConfig<>(MuleContextNotificationListener.class,
+                                                                             MuleContextNotification.class))
+                                        .add(new EnabledNotificationConfig<>(SecurityNotificationListener.class,
+                                                                             SecurityNotification.class))
+                                        .add(new EnabledNotificationConfig<>(ManagementNotificationListener.class,
+                                                                             ManagementNotification.class))
+                                        .add(new EnabledNotificationConfig<>(ConnectionNotificationListener.class,
+                                                                             ConnectionNotification.class))
+                                        .add(new EnabledNotificationConfig<>(CustomNotificationListener.class,
+                                                                             CustomNotification.class))
+                                        .add(new EnabledNotificationConfig<>(ExceptionNotificationListener.class,
+                                                                             ExceptionNotification.class))
+                                        .add(new EnabledNotificationConfig<>(TransactionNotificationListener.class,
+                                                                             TransactionNotification.class))
+                                        .add(new EnabledNotificationConfig<>(ExtensionNotificationListener.class,
+                                                                             ExtensionNotification.class))
+                                        .build())
+                                    .getBeanDefinition());
+  }
+
+  private void registerMuleConfigurationBean(BeanDefinitionRegistry beanDefinitionRegistry) {
+    beanDefinitionRegistry
+        .registerBeanDefinition(OBJECT_MULE_CONFIGURATION,
+                                genericBeanDefinition(MuleConfigurationConfigurator.class).getBeanDefinition());
   }
 
   private void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry, ConfigurableListableBeanFactory beanFactory) {
