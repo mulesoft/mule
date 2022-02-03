@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.generateFor;
+
+import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -31,6 +32,10 @@ public class ConfigurationDependencyResolver {
     this.appModelDependencyGraph = generateFor(applicationModel);
   }
 
+  public ConfigurationDependencyResolver(ArtifactAstDependencyGraph graph) {
+    this.appModelDependencyGraph = graph;
+  }
+
   /**
    * @param componentName the name attribute value of the component
    * @return the dependencies of the component with component name {@code #componentName}. An empty collection if there is no
@@ -47,7 +52,22 @@ public class ConfigurationDependencyResolver {
         .collect(toList());
   }
 
-  private static class ComponentNamePredicate implements Predicate<ComponentAst> {
+  /**
+   * @param componentName the name attribute value of the component
+   * @return the direct dependencies of the component with component name {@code #componentName}. An empty collection if there is
+   *         no component with such name.
+   */
+  public Collection<String> getDirectComponentDependencies(String componentName) {
+    return appModelDependencyGraph
+        .getRequiredComponents(componentName)
+        .stream()
+        .map(ComponentAst::getComponentId)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .collect(toList());
+  }
+
+  static class ComponentNamePredicate implements Predicate<ComponentAst> {
 
     private final String componentName;
 
