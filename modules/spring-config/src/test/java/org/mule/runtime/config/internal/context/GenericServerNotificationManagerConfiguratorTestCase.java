@@ -18,11 +18,11 @@ public class GenericServerNotificationManagerConfiguratorTestCase extends Abstra
 
   @Override
   protected ConfigurationBuilder getBuilder() throws Exception {
-    return new SpringXmlConfigurationBuilder(new String[]{"./generic-server-notification-manager-test.xml"}, emptyMap());
+    return new SpringXmlConfigurationBuilder(new String[] {"./generic-server-notification-manager-test.xml"}, emptyMap());
   }
 
   @Test
-  public void testRegistryHasAGenericServerNotificationManagerIfNoDynamicConfigIsPresent()  {
+  public void testRegistryHasAGenericServerNotificationManagerIfNoDynamicConfigIsPresent() {
     assertThat(((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(OBJECT_NOTIFICATION_MANAGER), notNullValue());
   }
 }
