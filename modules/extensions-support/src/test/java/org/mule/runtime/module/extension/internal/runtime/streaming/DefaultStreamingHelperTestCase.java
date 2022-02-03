@@ -42,9 +42,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.junit.Test;
-
 import javax.inject.Inject;
+
+import org.junit.Test;
 
 @SmallTest
 public class DefaultStreamingHelperTestCase extends AbstractMuleContextTestCase {
@@ -58,8 +58,12 @@ public class DefaultStreamingHelperTestCase extends AbstractMuleContextTestCase 
   private final List<String> valueList = Arrays.asList("Apple", "Banana", "Kiwi");
 
   @Override
+  protected boolean doTestClassInjection() {
+    return true;
+  }
+
+  @Override
   protected void doSetUp() throws Exception {
-    muleContext.getInjector().inject(this);
     cursorProviderFactory =
         new InMemoryCursorIteratorProviderFactory(InMemoryCursorIteratorConfig.getDefault(), streamingManager);
     event = testEvent();

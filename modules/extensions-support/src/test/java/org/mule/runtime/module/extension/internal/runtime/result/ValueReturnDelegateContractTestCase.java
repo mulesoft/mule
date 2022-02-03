@@ -65,6 +65,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.inject.Inject;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -73,8 +75,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.slf4j.Logger;
-
-import javax.inject.Inject;
 
 @SmallTest
 public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleContextTestCase {
@@ -112,9 +112,13 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
 
   private static final Logger LOGGER = getLogger(ValueReturnDelegateContractTestCase.class);
 
+  @Override
+  protected boolean doTestClassInjection() {
+    return true;
+  }
+
   @Before
   public void before() throws MuleException {
-    muleContext.getInjector().inject(this);
     event = eventBuilder(muleContext).message(Message.builder().value("").attributesValue(attributes).build()).build();
 
     when(outputModel.getType()).thenReturn(BaseTypeBuilder.create(JAVA).voidType().build());

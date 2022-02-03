@@ -42,7 +42,7 @@ import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.management.stats.PayloadStatistics;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.execution.FlowProcessMediator;
 import org.mule.runtime.core.internal.execution.FlowProcessTemplate;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
@@ -65,6 +65,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import javax.inject.Inject;
+
 import org.apache.commons.io.IOUtils;
 import org.junit.Rule;
 import org.junit.Test;
@@ -78,11 +80,19 @@ import io.qameta.allure.Story;
 @Story(STATISTICS)
 public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase {
 
+  @Inject
+  private StreamingManager streamingManager;
+
   @Rule
   public SystemProperty muleEnableStatistics = new SystemProperty(MULE_ENABLE_STATISTICS, "true");
 
   @Rule
   public SystemProperty muleDisablePayloadStatistics = new SystemProperty(MULE_DISABLE_PAYLOAD_STATISTICS, "false");
+
+  @Override
+  protected boolean doTestClassInjection() {
+    return true;
+  }
 
   @Test
   public void decorateInputStreamNoLocation() throws IOException {
@@ -803,8 +813,6 @@ public class PayloadStatisticsTestCase extends AbstractPayloadStatisticsTestCase
   @Issue("MULE-18895")
   @Description("Check that managing a decorator of a cursor provider returns the same instance instead of attempting to manage it again.")
   public void managedProviderNotManagedTwice() throws MuleException {
-    final DefaultStreamingManager streamingManager = new DefaultStreamingManager();
-
     final ManagedCursorStreamProvider provider = mock(ManagedCursorStreamProvider.class);
     when(provider.isManaged()).thenCallRealMethod();
     final InputDecoratedCursorStreamProvider decoratedProvider =

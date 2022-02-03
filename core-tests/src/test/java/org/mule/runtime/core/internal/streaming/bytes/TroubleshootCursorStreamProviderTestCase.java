@@ -12,8 +12,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.TROUBLESHOOTING;
 
-import org.junit.After;
-import org.junit.Before;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.util.DataSize;
@@ -21,11 +19,13 @@ import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.AbstractTroubleshootCursorProviderTestCase;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.junit.After;
+import org.junit.Before;
 
 @Feature(STREAMING)
 @Story(TROUBLESHOOTING)
