@@ -12,7 +12,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
+ * DependencyNode provides relevant information such as beanName, object, and current object's children when resolving bean
+ * dependencies
  */
 public class DependencyNode {
 
@@ -20,10 +21,7 @@ public class DependencyNode {
   private final List<DependencyNode> children = new LinkedList<>();
   private String name;
 
-  /**
-   * DependencyNode provides relevant information such as beanName, object, and current object's children when resolving bean
-   * dependencies
-   */
+
   public DependencyNode(Object object) {
     this.object = object;
   }
