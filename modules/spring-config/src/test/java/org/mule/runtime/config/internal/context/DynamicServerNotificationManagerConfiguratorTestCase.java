@@ -25,98 +25,11 @@ public class DynamicServerNotificationManagerConfiguratorTestCase extends Abstra
 
   @Override
   protected ConfigurationBuilder getBuilder() throws Exception {
-    return new SpringXmlConfigurationBuilder(new String[]{"./dynamic-server-notification-manager-test.xml"}, emptyMap());
+    return new SpringXmlConfigurationBuilder(new String[] {"./dynamic-server-notification-manager-test.xml"}, emptyMap());
   }
 
   @Test
   public void testRegistryHasNoGenericServerNotificationManagerIfDynamicConfigIsPresent() {
     assertSame(((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(OBJECT_NOTIFICATION_MANAGER), null);
-  }
-
-  protected static interface TestInterface extends NotificationListener<TestEvent> {
-    // empty
-  }
-
-  protected static interface TestInterface2 extends NotificationListener<Notification> {
-    // empty
-  }
-
-  public static class TestListener implements TestInterface {
-
-    private boolean called = false;
-
-    public boolean isCalled() {
-      return called;
-    }
-
-    @Override
-    public void onNotification(TestEvent notification) {
-      called = true;
-    }
-
-  }
-
-  public static class TestListener2 implements TestInterface2 {
-
-    private boolean called = false;
-
-    public boolean isCalled() {
-      return called;
-    }
-
-    @Override
-    public void onNotification(Notification notification) {
-      called = true;
-    }
-
-  }
-
-  public static class TestSecurityListener implements SecurityNotificationListener<SecurityNotification> {
-
-    private boolean called = false;
-
-    public boolean isCalled() {
-      return called;
-    }
-
-    @Override
-    public boolean isBlocking() {
-      return false;
-    }
-
-    @Override
-    public void onNotification(SecurityNotification notification) {
-      called = true;
-    }
-
-  }
-
-  protected static class TestEvent extends AbstractServerNotification {
-
-    public TestEvent() {
-      super(new Object(), 0);
-    }
-
-    @Override
-    public String getEventName() {
-      return "TestEvent";
-    }
-  }
-
-  protected static class TestSecurityEvent extends SecurityNotification {
-
-    @Override
-    public boolean isSynchronous() {
-      return true;
-    }
-
-    public TestSecurityEvent(MuleContext muleContext) throws Exception {
-      super(new UnauthorisedException(createStaticMessage("dummy")), 0);
-    }
-
-    @Override
-    public String getEventName() {
-      return "TestSecurityEvent";
-    }
   }
 }
