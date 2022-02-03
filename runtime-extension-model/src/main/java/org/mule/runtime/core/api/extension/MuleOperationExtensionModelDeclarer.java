@@ -6,16 +6,18 @@
  */
 package org.mule.runtime.core.api.extension;
 
-import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.config.internal.dsl.processor.xml.OperationDslNamespaceInfoProvider.OPERATION_DSL_NAMESPACE;
+import static org.mule.runtime.config.internal.dsl.processor.xml.OperationDslNamespaceInfoProvider.OPERATION_DSL_NAMESPACE_URI;
+import static org.mule.runtime.config.internal.dsl.processor.xml.OperationDslNamespaceInfoProvider.OPERATION_DSL_SCHEMA_LOCATION;
+import static org.mule.runtime.config.internal.dsl.processor.xml.OperationDslNamespaceInfoProvider.OPERATION_DSL_XSD_FILE_NAME;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.BASE_TYPE_BUILDER;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.BOOLEAN_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULESOFT_VENDOR;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
-import static org.mule.runtime.internal.dsl.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OPERATION_DEF_STEREOTYPE;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OUTPUT_ATTRIBUTES_STEREOTYPE;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OUTPUT_PAYLOAD_STEREOTYPE;
@@ -38,11 +40,6 @@ import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProvider
  */
 class MuleOperationExtensionModelDeclarer {
 
-  private static final String DSL_PREFIX = "operation";
-  private static final String NAMESPACE = format(DEFAULT_NAMESPACE_URI_MASK, "operation");
-  private static final String SCHEMA_LOCATION =
-      "http://www.mulesoft.org/schema/mule/operation-dsl/current/mule-operation.xsd";
-
   private static final String TYPE_EXAMPLE = "string or number or http:request-config";
 
   private static final MetadataType EXPRESSION_SUPPORT_TYPE = BASE_TYPE_BUILDER.stringType()
@@ -58,11 +55,11 @@ class MuleOperationExtensionModelDeclarer {
         .withCategory(COMMUNITY)
         .withModelProperty(new CustomBuildingDefinitionProviderModelProperty())
         .withXmlDsl(XmlDslModel.builder()
-            .setPrefix(DSL_PREFIX)
-            .setNamespace(NAMESPACE)
+            .setPrefix(OPERATION_DSL_NAMESPACE)
+            .setNamespace(OPERATION_DSL_NAMESPACE_URI)
             .setSchemaVersion(MULE_VERSION)
-            .setXsdFileName(DSL_PREFIX + ".xsd")
-            .setSchemaLocation(SCHEMA_LOCATION)
+            .setXsdFileName(OPERATION_DSL_XSD_FILE_NAME)
+            .setSchemaLocation(OPERATION_DSL_SCHEMA_LOCATION)
             .build());
 
     declareOperationDef(declarer);
