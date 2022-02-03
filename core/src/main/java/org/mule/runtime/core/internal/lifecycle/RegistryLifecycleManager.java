@@ -183,6 +183,8 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
   protected List<Object> getObjectsForPhase(LifecyclePhase phase) {
     LifecycleObjectSorter sorter = phase.newLifecycleObjectSorter();
 
+    sorter.setLifeCycleObjectNameOrderMap(lookupObjectsForLifecycle());
+
     lookupObjectsForLifecycle().forEach((key, value) -> sorter.addObject(key, value));
     return sorter.getSortedObjects();
   }
