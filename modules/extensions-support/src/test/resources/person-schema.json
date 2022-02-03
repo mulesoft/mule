@@ -12,6 +12,7 @@
     "age": {
       "description": "Age in years",
       "type": "integer",
+      "title": "Age",
       "minimum": 0
     }
   },
