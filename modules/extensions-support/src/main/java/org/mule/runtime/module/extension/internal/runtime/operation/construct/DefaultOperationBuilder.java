@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.construct.operation;
+package org.mule.runtime.module.extension.internal.runtime.operation.construct;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;

@@ -8,23 +8,11 @@ package org.mule.runtime.core.api.construct;
 
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.construct.operation.DefaultOperationBuilder;
 
 import java.util.List;
 
 public interface Operation extends Lifecycle, Processor {
-
-  /**
-   * Creates a new operation builder
-   *
-   * @param model       The {@link OperationModel} for this operation
-   * @param muleContext context where the flow will be registered.
-   */
-  static Builder builder(OperationModel model, MuleContext muleContext) {
-    return new DefaultOperationBuilder(model, muleContext);
-  }
 
   OperationModel getModel();
 
