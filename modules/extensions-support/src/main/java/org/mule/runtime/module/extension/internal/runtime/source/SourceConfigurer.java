@@ -142,6 +142,7 @@ public final class SourceConfigurer {
           SchedulingStrategy scheduler = (SchedulingStrategy) valueResolver.resolve(context);
           sdkSource = new PollingSourceWrapper<>((PollingSource) sdkSource, scheduler,
                                                  resolverMaxItemsPerPoll(resolverSet, context, initialiserEvent),
+                                                 resolveSequentialPollsValue(resolverSet, context),
                                                  muleContext.getExceptionListener());
 
         }
@@ -158,6 +159,15 @@ public final class SourceConfigurer {
       if (context != null) {
         context.close();
       }
+    }
+  }
+
+  private boolean resolveSequentialPollsValue(ResolverSet resolverSet, ValueResolvingContext context) throws MuleException{
+    ValueResolver<?> valueResolver = resolverSet.getResolvers().get(POLLING_SOURCE_LIMIT_PARAMETER_NAME);
+    if (valueResolver == null) {
+      return false;
+    } else {
+      return (Boolean) valueResolver.resolve(context);
     }
   }
 

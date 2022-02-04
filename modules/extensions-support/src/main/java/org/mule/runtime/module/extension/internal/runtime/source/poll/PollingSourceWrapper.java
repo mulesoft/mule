@@ -126,14 +126,16 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
   private org.mule.runtime.api.scheduler.Scheduler executor;
   private AtomicBoolean restarting = new AtomicBoolean(false);
   private DelegateRunnable delegateRunnable;
+  private boolean sequentialPolls;
 
   public PollingSourceWrapper(PollingSource<T, A> delegate, SchedulingStrategy scheduler, int maxItemsPerPoll,
-                              SystemExceptionHandler systemExceptionHandler) {
+                              SystemExceptionHandler systemExceptionHandler, boolean sequentialPolls) {
     super(delegate);
     this.delegate = delegate;
     this.scheduler = scheduler;
     this.maxItemsPerPoll = maxItemsPerPoll;
     this.systemExceptionHandler = systemExceptionHandler;
+    this.sequentialPolls = sequentialPolls;
   }
 
   @Override
@@ -209,6 +211,11 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
     }
 
     withWatermarkLock(() -> {
+      if(shouldSkipPoll()) {
+        LOGGER.debug("ADD REASON FOR SKIP");
+        return;
+      }
+
       DefaultPollContext pollContext = new DefaultPollContext(sourceCallback, getCurrentWatermark(), getUpdatedWatermark());
 
       try {
@@ -233,6 +240,18 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
                      t);
       }
     });
+  }
+
+  private boolean shouldSkipPoll() {
+    if(sequentialPolls) {
+      try {
+        return inflightIdsObjectStore.allKeys().size() != 0;
+      } catch (ObjectStoreException e) {
+        LOGGER.debug("ADD Reason for skip.");
+        return true;
+      }
+    }
+    return false;
   }
 
   private int compareWatermarks(String w1Label, Serializable w1, String w2Label, Serializable w2, Comparator comparator)

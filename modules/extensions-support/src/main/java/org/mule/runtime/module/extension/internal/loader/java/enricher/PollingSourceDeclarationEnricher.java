@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.enricher;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.String.valueOf;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
@@ -14,6 +16,8 @@ import static org.mule.runtime.extension.api.ExtensionConstants.POLLING_SOURCE_L
 import static org.mule.runtime.extension.api.ExtensionConstants.POLLING_SOURCE_LIMIT_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.SEQUENTIAL_POLLS_PARAMETER_DESCRIPTION;
+import static org.mule.runtime.extension.api.ExtensionConstants.SEQUENTIAL_POLLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.STRUCTURE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
@@ -59,6 +63,7 @@ import javax.xml.namespace.QName;
 public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
 
   private static final String POLLING_SOURCE_LIMIT_MULE_VERSION = "4.4.0";
+  private static final String SEQUENTIAL_POLLS_MULE_VERSION = "4.5.0";
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
@@ -82,6 +87,7 @@ public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarati
             thereArePollingSources.set(true);
 
             source.getParameterGroup(DEFAULT_GROUP_NAME).addParameter(declareSchedulingStrategyParameter(loader));
+            source.getParameterGroup(DEFAULT_GROUP_NAME).addParameter(declareSequentialPollsParameter());
 
             if (isPollingSourceLimitEnabled(extensionLoadingContext)) {
               source.getParameterGroup(DEFAULT_GROUP_NAME).addParameter(declarePollingSourceLimitParameter());
@@ -98,6 +104,20 @@ public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarati
         parameter.setExpressionSupport(NOT_SUPPORTED);
         parameter.addModelProperty(new SyntheticModelModelProperty());
         parameter.addModelProperty(new SinceMuleVersionModelProperty(POLLING_SOURCE_LIMIT_MULE_VERSION));
+        parameter.setLayoutModel(LayoutModel.builder().tabName(ADVANCED_TAB).build());
+
+        return parameter;
+      }
+
+      private ParameterDeclaration declareSequentialPollsParameter() {
+        ParameterDeclaration parameter = new ParameterDeclaration(SEQUENTIAL_POLLS_PARAMETER_NAME);
+        parameter.setDescription(SEQUENTIAL_POLLS_PARAMETER_DESCRIPTION);
+        parameter.setRequired(false);
+        parameter.setDefaultValue(valueOf(FALSE));
+        parameter.setType(BaseTypeBuilder.create(JAVA).booleanType().build(), false);
+        parameter.setExpressionSupport(NOT_SUPPORTED);
+        parameter.addModelProperty(new SyntheticModelModelProperty());
+        parameter.addModelProperty(new SinceMuleVersionModelProperty(SEQUENTIAL_POLLS_MULE_VERSION));
         parameter.setLayoutModel(LayoutModel.builder().tabName(ADVANCED_TAB).build());
 
         return parameter;
