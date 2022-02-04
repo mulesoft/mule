@@ -8,6 +8,8 @@ package org.mule.runtime.http2.api.domain;
 
 import org.mule.runtime.http2.api.server.Http2ResponseSender;
 
+import java.io.IOException;
+
 public class Http2Interaction {
 
   private Http2ResponseSender responseSender;
@@ -22,6 +24,10 @@ public class Http2Interaction {
   }
 
   public void sendResponse() {
-    this.responseSender.sendResponse(response);
+    try {
+      this.responseSender.sendResponse(response);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 }
