@@ -9,12 +9,19 @@ package org.mule.runtime.config.internal;
 import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LIFECYCLE_AND_DEPENDENCY_INJECTION;
 import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LifecyclePhaseStory.LIFECYCLE_PHASE_STORY;
 
+import static java.util.Arrays.asList;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
 import org.mule.runtime.config.internal.resolvers.DeclaredDependencyResolver;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
 
 import io.qameta.allure.Description;
@@ -29,7 +36,7 @@ import org.junit.Test;
 @Story(LIFECYCLE_PHASE_STORY)
 public class DeclaredDependencyResolverTestCase {
 
-  DeclaredDependencyResolver declaredDependencyResolver;
+  private DeclaredDependencyResolver declaredDependencyResolver;
   private AbstractSpringRegistry springRegistry;
   private InjectedDependenciesProvider object;
 
@@ -42,8 +49,23 @@ public class DeclaredDependencyResolverTestCase {
 
   @Test
   @Description("check if getDeclaredDirectDependencies properly interacts with InjectedDependencyProvider")
-  public void getDeclaredDirectDependenciesTest() {
+  public void getDeclaredDirectDependenciesInteractionTest() {
     declaredDependencyResolver.getDeclaredDependencies(object);
     verify(object, atLeastOnce()).getInjectedDependencies();
+  }
+
+  @Test
+  @Description("check if the method returns declared dependencies correctly")
+  public void getDeclaredDirectDependenciesTest() {
+    Class<?> type = MuleContext.class;
+    String beanName = "muleContext";
+    Object ob = new Object();
+
+    when(object.getInjectedDependencies()).thenReturn(asList(Either.left(type)));
+    when(springRegistry.get(beanName)).thenReturn(ob);
+    String[] beanNames = new String[] {beanName};
+    when(springRegistry.getBeanNamesForType(type)).thenReturn(beanNames);
+
+    assertThat(declaredDependencyResolver.getDeclaredDependencies(object).size(), is(1));
   }
 }

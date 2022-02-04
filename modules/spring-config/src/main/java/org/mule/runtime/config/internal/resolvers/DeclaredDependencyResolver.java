@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.internal.resolvers;
 
-import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.config.internal.BeanVertexWrapper;
@@ -14,6 +14,7 @@ import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
 import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -29,15 +30,24 @@ public class DeclaredDependencyResolver {
   }
 
   public List<BeanVertexWrapper> getDeclaredDependencies(Object object) {
-    List<BeanVertexWrapper> declaredDependencies = new ArrayList<>();
-    if ((object instanceof InjectedDependenciesProvider)) {
-      ((InjectedDependenciesProvider) object).getInjectedDependencies()
-          .forEach(dependency -> dependency
-              .reduce(type -> Stream.of(springRegistry.getBeanNamesForType(dependency.getLeft()))
-                  .map(beanName -> new BeanVertexWrapper(beanName, springRegistry.get(beanName)))
-                  .collect(toList()), beanName -> asList(new BeanVertexWrapper(beanName, springRegistry.get(beanName))))
-              .forEach(v -> declaredDependencies.add(v)));
+    List<BeanVertexWrapper> dependencies = new ArrayList<>();
+    if (!(object instanceof InjectedDependenciesProvider)) {
+      return dependencies;
     }
-    return declaredDependencies;
+    dependencies = ((InjectedDependenciesProvider) object).getInjectedDependencies()
+        .stream()
+        .map(dependency -> dependency.reduce(this::beansOfTypeList, this::beansOfNameList))
+        .flatMap(Collection::stream).collect(toList());
+    return dependencies;
+  }
+
+  private List<BeanVertexWrapper> beansOfNameList(String beanName) {
+    return singletonList(new BeanVertexWrapper(beanName, springRegistry.get(beanName)));
+  }
+
+  private List<BeanVertexWrapper> beansOfTypeList(Class<?> type) {
+    return Stream.of(springRegistry.getBeanNamesForType(type))
+        .map(beanName -> new BeanVertexWrapper(beanName, springRegistry.get(beanName)))
+        .collect(toList());
   }
 }
