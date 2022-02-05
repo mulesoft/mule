@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.memory.provider.type.ByteBufferType.HEAP;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_MAX_MEMORY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.DEFAULT_BUFFER_BUCKET_SIZE;
@@ -23,9 +24,13 @@ import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConsta
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
+import org.mule.runtime.api.memory.provider.ByteBufferProvider;
 import org.mule.runtime.core.api.streaming.bytes.ManagedByteBufferWrapper;
 import org.mule.runtime.core.internal.streaming.MemoryManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import javax.inject.Inject;
 
 import org.junit.After;
 import org.junit.Before;
@@ -43,8 +48,15 @@ public abstract class MemoryBoundByteBufferManagerContractTestCase extends Abstr
 
   private MemoryBoundByteBufferManager bufferManager = createDefaultBoundBuffer();
 
+  private ByteBufferProvider byteBufferProvider;
+
+  @Inject
+  private MemoryManagementService memoryManagementService;
+
   @Before
   public void setup() throws InitialisationException {
+    byteBufferProvider = memoryManagementService.getByteBufferProvider(muleContext.getId(), HEAP);
+    bufferManager.setByteBufferProvider(byteBufferProvider);
     initialiseIfNeeded(bufferManager, muleContext);
   }
 
@@ -65,13 +77,17 @@ public abstract class MemoryBoundByteBufferManagerContractTestCase extends Abstr
 
   protected abstract MemoryBoundByteBufferManager createBuffer(MemoryManager memoryManager, int capacity);
 
+  @Override
+  protected boolean doTestClassInjection() {
+    return true;
+  }
+
   @Test
   public void limitTotalMemory() throws InitialisationException {
     long maxMemory = round((DEFAULT_BUFFER_BUCKET_SIZE * 2) / MAX_STREAMING_MEMORY_PERCENTAGE);
 
     dispose();
-    bufferManager = createBuffer(getMemoryManager(maxMemory), DEFAULT_BUFFER_BUCKET_SIZE);
-    initialiseIfNeeded(bufferManager, muleContext);
+    bufferManager = initializeBufferManager(createBuffer(getMemoryManager(maxMemory), DEFAULT_BUFFER_BUCKET_SIZE));
 
     assertMemoryLimit(DEFAULT_BUFFER_BUCKET_SIZE);
   }
@@ -84,8 +100,7 @@ public abstract class MemoryBoundByteBufferManagerContractTestCase extends Abstr
     dispose();
     setProperty(MULE_STREAMING_MAX_MEMORY, String.valueOf(maxMemory));
     try {
-      bufferManager = createBuffer(memoryManager, DEFAULT_BUFFER_BUCKET_SIZE);
-      initialiseIfNeeded(bufferManager, muleContext);
+      bufferManager = initializeBufferManager(createBuffer(memoryManager, DEFAULT_BUFFER_BUCKET_SIZE));
       assertMemoryLimit(DEFAULT_BUFFER_BUCKET_SIZE);
       verify(memoryManager, never()).getMaxMemory();
     } finally {
@@ -99,8 +114,7 @@ public abstract class MemoryBoundByteBufferManagerContractTestCase extends Abstr
     dispose();
     try {
       expectedException.expect(IllegalArgumentException.class);
-      bufferManager = createBuffer(mock(MemoryManager.class), DEFAULT_BUFFER_BUCKET_SIZE);
-      initialiseIfNeeded(bufferManager, muleContext);
+      bufferManager = initializeBufferManager(createBuffer(mock(MemoryManager.class), DEFAULT_BUFFER_BUCKET_SIZE));
     } finally {
       clearProperty(MULE_STREAMING_MAX_MEMORY);
     }
@@ -138,5 +152,12 @@ public abstract class MemoryBoundByteBufferManagerContractTestCase extends Abstr
     when(memoryManager.getMaxMemory()).thenReturn(maxMemory);
 
     return memoryManager;
+  }
+
+  private MemoryBoundByteBufferManager initializeBufferManager(MemoryBoundByteBufferManager byteBufferManager)
+      throws InitialisationException {
+    byteBufferManager.setByteBufferProvider(byteBufferProvider);
+    initialiseIfNeeded(byteBufferManager, muleContext);
+    return byteBufferManager;
   }
 }

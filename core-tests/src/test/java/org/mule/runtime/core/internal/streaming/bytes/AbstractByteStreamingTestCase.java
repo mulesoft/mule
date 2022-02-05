@@ -14,12 +14,15 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+
+import javax.inject.Inject;
 
 import org.apache.commons.io.IOUtils;
 
@@ -31,8 +34,16 @@ public abstract class AbstractByteStreamingTestCase extends AbstractMuleContextT
 
   protected String data;
 
+  @Inject
+  protected MemoryManagementService memoryManagementService;
+
   public AbstractByteStreamingTestCase(int dataSize) {
     data = randomAlphanumeric(dataSize);
+  }
+
+  @Override
+  protected boolean doTestClassInjection() {
+    return true;
   }
 
   protected String toString(byte[] dest) throws IOException {

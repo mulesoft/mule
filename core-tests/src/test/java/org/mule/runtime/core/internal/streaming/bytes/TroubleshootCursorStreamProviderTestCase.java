@@ -7,12 +7,14 @@
 
 package org.mule.runtime.core.internal.streaming.bytes;
 
+import static org.mule.runtime.api.memory.provider.type.ByteBufferType.HEAP;
 import static org.mule.runtime.api.util.DataUnit.BYTE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.TROUBLESHOOTING;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.util.DataSize;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
@@ -21,6 +23,8 @@ import org.mule.runtime.core.internal.streaming.AbstractTroubleshootCursorProvid
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+
+import javax.inject.Inject;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -35,10 +39,19 @@ public class TroubleshootCursorStreamProviderTestCase extends AbstractTroublesho
 
   private final PoolingByteBufferManager bufferManager = new PoolingByteBufferManager();
 
+  @Inject
+  private MemoryManagementService memoryManagementService;
+
   @Before
   public void before() throws InitialisationException, NoSuchFieldException, IllegalAccessException {
+    bufferManager.setByteBufferProvider(memoryManagementService.getByteBufferProvider(muleContext.getId(), HEAP));
     initialiseIfNeeded(bufferManager, muleContext);
     super.before();
+  }
+
+  @Override
+  protected boolean doTestClassInjection() {
+    return true;
   }
 
   @After

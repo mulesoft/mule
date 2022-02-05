@@ -21,6 +21,7 @@ import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.memory.provider.type.ByteBufferType;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.util.DataSize;
@@ -83,6 +84,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   @Before
   public void before() throws InitialisationException {
     bufferManager = new PoolingByteBufferManager();
+    bufferManager.setByteBufferProvider(memoryManagementService.getByteBufferProvider(muleContext.getId(), ByteBufferType.HEAP));
     initialiseIfNeeded(bufferManager, muleContext);
     final InputStream dataStream = createDataStream();
     streamProvider = createStreamProvider(bufferSize, maxBufferSize, dataStream);

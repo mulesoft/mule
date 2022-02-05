@@ -22,6 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.memory.provider.type.ByteBufferType.HEAP;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
@@ -38,6 +39,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.OutputModel;
@@ -45,6 +47,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.streaming.bytes.factory.InMemoryCursorStreamProviderFactory;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -110,6 +113,11 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
   @Inject
   protected StreamingManager streamingManager;
 
+  @Inject
+  private MemoryManagementService memoryManagementService;
+
+  private ByteBufferManager byteBufferManager;
+
   private static final Logger LOGGER = getLogger(ValueReturnDelegateContractTestCase.class);
 
   @Override
@@ -135,6 +143,9 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
     when(operationContext.getComponentModel()).thenReturn(componentModel);
     when(operationContext.getComponent()).thenReturn(component);
     when(operationContext.getVariable(contains(CONNECTION_PARAM))).thenReturn(connectionHandler);
+
+    byteBufferManager = new SimpleByteBufferManager();
+    byteBufferManager.setByteBufferProvider(memoryManagementService.getByteBufferProvider(muleContext.getId(), HEAP));
   }
 
   @After
@@ -301,7 +312,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
   }
 
   protected InMemoryCursorStreamProviderFactory getCursorProviderFactory() {
-    return new InMemoryCursorStreamProviderFactory(new SimpleByteBufferManager(),
+    return new InMemoryCursorStreamProviderFactory(byteBufferManager,
                                                    InMemoryCursorStreamConfig.getDefault(),
                                                    streamingManager);
   }
