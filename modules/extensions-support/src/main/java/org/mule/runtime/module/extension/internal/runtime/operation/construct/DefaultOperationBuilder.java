@@ -9,13 +9,16 @@ package org.mule.runtime.module.extension.internal.runtime.operation.construct;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Operation;
 import org.mule.runtime.core.api.construct.Operation.Builder;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import java.util.List;
 
@@ -24,27 +27,16 @@ import java.util.List;
  *
  * @since 4.5.0
  */
-public class DefaultOperationBuilder implements Builder {
+class DefaultOperationBuilder implements Builder {
 
-  private final OperationModel model;
-  private final MuleContext muleContext;
+  private OperationModel operationModel;
+  private Location rootComponentLocation;
+  private ComponentLocation chainLocation;
+  private MuleContext muleContext;
   private List<Processor> processors = emptyList();
 
   private DefaultOperation operation;
 
-  /**
-   * Creates a new builder
-   *
-   * @param model        the model for the operation
-   * @param muleContext context where the operation will be associated with.
-   */
-  public DefaultOperationBuilder(OperationModel model, MuleContext muleContext) {
-    checkArgument(model != null, "name cannot be empty");
-    checkArgument(muleContext != null, "muleContext cannot be null");
-
-    this.model = model;
-    this.muleContext = muleContext;
-  }
 
   /**
    * {@inheritDoc}
@@ -69,6 +61,30 @@ public class DefaultOperationBuilder implements Builder {
     return this;
   }
 
+  @Override
+  public Builder setChainLocation(ComponentLocation location) {
+    this.chainLocation = location;
+    return this;
+  }
+
+  @Override
+  public Builder setRootComponentLocation(Location location) {
+    this.rootComponentLocation = location;
+    return this;
+  }
+
+  @Override
+  public Builder setOperationModel(OperationModel operationModel) {
+    this.operationModel = operationModel;
+    return this;
+  }
+
+  @Override
+  public Builder setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+    return this;
+  }
+
   /**
    * Builds a flow with the provided configuration.
    *
@@ -77,15 +93,22 @@ public class DefaultOperationBuilder implements Builder {
   @Override
   public Operation build() {
     checkImmutable();
+    checkInvoked(operationModel, "setOperationModel(OperationModel)");
+    checkInvoked(muleContext, "setMuleContext(MuleContext)");
+    checkInvoked(rootComponentLocation, "setRootComponentLocation(ComponentLocation)");
+    checkInvoked(chainLocation, "setChainLocation(ComponentLocation)");
+    checkState(processors != null && !processors.isEmpty(), "Processors cannot be null nor empty");
 
-    MessageProcessorChain
+    DefaultMessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder();
+    chainBuilder.chain(processors);
+    chainBuilder.setPipelineLocation(chainLocation);
 
-    operation = new DefaultOperation(model,
-        muleContext,
-        processors,
-        maxConcurrency,
-        createFlowStatistics(model, muleContext),
-        OperationComponentInitialStateManager.INSTANCE);
+    operation = new DefaultOperation(
+        chainBuilder.build(),
+        rootComponentLocation,
+        chainLocation,
+        operationModel,
+        muleContext);
 
     return operation;
   }
@@ -94,5 +117,9 @@ public class DefaultOperationBuilder implements Builder {
     if (operation != null) {
       throw new IllegalStateException("Cannot change attributes once the operation was built");
     }
+  }
+
+  private void checkInvoked(Object value, String methodName) {
+    checkState(value != null, methodName + " not invoked");
   }
 }

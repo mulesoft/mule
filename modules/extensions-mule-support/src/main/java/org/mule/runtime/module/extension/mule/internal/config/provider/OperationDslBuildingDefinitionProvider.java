@@ -14,13 +14,14 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Operation;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
-import org.mule.runtime.module.extension.mule.internal.config.factory.DefaultOperationFactoryBean;
+import org.mule.runtime.module.extension.mule.internal.config.factory.DefaultOperationObjectFactory;
 
 import java.util.List;
 
@@ -31,7 +32,6 @@ public class OperationDslBuildingDefinitionProvider implements ComponentBuilding
 
   @Override
   public void init() {
-
   }
 
   @Override
@@ -39,11 +39,11 @@ public class OperationDslBuildingDefinitionProvider implements ComponentBuilding
     return asList(
         baseDefinition.withIdentifier("def")
             .withTypeDefinition(fromType(Operation.class))
-            .withObjectFactoryType(DefaultOperationFactoryBean.class)
-            .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
+            .withObjectFactoryType(DefaultOperationObjectFactory.class)
+            .withConstructorParameterDefinition(fromSimpleParameter("name").build())
+            .withConstructorParameterDefinition(fromReferenceObject(ExtensionManager.class).build())
+            .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
             .withSetterParameterDefinition("body", fromChildConfiguration(OperationBody.class).build())
-            .withSetterParameterDefinition("extensionManager", fromReferenceObject(ExtensionManager.class).build())
-            .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
             .build(),
         baseDefinition.withIdentifier("body")
             .withTypeDefinition(fromType(OperationBody.class))
@@ -52,7 +52,7 @@ public class OperationDslBuildingDefinitionProvider implements ComponentBuilding
     );
   }
 
-  public static class OperationBody {
+  public static class OperationBody extends AbstractComponent {
 
     private List<Processor> processors;
 

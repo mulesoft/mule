@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.core.api.construct;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.List;
@@ -15,6 +18,10 @@ import java.util.List;
 public interface Operation extends Lifecycle, Processor {
 
   OperationModel getModel();
+
+  ComponentLocation getChainLocation();
+
+  Location getRootComponentLocation();
 
   /**
    * Creates instances of {@link Operation} with a default implementation
@@ -42,6 +49,13 @@ public interface Operation extends Lifecycle, Processor {
      */
     Builder processors(Processor... processors);
 
+    Builder setChainLocation(ComponentLocation location);
+
+    Builder setRootComponentLocation(Location location);
+
+    Builder setOperationModel(OperationModel operationModel);
+
+    Builder setMuleContext(MuleContext muleContext);
 
     /**
      * Builds an {@link Operation} with the provided configuration.

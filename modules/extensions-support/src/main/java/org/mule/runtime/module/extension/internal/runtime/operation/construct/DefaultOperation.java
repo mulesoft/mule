@@ -13,6 +13,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -32,17 +33,24 @@ public class DefaultOperation implements Operation {
 
   private final static Logger LOGGER = getLogger(DefaultOperation.class);
 
+  public static Builder builder() {
+    return new DefaultOperationBuilder();
+  }
+
   private final MessageProcessorChain chain;
-  private final ComponentLocation location;
+  private final Location rootComponentLocation;
+  private final ComponentLocation chainLocation;
   private final OperationModel operationModel;
   private final MuleContext muleContext;
 
-  public DefaultOperation(MessageProcessorChain chain,
-                          ComponentLocation location,
+  DefaultOperation(MessageProcessorChain chain,
+                          Location rootComponentLocation,
+                          ComponentLocation chainLocation,
                           OperationModel operationModel,
                           MuleContext muleContext) {
     this.chain = chain;
-    this.location = location;
+    this.rootComponentLocation = rootComponentLocation;
+    this.chainLocation = chainLocation;
     this.operationModel = operationModel;
     this.muleContext = muleContext;
   }
@@ -52,7 +60,7 @@ public class DefaultOperation implements Operation {
     return from(publisher)
         .map(event -> {
           SdkInternalContext sdkCtx = SdkInternalContext.from(event);
-          Map<String, Object> params = sdkCtx.getOperationExecutionParams(location, event.getContext().getId()).getParameters();
+          Map<String, Object> params = sdkCtx.getOperationExecutionParams(chainLocation, event.getContext().getId()).getParameters();
 
           return parameterized(event, params);
         })
@@ -89,5 +97,15 @@ public class DefaultOperation implements Operation {
   @Override
   public OperationModel getModel() {
     return operationModel;
+  }
+
+  @Override
+  public ComponentLocation getChainLocation() {
+    return chainLocation;
+  }
+
+  @Override
+  public Location getRootComponentLocation() {
+    return rootComponentLocation;
   }
 }

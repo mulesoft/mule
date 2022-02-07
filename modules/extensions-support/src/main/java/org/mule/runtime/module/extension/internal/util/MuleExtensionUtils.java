@@ -11,6 +11,7 @@ import static java.lang.Thread.currentThread;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
@@ -50,12 +51,14 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
+import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.collection.SmallMap;
@@ -736,6 +739,22 @@ public class MuleExtensionUtils {
   public static boolean isSourceCompletionCallbackType(Class<?> clazz) {
     return SourceCompletionCallback.class.equals(clazz)
         || org.mule.sdk.api.runtime.source.SourceCompletionCallback.class.equals(clazz);
+  }
+
+  public static Optional<OperationModel> findOperation(ExtensionModel extensionModel, String operationName) {
+    Reference<OperationModel> operation = new Reference<>();
+    new ExtensionWalker() {
+
+      @Override
+      protected void onOperation(HasOperationModels owner, OperationModel model) {
+        if (operationName.equals(model.getName())) {
+          operation.set(model);
+          stop();
+        }
+      }
+    }.walk(extensionModel);
+
+    return ofNullable(operation.get());
   }
 
   public static <T extends NamedObject> T getNamedObject(List<T> elemenets, String name) {

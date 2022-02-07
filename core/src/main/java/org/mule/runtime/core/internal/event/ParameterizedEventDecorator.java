@@ -35,9 +35,7 @@ public class ParameterizedEventDecorator extends BaseEventDecorator {
     return event;
   }
 
-
   private final Map<String, Object> parameters;
-
 
   private ParameterizedEventDecorator(InternalEvent event, Map<String, Object> parameters) {
     super(event);
@@ -46,7 +44,6 @@ public class ParameterizedEventDecorator extends BaseEventDecorator {
 
   @Override
   protected BindingContext.Builder doCreateBindingContextBuilder() {
-    return addParametersToBuilder(super.doCreateBindingContextBuilder().addBinding("params", parameters));
+    return addParametersToBuilder(super.doCreateBindingContextBuilder(), parameters);
   }
-
 }
