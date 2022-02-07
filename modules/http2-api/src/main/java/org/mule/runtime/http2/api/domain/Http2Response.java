@@ -8,9 +8,19 @@ package org.mule.runtime.http2.api.domain;
 
 import java.io.InputStream;
 
+/**
+ * Interface for an HTTP/2 Response message.
+ */
 public interface Http2Response {
 
+  /**
+   * @return the content as an {@link InputStream}.
+   */
   InputStream getInputStream();
 
+  /**
+   * @return the content length.
+   */
+  // TODO: Does it have special values? Might this be negative? Does it have a maximum?
   int getContentLength();
 }

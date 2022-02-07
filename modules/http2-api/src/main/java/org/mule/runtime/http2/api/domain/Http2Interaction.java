@@ -23,11 +23,7 @@ public class Http2Interaction {
     this.response = response;
   }
 
-  public void sendResponse() {
-    try {
-      this.responseSender.sendResponse(response);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+  public void sendResponse() throws IOException {
+    responseSender.sendResponse(response);
   }
 }
