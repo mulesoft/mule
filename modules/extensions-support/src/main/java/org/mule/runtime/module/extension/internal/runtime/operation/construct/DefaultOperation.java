@@ -65,7 +65,7 @@ public class DefaultOperation implements Operation {
           return parameterized(event, params);
         })
         .transform(chain)
-        //TODO: Discuss with Rodro. What happens if the chain fails? How to deparametrize? Do I even need to?
+        //TODO: Discuss with Rodro. What happens if the chain fails? How to deparametrize? ExceptionHandler?
         .map(ParameterizedEventDecorator::deparameterize);
   }
 
