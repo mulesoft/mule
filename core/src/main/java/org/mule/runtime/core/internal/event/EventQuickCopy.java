@@ -181,6 +181,5 @@ public final class EventQuickCopy {
           ? (T) outerValue
           : getEvent().getInternalParameter(key);
     }
-
   }
 }

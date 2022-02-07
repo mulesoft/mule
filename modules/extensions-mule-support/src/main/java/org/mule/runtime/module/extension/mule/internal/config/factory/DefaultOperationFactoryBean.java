@@ -8,14 +8,13 @@ package org.mule.runtime.module.extension.mule.internal.config.factory;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Operation;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.module.extension.mule.internal.config.provider.OperationDslBuildingDefinitionProvider.OperationBody;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class DefaultOperationFactoryBean extends AbstractComponent implements FactoryBean<Flow> {
+public class DefaultOperationFactoryBean extends AbstractComponent implements FactoryBean<Operation> {
 
   private String name;
   private ExtensionManager extensionManager;
@@ -23,7 +22,7 @@ public class DefaultOperationFactoryBean extends AbstractComponent implements Fa
   private MuleContext muleContext;
 
   @Override
-  public Flow getObject() throws Exception {
+  public Operation getObject() throws Exception {
     return null;
   }
 

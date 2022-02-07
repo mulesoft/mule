@@ -7,9 +7,9 @@
 package org.mule.runtime.core.internal.event;
 
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
-import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
 
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.BindingContextUtils;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ItemSequenceInfo;
@@ -41,8 +41,8 @@ abstract class BaseEventDecorator implements InternalEvent, DeserializationPostI
 
   private final InternalEvent event;
 
-  private transient LazyValue<BindingContext> bindingContextBuilder =
-      new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
+  protected transient LazyValue<BindingContext.Builder> bindingContextBuilder = createBindingContextBuilder();
+  protected transient LazyValue<BindingContext> bindingContext = createBindingContext();
 
   public BaseEventDecorator(InternalEvent event) {
     this.event = event;
@@ -154,6 +154,11 @@ abstract class BaseEventDecorator implements InternalEvent, DeserializationPostI
 
   @Override
   public BindingContext asBindingContext() {
+    return bindingContext.get();
+  }
+
+  @Override
+  public BindingContext.Builder asBindingContextBuilder() {
     return bindingContextBuilder.get();
   }
 
@@ -226,7 +231,20 @@ abstract class BaseEventDecorator implements InternalEvent, DeserializationPostI
    */
   @SuppressWarnings({"unused"})
   private void initAfterDeserialisation(MuleContext muleContext) throws MuleException {
-    bindingContextBuilder = new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
+    bindingContextBuilder = createBindingContextBuilder();
+    bindingContext = createBindingContext();
+  }
+
+  private LazyValue<BindingContext.Builder> createBindingContextBuilder() {
+    return new LazyValue<>(this::doCreateBindingContextBuilder);
+  }
+
+  protected BindingContext.Builder doCreateBindingContextBuilder() {
+    return BindingContextUtils.createBindingContextBuilder(this, NULL_BINDING_CONTEXT);
+  }
+
+  private LazyValue<BindingContext> createBindingContext() {
+    return new LazyValue<>(() -> bindingContextBuilder.get().build());
   }
 
   @Override

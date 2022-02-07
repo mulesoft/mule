@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Operation;
 import org.mule.runtime.core.api.construct.Operation.Builder;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.List;
 
@@ -76,6 +77,8 @@ public class DefaultOperationBuilder implements Builder {
   @Override
   public Operation build() {
     checkImmutable();
+
+    MessageProcessorChain
 
     operation = new DefaultOperation(model,
         muleContext,

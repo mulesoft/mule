@@ -6,29 +6,59 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation.construct;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.internal.event.ParameterizedEventDecorator.parameterized;
+import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Flux.from;
+
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Operation;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.event.ParameterizedEventDecorator;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext;
 
+import java.util.Map;
+
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
+import org.slf4j.Logger;
 
 public class DefaultOperation implements Operation {
 
-  private MessageProcessorChain chain;
+  private final static Logger LOGGER = getLogger(DefaultOperation.class);
+
+  private final MessageProcessorChain chain;
+  private final ComponentLocation location;
+  private final OperationModel operationModel;
+  private final MuleContext muleContext;
+
+  public DefaultOperation(MessageProcessorChain chain,
+                          ComponentLocation location,
+                          OperationModel operationModel,
+                          MuleContext muleContext) {
+    this.chain = chain;
+    this.location = location;
+    this.operationModel = operationModel;
+    this.muleContext = muleContext;
+  }
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    Flux.from(publisher)
+    return from(publisher)
         .map(event -> {
           SdkInternalContext sdkCtx = SdkInternalContext.from(event);
-          event.asBindingContext()
+          Map<String, Object> params = sdkCtx.getOperationExecutionParams(location, event.getContext().getId()).getParameters();
+
+          return parameterized(event, params);
         })
-        .transform()
+        .transform(chain)
+        //TODO: Discuss with Rodro. What happens if the chain fails? How to deparametrize? Do I even need to?
+        .map(ParameterizedEventDecorator::deparameterize);
   }
 
   @Override
@@ -37,27 +67,27 @@ public class DefaultOperation implements Operation {
   }
 
   @Override
-  public void dispose() {
-
-  }
-
-  @Override
   public void initialise() throws InitialisationException {
-
+    initialiseIfNeeded(chain, true, muleContext);
   }
 
   @Override
   public void start() throws MuleException {
-
+    chain.start();
   }
 
   @Override
   public void stop() throws MuleException {
-
+    chain.stop();
   }
 
   @Override
+  public void dispose() {
+    disposeIfNeeded(chain, LOGGER);
+  }
+  
+  @Override
   public OperationModel getModel() {
-    return null;
+    return operationModel;
   }
 }

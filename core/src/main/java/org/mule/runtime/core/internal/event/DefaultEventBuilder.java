@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
-import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
 import static org.mule.runtime.api.util.collection.SmallMap.unmodifiable;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsBytes;
@@ -25,6 +24,7 @@ import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.toGroupCorrelation;
 
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.BindingContextUtils;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -432,8 +432,9 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private transient EventInternalContext foreachInternalContext;
     private transient EventInternalContext sourcePolicyContext;
     private transient EventInternalContext operationPolicyContext;
-    private transient LazyValue<BindingContext> bindingContextBuilder =
-        new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
+
+    private transient LazyValue<BindingContext.Builder> bindingContextBuilder = createBindingContextBuilder();
+    private transient LazyValue<BindingContext> bindingContext = createBindingContext();
 
     // Needed for deserialization with kryo
     private InternalEventImplementation() {
@@ -601,10 +602,20 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
         setMessage(message);
       }
 
-      bindingContextBuilder = new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
+      bindingContextBuilder = createBindingContextBuilder();
+      bindingContext = createBindingContext();
+
       if (context instanceof DefaultEventContext) {
         ((DefaultEventContext) context).createStreamingState();
       }
+    }
+
+    private LazyValue<BindingContext.Builder> createBindingContextBuilder() {
+      return new LazyValue<>(() -> BindingContextUtils.createBindingContextBuilder(this, NULL_BINDING_CONTEXT));
+    }
+
+    private LazyValue<BindingContext> createBindingContext() {
+      return new LazyValue<>(() -> bindingContextBuilder.get().build());
     }
 
     @Override
@@ -740,6 +751,11 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     @Override
     public BindingContext asBindingContext() {
+      return bindingContext.get();
+    }
+
+    @Override
+    public BindingContext.Builder asBindingContextBuilder() {
       return bindingContextBuilder.get();
     }
   }
