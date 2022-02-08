@@ -211,8 +211,9 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
     }
 
     withWatermarkLock(() -> {
-      if(shouldSkipPoll()) {
-        LOGGER.debug("ADD REASON FOR SKIP");
+      if (shouldSkipPoll()) {
+        LOGGER.debug(format("Skipping poll on flow '%s', because the items from last poll have not finished processing.",
+                            flowName));
         return;
       }
 
@@ -243,11 +244,13 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
   }
 
   private boolean shouldSkipPoll() {
-    if(sequentialPolls) {
+    if (sequentialPolls) {
       try {
         return inflightIdsObjectStore.allKeys().size() != 0;
       } catch (ObjectStoreException e) {
-        LOGGER.debug("ADD Reason for skip.");
+        LOGGER
+            .error(format("Skipping poll on flow '%s', because there was an error trying to verify if the items from last poll have finished processing. %s",
+                          flowName, e.getMessage()));
         return true;
       }
     }

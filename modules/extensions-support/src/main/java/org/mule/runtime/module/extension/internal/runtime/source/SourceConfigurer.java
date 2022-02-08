@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.get
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.extension.api.ExtensionConstants.POLLING_SOURCE_LIMIT_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.SEQUENTIAL_POLLS_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.source.legacy.SourceTransactionalActionUtils.toLegacy;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectComponentLocation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectDefaultEncoding;
@@ -142,8 +143,8 @@ public final class SourceConfigurer {
           SchedulingStrategy scheduler = (SchedulingStrategy) valueResolver.resolve(context);
           sdkSource = new PollingSourceWrapper<>((PollingSource) sdkSource, scheduler,
                                                  resolverMaxItemsPerPoll(resolverSet, context, initialiserEvent),
-                                                 resolveSequentialPollsValue(resolverSet, context),
-                                                 muleContext.getExceptionListener());
+                                                 muleContext.getExceptionListener(),
+                                                 resolveSequentialPollsValue(resolverSet, context));
 
         }
       }
@@ -162,8 +163,8 @@ public final class SourceConfigurer {
     }
   }
 
-  private boolean resolveSequentialPollsValue(ResolverSet resolverSet, ValueResolvingContext context) throws MuleException{
-    ValueResolver<?> valueResolver = resolverSet.getResolvers().get(POLLING_SOURCE_LIMIT_PARAMETER_NAME);
+  private boolean resolveSequentialPollsValue(ResolverSet resolverSet, ValueResolvingContext context) throws MuleException {
+    ValueResolver<?> valueResolver = resolverSet.getResolvers().get(SEQUENTIAL_POLLS_PARAMETER_NAME);
     if (valueResolver == null) {
       return false;
     } else {
