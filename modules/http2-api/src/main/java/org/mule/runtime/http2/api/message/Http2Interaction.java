@@ -4,9 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.http2.api.domain;
+package org.mule.runtime.http2.api.message;
 
 import org.mule.runtime.http2.api.server.Http2ResponseSender;
+
+import java.io.IOException;
 
 public class Http2Interaction {
 
@@ -21,7 +23,7 @@ public class Http2Interaction {
     this.response = response;
   }
 
-  public void sendResponse() {
-    this.responseSender.sendResponse(response);
+  public void sendResponse() throws IOException {
+    responseSender.sendResponse(response);
   }
 }

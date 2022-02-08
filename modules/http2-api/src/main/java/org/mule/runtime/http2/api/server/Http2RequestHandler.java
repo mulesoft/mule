@@ -6,9 +6,18 @@
  */
 package org.mule.runtime.http2.api.server;
 
-import org.mule.runtime.http2.api.domain.Http2Request;
+import org.mule.runtime.http2.api.message.Http2Request;
 
+/**
+ * Handles HTTP/2 requests. Implementations must be able to handle many requests concurrently.
+ */
 public interface Http2RequestHandler {
 
+  /**
+   * Method to be invoked on each request.
+   *
+   * @param request        is the request to be handled.
+   * @param responseSender is a callback object to send the response.
+   */
   void handle(Http2Request request, Http2ResponseSender responseSender);
 }

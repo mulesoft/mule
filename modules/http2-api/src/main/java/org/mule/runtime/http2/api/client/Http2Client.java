@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.http2.api.client;
 
-import org.mule.runtime.http2.api.domain.Http2Request;
-import org.mule.runtime.http2.api.domain.Http2RequestOptions;
-import org.mule.runtime.http2.api.domain.Http2Response;
+import org.mule.runtime.http2.api.message.Http2Request;
+import org.mule.runtime.http2.api.message.Http2RequestOptions;
+import org.mule.runtime.http2.api.message.Http2Response;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
