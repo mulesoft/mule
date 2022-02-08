@@ -1,4 +1,4 @@
-<dfg></dfg><?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <catalogs xmlns="http://www.mulesoft.org/schema/mule/types" >
 
     <catalog name="Type1" format="application/json">
