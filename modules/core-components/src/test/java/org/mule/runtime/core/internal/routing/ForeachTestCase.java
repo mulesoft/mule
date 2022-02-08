@@ -48,6 +48,7 @@ import static org.mule.test.allure.AllureConstants.ScopeFeature.ForeachStory.FOR
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -357,13 +358,15 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
       throw throwable;
     };
     foreach.setMessageProcessors(asList(firstProcessor, failingProcessor));
-    initialiseIfNeeded(foreach, muleContext);
+
+    MessageProcessorChain chain = createChain(foreach);
     try {
       expectNestedProcessorException(throwable, failingProcessor);
-      processInChain(foreach, eventBuilder(muleContext).message(of(new DummyNestedIterableClass().iterator())).build());
+      processInChain(chain, eventBuilder(muleContext).message(of(new DummyNestedIterableClass().iterator())).build());
     } finally {
       assertThat(firstProcessor.invocations, equalTo(1));
       assertForEachContextConsumption((InternalEvent) eventReference.get());
+      disposeIfNeeded(chain, LOGGER);
     }
   }
 
@@ -391,6 +394,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
       process(internalForeach, eventBuilder(muleContext).message(of(payload)).build(), false);
     } finally {
       assertThat(nestedEventProcessor.invocations, equalTo(0));
+      disposeIfNeeded(nestedForeach, LOGGER);
     }
   }
 
@@ -427,13 +431,15 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     List<Processor> processors = getSimpleMessageProcessors(new TestMessageProcessor("zas"));
     processors.add(0, firstProcessor);
     foreach.setMessageProcessors(processors);
-    initialiseIfNeeded(foreach, muleContext);
 
+    MessageProcessorChain chain = createChain(foreach);
+    disposeIfNeeded(foreach, LOGGER);
     try {
       expectExpressionException(foreach);
-      processInChain(foreach, eventBuilder(muleContext).message(of(new DummyNestedIterableClass().iterator())).build());
+      processInChain(chain, eventBuilder(muleContext).message(of(new DummyNestedIterableClass().iterator())).build());
     } finally {
       assertThat(firstProcessor.invocations, equalTo(0));
+      disposeIfNeeded(chain, LOGGER);
     }
   }
 
@@ -597,6 +603,8 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   public void subscriberContextPropagation() throws MuleException {
     final ContextPropagationChecker contextPropagationChecker = new ContextPropagationChecker();
 
+    // Release resources already allocated for `simpleForeach`
+    disposeIfNeeded(simpleForeach, LOGGER);
     simpleForeach = createForeach(singletonList(contextPropagationChecker));
 
     assertContextPropagation(eventBuilder(muleContext).message(of(asList("1", "2", "3"))).build(), simpleForeach,
@@ -674,9 +682,13 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     assertThat(secondForeachCounter.get(), is(CONCURRENCY * payload.size()));
   }
 
-  private CoreEvent processInChain(Processor processor, CoreEvent event) throws Exception {
+  private MessageProcessorChain createChain(Processor processor) throws InitialisationException {
     final MessageProcessorChain chain = newChain(Optional.empty(), processor);
     initialiseIfNeeded(chain, muleContext);
+    return chain;
+  }
+
+  private CoreEvent processInChain(MessageProcessorChain chain, CoreEvent event) throws Exception {
     return process(chain, event, false);
   }
 

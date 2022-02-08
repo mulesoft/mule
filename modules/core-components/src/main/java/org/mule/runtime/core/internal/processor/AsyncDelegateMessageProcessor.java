@@ -143,14 +143,22 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     }
 
     delegateBuilder.setProcessingStrategy(processingStrategy);
-    delegate = delegateBuilder.build();
-    initialiseIfNeeded(delegate, getMuleContext());
+    initialiseDelegate();
 
     backpressureHandler = new QueueBackpressureHandler(schedulerService, () -> muleContext.getSchedulerBaseConfig(),
                                                        this::dispatchEvent, name != null ? name : getLocation().getLocation());
 
     initialiseIfNeeded(processingStrategy, muleContext);
     super.initialise();
+  }
+
+  private void initialiseDelegate() throws InitialisationException {
+    if (delegate != null) {
+      disposeIfNeeded(delegate, logger);
+    }
+
+    delegate = delegateBuilder.build();
+    initialiseIfNeeded(delegate, getMuleContext());
   }
 
   /**

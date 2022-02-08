@@ -7,6 +7,7 @@
 package org.mule.functional.api.component;
 
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
 import static java.util.Arrays.asList;
@@ -15,18 +16,16 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.just;
 
+import org.junit.*;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.google.common.collect.ImmutableMap;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import reactor.core.publisher.Flux;
@@ -54,6 +53,11 @@ public class OnErrorCheckLogHandlerTestCase extends AbstractMuleContextTestCase 
     checkLogHandler.setExceptionListener(new DefaultExceptionListener());
     initialiseIfNeeded(checkLogHandler, muleContext);
     checkLogHandler.start();
+  }
+
+  @After
+  public void disposeLogHandler() {
+    disposeIfNeeded(checkLogHandler, getLogger(getClass()));
   }
 
   @Test

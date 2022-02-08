@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.tck.MuleTestUtils.createFlow;
 
+import org.junit.After;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
 
@@ -24,6 +25,11 @@ public class FlowTestCase extends AbstractELTestCase {
   @Override
   public void setupFlowConstruct() throws Exception {
     flowConstruct = createFlow(muleContext, "flowName");
+  }
+
+  @After
+  public void after() {
+    flowConstruct.dispose();
   }
 
   @Test
