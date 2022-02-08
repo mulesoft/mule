@@ -19,13 +19,17 @@ import static org.mockito.Mockito.mock;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.just;
 
-import org.junit.*;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.google.common.collect.ImmutableMap;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import reactor.core.publisher.Flux;

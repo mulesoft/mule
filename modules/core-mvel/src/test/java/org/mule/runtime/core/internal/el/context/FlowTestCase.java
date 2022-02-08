@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.core.internal.el.context;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.tck.MuleTestUtils.createFlow;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.junit.After;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -29,13 +32,13 @@ public class FlowTestCase extends AbstractELTestCase {
 
   @After
   public void after() {
-    flowConstruct.dispose();
+    disposeIfNeeded(flowConstruct, getLogger(getClass()));
   }
 
   @Test
   public void flowName() {
     CoreEvent event = InternalEvent.builder(context).message(of("")).build();
-    assertEquals("flowName", evaluate("flow.name", event));
+    assertThat(evaluate("flow.name", event), equalTo("flowName"));
   }
 
   @Test
