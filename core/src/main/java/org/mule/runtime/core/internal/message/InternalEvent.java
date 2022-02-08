@@ -10,6 +10,7 @@ import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
@@ -20,6 +21,7 @@ import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.event.context.FlowProcessMediatorContext;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -58,7 +60,7 @@ public interface InternalEvent extends PrivilegedEvent {
    * Sets context related to the source-flow dispatch
    *
    * @return a {@link FlowProcessMediatorContext} with state from source-flow dispatch
-   * @param context an {@link FlowProcessMediatorContext}
+   * @param flowProcessMediatorContext an {@link FlowProcessMediatorContext}
    * @since 4.4, 4.3.1
    */
   void setFlowProcessMediatorContext(FlowProcessMediatorContext flowProcessMediatorContext);
@@ -119,6 +121,8 @@ public interface InternalEvent extends PrivilegedEvent {
    */
   <T extends EventInternalContext> void setOperationPolicyContext(EventInternalContext<T> context);
 
+  List<Map<String, TypedValue<?>>> getParametersStack();
+
   /**
    * Create new {@link Builder} based on an existing {@link CoreEvent} instance. The existing {@link EventContext} is conserved.
    *
@@ -140,7 +144,7 @@ public interface InternalEvent extends PrivilegedEvent {
   }
 
   @NoImplement
-  public interface Builder extends PrivilegedEvent.Builder {
+  interface Builder extends PrivilegedEvent.Builder {
 
     /**
      * Set a map of parameters to be internal by the runtime to pass information within the context of an event

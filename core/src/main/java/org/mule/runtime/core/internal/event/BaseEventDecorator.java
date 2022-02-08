@@ -7,9 +7,9 @@
 package org.mule.runtime.core.internal.event;
 
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
 
 import org.mule.runtime.api.el.BindingContext;
-import org.mule.runtime.api.el.BindingContextUtils;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ItemSequenceInfo;
@@ -32,6 +32,7 @@ import org.mule.runtime.core.privileged.event.context.FlowProcessMediatorContext
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 
 import java.nio.charset.Charset;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -41,8 +42,8 @@ abstract class BaseEventDecorator implements InternalEvent, DeserializationPostI
 
   private final InternalEvent event;
 
-  protected transient LazyValue<BindingContext.Builder> bindingContextBuilder = createBindingContextBuilder();
-  protected transient LazyValue<BindingContext> bindingContext = createBindingContext();
+  private transient LazyValue<BindingContext> bindingContextBuilder =
+      new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
 
   public BaseEventDecorator(InternalEvent event) {
     this.event = event;
@@ -118,6 +119,16 @@ abstract class BaseEventDecorator implements InternalEvent, DeserializationPostI
   }
 
   @Override
+  public List<Map<String, TypedValue<?>>> getParametersStack() {
+    return event.getParametersStack();
+  }
+
+  @Override
+  public Map<String, TypedValue<?>> getParameters() {
+    return event.getParameters();
+  }
+
+  @Override
   public Optional<Map<String, String>> getLoggingVariables() {
     return event.getLoggingVariables();
   }
@@ -154,11 +165,6 @@ abstract class BaseEventDecorator implements InternalEvent, DeserializationPostI
 
   @Override
   public BindingContext asBindingContext() {
-    return bindingContext.get();
-  }
-
-  @Override
-  public BindingContext.Builder asBindingContextBuilder() {
     return bindingContextBuilder.get();
   }
 
@@ -231,20 +237,7 @@ abstract class BaseEventDecorator implements InternalEvent, DeserializationPostI
    */
   @SuppressWarnings({"unused"})
   private void initAfterDeserialisation(MuleContext muleContext) throws MuleException {
-    bindingContextBuilder = createBindingContextBuilder();
-    bindingContext = createBindingContext();
-  }
-
-  private LazyValue<BindingContext.Builder> createBindingContextBuilder() {
-    return new LazyValue<>(this::doCreateBindingContextBuilder);
-  }
-
-  protected BindingContext.Builder doCreateBindingContextBuilder() {
-    return BindingContextUtils.createBindingContextBuilder(this, NULL_BINDING_CONTEXT);
-  }
-
-  private LazyValue<BindingContext> createBindingContext() {
-    return new LazyValue<>(() -> bindingContextBuilder.get().build());
+    bindingContextBuilder = new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
   }
 
   @Override

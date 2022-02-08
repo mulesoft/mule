@@ -7,10 +7,14 @@
 package org.mule.runtime.core.internal.event;
 
 import static java.lang.System.lineSeparator;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
 import static org.mule.runtime.api.util.collection.SmallMap.unmodifiable;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsBytes;
@@ -24,7 +28,6 @@ import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.toGroupCorrelation;
 
 import org.mule.runtime.api.el.BindingContext;
-import org.mule.runtime.api.el.BindingContextUtils;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -58,6 +61,8 @@ import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -69,10 +74,18 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   private BaseEventContext context;
   private Function<EventContext, Message> messageFactory;
-  private boolean varsModified = false;
+
   private CaseInsensitiveHashMap<String, TypedValue<?>> flowVariables;
   private CaseInsensitiveHashMap<String, TypedValue<?>> originalVars;
+  private boolean varsModified = false;
+
+  private CaseInsensitiveHashMap<String, TypedValue<?>> parameters;
+  private List<CaseInsensitiveHashMap<String, TypedValue<?>>> originalParametersStack;
+  private boolean parametersModified = false;
+  private boolean unstackParameters = false;
+
   private CaseInsensitiveHashMap<String, String> loggingVariables;
+
   private Map<String, Object> internalParameters;
   private Error error;
   private Optional<ItemSequenceInfo> itemSequenceInfo = empty();
@@ -109,6 +122,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.notificationsEnabled = event.isNotificationsEnabled();
 
     this.originalVars = (CaseInsensitiveHashMap<String, TypedValue<?>>) event.getVariables();
+    originalParametersStack = (List) event.getParametersStack();
+
     this.loggingVariables = (CaseInsensitiveHashMap<String, String>) event.getLoggingVariables().orElse(null);
     this.internalParameters = (Map<String, Object>) event.getInternalParameters();
     flowProcessMediatorContext = copyOf(event.getFlowProcessMediatorContext());
@@ -199,6 +214,23 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     flowVariables.put(key, value);
     this.varsModified = true;
     this.modified = true;
+    return this;
+  }
+
+  @Override
+  public CoreEvent.Builder stackParameters(Map<String, ?> parameters) {
+    this.parameters = new CaseInsensitiveHashMap<>();
+    copyFromTo(parameters, this.parameters);
+    parametersModified = true;
+
+    return this;
+  }
+
+  @Override
+  public CoreEvent.Builder unstackParameters() {
+    parameters = null;
+    parametersModified = unstackParameters = modified = true;
+
     return this;
   }
 
@@ -344,6 +376,45 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     return this;
   }
 
+  private <T> List<T> removeHead(List<T> list) {
+    if (list == null || list.size() < 2) {
+      return emptyList();
+    }
+
+    List<T> headless = new ArrayList<>(list.size() -1);
+    for (int i = 1; i < list.size(); i++) {
+      headless.add(list.get(i));
+    }
+
+    return unmodifiableList(headless);
+  }
+
+  private <T> List<T> addHead(List<T> list, T item) {
+    if (list == null || list.isEmpty()) {
+      return singletonList(item);
+    } else {
+      List<T> copy = new ArrayList<>(list.size() + 1);
+      copy.add(item);
+      copy.addAll(list);
+
+      return unmodifiableList(copy);
+    }
+  }
+
+  private List<CaseInsensitiveHashMap<String, TypedValue<?>>> buildParametersStack() {
+    if (parametersModified) {
+      if (parameters != null) {
+        return addHead(originalParametersStack, parameters);
+      } else {
+        return unstackParameters
+            ? removeHead(originalParametersStack)
+            : originalParametersStack;
+      }
+    } else {
+      return originalParametersStack;
+    }
+  }
+
   @Override
   public InternalEvent build() {
     if (originalEvent != null && !modified) {
@@ -352,6 +423,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       return new InternalEventImplementation(context,
                                              requireNonNull(messageFactory.apply(context)),
                                              varsModified ? flowVariables : originalVars,
+                                             buildParametersStack(),
                                              loggingVariables,
                                              internalParameters,
                                              session,
@@ -419,6 +491,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private final boolean notificationsEnabled;
 
     private final CaseInsensitiveHashMap<String, TypedValue<?>> variables;
+    private final List<CaseInsensitiveHashMap<String, TypedValue<?>>> parametersStack;
     private final CaseInsensitiveHashMap<String, String> loggingVariables;
 
     private final String legacyCorrelationId;
@@ -426,15 +499,15 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     private final ItemSequenceInfo itemSequenceInfo;
 
+    private transient CaseInsensitiveHashMap<String, TypedValue<?>> currentParameters;
     private transient Map<String, ?> internalParameters;
     private transient FlowProcessMediatorContext flowProcessMediatorContext;
     private transient EventInternalContext sdkInternalContext;
     private transient EventInternalContext foreachInternalContext;
     private transient EventInternalContext sourcePolicyContext;
     private transient EventInternalContext operationPolicyContext;
-
-    private transient LazyValue<BindingContext.Builder> bindingContextBuilder = createBindingContextBuilder();
-    private transient LazyValue<BindingContext> bindingContext = createBindingContext();
+    private transient LazyValue<BindingContext> bindingContextBuilder =
+        new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
 
     // Needed for deserialization with kryo
     private InternalEventImplementation() {
@@ -443,6 +516,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.securityContext = null;
       this.notificationsEnabled = false;
       this.variables = null;
+      this.parametersStack = null;
       this.loggingVariables = null;
       this.legacyCorrelationId = null;
       this.error = null;
@@ -459,6 +533,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private InternalEventImplementation(BaseEventContext context,
                                         Message message,
                                         CaseInsensitiveHashMap<String, TypedValue<?>> variables,
+                                        List<CaseInsensitiveHashMap<String, TypedValue<?>>> parametersStack,
                                         CaseInsensitiveHashMap<String, String> loggingVariables,
                                         Map<String, ?> internalParameters,
                                         MuleSession session,
@@ -478,6 +553,9 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.securityContext = securityContext;
       this.message = message;
       this.variables = variables.toImmutableCaseInsensitiveMap();
+      this.parametersStack = parametersStack;
+      currentParameters = peekCurrentParameters();
+
       this.internalParameters = internalParameters;
 
       this.itemSequenceInfo = itemSequenceInfo.orElse(null);
@@ -492,9 +570,16 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.notificationsEnabled = notificationsEnabled;
     }
 
+    private CaseInsensitiveHashMap<String, TypedValue<?>> peekCurrentParameters() {
+      return parametersStack.isEmpty()
+          ? emptyCaseInsensitiveMap()
+          : parametersStack.get(0).toImmutableCaseInsensitiveMap();
+    }
+
     private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException {
       is.defaultReadObject();
-      this.internalParameters = new SmallMap<>();
+      currentParameters = peekCurrentParameters();
+      internalParameters = new SmallMap<>();
     }
 
     @Override
@@ -602,20 +687,10 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
         setMessage(message);
       }
 
-      bindingContextBuilder = createBindingContextBuilder();
-      bindingContext = createBindingContext();
-
+      bindingContextBuilder = new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
       if (context instanceof DefaultEventContext) {
         ((DefaultEventContext) context).createStreamingState();
       }
-    }
-
-    private LazyValue<BindingContext.Builder> createBindingContextBuilder() {
-      return new LazyValue<>(() -> BindingContextUtils.createBindingContextBuilder(this, NULL_BINDING_CONTEXT));
-    }
-
-    private LazyValue<BindingContext> createBindingContext() {
-      return new LazyValue<>(() -> bindingContextBuilder.get().build());
     }
 
     @Override
@@ -640,6 +715,16 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     @Override
     public Map<String, TypedValue<?>> getVariables() {
       return variables;
+    }
+
+    @Override
+    public Map<String, TypedValue<?>> getParameters() {
+      return currentParameters;
+    }
+
+    @Override
+    public List<Map<String, TypedValue<?>>> getParametersStack() {
+      return (List) parametersStack;
     }
 
     @Override
@@ -751,11 +836,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     @Override
     public BindingContext asBindingContext() {
-      return bindingContext.get();
-    }
-
-    @Override
-    public BindingContext.Builder asBindingContextBuilder() {
       return bindingContextBuilder.get();
     }
   }

@@ -135,6 +135,10 @@ public interface CoreEvent extends Serializable, Event {
      */
     Builder addVariable(String key, Object value);
 
+    Builder stackParameters(Map<String, ?> parameters);
+
+    Builder unstackParameters();
+
     /**
      * Add a variable.
      *
