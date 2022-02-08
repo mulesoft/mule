@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.http2.api.server;
 
-import org.mule.runtime.http2.api.domain.Http2Response;
+import org.mule.runtime.http2.api.message.Http2Response;
 
 import java.io.IOException;
 
