@@ -310,7 +310,7 @@ public abstract class AbstractMuleTestCase {
   @AfterClass
   public static void clearTestFlows() {
     if (!testFlows.isEmpty()) {
-      testFlows.forEach(flow -> disposeIfNeeded(flow, LOGGER));
+      disposeIfNeeded(testFlows, LOGGER);
       testFlows.clear();
     }
   }
