@@ -15,15 +15,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
@@ -123,6 +118,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   private final ProcessingStrategyFactory processingStrategyFactory;
   private final RuntimeException illegalStateException = new IllegalStateException();
 
+  private Processor messageProcessor;
+
   @Rule
   public ExpectedException expectedException = none();
 
@@ -188,13 +185,21 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   public void after() throws MuleException {
     flow.stop();
     flow.dispose();
+
+    if (messageProcessor != null) {
+      stopIfNeeded(messageProcessor);
+      disposeIfNeeded(messageProcessor, LOGGER);
+
+      messageProcessor = null;
+    }
   }
 
   @Test
   public void testMPChain() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(getAppendingMP("1"), getAppendingMP("2"), getAppendingMP("3"));
-    assertEquals("0123", process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(), equalTo("0123"));
   }
 
   /*
@@ -211,24 +216,25 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     builder.chain(mp1, mp2, nullmp, mp3);
 
     CoreEvent requestEvent = getTestEventUsingFlow("0");
-    assertNull(process(builder.build(), requestEvent));
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, requestEvent), is(nullValue()));
 
     // mp1
-    assertSame(requestEvent.getMessage(), mp1.event.getMessage());
-    assertNotSame(mp1.event, mp1.resultEvent);
-    assertEquals("01", mp1.resultEvent.getMessage().getPayload().getValue());
+    assertThat(requestEvent.getMessage(), sameInstance(mp1.event.getMessage()));
+    assertThat(mp1.event, not(sameInstance(mp1.resultEvent)));
+    assertThat(mp1.resultEvent.getMessage().getPayload().getValue(), equalTo("01"));
 
     // mp2
-    assertSame(mp1.resultEvent.getMessage(), mp2.event.getMessage());
-    assertNotSame(mp2.event, mp2.resultEvent);
-    assertEquals("012", mp2.resultEvent.getMessage().getPayload().getValue());
+    assertThat(mp1.resultEvent.getMessage(), sameInstance(mp2.event.getMessage()));
+    assertThat(mp2.event, not(sameInstance(mp2.resultEvent)));
+    assertThat(mp2.resultEvent.getMessage().getPayload().getValue(), equalTo("012"));
 
     // nullmp
-    assertSame(mp2.resultEvent.getMessage(), nullmp.event.getMessage());
-    assertEquals("012", nullmp.event.getMessage().getPayload().getValue());
+    assertThat(mp2.resultEvent.getMessage(), sameInstance(nullmp.event.getMessage()));
+    assertThat(nullmp.event.getMessage().getPayload().getValue(), equalTo("012"));
 
     // mp3
-    assertNull(mp3.event);
+    assertThat(mp3.event, is(nullValue()));
   }
 
   /*
@@ -245,36 +251,39 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     builder.chain(mp1, mp2, voidmp, mp3);
 
     CoreEvent requestEvent = getTestEventUsingFlow("0");
-    assertEquals("0123", process(builder.build(), requestEvent).getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, requestEvent).getMessage().getPayload().getValue(), equalTo("0123"));
 
     // mp1
     // assertSame(requestEvent, mp1.event);
-    assertNotSame(mp1.event, mp1.resultEvent);
+    assertThat(mp1.event, not(sameInstance(mp1.resultEvent)));
 
     // mp2
     // assertSame(mp1.resultEvent, mp2.event);
-    assertNotSame(mp2.event, mp2.resultEvent);
+    assertThat(mp2.event, not(sameInstance(mp2.resultEvent)));
 
     // void mp
-    assertEquals(mp2.resultEvent.getMessage(), voidmp.event.getMessage());
+    assertThat(mp2.resultEvent.getMessage(), equalTo(voidmp.event.getMessage()));
 
     // mp3
     assertThat(mp3.event.getMessage().getPayload().getValue(), equalTo(mp2.resultEvent.getMessage().getPayload().getValue()));
-    assertEquals(mp3.event.getMessage().getPayload().getValue(), "012");
+    assertThat(mp3.event.getMessage().getPayload().getValue(), equalTo("012"));
   }
 
   @Test
   public void testMPChainWithNullReturnAtEnd() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(getAppendingMP("1"), getAppendingMP("2"), getAppendingMP("3"), new ReturnNullMP());
-    assertNull(process(builder.build(), getTestEventUsingFlow("0")));
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")), is(nullValue()));
   }
 
   @Test
   public void testMPChainWithVoidReturnAtEnd() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(getAppendingMP("1"), getAppendingMP("2"), getAppendingMP("3"), new ReturnVoidMP());
-    assertEquals("0123", process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(), equalTo("0123"));
   }
 
   @Test
@@ -283,15 +292,17 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     builder.chain(getAppendingMP("1"));
     builder.chain((MessageProcessorBuilder) () -> getAppendingMP("2"));
     builder.chain(getAppendingMP("3"));
-    assertEquals("0123", process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(), equalTo("0123"));
   }
 
   @Test
   public void testInterceptingMPChain() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new AppendingInterceptingMP("1"), new AppendingInterceptingMP("2"), new AppendingInterceptingMP("3"));
-    assertEquals("0before1before2before3after3after2after1",
-                 process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(),
+               equalTo("0before1before2before3after3after2after1"));
   }
 
   @Test
@@ -301,8 +312,9 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     AppendingInterceptingMP lastMP = new AppendingInterceptingMP("3");
 
     builder.chain(new AppendingInterceptingMP("1"), new AppendingInterceptingMP("2"), new ReturnNullInterceptongMP(), lastMP);
-    assertNull(process(builder.build(), getTestEventUsingFlow("0")));
-    assertFalse(lastMP.invoked);
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")), is(nullValue()));
+    assertThat(lastMP.invoked, is(false));
   }
 
   @Test
@@ -312,8 +324,9 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     AppendingInterceptingMP lastMP = new AppendingInterceptingMP("3");
 
     builder.chain(new AppendingInterceptingMP("1"), new AppendingInterceptingMP("2"), new ReturnNullInterceptongMP(), lastMP);
-    assertNull(process(builder.build(), getTestEventUsingFlow("0")));
-    assertFalse(lastMP.invoked);
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")), is(nullValue()));
+    assertThat(lastMP.invoked, is(false));
   }
 
   @Test
@@ -321,8 +334,9 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new AppendingInterceptingMP("1"), getAppendingMP("2"), getAppendingMP("3"), new AppendingInterceptingMP("4"),
                   getAppendingMP("5"));
-    assertEquals("0before123before45after4after1",
-                 process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(),
+               equalTo("0before123before45after4after1"));
   }
 
   @Test
@@ -331,7 +345,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new AppendingInterceptingMP("1"), new ReturnNullInterceptongMP(), getAppendingMP("2"), getAppendingMP("3"),
                   new AppendingInterceptingMP("4"), getAppendingMP("5"));
-    assertNull(process(builder.build(), getTestEventUsingFlow("0")));
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")), is(nullValue()));
   }
 
   @Test
@@ -340,7 +355,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new AppendingInterceptingMP("1"), new ReturnVoidMPInterceptongMP(), getAppendingMP("2"), getAppendingMP("3"),
                   new AppendingInterceptingMP("4"), getAppendingMP("5"));
-    assertThat(process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue(),
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(),
                equalTo("0before1after1"));
   }
 
@@ -350,7 +366,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new AppendingInterceptingMP("1"), getAppendingMP("2"), new ReturnNullInterceptongMP(), getAppendingMP("3"),
                   new AppendingInterceptingMP("4"), getAppendingMP("5"));
-    assertNull(process(builder.build(), getTestEventUsingFlow("0")));
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")), is(nullValue()));
   }
 
   @Test
@@ -359,7 +376,9 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new AppendingInterceptingMP("1"), getAppendingMP("2"), new ReturnVoidMPInterceptongMP(), getAppendingMP("3"),
                   new AppendingInterceptingMP("4"), getAppendingMP("5"));
-    assertEquals("0before12after1", process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(),
+               equalTo("0before12after1"));
   }
 
   @Test
@@ -369,7 +388,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new AppendingInterceptingMP("1"), new ReturnNullMP(), getAppendingMP("2"), getAppendingMP("3"),
                   new AppendingInterceptingMP("4"), getAppendingMP("5"));
-    assertNull(process(builder.build(), getTestEventUsingFlow("0")));
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")), is(nullValue()));
   }
 
   @Test
@@ -379,8 +399,9 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new AppendingInterceptingMP("1"), new ReturnVoidMP(), getAppendingMP("2"), getAppendingMP("3"),
                   new AppendingInterceptingMP("4"), getAppendingMP("5"));
-    assertEquals("0before123before45after4after1",
-                 process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(),
+               equalTo("0before123before45after4after1"));
   }
 
   @Test
@@ -390,7 +411,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new AppendingInterceptingMP("1"), getAppendingMP("2"), new ReturnNullMP(), getAppendingMP("3"),
                   new AppendingInterceptingMP("4"), getAppendingMP("5"));
-    assertNull(process(builder.build(), getTestEventUsingFlow("0")));
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")), is(nullValue()));
   }
 
   @Test
@@ -400,8 +422,9 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new AppendingInterceptingMP("1"), getAppendingMP("2"), new ReturnVoidMP(), getAppendingMP("3"),
                   new AppendingInterceptingMP("4"), getAppendingMP("5"));
-    assertEquals("0before123before45after4after1",
-                 process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(),
+               equalTo("0before123before45after4after1"));
   }
 
   @Test
@@ -411,7 +434,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new AppendingInterceptingMP("1"), getAppendingMP("2"), getAppendingMP("3"), new ReturnNullMP(),
                   new AppendingInterceptingMP("4"), getAppendingMP("5"));
-    assertNull(process(builder.build(), getTestEventUsingFlow("0")));
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")), is(nullValue()));
   }
 
   @Test
@@ -421,8 +445,9 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new AppendingInterceptingMP("1"), getAppendingMP("2"), getAppendingMP("3"), new ReturnVoidMP(),
                   new AppendingInterceptingMP("4"), getAppendingMP("5"));
-    assertEquals("0before123before45after4after1",
-                 process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(),
+               equalTo("0before123before45after4after1"));
   }
 
   @Test
@@ -431,7 +456,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new AppendingInterceptingMP("1"), getAppendingMP("2"), getAppendingMP("3"), new AppendingInterceptingMP("4"),
                   getAppendingMP("5"), new ReturnNullMP());
-    assertNull(process(builder.build(), getTestEventUsingFlow("0")));
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")), is(nullValue()));
   }
 
   @Test
@@ -440,8 +466,9 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new AppendingInterceptingMP("1"), getAppendingMP("2"), getAppendingMP("3"), new AppendingInterceptingMP("4"),
                   getAppendingMP("5"), new ReturnVoidMP());
-    assertEquals("0before123before45after4after1",
-                 process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(),
+               equalTo("0before123before45after4after1"));
   }
 
   @Test
@@ -450,7 +477,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     builder.chain(getAppendingMP("1"),
                   new DefaultMessageProcessorChainBuilder().chain(getAppendingMP("a"), getAppendingMP("b")).build(),
                   getAppendingMP("2"));
-    assertEquals("01ab2", process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(), equalTo("01ab2"));
   }
 
   @Test
@@ -460,7 +488,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
                   getAppendingMP("1"), new DefaultMessageProcessorChainBuilder()
                       .chain(getAppendingMP("a"), new ReturnNullMP(), getAppendingMP("b")).build(),
                   new ReturnNullMP(), getAppendingMP("2"));
-    assertNull(process(builder.build(), getTestEventUsingFlow("0")));
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")), is(nullValue()));
   }
 
   @Test
@@ -470,7 +499,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
                   getAppendingMP("1"), new DefaultMessageProcessorChainBuilder()
                       .chain(getAppendingMP("a"), new ReturnVoidMP(), getAppendingMP("b")).build(),
                   new ReturnVoidMP(), getAppendingMP("2"));
-    assertEquals("01ab2", process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(), equalTo("01ab2"));
   }
 
   @Test
@@ -478,7 +508,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(getAppendingMP("1"), new DefaultMessageProcessorChainBuilder()
         .chain(getAppendingMP("a"), getAppendingMP("b"), new ReturnNullMP()).build(), getAppendingMP("2"));
-    assertNull(process(builder.build(), getTestEventUsingFlow("0")));
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")), is(nullValue()));
   }
 
   @Test
@@ -486,7 +517,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(getAppendingMP("1"), new DefaultMessageProcessorChainBuilder()
         .chain(getAppendingMP("a"), getAppendingMP("b"), new ReturnVoidMP()).build(), getAppendingMP("2"));
-    assertEquals("01ab2", process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(), equalTo("01ab2"));
   }
 
   @Test
@@ -497,7 +529,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
             .build();
     nested.setMuleContext(muleContext);
     builder.chain(getAppendingMP("1"), event -> nested.process(event), getAppendingMP("2"));
-    assertNull("012", process(builder.build(), getTestEventUsingFlow("0")));
+    messageProcessor = builder.build();
+    assertThat("012", process(messageProcessor, getTestEventUsingFlow("0")), is(nullValue()));
   }
 
   @Test
@@ -509,7 +542,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     nested.setMuleContext(muleContext);
     builder.chain(getAppendingMP("1"), event -> nested.process(InternalEvent.builder(event)
         .message(event.getMessage()).build()), getAppendingMP("2"));
-    assertEquals("01ab2", process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(), equalTo("01ab2"));
   }
 
   @Test
@@ -519,8 +553,9 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
                   new DefaultMessageProcessorChainBuilder()
                       .chain(new AppendingInterceptingMP("a"), new AppendingInterceptingMP("b")).build(),
                   new AppendingInterceptingMP("2"));
-    assertEquals("0before1beforeabeforebafterbafterabefore2after2after1",
-                 process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(),
+               equalTo("0before1beforeabeforebafterbafterabefore2after2after1"));
   }
 
   @Test
@@ -531,7 +566,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
                       .chain(new AppendingInterceptingMP("a"), new ReturnNullInterceptongMP(), new AppendingInterceptingMP("b"))
                       .build(),
                   new AppendingInterceptingMP("2"));
-    assertNull(process(builder.build(), getTestEventUsingFlow("0")));
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")), is(nullValue()));
   }
 
   @Test
@@ -542,7 +578,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
                       .chain(new AppendingInterceptingMP("a"), new ReturnVoidMPInterceptongMP(), new AppendingInterceptingMP("b"))
                       .build(),
                   new AppendingInterceptingMP("2"));
-    assertThat(process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue(),
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(),
                equalTo("0before1beforeaafterabefore2after2after1"));
   }
 
@@ -553,15 +590,18 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
                   new DefaultMessageProcessorChainBuilder()
                       .chain(new AppendingInterceptingMP("a"), getAppendingMP("b")).build(),
                   new AppendingInterceptingMP("2"));
-    assertEquals("01beforeabafterabefore2after2",
-                 process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(),
+               equalTo("01beforeabafterabefore2after2"));
   }
 
   @Test
   public void testInterceptingMPChainStopFlow() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new AppendingInterceptingMP("1"), new AppendingInterceptingMP("2", true), new AppendingInterceptingMP("3"));
-    assertEquals("0before1after1", process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(),
+               equalTo("0before1after1"));
   }
 
   /**
@@ -575,8 +615,9 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
                   new DefaultMessageProcessorChainBuilder()
                       .chain(new AppendingInterceptingMP("a", true), new AppendingInterceptingMP("b")).build(),
                   new AppendingInterceptingMP("3"));
-    assertEquals("0before1before3after3after1",
-                 process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(),
+               equalTo("0before1before3after3after1"));
   }
 
   @Test
@@ -616,17 +657,19 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   public void testNoneIntercepting() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new TestNonIntercepting(), new TestNonIntercepting(), new TestNonIntercepting());
-    CoreEvent result = process(builder.build(), getTestEventUsingFlow(""));
-    assertEquals("MessageProcessorMessageProcessorMessageProcessor", result.getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    CoreEvent result = process(messageProcessor, getTestEventUsingFlow(""));
+    assertThat(result.getMessage().getPayload().getValue(), equalTo("MessageProcessorMessageProcessorMessageProcessor"));
   }
 
   @Test
   public void testAllIntercepting() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new TestIntercepting(), new TestIntercepting(), new TestIntercepting());
-    CoreEvent result = process(builder.build(), getTestEventUsingFlow(""));
-    assertEquals("InterceptingMessageProcessorInterceptingMessageProcessorInterceptingMessageProcessor",
-                 result.getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    CoreEvent result = process(messageProcessor, getTestEventUsingFlow(""));
+    assertThat(result.getMessage().getPayload().getValue(),
+               equalTo("InterceptingMessageProcessorInterceptingMessageProcessorInterceptingMessageProcessor"));
   }
 
   @Test
@@ -634,9 +677,10 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new TestIntercepting(), new TestNonIntercepting(), new TestNonIntercepting(), new TestIntercepting(),
                   new TestNonIntercepting(), new TestNonIntercepting());
-    CoreEvent result = process(builder.build(), getTestEventUsingFlow(""));
-    assertEquals("InterceptingMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessor",
-                 result.getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    CoreEvent result = process(messageProcessor, getTestEventUsingFlow(""));
+    assertThat(result.getMessage().getPayload().getValue(),
+               equalTo("InterceptingMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessor"));
   }
 
   @Test
@@ -647,7 +691,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new TestIntercepting(), new TestNonIntercepting())
         .setMessagingExceptionHandler(errorHandler);
-    final InterceptingMessageProcessorChain chain = (InterceptingMessageProcessorChain) builder.build();
+    messageProcessor = builder.build();
+    final InterceptingMessageProcessorChain chain = (InterceptingMessageProcessorChain) messageProcessor;
 
     final DefaultMessageProcessorChain intercepting =
         (DefaultMessageProcessorChain) chain.getMessageProcessorsForLifecycle().get(0);
@@ -661,13 +706,13 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
 
   @Test
   public void testMixStaticFactory() throws Exception {
-    MessageProcessorChain chain =
+    messageProcessor =
         newChain(empty(), new TestIntercepting(), new TestNonIntercepting(),
                  new TestNonIntercepting(), new TestIntercepting(), new TestNonIntercepting(),
                  new TestNonIntercepting());
-    CoreEvent result = process(chain, getTestEventUsingFlow(""));
-    assertEquals("InterceptingMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessor",
-                 result.getMessage().getPayload().getValue());
+    CoreEvent result = process(messageProcessor, getTestEventUsingFlow(""));
+    assertThat(result.getMessage().getPayload().getValue(),
+               equalTo("InterceptingMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessor"));
   }
 
   @Test
@@ -675,19 +720,20 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new TestNonIntercepting(), new TestIntercepting(), new TestNonIntercepting(), new TestNonIntercepting(),
                   new TestNonIntercepting(), new TestIntercepting());
-    CoreEvent result = process(builder.build(), getTestEventUsingFlow(""));
-    assertEquals("MessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessor",
-                 result.getMessage().getPayload().getValue());
+    messageProcessor = builder.build();
+    CoreEvent result = process(messageProcessor, getTestEventUsingFlow(""));
+    assertThat(result.getMessage().getPayload().getValue(),
+               equalTo("MessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessor"));
   }
 
   @Test
   public void testMix2StaticFactory() throws Exception {
-    MessageProcessorChain chain =
+    messageProcessor =
         newChain(empty(), new TestNonIntercepting(), new TestNonIntercepting(), new TestNonIntercepting(),
                  new TestIntercepting());
-    CoreEvent result = process(chain, getTestEventUsingFlow(""));
-    assertEquals("MessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessor",
-                 result.getMessage().getPayload().getValue());
+    CoreEvent result = process(messageProcessor, getTestEventUsingFlow(""));
+    assertThat(result.getMessage().getPayload().getValue(),
+               equalTo("MessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessor"));
   }
 
   @Test
@@ -695,7 +741,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(getAppendingMP("1"), new ExceptionThrowingMessageProcessor(illegalStateException));
     expectedException.expect(is(illegalStateException));
-    process(builder.build(), getTestEventUsingFlow("0"));
+    messageProcessor = builder.build();
+    process(messageProcessor, getTestEventUsingFlow("0"));
   }
 
   @Test
@@ -703,7 +750,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new ExceptionThrowingMessageProcessor(illegalStateException), getAppendingMP("1"));
     expectedException.expect(is(illegalStateException));
-    process(builder.build(), getTestEventUsingFlow("0"));
+    messageProcessor = builder.build();
+    process(messageProcessor, getTestEventUsingFlow("0"));
   }
 
   @Test
@@ -711,7 +759,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(getAppendingMP("1"), new ExceptionThrowingMessageProcessor(illegalStateException), getAppendingMP("2"));
     expectedException.expect(is(illegalStateException));
-    process(builder.build(), getTestEventUsingFlow("0"));
+    messageProcessor = builder.build();
+    process(messageProcessor, getTestEventUsingFlow("0"));
   }
 
   @Test
@@ -722,7 +771,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     builder.chain(getAppendingMP("1"));
     final CoreEvent inEvent = getTestEventUsingFlow("0");
     final String resultPayload = "01";
-    assertThat(process(builder.build(), inEvent).getMessage().getPayload().getValue(), equalTo(resultPayload));
+    messageProcessor = builder.build();
+    assertThat(process(messageProcessor, inEvent).getMessage().getPayload().getValue(), equalTo(resultPayload));
     assertThat(notificationList, hasSize(2));
     MessageProcessorNotification preNotification = notificationList.get(0);
     MessageProcessorNotification postNotification = notificationList.get(1);
@@ -742,7 +792,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     builder.chain(new ExceptionThrowingMessageProcessor(illegalStateException));
     final CoreEvent inEvent = getTestEventUsingFlow("0");
     try {
-      process(builder.build(), inEvent);
+      messageProcessor = builder.build();
+      process(messageProcessor, inEvent);
     } catch (Throwable t) {
       assertThat(t, is(illegalStateException));
       assertThat(notificationList, hasSize(2));
@@ -765,7 +816,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     builder.chain(new ExceptionThrowingMessageProcessor(messagingException));
     final CoreEvent inEvent = getTestEventUsingFlow("0");
     try {
-      process(builder.build(), inEvent);
+      messageProcessor = builder.build();
+      process(messageProcessor, inEvent);
     } catch (Throwable t) {
       assertThat(t, instanceOf(IllegalStateException.class));
       assertThat(notificationList, hasSize(2));
@@ -921,7 +973,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
 
     final CoreEvent inEvent = getTestEventUsingFlow("0");
     try {
-      process(builder.build(), inEvent);
+      messageProcessor = builder.build();
+      process(messageProcessor, inEvent);
       fail("Should have thrown");
     } catch (Throwable t) {
       // This is the most important assertion here, that the error was notified which means the chain was not
@@ -967,11 +1020,11 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   }
 
   private void assertLifecycle(AppendingInterceptingMP mp) {
-    assertTrue(mp.muleContextInjected);
-    assertTrue(mp.initialised);
-    assertTrue(mp.started);
-    assertTrue(mp.stopped);
-    assertTrue(mp.disposed);
+    assertThat(mp.muleContextInjected, is(true));
+    assertThat(mp.initialised, is(true));
+    assertThat(mp.started, is(true));
+    assertThat(mp.stopped, is(true));
+    assertThat(mp.disposed, is(true));
   }
 
   class NonBlockingAppendingMP extends AppendingMP {

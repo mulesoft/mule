@@ -86,7 +86,6 @@ public class OnCriticalErrorHandlerTestCase extends AbstractMuleContextTestCase 
   @Before
   public void before() throws Exception {
     flow = getTestFlow(muleContext);
-    flow.initialise();
 
     context = create(flow, TEST_CONNECTOR_LOCATION);
     muleEvent = InternalEvent.builder(context).message(of("")).build();
@@ -96,11 +95,6 @@ public class OnCriticalErrorHandlerTestCase extends AbstractMuleContextTestCase 
     error = mock(Error.class, RETURNS_DEEP_STUBS);
 
     muleEvent = InternalEvent.builder(muleEvent).error(error).build();
-  }
-
-  @After
-  public void after() {
-    flow.dispose();
   }
 
   @Test

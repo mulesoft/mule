@@ -331,6 +331,7 @@ public class MuleContextUtils {
    */
   public static <B extends CoreEvent.Builder> B eventBuilder(MuleContext muleContext) throws MuleException {
     FlowConstruct flowConstruct = getTestFlow(muleContext);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerFlowConstruct(flowConstruct);
     return (B) InternalEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION));
   }
 

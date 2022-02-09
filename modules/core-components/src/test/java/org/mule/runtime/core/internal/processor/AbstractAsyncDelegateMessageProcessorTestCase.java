@@ -16,7 +16,9 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -62,7 +64,7 @@ public abstract class AbstractAsyncDelegateMessageProcessorTestCase extends Abst
     async.stop();
     async.dispose();
 
-    flow.dispose();
+    disposeIfNeeded(flow, getLogger(getClass()));
     super.doTearDown();
   }
 

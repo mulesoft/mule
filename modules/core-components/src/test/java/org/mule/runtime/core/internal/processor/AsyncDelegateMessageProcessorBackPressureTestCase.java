@@ -30,6 +30,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.construct.FromFlowRejectedExecutionException;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.processor.strategy.StreamPerEventSink;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
@@ -63,10 +64,10 @@ public class AsyncDelegateMessageProcessorBackPressureTestCase extends AbstractA
     super.doSetUp();
     BackPressureGeneratorProcessingStrategy strategy = new BackPressureGeneratorProcessingStrategy();
     flow = createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator, (ctx, n) -> strategy);
-    async = createAsyncDelegateMessageProcessor(target, flow);
     service = new FixingBackPressureSchedulerService(strategy);
-    async.setSchedulerService(service);
-    async.initialise();
+    muleContext.getCustomizationService().registerCustomServiceImpl(muleContext.getSchedulerService().getName(), service);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(muleContext.getSchedulerService().getName(), service);
+    async = createAsyncDelegateMessageProcessor(target, flow);
     async.start();
   }
 
