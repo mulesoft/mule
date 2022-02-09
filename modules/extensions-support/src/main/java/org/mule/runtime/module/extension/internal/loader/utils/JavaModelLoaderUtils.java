@@ -7,58 +7,22 @@
 
 package org.mule.runtime.module.extension.internal.loader.utils;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
-import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.route.Route;
-import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
-import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
 
 import java.io.InputStream;
 import java.util.List;
-import java.util.Optional;
 
 public class JavaModelLoaderUtils {
-
-  /**
-   * Utility method to obtain the {@link XmlDslModel} of a given {@link XmlDslConfiguration}
-   *
-   * @param extensionElement              the extension element
-   * @param version                       version of the extension
-   * @param xmlDslAnnotationConfiguration configuration of {@link org.mule.runtime.extension.api.annotation.dsl.xml.Xml} of
-   *                                      {@link org.mule.sdk.api.annotation.dsl.xml.Xml}
-   * @return the {@link XmlDslModel}
-   */
-  public static XmlDslModel getXmlDslModel(ExtensionElement extensionElement,
-                                           String version,
-                                           Optional<XmlDslConfiguration> xmlDslAnnotationConfiguration) {
-    return getXmlDslModel(extensionElement.getName(), version, xmlDslAnnotationConfiguration);
-  }
-
-  public static XmlDslModel getXmlDslModel(String extensionName,
-                                           String version,
-                                           Optional<XmlDslConfiguration> xmlDslAnnotationConfiguration) {
-    Optional<String> prefix = empty();
-    Optional<String> namespace = empty();
-
-    if (xmlDslAnnotationConfiguration.isPresent()) {
-      prefix = of(xmlDslAnnotationConfiguration.get().getPrefix());
-      namespace = of(xmlDslAnnotationConfiguration.get().getNamespace());
-    }
-
-    return createXmlLanguageModel(prefix, namespace, extensionName, version);
-  }
 
   public static boolean isScope(MethodElement methodElement) {
     return methodElement.getParameters().stream().anyMatch(JavaModelLoaderUtils::isProcessorChain);

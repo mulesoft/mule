@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:operation="http://www.mulesoft.org/schema/mule/operation"
+      xmlns:this="http://www.mulesoft.org/schema/mule/this"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-        http://www.mulesoft.org/schema/mule/operation http://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd">
+        http://www.mulesoft.org/schema/mule/operation http://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd
+        http://www.mulesoft.org/schema/mule/this http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd">
 
 
     <flow name="superfluousFlow">
         <logger message="This flow only exists to make sure that is never referenced from the resulting ExtensionModel"/>
+    </flow>
+
+    <flow name="salutationFlow">
+        <this:hello-world receiver="World" />
     </flow>
 
     <operation:def name="helloWold" displayName="Hello World operation" summary="Returns a polite greeting">

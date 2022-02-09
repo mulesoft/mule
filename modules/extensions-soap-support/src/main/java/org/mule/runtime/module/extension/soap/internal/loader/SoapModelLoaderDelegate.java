@@ -11,7 +11,7 @@ import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.getExtensionInfo;
-import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getXmlDslModel;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getXmlDslModel;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapExtensionTypeFactory.getSoapExtensionType;
 
 import org.mule.metadata.api.ClassTypeLoader;

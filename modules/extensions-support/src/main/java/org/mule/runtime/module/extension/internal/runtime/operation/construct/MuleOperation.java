@@ -23,7 +23,10 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Operation;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+
+import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 
@@ -51,6 +54,11 @@ public class MuleOperation extends AbstractComponent implements Operation {
     this.chainLocation = chainLocation;
     this.operationModel = operationModel;
     this.muleContext = muleContext;
+  }
+
+  @Override
+  public void setAnnotations(Map<QName, Object> newAnnotations) {
+    super.setAnnotations(newAnnotations);
   }
 
   @Override

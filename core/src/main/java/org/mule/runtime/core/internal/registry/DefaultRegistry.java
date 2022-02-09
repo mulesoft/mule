@@ -40,7 +40,7 @@ public class DefaultRegistry implements Registry {
 
   @Override
   public <T> Optional<T> lookupByName(String name) {
-    return (Optional<T>) ofNullable(muleContext.getRegistry().lookupObject(name));
+    return ofNullable(muleContext.getRegistry().lookupObject(name));
   }
 
   @Override

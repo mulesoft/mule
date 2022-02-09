@@ -35,6 +35,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.OperationModelPa
 import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
+import org.mule.runtime.module.extension.mule.internal.execution.MuleOperationExecutor;
 
 import java.util.Collections;
 import java.util.List;
@@ -125,7 +126,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public Optional<CompletableComponentExecutorModelProperty> getExecutorModelProperty() {
-    return empty();
+    return of(new CompletableComponentExecutorModelProperty((model, p) -> new MuleOperationExecutor(model)));
   }
 
   @Override

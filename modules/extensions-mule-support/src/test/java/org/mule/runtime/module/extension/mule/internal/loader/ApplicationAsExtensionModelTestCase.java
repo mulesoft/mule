@@ -66,6 +66,11 @@ public class ApplicationAsExtensionModelTestCase extends MuleArtifactFunctionalT
   }
 
   @Test
+  public void salutationFlow() throws Exception {
+    flowRunner("salutationFlow").run();
+  }
+
+  @Test
   public void flowIsIgnored() {
     ExtensionModel extensionModel = getAppExtensionModel();
 

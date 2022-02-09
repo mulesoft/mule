@@ -5,11 +5,11 @@
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
-    "prefix": "application-as-extension-model-test-case#load-application-extension-model",
-    "namespace": "http://www.mulesoft.org/schema/mule/application-as-extension-model-test-case#load-application-extension-model",
-    "schemaLocation": "http://www.mulesoft.org/schema/mule/application-as-extension-model-test-case#load-application-extension-model/current/mule-application-as-extension-model-test-case#load-application-extension-model.xsd",
+    "prefix": "this",
+    "namespace": "this",
+    "schemaLocation": "this/current/mule-this.xsd",
     "schemaVersion": "1.0.0",
-    "xsdFileName": "mule-application-as-extension-model-test-case#load-application-extension-model.xsd"
+    "xsdFileName": "mule-this.xsd"
   },
   "resources": [],
   "subTypes": [],
@@ -49,10 +49,10 @@
       "semanticTerms": [],
       "stereotype": {
         "type": "HELLO_WOLD",
-        "namespace": "APPLICATION-AS-EXTENSION-MODEL-TEST-CASE_LOAD-APPLICATION-EXTENSION-MODEL",
+        "namespace": "THIS",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "APPLICATION-AS-EXTENSION-MODEL-TEST-CASE_LOAD-APPLICATION-EXTENSION-MODEL",
+          "namespace": "THIS",
           "parent": {
             "type": "PROCESSOR",
             "namespace": "MULE"
@@ -458,10 +458,10 @@
       "semanticTerms": [],
       "stereotype": {
         "type": "INTRODUCE_MYSELF",
-        "namespace": "APPLICATION-AS-EXTENSION-MODEL-TEST-CASE_LOAD-APPLICATION-EXTENSION-MODEL",
+        "namespace": "THIS",
         "parent": {
           "type": "PROCESSOR",
-          "namespace": "APPLICATION-AS-EXTENSION-MODEL-TEST-CASE_LOAD-APPLICATION-EXTENSION-MODEL",
+          "namespace": "THIS",
           "parent": {
             "type": "PROCESSOR",
             "namespace": "MULE"
@@ -778,16 +778,7 @@
   "notifications": [],
   "errors": [
     {
-      "error": "MULE:ANY",
-      "handleable": true
-    },
-    {
-      "error": "MULE:RETRY_EXHAUSTED",
-      "parent": "MULE:ANY",
-      "handleable": true
-    },
-    {
-      "error": "APPLICATION-AS-EXTENSION-MODEL-TEST-CASE#LOAD-APPLICATION-EXTENSION-MODEL:CONNECTIVITY",
+      "error": "THIS:CONNECTIVITY",
       "parent": "MULE:CONNECTIVITY",
       "handleable": true
     },
@@ -797,7 +788,16 @@
       "handleable": true
     },
     {
-      "error": "APPLICATION-AS-EXTENSION-MODEL-TEST-CASE#LOAD-APPLICATION-EXTENSION-MODEL:RETRY_EXHAUSTED",
+      "error": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MULE:RETRY_EXHAUSTED",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "THIS:RETRY_EXHAUSTED",
       "parent": "MULE:RETRY_EXHAUSTED",
       "handleable": true
     }

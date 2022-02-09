@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
@@ -131,7 +132,8 @@ class MuleSdkExtensionModelParser implements ExtensionModelParser {
 
   @Override
   public Optional<XmlDslConfiguration> getXmlDslConfiguration() {
-    return empty();
+    return of(new XmlDslConfiguration("this", "this"));
+
   }
 
   @Override
