@@ -17,7 +17,8 @@ public class BaseHttp2Response extends BaseHttp2Message implements Http2Response
     this.http2Status = http2Status;
   }
 
-  public Http2Status getHttp2Status() {
+  @Override
+  public Http2Status getStatus() {
     return http2Status;
   }
 }
