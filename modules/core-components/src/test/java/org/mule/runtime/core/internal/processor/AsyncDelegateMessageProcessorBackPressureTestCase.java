@@ -66,6 +66,9 @@ public class AsyncDelegateMessageProcessorBackPressureTestCase extends AbstractA
     async = createAsyncDelegateMessageProcessor(target, flow);
     service = new FixingBackPressureSchedulerService(strategy);
     async.setSchedulerService(service);
+    // This disposal/initialisation is needed to enforce the usage of the custom scheduler service without producing a
+    // leak
+    async.dispose();
     async.initialise();
     async.start();
   }
