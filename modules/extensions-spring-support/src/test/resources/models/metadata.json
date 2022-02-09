@@ -40868,7 +40868,10 @@
         },
         {
           "key": {
-            "name": "age"
+            "name": "age",
+            "annotations": {
+              "label": "Age"
+            }
           },
           "model": {
             "type": "Number",
