@@ -10,7 +10,6 @@ import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
@@ -21,7 +20,6 @@ import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.event.context.FlowProcessMediatorContext;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -120,8 +118,6 @@ public interface InternalEvent extends PrivilegedEvent {
    * @since 4.3.0
    */
   <T extends EventInternalContext> void setOperationPolicyContext(EventInternalContext<T> context);
-
-  List<Map<String, TypedValue<?>>> getParametersStack();
 
   /**
    * Create new {@link Builder} based on an existing {@link CoreEvent} instance. The existing {@link EventContext} is conserved.

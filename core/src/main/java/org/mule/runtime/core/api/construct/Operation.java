@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.construct;
 
+import org.mule.runtime.api.component.execution.ExecutableComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -15,7 +16,7 @@ import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.List;
 
-public interface Operation extends Lifecycle, Processor {
+public interface Operation extends ExecutableComponent, Lifecycle {
 
   OperationModel getModel();
 

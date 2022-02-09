@@ -32,7 +32,6 @@ import org.mule.runtime.core.privileged.event.context.FlowProcessMediatorContext
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 
 import java.nio.charset.Charset;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -116,11 +115,6 @@ abstract class BaseEventDecorator implements InternalEvent, DeserializationPostI
   @Override
   public Map<String, TypedValue<?>> getVariables() {
     return event.getVariables();
-  }
-
-  @Override
-  public List<Map<String, TypedValue<?>>> getParametersStack() {
-    return event.getParametersStack();
   }
 
   @Override

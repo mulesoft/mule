@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.construct.Operation;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
-import org.mule.runtime.module.extension.internal.runtime.operation.construct.DefaultOperation;
+import org.mule.runtime.module.extension.internal.runtime.operation.construct.MuleOperation;
 import org.mule.runtime.module.extension.mule.internal.config.provider.OperationDslBuildingDefinitionProvider.OperationBody;
 
 public class DefaultOperationObjectFactory extends AbstractComponent implements ObjectFactory<Operation> {
@@ -37,7 +37,7 @@ public class DefaultOperationObjectFactory extends AbstractComponent implements 
 
   @Override
   public Operation getObject() {
-    return DefaultOperation.builder()
+    return MuleOperation.builder()
         .processors(body.getProcessors())
         .setOperationModel(locateOperationModel())
         .setChainLocation(body.getLocation())

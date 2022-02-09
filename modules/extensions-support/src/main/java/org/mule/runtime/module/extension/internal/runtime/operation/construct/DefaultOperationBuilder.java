@@ -35,7 +35,7 @@ class DefaultOperationBuilder implements Builder {
   private MuleContext muleContext;
   private List<Processor> processors = emptyList();
 
-  private DefaultOperation operation;
+  private MuleOperation operation;
 
 
   /**
@@ -103,7 +103,9 @@ class DefaultOperationBuilder implements Builder {
     chainBuilder.chain(processors);
     chainBuilder.setPipelineLocation(chainLocation);
 
-    operation = new DefaultOperation(
+    //TODO: Are location and thingies really needed or will setAnnotations() be called automatically and
+    // do that for me?
+    operation = new MuleOperation(
         chainBuilder.build(),
         rootComponentLocation,
         chainLocation,

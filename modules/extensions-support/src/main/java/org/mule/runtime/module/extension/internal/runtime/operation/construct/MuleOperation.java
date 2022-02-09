@@ -8,30 +8,28 @@ package org.mule.runtime.module.extension.internal.runtime.operation.construct;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.internal.event.ParameterizedEventDecorator.parameterized;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Flux.from;
 
+import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.component.execution.ExecutionResult;
+import org.mule.runtime.api.component.execution.InputEvent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Operation;
-import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.event.ParameterizedEventDecorator;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext;
 
-import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
-public class DefaultOperation implements Operation {
+public class MuleOperation extends AbstractComponent implements Operation {
 
-  private final static Logger LOGGER = getLogger(DefaultOperation.class);
+  private final static Logger LOGGER = getLogger(MuleOperation.class);
 
   public static Builder builder() {
     return new DefaultOperationBuilder();
@@ -43,11 +41,11 @@ public class DefaultOperation implements Operation {
   private final OperationModel operationModel;
   private final MuleContext muleContext;
 
-  DefaultOperation(MessageProcessorChain chain,
-                          Location rootComponentLocation,
-                          ComponentLocation chainLocation,
-                          OperationModel operationModel,
-                          MuleContext muleContext) {
+  MuleOperation(MessageProcessorChain chain,
+                Location rootComponentLocation,
+                ComponentLocation chainLocation,
+                OperationModel operationModel,
+                MuleContext muleContext) {
     this.chain = chain;
     this.rootComponentLocation = rootComponentLocation;
     this.chainLocation = chainLocation;
@@ -56,22 +54,13 @@ public class DefaultOperation implements Operation {
   }
 
   @Override
-  public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    return from(publisher)
-        .map(event -> {
-          SdkInternalContext sdkCtx = SdkInternalContext.from(event);
-          Map<String, Object> params = sdkCtx.getOperationExecutionParams(chainLocation, event.getContext().getId()).getParameters();
-
-          return parameterized(event, params);
-        })
-        .transform(chain)
-        //TODO: Discuss with Rodro. What happens if the chain fails? How to deparametrize? ExceptionHandler?
-        .map(ParameterizedEventDecorator::deparameterize);
+  public CompletableFuture<ExecutionResult> execute(InputEvent inputEvent) {
+    return chain.execute(inputEvent);
   }
 
   @Override
-  public CoreEvent process(CoreEvent event) throws MuleException {
-    return chain.process(event);
+  public CompletableFuture<Event> execute(Event event) {
+    return chain.execute(event);
   }
 
   @Override

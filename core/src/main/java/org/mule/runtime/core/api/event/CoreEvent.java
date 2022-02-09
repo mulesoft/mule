@@ -135,10 +135,6 @@ public interface CoreEvent extends Serializable, Event {
      */
     Builder addVariable(String key, Object value);
 
-    Builder stackParameters(Map<String, ?> parameters);
-
-    Builder unstackParameters();
-
     /**
      * Add a variable.
      *
@@ -175,6 +171,10 @@ public interface CoreEvent extends Serializable, Event {
      * @return the builder instance
      */
     Builder clearVariables();
+
+    Builder parameters(Map<String, ?> parameters);
+
+    Builder clearParameters();
 
     /**
      * Sets the group correlation information to the produced event.
