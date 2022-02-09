@@ -10,6 +10,7 @@ import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -126,7 +127,7 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
     }).when(schedulerService).cpuLightScheduler();
 
     DefaultSchedulerMessageSource schedulerMessageSource = createMessageSource();
-    verify(schedulerService).cpuLightScheduler();
+    verify(schedulerService, atLeastOnce()).cpuLightScheduler();
 
     schedulerMessageSource.start();
 

@@ -77,17 +77,11 @@ public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTe
   @Before
   public void before() throws Exception {
     flow = getTestFlow(muleContext);
-    flow.initialise();
 
     context = create(flow, TEST_CONNECTOR_LOCATION);
     muleEvent = InternalEvent.builder(context).message(of("")).build();
 
     when(mockException.getExceptionInfo()).thenReturn(new MuleExceptionInfo());
-  }
-
-  @After
-  public void after() {
-    flow.dispose();
   }
 
   @Test

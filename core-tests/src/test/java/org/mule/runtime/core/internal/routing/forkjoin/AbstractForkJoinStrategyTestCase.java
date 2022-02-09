@@ -32,11 +32,13 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.TIMEOUT;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.test.allure.AllureConstants.ForkJoinStrategiesFeature.FORK_JOIN_STRATEGIES;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -65,6 +67,7 @@ import org.mule.runtime.core.privileged.routing.RoutingResult;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -80,6 +83,7 @@ import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
+import reactor.core.Disposable;
 
 @Feature(FORK_JOIN_STRATEGIES)
 public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleContextTestCase {
@@ -92,6 +96,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   protected Scheduler actualScheduler;
   protected Scheduler scheduler;
   protected ErrorType timeoutErrorType;
+  private final List<MessageProcessorChain> chains = new ArrayList<>();
 
   @Before
   public void setup() {
@@ -108,6 +113,10 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   @After
   public void tearDown() {
     actualScheduler.stop();
+    if (!chains.isEmpty()) {
+      disposeIfNeeded(chains, getLogger(getClass()));
+      chains.clear();
+    }
   }
 
   protected abstract ForkJoinStrategy createStrategy(ProcessingStrategy processingStrategy, int concurrency, boolean delayErrors,
@@ -456,6 +465,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
 
   protected MessageProcessorChain createChain(Processor processor) throws MuleException {
     MessageProcessorChain chain = newChain(Optional.empty(), processor);
+    chains.add(chain);
     initialiseIfNeeded(chain, muleContext);
     return chain;
   }

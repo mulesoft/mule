@@ -400,6 +400,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   @AfterClass
   public static void disposeContext() throws MuleException {
     try {
+      clearTestFlows();
       if (muleContext != null && !(muleContext.isDisposed() || muleContext.isDisposing())) {
         disposeOnlyMuleContext();
 
