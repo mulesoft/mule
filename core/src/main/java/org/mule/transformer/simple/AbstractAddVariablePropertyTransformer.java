@@ -70,7 +70,7 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
             }
             else
             {
-                if (isMimeTypeSet() || !StringUtils.isEmpty(encoding) || setVariableInheritedMimeTypeDisabled)
+                if (mustSetMimeType() || !StringUtils.isEmpty(encoding))
                 {
                     DataType<?> dataType = DataTypeFactory.create(typedValue.getValue().getClass(), getMimeType());
                     dataType.setEncoding(getEncoding());
@@ -83,6 +83,14 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
             }
         }
         return message;
+    }
+
+    private boolean mustSetMimeType() {
+        if (setVariableInheritedMimeTypeDisabled) {
+            return !StringUtils.isEmpty(mimeType);
+        } else {
+            return isMimeTypeSet();
+        }
     }
 
     @Override
