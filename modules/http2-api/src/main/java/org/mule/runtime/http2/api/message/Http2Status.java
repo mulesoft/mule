@@ -94,8 +94,8 @@ public enum Http2Status {
 
   HTTP_VERSION_NOT_SUPPORTED(505, "HTTP Version Not Supported");
 
-  private int statusCode;
-  private String reasonPhrase;
+  private final int statusCode;
+  private final String reasonPhrase;
 
   Http2Status(int statusCode, String reasonPhrase) {
     this.statusCode = statusCode;
@@ -108,6 +108,10 @@ public enum Http2Status {
 
   public String getReasonPhrase() {
     return reasonPhrase;
+  }
+
+  public String getCodeAsText() {
+    return String.valueOf(statusCode);
   }
 
   /**
@@ -133,7 +137,6 @@ public enum Http2Status {
         return httpStatus;
       }
     }
-
     return null;
   }
 }

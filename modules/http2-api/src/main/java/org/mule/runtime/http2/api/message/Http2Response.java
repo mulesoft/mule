@@ -10,4 +10,6 @@ package org.mule.runtime.http2.api.message;
  * Interface for an HTTP/2 Response message.
  */
 public interface Http2Response extends Http2Message {
+
+  Http2Status getStatus();
 }

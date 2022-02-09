@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.http2.api.message;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.http2.api.message.content.Http2Content;
 
 public abstract class BaseHttp2Message implements Http2Message {
@@ -13,6 +15,7 @@ public abstract class BaseHttp2Message implements Http2Message {
   private final Http2Content content;
 
   protected BaseHttp2Message(Http2Content content) {
+    checkArgument(content != null, "Content can't be null");
     this.content = content;
   }
 
