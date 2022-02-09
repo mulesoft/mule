@@ -11,9 +11,11 @@ import static java.util.Optional.empty;
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 
@@ -21,6 +23,7 @@ import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.Pair;
@@ -53,7 +56,7 @@ import org.reactivestreams.Publisher;
  *
  * @since 4.0
  */
-public class PolicyNextActionMessageProcessor extends AbstractComponent implements Processor, Initialisable {
+public class PolicyNextActionMessageProcessor extends AbstractComponent implements Processor, Initialisable, Disposable {
 
   static final String SOURCE_POLICY_PART_IDENTIFIER = "source";
   static final String SUBFLOW_POLICY_PART_IDENTIFIER = "sub-flow";
@@ -211,4 +214,8 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
     return muleContext.getConfiguration().getId();
   }
 
+  @Override
+  public void dispose() {
+    disposeIfNeeded(nextDispatchAsChain, getLogger(getClass()));
+  }
 }
