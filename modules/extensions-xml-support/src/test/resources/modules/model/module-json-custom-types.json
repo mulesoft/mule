@@ -1904,6 +1904,11 @@
                         },
                         "int": {}
                       }
+                    },
+                    "annotations": {
+                      "description": {
+                        "value": "Age in years"
+                      }
                     }
                   }
                 ]
@@ -2832,6 +2837,11 @@
                     "from": 0
                   },
                   "int": {}
+                }
+              },
+              "annotations": {
+                "description": {
+                  "value": "Age in years"
                 }
               }
             }

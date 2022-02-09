@@ -40868,7 +40868,10 @@
         },
         {
           "key": {
-            "name": "age"
+            "name": "age",
+            "annotations": {
+              "label": "Age"
+            }
           },
           "model": {
             "type": "Number",
@@ -40877,6 +40880,11 @@
                 "from": 0
               },
               "int": {}
+            }
+          },
+          "annotations": {
+            "description": {
+              "value": "Age in years"
             }
           }
         }
