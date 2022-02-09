@@ -6,8 +6,12 @@
  */
 package org.mule.runtime.http2.api.message;
 
-/**
- * Interface for an HTTP/2 Response message.
- */
-public interface Http2Response extends Http2Message {
+import org.mule.runtime.http2.api.message.content.Http2Content;
+
+public interface Http2Message {
+
+  /**
+   * @return the content.
+   */
+  Http2Content getContent();
 }

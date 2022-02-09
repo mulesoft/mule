@@ -8,6 +8,8 @@ package org.mule.runtime.http2.api.server;
 
 import org.mule.runtime.http2.api.message.Http2Request;
 
+import java.io.IOException;
+
 /**
  * Handles HTTP/2 requests. Implementations must be able to handle many requests concurrently.
  */
@@ -19,5 +21,5 @@ public interface Http2RequestHandler {
    * @param request        is the request to be handled.
    * @param responseSender is a callback object to send the response.
    */
-  void handle(Http2Request request, Http2ResponseSender responseSender);
+  void handle(Http2Request request, Http2ResponseSender responseSender) throws IOException;
 }

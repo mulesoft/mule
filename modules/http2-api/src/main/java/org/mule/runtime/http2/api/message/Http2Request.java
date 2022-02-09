@@ -6,9 +6,5 @@
  */
 package org.mule.runtime.http2.api.message;
 
-import java.io.InputStream;
-
-public interface Http2Request {
-
-  InputStream getInputStream();
+public interface Http2Request extends Http2Message {
 }
