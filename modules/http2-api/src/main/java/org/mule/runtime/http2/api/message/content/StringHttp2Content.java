@@ -15,4 +15,5 @@ public class StringHttp2Content extends BaseHttp2Content {
   public StringHttp2Content(String asString) {
     super(new ByteArrayInputStream(asString.getBytes(UTF_8)));
   }
+
 }
