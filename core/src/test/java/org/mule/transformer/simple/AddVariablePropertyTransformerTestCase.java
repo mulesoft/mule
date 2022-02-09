@@ -17,7 +17,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.transformer.types.MimeTypes.APPLICATION_JSON;
 import static org.mule.transformer.types.MimeTypes.APPLICATION_XML;
-import static org.mule.transformer.types.MimeTypes.JSON;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
@@ -37,7 +36,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import javax.activation.MimeTypeParseException;
-import javax.xml.crypto.Data;
 
 import org.junit.Before;
 import org.junit.Test;
