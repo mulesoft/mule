@@ -20,6 +20,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStreaming;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
@@ -44,6 +45,8 @@ import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
@@ -153,6 +156,11 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private ThreadNotificationService threadNotificationService;
   private ThreadNotificationLogger threadNotificationLogger;
 
+  @Inject
+  private SchedulerService schedulerService;
+
+  private Scheduler switchOnErrorScheduler;
+
   AbstractMessageProcessorChain(String name,
                                 Optional<ProcessingStrategy> processingStrategyOptional,
                                 List<Processor> processors, FlowExceptionHandler messagingExceptionHandler) {
@@ -188,7 +196,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
             final Flux<CoreEvent> upstream =
                 from(doApply(publisher, interceptors, (context, throwable) -> {
                   inflightEvents.incrementAndGet();
-                  errorRouter.accept(throwable);
+                  routeError(errorRouter, throwable);
                 }));
 
             return from(propagateCompletion(upstream, errorSwitchSinkSinkRef.flux(),
@@ -213,6 +221,14 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
     } else {
       return doApply(publisher, interceptors, (context, throwable) -> context.error(throwable));
+    }
+  }
+
+  private void routeError(Consumer<Exception> errorRouter, Exception throwable) {
+    if (!isTransactionActive() && !schedulerService.isCurrentThreadInWaitGroup()) {
+      switchOnErrorScheduler.submit(() -> errorRouter.accept(throwable));
+    } else {
+      errorRouter.accept(throwable);
     }
   }
 
@@ -563,6 +579,10 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         new ThreadNotificationLogger(threadNotificationService, muleContext.getConfiguration().isThreadLoggingEnabled());
 
     initialiseIfNeeded(getMessageProcessorsForLifecycle(), muleContext);
+
+    if (switchOnErrorScheduler == null) {
+      switchOnErrorScheduler = schedulerService.cpuLightScheduler();
+    }
   }
 
   @Override
@@ -593,6 +613,11 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   @Override
   public void dispose() {
     disposeIfNeeded(getMessageProcessorsForLifecycle(), LOGGER);
+
+    if (switchOnErrorScheduler != null) {
+      switchOnErrorScheduler.stop();
+      switchOnErrorScheduler = null;
+    }
   }
 
   FlowExceptionHandler getMessagingExceptionHandler() {
