@@ -30,8 +30,11 @@ import javax.inject.Inject;
 import org.jgrapht.alg.cycle.CycleDetector;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.traverse.BreadthFirstIterator;
+import org.jgrapht.traverse.DepthFirstIterator;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Bean;
 
 /**
  * Specialization of {@link DefaultLifecycleObjectSorter} which uses an {@link AbstractSpringRegistry} to not only consider the
@@ -81,28 +84,35 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
     dependencyGraph.addVertex(currentVertex);
 
     // get (direct) prerequisite objects for the current object
-    List<Pair<String, Object>> prerequisiteObjects = resolver.getDirectBeanDependencies(beanName);
+    // List<Pair<String, Object>> prerequisiteObjects = resolver.getDirectBeanDependencies(beanName);
+    Map<Pair<String, Object>, List<Pair<String, Object>>> prerequisiteObjectsMap =
+        resolver.getTransitiveDependencies(beanName, getDependencyGraphIndex(currentObject));
 
     // add direct prerequisites to the graph & create edges(current object -> prerequisite)
-    if (prerequisiteObjects.isEmpty()) {
-      return;
-    }
-    prerequisiteObjects.forEach(
-                                prerequisite -> {
-                                  String preReqName = prerequisite.getFirst();
-                                  Object preReqObject = prerequisite.getSecond();
+    for (Pair<String, Object> source : prerequisiteObjectsMap.keySet()) {
+      List<Pair<String, Object>> prerequisiteObjects = prerequisiteObjectsMap.get(source);
+      BeanVertexWrapper current = new BeanVertexWrapper(source.getFirst(), source.getSecond());
+      dependencyGraph.addVertex(current);
+      if (prerequisiteObjects.isEmpty()) {
+        continue;
+      }
+      prerequisiteObjects.forEach(
+                                  prerequisite -> {
+                                    String preReqName = prerequisite.getFirst();
+                                    Object preReqObject = prerequisite.getSecond();
 
-                                  BeanVertexWrapper preReqVertex = new BeanVertexWrapper(preReqName, preReqObject);
-                                  dependencyGraph.addVertex(preReqVertex);
+                                    BeanVertexWrapper preReqVertex = new BeanVertexWrapper(preReqName, preReqObject);
+                                    dependencyGraph.addVertex(preReqVertex);
 
-                                  // remove any additional edge that creates cycle
-                                  if (!dependencyGraph.containsEdge(preReqVertex, currentVertex)) {
-                                    dependencyGraph.addEdge(currentVertex, preReqVertex);
-                                    if (cycleDetector.detectCycles()) {
-                                      dependencyGraph.removeEdge(currentVertex, preReqVertex);
+                                    // remove any additional edge that creates cycle
+                                    if (!dependencyGraph.containsEdge(preReqVertex, current)) {
+                                      dependencyGraph.addEdge(current, preReqVertex);
+                                      if (cycleDetector.detectCycles()) {
+                                        dependencyGraph.removeEdge(current, preReqVertex);
+                                      }
                                     }
-                                  }
-                                });
+                                  });
+    }
   }
 
   /**
@@ -134,15 +144,16 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
    */
   @Override
   public List<Object> getSortedObjects() {
-    return dependencyGraphs.stream().map(x -> {
+    List<BeanVertexWrapper> res = dependencyGraphs.stream().map(x -> {
       List<BeanVertexWrapper> sortedObjects = newArrayList(new TopologicalOrderIterator<>(x, new Comparator<BeanVertexWrapper>() {
-
+        // tie-breaker: respect the order of lifecycleLookupObjects
         @Override
         public int compare(BeanVertexWrapper o1, BeanVertexWrapper o2) {
-          if (getLifeCycleObjectNameOrderMap().get(o1.getBeanName()) <= getLifeCycleObjectNameOrderMap().get(o2.getBeanName())) {
-            return 1;
-          } else {
+          if (getLifeCycleObjectNameOrderMap().getOrDefault(o1.getBeanName(), -1) > getLifeCycleObjectNameOrderMap()
+              .getOrDefault(o2.getBeanName(), -1)) {
             return -1;
+          } else {
+            return 1;
           }
         }
       }));
@@ -157,7 +168,9 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
       }
       return sortedObjectList;
 
-    }).stream().map(BeanVertexWrapper::getWrappedObject).collect(toList());
+    });
+    System.out.println(res.stream().map(y -> y.getBeanName()).collect(toList()));
+    return res.stream().map(BeanVertexWrapper::getWrappedObject).collect(toList());
 
   }
 

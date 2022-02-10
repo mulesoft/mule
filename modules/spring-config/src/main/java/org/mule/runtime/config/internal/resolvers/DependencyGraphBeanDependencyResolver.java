@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.resolvers;
 
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.util.Pair;
@@ -14,8 +15,11 @@ import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
 import org.mule.runtime.config.internal.registry.BeanDependencyResolver;
 import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
 
+import java.util.ArrayDeque;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 
@@ -34,6 +38,8 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
   private final ConfigurationDependencyResolver configurationDependencyResolver;
   private final DeclaredDependencyResolver declaredDependencyResolver;
   private final AutoDiscoveredDependencyResolver autoDiscoveredDependencyResolver;
+  private Map<Integer, Set<Pair<String, Object>>> visitedForBuckets;
+  private Map<Pair<String, Object>, List<Pair<String, Object>>> visited;
 
 
   public DependencyGraphBeanDependencyResolver(ConfigurationDependencyResolver configurationDependencyResolver,
@@ -44,6 +50,8 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
     this.declaredDependencyResolver = declaredDependencyResolver;
     this.autoDiscoveredDependencyResolver = autoDiscoveredDependencyResolver;
     this.springRegistry = springRegistry;
+    this.visitedForBuckets = new HashMap<>();
+    this.visited = new HashMap<>();
   }
 
   /**
@@ -71,21 +79,45 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
   }
 
   /**
-   * Provides only direct dependencies/required components for the beanName provided
+   * Provides only direct dependencies/required components for the object provided
    * 
-   * @param beanName
    * @return direct children(required components) of the current object
    */
-  public List<Pair<String, Object>> getDirectBeanDependencies(String beanName) {
-    Object currentObject = springRegistry.get(beanName);
-    final DependencyNode currentNode = new DependencyNode(beanName, currentObject);
+  public List<Pair<String, Object>> getDirectBeanDependencies(Pair<String, Object> current, int bucketIndex) {
+    visitedForBuckets.putIfAbsent(bucketIndex, new HashSet<>());
+    if (visitedForBuckets.get(bucketIndex).stream().map(x -> x.getSecond()).anyMatch(x -> x.equals(current.getSecond()))) {
+      return emptyList();
+    }
+    visitedForBuckets.get(bucketIndex).add(current);
+    if(visited.containsKey(current)){
+      return visited.get(current);
+    }
 
-    addDirectDependency(beanName, currentObject, currentNode, new HashSet<>());
+    final DependencyNode currentNode = new DependencyNode(current.getFirst(), current.getSecond());
 
-    return currentNode.getChildren()
+    addDirectDependency(current.getFirst(), current.getSecond(), currentNode, new HashSet<>());
+
+    List<Pair<String, Object>> directDependencies = currentNode.getChildren()
         .stream()
         .map(DependencyNode::getKeyObjectPair)
         .collect(toList());
+    visited.put(current, directDependencies);
+    return directDependencies;
+  }
+
+  public Map<Pair<String, Object>, List<Pair<String, Object>>> getTransitiveDependencies(String beanName, int bucketIndex) {
+    Map<Pair<String, Object>, List<Pair<String, Object>>> transitiveDependencies = new HashMap<>();
+    Set<Pair<String, Object>> processed = new HashSet<>();
+    ArrayDeque<Pair<String, Object>> dq = new ArrayDeque<>();
+    dq.add(new Pair<>(beanName, springRegistry.get(beanName)));
+    while (!dq.isEmpty()) {
+      Pair<String, Object> current = dq.remove();
+      if(!processed.add(current)) continue;
+      List<Pair<String, Object>> dependencies = getDirectBeanDependencies(current, bucketIndex);
+      dq.addAll(dependencies);
+      transitiveDependencies.put(current, dependencies);
+    }
+    return transitiveDependencies;
   }
 
   /**
