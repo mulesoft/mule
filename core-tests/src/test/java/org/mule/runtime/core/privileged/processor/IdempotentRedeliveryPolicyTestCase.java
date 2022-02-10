@@ -13,7 +13,6 @@ import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toMap;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,11 +27,14 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
 import static org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy.SECURE_HASH_EXPR_FORMAT;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 
+import org.junit.After;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -133,6 +135,11 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
 
     irp.setLockFactory(muleLockFactory);
     irp.setObjectStoreManager(mockObjectStoreManager);
+  }
+
+  @After
+  public void after() {
+    disposeIfNeeded(irp, getLogger(getClass()));
   }
 
   @Test(expected = ExpressionRuntimeException.class)

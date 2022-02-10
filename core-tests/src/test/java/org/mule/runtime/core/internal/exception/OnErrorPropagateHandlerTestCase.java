@@ -25,13 +25,13 @@ import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.*;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_PROPAGATE;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -286,12 +286,14 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
     MessageProcessorChain chain =
         buildNewChainWithListOfProcessors(empty(), singletonList(createFailingEventMessageProcessor(mockException)),
                                           onErrorPropagateHandler);
+    initialiseIfNeeded(chain, muleContext);
     expectedException.expect(hasRootCause(sameInstance(mockException)));
     try {
       just(testEvent()).transform(chain).block();
       fail("Expected exception");
     } finally {
       onErrorPropagateHandler.assertAllRoutersWereDisposed();
+      disposeIfNeeded(chain, getLogger(getClass()));
     }
   }
 
