@@ -6,6 +6,7 @@
  */
 package org.mule.tck;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.synchronizedList;
 import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -261,5 +262,10 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
     public String toString() {
       return scheduler.toString();
     }
+  }
+
+  @Override
+  public boolean isCurrentThreadInWaitGroup() {
+    return currentThread().getThreadGroup() == UNIT_TEST_THREAD_GROUP;
   }
 }
