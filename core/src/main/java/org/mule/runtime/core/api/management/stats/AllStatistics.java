@@ -7,11 +7,9 @@
 package org.mule.runtime.core.api.management.stats;
 
 import static java.lang.Boolean.getBoolean;
-import static java.lang.Boolean.valueOf;
 import static java.lang.System.currentTimeMillis;
-import static java.lang.System.getProperty;
+import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.COMPUTE_CONNECTION_ERRORS_IN_STATS;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_PAYLOAD_STATISTICS;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
 
 import org.mule.api.annotation.NoExtend;
@@ -23,7 +21,6 @@ import org.mule.runtime.core.internal.management.stats.ApplicationStatistics;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <code>AllStatistics</code> TODO
@@ -32,12 +29,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AllStatistics {
 
   private boolean isStatisticsEnabled = getBoolean(MULE_ENABLE_STATISTICS);
-  private boolean payloadStatisticsDisabled = valueOf((getProperty(MULE_DISABLE_PAYLOAD_STATISTICS, "true")));
 
   private long startTime;
   private final ApplicationStatistics appStats;
   private final Map<String, FlowConstructStatistics> flowConstructStats = new HashMap<>();
-  private final Map<String, PayloadStatistics> payloadStatistics = new ConcurrentHashMap<>();
+  private final Map<String, PayloadStatistics> payloadStatistics = emptyMap();
 
   /**
    *
@@ -72,17 +68,15 @@ public class AllStatistics {
     for (FlowConstructStatistics statistics : flowConstructStats.values()) {
       statistics.setEnabled(enable);
     }
-
-    if (isPayloadStatisticsEnabled()) {
-      enablePayloadStatistics(enable);
-    }
   }
 
+  /**
+   *
+   * @deprecated since 4.4.1, 4.5.0. Payload statistics are no longer supported, this method does nothing.
+   */
+  @Deprecated
   public void enablePayloadStatistics(boolean b) {
-    payloadStatisticsDisabled = !b;
-    for (PayloadStatistics statistics : payloadStatistics.values()) {
-      statistics.setEnabled(b);
-    }
+    // Does nothing.
   }
 
   public synchronized long getStartTime() {
@@ -117,7 +111,9 @@ public class AllStatistics {
   /**
    * @return the available payload statistics for all components.
    * @since 4.4, 4.3.1
+   * @deprecated since 4.4.1, 4.5.0. Payload statistics are no longer supported and will always return empty data.
    */
+  @Deprecated
   public Collection<PayloadStatistics> getPayloadStatistics() {
     return payloadStatistics.values();
   }
@@ -126,7 +122,9 @@ public class AllStatistics {
    * @param component the component to get the statistics for.
    * @return the statistics for the provided {@code component}.
    * @since 4.4, 4.3.1
+   * @deprecated since 4.4.1, 4.5.0. Payload statistics are no longer supported and will always return empty data.
    */
+  @Deprecated
   public PayloadStatistics computePayloadStatisticsIfAbsent(Component component) {
     return payloadStatistics.computeIfAbsent(component.getLocation().getLocation(),
                                              loc -> {
@@ -141,7 +139,9 @@ public class AllStatistics {
    * @param componentLocation the location of the component to get the statistics for.
    * @return the statistics for the component with the provided {@code componentLocation}.
    * @since 4.4, 4.3.1
+   * @deprecated since 4.4.1, 4.5.0. Payload statistics are no longer supported and will always return empty data.
    */
+  @Deprecated
   public PayloadStatistics getPayloadStatistics(String componentLocation) {
     return payloadStatistics.get(componentLocation);
   }
@@ -149,9 +149,11 @@ public class AllStatistics {
   /**
    * @return whether the payload statistics are enabled
    * @since 4.4, 4.3.1
+   * @deprecated since 4.4.1, 4.5.0. Payload statistics are no longer supported and will always return false.
    */
+  @Deprecated
   public boolean isPayloadStatisticsEnabled() {
-    return isEnabled() && !payloadStatisticsDisabled;
+    return false;
   }
 
   /**

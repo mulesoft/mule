@@ -168,7 +168,9 @@ public class MuleProperties {
    * Registry key for {@link CursorDecoratorFactory}
    *
    * @since 4.4, 4.3.1
+   * @deprecated since 4.4.1, 4.5.0. Payload statistics is no longer supported.
    */
+  @Deprecated
   public static final String OBJECT_PAYLOAD_STATISTICS_DECORATOR_FACTORY = "_mulePayloadStatisticsCursorDecoratorFactory";
   public static final String OBJECT_POLLING_CONTROLLER = "_mulePollingController";
   public static final String OBJECT_CLUSTER_CONFIGURATION = "_muleClusterConfiguration";

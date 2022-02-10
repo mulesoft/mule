@@ -23,6 +23,7 @@ import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
+import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 import static org.mule.runtime.core.internal.policy.DefaultPolicyManager.noPolicyOperation;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
@@ -95,6 +96,7 @@ import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.management.stats.CursorDecoratorFactory;
+import org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
@@ -241,9 +243,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Inject
   private ExtensionConnectionSupplier extensionConnectionSupplier;
-
-  @Inject
-  private CursorDecoratorFactory payloadStatisticsCursorDecoratorFactory;
 
   @Inject
   private ProfilingService profilingService;
@@ -600,7 +599,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   @Override
   protected void doInitialise() throws InitialisationException {
     if (!initialised) {
-      componentDecoratorFactory = payloadStatisticsCursorDecoratorFactory.componentDecoratorFactory(this);
+      componentDecoratorFactory = NO_OP_INSTANCE;
       initRetryPolicyResolver();
       try {
         transactionConfig = buildTransactionConfig();
