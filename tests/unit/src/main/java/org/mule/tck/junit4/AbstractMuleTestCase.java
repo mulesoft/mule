@@ -22,6 +22,7 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STREAMING_STATISTICS;
 import static org.mule.runtime.api.util.MuleSystemProperties.TESTING_MODE_PROPERTY_NAME;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.api.util.SystemUtils.parsePropertyDefinitions;
@@ -34,9 +35,12 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.SystemUtils;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.rule.WarningTimeout;
 import org.mule.tck.report.ThreadDumpOnTimeOut;
 
@@ -267,6 +271,22 @@ public abstract class AbstractMuleTestCase {
   public void takeTestCaseName() {
     if (testCaseName == null) {
       testCaseName = this.getClass().getName();
+    }
+  }
+
+  private static final List<Flow> testFlows = new ArrayList<>();
+
+  protected static Flow getTestFlow(MuleContext context) throws MuleException {
+    Flow flow = MuleTestUtils.getTestFlow(context);
+    testFlows.add(flow);
+    return flow;
+  }
+
+  @AfterClass
+  public static void clearTestFlows() {
+    if (!testFlows.isEmpty()) {
+      disposeIfNeeded(testFlows, LOGGER);
+      testFlows.clear();
     }
   }
 
