@@ -12,9 +12,12 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.transformer.types.MimeTypes.APPLICATION_JSON;
 import static org.mule.transformer.types.MimeTypes.APPLICATION_XML;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionManager;
@@ -57,9 +60,9 @@ public class AddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
     public static final String NULL_EXPRESSION = "#[string:someValueNull]";
     public static final String CUSTOM_ENCODING = UTF_8.name();
 
-    private MuleMessage mockMessage = Mockito.mock(MuleMessage.class);
-    private MuleContext mockMuleContext = Mockito.mock(MuleContext.class);
-    private ExpressionManager mockExpressionManager = Mockito.mock(ExpressionManager.class);
+    private MuleMessage mockMessage = mock(MuleMessage.class);
+    private MuleContext mockMuleContext = mock(MuleContext.class);
+    private ExpressionManager mockExpressionManager = mock(ExpressionManager.class);
     private AbstractAddVariablePropertyTransformer addVariableTransformer;
     private PropertyScope scope;
     private final ArgumentCaptor<DataType> dataTypeCaptor = ArgumentCaptor.forClass(DataType.class);
@@ -100,6 +103,32 @@ public class AddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
         TypedValue typedValue = new TypedValue(EXPRESSION_VALUE, DataTypeFactory.STRING);
         when(mockExpressionManager.evaluateTyped(EXPRESSION, mockMessage)).thenReturn(typedValue);
         addVariableTransformer.setMuleContext(mockMuleContext);
+    }
+
+    @Test
+    public void whenReturnTypeIsManuallySetInAddVariableTransformerTheMimeTypeIsNotInherited() throws Exception {
+        // We mock a data type to set as a return type
+        DataType dataType = mock(DataType.class);
+        when(dataType.getMimeType()).thenReturn(null);
+        when(dataType.getType()).thenReturn(String.class);
+        when(dataType.getEncoding()).thenReturn(UTF_8.toString());
+
+        when(mockExpressionManager.evaluate(EXPRESSION, mockMessage)).thenReturn(EXPRESSION_VALUE);
+        TypedValue typedValue = new TypedValue(EXPRESSION_VALUE, DataTypeFactory.JSON_STRING);
+        when(mockExpressionManager.evaluateTyped(EXPRESSION, mockMessage)).thenReturn(typedValue);
+
+        addVariableTransformer.setMuleContext(mockMuleContext);
+        addVariableTransformer.setIdentifier(PLAIN_STRING_KEY);
+        addVariableTransformer.setValue(EXPRESSION);
+        addVariableTransformer.setMimeType(APPLICATION_JSON);
+        addVariableTransformer.initialise();
+        addVariableTransformer.transform(mockMessage, ENCODING);
+
+        addVariableTransformer.setReturnDataType(dataType);
+
+        // This is to maintain the same exact behavior previous to MULE-19941 when MULE_DISABLE_SET_VARIABLE_INHERITED_MIME_TYPE default is not changed.
+        verify(mockMessage).setProperty(argThat(equalTo(PLAIN_STRING_KEY)), argThat(equalTo(EXPRESSION_VALUE)), argThat(equalTo(scope)), dataTypeCaptor.capture());
+        assertThat(dataTypeCaptor.getValue(), DataTypeMatcher.like(String.class, MimeTypes.ANY, UTF_8.toString()));
     }
 
     @Test
