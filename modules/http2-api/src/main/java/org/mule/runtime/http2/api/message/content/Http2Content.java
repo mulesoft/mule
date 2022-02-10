@@ -14,10 +14,4 @@ public interface Http2Content {
    * @return the content as an {@link InputStream}.
    */
   InputStream asInputStream();
-
-  /**
-   * @return the content length.
-   */
-  // TODO: Does it have special values? Might this be negative? Does it have a maximum?
-  int contentLength();
 }
