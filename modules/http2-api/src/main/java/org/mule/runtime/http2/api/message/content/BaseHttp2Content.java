@@ -11,20 +11,13 @@ import java.io.InputStream;
 public class BaseHttp2Content implements Http2Content {
 
   private final InputStream asInputStream;
-  private final int contentLength;
 
-  public BaseHttp2Content(InputStream asInputStream, int contentLength) {
+  public BaseHttp2Content(InputStream asInputStream) {
     this.asInputStream = asInputStream;
-    this.contentLength = contentLength;
   }
 
   @Override
   public InputStream asInputStream() {
     return asInputStream;
-  }
-
-  @Override
-  public int contentLength() {
-    return contentLength;
   }
 }

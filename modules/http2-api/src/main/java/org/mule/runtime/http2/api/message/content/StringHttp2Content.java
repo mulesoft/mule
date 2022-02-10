@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.http2.api.message.content;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.ByteArrayInputStream;
 
 public class StringHttp2Content extends BaseHttp2Content {
 
   public StringHttp2Content(String asString) {
-    super(new ByteArrayInputStream(asString.getBytes()), asString.length());
+    super(new ByteArrayInputStream(asString.getBytes(UTF_8)));
   }
 }

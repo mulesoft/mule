@@ -139,4 +139,13 @@ public enum Http2Status {
     }
     return null;
   }
+
+  public static Http2Status getStatusByString(CharSequence statusAsText) {
+    for (Http2Status httpStatus : values()) {
+      if (httpStatus.getCodeAsText().contentEquals(statusAsText)) {
+        return httpStatus;
+      }
+    }
+    return null;
+  }
 }

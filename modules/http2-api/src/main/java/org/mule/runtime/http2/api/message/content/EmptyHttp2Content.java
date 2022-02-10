@@ -13,6 +13,6 @@ public class EmptyHttp2Content extends BaseHttp2Content {
   private static final byte[] EMPTY_BUF = new byte[0];
 
   public EmptyHttp2Content() {
-    super(new ByteArrayInputStream(EMPTY_BUF), 0);
+    super(new ByteArrayInputStream(EMPTY_BUF));
   }
 }
