@@ -759,6 +759,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
 
     scatterGatherRouter.stop();
     scatterGatherRouter.dispose();
+    disposeIfNeeded(chain, LOGGER);
   }
 
   @Test
@@ -771,11 +772,13 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     choiceRouter.addRoute("true", newChain(empty(), getAppendingMP("3")));
     initialiseIfNeeded(choiceRouter, muleContext);
 
+    Processor chain = newChain(empty(), choiceRouter);
     try {
-      assertThat(process(newChain(empty(), choiceRouter), getTestEventUsingFlow("0")).getMessage().getPayload().getValue(),
+      assertThat(process(chain, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(),
                  equalTo("01"));
     } finally {
       disposeIfNeeded(choiceRouter, LOGGER);
+      disposeIfNeeded(chain, LOGGER);
     }
   }
 
