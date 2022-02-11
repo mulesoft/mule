@@ -12,8 +12,10 @@ import static java.lang.Boolean.getBoolean;
 
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.event.CoreEvent;
 
+import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.reactivestreams.Publisher;
 
 public class GlobalErrorHandler extends ErrorHandler {
@@ -51,5 +53,17 @@ public class GlobalErrorHandler extends ErrorHandler {
       this.local = local;
     }
     return local;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    setFromGlobalErrorHandler();
+    super.initialise();
+  }
+
+  private void setFromGlobalErrorHandler() {
+    this.getExceptionListeners().stream()
+            .filter(exceptionListener -> exceptionListener instanceof TemplateOnErrorHandler)
+            .forEach(exceptionListener -> ((TemplateOnErrorHandler) exceptionListener).setFromGlobalErrorHandler(true));
   }
 }
