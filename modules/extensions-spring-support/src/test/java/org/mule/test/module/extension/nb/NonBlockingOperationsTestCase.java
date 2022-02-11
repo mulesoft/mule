@@ -103,7 +103,7 @@ public class NonBlockingOperationsTestCase extends AbstractExtensionFunctionalTe
       assertCapturedThreadsNameMatch(startsWith("SimpleUnitTestSupportScheduler."));
 
       expectedException.expectFailingComponent(is(locator
-        .find(Location.builder().globalName("fireMissile").addProcessorsPart().addIndexPart(1).build()).get()));
+          .find(Location.builder().globalName("fireMissile").addProcessorsPart().addIndexPart(1).build()).get()));
       expectedException.expectMessage(is(MISSILE_PROOF));
       expectedException.expectCause(instanceOf(UnsupportedOperationException.class));
 
