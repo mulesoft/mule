@@ -27,8 +27,18 @@
         <error-handler>
             <on-error-propagate>
                 <logger/>
-                <!-- TODO: MULE-18118 - uncomment the following line when this issue is fixed -->
-                <!-- <custom-processor class="org.mule.test.module.extension.nb.NonBlockingOperationsTestCase$ThreadCaptor" /> -->
+                <custom-processor class="org.mule.test.module.extension.nb.NonBlockingOperationsTestCase$ThreadCaptor" />
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+
+    <flow name="nonBlockingOperationFailureInsideTransaction" initialState="stopped">
+        <custom-processor class="org.mule.test.module.extension.nb.NonBlockingOperationsTestCase$ThreadCaptor" />
+        <marvel:fire-missile at="#[payload]" config-ref="ironMan"/>
+        <error-handler>
+            <on-error-propagate>
+                <logger/>
+                <custom-processor class="org.mule.test.module.extension.nb.NonBlockingOperationsTestCase$ThreadCaptor" />
             </on-error-propagate>
         </error-handler>
     </flow>
