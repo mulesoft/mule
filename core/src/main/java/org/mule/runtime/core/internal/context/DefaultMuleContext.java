@@ -71,7 +71,6 @@ import static org.apache.commons.lang3.SystemUtils.JAVA_VERSION;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
-import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -136,7 +135,6 @@ import org.mule.runtime.core.internal.connector.DefaultSchedulerController;
 import org.mule.runtime.core.internal.connector.SchedulerController;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
-import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.LifecycleStrategy;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
@@ -931,17 +929,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       if (defaultErrorHandler == null) {
         throw new MuleRuntimeException(createStaticMessage(format("No global error handler named %s",
                                                                   config.getDefaultErrorHandlerName())));
-      }
-
-      if (rootContainerName.isPresent()) {
-        defaultErrorHandler = ((GlobalErrorHandler) defaultErrorHandler)
-            .createLocalErrorHandler(Location.builder().globalName(rootContainerName.get()).build());
-      } else {
-        try {
-          defaultErrorHandler = new ErrorHandlerFactory().createDefault(getRegistry().lookupObject(NotificationDispatcher.class));
-        } catch (RegistrationException e) {
-          throw new MuleRuntimeException(e);
-        }
       }
     } else {
       try {

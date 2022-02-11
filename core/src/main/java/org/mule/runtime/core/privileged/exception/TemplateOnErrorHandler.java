@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.exception;
 
+import static java.util.Optional.of;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
@@ -38,6 +39,7 @@ import static reactor.core.publisher.Flux.from;
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -94,6 +96,8 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   private static final Logger LOGGER = getLogger(TemplateOnErrorHandler.class);
 
   private static final Pattern ERROR_HANDLER_LOCATION_PATTERN = compile(".*/.*/.*");
+
+  private boolean fromGlobalErrorHandler = false;
 
   @Inject
   private ExpressionManager expressionManager;
@@ -221,7 +225,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       try {
         logger.error("Exception during exception strategy execution");
         getExceptionListener().resolveAndLogException(me);
-        if (isOwnedTransaction()) {
+        if (isOwnedTransaction(((CoreEvent) event).getContext().getOriginatingLocation().getRootContainerName())) {
           TransactionCoordination.getInstance().rollbackCurrentTransaction();
         }
       } catch (Exception ex) {
@@ -281,8 +285,8 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   protected void doInitialise() throws InitialisationException {
     super.doInitialise();
     Optional<ProcessingStrategy> processingStrategy = empty();
-    if (flowLocation.isPresent()) {
-      processingStrategy = getProcessingStrategy(locator, flowLocation.get());
+    if (fromGlobalErrorHandler) {
+      processingStrategy = getProcessingStrategyFromGlobalErrorHandler(locator);
     } else if (getLocation() != null) {
       processingStrategy = getProcessingStrategy(locator, this);
     }
@@ -300,6 +304,10 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
         errorHandlerLocation = errorHandlerLocation.substring(0, errorHandlerLocation.lastIndexOf('/'));
       }
     }
+  }
+
+  private Optional<ProcessingStrategy> getProcessingStrategyFromGlobalErrorHandler(ConfigurationComponentLocator locator) {
+    return of(new OnRuntimeProcessingStrategy(locator));
   }
 
   @Override
@@ -494,13 +502,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
    */
   public abstract TemplateOnErrorHandler duplicateFor(Location location);
 
-
-  private boolean isTransactionInGlobalErrorHandler(TransactionAdapter transaction) {
-    String transactionContainerName = transaction.getComponentLocation().get().getRootContainerName();
-    return flowLocation.isPresent() && transactionContainerName.equals(flowLocation.get().getGlobalName());
-  }
-
-  protected boolean isOwnedTransaction() {
+  protected boolean isOwnedTransaction(String location) {
     TransactionAdapter transaction = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
     if (transaction == null || !transaction.getComponentLocation().isPresent()) {
       return false;
@@ -508,12 +510,10 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
     if (inDefaultErrorHandler()) {
       return defaultErrorHandlerOwnsTransaction(transaction);
-    } else if (isTransactionInGlobalErrorHandler((transaction))) {
-      // We are in a GlobalErrorHandler that is defined for the container (Flow or TryScope) that created the tx
-      return true;
-    } else if (flowLocation.isPresent()) {
-      // We are in a Global Error Handler, which is not the one that created the Tx
-      return false;
+    }
+
+    if (fromGlobalErrorHandler) {
+      return transaction.getComponentLocation().get().getRootContainerName().equals(location);
     } else {
       // We are in a simple scenario where the error handler's location ends with "/error-handler/1".
       // We cannot use the RootContainerLocation, since in case of nested TryScopes (the outer one creating the tx)
@@ -550,5 +550,9 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   protected ErrorTypeRepository getErrorTypeRepository() {
     return errorTypeRepository;
+  }
+
+  public void setFromGlobalErrorHandler(boolean fromGlobalErrorHandler) {
+    this.fromGlobalErrorHandler = fromGlobalErrorHandler;
   }
 }
