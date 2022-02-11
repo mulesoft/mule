@@ -38,8 +38,8 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
   private final ConfigurationDependencyResolver configurationDependencyResolver;
   private final DeclaredDependencyResolver declaredDependencyResolver;
   private final AutoDiscoveredDependencyResolver autoDiscoveredDependencyResolver;
-  private Map<Integer, Set<Pair<String, Object>>> visitedForBuckets;
-  private Map<Pair<String, Object>, List<Pair<String, Object>>> visited;
+  private Map<Integer, Set<Pair<String, Object>>> visitedComponentsForBuckets;
+  private Map<Pair<String, Object>, List<Pair<String, Object>>> visitedComponents;
 
 
   public DependencyGraphBeanDependencyResolver(ConfigurationDependencyResolver configurationDependencyResolver,
@@ -50,8 +50,8 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
     this.declaredDependencyResolver = declaredDependencyResolver;
     this.autoDiscoveredDependencyResolver = autoDiscoveredDependencyResolver;
     this.springRegistry = springRegistry;
-    this.visitedForBuckets = new HashMap<>();
-    this.visited = new HashMap<>();
+    this.visitedComponentsForBuckets = new HashMap<>();
+    this.visitedComponents = new HashMap<>();
   }
 
   /**
@@ -81,16 +81,23 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
   /**
    * Provides only direct dependencies/required components for the object provided
    * 
-   * @return direct children(required components) of the current object
+   * @return direct children(required components) of the current object If the component is already visited for the current
+   *         bucket, we don't need to get dependencies again, return emptyList If the component is already visited for any other
+   *         buckets, but not for this bucket, return the dependencies already saved If it was never visited before, get direct
+   *         dependencies for the object
    */
   public List<Pair<String, Object>> getDirectBeanDependencies(Pair<String, Object> current, int bucketIndex) {
-    visitedForBuckets.putIfAbsent(bucketIndex, new HashSet<>());
-    if (visitedForBuckets.get(bucketIndex).stream().map(x -> x.getSecond()).anyMatch(x -> x.equals(current.getSecond()))) {
+    // if the component was already processed for the current bucket, we don't process it
+    visitedComponentsForBuckets.putIfAbsent(bucketIndex, new HashSet<>());
+    if (visitedComponentsForBuckets.get(bucketIndex).stream().map(x -> x.getSecond())
+        .anyMatch(x -> x.equals(current.getSecond()))) {
       return emptyList();
     }
-    visitedForBuckets.get(bucketIndex).add(current);
-    if(visited.containsKey(current)){
-      return visited.get(current);
+    visitedComponentsForBuckets.get(bucketIndex).add(current);
+
+    // if the component was already processed for any other bucket, it returns the direct dependencies that were saved before
+    if (visitedComponents.containsKey(current)) {
+      return visitedComponents.get(current);
     }
 
     final DependencyNode currentNode = new DependencyNode(current.getFirst(), current.getSecond());
@@ -101,20 +108,36 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
         .stream()
         .map(DependencyNode::getKeyObjectPair)
         .collect(toList());
-    visited.put(current, directDependencies);
+
+    // save the dependencies for current component for future usages
+    visitedComponents.put(current, directDependencies);
+
     return directDependencies;
   }
 
+  /**
+   * Provides all the dependencies/required components for the object provided
+   *
+   * @param beanName    the name of the bean to resolve dependencies
+   * @param bucketIndex the bucket(graph) we calculate the dependencies for
+   * @return a map with any relevant object as key, direct dependencies of the key as value
+   *
+   */
   public Map<Pair<String, Object>, List<Pair<String, Object>>> getTransitiveDependencies(String beanName, int bucketIndex) {
     Map<Pair<String, Object>, List<Pair<String, Object>>> transitiveDependencies = new HashMap<>();
-    Set<Pair<String, Object>> processed = new HashSet<>();
-    ArrayDeque<Pair<String, Object>> dq = new ArrayDeque<>();
-    dq.add(new Pair<>(beanName, springRegistry.get(beanName)));
-    while (!dq.isEmpty()) {
-      Pair<String, Object> current = dq.remove();
-      if(!processed.add(current)) continue;
+    Set<Pair<String, Object>> processedComponents = new HashSet<>();
+
+    ArrayDeque<Pair<String, Object>> queue = new ArrayDeque<>();
+    queue.add(new Pair<>(beanName, springRegistry.get(beanName)));
+
+    while (!queue.isEmpty()) {
+      Pair<String, Object> current = queue.remove();
+      // if the map already has the information about the component, we skip the component
+      if (!processedComponents.add(current)) {
+        continue;
+      }
       List<Pair<String, Object>> dependencies = getDirectBeanDependencies(current, bucketIndex);
-      dq.addAll(dependencies);
+      queue.addAll(dependencies);
       transitiveDependencies.put(current, dependencies);
     }
     return transitiveDependencies;

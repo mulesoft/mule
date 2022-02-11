@@ -31,57 +31,57 @@ import org.junit.Test;
 @Story(LIFECYCLE_PHASE_STORY)
 public class DependencyGraphBeanDependencyResolverTestCase {
 
-  // DependencyGraphBeanDependencyResolver resolver;
-  // private ConfigurationDependencyResolver configurationDependencyResolver;
-  // private DeclaredDependencyResolver declaredDependencyResolver;
-  // private AutoDiscoveredDependencyResolver autoDiscoveredDependencyResolver;
-  // private AbstractSpringRegistry springRegistry;
-  //
-  // @Before
-  // public void setUp() throws Exception {
-  // configurationDependencyResolver = mock(ConfigurationDependencyResolver.class);
-  // declaredDependencyResolver = mock(DeclaredDependencyResolver.class);
-  // autoDiscoveredDependencyResolver = mock(AutoDiscoveredDependencyResolver.class);
-  // springRegistry = mock(AbstractSpringRegistry.class);
-  // resolver = new DependencyGraphBeanDependencyResolver(configurationDependencyResolver, declaredDependencyResolver,
-  // autoDiscoveredDependencyResolver, springRegistry);
-  // }
-  //
-  // @Test
-  // @Description("check if getDirectBeanDependencies calls three different resolvers")
-  // public void getDirectBeanDependenciesTest() {
-  // String beanName = "component";
-  // Object currentObject = springRegistry.get(beanName);
-  // resolver.getDirectBeanDependencies(beanName);
-  // verify(autoDiscoveredDependencyResolver, times(1)).getAutoDiscoveredDependencies((beanName));
-  // verify(declaredDependencyResolver, times(1)).getDeclaredDependencies(currentObject);
-  // verify(configurationDependencyResolver, times(1)).getDirectComponentDependencies(beanName);
-  // }
-  //
-  // @Test
-  // @Description("delegate dependency resolution to autoDiscoveredDependencyResolver")
-  // public void addAutoDiscoveredDependenciesTest() {
-  // String beanName = "component";
-  // resolver.getDirectBeanDependencies(beanName);
-  // verify(autoDiscoveredDependencyResolver, times(1)).getAutoDiscoveredDependencies((beanName));
-  // }
-  //
-  // @Test
-  // @Description("delegate dependency resolution to declaredDependencyResolver")
-  // public void addDirectDeclaredDependenciesTest() {
-  // String beanName = "component";
-  // Object currentObject = springRegistry.get(beanName);
-  // resolver.getDirectBeanDependencies(beanName);
-  // verify(declaredDependencyResolver, times(1)).getDeclaredDependencies(currentObject);
-  // }
-  //
-  // @Test
-  // @Description("delegate dependency resolution to configurationDependencyResolver")
-  // public void addDirectConfigurationDependenciesTest() {
-  // String beanName = "component";
-  // resolver.getDirectBeanDependencies(beanName);
-  // verify(configurationDependencyResolver, times(1)).getDirectComponentDependencies(beanName);
-  // }
+  DependencyGraphBeanDependencyResolver resolver;
+  private ConfigurationDependencyResolver configurationDependencyResolver;
+  private DeclaredDependencyResolver declaredDependencyResolver;
+  private AutoDiscoveredDependencyResolver autoDiscoveredDependencyResolver;
+  private AbstractSpringRegistry springRegistry;
+
+  @Before
+  public void setUp() throws Exception {
+    configurationDependencyResolver = mock(ConfigurationDependencyResolver.class);
+    declaredDependencyResolver = mock(DeclaredDependencyResolver.class);
+    autoDiscoveredDependencyResolver = mock(AutoDiscoveredDependencyResolver.class);
+    springRegistry = mock(AbstractSpringRegistry.class);
+    resolver = new DependencyGraphBeanDependencyResolver(configurationDependencyResolver, declaredDependencyResolver,
+                                                         autoDiscoveredDependencyResolver, springRegistry);
+  }
+
+  @Test
+  @Description("check if getDirectBeanDependencies calls three different resolvers")
+  public void getDirectBeanDependenciesTest() {
+    String beanName = "component";
+    Object currentObject = springRegistry.get(beanName);
+    resolver.getTransitiveDependencies(beanName, 5);
+    verify(autoDiscoveredDependencyResolver, times(1)).getAutoDiscoveredDependencies((beanName));
+    verify(declaredDependencyResolver, times(1)).getDeclaredDependencies(currentObject);
+    verify(configurationDependencyResolver, times(1)).getDirectComponentDependencies(beanName);
+  }
+
+  @Test
+  @Description("delegate dependency resolution to autoDiscoveredDependencyResolver")
+  public void addAutoDiscoveredDependenciesTest() {
+    String beanName = "component";
+    resolver.getTransitiveDependencies(beanName, 5);
+    verify(autoDiscoveredDependencyResolver, times(1)).getAutoDiscoveredDependencies((beanName));
+  }
+
+  @Test
+  @Description("delegate dependency resolution to declaredDependencyResolver")
+  public void addDirectDeclaredDependenciesTest() {
+    String beanName = "component";
+    Object currentObject = springRegistry.get(beanName);
+    resolver.getTransitiveDependencies(beanName, 5);
+    verify(declaredDependencyResolver, times(1)).getDeclaredDependencies(currentObject);
+  }
+
+  @Test
+  @Description("delegate dependency resolution to configurationDependencyResolver")
+  public void addDirectConfigurationDependenciesTest() {
+    String beanName = "component";
+    resolver.getTransitiveDependencies(beanName, 5);
+    verify(configurationDependencyResolver, times(1)).getDirectComponentDependencies(beanName);
+  }
 
 
 

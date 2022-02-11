@@ -146,6 +146,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
   public List<Object> getSortedObjects() {
     List<BeanVertexWrapper> res = dependencyGraphs.stream().map(x -> {
       List<BeanVertexWrapper> sortedObjects = newArrayList(new TopologicalOrderIterator<>(x, new Comparator<BeanVertexWrapper>() {
+
         // tie-breaker: respect the order of lifecycleLookupObjects
         @Override
         public int compare(BeanVertexWrapper o1, BeanVertexWrapper o2) {
