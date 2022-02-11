@@ -30,8 +30,18 @@
         <error-handler>
             <on-error-propagate>
                 <logger/>
-                <!-- TODO: MULE-18118 - uncomment the following line when this issue is fixed -->
-                <!-- <flow-ref name="captureThread"/> -->
+                <flow-ref name="captureThread"/>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+
+    <flow name="nonBlockingOperationFailureInsideTransaction" initialState="stopped">
+        <flow-ref name="captureThread"/>
+        <marvel:fire-missile at="#[payload]" config-ref="ironMan"/>
+        <error-handler>
+            <on-error-propagate>
+                <logger/>
+                <flow-ref name="captureThread"/>
             </on-error-propagate>
         </error-handler>
     </flow>
