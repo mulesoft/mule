@@ -132,7 +132,7 @@ class MuleSdkExtensionModelParser implements ExtensionModelParser {
 
   @Override
   public Optional<XmlDslConfiguration> getXmlDslConfiguration() {
-    return of(new XmlDslConfiguration("this", "this"));
+    return of(new XmlDslConfiguration("this", "http://www.mulesoft.org/schema/mule/this"));
 
   }
 

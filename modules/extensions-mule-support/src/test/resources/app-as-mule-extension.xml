@@ -2,8 +2,10 @@
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:operation="http://www.mulesoft.org/schema/mule/operation"
       xmlns:this="http://www.mulesoft.org/schema/mule/this"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
         http://www.mulesoft.org/schema/mule/operation http://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd
         http://www.mulesoft.org/schema/mule/this http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd">
 
@@ -16,7 +18,7 @@
         <this:hello-world receiver="World" />
     </flow>
 
-    <operation:def name="helloWold" displayName="Hello World operation" summary="Returns a polite greeting">
+    <operation:def name="helloWorld" displayName="Hello World operation" summary="Returns a polite greeting">
         <operation:parameters>
             <operation:parameter name="greeting" type="string" summary="The greeting message">
                 <operation:description>The greeting message appended before the receivers name</operation:description>
