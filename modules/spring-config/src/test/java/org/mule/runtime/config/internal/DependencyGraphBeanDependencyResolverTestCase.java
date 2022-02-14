@@ -12,12 +12,14 @@ import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjecti
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
 import org.mule.runtime.config.internal.resolvers.AutoDiscoveredDependencyResolver;
+import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.resolvers.DeclaredDependencyResolver;
 import org.mule.runtime.config.internal.resolvers.DependencyGraphBeanDependencyResolver;
+import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -31,7 +33,7 @@ import org.junit.Test;
 @Story(LIFECYCLE_PHASE_STORY)
 public class DependencyGraphBeanDependencyResolverTestCase {
 
-  DependencyGraphBeanDependencyResolver resolver;
+  private DependencyGraphBeanDependencyResolver resolver;
   private ConfigurationDependencyResolver configurationDependencyResolver;
   private DeclaredDependencyResolver declaredDependencyResolver;
   private AutoDiscoveredDependencyResolver autoDiscoveredDependencyResolver;
@@ -48,39 +50,45 @@ public class DependencyGraphBeanDependencyResolverTestCase {
   }
 
   @Test
-  @Description("check if getDirectBeanDependencies calls three different resolvers")
+  @Description("Check if getDirectBeanDependencies calls three different resolvers")
   public void getDirectBeanDependenciesTest() {
-    String beanName = "component";
-    Object currentObject = springRegistry.get(beanName);
-    resolver.getTransitiveDependencies(beanName, 5);
-    verify(autoDiscoveredDependencyResolver, times(1)).getAutoDiscoveredDependencies((beanName));
+    when(springRegistry.get("component")).thenReturn(new DefaultStreamingManager());
+
+    Object currentObject = springRegistry.get("component");
+
+    resolver.getTransitiveDependencies("component", 5);
+    verify(autoDiscoveredDependencyResolver, times(1)).getAutoDiscoveredDependencies(("component"));
     verify(declaredDependencyResolver, times(1)).getDeclaredDependencies(currentObject);
-    verify(configurationDependencyResolver, times(1)).getDirectComponentDependencies(beanName);
+    verify(configurationDependencyResolver, times(1)).getDirectComponentDependencies("component");
   }
 
   @Test
-  @Description("delegate dependency resolution to autoDiscoveredDependencyResolver")
+  @Description("Delegate dependency resolution to autoDiscoveredDependencyResolver")
   public void addAutoDiscoveredDependenciesTest() {
-    String beanName = "component";
-    resolver.getTransitiveDependencies(beanName, 5);
-    verify(autoDiscoveredDependencyResolver, times(1)).getAutoDiscoveredDependencies((beanName));
+    when(springRegistry.get("component")).thenReturn(new DefaultStreamingManager());
+
+    resolver.getTransitiveDependencies("component", 5);
+    verify(autoDiscoveredDependencyResolver, times(1)).getAutoDiscoveredDependencies(("component"));
   }
 
   @Test
-  @Description("delegate dependency resolution to declaredDependencyResolver")
+  @Description("Delegate dependency resolution to declaredDependencyResolver.")
   public void addDirectDeclaredDependenciesTest() {
-    String beanName = "component";
-    Object currentObject = springRegistry.get(beanName);
-    resolver.getTransitiveDependencies(beanName, 5);
+    when(springRegistry.get("component")).thenReturn(new DefaultStreamingManager());
+
+    Object currentObject = springRegistry.get("component");
+
+    resolver.getTransitiveDependencies("component", 5);
     verify(declaredDependencyResolver, times(1)).getDeclaredDependencies(currentObject);
   }
 
   @Test
-  @Description("delegate dependency resolution to configurationDependencyResolver")
+  @Description("Delegate dependency resolution to configurationDependencyResolver.")
   public void addDirectConfigurationDependenciesTest() {
-    String beanName = "component";
-    resolver.getTransitiveDependencies(beanName, 5);
-    verify(configurationDependencyResolver, times(1)).getDirectComponentDependencies(beanName);
+    when(springRegistry.get("component")).thenReturn(new DefaultStreamingManager());
+
+    resolver.getTransitiveDependencies("component", 5);
+    verify(configurationDependencyResolver, times(1)).getDirectComponentDependencies("component");
   }
 
 
