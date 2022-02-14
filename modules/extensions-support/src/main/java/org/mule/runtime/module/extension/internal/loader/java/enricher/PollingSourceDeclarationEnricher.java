@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.enricher;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.String.valueOf;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
@@ -113,7 +111,7 @@ public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarati
         ParameterDeclaration parameter = new ParameterDeclaration(SEQUENTIAL_POLLS_PARAMETER_NAME);
         parameter.setDescription(SEQUENTIAL_POLLS_PARAMETER_DESCRIPTION);
         parameter.setRequired(false);
-        parameter.setDefaultValue(valueOf(FALSE));
+        parameter.setDefaultValue(false);
         parameter.setType(BaseTypeBuilder.create(JAVA).booleanType().build(), false);
         parameter.setExpressionSupport(NOT_SUPPORTED);
         parameter.addModelProperty(new SyntheticModelModelProperty());

@@ -16632,7 +16632,7 @@
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": "false",
+                  "defaultValue": false,
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -17308,7 +17308,7 @@
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": "false",
+                  "defaultValue": false,
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -32248,7 +32248,7 @@
               "isComponentId": false,
               "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "false",
+              "defaultValue": false,
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": false,
@@ -32669,7 +32669,7 @@
               "isComponentId": false,
               "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "false",
+              "defaultValue": false,
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": false,
@@ -33140,7 +33140,7 @@
               "isComponentId": false,
               "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "false",
+              "defaultValue": false,
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": false,
@@ -33870,7 +33870,7 @@
               "isComponentId": false,
               "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "false",
+              "defaultValue": false,
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": false,
@@ -34727,7 +34727,7 @@
               "isComponentId": false,
               "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "false",
+              "defaultValue": false,
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": false,
@@ -35093,7 +35093,7 @@
               "isComponentId": false,
               "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "false",
+              "defaultValue": false,
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": false,
