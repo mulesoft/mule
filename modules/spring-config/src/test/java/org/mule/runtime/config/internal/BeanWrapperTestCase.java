@@ -22,7 +22,7 @@ import org.junit.rules.ExpectedException;
 @Issue("MULE-19984")
 @Feature(LIFECYCLE_AND_DEPENDENCY_INJECTION)
 @Story(LIFECYCLE_PHASE_STORY)
-public class BeanVertexWrapperTestCase {
+public class BeanWrapperTestCase {
 
   @Rule
   public ExpectedException exceptionRule = ExpectedException.none();
@@ -32,8 +32,8 @@ public class BeanVertexWrapperTestCase {
 
     Object object1 = new Object();
     Object object2 = new Object();
-    BeanVertexWrapper first = new BeanVertexWrapper("firstObject", object1);
-    BeanVertexWrapper second = new BeanVertexWrapper("secondObject", object2);
+    BeanWrapper first = new BeanWrapper("firstObject", object1);
+    BeanWrapper second = new BeanWrapper("secondObject", object2);
 
     assertThat(first.equals(second), is(false));
   }
@@ -41,7 +41,7 @@ public class BeanVertexWrapperTestCase {
   @Test
   public void sameObjectInWrapperComparisonTest() {
     Object object1 = new Object();
-    BeanVertexWrapper first = new BeanVertexWrapper("firstObject", object1);
+    BeanWrapper first = new BeanWrapper("firstObject", object1);
 
     assertThat(first.equals(object1), is(true));
   }
@@ -55,7 +55,7 @@ public class BeanVertexWrapperTestCase {
   @Test
   public void sameProxyInWrapperComparisonTest() {
     FakeProxy fProxy = new FakeProxy(new Object());
-    BeanVertexWrapper wrapper = new BeanVertexWrapper("proxy", fProxy);
+    BeanWrapper wrapper = new BeanWrapper("proxy", fProxy);
 
     assertThat(wrapper.equals(wrapper), is(true));
   }
@@ -63,8 +63,8 @@ public class BeanVertexWrapperTestCase {
   @Test
   public void sameProxyInTwoDifferentWrappersComparisonTest() {
     FakeProxy fProxy = new FakeProxy(new Object());
-    BeanVertexWrapper wrapper1 = new BeanVertexWrapper("proxy1", fProxy);
-    BeanVertexWrapper wrapper2 = new BeanVertexWrapper("proxy2", fProxy);
+    BeanWrapper wrapper1 = new BeanWrapper("proxy1", fProxy);
+    BeanWrapper wrapper2 = new BeanWrapper("proxy2", fProxy);
 
     assertThat(wrapper1.equals(wrapper2), is(true));
     assertThat(wrapper2.equals(wrapper1), is(true));
@@ -75,8 +75,8 @@ public class BeanVertexWrapperTestCase {
     Object obj = new Object();
     FakeProxy fProxy1 = new FakeProxy(obj);
     FakeProxy fProxy2 = new FakeProxy(obj);
-    BeanVertexWrapper wrapper1 = new BeanVertexWrapper("proxy1", fProxy1);
-    BeanVertexWrapper wrapper2 = new BeanVertexWrapper("proxy2", fProxy2);
+    BeanWrapper wrapper1 = new BeanWrapper("proxy1", fProxy1);
+    BeanWrapper wrapper2 = new BeanWrapper("proxy2", fProxy2);
 
     assertThat(wrapper1.equals(wrapper2), is(true));
     assertThat(wrapper2.equals(wrapper1), is(true));
@@ -86,15 +86,15 @@ public class BeanVertexWrapperTestCase {
   public void nullInWrapperTest() {
     exceptionRule.expect(NullPointerException.class);
     exceptionRule.expectMessage("bean must not be null");
-    new BeanVertexWrapper("null", null);
+    new BeanWrapper("null", null);
   }
 
   @Test
   public void twoDifferentObjectsInWrapperTest() {
     Object object1 = new Object();
     Object object2 = new Object();
-    BeanVertexWrapper first = new BeanVertexWrapper("firstObject", object1);
-    BeanVertexWrapper second = new BeanVertexWrapper("secondObject", object2);
+    BeanWrapper first = new BeanWrapper("firstObject", object1);
+    BeanWrapper second = new BeanWrapper("secondObject", object2);
     assertThat(first.equals(second), is(false));
   }
 
@@ -102,7 +102,7 @@ public class BeanVertexWrapperTestCase {
   public void differentObjectsInWrapperTest() {
     Object object1 = new Object();
     Object object2 = new Object();
-    BeanVertexWrapper first = new BeanVertexWrapper("firstObject", object1);
+    BeanWrapper first = new BeanWrapper("firstObject", object1);
 
     assertThat(first.equals(object2), is(false));
   }
@@ -112,10 +112,10 @@ public class BeanVertexWrapperTestCase {
 
     Object object1 = new Object();
     Object object2 = new Object();
-    BeanVertexWrapper first = new BeanVertexWrapper("firstObject", object1);
-    BeanVertexWrapper second = new BeanVertexWrapper("secondObject", object2);
+    BeanWrapper first = new BeanWrapper("firstObject", object1);
+    BeanWrapper second = new BeanWrapper("secondObject", object2);
 
-    assertThat(first.getBeanName().equals("firstObject"), is(true));
+    assertThat(first.getName().equals("firstObject"), is(true));
     assertThat(first.hashCode() == second.hashCode(), is(false));
   }
 

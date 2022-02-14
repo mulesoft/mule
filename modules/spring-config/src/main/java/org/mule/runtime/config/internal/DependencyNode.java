@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.config.internal;
 
-import org.mule.runtime.api.util.Pair;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -48,7 +46,7 @@ public class DependencyNode {
     return name;
   }
 
-  public Pair<String, Object> getKeyObjectPair() {
-    return new Pair<>(name, object);
+  public BeanWrapper getNameAndObject() {
+    return new BeanWrapper(name, object);
   }
 }

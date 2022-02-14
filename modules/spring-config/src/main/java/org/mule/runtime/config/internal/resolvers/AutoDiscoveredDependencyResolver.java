@@ -8,11 +8,10 @@ package org.mule.runtime.config.internal.resolvers;
 
 import static java.util.stream.Collectors.toList;
 
-import org.mule.runtime.config.internal.BeanVertexWrapper;
+import org.mule.runtime.config.internal.BeanWrapper;
 import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
 
 import java.util.List;
-
 import javax.inject.Inject;
 
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -29,10 +28,10 @@ public class AutoDiscoveredDependencyResolver {
     this.springRegistry = springRegistry;
   }
 
-  public List<BeanVertexWrapper> getAutoDiscoveredDependencies(String beanName) {
+  public List<BeanWrapper> getAutoDiscoveredDependencies(String beanName) {
     return springRegistry.getDependencies(beanName).entrySet()
         .stream()
-        .map(x -> new BeanVertexWrapper(x.getKey(), x.getValue()))
+        .map(x -> new BeanWrapper(x.getKey(), x.getValue()))
         .collect(toList());
   }
 

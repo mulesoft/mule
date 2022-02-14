@@ -9,17 +9,16 @@ package org.mule.runtime.config.internal;
 import static java.util.Objects.requireNonNull;
 
 /**
- * BeanVertexWrapper helps the comparison/equality check among non-proxy vs. proxy or proxy vs. proxy when building a dependency
- * graph.
+ * BeanWrapper helps the comparison/equality check among non-proxy vs. proxy or proxy vs. proxy when building a dependency graph.
  */
-public class BeanVertexWrapper {
+public class BeanWrapper {
 
   final Object wrappedObject;
-  final String beanName;
+  final String name;
 
-  public BeanVertexWrapper(String beanName, Object o) {
+  public BeanWrapper(String name, Object o) {
     requireNonNull(o, "bean must not be null");
-    this.beanName = beanName;
+    this.name = name;
     this.wrappedObject = o;
   }
 
@@ -27,16 +26,16 @@ public class BeanVertexWrapper {
     return wrappedObject;
   }
 
-  public String getBeanName() {
-    return beanName;
+  public String getName() {
+    return name;
   }
 
   @Override
   public boolean equals(Object obj) {
     if (wrappedObject.equals(obj)) {
       return true;
-    } else if (obj instanceof BeanVertexWrapper) {
-      return this.getWrappedObject().hashCode() == ((BeanVertexWrapper) obj).getWrappedObject().hashCode();
+    } else if (obj instanceof BeanWrapper) {
+      return this.getWrappedObject().hashCode() == ((BeanWrapper) obj).getWrappedObject().hashCode();
     } else {
       return false;
     }

@@ -9,7 +9,7 @@ package org.mule.runtime.config.internal.resolvers;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
-import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.config.internal.BeanWrapper;
 import org.mule.runtime.config.internal.DependencyNode;
 import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
 import org.mule.runtime.config.internal.registry.BeanDependencyResolver;
@@ -18,6 +18,7 @@ import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,8 +39,8 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
   private final ConfigurationDependencyResolver configurationDependencyResolver;
   private final DeclaredDependencyResolver declaredDependencyResolver;
   private final AutoDiscoveredDependencyResolver autoDiscoveredDependencyResolver;
-  private Map<Integer, Set<Pair<String, Object>>> visitedComponentsForBuckets;
-  private Map<Pair<String, Object>, List<Pair<String, Object>>> visitedComponents;
+  private Map<Integer, Set<BeanWrapper>> visitedComponentsForBuckets;
+  private Map<BeanWrapper, List<BeanWrapper>> visitedComponents;
 
 
   public DependencyGraphBeanDependencyResolver(ConfigurationDependencyResolver configurationDependencyResolver,
@@ -86,31 +87,32 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
    *         buckets, but not for this bucket, return the dependencies already saved If it was never visited before, get direct
    *         dependencies for the object
    */
-  public List<Pair<String, Object>> getDirectBeanDependencies(Pair<String, Object> current, int bucketIndex) {
-    // if the component was already processed for the current bucket, we don't process it
+  public List<BeanWrapper> getDirectBeanDependencies(BeanWrapper currentObject, int bucketIndex) {
+    // If the component was already processed for the current bucket(graph), it won't process it
     visitedComponentsForBuckets.putIfAbsent(bucketIndex, new HashSet<>());
-    if (visitedComponentsForBuckets.get(bucketIndex).stream().map(x -> x.getSecond())
-        .anyMatch(x -> x.equals(current.getSecond()))) {
+    if (visitedComponentsForBuckets.get(bucketIndex).stream().map(x -> x.getWrappedObject())
+        .anyMatch(x -> x.equals(currentObject.getWrappedObject()))) {
       return emptyList();
     }
-    visitedComponentsForBuckets.get(bucketIndex).add(current);
+    visitedComponentsForBuckets.get(bucketIndex).add(currentObject);
 
-    // if the component was already processed for any other bucket, it returns the direct dependencies that were saved before
-    if (visitedComponents.containsKey(current)) {
-      return visitedComponents.get(current);
+    // If the component was already processed for any other buckets,
+    // it returns the direct dependencies that were saved before to build a dependency graph for the current bucket
+    if (visitedComponents.containsKey(currentObject)) {
+      return visitedComponents.get(currentObject);
     }
 
-    final DependencyNode currentNode = new DependencyNode(current.getFirst(), current.getSecond());
+    // Find direct dependencies for current
+    final DependencyNode currentNode = new DependencyNode(currentObject.getName(), currentObject.getWrappedObject());
+    addDirectDependency(currentObject.getName(), currentObject.getWrappedObject(), currentNode, new HashSet<>());
 
-    addDirectDependency(current.getFirst(), current.getSecond(), currentNode, new HashSet<>());
-
-    List<Pair<String, Object>> directDependencies = currentNode.getChildren()
+    List<BeanWrapper> directDependencies = currentNode.getChildren()
         .stream()
-        .map(DependencyNode::getKeyObjectPair)
+        .map(DependencyNode::getNameAndObject)
         .collect(toList());
 
-    // save the dependencies for current component for future usages
-    visitedComponents.put(current, directDependencies);
+    // save the dependencies of th current component for future usages
+    visitedComponents.put(currentObject, directDependencies);
 
     return directDependencies;
   }
@@ -123,20 +125,20 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
    * @return a map with any relevant object as key, direct dependencies of the key as value
    *
    */
-  public Map<Pair<String, Object>, List<Pair<String, Object>>> getTransitiveDependencies(String beanName, int bucketIndex) {
-    Map<Pair<String, Object>, List<Pair<String, Object>>> transitiveDependencies = new HashMap<>();
-    Set<Pair<String, Object>> processedComponents = new HashSet<>();
+  public Map<BeanWrapper, List<BeanWrapper>> getTransitiveDependencies(String beanName, int bucketIndex) {
+    Map<BeanWrapper, List<BeanWrapper>> transitiveDependencies = new LinkedHashMap<>();
+    Set<BeanWrapper> processedComponents = new HashSet<>();
 
-    ArrayDeque<Pair<String, Object>> queue = new ArrayDeque<>();
-    queue.add(new Pair<>(beanName, springRegistry.get(beanName)));
+    ArrayDeque<BeanWrapper> queue = new ArrayDeque<>();
+    queue.add(new BeanWrapper(beanName, springRegistry.get(beanName)));
 
     while (!queue.isEmpty()) {
-      Pair<String, Object> current = queue.remove();
+      BeanWrapper current = queue.remove();
       // if the map already has the information about the component, we skip the component
       if (!processedComponents.add(current)) {
         continue;
       }
-      List<Pair<String, Object>> dependencies = getDirectBeanDependencies(current, bucketIndex);
+      List<BeanWrapper> dependencies = getDirectBeanDependencies(current, bucketIndex);
       queue.addAll(dependencies);
       transitiveDependencies.put(current, dependencies);
     }
@@ -162,7 +164,7 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
    */
   private void addDirectDeclaredDependencies(Object object, Set<DependencyNode> processedKeys, DependencyNode node) {
     declaredDependencyResolver.getDeclaredDependencies(object)
-        .forEach(v -> addDirectChild(v.getBeanName(), v.getWrappedObject(), node,
+        .forEach(v -> addDirectChild(v.getName(), v.getWrappedObject(), node,
                                      processedKeys));
   }
 
@@ -193,7 +195,7 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
     autoDiscoveredDependencyResolver.getAutoDiscoveredDependencies(beanName)
         .stream()
         .filter(v -> !v.getWrappedObject().equals(node.getObject()))
-        .forEach(v -> addDirectChild(v.getBeanName(), v.getWrappedObject(), node,
+        .forEach(v -> addDirectChild(v.getName(), v.getWrappedObject(), node,
                                      processedKeys));
   }
 

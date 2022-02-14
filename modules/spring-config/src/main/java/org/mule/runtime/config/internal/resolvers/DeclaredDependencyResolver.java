@@ -9,7 +9,7 @@ package org.mule.runtime.config.internal.resolvers;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
-import org.mule.runtime.config.internal.BeanVertexWrapper;
+import org.mule.runtime.config.internal.BeanWrapper;
 import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
 import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
 
@@ -29,8 +29,8 @@ public class DeclaredDependencyResolver {
     this.springRegistry = springRegistry;
   }
 
-  public List<BeanVertexWrapper> getDeclaredDependencies(Object object) {
-    List<BeanVertexWrapper> dependencies = new ArrayList<>();
+  public List<BeanWrapper> getDeclaredDependencies(Object object) {
+    List<BeanWrapper> dependencies = new ArrayList<>();
     if (!(object instanceof InjectedDependenciesProvider)) {
       return dependencies;
     }
@@ -41,13 +41,13 @@ public class DeclaredDependencyResolver {
     return dependencies;
   }
 
-  private List<BeanVertexWrapper> beansOfNameList(String beanName) {
-    return singletonList(new BeanVertexWrapper(beanName, springRegistry.get(beanName)));
+  private List<BeanWrapper> beansOfNameList(String beanName) {
+    return singletonList(new BeanWrapper(beanName, springRegistry.get(beanName)));
   }
 
-  private List<BeanVertexWrapper> beansOfTypeList(Class<?> type) {
+  private List<BeanWrapper> beansOfTypeList(Class<?> type) {
     return Stream.of(springRegistry.getBeanNamesForType(type))
-        .map(beanName -> new BeanVertexWrapper(beanName, springRegistry.get(beanName)))
+        .map(beanName -> new BeanWrapper(beanName, springRegistry.get(beanName)))
         .collect(toList());
   }
 }

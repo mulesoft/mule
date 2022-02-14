@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal;
 import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LIFECYCLE_AND_DEPENDENCY_INJECTION;
 import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LifecyclePhaseStory.LIFECYCLE_PHASE_STORY;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 
@@ -25,7 +26,6 @@ import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.store.ObjectStoreManager;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.config.internal.resolvers.DependencyGraphBeanDependencyResolver;
 import org.mule.runtime.core.api.config.Config;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -37,8 +37,8 @@ import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.el.mvel.ExpressionLanguageExtension;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,8 +54,12 @@ import org.junit.Test;
 @Story(LIFECYCLE_PHASE_STORY)
 public class DependencyGraphLifecycleObjectSorterTestCase {
 
-  DependencyGraphLifecycleObjectSorter sorter;
-  DependencyGraphBeanDependencyResolver resolver;
+  private DependencyGraphLifecycleObjectSorter sorter;
+  private DependencyGraphBeanDependencyResolver resolver;
+  private DefaultStreamingManager objectA;
+  private DefaultStreamingManager objectB;
+  private DefaultStreamingManager objectC;
+  private Map<String, Object> lookupObjects;
 
   @Before
   public void setUp() throws Exception {
@@ -74,206 +78,225 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
         MuleConfiguration.class,
         Initialisable.class
     });
-    Map<String, Object> lookupObjects = new HashMap<>();
-    lookupObjects.put("A", new DefaultStreamingManager());
-    lookupObjects.put("B", new DefaultStreamingManager());
-    lookupObjects.put("C", new DefaultStreamingManager());
-    lookupObjects.put("D", new DefaultStreamingManager());
+    lookupObjects = new HashMap<>();
+    objectA = new DefaultStreamingManager();
+    objectB = new DefaultStreamingManager();
+    objectC = new DefaultStreamingManager();
+    lookupObjects.put("objectA", objectA);
+    lookupObjects.put("objectB", objectB);
+    lookupObjects.put("objectC", objectC);
     sorter.setLifeCycleObjectNameOrderMap(lookupObjects);
   }
 
 
   @Test
-  @Description("sort eligible components after adding one component")
-  public void addOneComponentTest() {
-    DefaultStreamingManager streamingManager = new DefaultStreamingManager();
-    sorter.addObject("streamingManager", streamingManager);
-    assertThat(sorter.getSortedObjects(), contains(streamingManager));
+  @Description("When one of the 12 lifecycle type objects is added, the object should be on the final list.")
+  public void addOneLifecycleTypeObjectTest() {
+    DefaultStreamingManager lifecycleObject = new DefaultStreamingManager();
+    sorter.addObject("lifecycleObject", lifecycleObject);
+    assertThat(sorter.getSortedObjects(), contains(lifecycleObject));
   }
 
   @Test
-  @Description("components that are not eligible shouldn't be added")
-  public void ignoreComponentTest() {
-    String object = "str";
-    sorter.addObject("string", object);
+  @Description("When an object that isn't on the ignored types list is added, it shouldn't be on the final list.")
+  public void addIgnoredObjectTest() {
+    String ignoredObject = "string";
+    sorter.addObject("ignoredObject", ignoredObject);
     assertThat(sorter.getSortedObjects(), empty());
   }
 
   @Test
-  @Description("sort components after adding no component")
+  @Description("Sort components without adding any components.")
   public void emptyListTest() {
     assertThat(sorter.getSortedObjects(), empty());
   }
 
 
   @Test
-  @Description("sort components after adding duplicates")
-  public void detectDuplicateTest() {
-    DefaultStreamingManager streamingManager = new DefaultStreamingManager();
-    sorter.addObject("streamingManager", streamingManager);
-    sorter.addObject("streamingManager", streamingManager);
-    sorter.addObject("streamingManager", streamingManager);
-    sorter.addObject("streamingManager", streamingManager);
+  @Description("Sort components after adding duplicate components.")
+  public void detectDuplicateComponentsTest() {
+    DefaultStreamingManager sameComponent = new DefaultStreamingManager();
+    sorter.addObject("sameComponent", sameComponent);
+    sorter.addObject("sameComponent", sameComponent);
+    sorter.addObject("sameComponent", sameComponent);
+    sorter.addObject("sameComponent", sameComponent);
 
     assertThat(sorter.getSortedObjects().size(), is(1));
 
   }
 
-  // @Test
-  // @Description("sort components for a graph with multiple levels " +
-  // "(When A -> C means A depends on C, A->C and C->B should return a list B - C - A")
-  // public void sortComponentsTest() {
-  // DefaultStreamingManager streamingManagerA = new DefaultStreamingManager();
-  // DefaultStreamingManager streamingManagerB = new DefaultStreamingManager();
-  // DefaultStreamingManager streamingManagerC = new DefaultStreamingManager();
-  //
-  // Pair<String, Object> componentA = new Pair<>("A", new DefaultStreamingManager());
-  // Pair<String, Object> componentB = new Pair<>("B", new DefaultStreamingManager());
-  // Pair<String, Object> componentC = new Pair<>("C", new DefaultStreamingManager());
-  //
-  // List<Pair<String, Object>> directDependenciesOfA = Arrays.asList(new Pair<>("C", streamingManagerC));
-  // List<Pair<String, Object>> directDependenciesOfC = Arrays.asList(new Pair<>("B", streamingManagerB));
-  //
-  // Map<Pair<String, Object>, List<Pair<String, Object>>> transitiveDependenciesOfA = new HashMap<>();
-  // transitiveDependenciesOfA.put(componentA, directDependenciesOfA);
-  // transitiveDependenciesOfA.put(componentC, directDependenciesOfC);
-  //
-  // Map<Pair<String, Object>, List<Pair<String, Object>>> transitiveDependenciesOfC = new HashMap<>();
-  // transitiveDependenciesOfC.put(componentC, directDependenciesOfC);
-  // transitiveDependenciesOfC.put(componentB, emptyList());
-  //
-  // when(resolver.getTransitiveDependencies("A", 5)).thenReturn(transitiveDependenciesOfA);
-  // when(resolver.getTransitiveDependencies("B", 5)).thenReturn(emptyMap());
-  // when(resolver.getTransitiveDependencies("C", 5)).thenReturn(transitiveDependenciesOfC);
-  //
-  // sorter.addObject("A", streamingManagerA);
-  // sorter.addObject("B", streamingManagerB);
-  // sorter.addObject("C", streamingManagerC);
-  //
-  // assertThat(sorter.getSortedObjects(), containsInRelativeOrder(streamingManagerB, streamingManagerC, streamingManagerA));
-  // }
+  @Test
+  @Description("Sort components for a graph with multiple levels " +
+      "(When A -> C means A depends on C, A->C and C->B should return a list B - C - A.")
+  public void sortComponentsTest() {
+    BeanWrapper componentA = new BeanWrapper("objectA", objectA);
+    BeanWrapper componentB = new BeanWrapper("objectB", objectB);
+    BeanWrapper componentC = new BeanWrapper("objectC", objectC);
+
+    List<BeanWrapper> directDependenciesOfA = asList(componentC);
+    List<BeanWrapper> directDependenciesOfC = asList(componentB);
+
+    Map<BeanWrapper, List<BeanWrapper>> transitiveDependenciesOfA = new LinkedHashMap<>();
+    transitiveDependenciesOfA.put(componentA, directDependenciesOfA);
+    transitiveDependenciesOfA.put(componentC, directDependenciesOfC);
+
+    Map<BeanWrapper, List<BeanWrapper>> transitiveDependenciesOfB = new LinkedHashMap<>();
+    transitiveDependenciesOfB.put(componentB, emptyList()); // no dependencies
+
+    Map<BeanWrapper, List<BeanWrapper>> transitiveDependenciesOfC = new LinkedHashMap<>();
+    transitiveDependenciesOfC.put(componentC, emptyList()); // already processed for this bucket
+
+    when(resolver.getTransitiveDependencies("objectA", 5)).thenReturn(transitiveDependenciesOfA);
+    when(resolver.getTransitiveDependencies("objectB", 5)).thenReturn(transitiveDependenciesOfB);
+    when(resolver.getTransitiveDependencies("objectC", 5)).thenReturn(transitiveDependenciesOfC);
+
+    sorter.addObject("objectA", objectA);
+    sorter.addObject("objectB", objectB);
+    sorter.addObject("objectC", objectC);
+
+    assertThat(sorter.getSortedObjects(), containsInRelativeOrder(objectB, objectC, objectA));
+  }
 
 
   @Test
-  @Description("sort components when two components are sharing same prerequisite: " +
-      "A -> C, B -> C: C should come before A and C should come before B")
+  @Description("Sort components when two components are sharing the same prerequisite. " +
+      "A -> C, B -> C: C should be initialized before A and B.")
   public void sortComponentsWithSharedChildTest() {
-    DefaultStreamingManager streamingManagerA = new DefaultStreamingManager();
-    DefaultStreamingManager streamingManagerB = new DefaultStreamingManager();
-    DefaultStreamingManager streamingManagerC = new DefaultStreamingManager();
-    Pair<String, Object> componentA = new Pair<>("A", streamingManagerA);
-    Pair<String, Object> componentB = new Pair<>("B", streamingManagerB);
-    Pair<String, Object> componentC = new Pair<>("C", streamingManagerC);
+    BeanWrapper componentA = new BeanWrapper("objectA", objectA);
+    BeanWrapper componentB = new BeanWrapper("objectB", objectB);
+    BeanWrapper componentC = new BeanWrapper("objectC", objectC);
 
+    List<BeanWrapper> dependenciesOfA = asList(componentC);
+    List<BeanWrapper> dependenciesOfB = asList(componentC);
 
-    List<Pair<String, Object>> depA = Arrays.asList(new Pair<>("C", streamingManagerC));
-    List<Pair<String, Object>> depB = Arrays.asList(new Pair<>("C", streamingManagerC));
-    Map<Pair<String, Object>, List<Pair<String, Object>>> transitiveDependenciesOfA = new HashMap<>();
-    transitiveDependenciesOfA.put(componentA, depA);
+    Map<BeanWrapper, List<BeanWrapper>> transitiveDependenciesOfA = new HashMap<>();
+    transitiveDependenciesOfA.put(componentA, dependenciesOfA);
     transitiveDependenciesOfA.put(componentC, emptyList());
-    Map<Pair<String, Object>, List<Pair<String, Object>>> transitiveDependenciesOfB = new HashMap<>();
-    transitiveDependenciesOfB.put(componentB, depB);
+    Map<BeanWrapper, List<BeanWrapper>> transitiveDependenciesOfB = new HashMap<>();
+    transitiveDependenciesOfB.put(componentB, dependenciesOfB);
     transitiveDependenciesOfB.put(componentC, emptyList());
 
-    when(resolver.getTransitiveDependencies("A", 5)).thenReturn(transitiveDependenciesOfA);
-    when(resolver.getTransitiveDependencies("B", 5)).thenReturn(transitiveDependenciesOfB);
-    when(resolver.getTransitiveDependencies("C", 5)).thenReturn(emptyMap());
+    when(resolver.getTransitiveDependencies("objectA", 5)).thenReturn(transitiveDependenciesOfA);
+    when(resolver.getTransitiveDependencies("objectB", 5)).thenReturn(transitiveDependenciesOfB);
+    when(resolver.getTransitiveDependencies("objectC", 5)).thenReturn(emptyMap());
+    sorter.setLifeCycleObjectNameOrderMap(lookupObjects);
 
-    sorter.addObject("A", streamingManagerA);
-    sorter.addObject("B", streamingManagerB);
-    sorter.addObject("C", streamingManagerC);
+    sorter.addObject("objectA", objectA);
+    sorter.addObject("objectB", objectB);
+    sorter.addObject("objectC", objectC);
 
-    assertThat(sorter.getSortedObjects(), anyOf(containsInRelativeOrder(streamingManagerC, streamingManagerA),
-                                                containsInRelativeOrder(streamingManagerC, streamingManagerB)));
+    assertThat(sorter.getSortedObjects(), anyOf(containsInRelativeOrder(objectC, objectA),
+                                                containsInRelativeOrder(objectC, objectB)));
   }
 
   @Test(expected = NullPointerException.class)
-  @Description("If a null component is added to the graph, it will throw NullPointerException")
-  public void handleNullComponentTest() {
-    sorter.addObject("A", null);
+  @Description("If a null component is added to the graph, it will throw NullPointerException.")
+  public void handleNullObjectTest() {
+    sorter.addObject("objectA", null);
   }
 
   @Test
-  @Description("Duplicates should be ignored if added again")
+  @Description("Duplicate components should be ignored if added again")
   public void sortComponentsWhenAddingDuplicatesTest() {
-    DefaultStreamingManager streamingManagerA = new DefaultStreamingManager();
-    DefaultStreamingManager streamingManagerB = new DefaultStreamingManager();
-    Pair<String, Object> componentA = new Pair<>("A", streamingManagerA);
-    Pair<String, Object> componentB = new Pair<>("B", streamingManagerB);
+    BeanWrapper componentA = new BeanWrapper("objectA", objectA);
+    BeanWrapper componentB = new BeanWrapper("objectB", objectB);
 
-    when(resolver.getDirectBeanDependencies(componentA, 5)).thenReturn(Arrays.asList(new Pair<>("B", streamingManagerB)));
-    when(resolver.getDirectBeanDependencies(componentB, 5)).thenReturn(Arrays.asList());
+    when(resolver.getDirectBeanDependencies(componentA, 5)).thenReturn(asList(componentB));
+    when(resolver.getDirectBeanDependencies(componentB, 5)).thenReturn(asList());
 
-    sorter.addObject("A", streamingManagerA);
-    sorter.addObject("B", streamingManagerB);
-    sorter.addObject("A", streamingManagerA);
-    sorter.addObject("A", streamingManagerA);
+    sorter.addObject("objectA", objectA);
+    sorter.addObject("objectB", objectB);
+    sorter.addObject("objectA", objectA);
+    sorter.addObject("objectA", objectA);
 
     assertThat(sorter.getSortedObjects().size(), is(2));
   }
 
 
-  // @Test
-  // @Description("detect cycle and remove the latest edge added to the graph to avoid cycles " +
-  // "(When A -> B, B -> C, C->A, the last edge that introduces cycle will be removed")
-  // public void detectIndirectCycleTest() {
-  // DefaultStreamingManager streamingManagerA = new DefaultStreamingManager();
-  // DefaultStreamingManager streamingManagerB = new DefaultStreamingManager();
-  // DefaultStreamingManager streamingManagerC = new DefaultStreamingManager();
-  // Pair<String, Object> componentA = new Pair<>("A", streamingManagerA);
-  // Pair<String, Object> componentB = new Pair<>("B", streamingManagerB);
-  // Pair<String, Object> componentC = new Pair<>("C", streamingManagerC);
-  //
-  // when(resolver.getDirectBeanDependencies(componentA, 5)).thenReturn(Arrays.asList(new Pair<>("B", streamingManagerB)));
-  // when(resolver.getDirectBeanDependencies(componentB, 5)).thenReturn(Arrays.asList(new Pair<>("C", streamingManagerC)));
-  // when(resolver.getDirectBeanDependencies(componentC, 5)).thenReturn(Arrays.asList(new Pair<>("A", streamingManagerA)));
-  //
-  // sorter.addObject("A", streamingManagerA);
-  // sorter.addObject("B", streamingManagerB);
-  // sorter.addObject("C", streamingManagerC);
-  //
-  // assertThat(sorter.getSortedObjects(), containsInRelativeOrder(streamingManagerC, streamingManagerA));
-  // }
-
   @Test
-  @Description("initializable C -> not initializable D -> initialisable A-> initialisable B : should 'BAC")
-  public void transitiveDependencyTest() {
-    DefaultStreamingManager streamingManagerA = new DefaultStreamingManager();
-    DefaultStreamingManager streamingManagerB = new DefaultStreamingManager();
-    DefaultStreamingManager streamingManagerC = new DefaultStreamingManager();
-    String stringD = "testD";
+  @Description("Detect cycles and remove the latest edge added to the graph to use top sort. " +
+      "(When A -> B, B -> C, C -> A, the last edge that creates a cycle will be removed.")
+  public void detectIndirectCycleTest() {
+    BeanWrapper componentA = new BeanWrapper("objectA", objectA);
+    BeanWrapper componentB = new BeanWrapper("objectB", objectB);
+    BeanWrapper componentC = new BeanWrapper("objectC", objectC);
 
-    Pair<String, Object> componentA = new Pair<>("A", streamingManagerA);
-    Pair<String, Object> componentB = new Pair<>("B", streamingManagerB);
-    Pair<String, Object> componentC = new Pair<>("C", streamingManagerC);
-    Pair<String, Object> componentD = new Pair<>("D", stringD);
+    List<BeanWrapper> dependenciesOfA = asList(componentB);
+    List<BeanWrapper> dependenciesOfB = asList(componentC);
+    List<BeanWrapper> dependenciesOfC = asList(componentA);
 
-    List<Pair<String, Object>> depC = Arrays.asList(componentD);
-    List<Pair<String, Object>> depD = Arrays.asList(componentA);
-    List<Pair<String, Object>> depA = Arrays.asList(componentB);
 
-    Map<Pair<String, Object>, List<Pair<String, Object>>> transitiveDependenciesOfA = new HashMap<>();
-    transitiveDependenciesOfA.put(componentA, depA);
-    transitiveDependenciesOfA.put(componentB, emptyList());
+    Map<BeanWrapper, List<BeanWrapper>> transitiveDependenciesOfA = new LinkedHashMap<>();
+    transitiveDependenciesOfA.put(componentA, dependenciesOfA);
+    transitiveDependenciesOfA.put(componentB, dependenciesOfB);
+    transitiveDependenciesOfA.put(componentC, dependenciesOfC);
 
-    Map<Pair<String, Object>, List<Pair<String, Object>>> transitiveDependenciesOfB = new HashMap<>();
+    Map<BeanWrapper, List<BeanWrapper>> transitiveDependenciesOfB = new LinkedHashMap<>();
     transitiveDependenciesOfB.put(componentB, emptyList());
 
-    Map<Pair<String, Object>, List<Pair<String, Object>>> transitiveDependenciesOfC = new HashMap<>();
-    transitiveDependenciesOfC.put(componentC, depC);
-    transitiveDependenciesOfC.put(componentD, depD);
+    Map<BeanWrapper, List<BeanWrapper>> transitiveDependenciesOfC = new LinkedHashMap<>();
+    transitiveDependenciesOfC.put(componentC, emptyList());
+    // components that were already processed won't be added to the map.
+
+
+    when(resolver.getDirectBeanDependencies(componentA, 5)).thenReturn(dependenciesOfA);
+    when(resolver.getDirectBeanDependencies(componentB, 5)).thenReturn(dependenciesOfB);
+    when(resolver.getDirectBeanDependencies(componentC, 5)).thenReturn(dependenciesOfC);
+
+    when(resolver.getTransitiveDependencies("objectA", 5)).thenReturn(transitiveDependenciesOfA);
+    when(resolver.getTransitiveDependencies("objectB", 5)).thenReturn(transitiveDependenciesOfB);
+    when(resolver.getTransitiveDependencies("objectC", 5)).thenReturn(transitiveDependenciesOfC);
+
+    sorter.setLifeCycleObjectNameOrderMap(lookupObjects);
+
+    sorter.addObject("objectA", objectA);
+    sorter.addObject("objectB", objectB);
+    sorter.addObject("objectC", objectC);
+
+    assertThat(sorter.getSortedObjects(), containsInRelativeOrder(objectC, objectA));
+  }
+
+  @Test
+  @Description("When adding C -> (non initializable) D -> A-> B, the order of initialisables should be BAC.")
+  public void transitiveDependenciesTest() {
+    String objectD = "objectD";
+
+    BeanWrapper componentA = new BeanWrapper("objectA", objectA);
+    BeanWrapper componentB = new BeanWrapper("objectB", objectB);
+    BeanWrapper componentC = new BeanWrapper("objectC", objectC);
+    BeanWrapper componentD = new BeanWrapper("objectD", objectD);
+
+    List<BeanWrapper> dependenciesOfA = asList(componentB);
+    List<BeanWrapper> dependenciesOfC = asList(componentD);
+    List<BeanWrapper> dependenciesOfD = asList(componentA);
+
+    Map<BeanWrapper, List<BeanWrapper>> transitiveDependenciesOfA = new LinkedHashMap<>();
+    transitiveDependenciesOfA.put(componentA, dependenciesOfA);
+    transitiveDependenciesOfA.put(componentB, emptyList());
+
+    Map<BeanWrapper, List<BeanWrapper>> transitiveDependenciesOfB = new LinkedHashMap<>();
+    transitiveDependenciesOfB.put(componentB, emptyList());
+
+    Map<BeanWrapper, List<BeanWrapper>> transitiveDependenciesOfC = new LinkedHashMap<>();
+    transitiveDependenciesOfC.put(componentC, dependenciesOfC);
+    transitiveDependenciesOfC.put(componentD, dependenciesOfD);
     transitiveDependenciesOfC.put(componentA, emptyList()); // already processed in the same bucket
     transitiveDependenciesOfC.put(componentB, emptyList()); // already processed in the same bucket
 
-    when(resolver.getTransitiveDependencies("C", 5)).thenReturn(transitiveDependenciesOfC);
 
+    when(resolver.getDirectBeanDependencies(componentA, 5)).thenReturn(dependenciesOfA);
+    when(resolver.getDirectBeanDependencies(componentB, 5)).thenReturn(emptyList());
+    when(resolver.getDirectBeanDependencies(componentC, 5)).thenReturn(dependenciesOfC);
+    when(resolver.getDirectBeanDependencies(componentD, 5)).thenReturn(dependenciesOfD);
+    when(resolver.getTransitiveDependencies("objectA", 5)).thenReturn(transitiveDependenciesOfA);
+    when(resolver.getTransitiveDependencies("objectB", 5)).thenReturn(transitiveDependenciesOfB);
+    when(resolver.getTransitiveDependencies("objectC", 5)).thenReturn(transitiveDependenciesOfC);
+    sorter.setLifeCycleObjectNameOrderMap(lookupObjects);
 
-    sorter.addObject("A", streamingManagerA);
-    sorter.addObject("B", streamingManagerB);
-    sorter.addObject("C", streamingManagerC);
+    sorter.addObject("objectA", objectA);
+    sorter.addObject("objectB", objectB);
+    sorter.addObject("objectC", objectC);
 
-
-    System.out.println(sorter.getSortedObjects());
-    assertThat(sorter.getSortedObjects(), containsInRelativeOrder(streamingManagerA, streamingManagerC));
+    assertThat(sorter.getSortedObjects(), containsInRelativeOrder(objectB, objectA, objectC));
   }
 }
