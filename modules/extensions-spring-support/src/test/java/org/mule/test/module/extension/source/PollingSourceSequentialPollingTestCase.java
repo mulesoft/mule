@@ -28,9 +28,13 @@ import org.mule.test.petstore.extension.PetFailingPollingSource;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,7 +45,10 @@ public class PollingSourceSequentialPollingTestCase extends AbstractExtensionFun
   private static final int TIMEOUT = 2000;
   private static final int LONG_TIMEOUT = 7000;
   private static final int DELAY = 100;
+  private static final int WAIT_IN_SECONDS = 5;
+  private static final int LONG_WAIT_IN_SECONDS = 30;
   private static final List<CoreEvent> ADOPTION_EVENTS = new LinkedList<>();
+  private static final Lock WAIT_LOCK = new ReentrantLock();
 
   public static class AdoptionProcessor implements Processor {
 
@@ -54,10 +61,48 @@ public class PollingSourceSequentialPollingTestCase extends AbstractExtensionFun
     }
   }
 
+  public static class WaitProcessor implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      try {
+        if (WAIT_LOCK.tryLock(WAIT_IN_SECONDS, TimeUnit.SECONDS)) {
+          WAIT_LOCK.unlock();
+        }
+      } catch (InterruptedException e) {
+      }
+      return event;
+    }
+  }
+
+  public static class LongWaitProcessor implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      try {
+        if (WAIT_LOCK.tryLock(LONG_WAIT_IN_SECONDS, TimeUnit.SECONDS)) {
+          WAIT_LOCK.unlock();
+        }
+      } catch (InterruptedException e) {
+      }
+      return event;
+    }
+  }
+
   @Override
   protected void doTearDown() throws Exception {
     ADOPTION_EVENTS.clear();
     super.doTearDown();
+  }
+
+  @Before
+  public void lock() {
+    WAIT_LOCK.lock();
+  }
+
+  @After
+  public void unlock() {
+    WAIT_LOCK.unlock();
   }
 
   @Override

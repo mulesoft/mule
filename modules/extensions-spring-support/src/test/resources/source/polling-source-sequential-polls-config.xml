@@ -10,6 +10,12 @@
     <object name="adopt"
             class="org.mule.test.module.extension.source.PollingSourceSequentialPollingTestCase$AdoptionProcessor"/>
 
+    <object name="wait"
+            class="org.mule.test.module.extension.source.PollingSourceSequentialPollingTestCase$WaitProcessor"/>
+
+    <object name="longWait"
+            class="org.mule.test.module.extension.source.PollingSourceSequentialPollingTestCase$LongWaitProcessor"/>
+
     <flow name="defaultConcurrentPoll" initialState="stopped">
         <petstore:pet-adoption-source idempotent="true">
             <scheduling-strategy>
@@ -17,11 +23,7 @@
             </scheduling-strategy>
         </petstore:pet-adoption-source>
         <flow-ref name="adopt"/>
-        <logger level="ERROR" message="#[%dw 2.0
-                            import * from dw::Runtime
-                            output application/json
-                            ---
-                            'Waiting for 5 seconds' wait 5000]"/>
+        <flow-ref name="wait"/>
     </flow>
 
     <flow name="concurrentPoll" initialState="stopped">
@@ -31,11 +33,7 @@
             </scheduling-strategy>
         </petstore:pet-adoption-source>
         <flow-ref name="adopt"/>
-        <logger level="ERROR" message="#[%dw 2.0
-                            import * from dw::Runtime
-                            output application/json
-                            ---
-                            'Waiting for 5 seconds' wait 5000]"/>
+        <flow-ref name="wait"/>
     </flow>
 
     <flow name="secuentialPoll" initialState="stopped">
@@ -45,11 +43,7 @@
             </scheduling-strategy>
         </petstore:pet-adoption-source>
         <flow-ref name="adopt"/>
-        <logger level="ERROR" message="#[%dw 2.0
-                            import * from dw::Runtime
-                            output application/json
-                            ---
-                            'Waiting for 5 seconds' wait 5000]"/>
+        <flow-ref name="wait"/>
     </flow>
 
     <flow name="secuentialPollLongProcess" initialState="stopped">
@@ -59,11 +53,7 @@
             </scheduling-strategy>
         </petstore:pet-adoption-source>
         <flow-ref name="adopt"/>
-        <logger level="ERROR" message="#[%dw 2.0
-                            import * from dw::Runtime
-                            output application/json
-                            ---
-                            'Waiting for 10 seconds' wait 10000]"/>
+        <flow-ref name="longWait"/>
     </flow>
 
 </mule>
