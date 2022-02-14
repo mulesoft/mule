@@ -25,7 +25,6 @@ import org.mule.test.function.extension.WeaveFunctionExtension;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.implicit.config.extension.extension.api.ImplicitConfigExtension;
 import org.mule.test.marvel.MarvelExtension;
-import org.mule.test.metadata.extension.MetadataExtension;
 import org.mule.test.nonimplicit.config.extension.extension.api.NonImplicitConfigExtension;
 import org.mule.test.oauth.TestOAuthExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
