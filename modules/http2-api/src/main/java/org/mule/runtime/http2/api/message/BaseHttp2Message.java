@@ -23,4 +23,9 @@ public abstract class BaseHttp2Message implements Http2Message {
   public Http2Content getContent() {
     return content;
   }
+
+  @Override
+  public boolean isOnlyHeaders() {
+    return content.isEmpty();
+  }
 }

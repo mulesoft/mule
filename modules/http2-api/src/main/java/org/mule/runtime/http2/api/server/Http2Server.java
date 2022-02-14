@@ -54,4 +54,12 @@ public interface Http2Server {
   // TODO: Should the path be a new class instead of an String?
   Http2RequestHandler addRequestHandler(final String path, final Http2RequestHandler requestHandler)
       throws RequestHandlerAlreadyPresentException;
+
+  /**
+   * Removes the {@link Http2RequestHandler} for the given path.
+   *
+   * @param path the path of the handler to be removed.
+   */
+  // TODO: Should it throw an exception when not found?
+  void removeRequestHandler(String path);
 }

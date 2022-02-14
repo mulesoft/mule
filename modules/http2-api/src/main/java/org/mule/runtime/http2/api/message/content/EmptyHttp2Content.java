@@ -15,4 +15,9 @@ public class EmptyHttp2Content extends BaseHttp2Content {
   public EmptyHttp2Content() {
     super(new ByteArrayInputStream(EMPTY_BUF));
   }
+
+  @Override
+  public boolean isEmpty() {
+    return true;
+  }
 }

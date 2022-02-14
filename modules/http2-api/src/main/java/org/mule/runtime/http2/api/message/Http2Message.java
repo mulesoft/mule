@@ -14,4 +14,6 @@ public interface Http2Message {
    * @return the content.
    */
   Http2Content getContent();
+
+  boolean isOnlyHeaders();
 }

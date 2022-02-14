@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.http2.api.client;
 
+import java.net.InetSocketAddress;
+
 public class Http2ClientConfiguration {
+
+  private InetSocketAddress serverAddress;
 
   public static Builder builder() {
     return new Builder();
@@ -14,9 +18,13 @@ public class Http2ClientConfiguration {
 
   private Http2ClientConfiguration() {}
 
+  public InetSocketAddress getServerAddress() {
+    return serverAddress;
+  }
+
   public static class Builder {
 
-    private Http2ClientConfiguration product;
+    private final Http2ClientConfiguration product;
 
     private Builder() {
       product = new Http2ClientConfiguration();
@@ -24,6 +32,11 @@ public class Http2ClientConfiguration {
 
     public Http2ClientConfiguration build() {
       return product;
+    }
+
+    public Builder withServerAddress(InetSocketAddress serverAddress) {
+      product.serverAddress = serverAddress;
+      return this;
     }
   }
 }

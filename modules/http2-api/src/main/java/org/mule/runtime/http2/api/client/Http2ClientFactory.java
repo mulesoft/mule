@@ -7,6 +7,9 @@
 package org.mule.runtime.http2.api.client;
 
 import org.mule.api.annotation.NoImplement;
+import org.mule.runtime.http2.api.exception.Http2ClientCreationException;
+
+import java.util.function.Supplier;
 
 /**
  * Factory object for {@link Http2Client}.
@@ -17,8 +20,16 @@ import org.mule.api.annotation.NoImplement;
 public interface Http2ClientFactory {
 
   /**
-   * @param configuration the {@link Http2ClientConfiguration} specifying the desired client.
-   * @return a newly built {@link Http2Client} based on the {@code configuration}.
+   * If an {@link Http2Client} exists for the given name, it returns it. Otherwise, it creates a new {@link Http2Client} by using
+   * the given {@link Http2ClientConfiguration} supplier.
+   * <p>
+   * In the case of returning an existent instance, it doesn't call the {@link Supplier#get()} method on the given supplier.
+   *
+   * @param name          the name of the required client.
+   * @param configuration a supplier of the configuration for a new client if it needs to be created.
+   * @return the {@link Http2Client} instance corresponding to the given name.
+   * @throws Http2ClientCreationException if an error occurs while creating the new {@link Http2Client}
    */
-  Http2Client create(Http2ClientConfiguration configuration);
+  Http2Client getOrCreateClient(String name, Supplier<? extends Http2ClientConfiguration> configuration)
+      throws Http2ClientCreationException;
 }

@@ -10,10 +10,8 @@ import org.mule.runtime.http2.api.message.Http2Request;
 import org.mule.runtime.http2.api.message.Http2RequestOptions;
 import org.mule.runtime.http2.api.message.Http2Response;
 
-import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 
 /**
@@ -33,31 +31,6 @@ public interface Http2Client {
    * Disables the client. Must be executed to dispose all client related resources.
    */
   void stop();
-
-  /**
-   * Same as {@link #send(Http2Request, Http2RequestOptions)} but using default options.
-   *
-   * @param request the {@link Http2Request} to send
-   * @return the received {@link Http2Response}
-   * @throws IOException      if an error occurs while executing
-   * @throws TimeoutException if {@code responseTimeout} is exceeded
-   */
-  default Http2Response send(Http2Request request) throws IOException, TimeoutException {
-    return send(request, Http2RequestOptions.builder().build());
-  }
-
-  /**
-   * Sends a {@link Http2Request} blocking the current thread until a response is available or the request times out.
-   * 
-   * @see #sendAsync(Http2Request, Http2RequestOptions) The non-blocking version.
-   *
-   * @param request the {@link Http2Request} to send
-   * @param options the {@link Http2RequestOptions} to use
-   * @return the received {@link Http2Response}
-   * @throws IOException      if an error occurs while executing
-   * @throws TimeoutException if {@code responseTimeout} is exceeded
-   */
-  Http2Response send(Http2Request request, Http2RequestOptions options) throws IOException, TimeoutException;
 
   /**
    * Same as {@link #sendAsync(Http2Request, Http2RequestOptions)} but using default options.
