@@ -16649,7 +16649,7 @@
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "sequentialPolls",
-                  "description": "ADD DESCRIPTION",
+                  "description": "Configure whether processing of items from different polls can overlap.",
                   "modelProperties": {
                     "sinceMuleVersion": {
                       "version": "4.5.0"
@@ -17325,7 +17325,7 @@
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
                   "name": "sequentialPolls",
-                  "description": "ADD DESCRIPTION",
+                  "description": "Configure whether processing of items from different polls can overlap.",
                   "modelProperties": {
                     "sinceMuleVersion": {
                       "version": "4.5.0"
@@ -32265,7 +32265,7 @@
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "sequentialPolls",
-              "description": "ADD DESCRIPTION",
+              "description": "Configure whether processing of items from different polls can overlap.",
               "modelProperties": {
                 "sinceMuleVersion": {
                   "version": "4.5.0"
@@ -32686,7 +32686,7 @@
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "sequentialPolls",
-              "description": "ADD DESCRIPTION",
+              "description": "Configure whether processing of items from different polls can overlap.",
               "modelProperties": {
                 "sinceMuleVersion": {
                   "version": "4.5.0"
@@ -33157,7 +33157,7 @@
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "sequentialPolls",
-              "description": "ADD DESCRIPTION",
+              "description": "Configure whether processing of items from different polls can overlap.",
               "modelProperties": {
                 "sinceMuleVersion": {
                   "version": "4.5.0"
@@ -33887,7 +33887,7 @@
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "sequentialPolls",
-              "description": "ADD DESCRIPTION",
+              "description": "Configure whether processing of items from different polls can overlap.",
               "modelProperties": {
                 "sinceMuleVersion": {
                   "version": "4.5.0"
@@ -34744,7 +34744,7 @@
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "sequentialPolls",
-              "description": "ADD DESCRIPTION",
+              "description": "Configure whether processing of items from different polls can overlap.",
               "modelProperties": {
                 "sinceMuleVersion": {
                   "version": "4.5.0"
@@ -35110,7 +35110,7 @@
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "sequentialPolls",
-              "description": "ADD DESCRIPTION",
+              "description": "Configure whether processing of items from different polls can overlap.",
               "modelProperties": {
                 "sinceMuleVersion": {
                   "version": "4.5.0"

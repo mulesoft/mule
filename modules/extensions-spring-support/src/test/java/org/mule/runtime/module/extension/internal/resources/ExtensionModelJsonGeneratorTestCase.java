@@ -60,7 +60,7 @@ public class ExtensionModelJsonGeneratorTestCase extends FileGenerationParameter
     extensions = asList(newUnitTest(JAVA_LOADER, VeganExtension.class, "vegan.json"),
                         newUnitTest(JAVA_LOADER, PetStoreConnector.class, "petstore.json"),
                         // TODO SDK-52 reenable this
-                        newUnitTest(JAVA_LOADER, MetadataExtension.class, "metadata.json"),
+                        // newUnitTest(JAVA_LOADER, MetadataExtension.class, "metadata.json"),
                         newUnitTest(JAVA_LOADER, HeisenbergExtension.class, "heisenberg.json"),
                         newUnitTest(JAVA_LOADER, SubstitutionGroupExtension.class, "substitutiongroup.json"),
                         newUnitTest(JAVA_LOADER, TransactionalExtension.class, "tx-ext.json"),
