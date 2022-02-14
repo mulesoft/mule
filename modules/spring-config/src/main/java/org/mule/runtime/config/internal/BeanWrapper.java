@@ -13,8 +13,8 @@ import static java.util.Objects.requireNonNull;
  */
 public class BeanWrapper {
 
-  final Object wrappedObject;
-  final String name;
+  private final Object wrappedObject;
+  private final String name;
 
   public BeanWrapper(String name, Object o) {
     requireNonNull(o, "bean must not be null");
@@ -35,7 +35,7 @@ public class BeanWrapper {
     if (wrappedObject.equals(obj)) {
       return true;
     } else if (obj instanceof BeanWrapper) {
-      return this.getWrappedObject().hashCode() == ((BeanWrapper) obj).getWrappedObject().hashCode();
+      return this.wrappedObject.hashCode() == ((BeanWrapper) obj).wrappedObject.hashCode();
     } else {
       return false;
     }

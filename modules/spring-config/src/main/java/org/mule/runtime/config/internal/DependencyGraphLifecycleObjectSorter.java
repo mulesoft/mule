@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.internal;
 
-import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Collections.reverse;
 import static java.util.Objects.requireNonNull;
@@ -16,6 +15,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
 import org.mule.runtime.config.internal.resolvers.DependencyGraphBeanDependencyResolver;
+import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleManager;
 import org.mule.runtime.core.internal.lifecycle.phases.DefaultLifecycleObjectSorter;
 import org.mule.runtime.core.internal.lifecycle.phases.LifecycleObjectSorter;
 
@@ -44,15 +44,15 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
 
   private List<DefaultDirectedGraph<BeanWrapper, DefaultEdge>> dependencyGraphs;
   private DependencyGraphBeanDependencyResolver resolver;
-  protected Class<?>[] orderedLifecycleTypes;
+  final protected Class<?>[] orderedLifecycleTypes;
   private Map<String, Integer> lifecycleObjectNameOrderMap;
 
   public DependencyGraphLifecycleObjectSorter(DependencyGraphBeanDependencyResolver resolver, Class<?>[] orderedLifecycleTypes) {
-    this.dependencyGraphs = new ArrayList<>();
+    this.dependencyGraphs = new ArrayList<>(orderedLifecycleTypes.length);
     this.resolver = resolver;
     this.orderedLifecycleTypes = orderedLifecycleTypes;
     for (int i = 0; i < orderedLifecycleTypes.length; i++) {
-      DefaultDirectedGraph<BeanWrapper, DefaultEdge> graph = new DefaultDirectedGraph(DefaultEdge.class);
+      DefaultDirectedGraph<BeanWrapper, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
       dependencyGraphs.add(graph);
     }
     this.lifecycleObjectNameOrderMap = new HashMap<>();
@@ -61,8 +61,8 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
   /**
    * Building a single dependency graph(bucket) for each lifecycle type
    * 
-   * @param beanName
-   * @param currentObject
+   * @param beanName      current object(bean)'s name to resolve dependencies
+   * @param currentObject current object that is going to be added to the graph(bucket)
    */
   @Override
   public void addObject(String beanName, Object currentObject) {
@@ -74,13 +74,12 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
     }
 
     DefaultDirectedGraph<BeanWrapper, DefaultEdge> dependencyGraph = getDependencyGraphForLifecycleType(currentObject);
-    CycleDetector cycleDetector = new CycleDetector(dependencyGraph);
+    CycleDetector<BeanWrapper, DefaultEdge> cycleDetector = new CycleDetector<>(dependencyGraph);
 
     BeanWrapper currentVertex = new BeanWrapper(beanName, currentObject);
     dependencyGraph.addVertex(currentVertex);
 
     // get (direct) prerequisite objects for the current object
-    // List<Pair<String, Object>> prerequisiteObjects = resolver.getDirectBeanDependencies(beanName);
     Map<BeanWrapper, List<BeanWrapper>> prerequisiteObjectsMap =
         resolver.getTransitiveDependencies(beanName, getDependencyGraphIndex(currentObject));
 
@@ -114,19 +113,23 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
   /**
    * Provides the index of the graph(bucket) the current object should be added to
    * 
-   * @param currentObject
-   * @return
+   * @param currentObject current object that is going to be added to the graph(bucket)
+   * @return index of the relevant dependency graph(bucket)
    */
   private int getDependencyGraphIndex(Object currentObject) {
-    Class<?> clazz = stream(orderedLifecycleTypes).filter(x -> x.isInstance(currentObject)).findFirst().get();
-    return asList(orderedLifecycleTypes).indexOf(clazz);
+    for (int index = 0; index < orderedLifecycleTypes.length; index++) {
+      if (orderedLifecycleTypes[index].isInstance(currentObject)) {
+        return index;
+      }
+    }
+    return orderedLifecycleTypes.length - 1;
   }
 
   /**
    * Provides the graph(bucket) the current object should be added to
    * 
-   * @param currentObject
-   * @return
+   * @param currentObject current object that is going to be added to the graph(bucket)
+   * @return index of the relevant dependency graph(bucket)
    */
   private DefaultDirectedGraph<BeanWrapper, DefaultEdge> getDependencyGraphForLifecycleType(Object currentObject) {
     return dependencyGraphs.get(getDependencyGraphIndex(currentObject));
@@ -183,6 +186,11 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
     }
   }
 
+  /**
+   * Provides the information about the lookup order of objects that should be initialized
+   *
+   * @return map with the order of objects that should be initialized from {@link RegistryLifecycleManager}'s lookup
+   */
   public Map<String, Integer> getLifeCycleObjectNameOrderMap() {
     return lifecycleObjectNameOrderMap;
   }
