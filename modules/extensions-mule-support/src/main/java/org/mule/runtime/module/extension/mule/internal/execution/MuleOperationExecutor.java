@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.mule.internal.execution;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
+import static org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.from;
 
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -20,7 +21,6 @@ import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext;
 
 import java.util.Map;
 
@@ -52,7 +52,7 @@ public class MuleOperationExecutor implements CompletableComponentExecutor<Compo
     final CoreEvent inputEvent = ctx.getEvent();
 
     CoreEvent executionEvent = builder(inputEvent)
-        .parameters(buildOperationParameters(inputEvent))
+        .parameters(buildOperationParameters(inputEvent, ctx))
         .build();
 
     operation.execute(executionEvent).whenComplete((event, exception) -> {
@@ -66,9 +66,9 @@ public class MuleOperationExecutor implements CompletableComponentExecutor<Compo
     });
   }
 
-  private Map<String, ?> buildOperationParameters(CoreEvent inputEvent) {
-    SdkInternalContext sdkCtx = SdkInternalContext.from(inputEvent);
-    return sdkCtx.getOperationExecutionParams(operation.getLocation(), inputEvent.getContext().getId())
+  private Map<String, ?> buildOperationParameters(CoreEvent inputEvent, ExecutionContextAdapter<ComponentModel> ctx) {
+    return from(inputEvent)
+        .getOperationExecutionParams(ctx.getComponent().getLocation(), inputEvent.getContext().getId())
         .getParameters();
   }
 }

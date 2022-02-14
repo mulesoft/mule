@@ -13,8 +13,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.execution.ExecutionResult;
 import org.mule.runtime.api.component.execution.InputEvent;
-import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -23,10 +21,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Operation;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-
-import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 
@@ -39,26 +34,15 @@ public class MuleOperation extends AbstractComponent implements Operation {
   }
 
   private final MessageProcessorChain chain;
-  private final Location rootComponentLocation;
-  private final ComponentLocation chainLocation;
   private final OperationModel operationModel;
   private final MuleContext muleContext;
 
   MuleOperation(MessageProcessorChain chain,
-                Location rootComponentLocation,
-                ComponentLocation chainLocation,
                 OperationModel operationModel,
                 MuleContext muleContext) {
     this.chain = chain;
-    this.rootComponentLocation = rootComponentLocation;
-    this.chainLocation = chainLocation;
     this.operationModel = operationModel;
     this.muleContext = muleContext;
-  }
-
-  @Override
-  public void setAnnotations(Map<QName, Object> newAnnotations) {
-    super.setAnnotations(newAnnotations);
   }
 
   @Override
@@ -94,15 +78,5 @@ public class MuleOperation extends AbstractComponent implements Operation {
   @Override
   public OperationModel getModel() {
     return operationModel;
-  }
-
-  @Override
-  public ComponentLocation getChainLocation() {
-    return chainLocation;
-  }
-
-  @Override
-  public Location getRootComponentLocation() {
-    return rootComponentLocation;
   }
 }

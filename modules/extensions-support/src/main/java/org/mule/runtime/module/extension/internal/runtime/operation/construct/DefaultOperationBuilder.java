@@ -11,8 +11,6 @@ import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 
-import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Operation;
@@ -30,12 +28,10 @@ import java.util.List;
 class DefaultOperationBuilder implements Builder {
 
   private OperationModel operationModel;
-  private Location rootComponentLocation;
-  private ComponentLocation chainLocation;
   private MuleContext muleContext;
   private List<Processor> processors = emptyList();
 
-  private MuleOperation operation;
+  private MuleOperation product;
 
 
   /**
@@ -62,18 +58,6 @@ class DefaultOperationBuilder implements Builder {
   }
 
   @Override
-  public Builder setChainLocation(ComponentLocation location) {
-    this.chainLocation = location;
-    return this;
-  }
-
-  @Override
-  public Builder setRootComponentLocation(Location location) {
-    this.rootComponentLocation = location;
-    return this;
-  }
-
-  @Override
   public Builder setOperationModel(OperationModel operationModel) {
     this.operationModel = operationModel;
     return this;
@@ -95,28 +79,21 @@ class DefaultOperationBuilder implements Builder {
     checkImmutable();
     checkInvoked(operationModel, "setOperationModel(OperationModel)");
     checkInvoked(muleContext, "setMuleContext(MuleContext)");
-    checkInvoked(rootComponentLocation, "setRootComponentLocation(ComponentLocation)");
-    checkInvoked(chainLocation, "setChainLocation(ComponentLocation)");
     checkState(processors != null && !processors.isEmpty(), "Processors cannot be null nor empty");
 
     DefaultMessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder();
     chainBuilder.chain(processors);
-    chainBuilder.setPipelineLocation(chainLocation);
 
-    //TODO: Are location and thingies really needed or will setAnnotations() be called automatically and
-    // do that for me?
-    operation = new MuleOperation(
+    product = new MuleOperation(
         chainBuilder.build(),
-        rootComponentLocation,
-        chainLocation,
         operationModel,
         muleContext);
 
-    return operation;
+    return product;
   }
 
   private final void checkImmutable() {
-    if (operation != null) {
+    if (product != null) {
       throw new IllegalStateException("Cannot change attributes once the operation was built");
     }
   }

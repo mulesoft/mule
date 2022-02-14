@@ -37,13 +37,14 @@ public class DefaultOperationObjectFactory extends AbstractComponent implements 
 
   @Override
   public Operation getObject() {
-    return MuleOperation.builder()
+   Operation operation = MuleOperation.builder()
         .processors(body.getProcessors())
         .setOperationModel(locateOperationModel())
-        .setChainLocation(body.getLocation())
-        .setRootComponentLocation(body.getRootContainerLocation())
         .setMuleContext(muleContext)
         .build();
+
+   operation.setAnnotations(getAnnotations());
+   return operation;
   }
 
   private OperationModel locateOperationModel() {
