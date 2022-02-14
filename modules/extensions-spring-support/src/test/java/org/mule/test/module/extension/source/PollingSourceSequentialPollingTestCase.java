@@ -189,16 +189,6 @@ public class PollingSourceSequentialPollingTestCase extends AbstractExtensionFun
     });
   }
 
-  private void assertAllNumbersAdoptedExactlyOnce() {
-    check(TIMEOUT, DELAY * 2, () -> {
-      synchronized (ADOPTION_EVENTS) {
-        return ADOPTION_EVENTS.size() == ALL_NUMBERS.size() &&
-            ADOPTION_EVENTS.stream().map(e -> e.getMessage().getPayload().getValue().toString()).collect(toList())
-                .containsAll(ALL_NUMBERS);
-      }
-    });
-  }
-
   private void startFlow(String flowName) throws Exception {
     ((Startable) getFlowConstruct(flowName)).start();
   }
