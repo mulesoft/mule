@@ -84,7 +84,9 @@ public interface ExecutionContextAdapter<M extends ComponentModel> extends Event
 
   /**
    * @return the factory for payload decorators to accumulate {@link PayloadStatistics}.
+   * @deprecated since 4.4.1, 4.5.0. Payload statistics is no longer supported.
    */
+  @Deprecated
   CursorComponentDecoratorFactory getComponentDecoratorFactory();
 
   /**

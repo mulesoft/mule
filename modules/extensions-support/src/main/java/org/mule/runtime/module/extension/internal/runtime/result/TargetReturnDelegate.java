@@ -17,7 +17,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -47,11 +46,10 @@ public final class TargetReturnDelegate extends AbstractReturnDelegate {
                               String targetValue,
                               ComponentModel componentModel,
                               ExpressionManager expressionManager,
-                              CursorComponentDecoratorFactory componentDecoratorFactory,
                               CursorProviderFactory cursorProviderFactory,
                               MuleContext muleContext,
                               StreamingManager streamingManager) {
-    super(componentModel, componentDecoratorFactory, cursorProviderFactory, muleContext);
+    super(componentModel, cursorProviderFactory, muleContext);
     this.expressionManager = expressionManager;
     this.target = target;
     this.targetValue = expressionManager.compile(targetValue, getTargetBindingContext(of("")));

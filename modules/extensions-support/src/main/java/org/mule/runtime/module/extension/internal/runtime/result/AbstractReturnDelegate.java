@@ -35,7 +35,6 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.util.StreamingUtils;
 import org.mule.runtime.core.internal.util.collection.TransformingCollection;
@@ -82,7 +81,6 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
 
   protected final MuleContext muleContext;
   private boolean returnsListOfMessages = false;
-  private final CursorComponentDecoratorFactory componentDecoratorFactory;
   private final CursorProviderFactory cursorProviderFactory;
   private final MediaType defaultMediaType;
   private boolean isSpecialHandling = false;
@@ -93,14 +91,12 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
   /**
    * Creates a new instance
    *
-   * @param componentModel            the component which produces the return value
-   * @param componentDecoratorFactory
-   * @param cursorProviderFactory     the {@link CursorProviderFactory} to use when a message is doing cursor based streaming. Can
-   *                                  be {@code null}
-   * @param muleContext               the {@link MuleContext} of the owning application
+   * @param componentModel        the component which produces the return value
+   * @param cursorProviderFactory the {@link CursorProviderFactory} to use when a message is doing cursor based streaming. Can be
+   *                              {@code null}
+   * @param muleContext           the {@link MuleContext} of the owning application
    */
   protected AbstractReturnDelegate(ComponentModel componentModel,
-                                   CursorComponentDecoratorFactory componentDecoratorFactory,
                                    CursorProviderFactory cursorProviderFactory,
                                    MuleContext muleContext) {
 
@@ -120,7 +116,6 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
     }
 
     this.muleContext = muleContext;
-    this.componentDecoratorFactory = componentDecoratorFactory;
     this.cursorProviderFactory = cursorProviderFactory;
 
     defaultEncoding = getDefaultEncoding(muleContext);
@@ -150,10 +145,8 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
         ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
         if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
           resultValue = resultValue.copy()
-              .output(componentDecoratorFactory
-                  .decorateOutput(new ConnectedInputStreamWrapper((InputStream) resultValue.getOutput(), connectionHandler,
-                                                                  getDecrementActiveComponentTask(operationContext)),
-                                  event.getCorrelationId()))
+              .output(new ConnectedInputStreamWrapper((InputStream) resultValue.getOutput(), connectionHandler,
+                                                      getDecrementActiveComponentTask(operationContext)))
               .build();
         }
       }
@@ -168,27 +161,20 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
                                                                                        contextMimeTypeParam);
       if (value instanceof Collection && returnsListOfMessages) {
         value = toLazyMessageCollection((Collection) value, operationContext, event);
-        value = messageCollection(new MediaTypeDecoratedResultCollection(componentDecoratorFactory
-            .decorateOutputCollection((Collection) value, event.getCorrelationId()),
-                                                                         payloadMediaTypeResolver),
+        value = messageCollection(new MediaTypeDecoratedResultCollection((Collection) value, payloadMediaTypeResolver),
                                   cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext(),
                                   originatingLocation);
       } else if (value instanceof Iterator) {
         if (returnsListOfMessages) {
           Iterator<Result> iterator = TransformingIterator.from((Iterator<Object>) value, toResult(operationContext, event));
-          value = messageIterator(new MediaTypeDecoratedResultIterator(componentDecoratorFactory
-              .decorateOutputIterator(iterator, event.getCorrelationId()),
-                                                                       payloadMediaTypeResolver),
+          value = messageIterator(new MediaTypeDecoratedResultIterator(iterator, payloadMediaTypeResolver),
                                   cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext(),
                                   originatingLocation);
-        } else {
-          value = componentDecoratorFactory.decorateOutput((Iterator) value, event.getCorrelationId());
         }
       }
 
       value = streamingContent(value, operationContext, cursorProviderFactory,
-                               ((BaseEventContext) event.getContext()).getRootContext(), originatingLocation,
-                               event.getCorrelationId());
+                               ((BaseEventContext) event.getContext()).getRootContext(), originatingLocation);
 
       Message.Builder messageBuilder;
 
@@ -227,12 +213,12 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
       if (result.getOutput() instanceof InputStream) {
         ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
         if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
-          result = result.copy().output(StreamingUtils.streamingContent(new ConnectedInputStreamWrapper(componentDecoratorFactory
-              .decorateOutput((InputStream) result.getOutput(), event.getCorrelationId()),
-                                                                                                        connectionHandler,
-                                                                                                        getDecrementActiveComponentTask(operationContext)),
-                                                                        cursorProviderFactory, event,
-                                                                        operationContext.getComponent().getLocation()))
+          result = result.copy().output(StreamingUtils
+              .streamingContent(new ConnectedInputStreamWrapper((InputStream) result.getOutput(),
+                                                                connectionHandler,
+                                                                getDecrementActiveComponentTask(operationContext)),
+                                cursorProviderFactory, event,
+                                operationContext.getComponent().getLocation()))
               .build();
         }
       }
@@ -255,14 +241,12 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
                                   ExecutionContextAdapter operationContext,
                                   CursorProviderFactory cursorProviderFactory,
                                   BaseEventContext eventContext,
-                                  ComponentLocation originatingLocation,
-                                  String correlationId) {
+                                  ComponentLocation originatingLocation) {
     if (value instanceof InputStream) {
       ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
       if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
-        value = componentDecoratorFactory.decorateOutput(new ConnectedInputStreamWrapper((InputStream) value, connectionHandler,
-                                                                                         getDecrementActiveComponentTask(operationContext)),
-                                                         correlationId);
+        value = new ConnectedInputStreamWrapper((InputStream) value, connectionHandler,
+                                                getDecrementActiveComponentTask(operationContext));
       }
     }
 

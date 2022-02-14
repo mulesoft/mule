@@ -54,21 +54,13 @@ public class ValueResolverFactory {
   public <T> ValueResolver<T> of(String parameterName, MetadataType expectedType, Object value, Object defaultValue,
                                  ExpressionSupport expressionSupport, boolean required,
                                  Set<ModelProperty> modelProperties) {
-    return of(parameterName, expectedType, value, defaultValue, expressionSupport, required, modelProperties, true, false);
+    return of(parameterName, expectedType, value, defaultValue, expressionSupport, required, modelProperties, true);
   }
 
   public <T> ValueResolver<T> of(String parameterName, MetadataType expectedType, Object value, Object defaultValue,
                                  ExpressionSupport expressionSupport, boolean required,
                                  Set<ModelProperty> modelProperties,
                                  boolean acceptsReferences) {
-    return of(parameterName, expectedType, value, defaultValue, expressionSupport, required, modelProperties, acceptsReferences,
-              false);
-  }
-
-  public <T> ValueResolver<T> of(String parameterName, MetadataType expectedType, Object value, Object defaultValue,
-                                 ExpressionSupport expressionSupport, boolean required,
-                                 Set<ModelProperty> modelProperties,
-                                 boolean acceptsReferences, boolean content) {
     if (value instanceof ValueResolver) {
       return (ValueResolver<T>) value;
     }
@@ -79,14 +71,13 @@ public class ValueResolverFactory {
 
     if (isExpression(value)) {
       final String expression = (String) value;
-      resolver = getExpressionBasedValueResolver(expectedType, expression, content, modelProperties, expectedClass);
+      resolver = getExpressionBasedValueResolver(expectedType, expression, modelProperties, expectedClass);
       if (required || isRequiredByExclusiveOptional(modelProperties)) {
         resolver = new RequiredParameterValueResolverWrapper<>(resolver, parameterName, expression);
       }
     } else {
-      resolver =
-          getStaticValueResolver(parameterName, expectedType, value, defaultValue, content, modelProperties, acceptsReferences,
-                                 expectedClass);
+      resolver = getStaticValueResolver(parameterName, expectedType, value, defaultValue, modelProperties, acceptsReferences,
+                                        expectedClass);
     }
 
     if (resolver.isDynamic() && expressionSupport == NOT_SUPPORTED) {
@@ -107,23 +98,22 @@ public class ValueResolverFactory {
   /**
    * Generates the {@link ValueResolver} for expression based values
    */
-  private ValueResolver getExpressionBasedValueResolver(MetadataType expectedType, String value, boolean content,
+  private ValueResolver getExpressionBasedValueResolver(MetadataType expectedType, String value,
                                                         Set<ModelProperty> modelProperties, Class<?> expectedClass) {
     ValueResolver resolver;
     Optional<StackedTypesModelProperty> stackedTypesModelProperty = getStackedTypesModelProperty(modelProperties);
     if (stackedTypesModelProperty.isPresent()) {
-      resolver = stackedTypesModelProperty.get().getValueResolverFactory().getExpressionBasedValueResolver(value, expectedClass,
-                                                                                                           content);
+      resolver = stackedTypesModelProperty.get().getValueResolverFactory().getExpressionBasedValueResolver(value, expectedClass);
       // TODO MULE-13518: Add support for stacked value resolvers for @Parameter inside pojos // The following "IFs" should be
       // removed once implemented
     } else if (isParameterResolver(expectedType)) {
-      resolver = new ExpressionBasedParameterResolverValueResolver<>(value, expectedClass, toDataType(expectedType), content);
+      resolver = new ExpressionBasedParameterResolverValueResolver<>(value, expectedClass, toDataType(expectedType));
     } else if (isTypedValue(expectedType)) {
-      resolver = new ExpressionTypedValueValueResolver<>(value, expectedClass, content);
+      resolver = new ExpressionTypedValueValueResolver<>(value, expectedClass);
     } else if (isLiteral(expectedType) || isTargetParameter(modelProperties)) {
       resolver = new StaticLiteralValueResolver<>(value, expectedClass);
     } else {
-      resolver = new TypeSafeExpressionValueResolver<>(value, expectedClass, toDataType(expectedType), content);
+      resolver = new TypeSafeExpressionValueResolver<>(value, expectedClass, toDataType(expectedType));
     }
     return resolver;
   }
@@ -132,7 +122,6 @@ public class ValueResolverFactory {
    * Generates the {@link ValueResolver} for non expression based values
    */
   private ValueResolver getStaticValueResolver(String parameterName, MetadataType expectedType, Object value, Object defaultValue,
-                                               boolean content,
                                                Set<ModelProperty> modelProperties, boolean acceptsReferences,
                                                Class<?> expectedClass) {
 
@@ -153,9 +142,8 @@ public class ValueResolverFactory {
 
     ValueResolver resolver;
     resolver = value != null
-        ? getValueResolverFromMetadataType(parameterName, expectedType, value, defaultValue, content, acceptsReferences,
-                                           expectedClass)
-        : new StaticValueResolver<>(defaultValue, content);
+        ? getValueResolverFromMetadataType(parameterName, expectedType, value, defaultValue, acceptsReferences, expectedClass)
+        : new StaticValueResolver<>(defaultValue);
 
     if (optionalStackedTypeModelProperty.isPresent()) {
       resolver = optionalStackedTypeModelProperty.get().getValueResolverFactory().getWrapperValueResolver(resolver);
@@ -174,10 +162,9 @@ public class ValueResolverFactory {
   }
 
   private ValueResolver getValueResolverFromMetadataType(String paramName, MetadataType expected, Object value,
-                                                         Object defaultValue, boolean content, boolean acceptsReferences,
-                                                         Class<?> expectedClass) {
+                                                         Object defaultValue, boolean acceptsReferences, Class<?> expectedClass) {
     ValueResolverFactoryTypeVisitor visitor =
-        new ValueResolverFactoryTypeVisitor(dslResolver, paramName, value, defaultValue, content, acceptsReferences,
+        new ValueResolverFactoryTypeVisitor(dslResolver, paramName, value, defaultValue, acceptsReferences,
                                             expectedClass);
     expected.accept(visitor);
     return visitor.getResolver();

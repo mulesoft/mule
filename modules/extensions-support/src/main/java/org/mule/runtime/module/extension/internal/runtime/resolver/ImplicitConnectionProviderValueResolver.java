@@ -61,11 +61,6 @@ public final class ImplicitConnectionProviderValueResolver<C> implements Connect
     return implicitConnectionProviderFactory.isDynamic();
   }
 
-  @Override
-  public boolean isContent() {
-    return false;
-  }
-
   /**
    * {@inheritDoc}
    */

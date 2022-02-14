@@ -6,6 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static java.lang.Runtime.getRuntime;
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -23,7 +29,6 @@ import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
-import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 import static org.mule.runtime.core.internal.policy.DefaultPolicyManager.noPolicyOperation;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
@@ -52,14 +57,6 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 
-import static java.lang.Runtime.getRuntime;
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
-
-import static org.apache.commons.beanutils.BeanUtils.setProperty;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
@@ -85,7 +82,6 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
@@ -95,8 +91,6 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.management.stats.CursorDecoratorFactory;
-import org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
@@ -134,7 +128,6 @@ import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ResultTransformer;
-import org.mule.runtime.module.extension.internal.runtime.operation.adapter.OperationTransactionalActionUtils;
 import org.mule.runtime.module.extension.internal.runtime.operation.adapter.SdkOperationTransactionalActionUtils;
 import org.mule.runtime.module.extension.internal.runtime.operation.retry.ComponentRetryPolicyTemplateResolver;
 import org.mule.runtime.module.extension.internal.runtime.operation.retry.RetryPolicyTemplateResolver;
@@ -157,7 +150,6 @@ import org.mule.sdk.api.tx.OperationTransactionalAction;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -208,7 +200,6 @@ import reactor.util.context.Context;
 public abstract class ComponentMessageProcessor<T extends ComponentModel> extends ExtensionComponent<T>
     implements Processor, ParametersResolverProcessor<T>, Lifecycle {
 
-  public static final String COMPONENT_DECORATOR_FACTORY_KEY = "componentDecoratorFactory";
   public static final String PROCESSOR_PATH_MDC_KEY = "processorPath";
   static final String INVALID_TARGET_MESSAGE =
       "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
@@ -256,8 +247,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private FluxSinkSupplier<CoreEvent> fluxSupplier;
 
   private Scheduler outerFluxCompletionScheduler;
-
-  private CursorComponentDecoratorFactory componentDecoratorFactory;
 
   /*
    * TODO: MULE-18483 When a policy is applied to an operation that has defined a target, it's necessary to wait until the policy
@@ -378,7 +367,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
               }
             })
             .doOnNext(event -> {
-              componentDecoratorFactory.incrementInvocationCount(event.getCorrelationId());
 
               final ExecutorCallback executorCallback = new ExecutorCallback() {
 
@@ -591,7 +579,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                                             CoreEvent event, Scheduler currentScheduler) {
 
     return new DefaultExecutionContext<>(extensionModel, configuration, resolvedParameters, componentModel, event,
-                                         getCursorProviderFactory(), componentDecoratorFactory, streamingManager, this,
+                                         getCursorProviderFactory(), streamingManager, this,
                                          retryPolicyResolver.apply(configuration), currentScheduler, transactionConfig,
                                          muleContext);
   }
@@ -599,7 +587,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   @Override
   protected void doInitialise() throws InitialisationException {
     if (!initialised) {
-      componentDecoratorFactory = NO_OP_INSTANCE;
       initRetryPolicyResolver();
       try {
         transactionConfig = buildTransactionConfig();
@@ -609,7 +596,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       returnDelegate = createReturnDelegate();
       valueReturnDelegate = getValueReturnDelegate();
       initialiseIfNeeded(resolverSet, muleContext);
-      componentExecutor = createComponentExecutor(componentDecoratorFactory);
+      componentExecutor = createComponentExecutor();
       executionMediator = createExecutionMediator();
       initialiseIfNeeded(componentExecutor, true, muleContext);
 
@@ -850,8 +837,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return new ComponentRetryPolicyTemplateResolver(retryPolicyTemplate, connectionManager);
   }
 
-  private CompletableComponentExecutor<T> createComponentExecutor(CursorComponentDecoratorFactory componentDecoratorFactory)
-      throws InitialisationException {
+  private CompletableComponentExecutor<T> createComponentExecutor() throws InitialisationException {
     Map<String, Object> params = new HashMap<>();
 
     LazyValue<ValueResolvingContext> resolvingContext =
@@ -914,16 +900,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         }
       }
 
-      final CompletableComponentExecutorFactory<T> operationExecutorFactory = getOperationExecutorFactory(componentModel);
-
-      try {
-        setProperty(operationExecutorFactory, COMPONENT_DECORATOR_FACTORY_KEY, componentDecoratorFactory);
-      } catch (IllegalAccessException | InvocationTargetException e) {
-        throw new MuleRuntimeException(e);
-      }
-
-      return operationExecutorFactory
-          .createExecutor(componentModel, params);
+      return getOperationExecutorFactory(componentModel).createExecutor(componentModel, params);
     } finally {
       resolvingContext.ifComputed(ValueResolvingContext::close);
     }
@@ -1003,19 +980,14 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   protected ReturnDelegate getTargetReturnDelegate() {
     if (isSanitizedPayload(sanitize(targetValue))) {
-      return new PayloadTargetReturnDelegate(target, componentModel,
-                                             componentDecoratorFactory, cursorProviderFactory,
-                                             muleContext);
+      return new PayloadTargetReturnDelegate(target, componentModel, cursorProviderFactory, muleContext);
     }
-    return new TargetReturnDelegate(target, targetValue, componentModel, expressionManager,
-                                    componentDecoratorFactory, cursorProviderFactory,
-                                    muleContext, streamingManager);
+    return new TargetReturnDelegate(target, targetValue, componentModel, expressionManager, cursorProviderFactory, muleContext,
+                                    streamingManager);
   }
 
   protected ValueReturnDelegate getValueReturnDelegate() {
-    return new ValueReturnDelegate(componentModel,
-                                   componentDecoratorFactory, cursorProviderFactory,
-                                   muleContext);
+    return new ValueReturnDelegate(componentModel, cursorProviderFactory, muleContext);
   }
 
   protected boolean isTargetPresent() {
@@ -1268,7 +1240,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private Map<String, Object> getResolutionResult(CoreEvent event, Optional<ConfigurationInstance> configuration)
       throws MuleException {
     try (ValueResolvingContext context = ValueResolvingContext.builder(event, expressionManager)
-        .withProperty(COMPONENT_DECORATOR_FACTORY_KEY, componentDecoratorFactory)
         .withConfig(configuration)
         .withLocation(getLocation()).build()) {
       return resolverSet.resolve(context).asMap();

@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -52,20 +51,14 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>, Ini
   private Registry registry;
 
   private DataType expectedDataType;
-  private boolean content;
   private Boolean melDefault;
   private Boolean melAvailable;
 
   public TypeSafeExpressionValueResolver(String expression, Class<T> expectedType, DataType expectedDataType) {
-    this(expression, expectedType, expectedDataType, false);
-  }
-
-  public TypeSafeExpressionValueResolver(String expression, Class<T> expectedType, DataType expectedDataType, boolean content) {
     checkArgument(expectedType != null, "expected type cannot be null");
     this.expression = expression;
     this.expectedType = expectedType;
     this.expectedDataType = expectedDataType;
-    this.content = content;
   }
 
   @Override
@@ -113,10 +106,5 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>, Ini
 
   public void setMelAvailable(Boolean melAvailable) {
     this.melAvailable = melAvailable;
-  }
-
-  @Override
-  public boolean isContent() {
-    return content;
   }
 }

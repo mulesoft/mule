@@ -90,11 +90,6 @@ public class ParameterResolverValueResolverWrapper<T>
   }
 
   @Override
-  public boolean isContent() {
-    return resolver.isContent();
-  }
-
-  @Override
   public void initialise() throws InitialisationException {
     initialiseIfNeeded(resolver, true, muleContext);
   }

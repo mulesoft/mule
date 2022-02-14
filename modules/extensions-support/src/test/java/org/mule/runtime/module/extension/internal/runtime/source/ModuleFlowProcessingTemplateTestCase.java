@@ -44,7 +44,6 @@ import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.AbstractPipeline;
@@ -308,7 +307,6 @@ public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleContextTes
     when(context.getMessagingExceptionResolver()).thenReturn(new MessagingExceptionResolver(source));
     when(context.getTransactionConfig()).thenReturn(empty());
     when(context.getFlowConstruct()).thenReturn(flow);
-    when(context.getComponentDecoratorFactory()).thenReturn(mock(CursorComponentDecoratorFactory.class));
 
     SourceResultAdapter resultAdapter = mock(SourceResultAdapter.class);
     when(resultAdapter.getResult()).thenReturn(Result.builder().build());

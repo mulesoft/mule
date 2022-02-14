@@ -126,7 +126,7 @@ public class StackableType {
   @FunctionalInterface
   public interface ExpressionBasedResolverFactory<T> {
 
-    ValueResolver<T> getResolver(String value, Class<T> expectedType, boolean content);
+    ValueResolver<T> getResolver(String value, Class<T> expectedType);
   }
 
   /**

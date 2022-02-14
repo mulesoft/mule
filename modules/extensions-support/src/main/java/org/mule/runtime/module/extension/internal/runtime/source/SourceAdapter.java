@@ -23,7 +23,6 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_TY
 import static org.mule.runtime.extension.api.runtime.source.BackPressureAction.FAIL;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.BACK_PRESSURE_ACTION_CONTEXT_PARAM;
-import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.COMPONENT_DECORATOR_FACTORY_KEY;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.fetchConfigFieldFromSourceObject;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.fetchConnectionFieldFromSourceObject;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsOfType;
@@ -58,7 +57,6 @@ import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.management.stats.CursorDecoratorFactory;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
@@ -139,9 +137,6 @@ public class SourceAdapter implements Lifecycle, Restartable {
 
   @Inject
   private ExpressionManager expressionManager;
-
-  @Inject
-  private CursorDecoratorFactory cursorDecoratorFactory;
 
   @Inject
   private Collection<ExceptionContextProvider> exceptionContextProviders;
@@ -236,8 +231,6 @@ public class SourceAdapter implements Lifecycle, Restartable {
                                                                              sourceModel,
                                                                              sourceInvokationTarget.get(),
                                                                              m, cursorProviderFactory,
-                                                                             cursorDecoratorFactory
-                                                                                 .componentDecoratorFactory(component),
                                                                              streamingManager,
                                                                              component,
                                                                              muleContext,
@@ -416,7 +409,6 @@ public class SourceAdapter implements Lifecycle, Restartable {
       return ValueResolvingContext.builder(event)
           .withExpressionManager(expressionManager)
           .withConfig(configurationInstance)
-          .withProperty(COMPONENT_DECORATOR_FACTORY_KEY, cursorDecoratorFactory.componentDecoratorFactory(component))
           .resolveCursors(false)
           .build();
     }

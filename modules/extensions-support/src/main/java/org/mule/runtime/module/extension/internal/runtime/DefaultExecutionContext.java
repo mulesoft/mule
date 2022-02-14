@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -27,7 +28,6 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-import org.mule.runtime.module.extension.internal.runtime.operation.ImmutableProcessorChainExecutor;
 import org.mule.runtime.module.extension.internal.runtime.operation.ProcessorChainExecutor;
 
 import java.util.Map;
@@ -51,7 +51,6 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   private CoreEvent event;
   private SecurityContext securityContext;
   private final CursorProviderFactory cursorProviderFactory;
-  private final CursorComponentDecoratorFactory componentDecoratorFactory;
   private final StreamingManager streamingManager;
   private final Optional<TransactionConfig> transactionConfig;
   private final Component component;
@@ -77,7 +76,6 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
                                  M componentModel,
                                  CoreEvent event,
                                  CursorProviderFactory cursorProviderFactory,
-                                 CursorComponentDecoratorFactory componentDecoratorFactory,
                                  StreamingManager streamingManager,
                                  Component component,
                                  RetryPolicyTemplate retryPolicyTemplate,
@@ -91,7 +89,6 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
     this.componentModel = componentModel;
     this.parameters = parameters;
     this.cursorProviderFactory = cursorProviderFactory;
-    this.componentDecoratorFactory = componentDecoratorFactory;
     this.streamingManager = streamingManager;
     this.muleContext = muleContext;
     this.component = component;
@@ -254,7 +251,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
 
   @Override
   public CursorComponentDecoratorFactory getComponentDecoratorFactory() {
-    return componentDecoratorFactory;
+    return NO_OP_INSTANCE;
   }
 
   /**

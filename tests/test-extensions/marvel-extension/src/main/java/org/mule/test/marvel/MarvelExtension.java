@@ -14,12 +14,11 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.test.marvel.drstrange.DrStrange;
 import org.mule.test.marvel.drstrange.DrStrangeErrorTypeDefinition;
-import org.mule.test.marvel.drstrange.DrStrangeTypeWithCustomStereotype;
 import org.mule.test.marvel.ironman.IronMan;
-import org.mule.test.marvel.xmen.XMen;
+import org.mule.test.marvel.drstrange.DrStrangeTypeWithCustomStereotype;
 
 @Extension(name = MARVEL_EXTENSION)
-@Configurations({IronMan.class, DrStrange.class, XMen.class})
+@Configurations({IronMan.class, DrStrange.class})
 @ErrorTypes(DrStrangeErrorTypeDefinition.class)
 @Export(classes = {IronMan.class, DrStrangeTypeWithCustomStereotype.class})
 public class MarvelExtension {

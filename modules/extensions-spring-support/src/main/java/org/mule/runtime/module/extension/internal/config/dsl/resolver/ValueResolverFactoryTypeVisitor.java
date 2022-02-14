@@ -61,16 +61,13 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
 
   private final DslSyntaxResolver dslSyntaxResolver;
   private final Object defaultValue;
-  private final boolean content;
   private final boolean acceptsReferences;
 
   public ValueResolverFactoryTypeVisitor(DslSyntaxResolver dslSyntaxResolver, String parameterName,
-                                         Object value, Object defaultValue, boolean content, boolean acceptsReferences,
-                                         Class<?> expectedClass) {
+                                         Object value, Object defaultValue, boolean acceptsReferences, Class<?> expectedClass) {
     super(parameterName, value, expectedClass);
     this.dslSyntaxResolver = dslSyntaxResolver;
     this.defaultValue = defaultValue;
-    this.content = content;
     this.acceptsReferences = acceptsReferences;
   }
 
@@ -100,7 +97,7 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
     } else {
       valueResolver = acceptsReferences
           ? defaultValueResolverParsingDelegate.parse(getValue().toString(), objectType, null)
-          : new StaticValueResolver<>(getValue(), content);
+          : new StaticValueResolver<>(getValue());
     }
 
     setResolver(valueResolver);
@@ -112,7 +109,7 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
         .map(delegate -> delegate.parse(getValue().toString(), metadataType, null))
         .orElseGet(() -> acceptsReferences
             ? defaultValueResolverParsingDelegate.parse(getValue().toString(), metadataType, null)
-            : new TypeSafeValueResolverWrapper(new StaticValueResolver<>(getValue(), content), getExpectedClass()));
+            : new TypeSafeValueResolverWrapper(new StaticValueResolver<>(getValue()), getExpectedClass()));
 
     setResolver(delegateResolver);
   }
@@ -125,7 +122,7 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
 
     if (value == null) {
       if (defaultValue == null) {
-        return new StaticValueResolver<>(null, content);
+        return new StaticValueResolver<>(null);
       }
 
       value = defaultValue;
@@ -165,7 +162,7 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
     }
 
     if (hasValidType(value)) {
-      return new StaticValueResolver<>(value, content);
+      return new StaticValueResolver<>(value);
     }
 
     throw new IllegalArgumentException(format("Could not transform value of type '%s' to a valid date type",

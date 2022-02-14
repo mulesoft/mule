@@ -57,9 +57,4 @@ public final class ProcessorChainValueResolver implements ValueResolver<Chain> {
     return false;
   }
 
-  @Override
-  public boolean isContent() {
-    return false;
-  }
-
 }
