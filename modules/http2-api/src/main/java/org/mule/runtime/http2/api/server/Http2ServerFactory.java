@@ -25,6 +25,7 @@ public interface Http2ServerFactory {
    * @param name          the name of the required server.
    * @param configuration a supplier of the configuration for a new server if it needs to be created.
    * @return the {@link Http2Server} instance corresponding to the given name.
+   * @throws Http2ServerCreationException if an error occurs while creating the new {@link Http2Server}
    */
   Http2Server getOrCreateServer(String name, Supplier<? extends Http2ServerConfiguration> configuration)
       throws Http2ServerCreationException;

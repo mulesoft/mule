@@ -8,7 +8,7 @@ package org.mule.runtime.http2.api.message.content;
 
 import java.io.InputStream;
 
-public class BaseHttp2Content implements Http2Content {
+public abstract class BaseHttp2Content implements Http2Content {
 
   private final InputStream asInputStream;
 

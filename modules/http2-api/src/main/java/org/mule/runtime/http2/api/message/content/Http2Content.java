@@ -14,4 +14,6 @@ public interface Http2Content {
    * @return the content as an {@link InputStream}.
    */
   InputStream asInputStream();
+
+  boolean isEmpty();
 }

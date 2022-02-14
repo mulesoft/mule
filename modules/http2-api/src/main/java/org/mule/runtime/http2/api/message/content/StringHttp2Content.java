@@ -12,8 +12,15 @@ import java.io.ByteArrayInputStream;
 
 public class StringHttp2Content extends BaseHttp2Content {
 
+  private final String asString;
+
   public StringHttp2Content(String asString) {
     super(new ByteArrayInputStream(asString.getBytes(UTF_8)));
+    this.asString = asString;
   }
 
+  @Override
+  public boolean isEmpty() {
+    return asString.isEmpty();
+  }
 }
