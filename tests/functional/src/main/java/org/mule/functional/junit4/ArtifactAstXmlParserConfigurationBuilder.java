@@ -181,7 +181,6 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
 
     final ArtifactAst effectiveAst = parseApplicationExtensionModel(partialAst, muleContext)
         .map(extensionModel -> {
-          // registerApplicationExtensionModel();
           Set<ExtensionModel> enrichedExtensionModels = new HashSet<>(extensions);
           enrichedExtensionModels.add(extensionModel);
           return doParseArtifactIntoAst(enrichedExtensionModels, true); // TODO: use disableXmlValidations field
@@ -224,11 +223,6 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
                                           .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader())
                                           .build());
 
-      // ExtensionManager appManager = extensionManager instanceof CompositeArtifactExtensionManager
-      // ? ((CompositeArtifactExtensionManager) extensionManager).getChildExtensionManager()
-      // : extensionManager;
-      //
-      extensionManager.registerExtension(appExtensionModel);
       return of(appExtensionModel);
     } else {
       logModelNotGenerated("Mule ExtensionModelLoader not found");

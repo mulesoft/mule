@@ -6,6 +6,14 @@
  */
 package org.mule.runtime.config.internal.context;
 
+import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
+import static java.util.Comparator.comparing;
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES;
@@ -46,16 +54,6 @@ import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.manager.ExtensionErrorsRegistrant.registerErrorMappings;
-
-import static java.lang.String.format;
-import static java.lang.System.lineSeparator;
-import static java.util.Comparator.comparing;
-import static java.util.Objects.requireNonNull;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
@@ -148,7 +146,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
-
 import org.slf4j.Logger;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;

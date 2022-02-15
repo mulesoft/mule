@@ -6,8 +6,8 @@
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "this",
-    "namespace": "this",
-    "schemaLocation": "this/current/mule-this.xsd",
+    "namespace": "http://www.mulesoft.org/schema/mule/this",
+    "schemaLocation": "http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd",
     "schemaVersion": "1.0.0",
     "xsdFileName": "mule-this.xsd"
   },
@@ -48,7 +48,7 @@
       "errors": [],
       "semanticTerms": [],
       "stereotype": {
-        "type": "HELLO_WOLD",
+        "type": "HELLO_WORLD",
         "namespace": "THIS",
         "parent": {
           "type": "PROCESSOR",
@@ -419,7 +419,7 @@
           "modelProperties": {}
         }
       ],
-      "name": "helloWold",
+      "name": "helloWorld",
       "displayModel": {
         "displayName": "Hello World operation",
         "summary": "Returns a polite greeting"
