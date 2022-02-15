@@ -11,18 +11,25 @@ import org.mule.runtime.http2.api.message.content.Http2Content;
 public class BaseHttp2Request extends BaseHttp2Message implements Http2Request {
 
   private final Http2Method method;
+  private final String path;
 
-  public BaseHttp2Request(Http2Method method, Http2Content content) {
+  public BaseHttp2Request(Http2Method method, String path, Http2Content content) {
     super(content);
     this.method = method;
+    this.path = path;
   }
 
-  public BaseHttp2Request(CharSequence methodAsText, Http2Content content) {
-    this(Http2Method.fromText(methodAsText), content);
+  public BaseHttp2Request(String methodAsText, String path, Http2Content content) {
+    this(Http2Method.fromText(methodAsText), path, content);
   }
 
   @Override
   public Http2Method getMethod() {
     return method;
+  }
+
+  @Override
+  public String getPath() {
+    return path;
   }
 }

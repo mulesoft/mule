@@ -9,4 +9,6 @@ package org.mule.runtime.http2.api.message;
 public interface Http2Request extends Http2Message {
 
   Http2Method getMethod();
+
+  String getPath();
 }

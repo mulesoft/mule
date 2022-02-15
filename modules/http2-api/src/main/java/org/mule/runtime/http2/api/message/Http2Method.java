@@ -27,9 +27,9 @@ public enum Http2Method {
     return asString;
   }
 
-  public static Http2Method fromText(CharSequence asText) {
+  public static Http2Method fromText(String asText) {
     for (Http2Method method : values()) {
-      if (method.toString().equalsIgnoreCase(asText.toString())) {
+      if (method.toString().equalsIgnoreCase(asText)) {
         return method;
       }
     }
