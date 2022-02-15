@@ -190,7 +190,7 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
       sorter.addObject(key, value);
       lookupObjects.add(key);
     });
-    sorter.setLifeCycleObjectNameOrderMap(lookupObjects);
+    sorter.setLifeCycleObjectNameOrder(lookupObjects);
     return sorter.getSortedObjects();
   }
 

@@ -151,7 +151,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
 
         @Override
         public int compare(BeanWrapper o1, BeanWrapper o2) {
-          if (getLifeCycleObjectNameOrderMap().getOrDefault(o1.getName(),-1) > getLifeCycleObjectNameOrderMap()
+          if (getLifeCycleObjectNameOrder().getOrDefault(o1.getName(), -1) > getLifeCycleObjectNameOrder()
               .getOrDefault(o2.getName(), -1)) {
             return -1;
           } else {
@@ -180,9 +180,9 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
    *
    * @param lookupObjects lifecycle object list which is ordered based on the type
    */
-  public void setLifeCycleObjectNameOrderMap(List<String> lookupObjects) {
+  public void setLifeCycleObjectNameOrder(List<String> lookupObjects) {
     int index = 0;
-    for (String objectName: lookupObjects) {
+    for (String objectName : lookupObjects) {
       lifecycleObjectNameOrderMap.put(objectName, index++);
     }
   }
@@ -192,7 +192,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
    *
    * @return map with the order of objects that should be initialized from {@link RegistryLifecycleManager}'s lookup
    */
-  public Map<String, Integer> getLifeCycleObjectNameOrderMap() {
+  private Map<String, Integer> getLifeCycleObjectNameOrder() {
     return lifecycleObjectNameOrderMap;
   }
 
