@@ -42,6 +42,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_
 import static org.mule.test.marvel.ironman.IronMan.CONFIG_NAME;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
+import static org.mule.test.vegan.extension.VeganExtension.KIWI;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
@@ -232,7 +233,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void untesteableConnetionProvider() throws Exception {
+  public void untestableConnectionProvider() throws Exception {
     ConnectionProviderModel connectionProviderModel = veganExtension.getConfigurationModel(APPLE)
         .map(c -> c.getConnectionProviders().get(0))
         .get();
@@ -241,7 +242,16 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void testeableConnectionProvider() throws Exception {
+  public void untestableSdkConnectionProvider() throws Exception {
+    ConnectionProviderModel connectionProviderModel = veganExtension.getConfigurationModel(KIWI)
+        .map(c -> c.getConnectionProviders().get(0))
+        .get();
+
+    assertThat(connectionProviderModel.supportsConnectivityTesting(), is(false));
+  }
+
+  @Test
+  public void testableConnectionProvider() throws Exception {
     ConnectionProviderModel connectionProviderModel = veganExtension.getConfigurationModel(BANANA)
         .map(c -> c.getConnectionProviders().get(0))
         .get();
