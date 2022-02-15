@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.registry;
 
+import org.mule.runtime.config.internal.DependencyGraphLifecycleObjectSorter;
 import org.mule.runtime.core.internal.lifecycle.phases.DefaultLifecycleObjectSorter;
 
 import java.util.List;
@@ -20,7 +21,9 @@ import org.springframework.beans.factory.config.BeanDefinition;
  * {@link BeanDefinition} that was derived from the {@link Inject} annotations
  *
  * @since 4.2.0
+ * @deprecated as of 4.5.0, Use {@link DependencyGraphLifecycleObjectSorter }instead
  */
+@Deprecated
 public class SpringLifecycleObjectSorter extends DefaultLifecycleObjectSorter {
 
   private final AbstractSpringRegistry registry;

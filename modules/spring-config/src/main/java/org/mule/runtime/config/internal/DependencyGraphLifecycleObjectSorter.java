@@ -44,7 +44,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
 
   private List<DefaultDirectedGraph<BeanWrapper, DefaultEdge>> dependencyGraphs;
   private DependencyGraphBeanDependencyResolver resolver;
-  final protected Class<?>[] orderedLifecycleTypes;
+  protected final Class<?>[] orderedLifecycleTypes;
   private Map<String, Integer> lifecycleObjectNameOrderMap;
 
   public DependencyGraphLifecycleObjectSorter(DependencyGraphBeanDependencyResolver resolver, Class<?>[] orderedLifecycleTypes) {
@@ -100,6 +100,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
                                     dependencyGraph.addVertex(preReqVertex);
 
                                     // remove any additional edge that creates cycle
+                                    // todo: W-10704588 Reduce time to detect cycles in a directed graph
                                     if (!dependencyGraph.containsEdge(preReqVertex, current)) {
                                       dependencyGraph.addEdge(current, preReqVertex);
                                       if (cycleDetector.detectCycles()) {

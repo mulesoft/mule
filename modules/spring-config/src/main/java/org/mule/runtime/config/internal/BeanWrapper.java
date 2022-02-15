@@ -41,6 +41,7 @@ public class BeanWrapper {
     }
   }
 
+  // todo: W-10704535 use cached hashCodes to improve performance
   @Override
   public int hashCode() {
     return wrappedObject.hashCode();
