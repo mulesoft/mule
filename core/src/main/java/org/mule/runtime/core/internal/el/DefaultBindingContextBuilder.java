@@ -18,6 +18,7 @@ import static org.mule.runtime.api.el.BindingContextUtils.AUTHENTICATION;
 import static org.mule.runtime.api.el.BindingContextUtils.CORRELATION_ID;
 import static org.mule.runtime.api.el.BindingContextUtils.ERROR;
 import static org.mule.runtime.api.el.BindingContextUtils.ITEM_SEQUENCE_INFO;
+import static org.mule.runtime.api.el.BindingContextUtils.PARAMS;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 
@@ -45,6 +46,7 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
   private TypedValue payloadBinding;
   private TypedValue attributesBinding;
   private Optional<Supplier<TypedValue>> varsBinding = empty();
+  private Optional<Supplier<TypedValue>> paramsBinding = empty();
   private TypedValue errorBinding;
   private TypedValue correlationIdBinding;
   private TypedValue authenticationBinding;
@@ -66,6 +68,7 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
     payloadBinding = bindingContext.lookup(PAYLOAD).orElse(null);
     attributesBinding = bindingContext.lookup(ATTRIBUTES).orElse(null);
     varsBinding = bindingContext.lookup(VARS).flatMap(vars -> of(() -> vars));
+    paramsBinding = bindingContext.lookup(PARAMS).flatMap(params -> of(() -> params));
     errorBinding = bindingContext.lookup(ERROR).orElse(null);
     correlationIdBinding = bindingContext.lookup(CORRELATION_ID).orElse(null);
     authenticationBinding = bindingContext.lookup(AUTHENTICATION).orElse(null);
@@ -84,6 +87,9 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
         break;
       case VARS:
         varsBinding = of(() -> value);
+        break;
+      case PARAMS:
+        paramsBinding = of(() -> value);
         break;
       case ERROR:
         errorBinding = value;
@@ -120,6 +126,9 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
       case VARS:
         varsBinding = of(lazyValue);
         break;
+      case PARAMS:
+        paramsBinding = of(lazyValue);
+        break;
       case ERROR:
         errorBinding = lazyValue.get();
         break;
@@ -151,14 +160,23 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
     if (bindingAdded) {
       // Because of how the lookup is expected to work, we need to create this context so its bindings are in the correct position
       // in the delegates list.
-      delegates.addFirst(new BindingContextImplementation(emptyList(), bindings == null ? emptyMap() : unmodifiableMap(bindings),
-                                                          payloadBinding, attributesBinding, varsBinding,
-                                                          errorBinding, correlationIdBinding, authenticationBinding,
-                                                          itemSequenceInfoBinding,
-                                                          modules != null ? unmodifiableCollection(modules) : emptyList()));
+      delegates.addFirst(new BindingContextImplementation(
+          emptyList(),
+          bindings == null ? emptyMap() : unmodifiableMap(bindings),
+          payloadBinding,
+          attributesBinding,
+          varsBinding,
+          paramsBinding,
+          errorBinding,
+          correlationIdBinding,
+          authenticationBinding,
+          itemSequenceInfoBinding,
+          modules != null ? unmodifiableCollection(modules) : emptyList()));
+
       payloadBinding = null;
       attributesBinding = null;
       varsBinding = empty();
+      paramsBinding = empty();
       errorBinding = null;
       correlationIdBinding = null;
       authenticationBinding = null;
@@ -170,9 +188,8 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
 
     payloadBinding = context.lookup(PAYLOAD).orElse(payloadBinding);
     attributesBinding = context.lookup(ATTRIBUTES).orElse(attributesBinding);
-    context.lookup(VARS).ifPresent(vars -> {
-      varsBinding = of(() -> vars);
-    });
+    context.lookup(VARS).ifPresent(vars -> varsBinding = of(() -> vars));
+    context.lookup(PARAMS).ifPresent(params -> paramsBinding = of(() -> params));
     errorBinding = context.lookup(ERROR).orElse(errorBinding);
     correlationIdBinding = context.lookup(CORRELATION_ID).orElse(correlationIdBinding);
     authenticationBinding = context.lookup(AUTHENTICATION).orElse(authenticationBinding);
@@ -194,11 +211,18 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
 
   @Override
   public BindingContext build() {
-    return new BindingContextImplementation(delegates == null || delegates.isEmpty() ? emptyList() : new ArrayList<>(delegates),
-                                            bindings == null ? emptyMap() : unmodifiableMap(bindings),
-                                            payloadBinding, attributesBinding, varsBinding,
-                                            errorBinding, correlationIdBinding, authenticationBinding, itemSequenceInfoBinding,
-                                            modules != null ? unmodifiableCollection(modules) : emptyList());
+    return new BindingContextImplementation(
+        delegates == null || delegates.isEmpty() ? emptyList() : new ArrayList<>(delegates),
+        bindings == null ? emptyMap() : unmodifiableMap(bindings),
+        payloadBinding,
+        attributesBinding,
+        varsBinding,
+        paramsBinding,
+        errorBinding,
+        correlationIdBinding,
+        authenticationBinding,
+        itemSequenceInfoBinding,
+        modules != null ? unmodifiableCollection(modules) : emptyList());
   }
 
   public BindingContext flattenAndBuild() {
@@ -210,6 +234,7 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
           || PAYLOAD.equals(binding.identifier())
           || ATTRIBUTES.equals(binding.identifier())
           || VARS.equals(binding.identifier())
+          || PARAMS.equals(binding.identifier())
           || ERROR.equals(binding.identifier())
           || CORRELATION_ID.equals(binding.identifier())
           || AUTHENTICATION.equals(binding.identifier())
@@ -222,6 +247,7 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
                                             original.lookup(PAYLOAD).orElse(null),
                                             original.lookup(ATTRIBUTES).orElse(null),
                                             of(() -> original.lookup(VARS).orElse(null)),
+        of(() -> original.lookup(PARAMS).orElse(null)),
                                             original.lookup(ERROR).orElse(null),
                                             original.lookup(CORRELATION_ID).orElse(null),
                                             original.lookup(AUTHENTICATION).orElse(null),
@@ -237,6 +263,7 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
     private final Optional<TypedValue> payloadBinding;
     private final Optional<TypedValue> attributesBinding;
     private final Supplier<TypedValue> varsBinding;
+    private final Supplier<TypedValue> paramsBinding;
     private final Optional<TypedValue> errorBinding;
     private final Optional<TypedValue> correlationIdBinding;
     private final Optional<TypedValue> authenticationBinding;
@@ -245,11 +272,14 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
     private final Map<String, Supplier<TypedValue>> bindings;
     private final Collection<ExpressionModule> modules;
 
-    private BindingContextImplementation(List<BindingContext> delegates, Map<String, Supplier<TypedValue>> bindings,
+    private BindingContextImplementation(List<BindingContext> delegates,
+                                         Map<String, Supplier<TypedValue>> bindings,
                                          TypedValue payloadBinding, TypedValue attributesBinding,
                                          Optional<Supplier<TypedValue>> varsBinding,
+                                         Optional<Supplier<TypedValue>> paramsBinding,
                                          TypedValue errorBinding, TypedValue correlationIdBinding,
-                                         TypedValue authenticationBinding, TypedValue itemSequenceInfoBinding,
+                                         TypedValue authenticationBinding,
+                                         TypedValue itemSequenceInfoBinding,
                                          Collection<ExpressionModule> modules) {
       this.delegates = delegates;
       this.bindings = bindings;
@@ -257,6 +287,7 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
       this.payloadBinding = ofNullable(payloadBinding);
       this.attributesBinding = ofNullable(attributesBinding);
       this.varsBinding = varsBinding.orElse(() -> null);
+      this.paramsBinding = paramsBinding.orElse(() -> null);
       this.errorBinding = ofNullable(errorBinding);
       this.correlationIdBinding = ofNullable(correlationIdBinding);
       this.authenticationBinding = ofNullable(authenticationBinding);
@@ -285,9 +316,17 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
 
       payloadBinding.ifPresent(pb -> bindingsMap.put(PAYLOAD, new Binding(PAYLOAD, pb)));
       attributesBinding.ifPresent(ab -> bindingsMap.put(ATTRIBUTES, new Binding(ATTRIBUTES, ab)));
-      if (varsBinding.get() != null) {
-        bindingsMap.put(VARS, new Binding(VARS, varsBinding.get()));
+
+      TypedValue vars = varsBinding.get();
+      if (vars != null) {
+        bindingsMap.put(VARS, new Binding(VARS, vars));
       }
+
+      TypedValue params = paramsBinding.get();
+      if (params != null) {
+        bindingsMap.put(PARAMS, new Binding(PARAMS, params));
+      }
+
       errorBinding.ifPresent(eb -> bindingsMap.put(ERROR, new Binding(ERROR, eb)));
       correlationIdBinding.ifPresent(cidb -> bindingsMap.put(CORRELATION_ID, new Binding(CORRELATION_ID, cidb)));
       authenticationBinding.ifPresent(ab -> bindingsMap.put(AUTHENTICATION, new Binding(AUTHENTICATION, ab)));
@@ -308,9 +347,15 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
 
       payloadBinding.ifPresent(pb -> identifiers.add(PAYLOAD));
       attributesBinding.ifPresent(pb -> identifiers.add(ATTRIBUTES));
+
       if (varsBinding.get() != null) {
         identifiers.add(VARS);
       }
+
+      if (paramsBinding.get() != null) {
+        identifiers.add(PARAMS);
+      }
+
       errorBinding.ifPresent(pb -> identifiers.add(ERROR));
       correlationIdBinding.ifPresent(pb -> identifiers.add(CORRELATION_ID));
       authenticationBinding.ifPresent(pb -> identifiers.add(AUTHENTICATION));
@@ -332,6 +377,8 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
           return attributesBinding;
         case VARS:
           return ofNullable(varsBinding.get());
+        case PARAMS:
+          return ofNullable(paramsBinding.get());
         case ERROR:
           return errorBinding;
         case CORRELATION_ID:

@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.mule.internal.loader;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
@@ -27,6 +28,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
@@ -67,7 +69,9 @@ public class ApplicationAsExtensionModelTestCase extends MuleArtifactFunctionalT
 
   @Test
   public void salutationFlow() throws Exception {
-    flowRunner("salutationFlow").run();
+    CoreEvent resultEvent = flowRunner("salutationFlow").run();
+    assertThat(resultEvent.getMessage().getPayload().getValue(), equalTo("Hello,  Malaga! "));
+    assertThat(resultEvent.getMessage().getAttributes().getValue(), is(nullValue()));
   }
 
   @Test

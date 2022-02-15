@@ -15,7 +15,7 @@
     </flow>
 
     <flow name="salutationFlow">
-        <this:hello-world receiver="World" />
+        <this:hello-world receiver="Malaga!" />
     </flow>
 
     <operation:def name="helloWorld" displayName="Hello World operation" summary="Returns a polite greeting">
@@ -38,7 +38,7 @@
             <operation:payload-type type="string"/>
         </operation:output>
         <operation:body>
-            <set-payload value="#['$(params.greeting) $(params.prefix) $(params.receiver) $(params.suffix)']"/>
+            <set-payload value="#['$(params.greeting) $(params.prefix) $(params.receiver) $(if(params.suffix == null) '' else params.suffix)']"/>
         </operation:body>
     </operation:def>
 

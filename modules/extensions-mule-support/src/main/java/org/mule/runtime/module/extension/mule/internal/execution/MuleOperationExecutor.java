@@ -57,12 +57,12 @@ public class MuleOperationExecutor implements CompletableComponentExecutor<Compo
         .parameters(buildOperationParameters(inputEvent, ctx))
         .build();
 
-    operation.execute(executionEvent).whenComplete((event, exception) -> {
+    operation.execute(executionEvent).whenComplete((resultEvent, exception) -> {
       if (exception != null) {
         callback.error(exception);
       } else {
         callback.complete(builder(inputEvent)
-            .message(event.getMessage())
+            .message(resultEvent.getMessage())
             .build());
       }
     });
