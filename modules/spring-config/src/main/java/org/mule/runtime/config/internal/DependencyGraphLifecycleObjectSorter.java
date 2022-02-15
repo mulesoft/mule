@@ -21,7 +21,6 @@ import org.mule.runtime.core.internal.lifecycle.phases.LifecycleObjectSorter;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
@@ -45,7 +44,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
   private List<DefaultDirectedGraph<BeanWrapper, DefaultEdge>> dependencyGraphs;
   private DependencyGraphBeanDependencyResolver resolver;
   protected final Class<?>[] orderedLifecycleTypes;
-  private Map<String, Integer> lifecycleObjectNameOrderMap;
+  private List<String> lifecycleObjectList;
 
   public DependencyGraphLifecycleObjectSorter(DependencyGraphBeanDependencyResolver resolver, Class<?>[] orderedLifecycleTypes) {
     this.dependencyGraphs = new ArrayList<>(orderedLifecycleTypes.length);
@@ -55,7 +54,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
       DefaultDirectedGraph<BeanWrapper, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
       dependencyGraphs.add(graph);
     }
-    this.lifecycleObjectNameOrderMap = new HashMap<>();
+    this.lifecycleObjectList = new ArrayList<>();
   }
 
   /**
@@ -72,8 +71,9 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
     if (stream(orderedLifecycleTypes).noneMatch(x -> x.isInstance(currentObject))) {
       return;
     }
+    int graphIndex = getDependencyGraphIndex(currentObject);
 
-    DefaultDirectedGraph<BeanWrapper, DefaultEdge> dependencyGraph = getDependencyGraphForLifecycleType(currentObject);
+    DefaultDirectedGraph<BeanWrapper, DefaultEdge> dependencyGraph = getDependencyGraphForLifecycleType(graphIndex);
     CycleDetector<BeanWrapper, DefaultEdge> cycleDetector = new CycleDetector<>(dependencyGraph);
 
     BeanWrapper currentVertex = new BeanWrapper(beanName, currentObject);
@@ -81,7 +81,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
 
     // get (direct) prerequisite objects for the current object
     Map<BeanWrapper, List<BeanWrapper>> prerequisiteObjectsMap =
-        resolver.getTransitiveDependencies(beanName, getDependencyGraphIndex(currentObject));
+        resolver.getTransitiveDependencies(beanName, graphIndex);
 
     // add direct prerequisites to the graph & create edges(current object -> prerequisite)
     for (BeanWrapper source : prerequisiteObjectsMap.keySet()) {
@@ -129,11 +129,11 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
   /**
    * Provides the graph(bucket) the current object should be added to
    * 
-   * @param currentObject current object that is going to be added to the graph(bucket)
-   * @return index of the relevant dependency graph(bucket)
+   * @param graphIndex index of the graph for the current object
+   * @return relevant dependency graph(bucket)
    */
-  private DefaultDirectedGraph<BeanWrapper, DefaultEdge> getDependencyGraphForLifecycleType(Object currentObject) {
-    return dependencyGraphs.get(getDependencyGraphIndex(currentObject));
+  private DefaultDirectedGraph<BeanWrapper, DefaultEdge> getDependencyGraphForLifecycleType(int graphIndex) {
+    return dependencyGraphs.get(graphIndex);
   }
 
   /**
@@ -150,8 +150,8 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
 
         @Override
         public int compare(BeanWrapper o1, BeanWrapper o2) {
-          if (getLifeCycleObjectNameOrderMap().getOrDefault(o1.getName(), -1) > getLifeCycleObjectNameOrderMap()
-              .getOrDefault(o2.getName(), -1)) {
+          if (getLifeCycleObjectList().indexOf(o1.getName()) > getLifeCycleObjectList()
+              .indexOf(o2.getName())) {
             return -1;
           } else {
             return 1;
@@ -175,25 +175,25 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
   }
 
   /**
-   * Provides the information that will be needed for the comparison during the top sort
-   * 
+   * Provides the information that will be needed for the comparison while sorting objects. This information will be used only for
+   * the tie-breaking in cases of partial ordering.
+   *
    * @param lookupObjectsForLifecycle lifecycle object list which is ordered based on the type
    */
-  public void setLifeCycleObjectNameOrderMap(Map<String, Object> lookupObjectsForLifecycle) {
-    int index = 0;
+  public void setLifeCycleObjectList(Map<String, Object> lookupObjectsForLifecycle) {
     for (Map.Entry<String, Object> entry : lookupObjectsForLifecycle.entrySet()) {
       String objectName = entry.getKey();
-      lifecycleObjectNameOrderMap.put(objectName, index++);
+      lifecycleObjectList.add(objectName);
     }
   }
 
   /**
    * Provides the information about the lookup order of objects that should be initialized
    *
-   * @return map with the order of objects that should be initialized from {@link RegistryLifecycleManager}'s lookup
+   * @return list of the objects that should be initialized from {@link RegistryLifecycleManager}'s lookup
    */
-  public Map<String, Integer> getLifeCycleObjectNameOrderMap() {
-    return lifecycleObjectNameOrderMap;
+  private List<String> getLifeCycleObjectList() {
+    return lifecycleObjectList;
   }
 
 

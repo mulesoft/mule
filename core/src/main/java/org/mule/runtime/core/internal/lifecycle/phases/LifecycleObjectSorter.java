@@ -33,9 +33,9 @@ public interface LifecycleObjectSorter {
   List<Object> getSortedObjects();
 
   /**
-   * Provides the order of objects as reference for initialise/dispose phases
+   * Provides objects that should be initialized during the initialise/dispose phases
    * 
    * @param lookupObjectsForLifecycle lifecycle object list which is ordered based on the type
    */
-  default void setLifeCycleObjectNameOrderMap(Map<String, Object> lookupObjectsForLifecycle) {};
+  default void setLifeCycleObjectList(Map<String, Object> lookupObjectsForLifecycle) {};
 }

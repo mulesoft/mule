@@ -85,7 +85,7 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
     lookupObjects.put("objectA", objectA);
     lookupObjects.put("objectB", objectB);
     lookupObjects.put("objectC", objectC);
-    sorter.setLifeCycleObjectNameOrderMap(lookupObjects);
+    sorter.setLifeCycleObjectList(lookupObjects);
   }
 
 
@@ -179,7 +179,7 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
     when(resolver.getTransitiveDependencies("objectA", 5)).thenReturn(transitiveDependenciesOfA);
     when(resolver.getTransitiveDependencies("objectB", 5)).thenReturn(transitiveDependenciesOfB);
     when(resolver.getTransitiveDependencies("objectC", 5)).thenReturn(emptyMap());
-    sorter.setLifeCycleObjectNameOrderMap(lookupObjects);
+    sorter.setLifeCycleObjectList(lookupObjects);
 
     sorter.addObject("objectA", objectA);
     sorter.addObject("objectB", objectB);
@@ -247,7 +247,7 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
     when(resolver.getTransitiveDependencies("objectB", 5)).thenReturn(transitiveDependenciesOfB);
     when(resolver.getTransitiveDependencies("objectC", 5)).thenReturn(transitiveDependenciesOfC);
 
-    sorter.setLifeCycleObjectNameOrderMap(lookupObjects);
+    sorter.setLifeCycleObjectList(lookupObjects);
 
     sorter.addObject("objectA", objectA);
     sorter.addObject("objectB", objectB);
@@ -291,7 +291,7 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
     when(resolver.getTransitiveDependencies("objectA", 5)).thenReturn(transitiveDependenciesOfA);
     when(resolver.getTransitiveDependencies("objectB", 5)).thenReturn(transitiveDependenciesOfB);
     when(resolver.getTransitiveDependencies("objectC", 5)).thenReturn(transitiveDependenciesOfC);
-    sorter.setLifeCycleObjectNameOrderMap(lookupObjects);
+    sorter.setLifeCycleObjectList(lookupObjects);
 
     sorter.addObject("objectA", objectA);
     sorter.addObject("objectB", objectB);

@@ -90,8 +90,7 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
   public List<BeanWrapper> getDirectBeanDependencies(BeanWrapper currentObject, int bucketIndex) {
     // If the component was already processed for the current bucket(graph), it won't process it
     visitedComponentsForBuckets.putIfAbsent(bucketIndex, new HashSet<>());
-    if (visitedComponentsForBuckets.get(bucketIndex).stream().map(x -> x.getWrappedObject())
-        .anyMatch(x -> x.equals(currentObject.getWrappedObject()))) {
+    if (visitedComponentsForBuckets.get(bucketIndex).contains(currentObject)) {
       return emptyList();
     }
     visitedComponentsForBuckets.get(bucketIndex).add(currentObject);
