@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.lifecycle.phases;
 import org.mule.runtime.core.internal.registry.Registry;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * A non reusable object which determines the correct order in which a particular {@link LifecyclePhase} should be applied to a
@@ -33,9 +32,9 @@ public interface LifecycleObjectSorter {
   List<Object> getSortedObjects();
 
   /**
-   * Provides objects that should be initialized during the initialise/dispose phases
-   * 
-   * @param lookupObjectsForLifecycle lifecycle object list which is ordered based on the type
+   * Provides the order of objects as reference for initialise/dispose phases
+   *
+   * @param lookupObjects lifecycle object list which is ordered based on the type
    */
-  default void setLifeCycleObjectList(Map<String, Object> lookupObjectsForLifecycle) {};
+  default void setLifeCycleObjectNameOrderMap(List<String> lookupObjects) {};
 }

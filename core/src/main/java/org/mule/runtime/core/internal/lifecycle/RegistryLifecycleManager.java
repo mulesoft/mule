@@ -28,6 +28,7 @@ import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.core.privileged.lifecycle.AbstractLifecycleManager;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -183,10 +184,13 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
   protected List<Object> getObjectsForPhase(LifecyclePhase phase) {
     LifecycleObjectSorter sorter = phase.newLifecycleObjectSorter();
     Map<String, Object> lookupObjectsForLifecycle = lookupObjectsForLifecycle();
+    List<String> lookupObjects = new ArrayList<>();
 
-    sorter.setLifeCycleObjectList(lookupObjectsForLifecycle);
-
-    lookupObjectsForLifecycle.forEach((key, value) -> sorter.addObject(key, value));
+    lookupObjectsForLifecycle.forEach((key, value) -> {
+      sorter.addObject(key, value);
+      lookupObjects.add(key);
+    });
+    sorter.setLifeCycleObjectNameOrderMap(lookupObjects);
     return sorter.getSortedObjects();
   }
 

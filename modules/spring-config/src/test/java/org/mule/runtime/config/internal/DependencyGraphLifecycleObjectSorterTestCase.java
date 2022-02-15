@@ -37,6 +37,7 @@ import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.el.mvel.ExpressionLanguageExtension;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -59,7 +60,7 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
   private DefaultStreamingManager objectA;
   private DefaultStreamingManager objectB;
   private DefaultStreamingManager objectC;
-  private Map<String, Object> lookupObjects;
+  private List<String> lookupObjects;
 
   @Before
   public void setUp() throws Exception {
@@ -78,14 +79,14 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
         MuleConfiguration.class,
         Initialisable.class
     });
-    lookupObjects = new HashMap<>();
+    lookupObjects = new ArrayList<>();
     objectA = new DefaultStreamingManager();
     objectB = new DefaultStreamingManager();
     objectC = new DefaultStreamingManager();
-    lookupObjects.put("objectA", objectA);
-    lookupObjects.put("objectB", objectB);
-    lookupObjects.put("objectC", objectC);
-    sorter.setLifeCycleObjectList(lookupObjects);
+    lookupObjects.add("objectA");
+    lookupObjects.add("objectB");
+    lookupObjects.add("objectC");
+    sorter.setLifeCycleObjectNameOrderMap(lookupObjects);
   }
 
 
@@ -179,7 +180,7 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
     when(resolver.getTransitiveDependencies("objectA", 5)).thenReturn(transitiveDependenciesOfA);
     when(resolver.getTransitiveDependencies("objectB", 5)).thenReturn(transitiveDependenciesOfB);
     when(resolver.getTransitiveDependencies("objectC", 5)).thenReturn(emptyMap());
-    sorter.setLifeCycleObjectList(lookupObjects);
+    sorter.setLifeCycleObjectNameOrderMap(lookupObjects);
 
     sorter.addObject("objectA", objectA);
     sorter.addObject("objectB", objectB);
@@ -247,7 +248,7 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
     when(resolver.getTransitiveDependencies("objectB", 5)).thenReturn(transitiveDependenciesOfB);
     when(resolver.getTransitiveDependencies("objectC", 5)).thenReturn(transitiveDependenciesOfC);
 
-    sorter.setLifeCycleObjectList(lookupObjects);
+    sorter.setLifeCycleObjectNameOrderMap(lookupObjects);
 
     sorter.addObject("objectA", objectA);
     sorter.addObject("objectB", objectB);
@@ -291,7 +292,7 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
     when(resolver.getTransitiveDependencies("objectA", 5)).thenReturn(transitiveDependenciesOfA);
     when(resolver.getTransitiveDependencies("objectB", 5)).thenReturn(transitiveDependenciesOfB);
     when(resolver.getTransitiveDependencies("objectC", 5)).thenReturn(transitiveDependenciesOfC);
-    sorter.setLifeCycleObjectList(lookupObjects);
+    sorter.setLifeCycleObjectNameOrderMap(lookupObjects);
 
     sorter.addObject("objectA", objectA);
     sorter.addObject("objectB", objectB);

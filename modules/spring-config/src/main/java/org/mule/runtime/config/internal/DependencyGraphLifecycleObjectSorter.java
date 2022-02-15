@@ -21,6 +21,7 @@ import org.mule.runtime.core.internal.lifecycle.phases.LifecycleObjectSorter;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
@@ -44,7 +45,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
   private List<DefaultDirectedGraph<BeanWrapper, DefaultEdge>> dependencyGraphs;
   private DependencyGraphBeanDependencyResolver resolver;
   protected final Class<?>[] orderedLifecycleTypes;
-  private List<String> lifecycleObjectList;
+  private Map<String, Integer> lifecycleObjectNameOrderMap;
 
   public DependencyGraphLifecycleObjectSorter(DependencyGraphBeanDependencyResolver resolver, Class<?>[] orderedLifecycleTypes) {
     this.dependencyGraphs = new ArrayList<>(orderedLifecycleTypes.length);
@@ -54,7 +55,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
       DefaultDirectedGraph<BeanWrapper, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
       dependencyGraphs.add(graph);
     }
-    this.lifecycleObjectList = new ArrayList<>();
+    this.lifecycleObjectNameOrderMap = new HashMap<>();
   }
 
   /**
@@ -150,8 +151,8 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
 
         @Override
         public int compare(BeanWrapper o1, BeanWrapper o2) {
-          if (getLifeCycleObjectList().indexOf(o1.getName()) > getLifeCycleObjectList()
-              .indexOf(o2.getName())) {
+          if (getLifeCycleObjectNameOrderMap().getOrDefault(o1.getName(),-1) > getLifeCycleObjectNameOrderMap()
+              .getOrDefault(o2.getName(), -1)) {
             return -1;
           } else {
             return 1;
@@ -175,26 +176,24 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
   }
 
   /**
-   * Provides the information that will be needed for the comparison while sorting objects. This information will be used only for
-   * the tie-breaking in cases of partial ordering.
+   * Provides the information that will be needed for the comparison during the top sort
    *
-   * @param lookupObjectsForLifecycle lifecycle object list which is ordered based on the type
+   * @param lookupObjects lifecycle object list which is ordered based on the type
    */
-  public void setLifeCycleObjectList(Map<String, Object> lookupObjectsForLifecycle) {
-    for (Map.Entry<String, Object> entry : lookupObjectsForLifecycle.entrySet()) {
-      String objectName = entry.getKey();
-      lifecycleObjectList.add(objectName);
+  public void setLifeCycleObjectNameOrderMap(List<String> lookupObjects) {
+    int index = 0;
+    for (String objectName: lookupObjects) {
+      lifecycleObjectNameOrderMap.put(objectName, index++);
     }
   }
 
   /**
    * Provides the information about the lookup order of objects that should be initialized
    *
-   * @return list of the objects that should be initialized from {@link RegistryLifecycleManager}'s lookup
+   * @return map with the order of objects that should be initialized from {@link RegistryLifecycleManager}'s lookup
    */
-  private List<String> getLifeCycleObjectList() {
-    return lifecycleObjectList;
+  public Map<String, Integer> getLifeCycleObjectNameOrderMap() {
+    return lifecycleObjectNameOrderMap;
   }
-
 
 }
