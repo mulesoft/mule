@@ -1,6 +1,4 @@
-Failed to deploy artifact [app-classloading-troubleshooting-1.0.0-mule-application]
-org.mule.runtime.deployment.model.api.DeploymentException: Failed to deploy artifact [app-classloading-troubleshooting-1.0.0-mule-application]
-Caused by: org.mule.runtime.api.exception.MuleRuntimeException: org.mule.runtime.deployment.model.api.DeploymentInitException: ArtifactClassLoaderResourceNotFoundException: Couldn't find resource: jms.properties neither on classpath or in file system 
+Couldn't find resource: jms.properties neither on classpath or in file system 
  ------------------------
 | Runtime Class Loader |
 ------------------------

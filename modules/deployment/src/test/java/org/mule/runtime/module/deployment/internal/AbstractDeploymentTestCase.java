@@ -114,6 +114,7 @@ import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -176,6 +177,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import org.apache.logging.log4j.LogManager;
 import org.slf4j.Logger;
 
 import org.junit.After;
@@ -187,6 +189,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import org.mockito.verification.VerificationMode;
+import uk.org.lidalia.slf4jext.Level;
+import uk.org.lidalia.slf4jtest.TestLogger;
+import uk.org.lidalia.slf4jtest.TestLoggerFactory;
 
 @RunWith(Parameterized.class)
 /**
@@ -295,6 +300,16 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   @BeforeClass
   public static void beforeClass() throws URISyntaxException, IllegalAccessException {
+    // Reduces unnecessary logging
+    TestLogger compilerUtilsTestLogger = TestLoggerFactory.getTestLogger(CompilerUtils.class);
+    compilerUtilsTestLogger.setEnabledLevelsForAllThreads(Level.ERROR);
+    TestLogger pollingProberTestLogger = TestLoggerFactory.getTestLogger(PollingProber.class);
+    pollingProberTestLogger.setEnabledLevelsForAllThreads(Level.ERROR);
+    TestLogger testLogger = TestLoggerFactory.getTestLogger(LoggerMessageProcessor.class);
+    testLogger.setEnabledLevelsForAllThreads(Level.ERROR);
+    // Initialises logging plugins with correct classloader
+    LogManager.getContext(false);
+
     barUtils1ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar1/BarUtils.java"));
     barUtils1_0JarFile =
         new JarFileBuilder("barUtils1",
@@ -1399,10 +1414,14 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   protected CoreEvent executeApplicationFlow(String flowName, String correlationId) throws Exception {
-    ClassLoader appClassLoader = deploymentService.getApplications().get(0).getArtifactClassLoader().getClassLoader();
+    return executeApplicationFlow(flowName, correlationId, 0);
+  }
+
+  protected CoreEvent executeApplicationFlow(String flowName, String correlationId, int appNumber) throws Exception {
+    ClassLoader appClassLoader = deploymentService.getApplications().get(appNumber).getArtifactClassLoader().getClassLoader();
     return withContextClassLoader(appClassLoader, () -> {
       final FlowRunner flowRunner =
-          new FlowRunner(deploymentService.getApplications().get(0).getArtifactContext().getRegistry(), flowName)
+          new FlowRunner(deploymentService.getApplications().get(appNumber).getArtifactContext().getRegistry(), flowName)
               .withPayload(TEST_MESSAGE);
 
       if (correlationId != null) {
