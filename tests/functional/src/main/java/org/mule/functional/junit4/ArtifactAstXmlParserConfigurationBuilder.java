@@ -158,10 +158,10 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
 
   private ArtifactAst doParseArtifactIntoAst(Set<ExtensionModel> extensions, boolean disableValidations) {
     XmlParserFactory xmlParserFactory = new XmlParserFactory(disableValidations, extensions, artifactProperties,
-        artifactType,
-        parentArtifactContext != null
-            ? parentArtifactContext.getArtifactAst()
-            : emptyArtifact());
+                                                             artifactType,
+                                                             parentArtifactContext != null
+                                                                 ? parentArtifactContext.getArtifactAst()
+                                                                 : emptyArtifact());
     AstXmlParser astXmlParser;
     if (ignoreCaches) {
       astXmlParser = xmlParserFactory.createMuleXmlParser();
@@ -170,33 +170,33 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
     }
 
     try {
-    return astXmlParser.parse(loadConfigResources(configResources));
+      return astXmlParser.parse(loadConfigResources(configResources));
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
   }
 
   protected ArtifactAst parseArtifactIntoAst(Set<ExtensionModel> extensions, MuleContext muleContext) {
-      final ArtifactAst partialAst = doParseArtifactIntoAst(extensions, true);
+    final ArtifactAst partialAst = doParseArtifactIntoAst(extensions, true);
 
-      final ArtifactAst effectiveAst = parseApplicationExtensionModel(partialAst, muleContext)
-          .map(extensionModel -> {
-//            registerApplicationExtensionModel();
-            Set<ExtensionModel> enrichedExtensionModels = new HashSet<>(extensions);
-            enrichedExtensionModels.add(extensionModel);
-            return doParseArtifactIntoAst(enrichedExtensionModels, true); //TODO: use disableXmlValidations field
-          }).orElseGet(() -> doParseArtifactIntoAst(extensions, disableXmlValidations));
+    final ArtifactAst effectiveAst = parseApplicationExtensionModel(partialAst, muleContext)
+        .map(extensionModel -> {
+          // registerApplicationExtensionModel();
+          Set<ExtensionModel> enrichedExtensionModels = new HashSet<>(extensions);
+          enrichedExtensionModels.add(extensionModel);
+          return doParseArtifactIntoAst(enrichedExtensionModels, true); // TODO: use disableXmlValidations field
+        }).orElseGet(() -> doParseArtifactIntoAst(extensions, disableXmlValidations));
 
 
-      if (getBoolean(SERIALIZE_DESERIALIZE_AST_PROPERTY)) {
-        try {
-          return seralizeAndDeserialize(effectiveAst);
-        } catch (Exception e) {
-          throw new MuleRuntimeException(e);
-        }
-      } else {
-        return effectiveAst;
+    if (getBoolean(SERIALIZE_DESERIALIZE_AST_PROPERTY)) {
+      try {
+        return seralizeAndDeserialize(effectiveAst);
+      } catch (Exception e) {
+        throw new MuleRuntimeException(e);
       }
+    } else {
+      return effectiveAst;
+    }
   }
 
   private Optional<ExtensionModel> parseApplicationExtensionModel(ArtifactAst ast, MuleContext muleContext) {
@@ -215,17 +215,19 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
     if (loader.isPresent()) {
       final ExtensionManager extensionManager = muleContext.getExtensionManager();
       ExtensionModel appExtensionModel = loader.get()
-          .loadExtensionModel(builder(muleContext.getExecutionClassLoader().getParent(), getDefault(extensionManager.getExtensions()))
-              .addParameter(VERSION, artifactCoordinates.get().getVersion())
-              .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
-              .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME, muleContext.getConfiguration().getId())
-              .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader())
-              .build());
+          .loadExtensionModel(builder(muleContext.getExecutionClassLoader().getParent(),
+                                      getDefault(extensionManager.getExtensions()))
+                                          .addParameter(VERSION, artifactCoordinates.get().getVersion())
+                                          .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
+                                          .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME,
+                                                        muleContext.getConfiguration().getId())
+                                          .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader())
+                                          .build());
 
-//      ExtensionManager appManager = extensionManager instanceof CompositeArtifactExtensionManager
-//          ? ((CompositeArtifactExtensionManager) extensionManager).getChildExtensionManager()
-//          : extensionManager;
-//
+      // ExtensionManager appManager = extensionManager instanceof CompositeArtifactExtensionManager
+      // ? ((CompositeArtifactExtensionManager) extensionManager).getChildExtensionManager()
+      // : extensionManager;
+      //
       extensionManager.registerExtension(appExtensionModel);
       return of(appExtensionModel);
     } else {
@@ -235,9 +237,9 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
   }
 
   private void logModelNotGenerated(String reason) {
-//    if (LOGGER.isWarnEnabled()) {
-//      LOGGER.warn(reason + ". ExtensionModel for app {} not generated", muleContext.getConfiguration().getId());
-//    }
+    // if (LOGGER.isWarnEnabled()) {
+    // LOGGER.warn(reason + ". ExtensionModel for app {} not generated", muleContext.getConfiguration().getId());
+    // }
   }
 
   private ArtifactAst seralizeAndDeserialize(ArtifactAst artifactAst) throws IOException {

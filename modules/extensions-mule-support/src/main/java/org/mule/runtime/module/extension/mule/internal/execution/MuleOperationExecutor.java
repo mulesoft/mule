@@ -43,7 +43,9 @@ public class MuleOperationExecutor implements CompletableComponentExecutor<Compo
   public void initialise() throws InitialisationException {
     operation = (Operation) new DefaultRegistry(muleContext).lookupByName(operationModel.getName())
         .orElseThrow(() -> new InitialisationException(createStaticMessage(
-            format("Operation '%s' not found in registry", operationModel.getName())), this));
+                                                                           format("Operation '%s' not found in registry",
+                                                                                  operationModel.getName())),
+                                                       this));
   }
 
   @Override

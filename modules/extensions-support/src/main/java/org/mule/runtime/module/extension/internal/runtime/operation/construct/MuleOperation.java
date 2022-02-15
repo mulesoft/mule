@@ -74,7 +74,7 @@ public class MuleOperation extends AbstractComponent implements Operation {
   public void dispose() {
     disposeIfNeeded(chain, LOGGER);
   }
-  
+
   @Override
   public OperationModel getModel() {
     return operationModel;

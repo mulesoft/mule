@@ -31,25 +31,23 @@ public class OperationDslBuildingDefinitionProvider implements ComponentBuilding
       new ComponentBuildingDefinition.Builder().withNamespace(OPERATION_DSL_NAMESPACE);
 
   @Override
-  public void init() {
-  }
+  public void init() {}
 
   @Override
   public List<ComponentBuildingDefinition> getComponentBuildingDefinitions() {
     return asList(
-        baseDefinition.withIdentifier("def")
-            .withTypeDefinition(fromType(Operation.class))
-            .withObjectFactoryType(DefaultOperationObjectFactory.class)
-            .withConstructorParameterDefinition(fromSimpleParameter("name").build())
-            .withConstructorParameterDefinition(fromReferenceObject(ExtensionManager.class).build())
-            .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
-            .withSetterParameterDefinition("body", fromChildConfiguration(OperationBody.class).build())
-            .build(),
-        baseDefinition.withIdentifier("body")
-            .withTypeDefinition(fromType(OperationBody.class))
-            .withSetterParameterDefinition("processors", fromChildCollectionConfiguration(Processor.class).build())
-            .build()
-    );
+                  baseDefinition.withIdentifier("def")
+                      .withTypeDefinition(fromType(Operation.class))
+                      .withObjectFactoryType(DefaultOperationObjectFactory.class)
+                      .withConstructorParameterDefinition(fromSimpleParameter("name").build())
+                      .withConstructorParameterDefinition(fromReferenceObject(ExtensionManager.class).build())
+                      .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
+                      .withSetterParameterDefinition("body", fromChildConfiguration(OperationBody.class).build())
+                      .build(),
+                  baseDefinition.withIdentifier("body")
+                      .withTypeDefinition(fromType(OperationBody.class))
+                      .withSetterParameterDefinition("processors", fromChildCollectionConfiguration(Processor.class).build())
+                      .build());
   }
 
   public static class OperationBody extends AbstractComponent {

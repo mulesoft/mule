@@ -379,7 +379,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       return new InternalEventImplementation(context,
                                              requireNonNull(messageFactory.apply(context)),
                                              varsModified ? flowVariables : originalVars,
-          parametersModified ? parameters : originalParameters,
+                                             parametersModified ? parameters : originalParameters,
                                              loggingVariables,
                                              internalParameters,
                                              session,

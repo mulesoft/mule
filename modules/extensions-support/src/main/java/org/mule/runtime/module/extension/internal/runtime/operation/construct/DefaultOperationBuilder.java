@@ -85,9 +85,9 @@ class DefaultOperationBuilder implements Builder {
     chainBuilder.chain(processors);
 
     product = new MuleOperation(
-        chainBuilder.build(),
-        operationModel,
-        muleContext);
+                                chainBuilder.build(),
+                                operationModel,
+                                muleContext);
 
     return product;
   }

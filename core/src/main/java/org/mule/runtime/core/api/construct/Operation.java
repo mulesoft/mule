@@ -21,8 +21,8 @@ public interface Operation extends ExecutableComponent, Lifecycle {
   /**
    * Creates instances of {@link Operation} with a default implementation
    * <p>
-   * Builder instances can be configured until {@link #build()} is called. After that point,
-   * builder methods will fail to update the builder state.
+   * Builder instances can be configured until {@link #build()} is called. After that point, builder methods will fail to update
+   * the builder state.
    *
    * @since 4.5.0
    */

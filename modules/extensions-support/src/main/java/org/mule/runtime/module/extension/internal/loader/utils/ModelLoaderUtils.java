@@ -27,8 +27,7 @@ import java.util.Optional;
  */
 public final class ModelLoaderUtils {
 
-  private ModelLoaderUtils() {
-  }
+  private ModelLoaderUtils() {}
 
   /**
    * Adds all the semantic terms in the {@code parser} into the given {@code declaration}

@@ -37,24 +37,26 @@ public class DefaultOperationObjectFactory extends AbstractComponent implements 
 
   @Override
   public Operation getObject() {
-   Operation operation = MuleOperation.builder()
+    Operation operation = MuleOperation.builder()
         .processors(body.getProcessors())
         .setOperationModel(locateOperationModel())
         .setMuleContext(muleContext)
         .build();
 
-   operation.setAnnotations(getAnnotations());
-   return operation;
+    operation.setAnnotations(getAnnotations());
+    return operation;
   }
 
   private OperationModel locateOperationModel() {
     ExtensionModel extensionModel = extensionManager.getExtension(muleContext.getConfiguration().getId())
         .orElseThrow(() -> new IllegalOperationModelDefinitionException(
-            format("Cannot parse operation '%s'. Application ExtensionModel not found", name)));
+                                                                        format("Cannot parse operation '%s'. Application ExtensionModel not found",
+                                                                               name)));
 
     return findOperation(extensionModel, name)
         .orElseThrow(() -> new IllegalOperationModelDefinitionException(
-            format("Cannot parse operation '%s'. OperationModel not found", name)));
+                                                                        format("Cannot parse operation '%s'. OperationModel not found",
+                                                                               name)));
   }
 
   public void setBody(OperationBody body) {
