@@ -9,8 +9,16 @@ package org.mule.runtime.config.internal;
 import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LIFECYCLE_AND_DEPENDENCY_INJECTION;
 import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LifecyclePhaseStory.LIFECYCLE_PHASE_STORY;
 
+import static java.lang.Thread.currentThread;
+import static java.lang.reflect.Proxy.newProxyInstance;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+
+import org.mule.runtime.ast.api.ComponentAst;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
@@ -48,13 +56,15 @@ public class BeanWrapperTestCase {
 
   @Test
   public void sameProxyComparisonTest() {
-    FakeProxy fProxy = new FakeProxy(new Object());
+    Object fProxy = newProxyInstance(currentThread().getContextClassLoader(), new Class[] {ComponentAst.class},
+                                     new MyInvocationHandler(new Object()));
     assertThat(fProxy.equals(fProxy), is(false));
   }
 
   @Test
   public void sameProxyInWrapperComparisonTest() {
-    FakeProxy fProxy = new FakeProxy(new Object());
+    Object fProxy = newProxyInstance(currentThread().getContextClassLoader(), new Class[] {ComponentAst.class},
+                                     new MyInvocationHandler(new Object()));
     BeanWrapper wrapper = new BeanWrapper("proxy", fProxy);
 
     assertThat(wrapper.equals(wrapper), is(true));
@@ -62,7 +72,8 @@ public class BeanWrapperTestCase {
 
   @Test
   public void sameProxyInTwoDifferentWrappersComparisonTest() {
-    FakeProxy fProxy = new FakeProxy(new Object());
+    Object fProxy = newProxyInstance(currentThread().getContextClassLoader(), new Class[] {ComponentAst.class},
+                                     new MyInvocationHandler(new Object()));
     BeanWrapper wrapper1 = new BeanWrapper("proxy1", fProxy);
     BeanWrapper wrapper2 = new BeanWrapper("proxy2", fProxy);
 
@@ -73,8 +84,11 @@ public class BeanWrapperTestCase {
   @Test
   public void objectInProxyAndWrapperComparisonTest() {
     Object obj = new Object();
-    FakeProxy fProxy1 = new FakeProxy(obj);
-    FakeProxy fProxy2 = new FakeProxy(obj);
+    Object fProxy1 =
+        newProxyInstance(currentThread().getContextClassLoader(), new Class[] {ComponentAst.class}, new MyInvocationHandler(obj));
+    Object fProxy2 =
+        newProxyInstance(currentThread().getContextClassLoader(), new Class[] {ComponentAst.class}, new MyInvocationHandler(obj));
+
     BeanWrapper wrapper1 = new BeanWrapper("proxy1", fProxy1);
     BeanWrapper wrapper2 = new BeanWrapper("proxy2", fProxy2);
 
@@ -120,23 +134,23 @@ public class BeanWrapperTestCase {
   }
 
 
-  static class FakeProxy {
+  private static class MyInvocationHandler implements InvocationHandler {
 
-    Object originalObject;
+    Object wrappedObject;
 
-    public FakeProxy(Object originalObject) {
-      this.originalObject = originalObject;
+    public MyInvocationHandler(Object obj) {
+      this.wrappedObject = obj;
     }
 
     @Override
-    public int hashCode() {
-      return this.originalObject.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      return originalObject.equals(obj);
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+      if (method.getName().equals("equals")) {
+        return wrappedObject.equals(args[0]);
+      }
+      if (method.getName().equals("hashCode")) {
+        return wrappedObject.hashCode();
+      }
+      return null;
     }
   }
-
 }
