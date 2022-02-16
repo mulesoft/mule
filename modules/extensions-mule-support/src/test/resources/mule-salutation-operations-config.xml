@@ -7,20 +7,20 @@
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
         http://www.mulesoft.org/schema/mule/this http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd">
 
-<import file="salutation-operations-def.xml"/>
+    <import file="salutation-operations-def.xml"/>
 
     <flow name="salutationFlow">
-        <this:hello-world receiver="Malaga!" />
+        <this:hello-world receiver="Malaga!"/>
     </flow>
 
     <flow name="composedOperation">
         <this:hello-and-introduce greeting="good morning" receiver="Malaga!"
-                                  myName="Anthony Stark" myNationalID="5" />
+                                  myName="Anthony Stark" myNationalID="5"/>
     </flow>
 
     <flow name="interceptAndDumpParameters">
-        <flow-ref name="composedOperation" />
-        <test:dump-intercepted-parameters />
+        <flow-ref name="composedOperation"/>
+        <test:dump-intercepted-parameters/>
     </flow>
 
 </mule>
