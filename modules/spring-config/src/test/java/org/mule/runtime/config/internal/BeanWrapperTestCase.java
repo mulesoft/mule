@@ -15,7 +15,7 @@ import static java.lang.reflect.Proxy.newProxyInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.core.api.MuleContext;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -56,14 +56,14 @@ public class BeanWrapperTestCase {
 
   @Test
   public void sameProxyComparisonTest() {
-    Object fProxy = newProxyInstance(currentThread().getContextClassLoader(), new Class[] {ComponentAst.class},
+    Object fProxy = newProxyInstance(currentThread().getContextClassLoader(), new Class[] {MuleContext.class},
                                      new MyInvocationHandler(new Object()));
     assertThat(fProxy.equals(fProxy), is(false));
   }
 
   @Test
   public void sameProxyInWrapperComparisonTest() {
-    Object fProxy = newProxyInstance(currentThread().getContextClassLoader(), new Class[] {ComponentAst.class},
+    Object fProxy = newProxyInstance(currentThread().getContextClassLoader(), new Class[] {MuleContext.class},
                                      new MyInvocationHandler(new Object()));
     BeanWrapper wrapper = new BeanWrapper("proxy", fProxy);
 
@@ -72,7 +72,7 @@ public class BeanWrapperTestCase {
 
   @Test
   public void sameProxyInTwoDifferentWrappersComparisonTest() {
-    Object fProxy = newProxyInstance(currentThread().getContextClassLoader(), new Class[] {ComponentAst.class},
+    Object fProxy = newProxyInstance(currentThread().getContextClassLoader(), new Class[] {MuleContext.class},
                                      new MyInvocationHandler(new Object()));
     BeanWrapper wrapper1 = new BeanWrapper("proxy1", fProxy);
     BeanWrapper wrapper2 = new BeanWrapper("proxy2", fProxy);
@@ -85,9 +85,9 @@ public class BeanWrapperTestCase {
   public void objectInProxyAndWrapperComparisonTest() {
     Object obj = new Object();
     Object fProxy1 =
-        newProxyInstance(currentThread().getContextClassLoader(), new Class[] {ComponentAst.class}, new MyInvocationHandler(obj));
+        newProxyInstance(currentThread().getContextClassLoader(), new Class[] {MuleContext.class}, new MyInvocationHandler(obj));
     Object fProxy2 =
-        newProxyInstance(currentThread().getContextClassLoader(), new Class[] {ComponentAst.class}, new MyInvocationHandler(obj));
+        newProxyInstance(currentThread().getContextClassLoader(), new Class[] {MuleContext.class}, new MyInvocationHandler(obj));
 
     BeanWrapper wrapper1 = new BeanWrapper("proxy1", fProxy1);
     BeanWrapper wrapper2 = new BeanWrapper("proxy2", fProxy2);
