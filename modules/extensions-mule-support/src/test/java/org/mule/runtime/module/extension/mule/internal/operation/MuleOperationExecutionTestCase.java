@@ -34,9 +34,7 @@ public class MuleOperationExecutionTestCase extends MuleArtifactFunctionalTestCa
   @Test
   @Description("Calls a flow that executes the simple <this:hello-world> operation")
   public void executeHelloWorldOperation() throws Exception {
-    CoreEvent resultEvent = flowRunner("salutationFlow").run();
-    assertThat(resultEvent.getMessage().getPayload().getValue(), equalTo("Hello,  Malaga! "));
-    assertThat(resultEvent.getMessage().getAttributes().getValue(), is(nullValue()));
+    assertHelloWorldResponse(flowRunner("salutationFlow").run());
   }
 
   @Test
@@ -90,7 +88,23 @@ public class MuleOperationExecutionTestCase extends MuleArtifactFunctionalTestCa
     assertValue(result.getVariables().get("token"), token);
   }
 
+  @Test
+  @Description("Message payload and attributes do not propagate into operations")
+  public void messageProperlyScoped() throws Exception {
+    CoreEvent result = flowRunner("salutationFlow")
+        .withPayload("Hello!")
+        .withAttributes(new Object())
+        .run();
+
+    assertHelloWorldResponse(result);
+  }
+
   private void assertValue(TypedValue<?> typedValue, Object rawValue) {
     assertThat(typedValue.getValue(), equalTo(rawValue));
+  }
+
+  private void assertHelloWorldResponse(CoreEvent resultEvent) {
+    assertThat(resultEvent.getMessage().getPayload().getValue(), equalTo("Hello,  Malaga! "));
+    assertThat(resultEvent.getMessage().getAttributes().getValue(), is(nullValue()));
   }
 }
