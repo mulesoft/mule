@@ -43,7 +43,8 @@ public class MuleOperationExecutionTestCase extends MuleArtifactFunctionalTestCa
   @Description("Calls a flow that executes the <this:hello-and-introduce> operation which is a composed one")
   public void executeComposedOperation() throws Exception {
     CoreEvent resultEvent = flowRunner("composedOperation").run();
-    assertThat(resultEvent.getMessage().getPayload().getValue(), equalTo("good morning  Malaga!  Hello lad, my name is Anthony Stark"));
+    assertThat(resultEvent.getMessage().getPayload().getValue(),
+               equalTo("good morning  Malaga!  Hello lad, my name is Anthony Stark"));
     assertThat(resultEvent.getMessage().getAttributes().getValue(), is(nullValue()));
   }
 
@@ -51,7 +52,8 @@ public class MuleOperationExecutionTestCase extends MuleArtifactFunctionalTestCa
   @Description("Verifies that operations params don't exit its own scope when composed")
   public void captureParamsAcrossOperations() throws Exception {
     CoreEvent resultEvent = flowRunner("interceptAndDumpParameters").run();
-    Map<String, List<Map<String, TypedValue<?>>>> dump = (Map<String, List<Map<String, TypedValue<?>>>>) resultEvent.getMessage().getPayload().getValue();
+    Map<String, List<Map<String, TypedValue<?>>>> dump =
+        (Map<String, List<Map<String, TypedValue<?>>>>) resultEvent.getMessage().getPayload().getValue();
     assertThat(dump.entrySet(), hasSize(2));
 
     List<Map<String, TypedValue<?>>> interception = dump.get("helloWorld");

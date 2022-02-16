@@ -161,17 +161,17 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
       // Because of how the lookup is expected to work, we need to create this context so its bindings are in the correct position
       // in the delegates list.
       delegates.addFirst(new BindingContextImplementation(
-          emptyList(),
-          bindings == null ? emptyMap() : unmodifiableMap(bindings),
-          payloadBinding,
-          attributesBinding,
-          varsBinding,
-          paramsBinding,
-          errorBinding,
-          correlationIdBinding,
-          authenticationBinding,
-          itemSequenceInfoBinding,
-          modules != null ? unmodifiableCollection(modules) : emptyList()));
+                                                          emptyList(),
+                                                          bindings == null ? emptyMap() : unmodifiableMap(bindings),
+                                                          payloadBinding,
+                                                          attributesBinding,
+                                                          varsBinding,
+                                                          paramsBinding,
+                                                          errorBinding,
+                                                          correlationIdBinding,
+                                                          authenticationBinding,
+                                                          itemSequenceInfoBinding,
+                                                          modules != null ? unmodifiableCollection(modules) : emptyList()));
 
       payloadBinding = null;
       attributesBinding = null;
@@ -212,17 +212,17 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
   @Override
   public BindingContext build() {
     return new BindingContextImplementation(
-        delegates == null || delegates.isEmpty() ? emptyList() : new ArrayList<>(delegates),
-        bindings == null ? emptyMap() : unmodifiableMap(bindings),
-        payloadBinding,
-        attributesBinding,
-        varsBinding,
-        paramsBinding,
-        errorBinding,
-        correlationIdBinding,
-        authenticationBinding,
-        itemSequenceInfoBinding,
-        modules != null ? unmodifiableCollection(modules) : emptyList());
+                                            delegates == null || delegates.isEmpty() ? emptyList() : new ArrayList<>(delegates),
+                                            bindings == null ? emptyMap() : unmodifiableMap(bindings),
+                                            payloadBinding,
+                                            attributesBinding,
+                                            varsBinding,
+                                            paramsBinding,
+                                            errorBinding,
+                                            correlationIdBinding,
+                                            authenticationBinding,
+                                            itemSequenceInfoBinding,
+                                            modules != null ? unmodifiableCollection(modules) : emptyList());
   }
 
   public BindingContext flattenAndBuild() {
@@ -247,7 +247,7 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
                                             original.lookup(PAYLOAD).orElse(null),
                                             original.lookup(ATTRIBUTES).orElse(null),
                                             of(() -> original.lookup(VARS).orElse(null)),
-        of(() -> original.lookup(PARAMS).orElse(null)),
+                                            of(() -> original.lookup(PARAMS).orElse(null)),
                                             original.lookup(ERROR).orElse(null),
                                             original.lookup(CORRELATION_ID).orElse(null),
                                             original.lookup(AUTHENTICATION).orElse(null),

@@ -200,8 +200,7 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withIdentifier("intercept-parameters")
         .withTypeDefinition(fromType(ParameterInterceptorProcessor.class))
         .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
-        .build()
-    );
+        .build());
 
     componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("dump-intercepted-parameters")
