@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.config.internal;
 
+
+import static java.lang.reflect.Proxy.isProxyClass;
 import static java.util.Objects.requireNonNull;
+
+import java.lang.reflect.Proxy;
 
 /**
  * BeanWrapper helps the comparison/equality check among non-proxy vs. proxy or proxy vs. proxy when building a dependency graph.
@@ -32,13 +36,23 @@ public class BeanWrapper {
 
   @Override
   public boolean equals(Object obj) {
-    if (wrappedObject.equals(obj)) {
+    // same objects
+    if (this == obj || wrappedObject.equals(obj)) {
       return true;
-    } else if (obj instanceof BeanWrapper) {
-      return this.wrappedObject.hashCode() == ((BeanWrapper) obj).wrappedObject.hashCode();
-    } else {
+    }
+    if (!(obj instanceof BeanWrapper)) {
       return false;
     }
+    // proxy vs. proxy
+    if (isProxyClass(this.wrappedObject.getClass()) && isProxyClass(((BeanWrapper) obj).wrappedObject.getClass())) {
+      return this.wrappedObject == ((BeanWrapper) obj).wrappedObject;
+    }
+    // non-proxy vs. proxy
+    if (isProxyClass(((BeanWrapper) obj).wrappedObject.getClass())) {
+      return ((BeanWrapper) obj).wrappedObject.equals(this.wrappedObject);
+    }
+    // other cases
+    return this.wrappedObject.equals(((BeanWrapper) obj).wrappedObject);
   }
 
   // todo: W-10704535 use cached hashCodes to improve performance
