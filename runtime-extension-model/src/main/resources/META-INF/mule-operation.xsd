@@ -50,7 +50,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="expressionSupport" default="NOT_SUPPORTED" type="expressionSupportType">
+                <xsd:attribute name="expressionSupport" default="SUPPORTED" type="expressionSupportType">
                     <xsd:annotation>
                         <xsd:documentation>
                             The support level this parameter offers regarding expressions

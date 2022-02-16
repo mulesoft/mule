@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.mule.internal.loader;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
@@ -28,11 +27,9 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
-import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import java.io.InputStream;
 
@@ -41,7 +38,6 @@ import javax.inject.Inject;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-@ArtifactClassLoaderRunnerConfig(applicationSharedRuntimeLibs = {"org.mule.tests:mule-tests-model"})
 public class ApplicationAsExtensionModelTestCase extends MuleArtifactFunctionalTestCase {
 
   @Inject
@@ -65,13 +61,6 @@ public class ApplicationAsExtensionModelTestCase extends MuleArtifactFunctionalT
       System.out.println(json);
       throw e;
     }
-  }
-
-  @Test
-  public void salutationFlow() throws Exception {
-    CoreEvent resultEvent = flowRunner("salutationFlow").run();
-    assertThat(resultEvent.getMessage().getPayload().getValue(), equalTo("Hello,  Malaga! "));
-    assertThat(resultEvent.getMessage().getAttributes().getValue(), is(nullValue()));
   }
 
   @Test

@@ -7,8 +7,13 @@
 
     <import file="salutation-operations-def.xml"/>
 
-    <flow name="superfluousFlow">
-        <logger message="This flow only exists to make sure that is never referenced from the resulting ExtensionModel"/>
+    <flow name="salutationFlow">
+        <this:hello-world receiver="Malaga!" />
+    </flow>
+
+    <flow name="composedOperation">
+        <this:hello-and-introduce greeting="good morning" receiver="Malaga!"
+                                  myName="Anthony Stark" myNationalID="5" />
     </flow>
 
 </mule>

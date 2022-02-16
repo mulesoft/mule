@@ -18,6 +18,7 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.BOO
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULESOFT_VENDOR;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
+import static org.mule.sdk.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OPERATION_DEF_STEREOTYPE;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OUTPUT_ATTRIBUTES_STEREOTYPE;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OUTPUT_PAYLOAD_STEREOTYPE;
@@ -222,7 +223,7 @@ class MuleOperationExtensionModelDeclarer {
     parameterDefParameters.withOptionalParameter("expressionSupport")
         .describedAs("The support level this parameter offers regarding expressions")
         .ofType(EXPRESSION_SUPPORT_TYPE)
-        .defaultingTo("NOT_SUPPORTED")
+        .defaultingTo(SUPPORTED.name())
         .withDisplayModel(display("Expression Support", "The support level this parameter offers regarding expressions"))
         .withExpressionSupport(NOT_SUPPORTED);
 

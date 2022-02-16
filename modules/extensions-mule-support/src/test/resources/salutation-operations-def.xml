@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:operation="http://www.mulesoft.org/schema/mule/operation"
+      xmlns:this="http://www.mulesoft.org/schema/mule/this"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+
+        http://www.mulesoft.org/schema/mule/operation http://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd
+        http://www.mulesoft.org/schema/mule/this http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd">
+
+
+    <operation:def name="helloWorld" displayName="Hello World operation" summary="Returns a polite greeting">
+        <operation:parameters>
+            <operation:parameter name="greeting" type="string" summary="The greeting message">
+                <operation:description>The greeting message appended before the receivers name</operation:description>
+                <operation:optional defaultValue="Hello, "/>
+            </operation:parameter>
+            <operation:parameter name="receiver" type="string" summary="The name of the person being greeted"/>
+            <operation:parameter name="prefix" type="string" summary="The receiver's prefix">
+                <operation:optional defaultValue=""/>
+                <operation:description>The prefix added to the receiver</operation:description>
+            </operation:parameter>
+            <operation:parameter name="suffix" type="string" summary="The receiver's suffix">
+                <operation:optional/>
+                <operation:description>The suffix added to the receiver</operation:description>
+            </operation:parameter>
+        </operation:parameters>
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <set-payload
+                    value="#['$(params.greeting) $(params.prefix) $(params.receiver) $(if(params.suffix == null) '' else params.suffix)']"/>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="introduceMyself" summary="Returns an introductory message. Like a sir.">
+        <operation:parameters>
+            <operation:parameter name="name" type="string" summary="The gentleman's name"/>
+            <operation:parameter name="nationalID" type="string" summary="The gentelman's identification"/>
+        </operation:parameters>
+        <operation:output>
+            <operation:payload-type type="string"/>
+            <operation:attributes-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <set-payload value="#['Hello lad, my name is $(params.name)']"/>
+            <!-- TODO: Set attributes -->
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="helloAndIntroduce" displayName="Hello and Introduce" summary="Says Hello and introduces itself">
+        <operation:parameters>
+            <operation:parameter name="greeting" type="string" summary="The greeting message">
+                <operation:description>The greeting message appended before the receivers name</operation:description>
+                <operation:optional defaultValue="Hello, "/>
+            </operation:parameter>
+            <operation:parameter name="receiver" type="string" summary="The name of the person being greeted"/>
+            <operation:parameter name="prefix" type="string" summary="The receiver's prefix">
+                <operation:optional defaultValue=""/>
+                <operation:description>The prefix added to the receiver</operation:description>
+            </operation:parameter>
+            <operation:parameter name="suffix" type="string" summary="The receiver's suffix">
+                <operation:optional/>
+                <operation:description>The suffix added to the receiver</operation:description>
+            </operation:parameter>
+            <operation:parameter name="myName" type="string" summary="The gentleman's name"/>
+            <operation:parameter name="myNationalID" type="string" summary="The gentelman's identification"/>
+        </operation:parameters>
+        <operation:output>
+            <operation:payload-type type="string"/>
+            <operation:attributes-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <this:hello-world greeting="#[params.greeting]"
+                              receiver="#[params.receiver]"
+                              prefix="#[params.prefix]"
+                              suffix="#[params.suffix]"
+                              target="helloWorld"/>
+
+            <this:introduce-myself name="#[params.myName]"
+                                   nationalID="#[params.myNationalID]"/>
+
+            <set-payload value="#[vars.helloWorld ++ ' ' ++ payload]"/>
+            <!-- TODO: Set attributes -->
+        </operation:body>
+    </operation:def>
+
+</mule>
