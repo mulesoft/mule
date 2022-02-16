@@ -13,8 +13,6 @@ import static java.util.stream.Collectors.toList;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
-import org.mule.runtime.config.internal.resolvers.DependencyGraphBeanDependencyResolver;
 import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleManager;
 import org.mule.runtime.core.internal.lifecycle.phases.DefaultLifecycleObjectSorter;
 import org.mule.runtime.core.internal.lifecycle.phases.LifecycleObjectSorter;
@@ -33,7 +31,7 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.springframework.beans.factory.config.BeanDefinition;
 
 /**
- * Specialization of {@link DefaultLifecycleObjectSorter} which uses an {@link AbstractSpringRegistry} to not only consider the
+ * Specialization of {@link DefaultLifecycleObjectSorter} which uses an {@link SpringRegistry} to not only consider the
  * provided objects but the beans on which that object depends on. This is accomplished by introspecting the
  * {@link BeanDefinition} that was derived from the {@link Inject} annotations. This sorter was introduced to replace
  * SpringLifecycleObjectSorter.
@@ -60,7 +58,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
 
   /**
    * Building a single dependency graph(bucket) for each lifecycle type
-   * 
+   *
    * @param beanName      current object(bean)'s name to resolve dependencies
    * @param currentObject current object that is going to be added to the graph(bucket)
    */
@@ -114,7 +112,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
 
   /**
    * Provides the index of the graph(bucket) the current object should be added to
-   * 
+   *
    * @param currentObject current object that is going to be added to the graph(bucket)
    * @return index of the relevant dependency graph(bucket)
    */
@@ -129,7 +127,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
 
   /**
    * Provides the graph(bucket) the current object should be added to
-   * 
+   *
    * @param graphIndex index of the graph for the current object
    * @return relevant dependency graph(bucket)
    */
@@ -140,7 +138,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
   /**
    * The objects in each graph(bucket) will be sorted based on the topological order. By reversing the order, The object that
    * should be initialised/disposed first will come first.
-   * 
+   *
    * @return A list with all the objects sorted based on the lifecycle type
    */
   @Override

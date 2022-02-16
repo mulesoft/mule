@@ -6,14 +6,13 @@
  */
 package org.mule.runtime.config.internal;
 
-import static com.google.common.graph.Traverser.forTree;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 
+import static com.google.common.graph.Traverser.forTree;
+
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.config.internal.DependencyNode;
-import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
 import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
 
 import java.util.HashSet;
@@ -79,8 +78,7 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
   }
 
   /**
-   * If the target object implements {@link InjectedDependenciesProvider}, then the custom dependencies
-   * declared by it are added.
+   * If the target object implements {@link InjectedDependenciesProvider}, then the custom dependencies declared by it are added.
    */
   private void addDeclaredDependencies(Object object, Set<String> processedKeys,
                                        DependencyNode node) {
@@ -120,10 +118,5 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
       addDependency(node, dependency.getKey(), dependency.getValue(), processedKeys);
     }
   }
-
-  public ConfigurationDependencyResolver getConfigurationDependencyResolver() {
-    return configurationDependencyResolver;
-  }
-
 
 }

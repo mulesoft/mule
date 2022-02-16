@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.resolvers;
+package org.mule.runtime.config.internal;
 
 import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LIFECYCLE_AND_DEPENDENCY_INJECTION;
 import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LifecyclePhaseStory.LIFECYCLE_PHASE_STORY;
@@ -18,7 +18,6 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.graph.internal.DefaultArtifactAstDependencyGraph;
-import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
 
 import java.util.Collection;
 import java.util.Set;
@@ -31,7 +30,6 @@ import io.qameta.allure.Story;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
-
 
 @Issue("MULE-19984")
 @Feature(LIFECYCLE_AND_DEPENDENCY_INJECTION)
@@ -46,8 +44,6 @@ public class ConfigurationDependencyResolverTestCase {
     graph = mock(DefaultArtifactAstDependencyGraph.class);
     configurationDependencyResolver = new ConfigurationDependencyResolver(graph);
   }
-
-
 
   @Test
   @Description("A set of two components will be returned when there are two required components")

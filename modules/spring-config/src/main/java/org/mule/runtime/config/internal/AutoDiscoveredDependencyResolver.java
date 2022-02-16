@@ -4,12 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.resolvers;
+package org.mule.runtime.config.internal;
 
 import static java.util.stream.Collectors.toList;
-
-import org.mule.runtime.config.internal.BeanWrapper;
-import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
 
 import java.util.List;
 import javax.inject.Inject;
@@ -22,9 +19,9 @@ import org.springframework.beans.factory.config.BeanDefinition;
  */
 public class AutoDiscoveredDependencyResolver {
 
-  private AbstractSpringRegistry springRegistry;
+  private final SpringRegistry springRegistry;
 
-  public AutoDiscoveredDependencyResolver(AbstractSpringRegistry springRegistry) {
+  public AutoDiscoveredDependencyResolver(SpringRegistry springRegistry) {
     this.springRegistry = springRegistry;
   }
 
