@@ -11,8 +11,6 @@ import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
-import static org.mule.runtime.api.meta.model.display.PathModel.Location.ANY;
-import static org.mule.runtime.api.meta.model.display.PathModel.Type.FILE;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
@@ -43,14 +41,12 @@ import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.api.meta.model.display.ClassValueModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
-import org.mule.runtime.api.meta.model.display.PathModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.declaration.type.annotation.LayoutTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotation;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingDelegate;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
-import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 
 /**
  * An {@link ExtensionDeclarer} for the Test Component Plugin
@@ -78,6 +74,8 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
     declareProcessor(extensionDeclarer);
     declareInvocationCounter(extensionDeclarer);
     declareAssert(extensionDeclarer);
+    declareParameterInterceptor(extensionDeclarer);
+    declareDumpInterceptedParameters(extensionDeclarer);
     declareLifecycleTracker(extensionDeclarer);
     declareLifecycleTrackerCheck(extensionDeclarer);
     declareLifecycleTrackerConfig(extensionDeclarer);
@@ -342,6 +340,16 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
   private void declareLifecycleTracker(HasOperationDeclarer declarer) {
     withNameParameter(voidOperation(declarer, "lifecycleTracker")
         .describedAs("Stores the lifecycle method calls received by this processor."));
+  }
+
+  private void declareParameterInterceptor(HasOperationDeclarer declarer) {
+    withNameParameter(voidOperation(declarer, "interceptParameters")
+        .describedAs("Intercepts and stores the current event's parameters"));
+  }
+
+  private void declareDumpInterceptedParameters(HasOperationDeclarer declarer) {
+    voidOperation(declarer, "dumpInterceptedParameters")
+        .describedAs("Returns the entire map of intercepted parameters");
   }
 
   private OperationDeclarer withNameParameter(OperationDeclarer declarer) {

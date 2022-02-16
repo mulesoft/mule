@@ -151,15 +151,6 @@
             <artifactId>mule-dwb-api</artifactId>
             <scope>provided</scope>
         </dependency>
-
-        <!-- Test Extensions dependencies -->
-        <dependency>
-            <groupId>org.mule.connectors</groupId>
-            <artifactId>mule-objectstore-connector</artifactId>
-            <version>1.1.1</version>
-            <classifier>mule-plugin</classifier>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>

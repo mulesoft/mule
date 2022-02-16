@@ -8,14 +8,15 @@ package org.mule.runtime.module.extension.mule.internal.operation;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.List;
 import java.util.Map;
@@ -24,19 +25,6 @@ import io.qameta.allure.Description;
 import org.junit.Test;
 
 public class MuleOperationExecutionTestCase extends MuleArtifactFunctionalTestCase {
-
-  private static List<Map<String, TypedValue<?>>> CAPTURED_PARAMS;
-
-  public static class ParametersCaptor implements Processor {
-
-    @Override
-    public CoreEvent process(CoreEvent event) throws MuleException {
-      if (CAPTURED_PARAMS != null) {
-        CAPTURED_PARAMS.add(event.getParameters());
-      }
-      return event;
-    }
-  }
 
   @Override
   protected String getConfigFile() {
@@ -60,7 +48,35 @@ public class MuleOperationExecutionTestCase extends MuleArtifactFunctionalTestCa
   }
 
   @Test
+  @Description("Verifies that operations params don't exit its own scope when composed")
   public void captureParamsAcrossOperations() throws Exception {
+    CoreEvent resultEvent = flowRunner("interceptAndDumpParameters").run();
+    Map<String, List<Map<String, TypedValue<?>>>> dump = (Map<String, List<Map<String, TypedValue<?>>>>) resultEvent.getMessage().getPayload().getValue();
+    assertThat(dump.entrySet(), hasSize(2));
 
+    List<Map<String, TypedValue<?>>> interception = dump.get("helloWorld");
+    assertThat(interception, hasSize(1));
+    Map<String, TypedValue<?>> params = interception.get(0);
+
+    assertValue(params.get("receiver"), "Malaga!");
+    assertValue(params.get("prefix"), "");
+    assertValue(params.get("greeting"), "good morning");
+    assertValue(params.get("suffix"), null);
+
+    assertThat(params.keySet(), not(containsInAnyOrder("nationalID", "name")));
+
+    interception = dump.get("introduceMyself");
+    assertThat(interception, hasSize(1));
+    params = interception.get(0);
+
+    assertValue(params.get("nationalID"), "5");
+    assertValue(params.get("name"), "Anthony Stark");
+    assertThat(params.keySet(), not(containsInAnyOrder("receiver", "prefix", "greeting", "suffix")));
   }
+
+
+  private void assertValue(TypedValue<?> typedValue, Object rawValue) {
+    assertThat(typedValue.getValue(), equalTo(rawValue));
+  }
+
 }

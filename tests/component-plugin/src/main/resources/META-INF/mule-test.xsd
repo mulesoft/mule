@@ -186,6 +186,30 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="intercept-parameters" type="interceptParametersType" substitutionGroup="mule:abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Intercepts and stores the current event's parameters
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="interceptParametersType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractMessageProcessorType">
+                <xsd:attribute name="name" use="required" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="dump-intercepted-parameters" substitutionGroup="mule:abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Returns the entire map of intercepted parameters
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:element name="lifecycle-tracker" substitutionGroup="mule:abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
