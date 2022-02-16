@@ -21,7 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-public class MuleDeploymentServiceTestCase extends AbstractMuleTestCase {
+public class MuleDeploymentServiceTestCase extends AbstractMuleWithTestLoggingSupportTestCase {
 
   @Rule
   public MockitoRule rule = MockitoJUnit.rule();

@@ -21,7 +21,7 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 @SmallTest
-public class DefaultMuleDeployerTestCase extends AbstractMuleTestCase {
+public class DefaultMuleDeployerTestCase extends AbstractMuleWithTestLoggingSupportTestCase {
 
   @Test
   public void disposesAppOnDeployFailure() throws Exception {

@@ -31,7 +31,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class DeploymentListenerAdapterTestCase extends AbstractMuleTestCase {
+public class DeploymentListenerAdapterTestCase extends AbstractMuleWithTestLoggingSupportTestCase {
 
   private static final String ARTIFACT_NAME = "artifactName";
 

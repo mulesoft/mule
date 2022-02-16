@@ -24,7 +24,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class CompositeDeploymentListenerTestCase extends AbstractMuleTestCase {
+public class CompositeDeploymentListenerTestCase extends AbstractMuleWithTestLoggingSupportTestCase {
 
   private static final String APP_NAME = "foo";
   private static final Exception DEPLOYMENT_EXCEPTION = new Exception("Exception on foo");

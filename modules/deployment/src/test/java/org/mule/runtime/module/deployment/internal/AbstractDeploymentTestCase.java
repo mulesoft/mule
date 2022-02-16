@@ -199,7 +199,7 @@ import uk.org.lidalia.slf4jtest.TestLoggerFactory;
  * <p>
  * Provides a set of test artifacts and resources to use on different test classes.
  */
-public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
+public abstract class AbstractDeploymentTestCase extends AbstractMuleWithTestLoggingSupportTestCase {
 
   public static final Logger logger = getLogger(AbstractDeploymentTestCase.class);
 

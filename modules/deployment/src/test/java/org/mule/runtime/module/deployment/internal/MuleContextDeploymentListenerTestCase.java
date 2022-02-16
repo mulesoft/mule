@@ -29,7 +29,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 @SmallTest
-public class MuleContextDeploymentListenerTestCase extends AbstractMuleTestCase {
+public class MuleContextDeploymentListenerTestCase extends AbstractMuleWithTestLoggingSupportTestCase {
 
   private static final String APP_NAME = "app";
 

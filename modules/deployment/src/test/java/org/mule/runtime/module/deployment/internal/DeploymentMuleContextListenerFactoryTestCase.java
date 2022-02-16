@@ -26,7 +26,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class DeploymentMuleContextListenerFactoryTestCase extends AbstractMuleTestCase {
+public class DeploymentMuleContextListenerFactoryTestCase extends AbstractMuleWithTestLoggingSupportTestCase {
 
   public static final String APP_NAME = "app";
   private final DeploymentListener deploymentListener = mock(DeploymentListener.class);

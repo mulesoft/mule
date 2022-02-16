@@ -45,7 +45,7 @@ import io.qameta.allure.Feature;
 
 @SmallTest
 @Feature(DOMAIN_DEPLOYMENT)
-public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase {
+public class DomainArchiveDeployerTestCase extends AbstractMuleWithTestLoggingSupportTestCase {
 
   public static final String DOMAIN_ZIP_PATH = "someZipFile";
   public static final String DOMAIN_NAME = "domain-name";

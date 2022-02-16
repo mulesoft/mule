@@ -34,7 +34,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
 @Feature(APP_DEPLOYMENT)
-public class DefaultArtifactDeployerTestCase extends AbstractMuleTestCase {
+public class DefaultArtifactDeployerTestCase extends AbstractMuleWithTestLoggingSupportTestCase {
 
   @Rule
   public ExpectedException expected = none();

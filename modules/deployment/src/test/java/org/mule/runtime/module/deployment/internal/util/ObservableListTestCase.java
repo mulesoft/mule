@@ -14,12 +14,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import org.mule.runtime.module.deployment.internal.AbstractMuleWithTestLoggingSupportTestCase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Collections;
 import java.util.ListIterator;
 
-public class ObservableListTestCase extends AbstractMuleTestCase {
+public class ObservableListTestCase extends AbstractMuleWithTestLoggingSupportTestCase {
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();

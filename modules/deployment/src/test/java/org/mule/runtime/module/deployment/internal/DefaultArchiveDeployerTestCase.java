@@ -25,7 +25,7 @@ import java.io.IOException;
 import org.junit.Test;
 
 @SmallTest
-public class DefaultArchiveDeployerTestCase extends AbstractMuleTestCase {
+public class DefaultArchiveDeployerTestCase extends AbstractMuleWithTestLoggingSupportTestCase {
 
   private static final String ARTIFACT_ID = "test";
 
