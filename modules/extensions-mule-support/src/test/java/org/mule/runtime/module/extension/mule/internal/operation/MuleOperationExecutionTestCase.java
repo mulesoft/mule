@@ -78,9 +78,19 @@ public class MuleOperationExecutionTestCase extends MuleArtifactFunctionalTestCa
     assertThat(params.keySet(), not(containsInAnyOrder("receiver", "prefix", "greeting", "suffix")));
   }
 
+  @Test
+  @Description("Flow vars don't make it into operations and operation vars don't exit them")
+  public void variablesProperlyScoped() throws Exception {
+    final Object token = new Object();
+    CoreEvent result = flowRunner("composedOperation")
+        .withVariable("token", token)
+        .run();
+
+    assertThat(result.getVariables().size(), is(1));
+    assertValue(result.getVariables().get("token"), token);
+  }
 
   private void assertValue(TypedValue<?> typedValue, Object rawValue) {
     assertThat(typedValue.getValue(), equalTo(rawValue));
   }
-
 }

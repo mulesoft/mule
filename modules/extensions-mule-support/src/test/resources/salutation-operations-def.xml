@@ -46,6 +46,13 @@
         </operation:output>
         <operation:body>
             <test:intercept-parameters name="introduceMyself" />
+            
+            <choice>
+                <when expression="#[sizeOf(vars) > 0]">
+                    <raise-error type="MULE:ANY" description="vars not empty"/>
+                </when>
+            </choice>
+
             <set-payload value="#['Hello lad, my name is $(params.name)']"/>
             <!-- TODO: Set attributes -->
         </operation:body>
@@ -85,6 +92,8 @@
 
             <set-payload value="#[vars.helloWorld ++ ' ' ++ payload]"/>
             <!-- TODO: Set attributes -->
+
+            <set-variable variableName="doNot" value="escape this chain" />
         </operation:body>
     </operation:def>
 

@@ -13,6 +13,7 @@ import static org.mule.runtime.module.extension.internal.runtime.execution.SdkIn
 
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Operation;
@@ -28,8 +29,9 @@ import javax.inject.Inject;
 
 public class MuleOperationExecutor implements CompletableComponentExecutor<ComponentModel>, Initialisable {
 
-  private final ComponentModel operationModel;
+  private static final Message NULL_MESSAGE = Message.builder().nullValue().build();
 
+  private final ComponentModel operationModel;
   private Operation operation;
 
   @Inject
@@ -53,8 +55,9 @@ public class MuleOperationExecutor implements CompletableComponentExecutor<Compo
     ExecutionContextAdapter<ComponentModel> ctx = (ExecutionContextAdapter<ComponentModel>) executionContext;
     final CoreEvent inputEvent = ctx.getEvent();
 
-    CoreEvent executionEvent = builder(inputEvent)
+    CoreEvent executionEvent = builder(inputEvent.getContext())
         .parameters(buildOperationParameters(inputEvent, ctx))
+        .message(NULL_MESSAGE)
         .build();
 
     operation.execute(executionEvent).whenComplete((resultEvent, exception) -> {
