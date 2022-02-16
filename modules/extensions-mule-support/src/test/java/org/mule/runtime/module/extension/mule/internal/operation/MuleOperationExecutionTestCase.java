@@ -52,9 +52,11 @@ public class MuleOperationExecutionTestCase extends MuleArtifactFunctionalTestCa
   @Description("Verifies that operations params don't exit its own scope when composed")
   public void captureParamsAcrossOperations() throws Exception {
     CoreEvent resultEvent = flowRunner("interceptAndDumpParameters").run();
+    assertThat(resultEvent.getParameters().size(), is(0));
+
     Map<String, List<Map<String, TypedValue<?>>>> dump =
         (Map<String, List<Map<String, TypedValue<?>>>>) resultEvent.getMessage().getPayload().getValue();
-    assertThat(dump.entrySet(), hasSize(2));
+    assertThat(dump.size(), is(2));
 
     List<Map<String, TypedValue<?>>> interception = dump.get("helloWorld");
     assertThat(interception, hasSize(1));
