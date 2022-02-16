@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal;
+package org.mule.runtime.config.internal.resolvers;
 
 import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LIFECYCLE_AND_DEPENDENCY_INJECTION;
 import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LifecyclePhaseStory.LIFECYCLE_PHASE_STORY;
@@ -15,10 +15,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
-import org.mule.runtime.config.internal.resolvers.AutoDiscoveredDependencyResolver;
-import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
-import org.mule.runtime.config.internal.resolvers.DeclaredDependencyResolver;
-import org.mule.runtime.config.internal.resolvers.DependencyGraphBeanDependencyResolver;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 
 import io.qameta.allure.Description;
@@ -90,7 +86,5 @@ public class DependencyGraphBeanDependencyResolverTestCase {
     resolver.getTransitiveDependencies("component", 5);
     verify(configurationDependencyResolver, times(1)).getDirectComponentDependencies("component");
   }
-
-
 
 }
