@@ -23,7 +23,8 @@ import java.util.function.BiConsumer;
 public interface Http2Client {
 
   /**
-   * Fully configures the client, leaving it ready to use. Must be executed before any requests are attempted.
+   * Fully configures the client, leaving it ready to use. Must be executed before any requests are attempted. It can be called
+   * multiple times, so the implementation must contemplate it.
    */
   void start();
 
