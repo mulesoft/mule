@@ -4,11 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.resolvers;
-
-import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.generateFor;
+package org.mule.runtime.config.internal;
 
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.generateFor;
 
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -70,7 +69,7 @@ public class ConfigurationDependencyResolver {
         .collect(toList());
   }
 
-  static class ComponentNamePredicate implements Predicate<ComponentAst> {
+  private static class ComponentNamePredicate implements Predicate<ComponentAst> {
 
     private final String componentName;
 

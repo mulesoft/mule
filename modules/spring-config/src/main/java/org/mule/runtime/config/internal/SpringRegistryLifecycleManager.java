@@ -18,11 +18,6 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.store.ObjectStoreManager;
-import org.mule.runtime.config.internal.DependencyGraphLifecycleObjectSorter;
-import org.mule.runtime.config.internal.resolvers.AutoDiscoveredDependencyResolver;
-import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
-import org.mule.runtime.config.internal.resolvers.DeclaredDependencyResolver;
-import org.mule.runtime.config.internal.resolvers.DependencyGraphBeanDependencyResolver;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.config.Config;
@@ -145,6 +140,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
           new DependencyGraphBeanDependencyResolver(configurationDependencyResolver, declaredDependencyResolver,
                                                     autoDiscoveredDependencyResolver, getSpringRegistry());
       return new DependencyGraphLifecycleObjectSorter(dependencyGraphBeanDependencyResolver, orderedLifecycleTypes);
+
     }
   }
 
@@ -202,6 +198,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
           new DependencyGraphBeanDependencyResolver(configurationDependencyResolver, declaredDependencyResolver,
                                                     autoDiscoveredDependencyResolver, getSpringRegistry());
       return new DependencyGraphLifecycleObjectSorter(dependencyGraphBeanDependencyResolver, orderedLifecycleTypes);
+
     }
   }
 

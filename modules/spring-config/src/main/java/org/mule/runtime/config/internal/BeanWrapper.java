@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.internal;
 
-
 import static java.lang.reflect.Proxy.isProxyClass;
 import static java.util.Objects.requireNonNull;
 

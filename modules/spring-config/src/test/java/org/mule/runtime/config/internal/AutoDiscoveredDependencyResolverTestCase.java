@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.resolvers;
+package org.mule.runtime.config.internal;
 
 import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LIFECYCLE_AND_DEPENDENCY_INJECTION;
 import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LifecyclePhaseStory.LIFECYCLE_PHASE_STORY;
@@ -12,9 +12,6 @@ import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjecti
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
-import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
-import org.mule.runtime.config.internal.resolvers.AutoDiscoveredDependencyResolver;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -29,11 +26,11 @@ import org.junit.Test;
 public class AutoDiscoveredDependencyResolverTestCase {
 
   private AutoDiscoveredDependencyResolver autoDiscoveredDependencyResolver;
-  private AbstractSpringRegistry springRegistry;
+  private SpringRegistry springRegistry;
 
   @Before
   public void setUp() throws Exception {
-    springRegistry = mock(AbstractSpringRegistry.class);
+    springRegistry = mock(SpringRegistry.class);
     autoDiscoveredDependencyResolver = new AutoDiscoveredDependencyResolver(springRegistry);
   }
 

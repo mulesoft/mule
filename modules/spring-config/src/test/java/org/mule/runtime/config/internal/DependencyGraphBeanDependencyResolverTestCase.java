@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.resolvers;
+package org.mule.runtime.config.internal;
 
 import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LIFECYCLE_AND_DEPENDENCY_INJECTION;
 import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LifecyclePhaseStory.LIFECYCLE_PHASE_STORY;
@@ -14,7 +14,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 
 import io.qameta.allure.Description;
@@ -33,14 +32,14 @@ public class DependencyGraphBeanDependencyResolverTestCase {
   private ConfigurationDependencyResolver configurationDependencyResolver;
   private DeclaredDependencyResolver declaredDependencyResolver;
   private AutoDiscoveredDependencyResolver autoDiscoveredDependencyResolver;
-  private AbstractSpringRegistry springRegistry;
+  private SpringRegistry springRegistry;
 
   @Before
   public void setUp() throws Exception {
     configurationDependencyResolver = mock(ConfigurationDependencyResolver.class);
     declaredDependencyResolver = mock(DeclaredDependencyResolver.class);
     autoDiscoveredDependencyResolver = mock(AutoDiscoveredDependencyResolver.class);
-    springRegistry = mock(AbstractSpringRegistry.class);
+    springRegistry = mock(SpringRegistry.class);
     resolver = new DependencyGraphBeanDependencyResolver(configurationDependencyResolver, declaredDependencyResolver,
                                                          autoDiscoveredDependencyResolver, springRegistry);
   }

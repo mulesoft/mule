@@ -4,13 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.resolvers;
+package org.mule.runtime.config.internal;
 
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
-import org.mule.runtime.config.internal.BeanWrapper;
-import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
 import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
 
 import java.util.ArrayList;
@@ -23,9 +21,9 @@ import java.util.stream.Stream;
  */
 public class DeclaredDependencyResolver {
 
-  private AbstractSpringRegistry springRegistry;
+  private SpringRegistry springRegistry;
 
-  public DeclaredDependencyResolver(AbstractSpringRegistry springRegistry) {
+  public DeclaredDependencyResolver(SpringRegistry springRegistry) {
     this.springRegistry = springRegistry;
   }
 
@@ -46,7 +44,7 @@ public class DeclaredDependencyResolver {
   }
 
   private List<BeanWrapper> beansOfTypeList(Class<?> type) {
-    return Stream.of(springRegistry.getBeanNamesForType(type))
+    return Stream.of(springRegistry.getApplicationContext().getBeanNamesForType(type))
         .map(beanName -> new BeanWrapper(beanName, springRegistry.get(beanName)))
         .collect(toList());
   }

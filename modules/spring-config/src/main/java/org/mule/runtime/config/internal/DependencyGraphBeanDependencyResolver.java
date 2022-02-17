@@ -4,15 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.resolvers;
+package org.mule.runtime.config.internal;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
-import org.mule.runtime.config.internal.BeanWrapper;
-import org.mule.runtime.config.internal.DependencyNode;
-import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
-import org.mule.runtime.config.internal.registry.BeanDependencyResolver;
 import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
 
 import java.util.ArrayDeque;
@@ -35,7 +31,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
  */
 public class DependencyGraphBeanDependencyResolver implements BeanDependencyResolver {
 
-  private AbstractSpringRegistry springRegistry;
+  private SpringRegistry springRegistry;
   private final ConfigurationDependencyResolver configurationDependencyResolver;
   private final DeclaredDependencyResolver declaredDependencyResolver;
   private final AutoDiscoveredDependencyResolver autoDiscoveredDependencyResolver;
@@ -46,7 +42,7 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
   public DependencyGraphBeanDependencyResolver(ConfigurationDependencyResolver configurationDependencyResolver,
                                                DeclaredDependencyResolver declaredDependencyResolver,
                                                AutoDiscoveredDependencyResolver autoDiscoveredDependencyResolver,
-                                               AbstractSpringRegistry springRegistry) {
+                                               SpringRegistry springRegistry) {
     this.configurationDependencyResolver = configurationDependencyResolver;
     this.declaredDependencyResolver = declaredDependencyResolver;
     this.autoDiscoveredDependencyResolver = autoDiscoveredDependencyResolver;
@@ -57,7 +53,7 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
 
   /**
    * Default method used in other sorters to resolve bean dependencies
-   * 
+   *
    * @param beanName the name of the bean to resolve dependencies
    * @return
    */
@@ -74,14 +70,9 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
         .collect(toList());
   }
 
-  @Override
-  public ConfigurationDependencyResolver getConfigurationDependencyResolver() {
-    return configurationDependencyResolver;
-  }
-
   /**
    * Provides only direct dependencies/required components for the object provided
-   * 
+   *
    * @return direct children(required components) of the current object If the component is already visited for the current
    *         bucket, we don't need to get dependencies again, return emptyList If the component is already visited for any other
    *         buckets, but not for this bucket, return the dependencies already saved If it was never visited before, get direct
@@ -146,7 +137,7 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
 
   /**
    * Delegates the task to the three different resolvers
-   * 
+   *
    * @param beanName      current object(bean)'s name
    * @param object        current object
    * @param node          a node for the current objects to add direct children
