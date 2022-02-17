@@ -26,7 +26,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVID
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_DISPATCHER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PAYLOAD_STATISTICS_DECORATOR_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSING_TIME_WATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_RESOURCE_LOCATOR;
@@ -81,7 +80,6 @@ import org.mule.runtime.core.internal.execution.MuleMessageProcessingManager;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
 import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
 import org.mule.runtime.core.internal.management.stats.DefaultProcessingTimeWatcher;
-import org.mule.runtime.core.internal.management.stats.NoOpCursorDecoratorFactory;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.processor.interceptor.DefaultProcessorInterceptorManager;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
@@ -164,7 +162,6 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
     registerObject(OBJECT_LOCK_FACTORY, new MuleLockFactory(), muleContext);
 
     registerObject(OBJECT_PROCESSING_TIME_WATCHER, new DefaultProcessingTimeWatcher(), muleContext);
-    registerObject(OBJECT_PAYLOAD_STATISTICS_DECORATOR_FACTORY, new NoOpCursorDecoratorFactory(), muleContext);
 
     TransformersRegistry transformersRegistry = new DefaultTransformersRegistry();
     registerObject(OBJECT_TRANSFORMERS_REGISTRY, transformersRegistry, muleContext);

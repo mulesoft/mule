@@ -3,6 +3,15 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter<M extends org.mule.runtime.api.meta.model.ComponentModel>::getComponentDecoratorFactory()",
+          "package": "org.mule.runtime.module.extension.api.runtime.privileged",
+          "classSimpleName": "ExecutionContextAdapter",
+          "methodName": "getComponentDecoratorFactory",
+          "elementKind": "method",
+          "justification": "This method is no longer used anywhere after the removal of Payload Statistics. Also, it was privileged, not plain API."
+        },
+        {
           "code": "java.class.removed",
           "old": "class org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader",
           "package": "org.mule.runtime.module.extension.api.loader",

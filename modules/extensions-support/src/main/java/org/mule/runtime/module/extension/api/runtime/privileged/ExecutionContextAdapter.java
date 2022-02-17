@@ -13,8 +13,6 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
-import org.mule.runtime.core.api.management.stats.PayloadStatistics;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -81,13 +79,6 @@ public interface ExecutionContextAdapter<M extends ComponentModel> extends Event
    * @return The {@link CursorProviderFactory} configured on the executing component
    */
   CursorProviderFactory getCursorProviderFactory();
-
-  /**
-   * @return the factory for payload decorators to accumulate {@link PayloadStatistics}.
-   * @deprecated since 4.4.1, 4.5.0. Payload statistics is no longer supported.
-   */
-  @Deprecated
-  CursorComponentDecoratorFactory getComponentDecoratorFactory();
 
   /**
    * @return The application's {@link StreamingManager}

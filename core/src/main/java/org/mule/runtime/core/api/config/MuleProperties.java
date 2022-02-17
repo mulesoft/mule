@@ -14,7 +14,6 @@ import org.mule.api.annotation.Experimental;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.util.MuleSystemProperties;
 import org.mule.runtime.core.internal.connection.DefaultConnectivityTesterFactory;
-import org.mule.runtime.core.internal.management.stats.CursorDecoratorFactory;
 
 /**
  * <code>MuleProperties</code> is a set of constants pertaining to Mule properties.

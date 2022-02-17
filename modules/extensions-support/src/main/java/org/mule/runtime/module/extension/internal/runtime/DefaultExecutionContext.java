@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -20,7 +19,6 @@ import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -247,11 +245,6 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   @Override
   public CursorProviderFactory getCursorProviderFactory() {
     return cursorProviderFactory;
-  }
-
-  @Override
-  public CursorComponentDecoratorFactory getComponentDecoratorFactory() {
-    return NO_OP_INSTANCE;
   }
 
   /**
