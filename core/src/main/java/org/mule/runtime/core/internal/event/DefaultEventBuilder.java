@@ -233,8 +233,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   @Override
   public CoreEvent.Builder clearParameters() {
     parameters = emptyCaseInsensitiveMap();
-    parametersModified = true;
-
+    modified = parametersModified = true;
+    
     return this;
   }
 
