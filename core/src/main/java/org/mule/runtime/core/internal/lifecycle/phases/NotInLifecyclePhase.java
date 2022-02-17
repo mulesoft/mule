@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.lifecycle.phases;
 
 import static java.util.Collections.emptyList;
+
 import org.mule.runtime.api.lifecycle.Initialisable;
 
 import java.util.List;
@@ -36,6 +37,7 @@ public class NotInLifecyclePhase extends DefaultLifecyclePhase {
       public List<Object> getSortedObjects() {
         return emptyList();
       }
+
     };
   }
 }
