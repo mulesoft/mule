@@ -16,7 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
+import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
