@@ -26,7 +26,6 @@ import org.mule.runtime.module.deployment.impl.internal.builder.DeployableFileBu
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultMuleDomain;
-import org.mule.runtime.module.deployment.logging.MemoryAppenderResource;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
@@ -344,7 +343,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
           @Override
           public boolean isSatisfied() {
             try {
-              assertThat(logger.getAllLoggingEvents().stream().anyMatch(e -> e.getMessage().equals("expectedErrorLog")),
+              assertThat(logger.getAllLoggingEvents().stream().anyMatch(e -> e.getMessage().equals(expectedErrorLog)),
                          is(true));
               return true;
             } catch (Exception e) {
