@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 import static java.lang.System.arraycopy;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
+import static org.mule.runtime.core.internal.util.message.MessageUtils.getCursorStreamDecorator;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.getParamNames;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.toMap;
 import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isConfigParameter;
@@ -47,11 +48,9 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.util.message.stream.UnclosableCursorStream;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -337,7 +336,9 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         Type generic = ((ParameterizedType) parameter.getParameterizedType()).getActualTypeArguments()[0];
         if (generic instanceof Class) {
           Class<?> genericClass = (Class<?>) generic;
-          if (CursorProvider.class.isAssignableFrom(genericClass) || Object.class.equals(genericClass)) {
+          if (CursorProvider.class.isAssignableFrom(genericClass)
+              || InputStream.class.isAssignableFrom(genericClass)
+              || Object.class.equals(genericClass)) {
             resolver = new TypedValueCursorArgumentResolverDecorator(resolver);
           }
         }
@@ -407,10 +408,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
     @Override
     protected Object decorate(Object value) {
-      if (value instanceof CursorStream) {
-        return new UnclosableCursorStream((CursorStream) value);
-      }
-      return value;
+      return getCursorStreamDecorator().apply(value);
     }
   }
 
@@ -442,7 +440,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
     @Override
     protected Object decorate(Object value) {
-      return resolveCursor((TypedValue) value);
+      return resolveCursor((TypedValue) value, getCursorStreamDecorator());
     }
   }
 
@@ -454,7 +452,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
     @Override
     protected Object decorate(Object value) {
-      return resolveCursor(value);
+      return resolveCursor(value, getCursorStreamDecorator());
     }
   }
 

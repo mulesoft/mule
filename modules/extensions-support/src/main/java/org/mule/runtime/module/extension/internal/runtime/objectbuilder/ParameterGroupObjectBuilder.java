@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
+import static org.mule.runtime.core.internal.util.message.MessageUtils.getCursorStreamDecorator;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.mapTypeValue;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
@@ -91,7 +93,8 @@ public class ParameterGroupObjectBuilder<T> {
       String name = field.getName();
       if (hasParameter.test(name)) {
         Object resolvedValue = resolveValue(new StaticValueResolver<>(parameters.apply(name)), context);
-        Object value = context == null || context.resolveCursors() ? resolveCursor(resolvedValue) : resolvedValue;
+        Object value = context == null || context.resolveCursors() ? resolveCursor(resolvedValue, getCursorStreamDecorator())
+            : mapTypeValue(resolvedValue, getCursorStreamDecorator());
         field.set(object, value);
       }
     }
