@@ -83,4 +83,5 @@ public class DefaultLifecycleObjectSorter implements LifecycleObjectSorter {
 
     return sorted;
   }
+
 }

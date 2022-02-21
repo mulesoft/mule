@@ -155,8 +155,7 @@
           "classSimpleName": "ReactiveInterceptor",
           "elementKind": "interface",
           "justification": "MULE-18177: This should have neven been made privileged"
-        },
-
+        }
       ]
     }
   },
