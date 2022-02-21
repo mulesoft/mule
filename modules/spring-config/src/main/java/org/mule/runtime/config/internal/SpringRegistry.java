@@ -16,7 +16,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
-import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
@@ -55,7 +54,7 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
    */
   public static final String SPRING_APPLICATION_CONTEXT = "springApplicationContext";
   private final BeanDependencyResolver beanDependencyResolver;
-
+  private final ConfigurationDependencyResolver configurationDependencyResolver;
   protected ApplicationContext applicationContext;
 
   private boolean readOnly;
@@ -75,6 +74,7 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
     super(REGISTRY_ID, muleContext, lifecycleInterceptor);
     setApplicationContext(applicationContext);
     this.beanDependencyResolver = new DefaultBeanDependencyResolver(dependencyResolver, this);
+    this.configurationDependencyResolver = dependencyResolver;
   }
 
   private void setApplicationContext(ApplicationContext applicationContext) {
@@ -469,6 +469,14 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
 
   public BeanDependencyResolver getBeanDependencyResolver() {
     return beanDependencyResolver;
+  }
+
+  public ConfigurationDependencyResolver getConfigurationDependencyResolver() {
+    return configurationDependencyResolver;
+  }
+
+  protected ApplicationContext getApplicationContext() {
+    return applicationContext;
   }
 
   ////////////////////////////////////////////////////////////////////////////////////

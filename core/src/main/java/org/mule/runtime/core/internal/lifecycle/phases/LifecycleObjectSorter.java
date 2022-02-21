@@ -30,4 +30,11 @@ public interface LifecycleObjectSorter {
    * @return The sorted list of objects previously added through {@link #addObject(String, Object)}
    */
   List<Object> getSortedObjects();
+
+  /**
+   * Provides the order of objects as reference for initialise/dispose phases
+   *
+   * @param lookupObjects lifecycle object list which is ordered based on the type
+   */
+  default void setLifeCycleObjectNameOrder(List<String> lookupObjects) {};
 }

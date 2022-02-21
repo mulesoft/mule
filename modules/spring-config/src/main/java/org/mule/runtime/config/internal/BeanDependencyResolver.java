@@ -22,5 +22,4 @@ public interface BeanDependencyResolver {
    * @return a order collection of bean objects.
    */
   List<Object> resolveBeanDependencies(String beanName);
-
 }
