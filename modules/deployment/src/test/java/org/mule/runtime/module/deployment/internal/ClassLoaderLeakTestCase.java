@@ -117,7 +117,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
   @Test
   public void undeploysApplicationDoesNotLeakClassloader() throws Exception {
-    
+
     ApplicationFileBuilder applicationFileBuilder = getApplicationFileBuilder();
 
     addPackedAppFromBuilder(applicationFileBuilder);
