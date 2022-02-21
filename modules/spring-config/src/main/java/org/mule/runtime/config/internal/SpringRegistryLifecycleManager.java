@@ -57,7 +57,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
   private static final boolean USE_LEGACY_SORTER = parseBoolean(getProperty(MULE_USE_LEGACY_LIFECYCLE_OBJECT_SORTER, "false"));
 
-  public SpringRegistryLifecycleManager(String id, Registry springRegistry, MuleContext muleContext,
+  public SpringRegistryLifecycleManager(String id, SpringRegistry springRegistry, MuleContext muleContext,
                                         LifecycleInterceptor lifecycleInterceptor) {
     super(id, springRegistry, muleContext, lifecycleInterceptor);
   }
