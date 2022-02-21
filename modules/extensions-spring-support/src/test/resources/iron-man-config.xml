@@ -62,8 +62,7 @@
         <test-components:assert-intercepting responseSameTask="false">
             <marvel:compute-flight-plan config-ref="ironMan" />
     
-            <!-- TODO: MULE-18119 - uncomment the following line when this issue is fixed -->
-            <!-- <flow-ref name="captureThread"/> -->
+            <flow-ref name="captureThread"/>
         </test-components:assert-intercepting>
     </flow>
 
