@@ -6,15 +6,6 @@
  */
 package org.mule.runtime.config.internal.context;
 
-import static java.lang.String.format;
-import static java.lang.System.lineSeparator;
-import static java.util.Collections.emptySet;
-import static java.util.Comparator.comparing;
-import static java.util.Objects.requireNonNull;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
@@ -54,6 +45,17 @@ import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.manager.ExtensionErrorsRegistrant.registerErrorMappings;
+
+import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
+import static java.util.Collections.emptySet;
+import static java.util.Comparator.comparing;
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
@@ -105,12 +107,10 @@ import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ApplicationModelAstPostProcessor;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.processor.ComponentLocatorCreatePostProcessor;
-import org.mule.runtime.config.internal.processor.DiscardedOptionalBeanPostProcessor;
 import org.mule.runtime.config.internal.processor.LifecycleStatePostProcessor;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
 import org.mule.runtime.config.internal.processor.PostRegistrationActionsPostProcessor;
 import org.mule.runtime.config.internal.registry.OptionalObjectsController;
-import org.mule.runtime.config.internal.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -146,13 +146,13 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.annotation.ContextAnnotationAutowireCandidateResolver;
@@ -402,8 +402,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                           new MuleContextPostProcessor(muleContext),
                           new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext
                               .getRegistry(), beanFactory),
-                          new DiscardedOptionalBeanPostProcessor(optionalObjectsController,
-                                                                 (DefaultListableBeanFactory) beanFactory),
+                          // new DiscardedOptionalBeanPostProcessor(optionalObjectsController,
+                          // (DefaultListableBeanFactory) beanFactory),
                           new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState()),
                           new ComponentLocatorCreatePostProcessor(componentLocator));
 
@@ -680,10 +680,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   private void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry, ConfigurableListableBeanFactory beanFactory) {
-    // registerAnnotationConfigProcessor(registry, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME,
-    // ConfigurationClassPostProcessor.class, null);
-    // registerAnnotationConfigProcessor(registry, REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME,
-    // RequiredAnnotationBeanPostProcessor.class, null);
     registerInjectorProcessor(beanFactory);
   }
 
@@ -698,24 +694,11 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
   }
 
-  // private void registerAnnotationConfigProcessor(BeanDefinitionRegistry registry, String key, Class<?> type, Object source) {
-  // RootBeanDefinition beanDefinition = new RootBeanDefinition(type);
-  // beanDefinition.setSource(source);
-  // registerPostProcessor(registry, beanDefinition, key);
-  // }
-  //
-  // protected void registerPostProcessor(BeanDefinitionRegistry registry, RootBeanDefinition definition, String beanName) {
-  // definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-  // registry.registerBeanDefinition(beanName, definition);
-  // }
-
   @Override
   protected DefaultListableBeanFactory createBeanFactory() {
     // Copy all postProcessors defined in the defaultMuleConfig so that they get applied to the child container
     DefaultListableBeanFactory beanFactory = new ObjectProviderAwareBeanFactory(getInternalParentBeanFactory());
     beanFactory.setAutowireCandidateResolver(new ContextAnnotationAutowireCandidateResolver());
-    beanFactory.setInstantiationStrategy(new LaxInstantiationStrategyWrapper(new CglibSubclassingInstantiationStrategy(),
-                                                                             optionalObjectsController));
 
     return beanFactory;
   }
