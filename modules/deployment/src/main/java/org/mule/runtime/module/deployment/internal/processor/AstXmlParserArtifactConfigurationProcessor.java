@@ -13,6 +13,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAI
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.config.internal.ApplicationFilteredFromPolicyArtifactAst.applicationFilteredFromPolicyArtifactAst;
+import static org.mule.runtime.core.api.artifact.ArtifactAstUtils.parseAndBuildAppExtensionModel;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -26,7 +27,6 @@ import org.mule.runtime.config.internal.dsl.model.config.ConfigurationProperties
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.StaticConfigurationPropertiesProvider;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.artifact.ArtifactAstUtils;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -84,7 +84,7 @@ public final class AstXmlParserArtifactConfigurationProcessor extends AbstractAs
         if (artifactConfigResources.length == 0) {
           artifactAst = emptyArtifact();
         } else {
-          artifactAst = ArtifactAstUtils.parseAndBuildAppExtensionModel(artifactConfigResources,
+          artifactAst = parseAndBuildAppExtensionModel(artifactConfigResources,
               (exts, disableValidations) -> createMuleXmlParser(muleContext, exts, artifactProperties, artifactType, parentArtifactAst, disableXmlValidations),
               extensions, toAstArtifactType(artifactType), disableXmlValidations, muleContext);
         }
