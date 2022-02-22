@@ -105,6 +105,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractRegistryBootstrap implements Initialisable {
 
   private static final String TRANSACTION_RESOURCE_SUFFIX = ".transaction.resource";
+  // TODO W-10736276 Remove this
   private static final String OPTIONAL_ATTRIBUTE = "optional";
   private static final String RETURN_CLASS_PROPERTY = "returnClass";
   private static final String MIME_TYPE_PROPERTY = "mimeType";

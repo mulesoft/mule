@@ -110,6 +110,7 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
     doRegisterObject(bootstrapProperty.getKey(), builder);
   }
 
+  // TODO W-10736276 Remove this
   private void notifyIfOptional(String key, boolean optional) {
     if (optional && optionalObjectsController != null) {
       optionalObjectsController.registerOptionalKey(key);

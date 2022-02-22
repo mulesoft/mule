@@ -8,7 +8,7 @@ package org.mule.runtime.config.internal.context;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_LAX_INSTANTIATION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -706,7 +706,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     beanFactory.setAutowireCandidateResolver(new ContextAnnotationAutowireCandidateResolver());
 
     // TODO W-10736276 Remove this
-    if (!featureFlaggingService.isEnabled(DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_LAX_INSTANTIATION)) {
+    if (!featureFlaggingService.isEnabled(DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES)) {
       beanFactory.setInstantiationStrategy(new LaxInstantiationStrategyWrapper(new CglibSubclassingInstantiationStrategy(),
                                                                                getOptionalObjectsController()));
     }

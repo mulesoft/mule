@@ -45,6 +45,7 @@ public class AbstractBootstrapProperty {
     return service;
   }
 
+  // TODO W-10736276 Remove this
   public Boolean getOptional() {
     return optional;
   }
