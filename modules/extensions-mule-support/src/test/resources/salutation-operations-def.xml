@@ -17,12 +17,12 @@
             </operation:parameter>
             <operation:parameter name="receiver" type="string" summary="The name of the person being greeted"/>
             <operation:parameter name="prefix" type="string" summary="The receiver's prefix">
-                <operation:optional defaultValue=""/>
                 <operation:description>The prefix added to the receiver</operation:description>
+                <operation:optional defaultValue=""/>
             </operation:parameter>
             <operation:parameter name="suffix" type="string" summary="The receiver's suffix">
-                <operation:optional/>
                 <operation:description>The suffix added to the receiver</operation:description>
+                <operation:optional/>
             </operation:parameter>
         </operation:parameters>
         <operation:output>
@@ -73,12 +73,12 @@
             </operation:parameter>
             <operation:parameter name="receiver" type="string" summary="The name of the person being greeted"/>
             <operation:parameter name="prefix" type="string" summary="The receiver's prefix">
-                <operation:optional defaultValue=""/>
                 <operation:description>The prefix added to the receiver</operation:description>
+                <operation:optional defaultValue=""/>
             </operation:parameter>
             <operation:parameter name="suffix" type="string" summary="The receiver's suffix">
-                <operation:optional/>
                 <operation:description>The suffix added to the receiver</operation:description>
+                <operation:optional/>
             </operation:parameter>
             <operation:parameter name="myName" type="string" summary="The gentleman's name"/>
             <operation:parameter name="myNationalID" type="string" summary="The gentelman's identification"/>

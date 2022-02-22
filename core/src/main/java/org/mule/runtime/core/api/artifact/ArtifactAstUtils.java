@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.api.artifact;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.ast.api.ArtifactType.APPLICATION;
 import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.getOptionalLoaderById;
@@ -16,6 +14,10 @@ import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSI
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_LOADER_ID;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_TYPE_LOADER_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
+
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -54,9 +56,7 @@ public final class ArtifactAstUtils {
         .map(extensionModel -> {
           Set<ExtensionModel> enrichedExtensionModels = new HashSet<>(extensions);
           enrichedExtensionModels.add(extensionModel);
-          return doParseArtifactIntoAst(configResources, parserSupplier, enrichedExtensionModels, true); // TODO: use
-                                                                                                         // disableXmlValidations
-                                                                                                         // field
+          return doParseArtifactIntoAst(configResources, parserSupplier, enrichedExtensionModels, disableValidations);
         }).orElseGet(() -> disableValidations ? partialAst
             : doParseArtifactIntoAst(configResources, parserSupplier, extensions, false));
   }

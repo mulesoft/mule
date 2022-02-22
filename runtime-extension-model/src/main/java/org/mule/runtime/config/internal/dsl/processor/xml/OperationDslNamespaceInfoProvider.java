@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.config.internal.dsl.processor.xml;
 
+import static org.mule.runtime.internal.dsl.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
+
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static org.mule.runtime.internal.dsl.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
 
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
@@ -29,7 +30,7 @@ public class OperationDslNamespaceInfoProvider implements XmlNamespaceInfoProvid
 
       @Override
       public String getNamespaceUriPrefix() {
-        return OPERATION_DSL_NAMESPACE;
+        return OPERATION_DSL_NAMESPACE_URI;
       }
 
       @Override

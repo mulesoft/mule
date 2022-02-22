@@ -121,7 +121,7 @@
         </xsd:attribute>
     </xsd:complexType>
 
-    <xsd:element name="def" type="operationDefType">
+    <xsd:element name="def" type="operationDefType" substitutionGroup="mule:abstract-extension">
         <xsd:annotation>
             <xsd:documentation>
                 Defines an operation
@@ -176,7 +176,7 @@
 
     <xsd:complexType name="operationDefType">
         <xsd:complexContent>
-            <xsd:extension base="mule:annotatedType">
+            <xsd:extension base="mule:abstractExtensionType">
                 <xsd:sequence>
                     <xsd:sequence>
                         <xsd:element name="description" type="xsd:string" minOccurs="0">
