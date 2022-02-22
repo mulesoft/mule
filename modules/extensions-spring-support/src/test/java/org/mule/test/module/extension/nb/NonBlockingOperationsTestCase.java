@@ -82,6 +82,7 @@ public class NonBlockingOperationsTestCase extends AbstractExtensionFunctionalTe
   @Test
   public void nonBlockingConnectedOperation() throws Exception {
     fireMissileAndAssert("fireMissile");
+    assertCapturedThreadsNameMatch(startsWith("SimpleUnitTestSupportScheduler."));
   }
 
   @Test
@@ -148,6 +149,8 @@ public class NonBlockingOperationsTestCase extends AbstractExtensionFunctionalTe
     IronMan ironMan = getIronMan("ironMan");
     final String payload = "take me to the avengers tower";
     Event event = flowRunner("computeFlightPlan").withPayload(payload).run();
+    // TODO: MULE-18119 - uncomment the following line when this issue is fixed
+    // assertCapturedThreadsNameMatch(startsWith("SimpleUnitTestSupportScheduler."));
     assertThat(event.getMessage().getPayload().getValue().toString(), equalTo(payload));
     new PollingProber().probe(1000, 1000, () -> FLIGHT_PLAN.equals(ironMan.getFlightPlan()));
   }

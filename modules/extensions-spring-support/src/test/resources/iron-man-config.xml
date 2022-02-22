@@ -58,8 +58,7 @@
         <test:assert-intercepting responseSameTask="false" />
         <marvel:compute-flight-plan config-ref="ironMan" />
 
-        <!-- TODO: MULE-18119 - uncomment the following line when this issue is fixed -->
-        <!-- <custom-processor class="org.mule.test.module.extension.nb.NonBlockingOperationsTestCase$ThreadCaptor" /> -->
+        <custom-processor class="org.mule.test.module.extension.nb.NonBlockingOperationsTestCase$ThreadCaptor" />
     </flow>
 
 </mule>
