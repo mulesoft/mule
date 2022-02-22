@@ -10,6 +10,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGA
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_LAX_INSTANTIATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_ERROR_TYPES_VALIDATION;
@@ -317,6 +318,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureEnforceRequiredExpressionValidation();
       configureEnforceExpressionValidation();
       configureParallelForeachFlattenMessage();
+      configureDisableRegistryBootstrapOptionalLaxInstantiation();
     }
   }
 
@@ -1385,6 +1387,18 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureParallelForeachFlattenMessage() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(PARALLEL_FOREACH_FLATTEN_MESSAGE,
+                                                featureContext -> featureContext.getArtifactMinMuleVersion()
+                                                    .filter(muleVersion -> muleVersion.atLeast("4.5.0")).isPresent());
+  }
+
+  /**
+   * Configures the {@link MuleRuntimeFeature#DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_LAX_INSTANTIATION} feature flag.
+   *
+   * @since 4.3.0-202203
+   */
+  private static void configureDisableRegistryBootstrapOptionalLaxInstantiation() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_LAX_INSTANTIATION,
                                                 featureContext -> featureContext.getArtifactMinMuleVersion()
                                                     .filter(muleVersion -> muleVersion.atLeast("4.5.0")).isPresent());
   }

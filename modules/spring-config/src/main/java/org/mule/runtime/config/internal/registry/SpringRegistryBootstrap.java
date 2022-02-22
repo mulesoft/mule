@@ -14,6 +14,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.config.internal.factories.BootstrapObjectFactoryBean;
+import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -86,13 +87,13 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
 
     builder.addPropertyValue("name", name);
 
-    // notifyIfOptional(name, bootstrapProperty.getOptional());
+    notifyIfOptional(name, bootstrapProperty.getOptional());
     doRegisterObject(name, builder);
   }
 
   @Override
   protected void doRegisterObject(ObjectBootstrapProperty bootstrapProperty) throws Exception {
-    // notifyIfOptional(bootstrapProperty.getKey(), bootstrapProperty.getOptional());
+    notifyIfOptional(bootstrapProperty.getKey(), bootstrapProperty.getOptional());
 
     Class<?> clazz = bootstrapProperty.getService().forName(bootstrapProperty.getClassName());
     BeanDefinitionBuilder builder;
@@ -109,19 +110,19 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
     doRegisterObject(bootstrapProperty.getKey(), builder);
   }
 
-  // private void notifyIfOptional(String key, boolean optional) {
-  // if (optional && optionalObjectsController != null) {
-  // optionalObjectsController.registerOptionalKey(key);
-  // }
-  // }
+  private void notifyIfOptional(String key, boolean optional) {
+    if (optional && optionalObjectsController != null) {
+      optionalObjectsController.registerOptionalKey(key);
+    }
+  }
 
   private void doRegisterObject(String key, BeanDefinitionBuilder builder) {
     beanDefinitionRegister.accept(key, builder.getBeanDefinition());
   }
 
-  // private void registerInstance(String key, Object value) {
-  // BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(ConstantFactoryBean.class);
-  // builder.addConstructorArgValue(value);
-  // doRegisterObject(key, builder);
-  // }
+  private void registerInstance(String key, Object value) {
+    BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(ConstantFactoryBean.class);
+    builder.addConstructorArgValue(value);
+    doRegisterObject(key, builder);
+  }
 }

@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.context;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_LAX_INSTANTIATION;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -111,6 +112,7 @@ import org.mule.runtime.config.internal.processor.LifecycleStatePostProcessor;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
 import org.mule.runtime.config.internal.processor.PostRegistrationActionsPostProcessor;
 import org.mule.runtime.config.internal.registry.OptionalObjectsController;
+import org.mule.runtime.config.internal.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -153,6 +155,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.annotation.ContextAnnotationAutowireCandidateResolver;
@@ -175,6 +178,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   protected final MemoryManagementService memoryManagementService;
   private ArtifactAst applicationModel;
   private final MuleContextWithRegistry muleContext;
+  private final FeatureFlaggingService featureFlaggingService;
   private final MuleFunctionsBindingContextProvider coreFunctionsProvider;
   private final BeanDefinitionFactory beanDefinitionFactory;
   private final ArtifactType artifactType;
@@ -185,7 +189,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final Map<String, String> artifactProperties;
   protected List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
   private final ExtensionManager extensionManager;
-
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -219,6 +222,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                              FeatureFlaggingService featureFlaggingService) {
     checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
     this.muleContext = (MuleContextWithRegistry) muleContext;
+    this.featureFlaggingService = featureFlaggingService;
     this.coreFunctionsProvider = this.muleContext.getRegistry().get(CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY);
     this.optionalObjectsController = optionalObjectsController;
     this.artifactType = artifactType;
@@ -699,6 +703,11 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     // Copy all postProcessors defined in the defaultMuleConfig so that they get applied to the child container
     DefaultListableBeanFactory beanFactory = new ObjectProviderAwareBeanFactory(getInternalParentBeanFactory());
     beanFactory.setAutowireCandidateResolver(new ContextAnnotationAutowireCandidateResolver());
+
+    if (!featureFlaggingService.isEnabled(DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_LAX_INSTANTIATION)) {
+      beanFactory.setInstantiationStrategy(new LaxInstantiationStrategyWrapper(new CglibSubclassingInstantiationStrategy(),
+                                                                               optionalObjectsController));
+    }
 
     return beanFactory;
   }
