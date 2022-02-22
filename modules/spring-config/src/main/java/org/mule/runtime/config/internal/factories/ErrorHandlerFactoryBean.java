@@ -27,6 +27,10 @@ public class ErrorHandlerFactoryBean extends AbstractComponentFactory<ErrorHandl
   private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
   private String name;
 
+  public ErrorHandlerFactoryBean() {
+    globalErrorHandlers.clear();
+  }
+
   @Override
   public ErrorHandler doGetObject() throws Exception {
     if (delegate != null) {
