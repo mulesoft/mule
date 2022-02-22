@@ -142,6 +142,8 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
   }
 
   private void clearLogsAndMDCThreadReferences() throws NoSuchFieldException, IllegalAccessException {
+    // TestMDCAdapter contains ThreadLocal variables with strong references to Threads which should be released to prevent
+    // possible leakages
     TestLoggerFactory.clearAll();
     MDCAdapter testMDCAdapter = StaticMDCBinder.SINGLETON.getMDCA();
     Field valueField = TestMDCAdapter.class.getDeclaredField("value");

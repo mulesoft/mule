@@ -36,6 +36,8 @@ public abstract class AbstractMuleWithTestLoggingSupportTestCase extends Abstrac
 
   @After
   public void clearMDCThreadReferences() throws NoSuchFieldException, IllegalAccessException {
+    // TestMDCAdapter contains ThreadLocal variables with strong references to Threads which should be released to prevent
+    // possible leakages
     MDCAdapter testMDCAdapter = StaticMDCBinder.SINGLETON.getMDCA();
     Field valueField = TestMDCAdapter.class.getDeclaredField("value");
     valueField.setAccessible(true);
