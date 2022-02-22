@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.config.internal;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_USE_LEGACY_LIFECYCLE_OBJECT_SORTER;
 import static org.mule.runtime.config.internal.MuleArtifactContext.INNER_BEAN_PREFIX;
+
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
 
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
@@ -50,6 +54,8 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import java.util.Map;
 
 public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
+
+  private static final boolean USE_LEGACY_SORTER = parseBoolean(getProperty(MULE_USE_LEGACY_LIFECYCLE_OBJECT_SORTER, "false"));
 
   public SpringRegistryLifecycleManager(String id, SpringRegistry springRegistry, MuleContext muleContext,
                                         LifecycleInterceptor lifecycleInterceptor) {
@@ -131,6 +137,9 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
     @Override
     public LifecycleObjectSorter newLifecycleObjectSorter() {
+      if (USE_LEGACY_SORTER) {
+        return new SpringLifecycleObjectSorter(orderedLifecycleTypes, getSpringRegistry());
+      }
       AutoDiscoveredDependencyResolver autoDiscoveredDependencyResolver =
           new AutoDiscoveredDependencyResolver(getSpringRegistry());
       DeclaredDependencyResolver declaredDependencyResolver = new DeclaredDependencyResolver(getSpringRegistry());
@@ -189,6 +198,9 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
     @Override
     public LifecycleObjectSorter newLifecycleObjectSorter() {
+      if (USE_LEGACY_SORTER) {
+        return new SpringLifecycleObjectSorter(orderedLifecycleTypes, getSpringRegistry());
+      }
       AutoDiscoveredDependencyResolver autoDiscoveredDependencyResolver =
           new AutoDiscoveredDependencyResolver(getSpringRegistry());
       DeclaredDependencyResolver declaredDependencyResolver = new DeclaredDependencyResolver(getSpringRegistry());
