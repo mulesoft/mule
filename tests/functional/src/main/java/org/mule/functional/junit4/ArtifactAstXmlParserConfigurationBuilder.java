@@ -40,7 +40,6 @@ import org.mule.runtime.dsl.api.ConfigResource;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -154,46 +153,26 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
         : parsersCache.get(xmlParserFactory);
   }
 
-  private ArtifactAst doParseArtifactIntoAst(Set<ExtensionModel> extensions, boolean disableValidations) {
-    XmlParserFactory xmlParserFactory = new XmlParserFactory(disableValidations, extensions, artifactProperties,
-                                                             artifactType,
-                                                             parentArtifactContext != null
-                                                                 ? parentArtifactContext.getArtifactAst()
-                                                                 : emptyArtifact());
-    AstXmlParser astXmlParser;
-    if (ignoreCaches) {
-      astXmlParser = xmlParserFactory.createMuleXmlParser();
-    } else {
-      astXmlParser = parsersCache.get(xmlParserFactory);
-    }
-
+  protected ArtifactAst parseArtifactIntoAst(Set<ExtensionModel> extensions, MuleContext muleContext) {
     try {
-      return astXmlParser.parse(loadConfigResources(configResources));
+      ArtifactAst ast = xx(configResources,
+          this::getParser,
+          extensions,
+          artifactType,
+          disableXmlValidations,
+          muleContext);
+
+      if (getBoolean(SERIALIZE_DESERIALIZE_AST_PROPERTY)) {
+        return serializeAndDeserialize(ast);
+      } else {
+        return ast;
+      }
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
   }
 
-  protected ArtifactAst parseArtifactIntoAst(Set<ExtensionModel> extensions, MuleContext muleContext) {
-    ArtifactAst ast = xx(Arrays.asList(configResources),
-        this::getParser,
-        extensions,
-        artifactType,
-        disableXmlValidations,
-        muleContext);
-
-    if (getBoolean(SERIALIZE_DESERIALIZE_AST_PROPERTY)) {
-      try {
-        return seralizeAndDeserialize(ast);
-      } catch (Exception e) {
-        throw new MuleRuntimeException(e);
-      }
-    } else {
-      return ast;
-    }
-  }
-
-  private ArtifactAst seralizeAndDeserialize(ArtifactAst artifactAst) throws IOException {
+  private ArtifactAst serializeAndDeserialize(ArtifactAst artifactAst) throws IOException {
     ArtifactAstSerializer jsonArtifactAstSerializer = new ArtifactAstSerializerProvider().getSerializer(JSON, "1.0");
     InputStream inputStream = jsonArtifactAstSerializer.serialize(artifactAst);
     ArtifactAstDeserializer defaultArtifactAstDeserializer = new ArtifactAstSerializerProvider().getDeserializer();

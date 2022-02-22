@@ -31,7 +31,6 @@ import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -41,12 +40,12 @@ public final class AstCosaUtils {
 
   private static final Logger LOGGER = getLogger(AstCosaUtils.class);
 
-  public static ArtifactAst xx(List<String> configResources,
+  public static ArtifactAst xx(String[] configResources,
                                AstXmlParserSupplier parserSupplier,
                                Set<ExtensionModel> extensions,
                                ArtifactType artifactType,
                                boolean disableValidations,
-                               MuleContext muleContext) {
+                               MuleContext muleContext) throws ConfigurationException {
 
     final ArtifactAst partialAst = doParseArtifactIntoAst(configResources, parserSupplier, extensions, true);
 
@@ -92,7 +91,7 @@ public final class AstCosaUtils {
     }
   }
 
-  private static ArtifactAst doParseArtifactIntoAst(List<String> configResources,
+  private static ArtifactAst doParseArtifactIntoAst(String[] configResources,
                                                     AstXmlParserSupplier parserSupplier,
                                                     Set<ExtensionModel> extensions,
                                                     boolean disableValidations) {
@@ -103,11 +102,11 @@ public final class AstCosaUtils {
     }
   }
 
-  private static ConfigResource[] loadConfigResources(List<String> configs) throws ConfigurationException {
+  private static ConfigResource[] loadConfigResources(String[] configs) throws ConfigurationException {
     try {
-      ConfigResource[] artifactConfigResources = new ConfigResource[configs.size()];
-      for (int i = 0; i < configs.size(); i++) {
-        artifactConfigResources[i] = new ConfigResource(configs.get(i));
+      ConfigResource[] artifactConfigResources = new ConfigResource[configs.length];
+      for (int i = 0; i < configs.length; i++) {
+        artifactConfigResources[i] = new ConfigResource(configs[i]);
       }
       return artifactConfigResources;
     } catch (IOException e) {

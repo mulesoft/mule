@@ -6,15 +6,14 @@
  */
 package org.mule.runtime.module.deployment.internal.processor;
 
+import static java.util.Collections.emptySet;
+import static java.util.Optional.empty;
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.config.internal.ApplicationFilteredFromPolicyArtifactAst.applicationFilteredFromPolicyArtifactAst;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
-
-import static java.util.Collections.emptySet;
-import static java.util.Optional.empty;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -27,6 +26,7 @@ import org.mule.runtime.config.internal.dsl.model.config.ConfigurationProperties
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.StaticConfigurationPropertiesProvider;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.artifact.AstCosaUtils;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -36,9 +36,7 @@ import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
-import org.mule.runtime.dsl.api.ConfigResource;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -55,8 +53,7 @@ public final class AstXmlParserArtifactConfigurationProcessor extends AbstractAs
       throws ConfigurationException {
     return createApplicationModel(artifactContextConfiguration.getMuleContext(),
                                   artifactContextConfiguration.getArtifactDeclaration(),
-                                  loadConfigResources(artifactContextConfiguration
-                                      .getConfigResources()),
+                                  artifactContextConfiguration.getConfigResources(),
                                   artifactContextConfiguration.getArtifactProperties(),
                                   artifactContextConfiguration.getArtifactType(),
                                   artifactContextConfiguration.getParentArtifactContext()
@@ -69,27 +66,17 @@ public final class AstXmlParserArtifactConfigurationProcessor extends AbstractAs
     return extensionManager == null ? emptySet() : extensionManager.getExtensions();
   }
 
-  protected ConfigResource[] loadConfigResources(String[] configs) throws ConfigurationException {
-    try {
-      ConfigResource[] artifactConfigResources = new ConfigResource[configs.length];
-      for (int i = 0; i < configs.length; i++) {
-        artifactConfigResources[i] = new ConfigResource(configs[i]);
-      }
-      return artifactConfigResources;
-    } catch (IOException e) {
-      throw new ConfigurationException(e);
-    }
-  }
-
   private ArtifactAst createApplicationModel(MuleContext muleContext,
                                              ArtifactDeclaration artifactDeclaration,
-                                             ConfigResource[] artifactConfigResources,
+                                             String[] artifactConfigResources,
                                              Map<String, String> artifactProperties,
                                              ArtifactType artifactType,
                                              ArtifactAst parentArtifactAst,
                                              boolean disableXmlValidations)
       throws ConfigurationException {
+
     Set<ExtensionModel> extensions = getExtensions(muleContext.getExtensionManager());
+
     try {
       final ArtifactAst artifactAst;
 
@@ -97,15 +84,17 @@ public final class AstXmlParserArtifactConfigurationProcessor extends AbstractAs
         if (artifactConfigResources.length == 0) {
           artifactAst = emptyArtifact();
         } else {
-          final AstXmlParser parser = createMuleXmlParser(muleContext, extensions, artifactProperties, artifactType,
-                                                          parentArtifactAst, disableXmlValidations);
-          artifactAst = parser.parse(artifactConfigResources);
+          artifactAst = AstCosaUtils.xx(artifactConfigResources,
+              (exts, disableValidations) -> createMuleXmlParser(muleContext, exts, artifactProperties, artifactType, parentArtifactAst, disableXmlValidations),
+              extensions, toAstArtifactType(artifactType), disableXmlValidations, muleContext);
         }
       } else {
         artifactAst = toArtifactast(artifactDeclaration, extensions);
       }
 
       return artifactAst;
+    } catch (ConfigurationException e) {
+      throw e;
     } catch (Exception e) {
       throw new ConfigurationException(e);
     }
@@ -124,6 +113,7 @@ public final class AstXmlParserArtifactConfigurationProcessor extends AbstractAs
     Builder builder = AstXmlParser.builder()
         .withPropertyResolver(propertyKey -> (String) propertyResolver.resolveValue(propertyKey))
         .withExtensionModels(extensions)
+        .withArtifactType(toAstArtifactType(artifactType))
         .withParentArtifact(resolveParentArtifact(parentArtifactAst, artifactType, featureFlaggingService));
     if (!featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)) {
       builder.withLegacyFailStrategy();
@@ -132,21 +122,20 @@ public final class AstXmlParserArtifactConfigurationProcessor extends AbstractAs
       builder.withSchemaValidationsDisabled();
     }
 
+    return builder.build();
+  }
+
+  private org.mule.runtime.ast.api.ArtifactType toAstArtifactType(ArtifactType artifactType) {
     switch (artifactType) {
       case APP:
-        builder.withArtifactType(org.mule.runtime.ast.api.ArtifactType.APPLICATION);
-        break;
+        return org.mule.runtime.ast.api.ArtifactType.APPLICATION;
       case DOMAIN:
-        builder.withArtifactType(org.mule.runtime.ast.api.ArtifactType.DOMAIN);
-        break;
+        return org.mule.runtime.ast.api.ArtifactType.DOMAIN;
       case POLICY:
-        builder.withArtifactType(org.mule.runtime.ast.api.ArtifactType.POLICY);
-        break;
+        return org.mule.runtime.ast.api.ArtifactType.POLICY;
       default:
         throw new IllegalArgumentException("The provided artifact type '" + artifactType + "' cannot be deployed.");
     }
-
-    return builder.build();
   }
 
   private FeatureFlaggingService getFeatureFlaggingService(MuleContext muleContext) {
