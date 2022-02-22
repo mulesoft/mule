@@ -49,7 +49,6 @@ import static org.mule.runtime.module.extension.internal.manager.ExtensionErrors
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
-import static java.util.Collections.emptySet;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.of;
@@ -108,6 +107,7 @@ import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ApplicationModelAstPostProcessor;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.processor.ComponentLocatorCreatePostProcessor;
+import org.mule.runtime.config.internal.processor.DiscardedOptionalBeanPostProcessor;
 import org.mule.runtime.config.internal.processor.LifecycleStatePostProcessor;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
 import org.mule.runtime.config.internal.processor.PostRegistrationActionsPostProcessor;
@@ -406,8 +406,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                           new MuleContextPostProcessor(muleContext),
                           new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext
                               .getRegistry(), beanFactory),
-                          // new DiscardedOptionalBeanPostProcessor(optionalObjectsController,
-                          // (DefaultListableBeanFactory) beanFactory),
+                          // TODO W-10736276 Remove this postProcessor
+                          new DiscardedOptionalBeanPostProcessor(getOptionalObjectsController(),
+                                                                 (DefaultListableBeanFactory) beanFactory),
                           new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState()),
                           new ComponentLocatorCreatePostProcessor(componentLocator));
 
@@ -704,9 +705,10 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     DefaultListableBeanFactory beanFactory = new ObjectProviderAwareBeanFactory(getInternalParentBeanFactory());
     beanFactory.setAutowireCandidateResolver(new ContextAnnotationAutowireCandidateResolver());
 
+    // TODO W-10736276 Remove this
     if (!featureFlaggingService.isEnabled(DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_LAX_INSTANTIATION)) {
       beanFactory.setInstantiationStrategy(new LaxInstantiationStrategyWrapper(new CglibSubclassingInstantiationStrategy(),
-                                                                               optionalObjectsController));
+                                                                               getOptionalObjectsController()));
     }
 
     return beanFactory;
@@ -765,10 +767,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   @Override
   public String toString() {
     return format("%s: %s (%s)", this.getClass().getName(), muleContext.getConfiguration().getId(), artifactType.name());
-  }
-
-  private Set<ExtensionModel> getExtensions() {
-    return extensionManager == null ? emptySet() : extensionManager.getExtensions();
   }
 
   public ArtifactAst getApplicationModel() {

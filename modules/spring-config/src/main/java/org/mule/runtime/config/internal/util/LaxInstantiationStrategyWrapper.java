@@ -28,7 +28,9 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
  *
  * @since 3.7.0
  * @see DiscardedOptionalBeanPostProcessor
+ * 
  */
+// TODO W-10736276 Remove this
 public class LaxInstantiationStrategyWrapper implements InstantiationStrategy {
 
   private final InstantiationStrategy delegate;

@@ -21,6 +21,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
  *
  * @since 3.7.0
  */
+// TODO W-10736276 Remove this
 public class DiscardedOptionalBeanPostProcessor implements InstantiationAwareBeanPostProcessor {
 
   private final OptionalObjectsController optionalObjectsController;
