@@ -16,7 +16,7 @@ import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.ast.internal.serialization.ArtifactAstSerializerFactory.JSON;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.config.internal.ConfigurationPropertiesResolverFactory.createConfigurationPropertiesResolver;
-import static org.mule.runtime.core.api.artifact.AstCosaUtils.xx;
+import static org.mule.runtime.core.api.artifact.ArtifactAstUtils.parseAndBuildAppExtensionModel;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -155,7 +155,7 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
 
   protected ArtifactAst parseArtifactIntoAst(Set<ExtensionModel> extensions, MuleContext muleContext) {
     try {
-      ArtifactAst ast = xx(configResources,
+      ArtifactAst ast = parseAndBuildAppExtensionModel(configResources,
           this::getParser,
           extensions,
           artifactType,

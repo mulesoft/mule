@@ -36,16 +36,16 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 
-public final class AstCosaUtils {
+public final class ArtifactAstUtils {
 
-  private static final Logger LOGGER = getLogger(AstCosaUtils.class);
+  private static final Logger LOGGER = getLogger(ArtifactAstUtils.class);
 
-  public static ArtifactAst xx(String[] configResources,
-                               AstXmlParserSupplier parserSupplier,
-                               Set<ExtensionModel> extensions,
-                               ArtifactType artifactType,
-                               boolean disableValidations,
-                               MuleContext muleContext) throws ConfigurationException {
+  public static ArtifactAst parseAndBuildAppExtensionModel(String[] configResources,
+                                                           AstXmlParserSupplier parserSupplier,
+                                                           Set<ExtensionModel> extensions,
+                                                           ArtifactType artifactType,
+                                                           boolean disableValidations,
+                                                           MuleContext muleContext) throws ConfigurationException {
 
     final ArtifactAst partialAst = doParseArtifactIntoAst(configResources, parserSupplier, extensions, true);
 
@@ -71,7 +71,7 @@ public final class AstCosaUtils {
       return empty();
     }
 
-    Optional<ExtensionModelLoader> loader = getOptionalLoaderById(AstCosaUtils.class.getClassLoader(), MULE_SDK_LOADER_ID);
+    Optional<ExtensionModelLoader> loader = getOptionalLoaderById(ArtifactAstUtils.class.getClassLoader(), MULE_SDK_LOADER_ID);
     if (loader.isPresent()) {
       final ExtensionManager extensionManager = muleContext.getExtensionManager();
       ExtensionModel appExtensionModel = loader.get()
