@@ -85,8 +85,13 @@ public final class AstXmlParserArtifactConfigurationProcessor extends AbstractAs
           artifactAst = emptyArtifact();
         } else {
           artifactAst = parseAndBuildAppExtensionModel(artifactConfigResources,
-              (exts, disableValidations) -> createMuleXmlParser(muleContext, exts, artifactProperties, artifactType, parentArtifactAst, disableXmlValidations),
-              extensions, toAstArtifactType(artifactType), disableXmlValidations, muleContext);
+                                                       (exts, disableValidations) -> createMuleXmlParser(muleContext, exts,
+                                                                                                         artifactProperties,
+                                                                                                         artifactType,
+                                                                                                         parentArtifactAst,
+                                                                                                         disableXmlValidations),
+                                                       extensions, toAstArtifactType(artifactType), disableXmlValidations,
+                                                       muleContext);
         }
       } else {
         artifactAst = toArtifactast(artifactDeclaration, extensions);

@@ -143,10 +143,10 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
 
   private AstXmlParser getParser(Set<ExtensionModel> extensions, boolean disableValidations) {
     XmlParserFactory xmlParserFactory = new XmlParserFactory(disableValidations, extensions, artifactProperties,
-        artifactType,
-        parentArtifactContext != null
-            ? parentArtifactContext.getArtifactAst()
-            : emptyArtifact());
+                                                             artifactType,
+                                                             parentArtifactContext != null
+                                                                 ? parentArtifactContext.getArtifactAst()
+                                                                 : emptyArtifact());
 
     return ignoreCaches
         ? xmlParserFactory.createMuleXmlParser()
@@ -156,11 +156,11 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
   protected ArtifactAst parseArtifactIntoAst(Set<ExtensionModel> extensions, MuleContext muleContext) {
     try {
       ArtifactAst ast = parseAndBuildAppExtensionModel(configResources,
-          this::getParser,
-          extensions,
-          artifactType,
-          disableXmlValidations,
-          muleContext);
+                                                       this::getParser,
+                                                       extensions,
+                                                       artifactType,
+                                                       disableXmlValidations,
+                                                       muleContext);
 
       if (getBoolean(SERIALIZE_DESERIALIZE_AST_PROPERTY)) {
         return serializeAndDeserialize(ast);
