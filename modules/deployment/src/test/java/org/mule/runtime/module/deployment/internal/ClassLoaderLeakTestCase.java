@@ -141,7 +141,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
     }));
   }
 
-  private void clearLogsAndTestMDCAdapterReferences() throws NoSuchFieldException, IllegalAccessException {
+  private void clearLogsAndMDCThreadReferences() throws NoSuchFieldException, IllegalAccessException {
     TestLoggerFactory.clearAll();
     MDCAdapter testMDCAdapter = StaticMDCBinder.SINGLETON.getMDCA();
     Field valueField = TestMDCAdapter.class.getDeclaredField("value");
