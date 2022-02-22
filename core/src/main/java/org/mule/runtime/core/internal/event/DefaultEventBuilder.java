@@ -234,7 +234,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   public CoreEvent.Builder clearParameters() {
     parameters = emptyCaseInsensitiveMap();
     modified = parametersModified = true;
-    
+
     return this;
   }
 

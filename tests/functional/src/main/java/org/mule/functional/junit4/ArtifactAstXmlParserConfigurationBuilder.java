@@ -10,22 +10,13 @@ import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.ast.api.ArtifactType.APPLICATION;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.ast.internal.serialization.ArtifactAstSerializerFactory.JSON;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.config.internal.ConfigurationPropertiesResolverFactory.createConfigurationPropertiesResolver;
-import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.getOptionalLoaderById;
-import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSION_NAME_PROPERTY_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_LOADER_ID;
-import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_TYPE_LOADER_PROPERTY_NAME;
-import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
-import static org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader.VERSION;
+import static org.mule.runtime.core.api.artifact.AstCosaUtils.xx;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -42,22 +33,17 @@ import org.mule.runtime.config.internal.ArtifactAstConfigurationBuilder;
 import org.mule.runtime.config.internal.ComponentBuildingDefinitionRegistryFactoryAware;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
-import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.type.catalog.ApplicationTypeLoader;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.dsl.api.ConfigResource;
-import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 import com.github.benmanes.caffeine.cache.Cache;
@@ -156,6 +142,18 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
     artifactAstConfigurationBuilder.configure(muleContext);
   }
 
+  private AstXmlParser getParser(Set<ExtensionModel> extensions, boolean disableValidations) {
+    XmlParserFactory xmlParserFactory = new XmlParserFactory(disableValidations, extensions, artifactProperties,
+        artifactType,
+        parentArtifactContext != null
+            ? parentArtifactContext.getArtifactAst()
+            : emptyArtifact());
+
+    return ignoreCaches
+        ? xmlParserFactory.createMuleXmlParser()
+        : parsersCache.get(xmlParserFactory);
+  }
+
   private ArtifactAst doParseArtifactIntoAst(Set<ExtensionModel> extensions, boolean disableValidations) {
     XmlParserFactory xmlParserFactory = new XmlParserFactory(disableValidations, extensions, artifactProperties,
                                                              artifactType,
@@ -177,63 +175,22 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
   }
 
   protected ArtifactAst parseArtifactIntoAst(Set<ExtensionModel> extensions, MuleContext muleContext) {
-    final ArtifactAst partialAst = doParseArtifactIntoAst(extensions, true);
-
-    final ArtifactAst effectiveAst = parseApplicationExtensionModel(partialAst, muleContext)
-        .map(extensionModel -> {
-          Set<ExtensionModel> enrichedExtensionModels = new HashSet<>(extensions);
-          enrichedExtensionModels.add(extensionModel);
-          return doParseArtifactIntoAst(enrichedExtensionModels, true); // TODO: use disableXmlValidations field
-        }).orElseGet(() -> doParseArtifactIntoAst(extensions, disableXmlValidations));
-
+    ArtifactAst ast = xx(Arrays.asList(configResources),
+        this::getParser,
+        extensions,
+        artifactType,
+        disableXmlValidations,
+        muleContext);
 
     if (getBoolean(SERIALIZE_DESERIALIZE_AST_PROPERTY)) {
       try {
-        return seralizeAndDeserialize(effectiveAst);
+        return seralizeAndDeserialize(ast);
       } catch (Exception e) {
         throw new MuleRuntimeException(e);
       }
     } else {
-      return effectiveAst;
+      return ast;
     }
-  }
-
-  private Optional<ExtensionModel> parseApplicationExtensionModel(ArtifactAst ast, MuleContext muleContext) {
-    if (!artifactType.equals(APPLICATION)) {
-      return empty();
-    }
-
-    Optional<ArtifactCoordinates> artifactCoordinates = muleContext.getConfiguration().getArtifactCoordinates();
-
-    if (!artifactCoordinates.isPresent()) {
-      logModelNotGenerated("No version specified on muleContext");
-      return empty();
-    }
-
-    Optional<ExtensionModelLoader> loader = getOptionalLoaderById(getClass().getClassLoader(), MULE_SDK_LOADER_ID);
-    if (loader.isPresent()) {
-      final ExtensionManager extensionManager = muleContext.getExtensionManager();
-      ExtensionModel appExtensionModel = loader.get()
-          .loadExtensionModel(builder(muleContext.getExecutionClassLoader().getParent(),
-                                      getDefault(extensionManager.getExtensions()))
-                                          .addParameter(VERSION, artifactCoordinates.get().getVersion())
-                                          .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
-                                          .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME,
-                                                        muleContext.getConfiguration().getId())
-                                          .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader())
-                                          .build());
-
-      return of(appExtensionModel);
-    } else {
-      logModelNotGenerated("Mule ExtensionModelLoader not found");
-      return empty();
-    }
-  }
-
-  private void logModelNotGenerated(String reason) {
-    // if (LOGGER.isWarnEnabled()) {
-    // LOGGER.warn(reason + ". ExtensionModel for app {} not generated", muleContext.getConfiguration().getId());
-    // }
   }
 
   private ArtifactAst seralizeAndDeserialize(ArtifactAst artifactAst) throws IOException {
