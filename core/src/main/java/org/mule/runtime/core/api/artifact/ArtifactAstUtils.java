@@ -45,7 +45,8 @@ public final class ArtifactAstUtils {
                                                            Set<ExtensionModel> extensions,
                                                            ArtifactType artifactType,
                                                            boolean disableValidations,
-                                                           MuleContext muleContext) throws ConfigurationException {
+                                                           MuleContext muleContext)
+      throws ConfigurationException {
 
     final ArtifactAst partialAst = doParseArtifactIntoAst(configResources, parserSupplier, extensions, true);
 
@@ -53,8 +54,11 @@ public final class ArtifactAstUtils {
         .map(extensionModel -> {
           Set<ExtensionModel> enrichedExtensionModels = new HashSet<>(extensions);
           enrichedExtensionModels.add(extensionModel);
-          return doParseArtifactIntoAst(configResources, parserSupplier, enrichedExtensionModels, true); // TODO: use disableXmlValidations field
-        }).orElseGet(() -> disableValidations ? partialAst : doParseArtifactIntoAst(configResources, parserSupplier, extensions, false));
+          return doParseArtifactIntoAst(configResources, parserSupplier, enrichedExtensionModels, true); // TODO: use
+                                                                                                         // disableXmlValidations
+                                                                                                         // field
+        }).orElseGet(() -> disableValidations ? partialAst
+            : doParseArtifactIntoAst(configResources, parserSupplier, extensions, false));
   }
 
   private static Optional<ExtensionModel> parseApplicationExtensionModel(ArtifactAst ast,
@@ -76,13 +80,13 @@ public final class ArtifactAstUtils {
       final ExtensionManager extensionManager = muleContext.getExtensionManager();
       ExtensionModel appExtensionModel = loader.get()
           .loadExtensionModel(builder(muleContext.getExecutionClassLoader().getParent(),
-              getDefault(extensionManager.getExtensions()))
-              .addParameter("version", artifactCoordinates.get().getVersion())
-              .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
-              .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME,
-                  muleContext.getConfiguration().getId())
-              .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader())
-              .build());
+                                      getDefault(extensionManager.getExtensions()))
+                                          .addParameter("version", artifactCoordinates.get().getVersion())
+                                          .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
+                                          .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME,
+                                                        muleContext.getConfiguration().getId())
+                                          .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader())
+                                          .build());
 
       return of(appExtensionModel);
     } else {
