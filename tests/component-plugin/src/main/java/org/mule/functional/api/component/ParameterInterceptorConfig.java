@@ -14,6 +14,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Tracks event parameters by classifying them through a reference name
+ *
+ * @since 4.5.0
+ */
 public class ParameterInterceptorConfig extends AbstractComponent {
 
   private Map<String, List<Map<String, TypedValue<?>>>> intercepted = new HashMap<>();

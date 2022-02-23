@@ -25,6 +25,11 @@ import org.mule.runtime.module.extension.mule.internal.config.factory.DefaultOpe
 
 import java.util.List;
 
+/**
+ * Definition provider for the {@code operation:def} element.
+ *
+ * @since 4.5.0
+ */
 public class OperationDslBuildingDefinitionProvider implements ComponentBuildingDefinitionProvider {
 
   private static ComponentBuildingDefinition.Builder baseDefinition =

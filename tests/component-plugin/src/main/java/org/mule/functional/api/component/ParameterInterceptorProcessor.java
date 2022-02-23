@@ -11,8 +11,15 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 
+/**
+ * {@link Processor} that invokes {@link ParameterInterceptorConfig#intercept(String, Map)} using each event's parameters
+ *
+ * @since 4.5.0
+ */
 public class ParameterInterceptorProcessor extends AbstractComponent implements Processor {
 
   @Inject

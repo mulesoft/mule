@@ -14,8 +14,17 @@ import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.List;
 
+/**
+ * A strongly typed operation defined through the Mule language.
+ *
+ * @since 4.5.0
+ */
 public interface Operation extends ExecutableComponent, Lifecycle {
 
+
+  /**
+   * @return the model that describes {@code this} operation
+   */
   OperationModel getModel();
 
   /**
@@ -44,14 +53,27 @@ public interface Operation extends ExecutableComponent, Lifecycle {
      */
     Builder processors(Processor... processors);
 
+    /**
+     * Configures the model that represents the produced operation
+     *
+     * @param operationModel an {@link OperationModel}
+     * @return {@code this} builder
+     */
     Builder setOperationModel(OperationModel operationModel);
 
+    /**
+     * Configures the {@link MuleContext} that owns the operation
+     *
+     * @param muleContext a {@link MuleContext}
+     * @return {@code this} builder
+     */
     Builder setMuleContext(MuleContext muleContext);
 
     /**
      * Builds an {@link Operation} with the provided configuration.
      *
      * @return a new {@link Operation} instance.
+     * @throws IllegalStateException if operation model, processors or muleContext not set.
      */
     Operation build();
   }

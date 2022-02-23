@@ -25,6 +25,11 @@ import java.util.concurrent.CompletableFuture;
 
 import org.slf4j.Logger;
 
+/**
+ * Default {@link Operation} implementation
+ *
+ * @since 4.5.0
+ */
 public class MuleOperation extends AbstractComponent implements Operation {
 
   private final static Logger LOGGER = getLogger(MuleOperation.class);

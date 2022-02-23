@@ -27,6 +27,11 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+/**
+ * {@link CompletableComponentExecutor} implemenetation that executes {@link Operation} instances.
+ *
+ * @since 4.5.0
+ */
 public class MuleOperationExecutor implements CompletableComponentExecutor<ComponentModel>, Initialisable {
 
   private static final Message NULL_MESSAGE = Message.builder().nullValue().build();

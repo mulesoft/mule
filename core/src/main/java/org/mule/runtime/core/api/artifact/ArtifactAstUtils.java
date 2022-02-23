@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.artifact;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.ast.api.ArtifactType.APPLICATION;
 import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.getOptionalLoaderById;
@@ -13,11 +15,8 @@ import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFAC
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSION_NAME_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_LOADER_ID;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_TYPE_LOADER_PROPERTY_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
-
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -38,10 +37,31 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 
+/**
+ * Utilities for parsing and handling {@link ArtifactAst}
+ *
+ * @since 4.5.0
+ */
 public final class ArtifactAstUtils {
 
   private static final Logger LOGGER = getLogger(ArtifactAstUtils.class);
 
+  /**
+   * Parses {@code configResources} for a Mule application and returns an {@link ArtifactAst} enriched with an additional
+   * {@link ExtensionModel} which models the app itself, with all its defined operations, sources, functions, etc.
+   * <p>
+   * This extra {@link ExtensionModel} is accessible through the {@link ArtifactAst#dependencies()} set its named after the
+   * {@code muleContext.getConfiguration.getId()} return value
+   *
+   * @param configResources    the paths to the application's config files
+   * @param parserSupplier     the supplier used to obtain the ast parser. It might be invoked several times during the parsing
+   * @param extensions         the initial set of extensions the app depends on.
+   * @param artifactType       the artifact type
+   * @param disableValidations whether to disable DSL validation
+   * @param muleContext        the app's {@link MuleContext}
+   * @return an {@link ArtifactAst}
+   * @throws ConfigurationException it the app couldn't be parsed
+   */
   public static ArtifactAst parseAndBuildAppExtensionModel(String[] configResources,
                                                            AstXmlParserSupplier parserSupplier,
                                                            Set<ExtensionModel> extensions,
@@ -81,7 +101,7 @@ public final class ArtifactAstUtils {
       ExtensionModel appExtensionModel = loader.get()
           .loadExtensionModel(builder(muleContext.getExecutionClassLoader().getParent(),
                                       getDefault(extensionManager.getExtensions()))
-                                          .addParameter("version", artifactCoordinates.get().getVersion())
+                                          .addParameter(VERSION_PROPERTY_NAME, artifactCoordinates.get().getVersion())
                                           .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
                                           .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME,
                                                         muleContext.getConfiguration().getId())
@@ -123,4 +143,6 @@ public final class ArtifactAstUtils {
       LOGGER.warn("ExtensionModel for app {} not generated: {}", muleContext.getConfiguration().getId(), reason);
     }
   }
+
+  private ArtifactAstUtils() {}
 }

@@ -16,6 +16,11 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+/**
+ * Returns and clears all the parameters captured in the {@link ParameterInterceptorConfig}
+ *
+ * @since 4.5.0
+ */
 public class DumpInterceptedParametersProcessor extends AbstractComponent implements Processor {
 
   @Inject

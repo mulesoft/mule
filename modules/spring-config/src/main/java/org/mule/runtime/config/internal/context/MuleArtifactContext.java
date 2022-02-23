@@ -50,9 +50,9 @@ import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFAC
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSION_NAME_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_LOADER_ID;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_TYPE_LOADER_PROPERTY_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
-import static org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.manager.ExtensionErrorsRegistrant.registerErrorMappings;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
@@ -346,7 +346,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     if (loader.isPresent()) {
       ExtensionModel appExtensionModel = loader.get()
           .loadExtensionModel(builder(getRegionClassLoader(), getDefault(extensionManager.getExtensions()))
-              .addParameter(VERSION, artifactCoordinates.get().getVersion())
+              .addParameter(VERSION_PROPERTY_NAME, artifactCoordinates.get().getVersion())
               .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, applicationModel)
               .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME, muleContext.getConfiguration().getId())
               .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader())

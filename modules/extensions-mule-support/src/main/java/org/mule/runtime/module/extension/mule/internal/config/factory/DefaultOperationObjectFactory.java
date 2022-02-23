@@ -20,6 +20,11 @@ import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionE
 import org.mule.runtime.module.extension.internal.runtime.operation.construct.MuleOperation;
 import org.mule.runtime.module.extension.mule.internal.config.provider.OperationDslBuildingDefinitionProvider.OperationBody;
 
+/**
+ * {@link ObjectFactory} for creating {@link Operation} instances
+ *
+ * @since 4.5.0
+ */
 public class DefaultOperationObjectFactory extends AbstractComponent implements ObjectFactory<Operation> {
 
   private final String name;

@@ -87,10 +87,10 @@ import org.mule.runtime.extension.api.runtime.source.SdkSourceFactory;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
@@ -741,6 +741,14 @@ public class MuleExtensionUtils {
         || org.mule.sdk.api.runtime.source.SourceCompletionCallback.class.equals(clazz);
   }
 
+  /**
+   * Finds an operation of the given {@code operationName} in the passed {@code extensionModel}
+   *
+   * @param extensionModel an {@link ExtensionModel}
+   * @param operationName  the name of the target operation
+   * @return optionally an {@link OperationModel}
+   * @since 4.5.0
+   */
   public static Optional<OperationModel> findOperation(ExtensionModel extensionModel, String operationName) {
     Reference<OperationModel> operation = new Reference<>();
     new ExtensionWalker() {

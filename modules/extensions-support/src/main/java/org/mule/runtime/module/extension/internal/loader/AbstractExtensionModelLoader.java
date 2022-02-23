@@ -11,15 +11,16 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_SDK_IGNORE_COMPONENT;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_SDK_POLLING_SOURCE_LIMIT;
+import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_COMPONENT_IGNORE;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENABLE_POLLING_SOURCE_LIMIT_PARAMETER;
 
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
+import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
-import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.validator.ConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validator.ConnectionProviderModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validator.DeprecationModelValidator;
@@ -36,8 +37,6 @@ public abstract class AbstractExtensionModelLoader extends ExtensionModelLoader 
 
   private static final boolean IGNORE_DISABLED = getProperty(DISABLE_SDK_IGNORE_COMPONENT) != null;
   private static final boolean ENABLE_POLLING_SOURCE_LIMIT = getProperty(ENABLE_SDK_POLLING_SOURCE_LIMIT) != null;
-
-  public static final String VERSION = "version";
 
   private final List<ExtensionModelValidator> validators = unmodifiableList(asList(
                                                                                    new ConfigurationModelValidator(),
@@ -72,7 +71,8 @@ public abstract class AbstractExtensionModelLoader extends ExtensionModelLoader 
   @Override
   protected final void declareExtension(ExtensionLoadingContext context) {
     String version =
-        context.<String>getParameter(VERSION).orElseThrow(() -> new IllegalArgumentException("version not specified"));
+        context.<String>getParameter(VERSION_PROPERTY_NAME)
+            .orElseThrow(() -> new IllegalArgumentException("version not specified"));
 
     ExtensionModelParserFactory parserFactory = getExtensionModelParserFactory(context);
     getModelLoaderDelegate(context, version).declare(parserFactory, context);
