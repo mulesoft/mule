@@ -91,6 +91,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.slf4j.LoggerFactory.getLogger;
+import static uk.org.lidalia.slf4jtest.TestLoggerFactory.getTestLogger;
 
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.functional.config.TestComponentBuildingDefinitionProvider;
@@ -301,11 +302,11 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleWithTestLog
   @BeforeClass
   public static void beforeClass() throws URISyntaxException, IllegalAccessException {
     // Reduces unnecessary logging
-    TestLogger compilerUtilsTestLogger = TestLoggerFactory.getTestLogger(CompilerUtils.class);
+    TestLogger compilerUtilsTestLogger = getTestLogger(CompilerUtils.class);
     compilerUtilsTestLogger.setEnabledLevelsForAllThreads(Level.ERROR);
-    TestLogger pollingProberTestLogger = TestLoggerFactory.getTestLogger(PollingProber.class);
+    TestLogger pollingProberTestLogger = getTestLogger(PollingProber.class);
     pollingProberTestLogger.setEnabledLevelsForAllThreads(Level.ERROR);
-    TestLogger testLogger = TestLoggerFactory.getTestLogger(LoggerMessageProcessor.class);
+    TestLogger testLogger = getTestLogger(LoggerMessageProcessor.class);
     testLogger.setEnabledLevelsForAllThreads(Level.ERROR);
     // Initialises logging plugins with correct classloader
     LogManager.getContext(false);
@@ -1414,10 +1415,14 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleWithTestLog
   }
 
   protected CoreEvent executeApplicationFlow(String flowName, String correlationId) throws Exception {
-    ClassLoader appClassLoader = deploymentService.getApplications().get(0).getArtifactClassLoader().getClassLoader();
+    return executeApplicationFlow(flowName, correlationId, 0);
+  }
+
+  protected CoreEvent executeApplicationFlow(String flowName, String correlationId, int appNumber) throws Exception {
+    ClassLoader appClassLoader = deploymentService.getApplications().get(appNumber).getArtifactClassLoader().getClassLoader();
     return withContextClassLoader(appClassLoader, () -> {
       final FlowRunner flowRunner =
-          new FlowRunner(deploymentService.getApplications().get(0).getArtifactContext().getRegistry(), flowName)
+          new FlowRunner(deploymentService.getApplications().get(appNumber).getArtifactContext().getRegistry(), flowName)
               .withPayload(TEST_MESSAGE);
 
       if (correlationId != null) {
