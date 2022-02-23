@@ -12,6 +12,9 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
+import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
+import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.extension.api.security.CredentialsPlacement.QUERY_PARAMS;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 
@@ -164,39 +167,39 @@ public class JavaConnectionProviderModelParserTestCase {
   }
 
   @Test
+  public void noManagementStrategyConnectionProvider() {
+    mockConnectionProviderWithClass(AbstractTransactionalConnectionProvider.class);
+    assertThat(parser.getConnectionManagementType(), is(NONE));
+  }
+
+  @Test
+  public void noManagementStrategySdkConnectionProvider() {
+    mockConnectionProviderWithClass(SdkAbstractTransactionalConnectionProvider.class);
+    assertThat(parser.getConnectionManagementType(), is(NONE));
+  }
+
+  @Test
   public void isPoolingConnectionProvider() {
     mockConnectionProviderWithClass(PoolingTransactionalConnectionProvider.class);
-    assertThat(JavaConnectionProviderModelParserUtils.isPoolingConnectionProvider(connectionProviderElement), is(true));
+    assertThat(parser.getConnectionManagementType(), is(POOLING));
   }
 
   @Test
   public void isSdkPoolingConnectionProvider() {
     mockConnectionProviderWithClass(SdkPoolingTransactionalConnectionProvider.class);
-    assertThat(JavaConnectionProviderModelParserUtils.isPoolingConnectionProvider(connectionProviderElement), is(true));
+    assertThat(parser.getConnectionManagementType(), is(POOLING));
   }
 
   @Test
   public void isCachedConnectionProvider() {
     mockConnectionProviderWithClass(CachedTransactionalConnectionProvider.class);
-    assertThat(JavaConnectionProviderModelParserUtils.isCachedConnectionProvider(connectionProviderElement), is(true));
+    assertThat(parser.getConnectionManagementType(), is(CACHED));
   }
 
   @Test
   public void isSdkCachedConnectionProvider() {
     mockConnectionProviderWithClass(SdkCachedTransactionalConnectionProvider.class);
-    assertThat(JavaConnectionProviderModelParserUtils.isCachedConnectionProvider(connectionProviderElement), is(true));
-  }
-
-  @Test
-  public void isTransactionalLegacyApi() {
-    assertThat(JavaConnectionProviderModelParserUtils
-        .isTransactional(new TypeWrapper(TestTransactionalConnection.class, TYPE_LOADER)), is(true));
-  }
-
-  @Test
-  public void isTransactionalSdkApi() {
-    assertThat(JavaConnectionProviderModelParserUtils
-        .isTransactional(new TypeWrapper(SdkTestTransactionalConnection.class, TYPE_LOADER)), is(true));
+    assertThat(parser.getConnectionManagementType(), is(CACHED));
   }
 
   private static class ValidationOAuthGrantTypeVisitor implements OAuthGrantTypeVisitor {
