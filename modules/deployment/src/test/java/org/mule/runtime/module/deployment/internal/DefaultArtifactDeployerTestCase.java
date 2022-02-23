@@ -19,7 +19,6 @@ import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.tck.SimpleUnitTestSupportScheduler;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
 import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;

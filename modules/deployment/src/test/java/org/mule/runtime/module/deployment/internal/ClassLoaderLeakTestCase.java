@@ -48,8 +48,6 @@ import org.mule.tck.util.CompilerUtils;
 import java.io.File;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
-import java.lang.reflect.Field;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.BeforeClass;
@@ -58,11 +56,6 @@ import org.junit.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
-import org.slf4j.impl.StaticMDCBinder;
-import org.slf4j.spi.MDCAdapter;
-import uk.org.lidalia.lang.ThreadLocal;
-import uk.org.lidalia.slf4jtest.TestLoggerFactory;
-import uk.org.lidalia.slf4jtest.TestMDCAdapter;
 
 public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase {
 
@@ -117,7 +110,6 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
   @Test
   public void undeploysApplicationDoesNotLeakClassloader() throws Exception {
-
     ApplicationFileBuilder applicationFileBuilder = getApplicationFileBuilder();
 
     addPackedAppFromBuilder(applicationFileBuilder);
@@ -139,17 +131,6 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
       assertThat(getDeploymentListener().getPhantomReference().isEnqueued(), is(true));
       return true;
     }));
-  }
-
-  private void clearLogsAndMDCThreadReferences() throws NoSuchFieldException, IllegalAccessException {
-    // TestMDCAdapter contains ThreadLocal variables with strong references to Threads which should be released to prevent
-    // possible leakages
-    TestLoggerFactory.clearAll();
-    MDCAdapter testMDCAdapter = StaticMDCBinder.SINGLETON.getMDCA();
-    Field valueField = TestMDCAdapter.class.getDeclaredField("value");
-    valueField.setAccessible(true);
-    ThreadLocal<Map<String, String>> threadLocal = (ThreadLocal<Map<String, String>>) valueField.get(testMDCAdapter);
-    threadLocal.reset();
   }
 
   @Test

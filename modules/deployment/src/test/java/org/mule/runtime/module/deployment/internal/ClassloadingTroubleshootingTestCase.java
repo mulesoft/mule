@@ -13,6 +13,7 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleBaseFolder;
 import static org.mule.runtime.core.api.util.ClassUtils.MULE_DESIGN_MODE;
@@ -37,6 +38,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -44,6 +46,7 @@ import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 import io.qameta.allure.Feature;
+import uk.org.lidalia.slf4jtest.LoggingEvent;
 import uk.org.lidalia.slf4jtest.TestLogger;
 import uk.org.lidalia.slf4jtest.TestLoggerFactory;
 
@@ -116,8 +119,8 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     startDeployment();
 
     assertDeploymentFailure(domainDeploymentListener, domainFileBuilder.getId());
-    assertThat(loggerDefaultArchiveDeployer.getAllLoggingEvents().stream().anyMatch(e -> e.getMessage()
-        .equals("Failed to deploy artifact [domain-classloading-troubleshooting-1.0.0-mule-domain]")), is(true));
+    assertThat(toMessages(loggerDefaultArchiveDeployer.getAllLoggingEvents()),
+               hasItem("Failed to deploy artifact [domain-classloading-troubleshooting-1.0.0-mule-domain]"));
     assertExpectedContentInDomainLog("classloading-troubleshooting/errors/domain-config-yaml-not-found");
   }
 
@@ -139,8 +142,8 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     startDeployment();
 
     assertDeploymentFailure(domainDeploymentListener, domainFileBuilder.getId());
-    assertThat(loggerDefaultArchiveDeployer.getAllLoggingEvents().stream().anyMatch(e -> e.getMessage()
-        .equals("Failed to deploy artifact [domain-classloading-troubleshooting-1.0.0-mule-domain]")), is(true));
+    assertThat(toMessages(loggerDefaultArchiveDeployer.getAllLoggingEvents()),
+               hasItem("Failed to deploy artifact [domain-classloading-troubleshooting-1.0.0-mule-domain]"));
     assertExpectedContentInDomainLog("classloading-troubleshooting/errors/domain-overrideme-class-not-found");
   }
 
@@ -167,8 +170,8 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
     assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    assertThat(loggerDefaultArchiveDeployer.getAllLoggingEvents().stream().anyMatch(e -> e.getMessage()
-        .equals("Failed to deploy artifact [app-classloading-troubleshooting-1.0.0-mule-application]")), is(true));
+    assertThat(toMessages(loggerDefaultArchiveDeployer.getAllLoggingEvents()),
+               hasItem("Failed to deploy artifact [app-classloading-troubleshooting-1.0.0-mule-application]"));
     assertExpectedContentInAppLog("classloading-troubleshooting/errors/app-overrideme2-class-not-found");
   }
 
@@ -196,8 +199,8 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
     assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    assertThat(loggerDefaultArchiveDeployer.getAllLoggingEvents().stream().anyMatch(e -> e.getMessage()
-        .equals("Failed to deploy artifact [app-classloading-troubleshooting-1.0.0-mule-application]")), is(true));
+    assertThat(toMessages(loggerDefaultArchiveDeployer.getAllLoggingEvents()),
+               hasItem("Failed to deploy artifact [app-classloading-troubleshooting-1.0.0-mule-application]"));
     assertExpectedContentInAppLog("classloading-troubleshooting/errors/app-test-overrideme-class-not-found");
   }
 
@@ -222,8 +225,8 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     deployDomainAndApplication(domainFileBuilder, applicationFileBuilder);
 
     assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
-    assertThat(loggerDefaultArchiveDeployer.getAllLoggingEvents().stream().anyMatch(e -> e.getMessage()
-        .equals("Failed to deploy artifact [app-classloading-troubleshooting-1.0.0-mule-application]")), is(true));
+    assertThat(toMessages(loggerDefaultArchiveDeployer.getAllLoggingEvents()),
+               hasItem("Failed to deploy artifact [app-classloading-troubleshooting-1.0.0-mule-application]"));
     assertExpectedContentInAppLog("classloading-troubleshooting/errors/app-jms-properties-resource-not-found");
   }
 
@@ -343,8 +346,8 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
           @Override
           public boolean isSatisfied() {
             try {
-              assertThat(logger.getAllLoggingEvents().stream().anyMatch(e -> e.getMessage().equals(expectedErrorLog)),
-                         is(true));
+              assertThat(toMessages(logger.getAllLoggingEvents()),
+                         hasItem(expectedErrorLog));
               return true;
             } catch (Exception e) {
               return false;
@@ -359,6 +362,10 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
             return "expected content ('" + expectedErrorLog + "') not found. Full log is:" + lineSeparator() + joiner.toString();
           }
         });
+  }
+
+  private List<String> toMessages(List<LoggingEvent> loggingEvents) {
+    return loggingEvents.stream().map(LoggingEvent::getMessage).collect(Collectors.toList());
   }
 
 }

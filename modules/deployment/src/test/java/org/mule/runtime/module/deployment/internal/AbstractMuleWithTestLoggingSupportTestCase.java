@@ -13,7 +13,6 @@ import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.slf4j.impl.StaticMDCBinder;
 import org.slf4j.spi.MDCAdapter;
 import uk.org.lidalia.lang.ThreadLocal;
@@ -29,15 +28,16 @@ public abstract class AbstractMuleWithTestLoggingSupportTestCase extends Abstrac
 
   @Before
   public void clearAllLogs() {
-    // Logs that are stored for later assert need to be cleared after every test
+    // Logs that are stored for later assert need to be cleared before every test
     // clearAll will reset state across all threads
     TestLoggerFactory.clearAll();
   }
 
   @After
-  public void clearMDCThreadReferences() throws NoSuchFieldException, IllegalAccessException {
-    // TestMDCAdapter contains ThreadLocal variables with strong references to Threads which should be released to prevent
-    // possible leakages
+  public void clearLogsAndMDCThreadReferences() throws NoSuchFieldException, IllegalAccessException {
+    // TestMDCAdapter contains its own implementation of ThreadLocal variables which hold strong references to Threads that should
+    // be released to prevent possible leakages
+    TestLoggerFactory.clearAll();
     MDCAdapter testMDCAdapter = StaticMDCBinder.SINGLETON.getMDCA();
     Field valueField = TestMDCAdapter.class.getDeclaredField("value");
     valueField.setAccessible(true);
