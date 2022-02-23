@@ -14,7 +14,6 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.config.internal.factories.BootstrapObjectFactoryBean;
-import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -110,7 +109,6 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
     doRegisterObject(bootstrapProperty.getKey(), builder);
   }
 
-  // TODO W-10736276 Remove this
   private void notifyIfOptional(String key, boolean optional) {
     if (optional && optionalObjectsController != null) {
       optionalObjectsController.registerOptionalKey(key);
@@ -121,9 +119,4 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
     beanDefinitionRegister.accept(key, builder.getBeanDefinition());
   }
 
-  private void registerInstance(String key, Object value) {
-    BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(ConstantFactoryBean.class);
-    builder.addConstructorArgValue(value);
-    doRegisterObject(key, builder);
-  }
 }
