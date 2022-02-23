@@ -89,7 +89,7 @@ public final class AstXmlParserArtifactConfigurationProcessor extends AbstractAs
                                                                                                          artifactProperties,
                                                                                                          artifactType,
                                                                                                          parentArtifactAst,
-                                                                                                         disableXmlValidations),
+                                                                                                         disableValidations),
                                                        extensions, toAstArtifactType(artifactType), disableXmlValidations,
                                                        muleContext);
         }
