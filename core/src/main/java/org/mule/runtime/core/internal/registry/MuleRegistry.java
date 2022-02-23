@@ -18,14 +18,6 @@ import java.util.Collection;
 public interface MuleRegistry extends Registry {
 
   /**
-   * Pass this flag as metadata of the {@link Registry#registerObject(String, Object, Object)} method to have lifecycle method
-   * calls on the registered objects omitted. Unless extending Mule, one will probably never have a use for this.
-   *
-   * @see Registry#registerObject(String, Object, Object)
-   */
-  int LIFECYCLE_BYPASS_FLAG = 0x01;
-
-  /**
    * Determines whether Inject processors should get executed on an object added to the registry Inject processors are responsible
    * for processing inject interfaces such as {@link org.mule.runtime.core.api.context.MuleContextAware}
    */

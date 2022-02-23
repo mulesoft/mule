@@ -163,15 +163,6 @@ public abstract class AbstractRegistry implements Registry {
   }
 
   /**
-   * {@inheritDoc}
-   */
-  @Override
-  @Deprecated
-  public final Object unregisterObject(String key, Object metadata) throws RegistrationException {
-    return unregisterObject(key);
-  }
-
-  /**
    * Template method for the logic to actually unregister the key without applying any lifecycle to it. Applying the shutdown
    * lifecycle will be up to {@link #unregisterObject(String)}
    *

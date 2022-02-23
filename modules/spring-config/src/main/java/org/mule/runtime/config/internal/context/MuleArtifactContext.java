@@ -404,6 +404,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     addBeanPostProcessors(beanFactory,
                           new MuleContextPostProcessor(muleContext),
+                          // ?
                           new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext
                               .getRegistry(), beanFactory),
                           // TODO W-10736276 Remove this postProcessor
