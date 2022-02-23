@@ -10,10 +10,10 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.core.internal.util.ArrayUtils;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.Collection;
 import java.util.List;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Implementation of {@link OptionalObjectsController} which groups a list of controllers and executes every operation on all of
@@ -21,6 +21,7 @@ import java.util.List;
  *
  * @since 3.7.0
  */
+// TODO W-10736276 Remove this
 public class CompositeOptionalObjectsController implements OptionalObjectsController {
 
   private final List<OptionalObjectsController> controllers;
