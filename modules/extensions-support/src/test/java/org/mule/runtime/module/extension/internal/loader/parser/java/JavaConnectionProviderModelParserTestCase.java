@@ -13,14 +13,18 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.extension.api.security.CredentialsPlacement.QUERY_PARAMS;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 
+import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.AuthorizationCode;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.ClientCredentials;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthCallbackValue;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantTypeVisitor;
@@ -33,6 +37,8 @@ import org.mule.runtime.module.extension.api.loader.java.type.ConnectionProvider
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.loader.java.property.oauth.OAuthCallbackValuesModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ConnectionProviderTypeWrapper;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
+import org.mule.runtime.module.extension.internal.loader.parser.java.connection.JavaConnectionProviderModelParserUtils;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -155,6 +161,42 @@ public class JavaConnectionProviderModelParserTestCase {
     Optional<OAuthCallbackValuesModelProperty> oAuthCallbackValuesModelProperty =
         parseOAuthCallbackValuesModelPropertyFromConnectionProviderClass(AuthorizationCodeConnectionProvider.class);
     assertThat(oAuthCallbackValuesModelProperty.isPresent(), is(false));
+  }
+
+  @Test
+  public void isPoolingConnectionProvider() {
+    mockConnectionProviderWithClass(PoolingTransactionalConnectionProvider.class);
+    assertThat(JavaConnectionProviderModelParserUtils.isPoolingConnectionProvider(connectionProviderElement), is(true));
+  }
+
+  @Test
+  public void isSdkPoolingConnectionProvider() {
+    mockConnectionProviderWithClass(SdkPoolingTransactionalConnectionProvider.class);
+    assertThat(JavaConnectionProviderModelParserUtils.isPoolingConnectionProvider(connectionProviderElement), is(true));
+  }
+
+  @Test
+  public void isCachedConnectionProvider() {
+    mockConnectionProviderWithClass(CachedTransactionalConnectionProvider.class);
+    assertThat(JavaConnectionProviderModelParserUtils.isCachedConnectionProvider(connectionProviderElement), is(true));
+  }
+
+  @Test
+  public void isSdkCachedConnectionProvider() {
+    mockConnectionProviderWithClass(SdkCachedTransactionalConnectionProvider.class);
+    assertThat(JavaConnectionProviderModelParserUtils.isCachedConnectionProvider(connectionProviderElement), is(true));
+  }
+
+  @Test
+  public void isTransactionalLegacyApi() {
+    assertThat(JavaConnectionProviderModelParserUtils
+        .isTransactional(new TypeWrapper(TestTransactionalConnection.class, TYPE_LOADER)), is(true));
+  }
+
+  @Test
+  public void isTransactionalSdkApi() {
+    assertThat(JavaConnectionProviderModelParserUtils
+        .isTransactional(new TypeWrapper(SdkTestTransactionalConnection.class, TYPE_LOADER)), is(true));
   }
 
   private static class ValidationOAuthGrantTypeVisitor implements OAuthGrantTypeVisitor {
@@ -295,5 +337,64 @@ public class JavaConnectionProviderModelParserTestCase {
     private String nonCallbackValue;
 
 
+  }
+
+  interface TestTransactionalConnection extends TransactionalConnection {
+  }
+
+  private class AbstractTransactionalConnectionProvider implements ConnectionProvider<TestTransactionalConnection> {
+
+    @Override
+    public TestTransactionalConnection connect() throws ConnectionException {
+      return null;
+    }
+
+    @Override
+    public void disconnect(TestTransactionalConnection connection) {
+
+    }
+
+    @Override
+    public ConnectionValidationResult validate(TestTransactionalConnection connection) {
+      return null;
+    }
+  }
+
+  private class PoolingTransactionalConnectionProvider extends AbstractTransactionalConnectionProvider
+      implements PoolingConnectionProvider<TestTransactionalConnection> {
+  }
+
+  private class CachedTransactionalConnectionProvider extends AbstractTransactionalConnectionProvider
+      implements CachedConnectionProvider<TestTransactionalConnection> {
+  }
+
+  protected interface SdkTestTransactionalConnection extends org.mule.sdk.api.connectivity.TransactionalConnection {
+  }
+
+  class SdkAbstractTransactionalConnectionProvider
+      implements org.mule.sdk.api.connectivity.ConnectionProvider<SdkTestTransactionalConnection> {
+
+    @Override
+    public SdkTestTransactionalConnection connect() throws ConnectionException {
+      return null;
+    }
+
+    @Override
+    public void disconnect(SdkTestTransactionalConnection connection) {
+
+    }
+
+    @Override
+    public org.mule.sdk.api.connectivity.ConnectionValidationResult validate(SdkTestTransactionalConnection connection) {
+      return null;
+    }
+  }
+
+  private class SdkPoolingTransactionalConnectionProvider extends SdkAbstractTransactionalConnectionProvider
+      implements org.mule.sdk.api.connectivity.PoolingConnectionProvider<SdkTestTransactionalConnection> {
+  }
+
+  private class SdkCachedTransactionalConnectionProvider extends SdkAbstractTransactionalConnectionProvider
+      implements org.mule.sdk.api.connectivity.CachedConnectionProvider<SdkTestTransactionalConnection> {
   }
 }
