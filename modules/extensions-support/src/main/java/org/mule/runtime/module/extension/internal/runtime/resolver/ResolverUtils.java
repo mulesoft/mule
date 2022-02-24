@@ -169,7 +169,7 @@ public class ResolverUtils {
   /**
    * Obtains a {@link TypedValue} of {@link Cursor} based on the given {@code typedValue}, if one is available. Additionally, if
    * the resulting cursor is a {@link CursorStream}, it will be wrapped inside {@link UnclosableCursorStream}.
-   * 
+   *
    * For performance reasons, we want to avoid receiving the decorator as a parameter.
    *
    * @return the given {@code typedValue} but converting a {@link CursorProvider} to a {@link Cursor} if any is present.
