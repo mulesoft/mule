@@ -136,9 +136,16 @@ public interface MuleContext extends Lifecycle {
 
   /**
    * Gets the queue manager used by mule for queuing events. This is used for service queues.
+   * 
+   * @deprecated Used only internally by Mule Runtime
    */
+  @Deprecated
   QueueManager getQueueManager();
 
+  /*
+   * @deprecated Used only internally by Mule Runtime
+   */
+  @Deprecated
   ObjectStoreManager getObjectStoreManager();
 
   ExtensionManager getExtensionManager();
