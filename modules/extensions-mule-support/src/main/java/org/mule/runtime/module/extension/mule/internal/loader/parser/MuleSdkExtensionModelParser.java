@@ -13,6 +13,8 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
+import static org.mule.runtime.internal.dsl.DslConstants.THIS_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.THIS_PREFIX;
 import static org.mule.sdk.api.annotation.Extension.MULESOFT;
 
 import org.mule.metadata.api.TypeLoader;
@@ -132,7 +134,7 @@ class MuleSdkExtensionModelParser implements ExtensionModelParser {
 
   @Override
   public Optional<XmlDslConfiguration> getXmlDslConfiguration() {
-    return of(new XmlDslConfiguration("this", "http://www.mulesoft.org/schema/mule/this"));
+    return of(new XmlDslConfiguration(THIS_PREFIX, THIS_NAMESPACE));
 
   }
 
