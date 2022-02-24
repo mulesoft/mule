@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 import static java.lang.System.arraycopy;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
-import static org.mule.runtime.core.internal.util.message.MessageUtils.getCursorStreamDecorator;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.getParamNames;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.toMap;
 import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isConfigParameter;
@@ -20,7 +19,7 @@ import static org.mule.runtime.module.extension.internal.runtime.execution.Metho
 import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isParameterResolverType;
 import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isSourceCompletionCallbackType;
 import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isStreamingHelperType;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursorAsUnclosable;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
 import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.hasParameterGroupAnnotation;
 import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.isParameterGroupShowInDsl;
@@ -48,9 +47,11 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.internal.util.message.stream.UnclosableCursorStream;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -400,19 +401,19 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     initArgumentResolvers();
   }
 
-  private static class InputStreamArgumentResolverDecorator extends ArgumentResolverDecorator {
+  private static class InputStreamArgumentResolverDecorator extends ArgumentResolverDecorator<InputStream> {
 
     public InputStreamArgumentResolverDecorator(ArgumentResolver<Object> decoratee) {
       super(decoratee);
     }
 
     @Override
-    protected Object decorate(Object value) {
-      return getCursorStreamDecorator().apply(value);
+    protected InputStream decorate(InputStream value) {
+      return value instanceof CursorStream ? new UnclosableCursorStream((CursorStream) value) : value;
     }
   }
 
-  private static class DefaultValueArgumentResolverDecorator extends ArgumentResolverDecorator {
+  private static class DefaultValueArgumentResolverDecorator extends ArgumentResolverDecorator<Object> {
 
     private final Object defaultValue;
 
@@ -432,19 +433,19 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     }
   }
 
-  private static class TypedValueCursorArgumentResolverDecorator extends ArgumentResolverDecorator {
+  private static class TypedValueCursorArgumentResolverDecorator extends ArgumentResolverDecorator<TypedValue<?>> {
 
     public TypedValueCursorArgumentResolverDecorator(ArgumentResolver<Object> decoratee) {
       super(decoratee);
     }
 
     @Override
-    protected Object decorate(Object value) {
-      return resolveCursor((TypedValue) value, getCursorStreamDecorator());
+    protected TypedValue<?> decorate(TypedValue<?> value) {
+      return resolveCursorAsUnclosable(value);
     }
   }
 
-  private static class ObjectArgumentResolverDecorator extends ArgumentResolverDecorator {
+  private static class ObjectArgumentResolverDecorator extends ArgumentResolverDecorator<Object> {
 
     public ObjectArgumentResolverDecorator(ArgumentResolver<Object> decoratee) {
       super(decoratee);
@@ -452,11 +453,11 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
     @Override
     protected Object decorate(Object value) {
-      return resolveCursor(value, getCursorStreamDecorator());
+      return resolveCursorAsUnclosable(value);
     }
   }
 
-  private static abstract class ArgumentResolverDecorator implements ArgumentResolver<Object> {
+  private static abstract class ArgumentResolverDecorator<T> implements ArgumentResolver<Object> {
 
     private final ArgumentResolver<Object> decoratee;
 
@@ -466,10 +467,10 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
     @Override
     public Object resolve(ExecutionContext executionContext) {
-      return decorate(decoratee.resolve(executionContext));
+      return decorate((T) decoratee.resolve(executionContext));
     }
 
-    protected abstract Object decorate(Object value);
+    protected abstract T decorate(T value);
 
     @Override
     public String toString() {

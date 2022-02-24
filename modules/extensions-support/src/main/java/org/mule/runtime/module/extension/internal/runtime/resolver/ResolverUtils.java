@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static java.util.Optional.empty;
-import static java.util.function.UnaryOperator.identity;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -27,7 +26,9 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.internal.util.message.stream.UnclosableCursorStream;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
 
 import java.util.Optional;
@@ -121,7 +122,14 @@ public class ResolverUtils {
    * @return the given {@code value} but converting a {@link CursorProvider} to a {@link Cursor} if any is present.
    */
   public static Object resolveCursor(Object value) {
-    return resolveCursor(value, identity());
+    // For performance reasons, we avoid delegating to the other version with the valueMapper parameter.
+    if (value instanceof CursorProvider) {
+      return ((CursorProvider<?>) value).openCursor();
+    } else if (value instanceof TypedValue) {
+      return resolveCursor((TypedValue<?>) value);
+    }
+
+    return value;
   }
 
   /**
@@ -164,11 +172,24 @@ public class ResolverUtils {
     return valueMapper.apply(value);
   }
 
-  public static Object resolveCursor(TypedValue<?> typedValue) {
-    return resolveCursor(typedValue, identity());
+  /**
+   * Obtains a {@link TypedValue} of {@link Cursor} based on the given {@code typedValue}, if one is available.
+   *
+   * @return the given {@code typedValue} but converting a {@link CursorProvider} to a {@link Cursor} if any is present.
+   */
+  public static TypedValue<?> resolveCursor(TypedValue<?> typedValue) {
+    // For performance reasons, we avoid delegating to the other version with the valueMapper parameter.
+    Object objectValue = typedValue.getValue();
+
+    if (objectValue instanceof CursorProvider) {
+      Cursor cursor = ((CursorProvider<?>) objectValue).openCursor();
+      return typedValue(typedValue, cursor);
+    }
+
+    return typedValue;
   }
 
-  public static Object resolveCursor(TypedValue<?> typedValue, UnaryOperator valueMapper) {
+  public static TypedValue<?> resolveCursor(TypedValue<?> typedValue, UnaryOperator valueMapper) {
     Object objectValue = typedValue.getValue();
 
     if (objectValue instanceof CursorProvider) {
@@ -185,8 +206,96 @@ public class ResolverUtils {
     }
   }
 
-  private static Object typedValue(TypedValue<?> typedValue, UnaryOperator valueMapper, Object value) {
+  /**
+   * Obtains a {@link Cursor} based on the {@code value}, if one is available. Additionally, if the resulting cursor is a
+   * {@link CursorStream}, it would be wrapped it inside {@link UnclosableCursorStream}.
+   *
+   * @return the given {@code value} but converting a {@link CursorProvider} to a {@link Cursor} if any is present.
+   */
+  public static Object resolveCursorAsUnclosable(Object value) {
+    if (value instanceof CursorProvider) {
+      return resolveCursorProviderAsUnclosable((CursorProvider<? extends Cursor>) value);
+    } else if (value instanceof TypedValue) {
+      return resolveCursorAsUnclosable((TypedValue<?>) value);
+    } else if (value instanceof CursorStream) {
+      return new UnclosableCursorStream((CursorStream) value);
+    }
+
+    return value;
+  }
+
+  /**
+   * Obtains a {@link TypedValue} of {@link Cursor} based on the given {@code typedValue}, if one is available. Additionally, if
+   * the resulting cursor is a {@link CursorStream}, it will be wrapped it inside {@link UnclosableCursorStream}.
+   *
+   * @return the given {@code typedValue} but converting a {@link CursorProvider} to a {@link Cursor} if any is present.
+   */
+  public static TypedValue<?> resolveCursorAsUnclosable(TypedValue<?> typedValue) {
+    Object objectValue = typedValue.getValue();
+
+    if (objectValue instanceof CursorProvider) {
+      Cursor cursor = resolveCursorProviderAsUnclosable((CursorProvider<?>) objectValue);
+      return typedValue(typedValue, cursor);
+    } else if (objectValue instanceof CursorStream) {
+      return new TypedValue<>(new UnclosableCursorStream((CursorStream) objectValue), typedValue.getDataType(),
+                              typedValue.getByteLength());
+    }
+
+    return typedValue;
+  }
+
+  /**
+   * If the value given is a {@link CursorStream} or a {@link TypedValue} of a {@link CursorStream}, it will be wrapped inside
+   * {@link UnclosableCursorStream}.
+   *
+   * @return A decorated value (or typed value), or the same instance if no change was needed.
+   */
+  public static Object typedValueAsUnclosable(Object value) {
+    if (value instanceof TypedValue) {
+      return typedValueAsUnclosable((TypedValue<?>) value);
+    } else if (value instanceof CursorStream) {
+      return new UnclosableCursorStream((CursorStream) value);
+    }
+
+    return value;
+  }
+
+  /**
+   * If the value of the given {@link TypedValue} is a {@link CursorStream}, it will be wrapped inside
+   * {@link UnclosableCursorStream}.
+   *
+   * @return A decorated typed value, or the same instance if no change was needed.
+   */
+  public static TypedValue<?> typedValueAsUnclosable(TypedValue<?> typedValue) {
+    Object objectValue = typedValue.getValue();
+
+    if (objectValue instanceof CursorStream) {
+      return new TypedValue<>(new UnclosableCursorStream((CursorStream) objectValue), typedValue.getDataType(),
+                              typedValue.getByteLength());
+    }
+
+    return typedValue;
+  }
+
+  private static Cursor resolveCursorProviderAsUnclosable(CursorProvider<?> cursorProvider) {
+    Cursor cursor = cursorProvider.openCursor();
+    if (cursor instanceof CursorStream) {
+      return new UnclosableCursorStream((CursorStream) cursor);
+    }
+    return cursor;
+  }
+
+  private static TypedValue<?> typedValue(TypedValue<?> typedValue, UnaryOperator valueMapper, Object value) {
     return new TypedValue<>(valueMapper.apply(value), DataType.builder()
+        .type(value != null ? value.getClass() : Object.class)
+        .mediaType(typedValue.getDataType().getMediaType())
+        .build(), typedValue.getByteLength());
+  }
+
+  private static TypedValue<?> typedValue(TypedValue<?> typedValue, Object value) {
+    // Even though we could delegate to the other method that receives a valueMapper passing an identity, for performance
+    // reasons we prefer to have this other version
+    return new TypedValue<>(value, DataType.builder()
         .type(value != null ? value.getClass() : Object.class)
         .mediaType(typedValue.getDataType().getMediaType())
         .build(), typedValue.getByteLength());
