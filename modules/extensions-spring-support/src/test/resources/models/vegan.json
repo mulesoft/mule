@@ -12732,7 +12732,7 @@
         {
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
-          "supportsConnectivityTesting": true,
+          "supportsConnectivityTesting": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "KIWI",
