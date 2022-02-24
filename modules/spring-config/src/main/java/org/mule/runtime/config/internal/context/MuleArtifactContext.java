@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
@@ -330,36 +331,50 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       return;
     }
 
-    boolean handbreak = true;
-    if (handbreak) {
+    final String appName = muleContext.getConfiguration().getId();
+
+    if (extensionManager.getExtension(appName).isPresent()) {
+      logModelNotGenerated("ExtensionModel already registered");
       return;
+    }
+
+    fetchOrGenerateApplicationExtensionModel(appName).ifPresent(appExtensionModel -> {
+      ExtensionManager appManager = extensionManager instanceof CompositeArtifactExtensionManager
+          ? ((CompositeArtifactExtensionManager) extensionManager).getChildExtensionManager()
+          : extensionManager;
+
+      appManager.registerExtension(appExtensionModel);
+    });
+  }
+
+  private Optional<ExtensionModel> fetchOrGenerateApplicationExtensionModel(String appName) {
+    Optional<ExtensionModel> appExtensionModel = applicationModel.dependencies().stream()
+        .filter(em -> em.getName().equals(appName))
+        .findFirst();
+
+    if (appExtensionModel.isPresent()) {
+      return appExtensionModel;
     }
 
     Optional<ArtifactCoordinates> artifactCoordinates = muleContext.getConfiguration().getArtifactCoordinates();
 
     if (!artifactCoordinates.isPresent()) {
       logModelNotGenerated("No version specified on muleContext");
-      return;
+      return empty();
     }
 
     Optional<ExtensionModelLoader> loader = getMuleExtensionLoader();
     if (loader.isPresent()) {
-      ExtensionModel appExtensionModel = loader.get()
+      return of(loader.get()
           .loadExtensionModel(builder(getRegionClassLoader(), getDefault(extensionManager.getExtensions()))
               .addParameter(VERSION_PROPERTY_NAME, artifactCoordinates.get().getVersion())
               .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, applicationModel)
               .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME, muleContext.getConfiguration().getId())
               .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader())
-              .build());
-
-      ExtensionManager appManager = extensionManager instanceof CompositeArtifactExtensionManager
-          ? ((CompositeArtifactExtensionManager) extensionManager).getChildExtensionManager()
-          : extensionManager;
-
-      appManager.registerExtension(appExtensionModel);
+              .build()));
     } else {
       logModelNotGenerated("Mule ExtensionModelLoader not found");
-      return;
+      return empty();
     }
   }
 
