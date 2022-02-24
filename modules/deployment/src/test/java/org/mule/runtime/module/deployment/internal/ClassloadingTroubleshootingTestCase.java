@@ -20,6 +20,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.MULE_DESIGN_MODE;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+import static uk.org.lidalia.slf4jtest.TestLoggerFactory.getTestLogger;
 
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultMuleApplication;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
@@ -64,9 +65,9 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
   private JarFileBuilder overrider2Library;
   private JarFileBuilder overriderTestLibrary;
 
-  TestLogger loggerDefaultMuleDomain = TestLoggerFactory.getTestLogger(DefaultMuleDomain.class);
-  TestLogger loggerDefaultArchiveDeployer = TestLoggerFactory.getTestLogger(DefaultArchiveDeployer.class);
-  TestLogger loggerDefaultMuleApplication = TestLoggerFactory.getTestLogger(DefaultMuleApplication.class);
+  TestLogger loggerDefaultMuleDomain = getTestLogger(DefaultMuleDomain.class);
+  TestLogger loggerDefaultArchiveDeployer = getTestLogger(DefaultArchiveDeployer.class);
+  TestLogger loggerDefaultMuleApplication = getTestLogger(DefaultMuleApplication.class);
 
   public ClassloadingTroubleshootingTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
