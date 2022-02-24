@@ -361,6 +361,8 @@ public interface AllureConstants {
 
     interface ObjectStoreStory {
 
+      String OBJECT_STORE_DATA_STORAGE = "ObjectStore data storage";
+
       String PERSISTENT_DATA_REDEPLOYMENT = "Persistent data redeployment";
 
       String OBJECT_STORE_AS_OPERATION_PARAMETER = "ObjectStore is used as an operation parameter";
@@ -444,6 +446,7 @@ public interface AllureConstants {
 
     interface VMStory {
 
+      String VM_QUEUES = "VM Queues";
       String PERSISTENT_DATA_REDEPLOYMENT = "Persistent data redeployment";
 
     }

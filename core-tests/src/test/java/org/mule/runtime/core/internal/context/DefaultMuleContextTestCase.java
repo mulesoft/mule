@@ -31,6 +31,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
@@ -117,7 +118,7 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
   @Test
   public void getObjectStoreManager() throws Exception {
     createMuleContext();
-    Object osManager = context.getObjectStoreManager();
+    Object osManager = ((MuleContextWithRegistry) context).getRegistry().lookupObject(ObjectStoreManager.class);
     assertThat(osManager, instanceOf(MuleObjectStoreManager.class));
   }
 
