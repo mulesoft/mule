@@ -11,6 +11,10 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.errorInvokingMessageProcessorWithinTransaction;
+import static org.mule.runtime.core.api.exception.TransactionCheckProcessor.COMMIT_TX;
+import static org.mule.runtime.core.api.exception.TransactionCheckProcessor.CONTINUE_WITH_TX;
+import static org.mule.runtime.core.api.exception.TransactionCheckProcessor.LAST_TRANSACTION_STATE;
+import static org.mule.runtime.core.api.exception.TransactionCheckProcessor.TRANSACTION_CHECK_ENABLED;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createScopeTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -56,6 +60,7 @@ import java.util.List;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
+import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
 /**
@@ -79,33 +84,50 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    if (transactionConfig.getAction() != ACTION_INDIFFERENT) {
-      ExecutionTemplate<CoreEvent> executionTemplate = createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
-      final I18nMessage txErrorMessage = errorInvokingMessageProcessorWithinTransaction(nestedChain, transactionConfig);
-
-      return subscriberContext()
-          .flatMapMany(ctx -> from(publisher)
-              .handle((event, sink) -> {
-                final boolean txPrevoiuslyActive = isTransactionActive();
-                Transaction previousTx = getCurrentTx();
-                try {
-                  sink.next(executionTemplate.execute(() -> {
-                    handlePreviousTransaction(txPrevoiuslyActive, previousTx, getCurrentTx());
-                    return processBlocking(ctx, event);
-                  }));
-                } catch (Exception e) {
-                  final Throwable unwrapped = unwrap(e);
-
-                  if (unwrapped instanceof MuleException) {
-                    sink.error(unwrapped);
-                  } else {
-                    sink.error(new DefaultMuleException(txErrorMessage, unwrapped));
-                  }
-                }
-              }));
-    } else {
-      return from(publisher).transform(nestedChain);
+    if (transactionConfig.getAction() == ACTION_INDIFFERENT) {
+      return withTransactionCheckIfNeeded(from(publisher).transform(nestedChain));
     }
+
+    ExecutionTemplate<CoreEvent> executionTemplate = createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
+    final I18nMessage txErrorMessage = errorInvokingMessageProcessorWithinTransaction(nestedChain, transactionConfig);
+
+    return subscriberContext()
+        .flatMapMany(ctx -> from(publisher)
+            .handle((event, sink) -> {
+              final boolean txPrevoiuslyActive = isTransactionActive();
+              Transaction previousTx = getCurrentTx();
+              try {
+                sink.next(executionTemplate.execute(() -> {
+                  handlePreviousTransaction(txPrevoiuslyActive, previousTx, getCurrentTx());
+                  return withTransactionCheckIfNeeded(processBlocking(ctx, event));
+                }));
+              } catch (Exception e) {
+                final Throwable unwrapped = unwrap(e);
+
+                if (unwrapped instanceof MuleException) {
+                  sink.error(unwrapped);
+                } else {
+                  sink.error(new DefaultMuleException(txErrorMessage, unwrapped));
+                }
+              }
+            }));
+
+  }
+
+  private CoreEvent withTransactionCheckIfNeeded(CoreEvent event) {
+    if (!TRANSACTION_CHECK_ENABLED) {
+      return event;
+    }
+    return CoreEvent.builder(event).addVariable(LAST_TRANSACTION_STATE, COMMIT_TX).build();
+  }
+
+  private Publisher<CoreEvent> withTransactionCheckIfNeeded(Flux<CoreEvent> publisher) {
+    if (!TRANSACTION_CHECK_ENABLED) {
+      return publisher;
+    }
+    return publisher.map(event -> isTransactionActive()
+        ? CoreEvent.builder(event).addVariable(LAST_TRANSACTION_STATE, CONTINUE_WITH_TX).build()
+        : event);
   }
 
   private void handlePreviousTransaction(final boolean txPrevoiuslyActive, Transaction previousTx, Transaction currentTx) {

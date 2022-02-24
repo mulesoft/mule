@@ -6,6 +6,13 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
+import static org.mule.runtime.core.api.exception.TransactionCheckProcessor.CONTINUE_WITH_TX;
+import static org.mule.runtime.core.api.exception.TransactionCheckProcessor.LAST_TRANSACTION_STATE;
+import static org.mule.runtime.core.api.exception.TransactionCheckProcessor.ROLLBACK_TX;
+import static org.mule.runtime.core.api.exception.TransactionCheckProcessor.TRANSACTION_CHECK_ENABLED;
+
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
@@ -19,9 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-
-import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
-import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
 
 /**
  * Handler that will propagate errors and rollback transactions. Replaces the rollback-exception-strategy from Mule 3.
@@ -57,8 +61,15 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     return event -> {
       Exception exception = getException(event);
       event = super.beforeRouting().apply(event);
+      String txState;
       if (!isRedeliveryExhausted(exception) && isOwnedTransaction()) {
         rollback(exception);
+        txState = ROLLBACK_TX;
+      } else {
+        txState = CONTINUE_WITH_TX;
+      }
+      if (TRANSACTION_CHECK_ENABLED) {
+        event = CoreEvent.builder(event).addVariable(LAST_TRANSACTION_STATE, txState).build();
       }
       return event;
     };
