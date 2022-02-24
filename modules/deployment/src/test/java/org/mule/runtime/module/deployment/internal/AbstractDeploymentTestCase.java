@@ -1415,14 +1415,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleWithTestLog
   }
 
   protected CoreEvent executeApplicationFlow(String flowName, String correlationId) throws Exception {
-    return executeApplicationFlow(flowName, correlationId, 0);
-  }
-
-  protected CoreEvent executeApplicationFlow(String flowName, String correlationId, int appNumber) throws Exception {
-    ClassLoader appClassLoader = deploymentService.getApplications().get(appNumber).getArtifactClassLoader().getClassLoader();
+    ClassLoader appClassLoader = deploymentService.getApplications().get(0).getArtifactClassLoader().getClassLoader();
     return withContextClassLoader(appClassLoader, () -> {
       final FlowRunner flowRunner =
-          new FlowRunner(deploymentService.getApplications().get(appNumber).getArtifactContext().getRegistry(), flowName)
+          new FlowRunner(deploymentService.getApplications().get(0).getArtifactContext().getRegistry(), flowName)
               .withPayload(TEST_MESSAGE);
 
       if (correlationId != null) {
