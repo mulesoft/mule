@@ -138,7 +138,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
   private final Cache<Pair<String, List<Policy>>, SourcePolicy> sourcePolicyInnerCache =
       Caffeine.newBuilder()
           .build();
-  private final Cache<List<Policy>, OperationPolicy> operationPolicyInnerCache =
+  private final Cache<Pair<ComponentIdentifier, List<Policy>>, OperationPolicy> operationPolicyInnerCache =
       Caffeine.newBuilder()
           .build();
 
@@ -257,10 +257,10 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
 
       OperationPolicy operationPolicy =
           operationPolicyOuterCache.get(policyKey, outerKey -> operationPolicyInnerCache
-              .get(policyProvider.findOperationParameterizedPolicies(outerKey.getSecond()),
-                   innerKey -> innerKey.isEmpty()
+              .get(new Pair<>(operationIdentifier, policyProvider.findOperationParameterizedPolicies(outerKey.getSecond())),
+                   innerKey -> innerKey.getSecond().isEmpty()
                        ? NO_POLICY_OPERATION
-                       : compositePolicyFactory.createOperationPolicy(operation, innerKey,
+                       : compositePolicyFactory.createOperationPolicy(operation, innerKey.getSecond(),
                                                                       lookupOperationParametersTransformer(outerKey.getFirst()),
                                                                       operationPolicyProcessorFactory,
                                                                       muleContext.getConfiguration().getShutdownTimeout(),
