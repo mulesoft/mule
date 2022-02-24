@@ -20,13 +20,12 @@ import org.mule.runtime.core.privileged.registry.InjectProcessor;
 @Deprecated
 public class MuleContextProcessor implements InjectProcessor {
 
-  private final MuleContext context;
+  private MuleContext context;
 
   public MuleContextProcessor(MuleContext context) {
     this.context = context;
   }
 
-  @Override
   public Object process(Object object) {
     if (object instanceof MuleContextAware) {
       ((MuleContextAware) object).setMuleContext(context);

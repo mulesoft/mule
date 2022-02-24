@@ -6,44 +6,19 @@
  */
 package org.mule.runtime.core.internal.registry;
 
-import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_APPLY_OBJECT_PROCESSOR;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.getInstance;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_HANDLER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
-import static org.mule.runtime.core.internal.registry.MuleRegistry.INJECT_PROCESSORS_BYPASS_FLAG;
-import static org.mule.runtime.core.internal.registry.MuleRegistry.PRE_INIT_PROCESSORS_BYPASS_FLAG;
-import static org.mule.runtime.core.internal.util.InjectionUtils.getInjectionTarget;
-
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
-
-import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+import static org.mule.runtime.core.internal.util.InjectionUtils.getInjectionTarget;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withAnnotation;
 
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.FeatureContext;
-import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
-import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.core.internal.config.FeatureFlaggingServiceBuilder;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
-import org.mule.runtime.core.internal.registry.map.RegistryMap;
-import org.mule.runtime.core.privileged.PrivilegedMuleContext;
-import org.mule.runtime.core.privileged.endpoint.LegacyImmutableEndpoint;
-import org.mule.runtime.core.privileged.registry.InjectProcessor;
-import org.mule.runtime.core.privileged.registry.PreInitProcessor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import java.lang.reflect.Field;
@@ -51,11 +26,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -70,79 +42,18 @@ import javax.inject.Named;
  *
  * @since 3.7.0
  */
-public class SimpleRegistry extends AbstractRegistry implements Injector {
+public class SimpleRegistry extends TransientRegistry implements Injector {
 
   private static final String REGISTRY_ID = "org.mule.runtime.core.Registry.Simple";
 
-  private final boolean disabledApplyObjectProcessor;
-  private final RegistryMap registryMap = new RegistryMap(logger);
-
   public SimpleRegistry(MuleContext muleContext, LifecycleInterceptor lifecycleInterceptor) {
     super(REGISTRY_ID, muleContext, lifecycleInterceptor);
-    putDefaultEntriesIntoRegistry();
-
-    disabledApplyObjectProcessor =
-        ((FeatureFlaggingService) registryMap.get(FEATURE_FLAGGING_SERVICE_KEY)).isEnabled(DISABLE_APPLY_OBJECT_PROCESSOR);
-  }
-
-  private void putDefaultEntriesIntoRegistry() {
-    Map<String, Object> defaultEntries = new HashMap<>();
-    if (muleContext != null) {
-      defaultEntries.put(OBJECT_MULE_CONTEXT, muleContext);
-      defaultEntries.put(OBJECT_REGISTRY, new DefaultRegistry(muleContext));
-      defaultEntries.put(OBJECT_NOTIFICATION_HANDLER, ((PrivilegedMuleContext) muleContext).getNotificationManager());
-      defaultEntries.put("_muleContextProcessor", new MuleContextProcessor(muleContext));
-      // Initial feature flagging service setup
-      FeatureFlaggingRegistry ffRegistry = getInstance();
-      FeatureFlaggingService featureFlaggingService = new FeatureFlaggingServiceBuilder()
-          .withContext(muleContext)
-          .withContext(new FeatureContext(muleContext.getConfiguration().getMinMuleVersion().orElse(null), resolveArtifactName()))
-          .withMuleContextFlags(ffRegistry.getFeatureConfigurations())
-          .withFeatureContextFlags(ffRegistry.getFeatureFlagConfigurations())
-          .build();
-      defaultEntries.put(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
-    }
-
-    defaultEntries.put("_muleLifecycleStateInjectorProcessor",
-                       new LifecycleStateInjectorProcessor(getLifecycleManager().getState()));
-    defaultEntries.put("_muleLifecycleManager", getLifecycleManager());
-
-    registryMap.putAll(defaultEntries);
-  }
-
-  private String resolveArtifactName() {
-    if (muleContext.getConfiguration() != null) {
-      return muleContext.getConfiguration().getId();
-    } else {
-      return "";
-    }
   }
 
   @Override
   protected void doInitialise() throws InitialisationException {
     injectFieldDependencies();
-    injectInto(lookupObjects(Transformer.class));
-    injectInto(lookupObjects(LegacyImmutableEndpoint.class));
-    injectInto(lookupObjects(Object.class));
-  }
-
-  @Override
-  protected void doDispose() {
-    disposeLostObjects();
-    registryMap.clear();
-  }
-
-  private void disposeLostObjects() {
-    for (Object obj : registryMap.getLostObjects()) {
-      try {
-        ((Disposable) obj).dispose();
-      } catch (Exception e) {
-        logger.warn("Can not dispose object. " + getMessage(e));
-        if (logger.isDebugEnabled()) {
-          logger.debug("Can not dispose object. " + getStackTrace(e));
-        }
-      }
-    }
+    super.doInitialise();
   }
 
   /**
@@ -154,104 +65,15 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
     return lookupObject(key);
   }
 
-  @Override
-  public <T> T lookupObject(String key) {
-    return doGet(key);
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public <T> Collection<T> lookupObjects(Class<T> returntype) {
-    return (Collection<T>) registryMap.select(returntype::isInstance);
-  }
-
-  @Override
-  public <T> Collection<T> lookupLocalObjects(Class<T> type) {
-    // just delegate to lookupObjects since there's no parent ever
-    return lookupObjects(type);
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public <T> Map<String, T> lookupByType(Class<T> type) {
-    final Map<String, T> results = new HashMap<>();
-    try {
-      registryMap.lockForReading();
-
-      for (Map.Entry<String, Object> entry : registryMap.entrySet()) {
-        final Class<?> clazz = entry.getValue().getClass();
-        if (type.isAssignableFrom(clazz)) {
-          results.put(entry.getKey(), (T) entry.getValue());
-        }
-      }
-    } finally {
-      registryMap.unlockForReading();
-    }
-
-    return results;
-  }
-
-  @Override
-  public boolean isSingleton(String key) {
-    return true;
-  }
-
-  @Override
-  public void registerObjects(Map<String, Object> objects) throws RegistrationException {
-    if (objects == null) {
-      return;
-    }
-
-    for (Map.Entry<String, Object> entry : objects.entrySet()) {
-      registerObject(entry.getKey(), entry.getValue());
-    }
-  }
-
   /**
-   * Allows for arbitrary registration of objects
-   *
-   * @param key
-   * @param value
+   * {@inheritDoc}
    */
   @Override
-  public void registerObject(String key, Object object) throws RegistrationException {
-    doRegisterObject(key, preRegisterObject(key, object, this::injectInto));
-  }
-
-  /**
-   * Allows for arbitrary registration of objects
-   */
-  @Override
-  public void registerObject(String key, Object object, Object metadata) throws RegistrationException {
-    doRegisterObject(key, preRegisterObject(key, object, o -> applyProcessors(o, metadata)));
-  }
-
-  private Object preRegisterObject(String key, Object object, UnaryOperator<Object> processor) throws RegistrationException {
-    checkDisposed();
-    if (StringUtils.isBlank(key)) {
-      throw new RegistrationException(createStaticMessage("Attempt to register object with no key"));
-    }
-
-    if (logger.isDebugEnabled()) {
-      logger.debug(format("registering key/object %s/%s", key, object));
-    }
-
-    logger.debug("applying processors");
-
-    return processor.apply(object);
-  }
-
-  private void checkDisposed() throws RegistrationException {
-    if (getLifecycleManager().isPhaseComplete(Disposable.PHASE_NAME)) {
-      throw new RegistrationException(createStaticMessage("Cannot register objects on the registry as the context is disposed"));
-    }
-  }
-
-  private void doRegisterObject(String key, Object object) throws RegistrationException {
+  protected void doRegisterObject(String key, Object object, Object metadata) throws RegistrationException {
     Object previous = doGet(key);
     if (previous != null) {
       if (logger.isDebugEnabled()) {
-        logger.debug(format("An entry already exists for key %s. It will be replaced", key));
+        logger.debug(String.format("An entry already exists for key %s. It will be replaced", key));
       }
 
       unregisterObject(key);
@@ -264,19 +86,6 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
     } catch (MuleException e) {
       throw new RegistrationException(e);
     }
-  }
-
-  private <T> T doGet(String key) {
-    return registryMap.get(key);
-  }
-
-  private void doPut(String key, Object object) {
-    registryMap.putAndLogWarningIfDuplicate(key, object);
-  }
-
-  @Override
-  protected Object doUnregisterObject(String key) throws RegistrationException {
-    return registryMap.remove(key);
   }
 
   /**
@@ -315,44 +124,15 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
   @Override
   public <T> T inject(T object) {
     object = getInjectionTarget(object);
-    return (T) injectInto(applyFlaggedProcessors(object, Object.class));
+    return (T) applyProcessors(object, null);
   }
 
-  private Object applyProcessors(Object object, Object metadata) {
-    return injectInto(applyFlaggedProcessors(object, metadata));
-  }
-
-  // TODO W- Remove this
-  private Object applyFlaggedProcessors(Object object, Object metadata) {
-    if (disabledApplyObjectProcessor) {
-      return object;
-    }
-
-    Object theObject = object;
-
-    if (!hasFlag(metadata, INJECT_PROCESSORS_BYPASS_FLAG)) {
-      // Process injectors first
-      Collection<InjectProcessor> injectProcessors = lookupObjects(InjectProcessor.class);
-      for (InjectProcessor processor : injectProcessors) {
-        theObject = processor.process(theObject);
-      }
-    }
-
-    if (!hasFlag(metadata, PRE_INIT_PROCESSORS_BYPASS_FLAG)) {
-      // Then any other processors
-      Collection<PreInitProcessor> processors = lookupObjects(PreInitProcessor.class);
-      for (PreInitProcessor processor : processors) {
-        theObject = processor.process(theObject);
-        if (theObject == null) {
-          return null;
-        }
-      }
-    }
-    return theObject;
-  }
-
-  protected boolean hasFlag(Object metaData, int flag) {
-    return metaData != null && metaData instanceof Integer && ((Integer) metaData & flag) != 0;
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected Object applyProcessors(Object object, Object metadata) {
+    return injectInto(super.applyProcessors(object, metadata));
   }
 
   private void injectFieldDependencies() throws InitialisationException {
@@ -446,19 +226,5 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
       throws RegistrationException {
     Collection<T> dependencies = lookupObjects(dependencyType);
     return dependencies;
-  }
-
-  // /////////////////////////////////////////////////////////////////////////
-  // Registry Metadata
-  // /////////////////////////////////////////////////////////////////////////
-
-  @Override
-  public boolean isReadOnly() {
-    return false;
-  }
-
-  @Override
-  public boolean isRemote() {
-    return false;
   }
 }

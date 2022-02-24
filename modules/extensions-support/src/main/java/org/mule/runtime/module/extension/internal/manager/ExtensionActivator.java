@@ -29,6 +29,7 @@ import org.mule.runtime.api.meta.model.function.FunctionModel;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.el.DefaultBindingContextBuilder;
 import org.mule.runtime.core.internal.el.DefaultExpressionModuleBuilder;
 import org.mule.runtime.core.internal.transformer.simple.StringToEnum;
@@ -77,7 +78,7 @@ public final class ExtensionActivator implements Startable, Stoppable {
           if (enumTypes.add(enumClass)) {
             try {
               StringToEnum stringToEnum = new StringToEnum(enumClass);
-              registerObject(muleContext, getName(stringToEnum), stringToEnum);
+              registerObject(muleContext, getName(stringToEnum), stringToEnum, Transformer.class);
             } catch (MuleException e) {
               throw new MuleRuntimeException(createStaticMessage("Could not register transformer for enum "
                   + enumClass.getName()), e);

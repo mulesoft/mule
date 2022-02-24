@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.context;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_APPLY_OBJECT_PROCESSOR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES;
@@ -322,7 +321,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureEnforceExpressionValidation();
       configureParallelForeachFlattenMessage();
       configureDisableRegistryBootstrapOptionalEntries();
-      configureDisableApplyObjectProcessor();
     }
   }
 
@@ -1386,22 +1384,11 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   /**
    * Configures the {@link MuleRuntimeFeature#DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES} feature flag.
    *
-   * @since 4.5
+   * @since 4.3.0-202203
    */
   private static void configureDisableRegistryBootstrapOptionalEntries() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES,
-                                                minMuleVersion("4.5.0"));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#DISABLE_APPLY_OBJECT_PROCESSOR} feature flag.
-   *
-   * @since 4.5
-   */
-  private static void configureDisableApplyObjectProcessor() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(DISABLE_APPLY_OBJECT_PROCESSOR,
                                                 minMuleVersion("4.5.0"));
   }
 

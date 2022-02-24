@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -31,6 +32,8 @@ public class MuleRegistryHelper implements MuleRegistry {
   private final Registry registry;
 
   private final MuleContext muleContext;
+
+  private final Map<Object, Object> postProcessedObjects = new HashMap<>();
 
   public MuleRegistryHelper(Registry registry, MuleContext muleContext) {
     this.registry = registry;
@@ -98,7 +101,7 @@ public class MuleRegistryHelper implements MuleRegistry {
    */
   @Override
   public void registerFlowConstruct(FlowConstruct flowConstruct) throws MuleException {
-    registry.registerObject(getName(flowConstruct), flowConstruct);
+    registry.registerObject(getName(flowConstruct), flowConstruct, FlowConstruct.class);
   }
 
   /**
@@ -203,6 +206,15 @@ public class MuleRegistryHelper implements MuleRegistry {
   @Override
   public void registerObject(String key, Object value, Object metadata) throws RegistrationException {
     registry.registerObject(key, value, metadata);
+
+    postObjectRegistrationActions(value);
+  }
+
+  public void postObjectRegistrationActions(Object value) {
+    // TODO MULE-10238 - Remove this check once SimpleRegistry gets removed
+    if (!postProcessedObjects.containsKey(value)) {
+      postProcessedObjects.put(value, value);
+    }
   }
 
   /**
@@ -211,6 +223,8 @@ public class MuleRegistryHelper implements MuleRegistry {
   @Override
   public void registerObject(String key, Object value) throws RegistrationException {
     registry.registerObject(key, value);
+
+    postObjectRegistrationActions(value);
   }
 
   /**
@@ -219,6 +233,18 @@ public class MuleRegistryHelper implements MuleRegistry {
   @Override
   public void registerObjects(Map objects) throws RegistrationException {
     registry.registerObjects(objects);
+
+    for (Object value : objects.values()) {
+      postObjectRegistrationActions(value);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Object unregisterObject(String key, Object metadata) throws RegistrationException {
+    return registry.unregisterObject(key, metadata);
   }
 
   /**

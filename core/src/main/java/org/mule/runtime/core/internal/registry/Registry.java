@@ -119,6 +119,21 @@ public interface Registry extends Initialisable, Disposable {
   Object unregisterObject(String key) throws RegistrationException;
 
   /**
+   * Will remove an object by name from the registry. By default the registry must apply all remaining lifecycle phases to the
+   * object when it is removed.
+   *
+   * @param key      the name or key of the object to remove from the registry
+   * @param metadata an implementation specific argument that can be passed into the method
+   * @throws RegistrationException if there is a problem unregistering the object. Typically this will be because the object's
+   *                               lifecycle threw an exception
+   * @throws RegistrationException if there is a problem unregistering the object. Typically this will be because the object's
+   *                               lifecycle threw an exception
+   * @deprecated as of 3.7.0. Use {@link #unregisterObject(String)} instead
+   */
+  @Deprecated
+  Object unregisterObject(String key, Object metadata) throws RegistrationException;
+
+  /**
    * Will fire any lifecycle methods according to the current lifecycle without actually registering the object in the registry.
    * This is useful for prototype objects that are created per request and would clutter the registry with single use objects.
    *

@@ -83,6 +83,7 @@ public class PostRegistrationActionsPostProcessor implements BeanPostProcessor {
         return bean;
       }
       seenBeanNames.add(beanName);
+      registryHelper.postObjectRegistrationActions(object);
     }
     return bean;
   }

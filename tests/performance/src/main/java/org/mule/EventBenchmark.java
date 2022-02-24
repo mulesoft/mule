@@ -19,6 +19,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -47,7 +48,7 @@ public class EventBenchmark extends AbstractBenchmark {
     muleContext = createMuleContextWithServices();
     muleContext.start();
     flow = createFlow(muleContext);
-    registerObject(muleContext, FLOW_NAME, flow);
+    registerObject(muleContext, FLOW_NAME, flow, FlowConstruct.class);
     Message.Builder messageBuilder = Message.builder().value(PAYLOAD);
     CoreEvent.Builder eventBuilder =
         CoreEvent.builder(create(flow, CONNECTOR_LOCATION)).message(messageBuilder.build());
