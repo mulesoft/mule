@@ -96,12 +96,6 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
 
   }
 
-  @Override
-  public void tearDown() throws Exception {
-    super.tearDown();
-    TestLoggerFactory.clearAll();
-  }
-
   @Test
   public void heavyDomainResourceNotFoundInConfigProperties() throws Exception {
     domainResourceNotFoundInConfigProperties(false);
