@@ -36,8 +36,10 @@ import javax.annotation.PreDestroy;
  *             currently supported registries instead
  */
 @Deprecated
+// TODO W- Remove this
 public class JSR250ValidatorProcessor implements InjectProcessor {
 
+  @Override
   public Object process(Object object) {
     List<AnnotationMetaData> annos = AnnotationUtils.getMethodAnnotations(object.getClass(), PostConstruct.class);
     if (annos.size() > 1) {

@@ -15,5 +15,6 @@ import org.mule.runtime.core.internal.registry.Registry;
  *             currently supported registries instead
  */
 @Deprecated
+// TODO W- Remove this
 public interface PreInitProcessor extends ObjectProcessor {
 }

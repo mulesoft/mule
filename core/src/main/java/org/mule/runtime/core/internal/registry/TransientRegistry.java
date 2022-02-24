@@ -48,29 +48,30 @@ import java.util.Map;
 @Deprecated
 public abstract class TransientRegistry extends AbstractRegistry {
 
+  private final boolean disableApplyObjectProcessor;
   private final RegistryMap registryMap = new RegistryMap(logger);
 
   public TransientRegistry(String id, MuleContext muleContext, LifecycleInterceptor lifecycleInterceptor) {
     super(id, muleContext, lifecycleInterceptor);
-    putDefaultEntriesIntoRegistry();
+    if (getMuleContext() != null) {
+      FeatureFlaggingService featureFlaggingService = createFeatureFlaggingService(getMuleContext());
+      // disableApplyObjectProcessor = featureFlaggingService.isEnabled(DISABLE_APPLY_OBJECT_PROCESSOR);
+      disableApplyObjectProcessor = true;
+      putDefaultEntriesIntoRegistry(featureFlaggingService);
+    } else {
+      disableApplyObjectProcessor = true;
+      putDefaultEntriesIntoRegistry(null);
+    }
   }
 
-  private void putDefaultEntriesIntoRegistry() {
+  private void putDefaultEntriesIntoRegistry(FeatureFlaggingService featureFlaggingService) {
     Map<String, Object> defaultEntries = new HashMap<>();
-    if (muleContext != null) {
-      defaultEntries.put(OBJECT_MULE_CONTEXT, muleContext);
-      defaultEntries.put(OBJECT_REGISTRY, new DefaultRegistry(muleContext));
-      defaultEntries.put("_muleContextProcessor", new MuleContextProcessor(muleContext));
-      defaultEntries.put("_registryProcessor", new RegistryProcessor(muleContext));
-      defaultEntries.put(OBJECT_NOTIFICATION_HANDLER, ((PrivilegedMuleContext) muleContext).getNotificationManager());
-      // Initial feature flagging service setup
-      FeatureFlaggingRegistry ffRegistry = getInstance();
-      FeatureFlaggingService featureFlaggingService = new FeatureFlaggingServiceBuilder()
-          .withContext(muleContext)
-          .withContext(new FeatureContext(muleContext.getConfiguration().getMinMuleVersion().orElse(null), resolveArtifactName()))
-          .withMuleContextFlags(ffRegistry.getFeatureConfigurations())
-          .withFeatureContextFlags(ffRegistry.getFeatureFlagConfigurations())
-          .build();
+    if (getMuleContext() != null) {
+      defaultEntries.put(OBJECT_MULE_CONTEXT, getMuleContext());
+      defaultEntries.put(OBJECT_REGISTRY, new DefaultRegistry(getMuleContext()));
+      defaultEntries.put("_muleContextProcessor", new MuleContextProcessor(getMuleContext()));
+      defaultEntries.put("_registryProcessor", new RegistryProcessor(getMuleContext()));
+      defaultEntries.put(OBJECT_NOTIFICATION_HANDLER, ((PrivilegedMuleContext) getMuleContext()).getNotificationManager());
       defaultEntries.put(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
     }
 
@@ -80,9 +81,21 @@ public abstract class TransientRegistry extends AbstractRegistry {
     registryMap.putAll(defaultEntries);
   }
 
+  private FeatureFlaggingService createFeatureFlaggingService(MuleContext muleContext) {
+    // Initial feature flagging service setup
+    FeatureFlaggingRegistry ffRegistry = getInstance();
+    return new FeatureFlaggingServiceBuilder()
+        .withContext(muleContext)
+        .withContext(new FeatureContext(muleContext.getConfiguration().getMinMuleVersion().orElse(null),
+                                        resolveArtifactName()))
+        .withMuleContextFlags(ffRegistry.getFeatureConfigurations())
+        .withFeatureContextFlags(ffRegistry.getFeatureFlagConfigurations())
+        .build();
+  }
+
   private String resolveArtifactName() {
-    if (muleContext.getConfiguration() != null) {
-      return muleContext.getConfiguration().getId();
+    if (getMuleContext().getConfiguration() != null) {
+      return getMuleContext().getConfiguration().getId();
     } else {
       return "";
     }
@@ -213,6 +226,10 @@ public abstract class TransientRegistry extends AbstractRegistry {
   }
 
   protected Object applyProcessors(Object object, Object metadata) {
+    if (disableApplyObjectProcessor) {
+      return object;
+    }
+
     Object theObject = object;
 
     if (!hasFlag(metadata, MuleRegistry.INJECT_PROCESSORS_BYPASS_FLAG)) {

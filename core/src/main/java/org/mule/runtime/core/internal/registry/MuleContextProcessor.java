@@ -18,14 +18,16 @@ import org.mule.runtime.core.privileged.registry.InjectProcessor;
  *             currently supported registries instead
  */
 @Deprecated
+// TODO W- Remove this
 public class MuleContextProcessor implements InjectProcessor {
 
-  private MuleContext context;
+  private final MuleContext context;
 
   public MuleContextProcessor(MuleContext context) {
     this.context = context;
   }
 
+  @Override
   public Object process(Object object) {
     if (object instanceof MuleContextAware) {
       ((MuleContextAware) object).setMuleContext(context);

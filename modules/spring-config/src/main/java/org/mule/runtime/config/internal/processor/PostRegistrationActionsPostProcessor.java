@@ -25,6 +25,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
  *
  * @since 3.7.0
  */
+// remove
 public class PostRegistrationActionsPostProcessor implements BeanPostProcessor {
 
   private final MuleRegistryHelper registryHelper;
@@ -83,7 +84,7 @@ public class PostRegistrationActionsPostProcessor implements BeanPostProcessor {
         return bean;
       }
       seenBeanNames.add(beanName);
-      registryHelper.postObjectRegistrationActions(object);
+      // registryHelper.postObjectRegistrationActions(object);
     }
     return bean;
   }

@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.core.internal.registry;
 
+import static org.mule.runtime.core.internal.util.InjectionUtils.getInjectionTarget;
+
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.internal.util.InjectionUtils.getInjectionTarget;
+
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withAnnotation;
@@ -217,7 +219,7 @@ public class SimpleRegistry extends TransientRegistry implements Injector {
       dependency = lookupObject(dependencyType);
     }
     if (dependency == null && MuleContext.class.isAssignableFrom(dependencyType)) {
-      dependency = muleContext;
+      dependency = getMuleContext();
     }
     return nullToOptional ? ofNullable(dependency) : dependency;
   }
