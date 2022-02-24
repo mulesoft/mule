@@ -72,6 +72,11 @@ public final class ArtifactAstUtils {
 
     final ArtifactAst partialAst = doParseArtifactIntoAst(configResources, parserSupplier, extensions, true);
 
+    if (true) {
+//    if (System.getProperty("test") == null) {
+      return partialAst;
+    }
+
     return parseApplicationExtensionModel(partialAst, artifactType, muleContext)
         .map(extensionModel -> {
           Set<ExtensionModel> enrichedExtensionModels = new HashSet<>(extensions);
