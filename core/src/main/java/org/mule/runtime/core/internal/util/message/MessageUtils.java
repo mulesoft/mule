@@ -17,11 +17,9 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.util.collection.TransformingIterator;
-import org.mule.runtime.core.internal.util.message.stream.UnclosableCursorStream;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.sdk.api.runtime.operation.Result;
 
@@ -33,7 +31,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.function.Function;
-import java.util.function.UnaryOperator;
 
 /**
  * Utility methods for handling {@link Message messages}
@@ -41,13 +38,6 @@ import java.util.function.UnaryOperator;
  * @since 4.0
  */
 public final class MessageUtils {
-
-  private static final UnaryOperator<Object> CURSOR_STREAM_AS_UNCLOSABLE_DECORATOR = value -> {
-    if (value instanceof CursorStream && !(value instanceof UnclosableCursorStream)) {
-      return new UnclosableCursorStream((CursorStream) value);
-    }
-    return value;
-  };
 
   private MessageUtils() {}
 
@@ -480,13 +470,5 @@ public final class MessageUtils {
     }
 
     return builder.build();
-  }
-
-  /**
-   * @return A decorator to be applied for {@link CursorStream}.
-   */
-  public static UnaryOperator<Object> getCursorStreamDecorator() {
-    // It is important to have the decorator instance cached to reduce pressure on the GC and improve performance.
-    return CURSOR_STREAM_AS_UNCLOSABLE_DECORATOR;
   }
 }
