@@ -3,6 +3,26 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.removed",
+          "old": "method java.util.Map<java.lang.String, java.lang.Object> org.mule.runtime.core.api.util.SystemUtils::getCommandLineOptions(java.lang.String[], java.lang.String[][]) throws org.mule.runtime.api.exception.MuleException",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "SystemUtils",
+          "methodName": "getCommandLineOptions",
+          "elementKind": "method",
+          "justification": "MULE-1947: Moved this method to mule-module-launcher"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.core.api.util.SystemUtils",
+          "new": "class org.mule.runtime.core.api.util.SystemUtils",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "annotation": "@org.mule.api.annotation.NoInstantiate",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "SystemUtils",
+          "elementKind": "class",
+          "justification": "MULE-1947: It had a private constructor previously, couldn be instantiated anyway."
+        },
+        {
           "code": "java.class.noLongerInheritsFromClass",
           "old": "class org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
           "new": "class org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",

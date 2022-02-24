@@ -8,8 +8,10 @@ package org.mule.runtime.module.launcher;
 
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorInShutdown;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorWhileRunning;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -19,6 +21,7 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
 
 import static java.lang.ClassLoader.getSystemClassLoader;
+import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
@@ -29,9 +32,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.container.api.MuleFoldersUtil;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.lock.ServerLockFactory;
 import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
@@ -46,6 +46,7 @@ import org.mule.runtime.module.launcher.coreextension.ClasspathMuleCoreExtension
 import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
+import org.mule.runtime.module.launcher.internal.util.SystemUtils;
 import org.mule.runtime.module.launcher.log4j2.MuleLog4jContextFactory;
 import org.mule.runtime.module.reboot.MuleContainerBootstrap;
 import org.mule.runtime.module.repository.api.RepositoryService;
@@ -233,12 +234,12 @@ public class MuleContainer {
   }
 
   private void createExecutionMuleFolder() {
-    File executionFolder = MuleFoldersUtil.getExecutionFolder();
+    File executionFolder = getExecutionFolder();
     if (!executionFolder.exists()) {
       if (!executionFolder.mkdirs()) {
-        throw new MuleRuntimeException(CoreMessages.createStaticMessage(format(
-                                                                               "Could not create folder %s, validate that the process has permissions over that directory",
-                                                                               executionFolder.getAbsolutePath())));
+        throw new MuleRuntimeException(createStaticMessage(format(
+                                                                  "Could not create folder %s, validate that the process has permissions over that directory",
+                                                                  executionFolder.getAbsolutePath())));
       }
     }
   }
@@ -385,14 +386,14 @@ public class MuleContainer {
     if (muleShutdownHook == null) {
       muleShutdownHook = new MuleShutdownHook();
     } else {
-      Runtime.getRuntime().removeShutdownHook(muleShutdownHook);
+      getRuntime().removeShutdownHook(muleShutdownHook);
     }
-    Runtime.getRuntime().addShutdownHook(muleShutdownHook);
+    getRuntime().addShutdownHook(muleShutdownHook);
   }
 
   public void unregisterShutdownHook() {
     if (muleShutdownHook != null) {
-      Runtime.getRuntime().removeShutdownHook(muleShutdownHook);
+      getRuntime().removeShutdownHook(muleShutdownHook);
     }
   }
 

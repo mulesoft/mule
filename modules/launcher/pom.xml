@@ -53,10 +53,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>tanukisoft</groupId>
-            <artifactId>wrapper</artifactId>
-        </dependency>
-        <dependency>
             <groupId>it.unimi.dsi</groupId>
             <artifactId>fastutil</artifactId>
         </dependency>
