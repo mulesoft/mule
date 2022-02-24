@@ -6,17 +6,9 @@
  */
 package org.mule.runtime.config.internal.context;
 
-import static java.lang.String.format;
-import static java.lang.System.lineSeparator;
-import static java.util.Collections.emptySet;
-import static java.util.Comparator.comparing;
-import static java.util.Objects.requireNonNull;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -54,10 +46,18 @@ import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.manager.ExtensionErrorsRegistrant.registerErrorMappings;
+
+import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
+import static java.util.Comparator.comparing;
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
-import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
-import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -148,9 +148,9 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -158,8 +158,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
-import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.context.annotation.ContextAnnotationAutowireCandidateResolver;
 import org.springframework.context.support.AbstractRefreshableConfigApplicationContext;
 
@@ -180,6 +178,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   protected final MemoryManagementService memoryManagementService;
   private ArtifactAst applicationModel;
   private final MuleContextWithRegistry muleContext;
+  private final FeatureFlaggingService featureFlaggingService;
   private final MuleFunctionsBindingContextProvider coreFunctionsProvider;
   private final BeanDefinitionFactory beanDefinitionFactory;
   private final ArtifactType artifactType;
@@ -190,7 +189,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final Map<String, String> artifactProperties;
   protected List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
   private final ExtensionManager extensionManager;
-
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -224,6 +222,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                              FeatureFlaggingService featureFlaggingService) {
     checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
     this.muleContext = (MuleContextWithRegistry) muleContext;
+    this.featureFlaggingService = featureFlaggingService;
     this.coreFunctionsProvider = this.muleContext.getRegistry().get(CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY);
     this.optionalObjectsController = optionalObjectsController;
     this.artifactType = artifactType;
@@ -407,7 +406,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                           new MuleContextPostProcessor(muleContext),
                           new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext
                               .getRegistry(), beanFactory),
-                          new DiscardedOptionalBeanPostProcessor(optionalObjectsController,
+                          // TODO W-10736276 Remove this postProcessor
+                          new DiscardedOptionalBeanPostProcessor(getOptionalObjectsController(),
                                                                  (DefaultListableBeanFactory) beanFactory),
                           new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState()),
                           new ComponentLocatorCreatePostProcessor(componentLocator));
@@ -685,10 +685,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   private void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry, ConfigurableListableBeanFactory beanFactory) {
-    registerAnnotationConfigProcessor(registry, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME,
-                                      ConfigurationClassPostProcessor.class, null);
-    registerAnnotationConfigProcessor(registry, REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME,
-                                      RequiredAnnotationBeanPostProcessor.class, null);
     registerInjectorProcessor(beanFactory);
   }
 
@@ -703,24 +699,17 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
   }
 
-  private void registerAnnotationConfigProcessor(BeanDefinitionRegistry registry, String key, Class<?> type, Object source) {
-    RootBeanDefinition beanDefinition = new RootBeanDefinition(type);
-    beanDefinition.setSource(source);
-    registerPostProcessor(registry, beanDefinition, key);
-  }
-
-  protected void registerPostProcessor(BeanDefinitionRegistry registry, RootBeanDefinition definition, String beanName) {
-    definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-    registry.registerBeanDefinition(beanName, definition);
-  }
-
   @Override
   protected DefaultListableBeanFactory createBeanFactory() {
     // Copy all postProcessors defined in the defaultMuleConfig so that they get applied to the child container
     DefaultListableBeanFactory beanFactory = new ObjectProviderAwareBeanFactory(getInternalParentBeanFactory());
     beanFactory.setAutowireCandidateResolver(new ContextAnnotationAutowireCandidateResolver());
-    beanFactory.setInstantiationStrategy(new LaxInstantiationStrategyWrapper(new CglibSubclassingInstantiationStrategy(),
-                                                                             optionalObjectsController));
+
+    // TODO W-10736276 Remove this
+    if (!featureFlaggingService.isEnabled(DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES)) {
+      beanFactory.setInstantiationStrategy(new LaxInstantiationStrategyWrapper(new CglibSubclassingInstantiationStrategy(),
+                                                                               getOptionalObjectsController()));
+    }
 
     return beanFactory;
   }
@@ -778,10 +767,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   @Override
   public String toString() {
     return format("%s: %s (%s)", this.getClass().getName(), muleContext.getConfiguration().getId(), artifactType.name());
-  }
-
-  private Set<ExtensionModel> getExtensions() {
-    return extensionManager == null ? emptySet() : extensionManager.getExtensions();
   }
 
   public ArtifactAst getApplicationModel() {

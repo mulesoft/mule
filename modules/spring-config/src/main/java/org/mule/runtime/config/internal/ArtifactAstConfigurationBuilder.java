@@ -30,7 +30,6 @@ import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocato
 import org.mule.runtime.config.internal.context.BaseMuleArtifactContext;
 import org.mule.runtime.config.internal.context.MuleArtifactContext;
 import org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext;
-import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.model.ComponentModelInitializer;
 import org.mule.runtime.config.internal.registry.BaseSpringRegistry;
@@ -38,6 +37,7 @@ import org.mule.runtime.config.internal.registry.CompositeOptionalObjectsControl
 import org.mule.runtime.config.internal.registry.DefaultOptionalObjectsController;
 import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.config.internal.registry.SpringRegistry;
+import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -166,6 +166,8 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
 
   protected OptionalObjectsController createApplicationObjectController() {
     OptionalObjectsController applicationObjectcontroller = new DefaultOptionalObjectsController();
+
+    // >> TODO W-10736276 Remove this
     OptionalObjectsController parentObjectController = null;
 
     if (parentContext instanceof MuleArtifactContext) {
@@ -175,6 +177,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
     if (parentObjectController != null) {
       applicationObjectcontroller = new CompositeOptionalObjectsController(applicationObjectcontroller, parentObjectController);
     }
+    // << TODO W-10736276 Remove this
 
     return applicationObjectcontroller;
   }
