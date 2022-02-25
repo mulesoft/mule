@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.artifact;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.ast.api.ArtifactType.APPLICATION;
 import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.getOptionalLoaderById;
@@ -85,6 +86,12 @@ public final class ArtifactAstUtils {
                                                                          ArtifactType artifactType,
                                                                          MuleContext muleContext) {
     if (!artifactType.equals(APPLICATION)) {
+      return empty();
+    }
+
+    if (!ast.topLevelComponentsStream()
+        .filter(c -> c.getComponentType() == OPERATION_DEF)
+        .findAny().isPresent()) {
       return empty();
     }
 
