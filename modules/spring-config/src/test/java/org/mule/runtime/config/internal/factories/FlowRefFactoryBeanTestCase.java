@@ -67,6 +67,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
 import org.mule.runtime.config.internal.context.MuleArtifactContext;
@@ -378,12 +379,15 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
         .findFirst()
         .get();
     BeanDefinition subFlowBeanDefinition = genericBeanDefinition(new ObjectFactoryClassRepository()
-        .getObjectFactoryClass(subFlowComponentBuildingDefinition, SubflowMessageProcessorChainFactoryBean.class, Object.class,
-                               () -> true))
-                                   .addPropertyValue("name", PARSED_DYNAMIC_REFERENCED_FLOW)
-                                   .addPropertyValue("messageProcessors", subFlowProcessorBeanDefinition)
-                                   .setScope(BeanDefinition.SCOPE_PROTOTYPE)
-                                   .getBeanDefinition();
+        .getObjectFactoryClass(SubflowMessageProcessorChainFactoryBean.class))
+            .addPropertyValue("name", PARSED_DYNAMIC_REFERENCED_FLOW)
+            .addPropertyValue("messageProcessors", subFlowProcessorBeanDefinition)
+            .addPropertyValue("isSingleton", !subFlowComponentBuildingDefinition.isPrototype())
+            .addPropertyValue("objectTypeClass", Object.class)
+            .addPropertyValue("isPrototype", subFlowComponentBuildingDefinition.isPrototype())
+            .addPropertyValue("isEagerInit", new LazyValue<>(() -> true))
+            .setScope(BeanDefinition.SCOPE_PROTOTYPE)
+            .getBeanDefinition();
     beanFactory.registerBeanDefinition(PARSED_DYNAMIC_REFERENCED_FLOW, subFlowBeanDefinition);
     // Additional flow and processing strategy (needed to generate a concurrent subflow instantiation)
     Flow concurrentCallerFlow = mock(Flow.class, INITIALIZABLE_MESSAGE_PROCESSOR);

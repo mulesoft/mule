@@ -121,8 +121,12 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
     Class<?> objectFactoryType = componentBuildingDefinition.getObjectFactoryType();
 
     return rootBeanDefinition(objectFactoryClassRepository
-        .getObjectFactoryClass(componentBuildingDefinition, objectFactoryType, componentModel.getType(),
-                               new LazyValue<>(() -> componentModel.getBeanDefinition().isLazyInit())));
+        .getObjectFactoryClass(objectFactoryType))
+            .addPropertyValue("isSingleton", !componentBuildingDefinition.isPrototype())
+            .addPropertyValue("objectTypeClass", componentModel.getType())
+            .addPropertyValue("isPrototype", componentBuildingDefinition.isPrototype())
+            .addPropertyValue("isEagerInit", new LazyValue<>(() -> componentModel.getBeanDefinition().isLazyInit()));
+
   }
 
   protected abstract void processComponentDefinitionModel(Map<ComponentAst, SpringComponentModel> springComponentModels,
