@@ -20,6 +20,8 @@ import static org.mockito.Mockito.when;
 import static org.mule.test.petstore.extension.PetStoreOperations.operationExecutionCounter;
 import static org.mule.test.petstore.extension.PetStoreOperations.shouldFailWithConnectionException;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
@@ -70,6 +72,29 @@ public class ReconnectionWithStreamingTestCase extends AbstractExtensionFunction
     shouldFailWithConnectionException = true;
     operationExecutionCounter.set(0);
     CoreEvent response = flowRunner("streamingTypedValueReconnectWithClosedStream").withVariable("signature", "hn").run();
+    assertThat(response.getMessage().getPayload().getValue(), is("SUCCESS"));
+    assertThat(operationExecutionCounter.get(), greaterThanOrEqualTo(2));
+  }
+
+  @Test
+  @Issue("W-10619668")
+  @Description("Checks that it is not possible for an operation to close a CursorStream that comes from a parameter inside a ParameterGroup")
+  public void cursorInParameterGroupIsNotAffectedIfCloseIsCalled() throws Exception {
+    shouldFailWithConnectionException = true;
+    operationExecutionCounter.set(0);
+    CoreEvent response = flowRunner("streamingReconnectWithClosedStreamInParameterGroup").withVariable("signature", "hn").run();
+    assertThat(response.getMessage().getPayload().getValue(), is("SUCCESS"));
+    assertThat(operationExecutionCounter.get(), greaterThanOrEqualTo(2));
+  }
+
+  @Test
+  @Issue("W-10619668")
+  @Description("Checks that it is not possible for an operation to close a CursorStream that comes from a parameter inside a ParameterGroup with showInDsl")
+  public void cursorInParameterGroupShownInDslIsNotAffectedIfCloseIsCalled() throws Exception {
+    shouldFailWithConnectionException = true;
+    operationExecutionCounter.set(0);
+    CoreEvent response =
+        flowRunner("streamingReconnectWithClosedStreamInParameterGroupShownInDsl").withVariable("signature", "hn").run();
     assertThat(response.getMessage().getPayload().getValue(), is("SUCCESS"));
     assertThat(operationExecutionCounter.get(), greaterThanOrEqualTo(2));
   }
