@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.registry;
 
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_APPLY_OBJECT_PROCESSOR;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.getInstance;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
@@ -58,8 +59,7 @@ public abstract class TransientRegistry extends AbstractRegistry {
     super(id, muleContext, lifecycleInterceptor);
     if (getMuleContext() != null) {
       FeatureFlaggingService featureFlaggingService = createFeatureFlaggingService(getMuleContext());
-      // disableApplyObjectProcessor = featureFlaggingService.isEnabled(DISABLE_APPLY_OBJECT_PROCESSOR);
-      disableApplyObjectProcessor = true;
+      disableApplyObjectProcessor = featureFlaggingService.isEnabled(DISABLE_APPLY_OBJECT_PROCESSOR);
       putDefaultEntriesIntoRegistry(featureFlaggingService);
     } else {
       disableApplyObjectProcessor = true;
@@ -229,9 +229,9 @@ public abstract class TransientRegistry extends AbstractRegistry {
   }
 
   protected Object applyProcessors(Object object, Object metadata) {
-    // if (disableApplyObjectProcessor) {
-    // return object;
-    // }
+    if (disableApplyObjectProcessor) {
+      return object;
+    }
 
     Object theObject = object;
 
@@ -296,6 +296,10 @@ public abstract class TransientRegistry extends AbstractRegistry {
 
   protected void doRegisterObject(String key, Object object, Object metadata) throws RegistrationException {
     doPut(key, object);
+
+    if (disableApplyObjectProcessor) {
+      return;
+    }
 
     try {
       if (!hasFlag(metadata, MuleRegistry.LIFECYCLE_BYPASS_FLAG)) {
