@@ -162,6 +162,23 @@ public class PetStoreOperations {
     throw new IllegalStateException("The operation failed!");
   }
 
+  public List<String> getPetsWithIntermitentConnectionProblemAndClosingStreamInParameterGroup(@Connection PetStoreClient client,
+                                                                                              @Config PetStoreConnector config,
+                                                                                              @ParameterGroup(
+                                                                                                  name = "Owner") PetOwner owner)
+      throws IOException {
+    return getPetsWithIntermitentConnectionProblemAndClosingStream(client, config, owner.getName(), owner.getSignature());
+  }
+
+  public List<String> getPetsWithIntermitentConnectionProblemAndClosingStreamInParameterGroupShownInDsl(@Connection PetStoreClient client,
+                                                                                                        @Config PetStoreConnector config,
+                                                                                                        @ParameterGroup(
+                                                                                                            name = "Owner",
+                                                                                                            showInDsl = true) PetOwner owner)
+      throws IOException {
+    return getPetsWithIntermitentConnectionProblemAndClosingStream(client, config, owner.getName(), owner.getSignature());
+  }
+
   public List<String> getPetsWithIntermitentConnectionProblemAndClosingTypedValueStream(@Connection PetStoreClient client,
                                                                                         @Config PetStoreConnector config,
                                                                                         String ownerName,
