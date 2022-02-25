@@ -7,10 +7,13 @@
 package org.mule.runtime.core.internal.registry;
 
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.getInstance;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_HANDLER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
+
+import static java.lang.String.format;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
@@ -226,9 +229,9 @@ public abstract class TransientRegistry extends AbstractRegistry {
   }
 
   protected Object applyProcessors(Object object, Object metadata) {
-    if (disableApplyObjectProcessor) {
-      return object;
-    }
+    // if (disableApplyObjectProcessor) {
+    // return object;
+    // }
 
     Object theObject = object;
 
@@ -271,11 +274,11 @@ public abstract class TransientRegistry extends AbstractRegistry {
   public void registerObject(String key, Object object, Object metadata) throws RegistrationException {
     checkDisposed();
     if (StringUtils.isBlank(key)) {
-      throw new RegistrationException(I18nMessageFactory.createStaticMessage("Attempt to register object with no key"));
+      throw new RegistrationException(createStaticMessage("Attempt to register object with no key"));
     }
 
     if (logger.isDebugEnabled()) {
-      logger.debug(String.format("registering key/object %s/%s", key, object));
+      logger.debug(format("registering key/object %s/%s", key, object));
     }
 
     logger.debug("applying processors");
