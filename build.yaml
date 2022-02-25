@@ -13,4 +13,4 @@ upstreamProjects:
 mavenAdditionalArgs: -Djava.net.preferIPv4Stack=true
 mavenCompileGoal: clean install -U -DskipTests -DskipITs -Dinvoker.skip=true -Darchetype.test.skip -Dmaven.javadoc.skip
 projectType: runtime
-archiveArtifacts: "**/heap1.hprof"
+archiveArtifacts: "**/deployment/**"
