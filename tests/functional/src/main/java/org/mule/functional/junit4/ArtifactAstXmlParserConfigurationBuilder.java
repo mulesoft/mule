@@ -33,10 +33,8 @@ import org.mule.runtime.config.internal.ArtifactAstConfigurationBuilder;
 import org.mule.runtime.config.internal.ComponentBuildingDefinitionRegistryFactoryAware;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
-import org.mule.runtime.dsl.api.ConfigResource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -200,18 +198,6 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
         return org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
       default:
         return null;
-    }
-  }
-
-  private ConfigResource[] loadConfigResources(String[] configs) throws ConfigurationException {
-    try {
-      ConfigResource[] artifactConfigResources = new ConfigResource[configs.length];
-      for (int i = 0; i < configs.length; i++) {
-        artifactConfigResources[i] = new ConfigResource(configs[i]);
-      }
-      return artifactConfigResources;
-    } catch (IOException e) {
-      throw new ConfigurationException(e);
     }
   }
 

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.artifact;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
@@ -20,13 +22,13 @@ import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ArtifactType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.type.catalog.ApplicationTypeLoader;
 import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
@@ -46,6 +48,8 @@ import org.slf4j.Logger;
 public final class ArtifactAstUtils {
 
   private static final Logger LOGGER = getLogger(ArtifactAstUtils.class);
+
+  private static final Set<ComponentType> APPLICATION_COMPONENT_TYPES = unmodifiableSet(new HashSet<>(asList(OPERATION_DEF)));
 
   /**
    * Parses {@code configResources} for a Mule application and returns an {@link ArtifactAst} enriched with an additional
@@ -73,25 +77,35 @@ public final class ArtifactAstUtils {
 
     final ArtifactAst partialAst = doParseArtifactIntoAst(configResources, parserSupplier, extensions, true);
 
-    return parseApplicationExtensionModel(partialAst, artifactType, muleContext)
-        .map(extensionModel -> {
-          Set<ExtensionModel> enrichedExtensionModels = new HashSet<>(extensions);
-          enrichedExtensionModels.add(extensionModel);
-          return doParseArtifactIntoAst(configResources, parserSupplier, enrichedExtensionModels, disableValidations);
-        }).orElseGet(() -> disableValidations ? partialAst
-            : doParseArtifactIntoAst(configResources, parserSupplier, extensions, false));
-  }
-
-  private static Optional<ExtensionModel> parseApplicationExtensionModel(ArtifactAst ast,
-                                                                         ArtifactType artifactType,
-                                                                         MuleContext muleContext) {
-    if (!artifactType.equals(APPLICATION)) {
-      return empty();
+    if (artifactType.equals(APPLICATION)) {
+      ExtensionModel artifactExtensionModel =
+          parseArtifactExtensionModel(partialAst, muleContext.getExecutionClassLoader().getParent(), muleContext).orElse(null);
+      if (artifactExtensionModel != null) {
+        Set<ExtensionModel> enrichedExtensionModels = new HashSet<>(extensions);
+        enrichedExtensionModels.add(artifactExtensionModel);
+        return doParseArtifactIntoAst(configResources, parserSupplier, enrichedExtensionModels, disableValidations);
+      }
     }
 
-    if (!ast.topLevelComponentsStream()
-        .filter(c -> c.getComponentType() == OPERATION_DEF)
-        .findAny().isPresent()) {
+    return disableValidations
+        ? partialAst
+        : doParseArtifactIntoAst(configResources, parserSupplier, extensions, false);
+  }
+
+  /**
+   * If the {@code ast} represents an application which defines reusable components (operations, sources, etc), it returns an
+   * {@link ExtensionModel} which represents it.
+   *
+   * @param ast                 the application's AST
+   * @param artifactClassLoader the application's classloader
+   * @param muleContext         the application's context
+   * @return an optional {@link ExtensionModel}
+   */
+  public static Optional<ExtensionModel> parseArtifactExtensionModel(ArtifactAst ast,
+                                                                     ClassLoader artifactClassLoader,
+                                                                     MuleContext muleContext) {
+
+    if (ast.topLevelComponentsStream().noneMatch(APPLICATION_COMPONENT_TYPES::contains)) {
       return empty();
     }
 
@@ -104,18 +118,14 @@ public final class ArtifactAstUtils {
 
     Optional<ExtensionModelLoader> loader = getOptionalLoaderById(ArtifactAstUtils.class.getClassLoader(), MULE_SDK_LOADER_ID);
     if (loader.isPresent()) {
-      final ExtensionManager extensionManager = muleContext.getExtensionManager();
-      ExtensionModel appExtensionModel = loader.get()
-          .loadExtensionModel(builder(muleContext.getExecutionClassLoader().getParent(),
-                                      getDefault(extensionManager.getExtensions()))
-                                          .addParameter(VERSION_PROPERTY_NAME, artifactCoordinates.get().getVersion())
-                                          .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
-                                          .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME,
-                                                        muleContext.getConfiguration().getId())
-                                          .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader())
-                                          .build());
-
-      return of(appExtensionModel);
+      return of(loader.get()
+          .loadExtensionModel(builder(artifactClassLoader, getDefault(muleContext.getExtensionManager().getExtensions()))
+              .addParameter(VERSION_PROPERTY_NAME, artifactCoordinates.get().getVersion())
+              .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
+              .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME,
+                            muleContext.getConfiguration().getId())
+              .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader())
+              .build()));
     } else {
       logModelNotGenerated("Mule ExtensionModelLoader not found", muleContext);
       return empty();
