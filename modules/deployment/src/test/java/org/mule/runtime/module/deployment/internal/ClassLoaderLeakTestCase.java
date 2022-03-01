@@ -51,6 +51,7 @@ import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.sun.management.HotSpotDiagnosticMXBean;
@@ -60,6 +61,7 @@ import org.junit.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
+import org.junit.rules.TestName;
 import org.slf4j.impl.StaticMDCBinder;
 import org.slf4j.spi.MDCAdapter;
 import uk.org.lidalia.lang.ThreadLocal;
@@ -70,6 +72,9 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
   @Rule
   public SystemProperty directoryWatcherChangeCheckInterval = new SystemProperty(CHANGE_CHECK_INTERVAL_PROPERTY, "5");
+
+  @Rule
+  public TestName name = new TestName();
 
   private static File simpleExtensionJarFile;
 
@@ -118,6 +123,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
   }
 
   @Test
+  // @FlakyTest
   public void undeploysApplicationDoesNotLeakClassloader() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = getApplicationFileBuilder();
 
@@ -134,19 +140,19 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
       return true;
     }));
 
-    new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      try {
+    try {
+      new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
         clearLogsAndMDCThreadReferences();
         System.gc();
         assertThat(getDeploymentListener().getPhantomReference().isEnqueued(), is(true));
-      } catch (Throwable e) {
-        HotSpotDiagnosticMXBean mxBean = ManagementFactory.newPlatformMXBeanProxy(ManagementFactory.getPlatformMBeanServer(),
-                                                                                  "com.sun.management:type=HotSpotDiagnostic",
-                                                                                  HotSpotDiagnosticMXBean.class);
-        mxBean.dumpHeap("heap1.hprof", true);
-      }
-      return true;
-    }));
+        return true;
+      }));
+    } catch (AssertionError e) {
+      HotSpotDiagnosticMXBean mxBean = ManagementFactory.newPlatformMXBeanProxy(ManagementFactory.getPlatformMBeanServer(),
+                                                                                "com.sun.management:type=HotSpotDiagnostic",
+                                                                                HotSpotDiagnosticMXBean.class);
+      mxBean.dumpHeap("heap_prueba" + name.getMethodName() + ".hprof", true);
+    }
   }
 
   @Test
@@ -174,19 +180,19 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
       return true;
     }));
 
-    new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      try {
+    try {
+      new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
         clearLogsAndMDCThreadReferences();
         System.gc();
         assertThat(getDeploymentListener().getPhantomReference().isEnqueued(), is(true));
-      } catch (Throwable e) {
-        HotSpotDiagnosticMXBean mxBean = ManagementFactory.newPlatformMXBeanProxy(ManagementFactory.getPlatformMBeanServer(),
-                                                                                  "com.sun.management:type=HotSpotDiagnostic",
-                                                                                  HotSpotDiagnosticMXBean.class);
-        mxBean.dumpHeap("heap1.hprof", true);
-      }
-      return true;
-    }));
+        return true;
+      }));
+    } catch (AssertionError e) {
+      HotSpotDiagnosticMXBean mxBean = ManagementFactory.newPlatformMXBeanProxy(ManagementFactory.getPlatformMBeanServer(),
+                                                                                "com.sun.management:type=HotSpotDiagnostic",
+                                                                                HotSpotDiagnosticMXBean.class);
+      mxBean.dumpHeap("heap_prueba" + name.getMethodName() + ".hprof", true);
+    }
   }
 
   @Test
