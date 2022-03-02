@@ -46,22 +46,18 @@ import org.mule.tck.report.HeapDumper;
 import org.mule.tck.util.CompilerUtils;
 
 import java.io.File;
-import java.lang.management.ManagementFactory;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.reflect.Field;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.sun.management.HotSpotDiagnosticMXBean;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
-import org.junit.rules.TestName;
 import org.slf4j.impl.StaticMDCBinder;
 import org.slf4j.spi.MDCAdapter;
 import uk.org.lidalia.lang.ThreadLocal;
@@ -73,9 +69,6 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
   @Rule
   public SystemProperty directoryWatcherChangeCheckInterval = new SystemProperty(CHANGE_CHECK_INTERVAL_PROPERTY, "5");
 
-  @Rule
-  public TestName name = new TestName();
-
   private static File simpleExtensionJarFile;
 
   private static final String POLICY_PROPERTY_VALUE = "policyPropertyValue";
@@ -83,7 +76,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
   private static final String FOO_POLICY_NAME = "fooPolicy";
 
   private static final int PROBER_POLLING_INTERVAL = 100;
-  private static final int PROBER_POLIING_TIMEOUT = 50000;
+  private static final int PROBER_POLIING_TIMEOUT = 5000;
 
   private final String appName;
 
@@ -123,7 +116,6 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
   }
 
   @Test
-  // @FlakyTest
   public void undeploysApplicationDoesNotLeakClassloader() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = getApplicationFileBuilder();
 
@@ -140,19 +132,12 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
       return true;
     }));
 
-    try {
-      new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-        clearLogsAndMDCThreadReferences();
-        System.gc();
-        assertThat(getDeploymentListener().getPhantomReference().isEnqueued(), is(true));
-        return true;
-      }));
-    } catch (AssertionError e) {
-      HotSpotDiagnosticMXBean mxBean = ManagementFactory.newPlatformMXBeanProxy(ManagementFactory.getPlatformMBeanServer(),
-                                                                                "com.sun.management:type=HotSpotDiagnostic",
-                                                                                HotSpotDiagnosticMXBean.class);
-      mxBean.dumpHeap("heap_prueba" + name.getMethodName() + ".hprof", true);
-    }
+    new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+      clearLogsAndMDCThreadReferences();
+      System.gc();
+      assertThat(getDeploymentListener().getPhantomReference().isEnqueued(), is(true));
+      return true;
+    }));
   }
 
   @Test
@@ -180,19 +165,12 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
       return true;
     }));
 
-    try {
-      new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-        clearLogsAndMDCThreadReferences();
-        System.gc();
-        assertThat(getDeploymentListener().getPhantomReference().isEnqueued(), is(true));
-        return true;
-      }));
-    } catch (AssertionError e) {
-      HotSpotDiagnosticMXBean mxBean = ManagementFactory.newPlatformMXBeanProxy(ManagementFactory.getPlatformMBeanServer(),
-                                                                                "com.sun.management:type=HotSpotDiagnostic",
-                                                                                HotSpotDiagnosticMXBean.class);
-      mxBean.dumpHeap("heap_prueba" + name.getMethodName() + ".hprof", true);
-    }
+    new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+      clearLogsAndMDCThreadReferences();
+      System.gc();
+      assertThat(getDeploymentListener().getPhantomReference().isEnqueued(), is(true));
+      return true;
+    }));
   }
 
   @Test
