@@ -36,6 +36,20 @@
         <set-payload value="SUCCESS"/>
     </flow>
 
+    <flow name="streamingReconnectWithClosedStreamInParameterGroup">
+        <petstore:get-streamed-signature signature="#[vars.signature]"/>
+        <petstore:get-pets-with-intermitent-connection-problem-and-closing-stream-in-parameter-group config-ref="petstore" name="jo" signature="#[payload]"/>
+        <set-payload value="SUCCESS"/>
+    </flow>
+
+    <flow name="streamingReconnectWithClosedStreamInParameterGroupShownInDsl">
+        <petstore:get-streamed-signature signature="#[vars.signature]"/>
+        <petstore:get-pets-with-intermitent-connection-problem-and-closing-stream-in-parameter-group-shown-in-dsl config-ref="petstore">
+            <petstore:owner name="jo" signature="#[payload]"/>
+        </petstore:get-pets-with-intermitent-connection-problem-and-closing-stream-in-parameter-group-shown-in-dsl>
+        <set-payload value="SUCCESS"/>
+    </flow>
+
     <flow name="streamingReconnectWithParameterGroup">
         <petstore:get-pets-with-parameter-group config-ref="petstore" name="jo" signature="#[vars.signature]"/>
     </flow>
