@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
+import java.util.function.UnaryOperator;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.message.Message;
@@ -42,6 +43,12 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
  */
 public final class MessageUtils {
 
+  private static final UnaryOperator<Object> CURSOR_STREAM_AS_UNCLOSABLE_DECORATOR = value -> {
+    if (value instanceof CursorStream && !(value instanceof UnclosableCursorStream)) {
+      return new UnclosableCursorStream((CursorStream) value);
+    }
+    return value;
+  };
 
   private MessageUtils() {}
 
@@ -297,5 +304,14 @@ public final class MessageUtils {
     } else {
       return v;
     }
+  }
+
+  /**
+   * @return A decorator to be applied for {@link CursorStream} even when there is no {@link CursorComponentDecoratorFactory} to
+   *         apply.
+   */
+  public static UnaryOperator<Object> getCursorStreamDecorator() {
+    // It is important to have the decorator instance cached to reduce pressure on the GC and improve performance.
+    return CURSOR_STREAM_AS_UNCLOSABLE_DECORATOR;
   }
 }
