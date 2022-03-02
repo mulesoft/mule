@@ -185,11 +185,6 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
   }
 
   @Override
-  public <T> T lookupObject(Class<T> type) throws RegistrationException {
-    return super.lookupObject(type);
-  }
-
-  @Override
   @SuppressWarnings("unchecked")
   public <T> Collection<T> lookupObjects(Class<T> returntype) {
     return (Collection<T>) registryMap.select(returntype::isInstance);
@@ -231,14 +226,14 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
   /////////////////////////////////
 
   /**
-   * Allows for arbitary registration of transient objects
+   * Allows for arbitrary registration of transient objects
    *
    * @param key
    * @param value
    */
   @Override
   public void registerObject(String key, Object value) throws RegistrationException {
-    registerObject(key, value, Object.class);
+    registerObject(key, value, null);
   }
 
   /**
@@ -261,7 +256,7 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
       return;
     }
 
-    doRegisterObject(key, object, metadata);
+    doRegisterObject(key, object);
   }
 
   @Override
@@ -283,11 +278,11 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
   /**
    * {@inheritDoc}
    */
-  private void doRegisterObject(String key, Object object, Object metadata) throws RegistrationException {
+  private void doRegisterObject(String key, Object object) throws RegistrationException {
     Object previous = doGet(key);
     if (previous != null) {
       if (logger.isDebugEnabled()) {
-        logger.debug(String.format("An entry already exists for key %s. It will be replaced", key));
+        logger.debug(format("An entry already exists for key %s. It will be replaced", key));
       }
 
       unregisterObject(key);
@@ -350,11 +345,11 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
   /**
    * {@inheritDoc}
    */
-  protected Object applyProcessors(Object object, Object metadata) {
+  private Object applyProcessors(Object object, Object metadata) {
     return injectInto(doApplyProcessors(object, metadata));
   }
 
-  protected Object doApplyProcessors(Object object, Object metadata) {
+  private Object doApplyProcessors(Object object, Object metadata) {
     if (disableApplyObjectProcessor) {
       return object;
     }

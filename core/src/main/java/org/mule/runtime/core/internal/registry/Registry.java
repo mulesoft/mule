@@ -96,6 +96,7 @@ public interface Registry extends Initialisable, Disposable {
    * @throws RegistrationException if an object with the same key already exists
    * @deprecated as of 3.7.0. Use {@link #registerObject(String, Object)} instead
    */
+  // TODO W-10781591 remove this
   @Deprecated
   void registerObject(String key, Object value, Object metadata) throws RegistrationException;
 
