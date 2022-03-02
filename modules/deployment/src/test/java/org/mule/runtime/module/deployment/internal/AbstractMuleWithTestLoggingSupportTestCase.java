@@ -8,9 +8,16 @@ package org.mule.runtime.module.deployment.internal;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.lang.reflect.Field;
+import java.util.Map;
+
 import org.junit.After;
 import org.junit.Before;
+import org.slf4j.impl.StaticMDCBinder;
+import org.slf4j.spi.MDCAdapter;
+import uk.org.lidalia.lang.ThreadLocal;
 import uk.org.lidalia.slf4jtest.TestLoggerFactory;
+import uk.org.lidalia.slf4jtest.TestMDCAdapter;
 
 /**
  * Abstract class for tests on the deployment module since SLF4J Test Logging Library is used
@@ -20,10 +27,21 @@ import uk.org.lidalia.slf4jtest.TestLoggerFactory;
 public abstract class AbstractMuleWithTestLoggingSupportTestCase extends AbstractMuleTestCase {
 
   @Before
-  @After
   public void clearAllLogs() {
     // Logs that are stored for later assert need to be cleared before every test
     // clearAll will reset state across all threads
     TestLoggerFactory.clearAll();
+  }
+
+  @After
+  public void clearLogsAndMDCThreadReferences() throws NoSuchFieldException, IllegalAccessException {
+    // TestMDCAdapter contains its own implementation of ThreadLocal variables which hold strong references to Threads that should
+    // be released to prevent possible leakages
+    TestLoggerFactory.clearAll();
+    MDCAdapter testMDCAdapter = StaticMDCBinder.SINGLETON.getMDCA();
+    Field valueField = TestMDCAdapter.class.getDeclaredField("value");
+    valueField.setAccessible(true);
+    ThreadLocal<Map<String, String>> threadLocal = (ThreadLocal<Map<String, String>>) valueField.get(testMDCAdapter);
+    threadLocal.reset();
   }
 }
