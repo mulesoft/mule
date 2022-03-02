@@ -5269,7 +5269,6 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -5285,7 +5284,6 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
@@ -5299,19 +5297,7 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
-                      "classInformation": {
-                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
-                        "hasDefaultConstructor": false,
-                        "isInterface": true,
-                        "isInstantiable": false,
-                        "isAbstract": true,
-                        "isFinal": false,
-                        "implementedInterfaces": [],
-                        "parent": "",
-                        "genericTypes": [],
-                        "isMap": false
-                      }
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
                     },
                     "fields": []
                   },
@@ -5319,7 +5305,6 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -5343,7 +5328,6 @@
                       }
                     }
                   ],
-                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -5372,7 +5356,6 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -5387,7 +5370,6 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
                   "name": "name",
                   "description": "",
                   "modelProperties": {}
@@ -5417,7 +5399,6 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -5432,7 +5413,6 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
                   "name": "signature",
                   "description": "",
                   "modelProperties": {}
@@ -5462,7 +5442,6 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -5477,7 +5456,6 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
                   "name": "address",
                   "description": "",
                   "modelProperties": {}
@@ -5507,7 +5485,6 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -5522,7 +5499,6 @@
                     "order": 4
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
                   "name": "certificate",
                   "description": "",
                   "modelProperties": {}
@@ -5551,7 +5527,6 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -5567,7 +5542,6 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -5584,7 +5558,6 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "REQUIRED",
                   "defaultValue": "#[payload]",
                   "role": "BEHAVIOUR",
@@ -5601,7 +5574,6 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -5627,148 +5599,15 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Array",
-                    "annotations": {
-                      "infrastructureType": {},
-                      "description": {
-                        "value": "Determines that an error thrown by this operation should be mapped to another"
-                      },
-                      "typeDsl": {
-                        "allowInlineDefinition": true,
-                        "allowTopLevelDefinition": false
-                      }
-                    },
-                    "item": {
-                      "type": "Object",
-                      "annotations": {
-                        "typeId": "errorMapping",
-                        "infrastructureType": {}
-                      },
-                      "fields": [
-                        {
-                          "key": {
-                            "name": "source"
-                          },
-                          "model": {
-                            "format": {
-                              "id": "text",
-                              "label": "Text",
-                              "validMimeTypes": [
-                                "text/plain"
-                              ]
-                            },
-                            "type": "String",
-                            "annotations": {
-                              "typeId": "errorTypeMatcher",
-                              "enum": {
-                                "type": "[Ljava.lang.String;",
-                                "values": [
-                                  "ANY",
-                                  "REDELIVERY_EXHAUSTED",
-                                  "TRANSFORMATION",
-                                  "EXPRESSION",
-                                  "SECURITY",
-                                  "CLIENT_SECURITY",
-                                  "SERVER_SECURITY",
-                                  "ROUTING",
-                                  "CONNECTIVITY",
-                                  "RETRY_EXHAUSTED",
-                                  "TIMEOUT"
-                                ]
-                              }
-                            }
-                          }
-                        },
-                        {
-                          "key": {
-                            "name": "target",
-                            "required": "true"
-                          },
-                          "model": {
-                            "format": {
-                              "id": "text",
-                              "label": "Text",
-                              "validMimeTypes": [
-                                "text/plain"
-                              ]
-                            },
-                            "type": "String",
-                            "annotations": {
-                              "typeId": "errorTypeDefinition"
-                            }
-                          }
-                        }
-                      ]
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 9,
-                    "tabName": "Error Mapping"
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "errorMappings",
-                  "description": "Set of error mappings",
-                  "modelProperties": {
-                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
-                      "value": {
-                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "error-mappings",
-                        "prefix": "mule"
-                      }
-                    },
-                    "sinceMuleVersion": {
-                      "version": "4.4.0"
-                    },
-                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
-                      "sequence": 12
-                    }
-                  }
-                }
-              ],
-              "exclusiveParametersModels": [],
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 4
-              },
-              "showInDsl": false,
-              "name": "Error Mappings",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "parameters": [
-                {
-                  "type": {
-                    "format": "java",
                     "type": "Union",
                     "annotations": {
-                      "typeId": "ReconnectionStrategy",
-                      "infrastructureType": {}
+                      "typeId": "ReconnectionStrategy"
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "reconnect",
-                          "infrastructureType": {}
+                          "typeId": "reconnect"
                         },
                         "fields": [
                           {
@@ -5840,8 +5679,7 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "reconnect-forever",
-                          "infrastructureType": {}
+                          "typeId": "reconnect-forever"
                         },
                         "fields": [
                           {
@@ -5899,7 +5737,6 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -5911,11 +5748,10 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 10,
+                    "order": 9,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -5937,7 +5773,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 5
+                "order": 4
               },
               "showInDsl": false,
               "name": "Connection",
@@ -6001,7 +5837,6 @@
             "PETSTORE:CONNECTIVITY",
             "PETSTORE:RETRY_EXHAUSTED"
           ],
-          "semanticTerms": [],
           "stereotype": {
             "type": "GET_PETS_WITH_INTERMITENT_CONNECTION_PROBLEM_AND_CLOSING_STREAM_IN_PARAMETER_GROUP_SHOWN_IN_DSL",
             "namespace": "PETSTORE",
@@ -6026,7 +5861,6 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -6042,7 +5876,6 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {
@@ -6056,19 +5889,7 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
-                      "classInformation": {
-                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
-                        "hasDefaultConstructor": false,
-                        "isInterface": true,
-                        "isInstantiable": false,
-                        "isAbstract": true,
-                        "isFinal": false,
-                        "implementedInterfaces": [],
-                        "parent": "",
-                        "genericTypes": [],
-                        "isMap": false
-                      }
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
                     },
                     "fields": []
                   },
@@ -6076,7 +5897,6 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -6100,7 +5920,6 @@
                       }
                     }
                   ],
-                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -6129,7 +5948,6 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -6144,7 +5962,6 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
                   "name": "name",
                   "description": "",
                   "modelProperties": {}
@@ -6174,7 +5991,6 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -6189,7 +6005,6 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
                   "name": "signature",
                   "description": "",
                   "modelProperties": {}
@@ -6219,7 +6034,6 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -6234,7 +6048,6 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
                   "name": "address",
                   "description": "",
                   "modelProperties": {}
@@ -6264,7 +6077,6 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -6279,7 +6091,6 @@
                     "order": 4
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
                   "name": "certificate",
                   "description": "",
                   "modelProperties": {}
@@ -6308,7 +6119,6 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -6324,7 +6134,6 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -6341,7 +6150,6 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "REQUIRED",
                   "defaultValue": "#[payload]",
                   "role": "BEHAVIOUR",
@@ -6358,7 +6166,6 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -6384,148 +6191,15 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Array",
-                    "annotations": {
-                      "infrastructureType": {},
-                      "description": {
-                        "value": "Determines that an error thrown by this operation should be mapped to another"
-                      },
-                      "typeDsl": {
-                        "allowInlineDefinition": true,
-                        "allowTopLevelDefinition": false
-                      }
-                    },
-                    "item": {
-                      "type": "Object",
-                      "annotations": {
-                        "typeId": "errorMapping",
-                        "infrastructureType": {}
-                      },
-                      "fields": [
-                        {
-                          "key": {
-                            "name": "source"
-                          },
-                          "model": {
-                            "format": {
-                              "id": "text",
-                              "label": "Text",
-                              "validMimeTypes": [
-                                "text/plain"
-                              ]
-                            },
-                            "type": "String",
-                            "annotations": {
-                              "typeId": "errorTypeMatcher",
-                              "enum": {
-                                "type": "[Ljava.lang.String;",
-                                "values": [
-                                  "ANY",
-                                  "REDELIVERY_EXHAUSTED",
-                                  "TRANSFORMATION",
-                                  "EXPRESSION",
-                                  "SECURITY",
-                                  "CLIENT_SECURITY",
-                                  "SERVER_SECURITY",
-                                  "ROUTING",
-                                  "CONNECTIVITY",
-                                  "RETRY_EXHAUSTED",
-                                  "TIMEOUT"
-                                ]
-                              }
-                            }
-                          }
-                        },
-                        {
-                          "key": {
-                            "name": "target",
-                            "required": "true"
-                          },
-                          "model": {
-                            "format": {
-                              "id": "text",
-                              "label": "Text",
-                              "validMimeTypes": [
-                                "text/plain"
-                              ]
-                            },
-                            "type": "String",
-                            "annotations": {
-                              "typeId": "errorTypeDefinition"
-                            }
-                          }
-                        }
-                      ]
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 9,
-                    "tabName": "Error Mapping"
-                  },
-                  "allowedStereotypeModels": [],
-                  "semanticTerms": [],
-                  "name": "errorMappings",
-                  "description": "Set of error mappings",
-                  "modelProperties": {
-                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
-                      "value": {
-                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "error-mappings",
-                        "prefix": "mule"
-                      }
-                    },
-                    "sinceMuleVersion": {
-                      "version": "4.4.0"
-                    },
-                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
-                      "sequence": 12
-                    }
-                  }
-                }
-              ],
-              "exclusiveParametersModels": [],
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 4
-              },
-              "showInDsl": false,
-              "name": "Error Mappings",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "parameters": [
-                {
-                  "type": {
-                    "format": "java",
                     "type": "Union",
                     "annotations": {
-                      "typeId": "ReconnectionStrategy",
-                      "infrastructureType": {}
+                      "typeId": "ReconnectionStrategy"
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "reconnect",
-                          "infrastructureType": {}
+                          "typeId": "reconnect"
                         },
                         "fields": [
                           {
@@ -6597,8 +6271,7 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "reconnect-forever",
-                          "infrastructureType": {}
+                          "typeId": "reconnect-forever"
                         },
                         "fields": [
                           {
@@ -6656,7 +6329,6 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -6668,11 +6340,10 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 10,
+                    "order": 9,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
-                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -6694,7 +6365,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 5
+                "order": 4
               },
               "showInDsl": false,
               "name": "Connection",
@@ -6758,7 +6429,6 @@
             "PETSTORE:CONNECTIVITY",
             "PETSTORE:RETRY_EXHAUSTED"
           ],
-          "semanticTerms": [],
           "stereotype": {
             "type": "GET_PETS_WITH_INTERMITENT_CONNECTION_PROBLEM_AND_CLOSING_TYPED_VALUE_STREAM",
             "namespace": "PETSTORE",
