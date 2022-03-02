@@ -20,8 +20,8 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.config.internal.context.ObjectProviderAwareBeanFactory;
-import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
+import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
@@ -127,7 +127,7 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
 
   @Override
   protected LifecycleManager createLifecycleManager(LifecycleInterceptor lifecycleInterceptor) {
-    return new SpringRegistryLifecycleManager(getRegistryId(), this, muleContext, lifecycleInterceptor);
+    return new SpringRegistryLifecycleManager(getRegistryId(), this, getMuleContext(), lifecycleInterceptor);
   }
 
   /**
@@ -418,7 +418,7 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
     @Override
     public void registerObject(String key, Object value) throws RegistrationException {
       try {
-        muleContext.withLifecycleLock((CheckedRunnable) () -> doRegisterObject(key, value));
+        getMuleContext().withLifecycleLock((CheckedRunnable) () -> doRegisterObject(key, value));
       } catch (RuntimeException e) {
         Throwable cause = e.getCause();
         if (cause instanceof RegistrationException) {

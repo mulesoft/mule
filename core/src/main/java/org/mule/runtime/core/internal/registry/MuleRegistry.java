@@ -23,18 +23,21 @@ public interface MuleRegistry extends Registry {
    *
    * @see Registry#registerObject(String, Object, Object)
    */
+  // TODO W-10781591 Remove this
   int LIFECYCLE_BYPASS_FLAG = 0x01;
 
   /**
    * Determines whether Inject processors should get executed on an object added to the registry Inject processors are responsible
    * for processing inject interfaces such as {@link org.mule.runtime.core.api.context.MuleContextAware}
    */
+  // TODO W-10781591 Remove this
   int INJECT_PROCESSORS_BYPASS_FLAG = 0x02;
 
   /**
    * Determines whether pre-init processors should get executed on an object added to the registry. Pre init processors are
    * basically object processors that do not inject members into objects. These processors happen after the inject processors
    */
+  // TODO W-10781591 Remove this
   int PRE_INIT_PROCESSORS_BYPASS_FLAG = 0x04;
 
   // /////////////////////////////////////////////////////////////////////////

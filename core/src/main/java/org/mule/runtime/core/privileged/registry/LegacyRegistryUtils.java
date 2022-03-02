@@ -84,7 +84,11 @@ public final class LegacyRegistryUtils {
    * @param object   the object to store in the registry. This is a non-null value
    * @param metadata an implementation specific argument that can be passed into the method
    * @throws RegistrationException if an object with the same key already exists
+   * 
+   * @deprecated Use {@link #registerObject(MuleContext, String, Object)} instead.
    */
+  // TODO W-10781591 remove this
+  @Deprecated
   public static void registerObject(MuleContext context, String key, Object object, Object metadata)
       throws RegistrationException {
     getRegistry(context).registerObject(key, object, metadata);

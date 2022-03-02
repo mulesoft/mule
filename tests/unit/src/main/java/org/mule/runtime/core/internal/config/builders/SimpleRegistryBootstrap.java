@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.config.builders;
 
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
-
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import org.mule.runtime.api.metadata.DataType;
@@ -19,13 +17,10 @@ import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap;
-import org.mule.runtime.core.internal.config.bootstrap.BootstrapObjectFactory;
 import org.mule.runtime.core.internal.config.bootstrap.ObjectBootstrapProperty;
 import org.mule.runtime.core.internal.config.bootstrap.TransformerBootstrapProperty;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.SimpleRegistry;
-import org.mule.runtime.core.internal.util.StreamCloser;
-import org.mule.runtime.core.privileged.registry.ObjectProcessor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 /**
@@ -73,16 +68,6 @@ public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap {
   @Override
   protected void doRegisterObject(ObjectBootstrapProperty bootstrapProperty) throws Exception {
     Object value = bootstrapProperty.getService().instantiateClass(bootstrapProperty.getClassName());
-    Class<?> meta = Object.class;
-
-    if (value instanceof ObjectProcessor) {
-      meta = ObjectProcessor.class;
-    } else if (value instanceof StreamCloser) {
-      meta = StreamCloser.class;
-    } else if (value instanceof BootstrapObjectFactory) {
-      setMuleContextIfNeeded(value, muleContext);
-      value = ((BootstrapObjectFactory) value).create();
-    }
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(bootstrapProperty.getKey(), value, meta);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(bootstrapProperty.getKey(), value);
   }
 }

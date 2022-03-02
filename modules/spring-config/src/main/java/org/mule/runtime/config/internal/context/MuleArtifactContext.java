@@ -110,7 +110,6 @@ import org.mule.runtime.config.internal.processor.ComponentLocatorCreatePostProc
 import org.mule.runtime.config.internal.processor.DiscardedOptionalBeanPostProcessor;
 import org.mule.runtime.config.internal.processor.LifecycleStatePostProcessor;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
-import org.mule.runtime.config.internal.processor.PostRegistrationActionsPostProcessor;
 import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.config.internal.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
@@ -129,7 +128,6 @@ import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
-import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
 import org.mule.runtime.core.internal.util.DefaultResourceLocator;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
@@ -404,8 +402,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     addBeanPostProcessors(beanFactory,
                           new MuleContextPostProcessor(muleContext),
-                          new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext
-                              .getRegistry(), beanFactory),
                           // TODO W-10736276 Remove this postProcessor
                           new DiscardedOptionalBeanPostProcessor(getOptionalObjectsController(),
                                                                  (DefaultListableBeanFactory) beanFactory),
@@ -728,8 +724,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   /**
-   * Forces the registration of instances of {@link TransformerResolver} and {@link Converter} to be created, so that
-   * {@link PostRegistrationActionsPostProcessor} can work its magic and add them to the transformation graph
+   * Forces the registration of instances of {@link TransformerResolver} and {@link Converter} to be created, so that they are
+   * added to the transformation graph.
    */
   protected static void postProcessBeanDefinition(SpringComponentModel resolvedComponent, BeanDefinitionRegistry registry,
                                                   String beanName) {

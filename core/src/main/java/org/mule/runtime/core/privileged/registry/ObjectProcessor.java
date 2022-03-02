@@ -20,6 +20,7 @@ import org.mule.runtime.core.internal.registry.Registry;
  *             currently supported registries instead
  */
 @Deprecated
+// TODO W-10781591 Remove this
 public interface ObjectProcessor {
 
   Object process(Object object);

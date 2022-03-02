@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.registry;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 
 import static java.lang.String.format;
 
@@ -18,7 +19,6 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
@@ -40,17 +40,16 @@ public abstract class AbstractRegistry implements Registry {
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-  protected MuleContext muleContext;
+  private final MuleContext muleContext;
   private final RegistryLifecycleManager lifecycleManager;
 
   protected AbstractRegistry(String id, MuleContext muleContext, LifecycleInterceptor lifecycleInterceptor) {
     if (id == null) {
-      throw new MuleRuntimeException(CoreMessages.objectIsNull("RegistryID"));
+      throw new MuleRuntimeException(objectIsNull("RegistryID"));
     }
     this.id = id;
     this.muleContext = muleContext;
-    lifecycleManager =
-        (RegistryLifecycleManager) createLifecycleManager(lifecycleInterceptor);
+    lifecycleManager = (RegistryLifecycleManager) createLifecycleManager(lifecycleInterceptor);
   }
 
   @Override
@@ -163,15 +162,6 @@ public abstract class AbstractRegistry implements Registry {
   }
 
   /**
-   * {@inheritDoc}
-   */
-  @Override
-  @Deprecated
-  public final Object unregisterObject(String key, Object metadata) throws RegistrationException {
-    return unregisterObject(key);
-  }
-
-  /**
    * Template method for the logic to actually unregister the key without applying any lifecycle to it. Applying the shutdown
    * lifecycle will be up to {@link #unregisterObject(String)}
    *
@@ -208,6 +198,10 @@ public abstract class AbstractRegistry implements Registry {
   // /////////////////////////////////////////////////////////////////////////
   // Registry Metadata
   // /////////////////////////////////////////////////////////////////////////
+
+  public MuleContext getMuleContext() {
+    return muleContext;
+  }
 
   @Override
   public final String getRegistryId() {

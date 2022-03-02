@@ -6,27 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.manager;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyObject;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.same;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
@@ -42,6 +21,28 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.stubRegistryKeys;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -51,7 +52,6 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
@@ -81,9 +81,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -134,7 +136,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   private ConfigurationProvider extension1ConfigurationProvider;
 
   @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
-  private ConfigurationInstance extension1ConfigurationInstance = mock(ConfigurationInstance.class);
+  private final ConfigurationInstance extension1ConfigurationInstance = mock(ConfigurationInstance.class);
 
   @Mock(lenient = true)
   private CompletableComponentExecutorFactory executorFactory;
@@ -353,7 +355,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     mockParameters(extension1ConfigurationModel, parameter, parameterOfRepeatedEnumType);
     extensionsManager.registerExtension(extensionModel1);
 
-    verify(muleContext.getRegistry()).registerObject(anyString(), any(StringToEnum.class), eq(Transformer.class));
+    verify(muleContext.getRegistry()).registerObject(anyString(), any(StringToEnum.class));
   }
 
   @Test
@@ -369,7 +371,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     mockParameters(extension1ConfigurationModel, parameter);
     extensionsManager.registerExtension(extensionModel1);
 
-    verify(muleContext.getRegistry()).registerObject(anyString(), any(StringToEnum.class), eq(Transformer.class));
+    verify(muleContext.getRegistry()).registerObject(anyString(), any(StringToEnum.class));
   }
 
   private void makeExtension1ConfigurationNotImplicit() {
