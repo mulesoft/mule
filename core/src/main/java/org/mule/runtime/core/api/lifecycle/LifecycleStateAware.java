@@ -18,7 +18,7 @@ import org.mule.runtime.core.internal.registry.Registry;
  * @since 3.0
  */
 @Deprecated
-// TODO W- Remove this
+// TODO W-10781591 Remove this
 public interface LifecycleStateAware {
 
   void setLifecycleState(LifecycleState state);

@@ -36,7 +36,7 @@ import javax.annotation.PreDestroy;
  *             currently supported registries instead
  */
 @Deprecated
-// TODO W- Remove this
+// TODO W-10781591 Remove this
 public class JSR250ValidatorProcessor implements InjectProcessor {
 
   @Override

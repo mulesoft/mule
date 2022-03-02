@@ -18,7 +18,7 @@ import org.mule.runtime.core.privileged.registry.InjectProcessor;
  *             currently supported registries instead
  */
 @Deprecated
-// TODO W- Remove this
+// TODO W-10781591 Remove this
 public class MuleContextProcessor implements InjectProcessor {
 
   private final MuleContext context;
