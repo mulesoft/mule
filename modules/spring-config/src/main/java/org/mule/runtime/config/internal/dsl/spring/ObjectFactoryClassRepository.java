@@ -16,6 +16,7 @@ import static net.bytebuddy.matcher.ElementMatchers.named;
 
 import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.FieldAccessor;
 import net.bytebuddy.implementation.MethodCall;
@@ -24,6 +25,7 @@ import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.This;
+import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectTypeProvider;
@@ -48,6 +50,17 @@ import org.springframework.beans.factory.SmartFactoryBean;
  */
 public class ObjectFactoryClassRepository {
 
+  // This only works because the cache uses an identity hashCode() and equals() for keys when they are configured as weak.
+  // (check com.github.benmanes.caffeine.cache.Caffeine.weakKeys javadoc).
+  // If that is not the case, this will never work because we want to compare class loaders by instance.
+  // The idea for this cache is to avoid the creation of multiple CompositeClassLoader instances with the same delegates.
+  // That is because CGLIB enhancer uses the composite class loader to define the enhanced class and every new instance loads
+  // the same defined class over and over again, causing metaspace OOM in some scenarios.
+  private static final LoadingCache<ClassLoader, ClassLoader> COMPOSITE_CL_CACHE = newBuilder()
+      .weakKeys()
+      .weakValues()
+      .build(cl -> from(ObjectFactoryClassRepository.class.getClassLoader(), cl));
+
   /**
    * Retrieves a {@link Class} for the {@link ObjectFactory} defined by the {@code objectFactoryType} parameter. Once acquired the
    * {@code Class} instance should not be reused for another {@link ComponentBuildingDefinition}.
@@ -58,16 +71,20 @@ public class ObjectFactoryClassRepository {
   public Class<ObjectFactory> getObjectFactoryClass(Class objectFactoryType) {
     synchronized (this.getClass().getClassLoader()) {
       String name = objectFactoryType.getName() + "_ByteBuddy";
+      ClassLoader classLoader = getClass().getClassLoader();
+      if (SmartFactoryBean.class.getClassLoader() != objectFactoryType.getClassLoader()) {
+        classLoader = COMPOSITE_CL_CACHE.get(objectFactoryType.getClassLoader());
+      }
       try {
-        return (Class<ObjectFactory>) forName(name, true, this.getClass().getClassLoader());
+        return (Class<ObjectFactory>) forName(name, true, classLoader);
       } catch (ClassNotFoundException e) {
         // class doesn't exist, generate
       }
-      return createObjectFactoryDynamicClass(objectFactoryType, name);
+      return createObjectFactoryDynamicClass(objectFactoryType, name, classLoader);
     }
   }
 
-  private Class<ObjectFactory> createObjectFactoryDynamicClass(Class objectFactoryType, String name) {
+  private Class<ObjectFactory> createObjectFactoryDynamicClass(Class objectFactoryType, String name, ClassLoader classLoader) {
     final GenericInterceptor interceptor = new GenericInterceptor();
     return new ByteBuddy()
         .subclass(objectFactoryType, IMITATE_SUPER_CLASS)
@@ -85,7 +102,7 @@ public class ObjectFactoryClassRepository {
         .method(named("isEagerInit").and(isDeclaredBy(SmartFactoryBean.class))).intercept(MethodDelegation.to(interceptor))
         .method(named("getObject").and(isDeclaredBy(FactoryBean.class))).intercept(MethodCall.invokeSuper())
         .make()
-        .load(this.getClass().getClassLoader(), INJECTION)
+        .load(classLoader, INJECTION)
         .getLoaded();
   }
 
