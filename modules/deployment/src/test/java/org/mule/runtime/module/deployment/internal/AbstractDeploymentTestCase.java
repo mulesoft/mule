@@ -307,7 +307,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleWithTestLog
     TestLogger testLogger = getTestLogger(LoggerMessageProcessor.class);
     testLogger.setEnabledLevelsForAllThreads(Level.ERROR);
     // Initialises logging plugins with correct classloader
-    // LogManager.getContext(false);
+    LogManager.getContext(false);
 
     barUtils1ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar1/BarUtils.java"));
     barUtils1_0JarFile =
