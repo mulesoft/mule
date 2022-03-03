@@ -10,7 +10,6 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedResult;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -27,10 +26,9 @@ public final class ValueReturnDelegate extends AbstractReturnDelegate {
    * {@inheritDoc}
    */
   public ValueReturnDelegate(ComponentModel componentModel,
-                             CursorComponentDecoratorFactory componentDecoratorFactory,
                              CursorProviderFactory cursorProviderFactory,
                              MuleContext muleContext) {
-    super(componentModel, componentDecoratorFactory, cursorProviderFactory, muleContext);
+    super(componentModel, cursorProviderFactory, muleContext);
   }
 
   /**

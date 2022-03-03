@@ -14,14 +14,12 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
@@ -110,9 +108,5 @@ public class ComponentExecutorCompletableAdapterFactory<T extends ComponentModel
           ? ((OperationArgumentResolverFactory<T>) delegate).createArgumentResolver(operationModel)
           : ec -> emptyMap();
     }
-  }
-
-  public void setComponentDecoratorFactory(CursorComponentDecoratorFactory componentDecoratorFactory) {
-    // Do not calculate statistics for legacy mode operations
   }
 }

@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -65,11 +64,6 @@ public class RegistryLookupValueResolver<T> implements ValueResolver<T> {
    */
   @Override
   public boolean isDynamic() {
-    return false;
-  }
-
-  @Override
-  public boolean isContent() {
     return false;
   }
 

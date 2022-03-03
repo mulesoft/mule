@@ -10,7 +10,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveRecursively;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -93,11 +92,6 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
     return dynamic;
   }
 
-  @Override
-  public boolean isContent() {
-    return false;
-  }
-
   /**
    * Evaluates all the added {@link ValueResolver}s and returns the results into a {@link ResolverSetResult}
    *
@@ -144,4 +138,5 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
   ResolverSetResult.Builder getResolverSetBuilder() {
     return ResolverSetResult.newBuilder();
   }
+
 }

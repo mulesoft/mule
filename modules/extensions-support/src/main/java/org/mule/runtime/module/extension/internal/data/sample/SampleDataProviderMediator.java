@@ -11,7 +11,6 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
-import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.withRefreshToken;
 import static org.mule.sdk.api.data.sample.SampleDataException.NOT_SUPPORTED;
@@ -79,7 +78,7 @@ public class SampleDataProviderMediator {
     this.reflectionCache = reflectionCache;
     this.streamingManager = streamingManager;
     sampleDataProperty = componentModel.getModelProperty(SampleDataProviderFactoryModelProperty.class).orElse(null);
-    returnDelegate = new ValueReturnDelegate(componentModel, NO_OP_INSTANCE, cursorProviderFactory, muleContext);
+    returnDelegate = new ValueReturnDelegate(componentModel, cursorProviderFactory, muleContext);
   }
 
   /**
@@ -156,7 +155,6 @@ public class SampleDataProviderMediator {
                                        componentModel,
                                        getNullEvent(muleContext),
                                        cursorProviderFactory,
-                                       NO_OP_INSTANCE,
                                        streamingManager,
                                        component,
                                        new NoRetryPolicyTemplate(),

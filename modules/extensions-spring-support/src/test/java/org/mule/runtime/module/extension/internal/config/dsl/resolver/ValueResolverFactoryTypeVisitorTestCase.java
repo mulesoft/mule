@@ -84,7 +84,7 @@ public class ValueResolverFactoryTypeVisitorTestCase {
 
   private ValueResolverFactoryTypeVisitor createValueResolverFactoryTypeVisitor(Object value, Class<?> expectedClass) {
     return new ValueResolverFactoryTypeVisitor(dslSyntaxResolver, "parameter",
-                                               value, null, false, false, expectedClass);
+                                               value, null, false, expectedClass);
   }
 
   private DateTimeType createDateTimeType(Class<?> expectedClass) {

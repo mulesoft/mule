@@ -125,23 +125,22 @@ public class StackableTypesParameterContributor implements ParameterDeclarerCont
             .builder(ParameterResolver.class)
             .setStaticResolverFactory(value -> new StaticValueResolver<>(new StaticParameterResolver<>(value)))
             .setDelegateResolverFactory(resolver -> new ParameterResolverValueResolverWrapper(resolver))
-            .setExpressionBasedResolverFactory((value, expectedType,
-                                                content) -> new ExpressionBasedParameterResolverValueResolver(value, expectedType,
-                                                                                                              fromType(expectedType),
-                                                                                                              content))
+            .setExpressionBasedResolverFactory((value,
+                                                expectedType) -> new ExpressionBasedParameterResolverValueResolver(value,
+                                                                                                                   expectedType,
+                                                                                                                   fromType(expectedType)))
             .build())
         .addType(StackableType
             .builder(TypedValue.class)
             .setStaticResolverFactory(value -> new StaticValueResolver<>(new TypedValue<>(value, DataType.fromObject(value))))
             .setDelegateResolverFactory(valueResolver -> new TypedValueValueResolverWrapper(valueResolver))
-            .setExpressionBasedResolverFactory((expression, expectedType,
-                                                content) -> new ExpressionTypedValueValueResolver(expression,
-                                                                                                  expectedType, content))
+            .setExpressionBasedResolverFactory((expression, expectedType) -> new ExpressionTypedValueValueResolver(expression,
+                                                                                                                   expectedType))
             .build())
         .addType(StackableType
             .builder(Literal.class)
-            .setExpressionBasedResolverFactory((expression, expectedType, content) -> new StaticLiteralValueResolver(expression,
-                                                                                                                     expectedType))
+            .setExpressionBasedResolverFactory((expression, expectedType) -> new StaticLiteralValueResolver(expression,
+                                                                                                            expectedType))
             .setStaticResolverFactory((value) -> new StaticLiteralValueResolver(value.toString(), value.getClass()))
             .build())
         .build();

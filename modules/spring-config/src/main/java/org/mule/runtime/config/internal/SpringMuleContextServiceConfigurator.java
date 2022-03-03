@@ -43,7 +43,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATIO
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_HANDLER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_OBJECT_NAME_PROCESSOR;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PAYLOAD_STATISTICS_DECORATOR_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSING_TIME_WATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
@@ -130,7 +129,6 @@ import org.mule.runtime.core.internal.execution.MuleMessageProcessingManager;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
 import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
 import org.mule.runtime.core.internal.management.stats.DefaultProcessingTimeWatcher;
-import org.mule.runtime.core.internal.management.stats.PayloadStatisticsCursorDecoratorFactory;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.metadata.cache.DefaultPersistentMetadataCacheManager;
 import org.mule.runtime.core.internal.policy.DefaultPolicyManager;
@@ -247,7 +245,6 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_LOCK_FACTORY, getBeanDefinition(MuleLockFactory.class))
       .put(OBJECT_LOCK_PROVIDER, getBeanDefinition(SingleServerLockProvider.class))
       .put(OBJECT_PROCESSING_TIME_WATCHER, getBeanDefinition(DefaultProcessingTimeWatcher.class))
-      .put(OBJECT_PAYLOAD_STATISTICS_DECORATOR_FACTORY, getBeanDefinition(PayloadStatisticsCursorDecoratorFactory.class))
       .put(OBJECT_EXCEPTION_LOCATION_PROVIDER, getBeanDefinition(MessagingExceptionLocationProvider.class))
       .put(OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER, getBeanDefinition(MessageProcessingFlowTraceManager.class))
       .put(CONNECTIVITY_TESTING_SERVICE_KEY, getBeanDefinition(DefaultConnectivityTestingService.class))

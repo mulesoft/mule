@@ -110,11 +110,6 @@ public final class MapValueResolver<K, V> implements ValueResolver<Map<K, V>>, I
     }
   }
 
-  @Override
-  public boolean isContent() {
-    return false;
-  }
-
   private Map<K, V> instantiateMap() {
     try {
       return mapType.newInstance();

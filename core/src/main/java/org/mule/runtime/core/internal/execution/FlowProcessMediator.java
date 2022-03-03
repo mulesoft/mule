@@ -58,10 +58,8 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.NotificationHelper;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -205,10 +203,8 @@ public class FlowProcessMediator implements Initialisable {
           new FlowProcessor(publisher -> applyWithChildContext(from(publisher), template::routeEventAsync, empty()),
                             flowConstruct);
 
-      final CursorComponentDecoratorFactory componentDecoratorFactory = messageProcessContext.getComponentDecoratorFactory();
-      final CoreEvent event = createEvent(template, componentDecoratorFactory, messageSource,
+      final CoreEvent event = createEvent(template, messageSource,
                                           responseCompletion, flowConstruct);
-      componentDecoratorFactory.incrementInvocationCount(event.getCorrelationId());
 
       policyManager.addSourcePointcutParametersIntoEvent(messageSource, event.getMessage().getAttributes(),
                                                          (InternalEvent) event);
@@ -533,8 +529,7 @@ public class FlowProcessMediator implements Initialisable {
     return adapter.getCorrelationId().orElseGet(() -> evaluateCorrelationIdExpressionGenerator());
   }
 
-  private CoreEvent createEvent(FlowProcessTemplate template,
-                                CursorComponentDecoratorFactory componentDecoratorFactory, MessageSource source,
+  private CoreEvent createEvent(FlowProcessTemplate template, MessageSource source,
                                 CompletableFuture<Void> responseCompletion, FlowConstruct flowConstruct) {
 
     SourceResultAdapter adapter = template.getSourceMessage();
@@ -549,8 +544,7 @@ public class FlowProcessMediator implements Initialisable {
       if (resultValue instanceof Collection && adapter.isCollection()) {
         Collection<Result> resultCollection = new TransformingLegacyResultAdapterCollection((Collection) resultValue);
         eventMessage = toMessage(Result.<Collection<Message>, TypedValue<?>>builder()
-            .output(messageCollection(new MediaTypeDecoratedResultCollection(componentDecoratorFactory
-                .decorateOutputCollection(resultCollection, adapter.getCorrelationId().orElse("")),
+            .output(messageCollection(new MediaTypeDecoratedResultCollection(resultCollection,
                                                                              adapter.getPayloadMediaTypeResolver()),
                                       adapter.getCursorProviderFactory(),
                                       ((BaseEventContext) eventCtx).getRootContext(),
@@ -558,9 +552,8 @@ public class FlowProcessMediator implements Initialisable {
             .mediaType(result.getMediaType().orElse(ANY))
             .build());
       } else {
-        eventMessage = toMessage(result, adapter.getMediaType(), componentDecoratorFactory, adapter.getCursorProviderFactory(),
-                                 ((BaseEventContext) eventCtx).getRootContext(), source.getLocation(),
-                                 adapter.getCorrelationId().orElse(null));
+        eventMessage = toMessage(result, adapter.getMediaType(), adapter.getCursorProviderFactory(),
+                                 ((BaseEventContext) eventCtx).getRootContext(), source.getLocation());
       }
 
       return eventMessage;

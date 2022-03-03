@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.management.stats;
 
+import org.mule.api.annotation.Experimental;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.sdk.api.runtime.streaming.PagingProvider;
@@ -18,7 +19,10 @@ import java.util.Iterator;
  * Implementations provide the functionality to decorate {@link Cursor}s in order to capture {@link PayloadStatistics} from it.
  *
  * @since 4.4, 4.3.1
+ * @deprecated since 4.4.1, 4.5.0. Payload statistics is no longer supported.
  */
+@Experimental
+@Deprecated
 public interface CursorComponentDecoratorFactory {
 
   /**
