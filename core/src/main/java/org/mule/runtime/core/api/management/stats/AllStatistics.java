@@ -12,6 +12,7 @@ import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.COMPUTE_CONNECTION_ERRORS_IN_STATS;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
 
+import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.config.MuleRuntimeFeature;
@@ -74,6 +75,7 @@ public class AllStatistics {
    *
    * @deprecated since 4.4.1, 4.5.0. Payload statistics are no longer supported, this method does nothing.
    */
+  @Experimental
   @Deprecated
   public void enablePayloadStatistics(boolean b) {
     // Does nothing.
@@ -113,6 +115,7 @@ public class AllStatistics {
    * @since 4.4, 4.3.1
    * @deprecated since 4.4.1, 4.5.0. Payload statistics are no longer supported and will always return empty data.
    */
+  @Experimental
   @Deprecated
   public Collection<PayloadStatistics> getPayloadStatistics() {
     return payloadStatistics.values();
@@ -124,6 +127,7 @@ public class AllStatistics {
    * @since 4.4, 4.3.1
    * @deprecated since 4.4.1, 4.5.0. Payload statistics are no longer supported and will always return empty data.
    */
+  @Experimental
   @Deprecated
   public PayloadStatistics computePayloadStatisticsIfAbsent(Component component) {
     return payloadStatistics.computeIfAbsent(component.getLocation().getLocation(),
@@ -141,6 +145,7 @@ public class AllStatistics {
    * @since 4.4, 4.3.1
    * @deprecated since 4.4.1, 4.5.0. Payload statistics are no longer supported and will always return empty data.
    */
+  @Experimental
   @Deprecated
   public PayloadStatistics getPayloadStatistics(String componentLocation) {
     return payloadStatistics.get(componentLocation);
@@ -151,6 +156,7 @@ public class AllStatistics {
    * @since 4.4, 4.3.1
    * @deprecated since 4.4.1, 4.5.0. Payload statistics are no longer supported and will always return false.
    */
+  @Experimental
   @Deprecated
   public boolean isPayloadStatisticsEnabled() {
     return false;
