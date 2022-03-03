@@ -34,7 +34,7 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
-import org.mule.runtime.module.deployment.internal.AbstractMuleWithTestLoggingSupportTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
@@ -52,7 +52,7 @@ import org.junit.rules.TemporaryFolder;
 
 import io.qameta.allure.Issue;
 
-public class AstXmlParserArtifactConfigurationProcessorTestCase extends AbstractMuleWithTestLoggingSupportTestCase {
+public class AstXmlParserArtifactConfigurationProcessorTestCase extends AbstractMuleTestCase {
 
   @Rule
   public TemporaryFolder tempFolder = new TemporaryFolder();

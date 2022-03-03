@@ -16,6 +16,9 @@ import org.junit.rules.ExternalResource;
 import org.slf4j.MDC;
 import org.slf4j.spi.MDCAdapter;
 
+/**
+ * Cleans up resources stored by slf4j-test library used for testing logging behaviour
+ */
 public class LogCleanup extends ExternalResource {
 
   private static Method clearAllMethod;
@@ -32,15 +35,19 @@ public class LogCleanup extends ExternalResource {
     clearLogsAndMDCThreadReferences();
   }
 
+  /**
+   * Logs that are stored for later assert need to be cleared before every test Reflection needs to be used because slf4j-test is
+   * not included on every module
+   */
   public static void clearAllLogs() {
-    // Logs that are stored for later assert need to be cleared before every test
-    // clearAll will reset state across all threads
     try {
+      // Loading resources once per class for better performance
       if (clearAllMethod == null) {
         Class<?> testLoggerFactoryClass =
             forName("uk.org.lidalia.slf4jtest.TestLoggerFactory", false, LogCleanup.class.getClassLoader());
         clearAllMethod = testLoggerFactoryClass.getMethod("clearAll");
       }
+      // clearAll will reset state across all threads
       clearAllMethod.invoke(null);
     } catch (ClassNotFoundException ignored) {
       // In this case, the class was not loaded because it does not exist in the current classpath so the method must finish
@@ -49,10 +56,13 @@ public class LogCleanup extends ExternalResource {
     }
   }
 
+  /**
+   * TestMDCAdapter contains its own implementation of ThreadLocal variables which hold strong references to Threads that should
+   * be released to prevent possible leakages Reflection needs to be used because slf4j-test is not included on every module
+   */
   public static void clearLogsAndMDCThreadReferences() {
-    // TestMDCAdapter contains its own implementation of ThreadLocal variables which hold strong references to Threads that should
-    // be released to prevent possible leakages
     clearAllLogs();
+    // Loading resources once per class for better performance
     if (testMDCThreadLocals == null || resetMethod == null) {
       Class<?> adapterClass;
       Class<?> threadLocalClass;

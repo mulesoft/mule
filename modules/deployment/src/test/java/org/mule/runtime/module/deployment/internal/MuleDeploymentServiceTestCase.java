@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.internal;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-public class MuleDeploymentServiceTestCase extends AbstractMuleWithTestLoggingSupportTestCase {
+public class MuleDeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @Rule
   public MockitoRule rule = MockitoJUnit.rule();

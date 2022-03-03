@@ -24,6 +24,7 @@ import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentService;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.File;
@@ -44,7 +45,7 @@ import io.qameta.allure.Feature;
 
 @SmallTest
 @Feature(DOMAIN_DEPLOYMENT)
-public class DomainArchiveDeployerTestCase extends AbstractMuleWithTestLoggingSupportTestCase {
+public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase {
 
   public static final String DOMAIN_ZIP_PATH = "someZipFile";
   public static final String DOMAIN_NAME = "domain-name";

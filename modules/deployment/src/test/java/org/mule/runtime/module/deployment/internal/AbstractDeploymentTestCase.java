@@ -147,6 +147,7 @@ import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDes
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitProbe;
@@ -198,7 +199,7 @@ import uk.org.lidalia.slf4jtest.TestLogger;
  * <p>
  * Provides a set of test artifacts and resources to use on different test classes.
  */
-public abstract class AbstractDeploymentTestCase extends AbstractMuleWithTestLoggingSupportTestCase {
+public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   public static final Logger logger = getLogger(AbstractDeploymentTestCase.class);
 

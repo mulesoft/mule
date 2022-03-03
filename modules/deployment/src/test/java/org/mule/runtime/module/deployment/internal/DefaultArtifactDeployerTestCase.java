@@ -19,6 +19,7 @@ import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.tck.SimpleUnitTestSupportScheduler;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
 import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
@@ -33,7 +34,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
 @Feature(APP_DEPLOYMENT)
-public class DefaultArtifactDeployerTestCase extends AbstractMuleWithTestLoggingSupportTestCase {
+public class DefaultArtifactDeployerTestCase extends AbstractMuleTestCase {
 
   @Rule
   public ExpectedException expected = none();
