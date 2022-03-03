@@ -54,11 +54,13 @@ public class LoggingSeparationTestCase extends AbstractApplicationDeploymentTest
     executeApplicationFlow("logging");
 
     assertThat(logger.getAllLoggingEvents().size(), is(1));
+    //TODO: Change thread name check to TCCL check when available on slf4j-test
     assertThat("", logger.getAllLoggingEvents().get(0).getThreadName(), stringContainsInOrder("logging-app-1"));
 
     executeApplicationFlow("logging2", null, 1);
 
     assertThat(logger.getAllLoggingEvents().size(), is(2));
+    //TODO: Change thread name check to TCCL check when available on slf4j-test
     assertThat("", logger.getAllLoggingEvents().get(1).getThreadName(), stringContainsInOrder("logging-app-2"));
   }
 }
