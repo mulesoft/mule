@@ -201,7 +201,7 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
 
   private ByteBuffer softCopy(long position, int length) {
     final int offset = toIntExact(position);
-    return wrap(actingBuffer.array(), offset, min(length, actingBuffer.limit() - offset)).slice();
+    return wrap(actingBuffer.array(), offset + actingBuffer.arrayOffset(), min(length, actingBuffer.limit() - offset)).slice();
   }
 
   protected ByteBuffer hardCopy(long position, int length) {
@@ -209,7 +209,7 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
     length = min(length, actingBuffer.limit() - offset);
 
     byte[] b = new byte[length];
-    arraycopy(actingBuffer.array(), offset, b, 0, length);
+    arraycopy(actingBuffer.array(), offset + actingBuffer.arrayOffset(), b, 0, length);
     return wrap(b);
   }
 

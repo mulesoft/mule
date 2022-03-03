@@ -12,24 +12,24 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.internal.streaming.IdentifiableCursorProviderDecorator.of;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.STREAM_MANAGEMENT;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
-import org.junit.Test;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.lang.ref.WeakReference;
+
+import javax.inject.Inject;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+import org.junit.Test;
 
 @Feature(STREAMING)
 @Story(STREAM_MANAGEMENT)
@@ -37,19 +37,17 @@ public class StreamingGhostBusterTestCase extends AbstractMuleContextTestCase {
 
   private static final int GC_POLLING_TIMEOUT = 10000;
 
+  @Inject
   private StreamingGhostBuster ghostBuster;
 
   @Override
-  protected void doSetUp() throws Exception {
-    ghostBuster = new StreamingGhostBuster();
-    initialiseIfNeeded(ghostBuster, true, muleContext);
-    startIfNeeded(ghostBuster);
+  protected boolean doTestClassInjection() {
+    return true;
   }
 
   @Override
-  protected void doTearDown() throws MuleException {
-    ghostBuster.stop();
-    ghostBuster.dispose();
+  protected boolean isStartContext() {
+    return true;
   }
 
   @Test
@@ -71,5 +69,4 @@ public class StreamingGhostBusterTestCase extends AbstractMuleContextTestCase {
       return true;
     });
   }
-
 }

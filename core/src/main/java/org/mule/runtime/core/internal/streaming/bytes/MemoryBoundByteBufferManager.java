@@ -13,6 +13,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_MAX_MEMORY;
 import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.MAX_STREAMING_MEMORY_PERCENTAGE;
 
+import org.mule.runtime.api.memory.provider.ByteBufferProvider;
 import org.mule.runtime.api.util.MuleSystemProperties;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.ManagedByteBufferWrapper;
@@ -41,6 +42,7 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager 
 
   private final AtomicLong streamingMemory = new AtomicLong(0);
   private final long maxStreamingMemory;
+  private ByteBufferProvider<ByteBuffer> byteBufferProvider;
 
   /**
    * Creates a new instance
@@ -69,7 +71,7 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager 
    */
   protected final ByteBuffer allocateIfFits(int capacity) {
     if (streamingMemory.addAndGet(capacity) <= maxStreamingMemory) {
-      return ByteBuffer.allocate(capacity);
+      return byteBufferProvider.allocate(capacity);
     }
 
     streamingMemory.addAndGet(-capacity);
@@ -109,6 +111,7 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager 
    * @param byteBuffer a {@link ByteBuffer}
    */
   protected void doDeallocate(ByteBuffer byteBuffer) {
+    byteBufferProvider.release(byteBuffer);
     streamingMemory.addAndGet(-byteBuffer.capacity());
   }
 
@@ -125,5 +128,10 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager 
                                                   maxMemoryProperty));
       }
     }
+  }
+
+  @Override
+  public void setByteBufferProvider(ByteBufferProvider<ByteBuffer> byteBufferProvider) {
+    this.byteBufferProvider = byteBufferProvider;
   }
 }

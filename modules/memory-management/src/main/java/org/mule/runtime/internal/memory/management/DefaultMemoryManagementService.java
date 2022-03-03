@@ -19,7 +19,6 @@ import org.mule.runtime.api.memory.provider.type.ByteBufferType;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A Default Implementation of {@link MemoryManagementService}
@@ -36,7 +35,7 @@ public class DefaultMemoryManagementService implements MemoryManagementService {
     return INSTANCE;
   }
 
-  private DefaultMemoryManagementService() {};
+  private DefaultMemoryManagementService() {}
 
   @Override
   public void dispose() {
@@ -74,7 +73,10 @@ public class DefaultMemoryManagementService implements MemoryManagementService {
 
   @Override
   public synchronized void disposeByteBufferProvider(String name) {
-    byteBufferProviders.remove(name).dispose();
+    ByteBufferProvider<?> byteBufferProvider = byteBufferProviders.remove(name);
+    if (byteBufferProvider != null) {
+      byteBufferProvider.dispose();
+    }
   }
 
 }

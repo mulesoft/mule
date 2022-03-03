@@ -7,22 +7,29 @@
 
 package org.mule.runtime.core.internal.streaming.bytes;
 
+import static org.mule.runtime.api.memory.provider.type.ByteBufferType.HEAP;
 import static org.mule.runtime.api.util.DataUnit.BYTE;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.TROUBLESHOOTING;
 
-import org.junit.After;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.util.DataSize;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.AbstractTroubleshootCursorProviderTestCase;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+
+import javax.inject.Inject;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.junit.After;
+import org.junit.Before;
 
 @Feature(STREAMING)
 @Story(TROUBLESHOOTING)
@@ -30,7 +37,22 @@ public class TroubleshootCursorStreamProviderTestCase extends AbstractTroublesho
 
   private static final byte[] DATA = "Hello".getBytes();
 
-  private PoolingByteBufferManager bufferManager;
+  private final PoolingByteBufferManager bufferManager = new PoolingByteBufferManager();
+
+  @Inject
+  private MemoryManagementService memoryManagementService;
+
+  @Before
+  public void before() throws InitialisationException, NoSuchFieldException, IllegalAccessException {
+    bufferManager.setByteBufferProvider(memoryManagementService.getByteBufferProvider(muleContext.getId(), HEAP));
+    initialiseIfNeeded(bufferManager, muleContext);
+    super.before();
+  }
+
+  @Override
+  protected boolean doTestClassInjection() {
+    return true;
+  }
 
   @After
   public void after() {
@@ -42,8 +64,6 @@ public class TroubleshootCursorStreamProviderTestCase extends AbstractTroublesho
     int bufferSize = 10;
     int maxBufferSize = 20;
     InputStream dataStream = new ByteArrayInputStream(DATA);
-
-    bufferManager = new PoolingByteBufferManager();
 
     InMemoryCursorStreamConfig config =
         new InMemoryCursorStreamConfig(new DataSize(bufferSize, BYTE),

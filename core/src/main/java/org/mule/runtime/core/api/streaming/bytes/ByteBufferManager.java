@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.streaming.bytes;
 
 import org.mule.api.annotation.NoImplement;
+import org.mule.runtime.api.memory.provider.ByteBufferProvider;
 import org.mule.runtime.core.internal.streaming.bytes.MaxStreamingMemoryExceededException;
 
 import java.nio.ByteBuffer;
@@ -58,4 +59,6 @@ public interface ByteBufferManager {
    */
   @Deprecated
   void deallocate(ByteBuffer byteBuffer);
+
+  void setByteBufferProvider(ByteBufferProvider<ByteBuffer> byteBufferProvider);
 }

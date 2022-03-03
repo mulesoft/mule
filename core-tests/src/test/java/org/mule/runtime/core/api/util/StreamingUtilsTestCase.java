@@ -15,12 +15,16 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.memory.provider.type.ByteBufferType.HEAP;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.StreamingUtils.consumeRepeatablePayload;
 import static org.mule.runtime.core.api.util.StreamingUtils.consumeRepeatableValue;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
@@ -28,6 +32,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider;
 import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
@@ -35,7 +40,7 @@ import org.mule.runtime.core.api.streaming.object.InMemoryCursorIteratorConfig;
 import org.mule.runtime.core.internal.streaming.bytes.ByteArrayCursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.bytes.SimpleByteBufferManager;
 import org.mule.runtime.core.internal.streaming.object.InMemoryCursorIteratorProvider;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.ByteArrayInputStream;
@@ -43,18 +48,37 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-
+import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
 @Feature(STREAMING)
 @Story(STREAMING)
-public class StreamingUtilsTestCase extends AbstractMuleTestCase {
+public class StreamingUtilsTestCase extends AbstractMuleContextTestCase {
 
   private static final List<String> TEST_LIST = asList("Apple", "Banana", "Kiwi");
+
+  private ByteBufferManager byteBufferManager;
+
+  @Inject
+  private MemoryManagementService memoryManagementService;
+
+  @Override
+  protected boolean doTestClassInjection() {
+    return true;
+  }
+
+  @Before
+  public void initialize() throws InitialisationException {
+    byteBufferManager = new SimpleByteBufferManager();
+    byteBufferManager.setByteBufferProvider(memoryManagementService.getByteBufferProvider(muleContext.getId(), HEAP));
+    initialiseIfNeeded(byteBufferManager, muleContext);
+  }
 
   @Test
   @Description("Test that repeatable stream in the payload is consumed into another fully in memory stream provider")
@@ -216,7 +240,7 @@ public class StreamingUtilsTestCase extends AbstractMuleTestCase {
   private CursorStreamProvider asCursorProvider(String value) {
     return new InMemoryCursorStreamProvider(new ByteArrayInputStream(value.getBytes()),
                                             InMemoryCursorStreamConfig.getDefault(),
-                                            new SimpleByteBufferManager());
+                                            byteBufferManager);
   }
 
   private <T> CursorIteratorProvider asCursorProvider(List<T> list) {

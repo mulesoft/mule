@@ -16,6 +16,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.streaming.bytes.ManagedByteBufferWrapper;
 import org.mule.runtime.core.internal.streaming.DefaultMemoryManager;
 import org.mule.runtime.core.internal.streaming.MemoryManager;
@@ -44,11 +46,12 @@ import org.vibur.objectpool.util.MultithreadConcurrentQueueCollection;
  *
  * @since 4.0
  */
-public class PoolingByteBufferManager extends MemoryBoundByteBufferManager implements Disposable {
+public class PoolingByteBufferManager extends MemoryBoundByteBufferManager implements Initialisable, Disposable {
 
   private static final Logger LOGGER = getLogger(PoolingByteBufferManager.class);
 
   private final int size;
+  private final int bufferSize;
 
   private BufferPool defaultSizePool;
 
@@ -86,6 +89,11 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
   public PoolingByteBufferManager(MemoryManager memoryManager, int size, int bufferSize) {
     super(memoryManager);
     this.size = size;
+    this.bufferSize = bufferSize;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
     defaultSizePool = newBufferPool(bufferSize);
   }
 
@@ -111,7 +119,9 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
   @Override
   public void dispose() {
     try {
-      defaultSizePool.close();
+      if (defaultSizePool != null) {
+        defaultSizePool.close();
+      }
     } catch (Exception e) {
       if (LOGGER.isWarnEnabled()) {
         LOGGER.warn("Error disposing default capacity byte buffers pool", e);

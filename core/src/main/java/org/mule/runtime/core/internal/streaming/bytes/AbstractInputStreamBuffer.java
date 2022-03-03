@@ -100,7 +100,9 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
 
     int totalRead = 0;
     int remaining = buffer.remaining();
-    int offset = buffer.position();
+    int backingArrayOffset = buffer.arrayOffset() + buffer.position();
+    int bufferOffset = buffer.position();
+
 
     while (remaining > 0) {
       try {
@@ -108,7 +110,7 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
           break;
         }
 
-        int read = stream.read(dest, offset, remaining);
+        int read = stream.read(dest, backingArrayOffset, remaining);
 
         if (read == -1) {
           streamFullyConsumed = true;
@@ -123,7 +125,7 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
 
         totalRead += read;
         remaining -= read;
-        offset += read;
+        backingArrayOffset += read;
       } catch (IOException e) {
         if (!interrupted()) {
           throw e;
@@ -144,7 +146,7 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
     }
 
     if (totalRead > 0) {
-      buffer.position(offset);
+      buffer.position(bufferOffset + totalRead);
     }
 
     return totalRead;

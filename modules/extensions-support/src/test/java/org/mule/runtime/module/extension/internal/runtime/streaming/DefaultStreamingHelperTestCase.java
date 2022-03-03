@@ -15,7 +15,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -28,7 +27,6 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
@@ -44,12 +42,15 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.junit.Test;
 
 @SmallTest
 public class DefaultStreamingHelperTestCase extends AbstractMuleContextTestCase {
 
   private StreamingHelper streamingHelper;
+  @Inject
   private StreamingManager streamingManager;
   private CursorProviderFactory cursorProviderFactory;
   private CoreEvent event;
@@ -57,9 +58,12 @@ public class DefaultStreamingHelperTestCase extends AbstractMuleContextTestCase 
   private final List<String> valueList = Arrays.asList("Apple", "Banana", "Kiwi");
 
   @Override
+  protected boolean doTestClassInjection() {
+    return true;
+  }
+
+  @Override
   protected void doSetUp() throws Exception {
-    streamingManager = new DefaultStreamingManager();
-    initialiseIfNeeded(streamingManager, true, muleContext);
     cursorProviderFactory =
         new InMemoryCursorIteratorProviderFactory(InMemoryCursorIteratorConfig.getDefault(), streamingManager);
     event = testEvent();

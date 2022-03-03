@@ -16,21 +16,29 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.memory.provider.type.ByteBufferType.HEAP;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_MAX_MEMORY;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.DEFAULT_BUFFER_BUCKET_SIZE;
 import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.MAX_STREAMING_MEMORY_PERCENTAGE;
 
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
+import org.mule.runtime.api.memory.provider.ByteBufferProvider;
 import org.mule.runtime.core.api.streaming.bytes.ManagedByteBufferWrapper;
 import org.mule.runtime.core.internal.streaming.MemoryManager;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import javax.inject.Inject;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public abstract class MemoryBoundByteBufferManagerContractTestCase extends AbstractMuleTestCase {
+public abstract class MemoryBoundByteBufferManagerContractTestCase extends AbstractMuleContextTestCase {
 
   private static final int CAPACITY = 100;
   private static final int OTHER_CAPACITY = CAPACITY + 1;
@@ -39,6 +47,18 @@ public abstract class MemoryBoundByteBufferManagerContractTestCase extends Abstr
   public ExpectedException expectedException = ExpectedException.none();
 
   private MemoryBoundByteBufferManager bufferManager = createDefaultBoundBuffer();
+
+  private ByteBufferProvider byteBufferProvider;
+
+  @Inject
+  private MemoryManagementService memoryManagementService;
+
+  @Before
+  public void setup() throws InitialisationException {
+    byteBufferProvider = memoryManagementService.getByteBufferProvider(muleContext.getId(), HEAP);
+    bufferManager.setByteBufferProvider(byteBufferProvider);
+    initialiseIfNeeded(bufferManager, muleContext);
+  }
 
   @After
   public void dispose() {
@@ -57,25 +77,30 @@ public abstract class MemoryBoundByteBufferManagerContractTestCase extends Abstr
 
   protected abstract MemoryBoundByteBufferManager createBuffer(MemoryManager memoryManager, int capacity);
 
+  @Override
+  protected boolean doTestClassInjection() {
+    return true;
+  }
+
   @Test
-  public void limitTotalMemory() {
+  public void limitTotalMemory() throws InitialisationException {
     long maxMemory = round((DEFAULT_BUFFER_BUCKET_SIZE * 2) / MAX_STREAMING_MEMORY_PERCENTAGE);
 
     dispose();
-    bufferManager = createBuffer(getMemoryManager(maxMemory), DEFAULT_BUFFER_BUCKET_SIZE);
+    bufferManager = initializeBufferManager(createBuffer(getMemoryManager(maxMemory), DEFAULT_BUFFER_BUCKET_SIZE));
 
     assertMemoryLimit(DEFAULT_BUFFER_BUCKET_SIZE);
   }
 
   @Test
-  public void limitTotalMemoryThroughSystemProperty() {
+  public void limitTotalMemoryThroughSystemProperty() throws InitialisationException {
     long maxMemory = round((DEFAULT_BUFFER_BUCKET_SIZE * 2) / MAX_STREAMING_MEMORY_PERCENTAGE);
     MemoryManager memoryManager = getMemoryManager(maxMemory);
 
     dispose();
     setProperty(MULE_STREAMING_MAX_MEMORY, String.valueOf(maxMemory));
     try {
-      bufferManager = createBuffer(memoryManager, DEFAULT_BUFFER_BUCKET_SIZE);
+      bufferManager = initializeBufferManager(createBuffer(memoryManager, DEFAULT_BUFFER_BUCKET_SIZE));
       assertMemoryLimit(DEFAULT_BUFFER_BUCKET_SIZE);
       verify(memoryManager, never()).getMaxMemory();
     } finally {
@@ -84,12 +109,12 @@ public abstract class MemoryBoundByteBufferManagerContractTestCase extends Abstr
   }
 
   @Test
-  public void invalidMemoryCapThroughSystemProperty() {
+  public void invalidMemoryCapThroughSystemProperty() throws InitialisationException {
     setProperty(MULE_STREAMING_MAX_MEMORY, "don't spend that much memory please");
     dispose();
     try {
       expectedException.expect(IllegalArgumentException.class);
-      bufferManager = createBuffer(mock(MemoryManager.class), DEFAULT_BUFFER_BUCKET_SIZE);
+      bufferManager = initializeBufferManager(createBuffer(mock(MemoryManager.class), DEFAULT_BUFFER_BUCKET_SIZE));
     } finally {
       clearProperty(MULE_STREAMING_MAX_MEMORY);
     }
@@ -127,5 +152,12 @@ public abstract class MemoryBoundByteBufferManagerContractTestCase extends Abstr
     when(memoryManager.getMaxMemory()).thenReturn(maxMemory);
 
     return memoryManager;
+  }
+
+  private MemoryBoundByteBufferManager initializeBufferManager(MemoryBoundByteBufferManager byteBufferManager)
+      throws InitialisationException {
+    byteBufferManager.setByteBufferProvider(byteBufferProvider);
+    initialiseIfNeeded(byteBufferManager, muleContext);
+    return byteBufferManager;
   }
 }
