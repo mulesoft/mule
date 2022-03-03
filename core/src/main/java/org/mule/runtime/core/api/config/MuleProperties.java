@@ -166,6 +166,7 @@ public class MuleProperties {
    * @since 4.4, 4.3.1
    * @deprecated since 4.4.1, 4.5.0. Payload statistics is no longer supported.
    */
+  @Experimental
   @Deprecated
   public static final String OBJECT_PAYLOAD_STATISTICS_DECORATOR_FACTORY = "_mulePayloadStatisticsCursorDecoratorFactory";
   public static final String OBJECT_POLLING_CONTROLLER = "_mulePollingController";

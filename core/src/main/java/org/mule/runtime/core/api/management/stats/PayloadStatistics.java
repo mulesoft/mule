@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.management.stats;
 
+import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.Component;
 
@@ -41,6 +42,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @deprecated since 4.4.1, 4.5.0. Payload statistics is no longer supported.
  */
 @NoExtend
+@Experimental
 @Deprecated
 public class PayloadStatistics implements Statistics {
 
