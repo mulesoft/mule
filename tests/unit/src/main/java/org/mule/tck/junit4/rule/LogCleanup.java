@@ -36,8 +36,9 @@ public class LogCleanup extends ExternalResource {
   }
 
   /**
-   * Logs that are stored for later assert need to be cleared before every test Reflection needs to be used because slf4j-test is
-   * not included on every module
+   * Logs that are stored for later assert need to be cleared before every test
+   * 
+   * Reflection needs to be used because slf4j-test is not included on every module
    */
   public static void clearAllLogs() {
     try {
@@ -58,7 +59,9 @@ public class LogCleanup extends ExternalResource {
 
   /**
    * TestMDCAdapter contains its own implementation of ThreadLocal variables which hold strong references to Threads that should
-   * be released to prevent possible leakages Reflection needs to be used because slf4j-test is not included on every module
+   * be released to prevent possible leakages
+   * 
+   * Reflection needs to be used because slf4j-test is not included on every module
    */
   public static void clearLogsAndMDCThreadReferences() {
     clearAllLogs();
