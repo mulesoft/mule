@@ -41,8 +41,7 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
   @Override
   protected ReturnDelegate createReturnDelegate() {
     return new TargetReturnDelegate(TARGET, "#[message]", componentModel, muleContext.getExpressionManager(),
-                                    componentDecoratorFactory, getCursorProviderFactory(),
-                                    muleContext, streamingManager);
+                                    getCursorProviderFactory(), muleContext, streamingManager);
   }
 
   @After
@@ -78,8 +77,7 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
     when(componentModel.supportsStreaming()).thenReturn(true);
 
     delegate = new TargetReturnDelegate(TARGET, "#[payload.token]", componentModel, muleContext.getExpressionManager(),
-                                        componentDecoratorFactory, getCursorProviderFactory(), muleContext,
-                                        streamingManager);
+                                        getCursorProviderFactory(), muleContext, streamingManager);
 
     MediaType mediaType = APPLICATION_JSON.withCharset(Charset.defaultCharset());
     Result<Object, Object> value = Result.builder()

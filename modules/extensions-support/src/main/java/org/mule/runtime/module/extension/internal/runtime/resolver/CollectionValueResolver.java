@@ -18,6 +18,8 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -25,8 +27,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * A {@link ValueResolver} that takes a list of {@link ValueResolver}s and upon invocation of
@@ -92,11 +92,6 @@ public final class CollectionValueResolver<T> implements ValueResolver<Collectio
   @Override
   public boolean isDynamic() {
     return hasAnyDynamic(resolvers);
-  }
-
-  @Override
-  public boolean isContent() {
-    return false;
   }
 
   private Collection<T> instantiateCollection() {

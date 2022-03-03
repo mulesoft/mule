@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 import java.lang.reflect.Method;
@@ -19,12 +18,10 @@ import java.lang.reflect.Method;
  */
 public class CompletableMethodOperationExecutor<M extends ComponentModel> extends AbstractCompletableMethodOperationExecutor<M> {
 
-  public CompletableMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance,
-                                            CursorComponentDecoratorFactory componentDecoratorFactory) {
-    super(operationModel, operationMethod, operationInstance, componentDecoratorFactory);
+  public CompletableMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
+    super(operationModel, operationMethod, operationInstance);
   }
 
-  @Override
   protected void doExecute(ExecutionContext<M> executionContext, ExecutorCallback callback) {
     callback.complete(executor.execute(executionContext));
   }

@@ -13,7 +13,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.isIn;
 import static org.hamcrest.core.Is.is;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_PAYLOAD_STATISTICS;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.INVOLVED_PEOPLE;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.closeEmptyOperationCalls;
@@ -44,10 +43,7 @@ public class PagedOperationExecutionTestCase extends AbstractExtensionFunctional
 
   @Parameters
   public static List<Object[]> data() {
-    return asList(new Object[][] {{"true", "false"},
-        {"true", "true"},
-        {"false", "false"},
-        {"false", "true"}});
+    return asList(new Object[][] {{"true"}, {"false"}});
   }
 
   @Rule
@@ -56,16 +52,11 @@ public class PagedOperationExecutionTestCase extends AbstractExtensionFunctional
   @Rule
   public SystemProperty withStatistics;
 
-  @Rule
-  public SystemProperty withPayloadStatistics;
-
   @Mock
   private ConnectionManager connectionManager;
 
-  public PagedOperationExecutionTestCase(String enableStatistics, String disablePayloadStatistics) {
+  public PagedOperationExecutionTestCase(String enableStatistics) {
     this.withStatistics = new SystemProperty(MULE_ENABLE_STATISTICS, enableStatistics);
-    this.withPayloadStatistics =
-        new SystemProperty(MULE_DISABLE_PAYLOAD_STATISTICS, disablePayloadStatistics);
   }
 
   @Override

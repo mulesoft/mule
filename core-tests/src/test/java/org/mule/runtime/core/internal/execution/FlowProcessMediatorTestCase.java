@@ -56,7 +56,6 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.AbstractPipeline;
@@ -200,7 +199,6 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     when(context.getMessagingExceptionResolver()).thenReturn(new MessagingExceptionResolver(source));
     when(context.getTransactionConfig()).thenReturn(empty());
     when(context.getFlowConstruct()).thenReturn(flow);
-    when(context.getComponentDecoratorFactory()).thenReturn(mock(CursorComponentDecoratorFactory.class));
 
     template = mock(FlowProcessTemplate.class);
     resultAdapter = mock(SourceResultAdapter.class);

@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.extension.api.annotation.param.Content;
 
 /**
  * Provides a value which is dependant on a {@link CoreEvent}
@@ -33,11 +32,4 @@ public interface ValueResolver<T> {
    * @return whether the resolved value changes based or the resolution context or not
    */
   boolean isDynamic();
-
-  /**
-   * @return if the value is a {@link Content} on the component with the value to be resolved.
-   *
-   * @since 4.4, 4.3.1
-   */
-  boolean isContent();
 }

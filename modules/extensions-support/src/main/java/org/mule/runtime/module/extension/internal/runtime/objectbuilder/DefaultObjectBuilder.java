@@ -13,14 +13,11 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getMuleVersion;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.internal.util.message.MessageUtils.decorateInput;
-import static org.mule.runtime.core.internal.util.message.MessageUtils.getCursorStreamDecorator;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
-import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.COMPONENT_DECORATOR_FACTORY_KEY;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.mapTypeValue;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursorAsUnclosable;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.typedValueAsUnclosable;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
@@ -30,7 +27,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -120,28 +116,12 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
   public T build(ValueResolvingContext context) throws MuleException {
     T object = createInstance(prototypeClass);
 
-    final CursorComponentDecoratorFactory componentDecoratorFactory =
-        context != null
-            ? (CursorComponentDecoratorFactory) context.getProperty(COMPONENT_DECORATOR_FACTORY_KEY)
-            : null;
-
     for (Map.Entry<FieldSetter, ValueResolver<Object>> entry : resolvers.entrySet()) {
       final Object resolvedValue = resolveValue(entry.getValue(), context);
 
       entry.getKey().set(object,
-                         context == null || context.resolveCursors()
-                             ? resolveCursor(resolvedValue,
-                                             entry.getValue().isContent() && componentDecoratorFactory != null
-                                                 ? v -> decorateInput(v, context.getEvent()
-                                                     .getCorrelationId(),
-                                                                      componentDecoratorFactory)
-                                                 : getCursorStreamDecorator())
-                             : entry.getValue().isContent() && componentDecoratorFactory != null
-                                 ? mapTypeValue(resolvedValue,
-                                                v -> decorateInput(v, context.getEvent()
-                                                    .getCorrelationId(),
-                                                                   componentDecoratorFactory))
-                                 : getCursorStreamDecorator().apply(resolvedValue));
+                         context == null || context.resolveCursors() ? resolveCursorAsUnclosable(resolvedValue)
+                             : typedValueAsUnclosable(resolvedValue));
     }
 
     injectFields(object, name, encoding, getMuleVersion(), reflectionCache);

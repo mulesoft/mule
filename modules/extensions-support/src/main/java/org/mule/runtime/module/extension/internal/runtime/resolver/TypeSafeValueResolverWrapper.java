@@ -58,11 +58,6 @@ public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
   }
 
   @Override
-  public boolean isContent() {
-    return valueResolverDelegate.isContent();
-  }
-
-  @Override
   public void initialise() throws InitialisationException {
     TypeSafeTransformer typeSafeTransformer = new TypeSafeTransformer(transformationService);
     resolver = context -> {

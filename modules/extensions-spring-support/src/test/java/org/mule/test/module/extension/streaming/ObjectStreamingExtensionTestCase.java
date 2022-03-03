@@ -15,7 +15,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_PAYLOAD_STATISTICS;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.OBJECT_STREAMING;
 
@@ -56,10 +56,7 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
 
   // This test asserts internals that are modified when statistics are enabled
   @Rule
-  public SystemProperty withStatistics = new SystemProperty(MULE_DISABLE_PAYLOAD_STATISTICS, "true");
-
-  @Rule
-  public SystemProperty withPayloadStatistics = new SystemProperty(MULE_DISABLE_PAYLOAD_STATISTICS, "false");
+  public SystemProperty withStatistics = new SystemProperty(MULE_ENABLE_STATISTICS, "true");
 
   @Override
   protected void doSetUp() throws Exception {

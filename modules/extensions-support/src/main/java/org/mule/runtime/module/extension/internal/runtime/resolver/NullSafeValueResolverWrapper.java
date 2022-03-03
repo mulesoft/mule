@@ -212,13 +212,9 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
   }
 
   @Override
-  public boolean isContent() {
-    return delegate.isContent();
-  }
-
-  @Override
   public void initialise() throws InitialisationException {
     initialiseIfNeeded(delegate, muleContext);
     initialiseIfNeeded(fallback, muleContext);
   }
+
 }
