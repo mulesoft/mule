@@ -164,7 +164,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
    */
   private MuleArtifactResourcesRegistry(ModuleRepository moduleRepository,
                                         ArtifactConfigurationProcessor artifactConfigurationProcessor)
-    throws RegistrationException {
+      throws RegistrationException {
     // Creates a registry to be used as an injector.
     super(null, null);
 
@@ -181,14 +181,14 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
 
     domainManager = new DefaultDomainManager();
     this.domainClassLoaderFactory =
-      trackDeployableArtifactClassLoaderFactory(domainClassLoaderFactory(name -> getAppDataFolder(name)));
+        trackDeployableArtifactClassLoaderFactory(domainClassLoaderFactory(name -> getAppDataFolder(name)));
 
     this.artifactPluginClassLoaderFactory =
-      trackArtifactClassLoaderFactory(new ArtifactPluginClassLoaderFactory());
+        trackArtifactClassLoaderFactory(new ArtifactPluginClassLoaderFactory());
     final AbstractArtifactDescriptorFactory<MulePluginModel, ArtifactPluginDescriptor> artifactPluginDescriptorFactory =
-      artifactDescriptorFactoryProvider()
-        .createArtifactPluginDescriptorFactory(new DescriptorLoaderRepositoryFactory().createDescriptorLoaderRepository(),
-                                               ArtifactDescriptorValidatorBuilder.builder());
+        artifactDescriptorFactoryProvider()
+            .createArtifactPluginDescriptorFactory(new DescriptorLoaderRepositoryFactory().createDescriptorLoaderRepository(),
+                                                   ArtifactDescriptorValidatorBuilder.builder());
     artifactPluginDescriptorLoader = new ArtifactPluginDescriptorLoader(artifactPluginDescriptorFactory);
     descriptorLoaderRepository = new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry());
 
@@ -200,39 +200,39 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                                                     artifactDescriptorValidatorBuilder);
 
     DeployableArtifactClassLoaderFactory<ApplicationDescriptor> applicationClassLoaderFactory =
-      trackDeployableArtifactClassLoaderFactory(applicationClassLoaderFactory(name -> getAppDataFolder(name)));
+        trackDeployableArtifactClassLoaderFactory(applicationClassLoaderFactory(name -> getAppDataFolder(name)));
     pluginClassLoadersFactory = new DefaultRegionPluginClassLoadersFactory(artifactPluginClassLoaderFactory, moduleRepository);
     applicationClassLoaderBuilderFactory =
-      new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory, pluginClassLoadersFactory);
+        new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory, pluginClassLoadersFactory);
     domainClassLoaderBuilderFactory =
-      new DomainClassLoaderBuilderFactory(containerClassLoader, domainClassLoaderFactory,
-                                          pluginClassLoadersFactory);
+        new DomainClassLoaderBuilderFactory(containerClassLoader, domainClassLoaderFactory,
+                                            pluginClassLoadersFactory);
 
     this.artifactConfigurationProcessor = artifactConfigurationProcessor;
 
     ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory = new ServiceClassLoaderFactory();
     serviceManager =
-      ServiceManager.create(new DefaultServiceDiscoverer(new FileSystemServiceProviderDiscoverer(containerClassLoader,
-                                                                                                 trackArtifactClassLoaderFactory(serviceClassLoaderFactory),
-                                                                                                 descriptorLoaderRepository,
-                                                                                                 artifactDescriptorValidatorBuilder),
-                                                         new ReflectionServiceResolver(new ServiceRegistry(), this)));
+        ServiceManager.create(new DefaultServiceDiscoverer(new FileSystemServiceProviderDiscoverer(containerClassLoader,
+                                                                                                   trackArtifactClassLoaderFactory(serviceClassLoaderFactory),
+                                                                                                   descriptorLoaderRepository,
+                                                                                                   artifactDescriptorValidatorBuilder),
+                                                           new ReflectionServiceResolver(new ServiceRegistry(), this)));
     extensionModelLoaderManager = new MuleExtensionModelLoaderManager(containerClassLoader);
 
     pluginDependenciesResolver =
-      new DefaultArtifactDescriptorFactoryProvider().createBundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
+        new DefaultArtifactDescriptorFactoryProvider().createBundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
     domainFactory = new DefaultDomainFactory(domainDescriptorFactory, domainManager,
                                              artifactClassLoaderManager, serviceManager,
                                              pluginDependenciesResolver, domainClassLoaderBuilderFactory,
                                              extensionModelLoaderManager, licenseValidator,
                                              runtimeLockFactory,
-                                             artifactMemoryManagementService,
+                                             memoryManagementService,
                                              artifactConfigurationProcessor);
 
     DeployableArtifactClassLoaderFactory<PolicyTemplateDescriptor> policyClassLoaderFactory =
-      trackDeployableArtifactClassLoaderFactory(new PolicyTemplateClassLoaderFactory());
+        trackDeployableArtifactClassLoaderFactory(new PolicyTemplateClassLoaderFactory());
     PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory =
-      new ApplicationPolicyTemplateClassLoaderBuilderFactory(policyClassLoaderFactory, pluginClassLoadersFactory);
+        new ApplicationPolicyTemplateClassLoaderBuilderFactory(policyClassLoaderFactory, pluginClassLoadersFactory);
 
     applicationFactory = new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
                                                        domainManager, serviceManager,
@@ -242,11 +242,11 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                                        artifactPluginDescriptorLoader,
                                                        licenseValidator,
                                                        runtimeLockFactory,
-                                                       artifactMemoryManagementService,
+                                                       memoryManagementService,
                                                        artifactConfigurationProcessor);
     toolingApplicationDescriptorFactory =
-      new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
-                                       artifactDescriptorValidatorBuilder);
+        new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
+                                         artifactDescriptorValidatorBuilder);
   }
 
   private <T extends ArtifactDescriptor> ArtifactClassLoaderFactory<T> trackArtifactClassLoaderFactory(ArtifactClassLoaderFactory<T> artifactClassLoaderFactory) {
