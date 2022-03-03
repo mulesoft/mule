@@ -83,7 +83,6 @@ public class LogCleanup extends ExternalResource {
         throw new RuntimeException("Could not reset ThreadLocals", e);
       }
     }
-
     try {
       resetMethod.invoke(testMDCThreadLocals);
     } catch (IllegalAccessException | InvocationTargetException e) {
