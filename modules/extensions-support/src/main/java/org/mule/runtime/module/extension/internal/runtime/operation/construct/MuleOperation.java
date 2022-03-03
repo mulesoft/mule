@@ -18,7 +18,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.Operation;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.concurrent.CompletableFuture;

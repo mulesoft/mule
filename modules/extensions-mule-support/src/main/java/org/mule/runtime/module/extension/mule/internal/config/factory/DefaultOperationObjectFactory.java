@@ -13,7 +13,7 @@ import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.Operation;
+import org.mule.runtime.module.extension.internal.runtime.operation.construct.Operation;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;

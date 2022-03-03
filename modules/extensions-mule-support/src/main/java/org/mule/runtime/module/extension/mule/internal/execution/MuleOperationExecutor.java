@@ -16,7 +16,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.Operation;
+import org.mule.runtime.module.extension.internal.runtime.operation.construct.Operation;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;

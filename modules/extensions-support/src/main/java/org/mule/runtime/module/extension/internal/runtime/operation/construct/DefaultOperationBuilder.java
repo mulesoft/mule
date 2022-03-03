@@ -13,8 +13,7 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.Operation;
-import org.mule.runtime.core.api.construct.Operation.Builder;
+import org.mule.runtime.module.extension.internal.runtime.operation.construct.Operation.Builder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 

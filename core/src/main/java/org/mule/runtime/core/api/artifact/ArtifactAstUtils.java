@@ -105,7 +105,8 @@ public final class ArtifactAstUtils {
                                                                      ClassLoader artifactClassLoader,
                                                                      MuleContext muleContext) {
 
-    if (ast.topLevelComponentsStream().noneMatch(APPLICATION_COMPONENT_TYPES::contains)) {
+    if (ast.topLevelComponentsStream()
+        .noneMatch(component -> APPLICATION_COMPONENT_TYPES.contains(component.getComponentType()))) {
       return empty();
     }
 
