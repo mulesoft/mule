@@ -128,8 +128,8 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
 
     if (!featureFlaggingService.isEnabled(ENABLE_BYTE_BUDDY_OBJECT_CREATION)) {
       return rootBeanDefinition(objectFactoryClassRepository
-              .getObjectFactoryDynamicClass(componentBuildingDefinition, objectFactoryType, componentModel.getType(),
-                      new LazyValue<>(() -> componentModel.getBeanDefinition().isLazyInit())));
+          .getObjectFactoryDynamicClass(componentBuildingDefinition, objectFactoryType, componentModel.getType(),
+                                        new LazyValue<>(() -> componentModel.getBeanDefinition().isLazyInit())));
     }
 
     return rootBeanDefinition(objectFactoryClassRepository

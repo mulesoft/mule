@@ -119,9 +119,9 @@ public class ObjectFactoryClassRepository {
 
   @Deprecated
   public Class<ObjectFactory> getObjectFactoryDynamicClass(final ComponentBuildingDefinition componentBuildingDefinition,
-                                                            final Class objectFactoryType,
-                                                            final Class createdObjectType,
-                                                            final Supplier<Boolean> isLazyInitFunction) {
+                                                           final Class objectFactoryType,
+                                                           final Class createdObjectType,
+                                                           final Supplier<Boolean> isLazyInitFunction) {
     /*
      * We need this to allow spring create the object using a FactoryBean but using the object factory setters and getters so we
      * create as FactoryBean a dynamic class that will have the same attributes and methods as the ObjectFactory that the user
@@ -152,26 +152,26 @@ public class ObjectFactoryClassRepository {
 
     Class<ObjectFactory> factoryBeanClass = enhancer.createClass();
     registerStaticCallbacks(factoryBeanClass, new Callback[] {
-            (MethodInterceptor) (obj, method, args, proxy) -> {
-              final boolean eager = !isLazyInitFunction.get();
+        (MethodInterceptor) (obj, method, args, proxy) -> {
+          final boolean eager = !isLazyInitFunction.get();
 
-              if (method.getName().equals("isSingleton")) {
-                return !prototype;
-              }
-              if (method.getName().equals("getObjectType") && !ObjectTypeProvider.class.isAssignableFrom(obj.getClass())) {
-                return createdObjectType;
-              }
-              if (method.getName().equals("getObject")) {
-                return proxy.invokeSuper(obj, args);
-              }
-              if (method.getName().equals("isPrototype")) {
-                return prototype;
-              }
-              if (method.getName().equals("isEagerInit")) {
-                return eager;
-              }
-              return proxy.invokeSuper(obj, args);
-            }
+          if (method.getName().equals("isSingleton")) {
+            return !prototype;
+          }
+          if (method.getName().equals("getObjectType") && !ObjectTypeProvider.class.isAssignableFrom(obj.getClass())) {
+            return createdObjectType;
+          }
+          if (method.getName().equals("getObject")) {
+            return proxy.invokeSuper(obj, args);
+          }
+          if (method.getName().equals("isPrototype")) {
+            return prototype;
+          }
+          if (method.getName().equals("isEagerInit")) {
+            return eager;
+          }
+          return proxy.invokeSuper(obj, args);
+        }
     });
     return factoryBeanClass;
   }
