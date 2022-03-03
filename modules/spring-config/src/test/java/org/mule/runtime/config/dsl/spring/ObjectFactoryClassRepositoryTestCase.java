@@ -55,18 +55,22 @@ public class ObjectFactoryClassRepositoryTestCase {
   }
 
   @Test
-  public void testLoadSameClass() throws InstantiationException, IllegalAccessException {
+  public void testLoadSameClassHasDifferentInterceptors() throws InstantiationException, IllegalAccessException {
     ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
 
     ObjectFactoryClassRepository.SmartFactoryBeanInterceptor byteBuddyClass =
         (ObjectFactoryClassRepository.SmartFactoryBeanInterceptor) objectFactoryClassRepository
             .getObjectFactoryClass(FakeObjectConnectionProviderObjectFactory.class).newInstance();
+    byteBuddyClass.setObjectTypeClass(String.class);
 
     ObjectFactoryClassRepository.SmartFactoryBeanInterceptor otherByteBuddyClass =
         (ObjectFactoryClassRepository.SmartFactoryBeanInterceptor) objectFactoryClassRepository
             .getObjectFactoryClass(FakeObjectConnectionProviderObjectFactory.class).newInstance();
+    otherByteBuddyClass.setObjectTypeClass(Integer.class);
 
     assertThat(byteBuddyClass.getClass(), is(otherByteBuddyClass.getClass()));
+    assertThat(byteBuddyClass.getObjectType(), is(String.class));
+    assertThat(otherByteBuddyClass.getObjectType(), is(Integer.class));
   }
 
   @Test

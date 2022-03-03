@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.dsl.spring;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_BYTE_BUDDY_OBJECT_CREATION;
 import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.maskPasswords;
 
 import static java.util.stream.Collectors.toMap;
@@ -18,6 +19,7 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
@@ -28,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -41,6 +44,9 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
 
   private final ObjectFactoryClassRepository objectFactoryClassRepository;
   private final boolean disableTrimWhitespaces;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   public CommonBeanBaseDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository,
                                          boolean disableTrimWhitespaces) {
@@ -120,12 +126,18 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
                                                                              final ComponentBuildingDefinition componentBuildingDefinition) {
     Class<?> objectFactoryType = componentBuildingDefinition.getObjectFactoryType();
 
+    if (!featureFlaggingService.isEnabled(ENABLE_BYTE_BUDDY_OBJECT_CREATION)) {
+      return rootBeanDefinition(objectFactoryClassRepository
+              .getObjectFactoryDynamicClass(componentBuildingDefinition, objectFactoryType, componentModel.getType(),
+                      new LazyValue<>(() -> componentModel.getBeanDefinition().isLazyInit())));
+    }
+
     return rootBeanDefinition(objectFactoryClassRepository
         .getObjectFactoryClass(objectFactoryType))
             .addPropertyValue("isSingleton", !componentBuildingDefinition.isPrototype())
             .addPropertyValue("objectTypeClass", componentModel.getType())
             .addPropertyValue("isPrototype", componentBuildingDefinition.isPrototype())
-            .addPropertyValue("isEagerInit", new LazyValue<>(() -> componentModel.getBeanDefinition().isLazyInit()));
+            .addPropertyValue("isEagerInit", new LazyValue<>(() -> !componentModel.getBeanDefinition().isLazyInit()));
 
   }
 
