@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api.artifact;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableSet;
+import static java.util.EnumSet.of;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
@@ -49,7 +49,7 @@ public final class ArtifactAstUtils {
 
   private static final Logger LOGGER = getLogger(ArtifactAstUtils.class);
 
-  private static final Set<ComponentType> APPLICATION_COMPONENT_TYPES = unmodifiableSet(new HashSet<>(asList(OPERATION_DEF)));
+  private static final Set<ComponentType> APPLICATION_COMPONENT_TYPES = unmodifiableSet(of(OPERATION_DEF));
 
   /**
    * Parses {@code configResources} for a Mule application and returns an {@link ArtifactAst} enriched with an additional
