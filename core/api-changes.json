@@ -84,6 +84,100 @@
           "methodName": "setStaticFieldValue",
           "elementKind": "method",
           "justification": "Added convenience methods por reflection use cases"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "field org.mule.runtime.core.api.config.MuleProperties.OBJECT_PAYLOAD_STATISTICS_DECORATOR_FACTORY",
+          "new": "field org.mule.runtime.core.api.config.MuleProperties.OBJECT_PAYLOAD_STATISTICS_DECORATOR_FACTORY",
+          "annotationType": "org.mule.api.annotation.Experimental",
+          "annotation": "@org.mule.api.annotation.Experimental",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "MuleProperties",
+          "fieldName": "OBJECT_PAYLOAD_STATISTICS_DECORATOR_FACTORY",
+          "elementKind": "field",
+          "justification": "Should have been annotated as experimental to start with. It is deprecated now and will be removed soon."
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "method org.mule.runtime.core.api.management.stats.PayloadStatistics org.mule.runtime.core.api.management.stats.AllStatistics::computePayloadStatisticsIfAbsent(org.mule.runtime.api.component.Component)",
+          "new": "method org.mule.runtime.core.api.management.stats.PayloadStatistics org.mule.runtime.core.api.management.stats.AllStatistics::computePayloadStatisticsIfAbsent(org.mule.runtime.api.component.Component)",
+          "annotationType": "org.mule.api.annotation.Experimental",
+          "annotation": "@org.mule.api.annotation.Experimental",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "AllStatistics",
+          "methodName": "computePayloadStatisticsIfAbsent",
+          "elementKind": "method",
+          "justification": "Should have been annotated as experimental to start with. It is deprecated now and will be removed soon."
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "method void org.mule.runtime.core.api.management.stats.AllStatistics::enablePayloadStatistics(boolean)",
+          "new": "method void org.mule.runtime.core.api.management.stats.AllStatistics::enablePayloadStatistics(boolean)",
+          "annotationType": "org.mule.api.annotation.Experimental",
+          "annotation": "@org.mule.api.annotation.Experimental",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "AllStatistics",
+          "methodName": "enablePayloadStatistics",
+          "elementKind": "method",
+          "justification": "Should have been annotated as experimental to start with. It is deprecated now and will be removed soon."
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "method java.util.Collection<org.mule.runtime.core.api.management.stats.PayloadStatistics> org.mule.runtime.core.api.management.stats.AllStatistics::getPayloadStatistics()",
+          "new": "method java.util.Collection<org.mule.runtime.core.api.management.stats.PayloadStatistics> org.mule.runtime.core.api.management.stats.AllStatistics::getPayloadStatistics()",
+          "annotationType": "org.mule.api.annotation.Experimental",
+          "annotation": "@org.mule.api.annotation.Experimental",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "AllStatistics",
+          "methodName": "getPayloadStatistics",
+          "elementKind": "method",
+          "justification": "Should have been annotated as experimental to start with. It is deprecated now and will be removed soon."
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "method org.mule.runtime.core.api.management.stats.PayloadStatistics org.mule.runtime.core.api.management.stats.AllStatistics::getPayloadStatistics(java.lang.String)",
+          "new": "method org.mule.runtime.core.api.management.stats.PayloadStatistics org.mule.runtime.core.api.management.stats.AllStatistics::getPayloadStatistics(java.lang.String)",
+          "annotationType": "org.mule.api.annotation.Experimental",
+          "annotation": "@org.mule.api.annotation.Experimental",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "AllStatistics",
+          "methodName": "getPayloadStatistics",
+          "elementKind": "method",
+          "justification": "Should have been annotated as experimental to start with. It is deprecated now and will be removed soon."
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "method boolean org.mule.runtime.core.api.management.stats.AllStatistics::isPayloadStatisticsEnabled()",
+          "new": "method boolean org.mule.runtime.core.api.management.stats.AllStatistics::isPayloadStatisticsEnabled()",
+          "annotationType": "org.mule.api.annotation.Experimental",
+          "annotation": "@org.mule.api.annotation.Experimental",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "AllStatistics",
+          "methodName": "isPayloadStatisticsEnabled",
+          "elementKind": "method",
+          "justification": "Should have been annotated as experimental to start with. It is deprecated now and will be removed soon."
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory",
+          "new": "interface org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory",
+          "annotationType": "org.mule.api.annotation.Experimental",
+          "annotation": "@org.mule.api.annotation.Experimental",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "CursorComponentDecoratorFactory",
+          "elementKind": "interface",
+          "justification": "Should have been annotated as experimental to start with. It is deprecated now and will be removed soon."
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.core.api.management.stats.PayloadStatistics",
+          "new": "class org.mule.runtime.core.api.management.stats.PayloadStatistics",
+          "annotationType": "org.mule.api.annotation.Experimental",
+          "annotation": "@org.mule.api.annotation.Experimental",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "PayloadStatistics",
+          "elementKind": "class",
+          "justification": "Should have been annotated as experimental to start with. It is deprecated now and will be removed soon."
         }
       ]
     }
