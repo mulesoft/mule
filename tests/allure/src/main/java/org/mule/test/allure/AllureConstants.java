@@ -302,6 +302,17 @@ public interface AllureConstants {
     }
   }
 
+  interface ReuseFeature {
+
+    String REUSE = "Reuse";
+
+    interface ReuseStory {
+
+      String APPLICATION_EXTENSION_MODEL = "Application Extension Model";
+      String OPERATIONS = "Operations";
+    }
+  }
+
   interface HttpFeature {
 
     String HTTP_EXTENSION = "HTTP Extension";

@@ -11,6 +11,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
+import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.APPLICATION_EXTENSION_MODEL;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.meta.NamedObject;
@@ -35,9 +37,13 @@ import java.io.InputStream;
 
 import javax.inject.Inject;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
+@Feature(REUSE)
+@Story(APPLICATION_EXTENSION_MODEL)
 public class ApplicationAsExtensionModelTestCase extends MuleArtifactFunctionalTestCase {
 
   @Inject
