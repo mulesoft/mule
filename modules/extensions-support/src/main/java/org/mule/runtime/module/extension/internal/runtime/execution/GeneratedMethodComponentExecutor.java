@@ -26,7 +26,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.exception.SdkMethodInvocationException;
 import org.mule.runtime.module.extension.internal.runtime.execution.executor.MethodExecutor;
@@ -74,7 +73,6 @@ public class GeneratedMethodComponentExecutor<M extends ComponentModel>
   private final List<ParameterGroupModel> groups;
   private final Method method;
   private final Object componentInstance;
-  private final CursorComponentDecoratorFactory componentDecoratorFactory;
   private final ClassLoader extensionClassLoader;
 
   @Inject
@@ -84,12 +82,10 @@ public class GeneratedMethodComponentExecutor<M extends ComponentModel>
   private MethodExecutor methodExecutor;
   private MuleContext muleContext;
 
-  public GeneratedMethodComponentExecutor(List<ParameterGroupModel> groups, Method method, Object componentInstance,
-                                          CursorComponentDecoratorFactory componentDecoratorFactory) {
+  public GeneratedMethodComponentExecutor(List<ParameterGroupModel> groups, Method method, Object componentInstance) {
     this.groups = groups;
     this.method = method;
     this.componentInstance = componentInstance;
-    this.componentDecoratorFactory = componentDecoratorFactory;
     extensionClassLoader = method.getDeclaringClass().getClassLoader();
   }
 
@@ -123,7 +119,7 @@ public class GeneratedMethodComponentExecutor<M extends ComponentModel>
 
   private ArgumentResolverDelegate getMethodArgumentResolver(List<ParameterGroupModel> groups, Method method) {
     try {
-      MethodArgumentResolverDelegate resolver = new MethodArgumentResolverDelegate(groups, method, componentDecoratorFactory);
+      MethodArgumentResolverDelegate resolver = new MethodArgumentResolverDelegate(groups, method);
       initialiseIfNeeded(resolver, muleContext);
       return resolver;
     } catch (Exception e) {

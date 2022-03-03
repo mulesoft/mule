@@ -394,9 +394,9 @@ public abstract class ExtensionDefinitionParser {
             .withIdentifier(valueDsl.getElementName())
             .withTypeDefinition(fromMapEntryType(keyClass, valueClass))
             .withKeyTypeConverter(getTypeConverter(parameterName, keyType, null, expressionSupport, true,
-                                                   emptySet(), false, false))
+                                                   emptySet(), false))
             .withTypeConverter(getTypeConverter(parameterName, valueType, null, expressionSupport, true,
-                                                emptySet(), false, false))
+                                                emptySet(), false))
             .build());
       }
 
@@ -435,7 +435,7 @@ public abstract class ExtensionDefinitionParser {
               addDefinition(definitionBuilder.withIdentifier(valueListGenericDsl.get().getElementName())
                   .withTypeDefinition(fromType(getType(metadataType)))
                   .withTypeConverter(getTypeConverter(parameterName, metadataType, getDefaultValue(metadataType),
-                                                      getExpressionSupport(metadataType), false, emptySet(), true, false))
+                                                      getExpressionSupport(metadataType), false, emptySet(), true))
                   .build());
             }
 
@@ -500,7 +500,7 @@ public abstract class ExtensionDefinitionParser {
               .withIdentifier(elementName)
               .withTypeDefinition(fromType(String.class))
               .withTypeConverter(getTypeConverter(elementName, stringType, defaultValue, expressionSupport, false, emptySet(),
-                                                  acceptsReferences, false))
+                                                  acceptsReferences))
               .build());
         } else {
           defaultVisit(stringType);
@@ -617,7 +617,7 @@ public abstract class ExtensionDefinitionParser {
 
         private void addBasicTypeDefinition(MetadataType metadataType) {
           TypeConverter typeConverter = getTypeConverter(name, metadataType, getDefaultValue(metadataType).orElse(null),
-                                                         getExpressionSupport(metadataType), false, emptySet(), true, false);
+                                                         getExpressionSupport(metadataType), false, emptySet(), true);
 
           Builder itemDefinitionBuilder = definitionBuilder.withIdentifier(itemIdentifier).withNamespace(itemNamespace)
               .withTypeDefinition(fromType(ExtensionMetadataTypeUtils.getType(metadataType).orElse(Object.class)))
@@ -723,7 +723,7 @@ public abstract class ExtensionDefinitionParser {
     AttributeDefinition.Builder definitionBuilder;
 
     TypeConverter typeConverter = getTypeConverter(name, type, defaultValue, expressionSupport, required,
-                                                   modelProperties, acceptsReferences, false);
+                                                   modelProperties, acceptsReferences);
 
     if (acceptsReferences && type instanceof StringType && !allowedStereotypes.isEmpty()) {
       definitionBuilder = fromSoftReferenceSimpleParameter(name);
@@ -748,7 +748,7 @@ public abstract class ExtensionDefinitionParser {
                                    List<StereotypeModel> allowedStereotypes, boolean content) {
     if (content) {
       TypeConverter typeConverter = getTypeConverter(name, type, defaultValue, expressionSupport, required,
-                                                     modelProperties, !allowedStereotypes.isEmpty(), content);
+                                                     modelProperties, !allowedStereotypes.isEmpty());
       parseFromTextExpression(name, dsl, () -> typeConverter);
     } else {
       parseObjectParameter(key, name, (ObjectType) type,
@@ -772,8 +772,7 @@ public abstract class ExtensionDefinitionParser {
                                                      parameterModel.getExpressionSupport(),
                                                      parameterModel.isRequired(),
                                                      parameterModel.getModelProperties(),
-                                                     acceptsReferences(parameterModel),
-                                                     true);
+                                                     acceptsReferences(parameterModel));
 
       parseFromTextExpression(parameterModel, paramDsl, () -> typeConverter);
     } else {
@@ -937,8 +936,7 @@ public abstract class ExtensionDefinitionParser {
   }
 
   private TypeConverter getTypeConverter(String name, MetadataType type, Object defaultValue, ExpressionSupport expressionSupport,
-                                         boolean required, Set<ModelProperty> modelProperties, boolean acceptsReferences,
-                                         boolean content) {
+                                         boolean required, Set<ModelProperty> modelProperties, boolean acceptsReferences) {
 
     ClassLoader extensionClassLoader = getContextClassLoader();
     TypeConverter typeConverter = value -> {
@@ -948,7 +946,7 @@ public abstract class ExtensionDefinitionParser {
       setContextClassLoader(thread, currentClassLoader, compositeClassLoader);
       try {
         return valueResolverFactory.of(name, type, value, defaultValue, expressionSupport, required, modelProperties,
-                                       acceptsReferences, content);
+                                       acceptsReferences);
       } finally {
         setContextClassLoader(thread, compositeClassLoader, currentClassLoader);
       }

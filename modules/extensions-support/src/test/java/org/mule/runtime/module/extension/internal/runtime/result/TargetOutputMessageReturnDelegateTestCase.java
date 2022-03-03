@@ -15,7 +15,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
-import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getDefaultCursorStreamProviderFactory;
 
@@ -26,7 +25,6 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -70,8 +68,6 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleConte
   @Mock
   protected Object attributes;
 
-  public CursorComponentDecoratorFactory componentDecoratorFactory = NO_OP_INSTANCE;
-
   protected ReturnDelegate delegate;
   private final Object payload = "hello world!";
 
@@ -87,8 +83,7 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleConte
 
   private TargetReturnDelegate createDelegate(String expression) {
     return new TargetReturnDelegate(TARGET, expression, componentModel, expressionManager,
-                                    componentDecoratorFactory, getDefaultCursorStreamProviderFactory(), muleContext,
-                                    streamingManager);
+                                    getDefaultCursorStreamProviderFactory(), muleContext, streamingManager);
   }
 
   @Test

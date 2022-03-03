@@ -18,7 +18,9 @@ import java.util.Iterator;
  * Implementations provide the functionality to decorate {@link Cursor}s in order to capture {@link PayloadStatistics} from it.
  *
  * @since 4.4, 4.3.1
+ * @deprecated since 4.4.1, 4.5.0. Payload statistics is no longer supported.
  */
+@Deprecated
 public interface CursorComponentDecoratorFactory {
 
   /**

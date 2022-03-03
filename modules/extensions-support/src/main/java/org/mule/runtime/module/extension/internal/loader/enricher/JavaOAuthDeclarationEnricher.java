@@ -22,7 +22,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
@@ -34,7 +33,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarat
 import org.mule.runtime.api.meta.model.declaration.fluent.util.DeclarationWalker;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthCallbackValue;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthParameter;
@@ -49,8 +47,6 @@ import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDe
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
-import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.oauth.OAuthCallbackValuesModelProperty;
@@ -196,7 +192,7 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
       operation.setSupportsStreaming(false);
       operation.setTransactional(false);
       operation
-          .addModelProperty(new CompletableComponentExecutorModelProperty(new JavaOAuthCompletableComponentExecutorFactory()));
+          .addModelProperty(new CompletableComponentExecutorModelProperty((model, params) -> new UnauthorizeOperationExecutor()));
 
       if (supportsAuthCode) {
         ParameterGroupDeclaration group = operation.getParameterGroup(DEFAULT_GROUP_NAME);
@@ -223,19 +219,4 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
       return declaration;
     }
   }
-
-  public static final class JavaOAuthCompletableComponentExecutorFactory
-      implements CompletableComponentExecutorFactory<ComponentModel> {
-
-    @Override
-    public CompletableComponentExecutor<ComponentModel> createExecutor(ComponentModel componentModel,
-                                                                       Map<String, Object> parameters) {
-      return new UnauthorizeOperationExecutor();
-    }
-
-    public void setComponentDecoratorFactory(CursorComponentDecoratorFactory componentDecoratorFactory) {
-      // Nothing to do, this executor will not consume the payload so no metrics need to be calculated for this
-    }
-  }
-
 }

@@ -127,11 +127,6 @@ public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<
     return true;
   }
 
-  @Override
-  public boolean isContent() {
-    return false;
-  }
-
   /**
    * {@inheritDoc}
    */

@@ -53,7 +53,6 @@ import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.lifecycle.PrimaryNodeLifecycleNotificationListener;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
@@ -66,7 +65,6 @@ import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
 import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
-import org.mule.runtime.core.internal.management.stats.CursorDecoratorFactory;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
@@ -133,9 +131,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Inject
   private ClusterService clusterService;
-
-  @Inject
-  private CursorDecoratorFactory cursorDecoratorFactory;
 
   @Inject
   private FeatureFlaggingService featureFlaggingService;
@@ -527,8 +522,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private MessageProcessContext createProcessingContext() {
-    // doing this here instead of inlining in the method below that uses it avoids doing the map lookup per event received.
-    final CursorComponentDecoratorFactory componentDecoratorFactory = cursorDecoratorFactory.componentDecoratorFactory(this);
 
     return new MessageProcessContext() {
 
@@ -557,11 +550,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       @Override
       public MessagingExceptionResolver getMessagingExceptionResolver() {
         return messagingExceptionResolver;
-      }
-
-      @Override
-      public CursorComponentDecoratorFactory getComponentDecoratorFactory() {
-        return componentDecoratorFactory;
       }
 
       @Override

@@ -34,9 +34,4 @@ public class ConfigurationValueResolver<T> implements ValueResolver<T> {
   public boolean isDynamic() {
     return configurationProvider.isDynamic();
   }
-
-  @Override
-  public boolean isContent() {
-    return false;
-  }
 }

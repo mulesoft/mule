@@ -12,7 +12,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_PAYLOAD_STATISTICS;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.tck.probe.PollingProber.probe;
@@ -54,21 +53,14 @@ public class TypedValueParameterOperationExecutionTestCase extends AbstractTyped
 
   @Parameters
   public static List<Object[]> parameters() {
-    return asList(new Object[][] {{"true", "false"},
-        {"true", "true"},
-        {"false", "false"},
-        {"false", "true"}});
+    return asList(new Object[][] {{"true"}, {"false"}});
   }
 
   @Rule
   public SystemProperty withStatistics;
 
-  @Rule
-  public SystemProperty withPayloadStatistics;
-
-  public TypedValueParameterOperationExecutionTestCase(String enableStatistics, String disablePayloadStatistics) {
+  public TypedValueParameterOperationExecutionTestCase(String enableStatistics) {
     this.withStatistics = new SystemProperty(MULE_ENABLE_STATISTICS, enableStatistics);
-    this.withPayloadStatistics = new SystemProperty(MULE_DISABLE_PAYLOAD_STATISTICS, disablePayloadStatistics);
   }
 
   @Override

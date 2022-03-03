@@ -38,8 +38,10 @@ import java.util.concurrent.atomic.AtomicLong;
  * consumed {@code enabled} flag is {@code true}, the consumption for that specific stream will not modify this object.
  *
  * @since 4.4, 4.3.1
+ * @deprecated since 4.4.1, 4.5.0. Payload statistics is no longer supported.
  */
 @NoExtend
+@Deprecated
 public class PayloadStatistics implements Statistics {
 
   private static final long serialVersionUID = 2335903369488757953L;

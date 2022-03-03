@@ -14,7 +14,6 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -131,11 +130,6 @@ public abstract class AbstractExecutionContextAdapterDecorator<M extends Compone
   @Override
   public CursorProviderFactory getCursorProviderFactory() {
     return decorated.getCursorProviderFactory();
-  }
-
-  @Override
-  public CursorComponentDecoratorFactory getComponentDecoratorFactory() {
-    return decorated.getComponentDecoratorFactory();
   }
 
   @Override

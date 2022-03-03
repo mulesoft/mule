@@ -44,10 +44,6 @@ public class StackableTypesValueResolverFactory {
    * @return The expression based {@link ValueResolver}
    */
   public ValueResolver getExpressionBasedValueResolver(String expression, Class expectedType) {
-    return getExpressionBasedValueResolver(expression, expectedType, false);
-  }
-
-  public ValueResolver getExpressionBasedValueResolver(String expression, Class expectedType, boolean content) {
     Stack<StackableType> stackableTypes = types.get();
     StackableType stackableType = stackableTypes.pop();
     StackableType.ExpressionBasedResolverFactory resolverFactory = stackableType
@@ -55,7 +51,7 @@ public class StackableTypesValueResolverFactory {
         .orElseThrow(() -> new IllegalStateException(format("Unable to create an Expression Based ValueResolver of '%s' type. No ExpressionBasedResolverFactory was registered for this type.",
                                                             stackableType.getType().getTypeName())));
 
-    ValueResolver resolver = resolverFactory.getResolver(expression, expectedType, content);
+    ValueResolver resolver = resolverFactory.getResolver(expression, expectedType);
     resolver = getWrapperValueResolver(resolver, stackableTypes);
     return resolver;
   }

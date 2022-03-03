@@ -46,9 +46,4 @@ public class StaticLiteralValueResolver<T> implements ValueResolver<Literal<T>> 
   public boolean isDynamic() {
     return false;
   }
-
-  @Override
-  public boolean isContent() {
-    return false;
-  }
 }

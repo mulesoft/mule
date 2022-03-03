@@ -497,7 +497,6 @@ public interface AllureConstants {
       String OBJECT_STREAMING = "Object Streaming";
       String STREAM_MANAGEMENT = "Management of Streams";
       String TROUBLESHOOTING = "Streaming troubleshooting";
-      String STATISTICS = "Payload statistics";
     }
 
   }

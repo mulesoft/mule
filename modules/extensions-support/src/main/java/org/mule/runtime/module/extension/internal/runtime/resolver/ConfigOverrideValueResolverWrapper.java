@@ -185,11 +185,6 @@ public final class ConfigOverrideValueResolverWrapper<T> implements ValueResolve
   }
 
   @Override
-  public boolean isContent() {
-    return false;
-  }
-
-  @Override
   public void initialise() throws InitialisationException {
     try {
       muleContext.getInjector().inject(delegate);
