@@ -15,7 +15,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.el.BindingContextUtils.ERROR;
 import static org.mule.runtime.api.el.BindingContextUtils.MESSAGE;
-import static org.mule.runtime.api.el.BindingContextUtils.PARAMS;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
@@ -83,13 +82,11 @@ public class LookupFunction implements ExpressionFunction {
     if (component instanceof Flow) {
       Message incomingMessage = lookupValue(context, MESSAGE, Message.builder().nullValue().build());
       Map<String, ?> incomingVariables = lookupValue(context, VARS, EMPTY_MAP);
-      Map<String, ?> incomingParams = lookupValue(context, PARAMS, EMPTY_MAP);
       Error incomingError = lookupValue(context, ERROR, null);
 
       Message message = Message.builder(incomingMessage).value(payload).mediaType(APPLICATION_JAVA).build();
       CoreEvent event = CoreEvent.builder(PrivilegedEvent.getCurrentEvent().getContext())
           .variables(incomingVariables)
-          .parameters(incomingParams)
           .error(incomingError)
           .message(message)
           .build();
