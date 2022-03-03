@@ -40,7 +40,6 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileB
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilder;
-import org.mule.tck.junit4.rule.LogCleanup;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -71,7 +70,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
   private static final String FOO_POLICY_NAME = "fooPolicy";
 
   private static final int PROBER_POLLING_INTERVAL = 100;
-  private static final int PROBER_POLIING_TIMEOUT = 5000;
+  private static final int PROBER_POLLING_TIMEOUT = 5000;
 
   private final String appName;
 
@@ -122,12 +121,12 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
     assertThat(removeAppAnchorFile(appName), is(true));
 
-    new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       assertThat(getDeploymentListener().isAppUndeployed(), is(true));
       return true;
     }));
 
-    new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       clearLogsAndMDCThreadReferences();
       System.gc();
       assertThat(getDeploymentListener().getPhantomReference().isEnqueued(), is(true));
@@ -155,12 +154,12 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
     assertThat(removeAppAnchorFile(appName), is(true));
 
-    new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       assertThat(getDeploymentListener().isAppUndeployed(), is(true));
       return true;
     }));
 
-    new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       clearLogsAndMDCThreadReferences();
       System.gc();
       assertThat(getDeploymentListener().getPhantomReference().isEnqueued(), is(true));
@@ -234,7 +233,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
     doAnswer(invocation -> {
       try {
-        new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+        new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
           System.gc();
           assertThat(firstAppRef.isEnqueued(), is(true));
           return true;
@@ -251,7 +250,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
   private void assertRededeployment(DeploymentListener mockDeploymentListener,
                                     AtomicReference<Throwable> redeploymentSuccessThrown) {
-    new PollingProber(PROBER_POLIING_TIMEOUT + 1000, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+    new PollingProber(PROBER_POLLING_TIMEOUT + 1000, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       if (redeploymentSuccessThrown.get() != null) {
         throw new MuleRuntimeException(redeploymentSuccessThrown.get());
       }
