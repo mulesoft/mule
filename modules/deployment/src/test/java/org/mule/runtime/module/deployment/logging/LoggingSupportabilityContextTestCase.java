@@ -7,8 +7,11 @@
 package org.mule.runtime.module.deployment.logging;
 
 import static java.util.Arrays.asList;
+
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static uk.org.lidalia.slf4jtest.LoggingEvent.error;
+import static uk.org.lidalia.slf4jtest.TestLoggerFactory.getTestLogger;
 
 import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
@@ -18,15 +21,13 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.qameta.allure.Description;
-import static org.hamcrest.Matchers.is;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 import uk.org.lidalia.slf4jtest.TestLogger;
-import uk.org.lidalia.slf4jtest.TestLoggerFactory;
 
 public class LoggingSupportabilityContextTestCase extends AbstractApplicationDeploymentTestCase {
 
-  TestLogger logger = TestLoggerFactory.getTestLogger(LoggerMessageProcessor.class);
+  TestLogger logger = getTestLogger(LoggerMessageProcessor.class);
 
   @Parameterized.Parameters(name = "Parallel: {0}")
   public static List<Boolean> params() {
@@ -55,6 +56,6 @@ public class LoggingSupportabilityContextTestCase extends AbstractApplicationDep
 
     executeApplicationFlow("logging", correlationId);
 
-    assertThat(logger.getAllLoggingEvents(), is(asList(error(mdcMap, "I'm a logger"))));
+    assertThat(logger.getAllLoggingEvents(), hasItem(error(mdcMap, "I'm a logger")));
   }
 }
