@@ -42,6 +42,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.rule.LogCleanup;
 import org.mule.tck.junit4.rule.WarningTimeout;
 import org.mule.tck.report.ThreadDumpOnTimeOut;
 
@@ -111,7 +112,8 @@ public abstract class AbstractMuleTestCase {
 
   @Rule
   public final TestRule chain = RuleChain
-      .outerRule(new ThreadDumpOnTimeOut())
+      .outerRule(new LogCleanup())
+      .around(new ThreadDumpOnTimeOut())
       .around(createTestTimeoutRule());
 
   /**

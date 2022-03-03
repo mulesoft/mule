@@ -1,4 +1,4 @@
-org.mule.runtime.module.deployment.impl.internal.classloader.MuleClassNotFoundException: Couldn't find class: test.OverrideMe 
+Couldn't find class: test.OverrideMe 
  ------------------------
 | Runtime Class Loader |
 ------------------------

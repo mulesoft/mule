@@ -91,6 +91,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.slf4j.LoggerFactory.getLogger;
+import static uk.org.lidalia.slf4jtest.TestLoggerFactory.getTestLogger;
 
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.functional.config.TestComponentBuildingDefinitionProvider;
@@ -114,6 +115,7 @@ import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -176,6 +178,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import org.apache.logging.log4j.LogManager;
 import org.slf4j.Logger;
 
 import org.junit.After;
@@ -187,6 +190,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import org.mockito.verification.VerificationMode;
+import uk.org.lidalia.slf4jext.Level;
+import uk.org.lidalia.slf4jtest.TestLogger;
 
 @RunWith(Parameterized.class)
 /**
@@ -295,6 +300,16 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   @BeforeClass
   public static void beforeClass() throws URISyntaxException, IllegalAccessException {
+    // Reduces unnecessary logging
+    TestLogger compilerUtilsTestLogger = getTestLogger(CompilerUtils.class);
+    compilerUtilsTestLogger.setEnabledLevelsForAllThreads(Level.ERROR);
+    TestLogger pollingProberTestLogger = getTestLogger(PollingProber.class);
+    pollingProberTestLogger.setEnabledLevelsForAllThreads(Level.ERROR);
+    TestLogger testLogger = getTestLogger(LoggerMessageProcessor.class);
+    testLogger.setEnabledLevelsForAllThreads(Level.ERROR);
+    // Initialises logging plugins with correct classloader
+    LogManager.getContext(false);
+
     barUtils1ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar1/BarUtils.java"));
     barUtils1_0JarFile =
         new JarFileBuilder("barUtils1",

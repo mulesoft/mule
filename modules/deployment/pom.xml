@@ -90,6 +90,12 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j-impl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
@@ -189,6 +195,13 @@
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-allure</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+<!--         https://mvnrepository.com/artifact/uk.org.lidalia/slf4j-test -->
+        <dependency>
+            <groupId>uk.org.lidalia</groupId>
+            <artifactId>slf4j-test</artifactId>
+            <version>1.2.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

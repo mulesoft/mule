@@ -1,6 +1,4 @@
-Failed to deploy artifact [domain-classloading-troubleshooting-1.0.0-mule-domain]
-org.mule.runtime.deployment.model.api.DeploymentException: Failed to deploy artifact [domain-classloading-troubleshooting-1.0.0-mule-domain]
-Caused by: org.mule.runtime.api.exception.MuleRuntimeException: org.mule.runtime.deployment.model.api.DeploymentInitException: MuleClassNotFoundException: Couldn't find class: OverrideMe 
+Couldn't find class: OverrideMe 
  ------------------------
 | Runtime Class Loader |
 ------------------------

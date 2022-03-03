@@ -13,18 +13,21 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleBaseFolder;
 import static org.mule.runtime.core.api.util.ClassUtils.MULE_DESIGN_MODE;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+import static uk.org.lidalia.slf4jtest.TestLoggerFactory.getTestLogger;
 
+import org.mule.runtime.module.deployment.impl.internal.application.DefaultMuleApplication;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DeployableFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
-import org.mule.runtime.module.deployment.logging.MemoryAppenderResource;
+import org.mule.runtime.module.deployment.impl.internal.domain.DefaultMuleDomain;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
@@ -36,6 +39,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -43,6 +47,9 @@ import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 import io.qameta.allure.Feature;
+import uk.org.lidalia.slf4jtest.LoggingEvent;
+import uk.org.lidalia.slf4jtest.TestLogger;
+import uk.org.lidalia.slf4jtest.TestLoggerFactory;
 
 @Feature(CLASSLOADING_ISOLATION)
 public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestCase {
@@ -57,7 +64,10 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
   private JarFileBuilder overriderLibrary;
   private JarFileBuilder overrider2Library;
   private JarFileBuilder overriderTestLibrary;
-  private MemoryAppenderResource appender;
+
+  TestLogger loggerDefaultMuleDomain = getTestLogger(DefaultMuleDomain.class);
+  TestLogger loggerDefaultArchiveDeployer = getTestLogger(DefaultArchiveDeployer.class);
+  TestLogger loggerDefaultMuleApplication = getTestLogger(DefaultMuleApplication.class);
 
   public ClassloadingTroubleshootingTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
@@ -84,15 +94,6 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
                            new JarCompiler().compiling(getResourceFile("/classloading-troubleshooting/src/test/OverrideMe.java"))
                                .compile("overrider-test-library.jar"));
 
-    appender = new MemoryAppenderResource(containerClassLoader.getClassLoader());
-  }
-
-  @Override
-  public void tearDown() throws Exception {
-    super.tearDown();
-    if (appender != null) {
-      appender.tearDown();
-    }
   }
 
   @Test
@@ -113,7 +114,9 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     startDeployment();
 
     assertDeploymentFailure(domainDeploymentListener, domainFileBuilder.getId());
-    assertExpectedContentInAppLog("classloading-troubleshooting/errors/domain-config-yaml-not-found");
+    assertThat(toMessages(loggerDefaultArchiveDeployer.getAllLoggingEvents()),
+               hasItem("Failed to deploy artifact [domain-classloading-troubleshooting-1.0.0-mule-domain]"));
+    assertExpectedContentInDomainLog("classloading-troubleshooting/errors/domain-config-yaml-not-found");
   }
 
   @Test
@@ -134,7 +137,9 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     startDeployment();
 
     assertDeploymentFailure(domainDeploymentListener, domainFileBuilder.getId());
-    assertExpectedContentInAppLog("classloading-troubleshooting/errors/domain-overrideme-class-not-found");
+    assertThat(toMessages(loggerDefaultArchiveDeployer.getAllLoggingEvents()),
+               hasItem("Failed to deploy artifact [domain-classloading-troubleshooting-1.0.0-mule-domain]"));
+    assertExpectedContentInDomainLog("classloading-troubleshooting/errors/domain-overrideme-class-not-found");
   }
 
   @Test
@@ -160,6 +165,8 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
     assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
 
+    assertThat(toMessages(loggerDefaultArchiveDeployer.getAllLoggingEvents()),
+               hasItem("Failed to deploy artifact [app-classloading-troubleshooting-1.0.0-mule-application]"));
     assertExpectedContentInAppLog("classloading-troubleshooting/errors/app-overrideme2-class-not-found");
   }
 
@@ -186,6 +193,9 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
 
     assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
     assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    assertThat(toMessages(loggerDefaultArchiveDeployer.getAllLoggingEvents()),
+               hasItem("Failed to deploy artifact [app-classloading-troubleshooting-1.0.0-mule-application]"));
     assertExpectedContentInAppLog("classloading-troubleshooting/errors/app-test-overrideme-class-not-found");
   }
 
@@ -210,6 +220,8 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     deployDomainAndApplication(domainFileBuilder, applicationFileBuilder);
 
     assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
+    assertThat(toMessages(loggerDefaultArchiveDeployer.getAllLoggingEvents()),
+               hasItem("Failed to deploy artifact [app-classloading-troubleshooting-1.0.0-mule-application]"));
     assertExpectedContentInAppLog("classloading-troubleshooting/errors/app-jms-properties-resource-not-found");
   }
 
@@ -311,6 +323,14 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
   }
 
   private void assertExpectedContentInAppLog(String fileLocation) throws Exception {
+    assertExpectedContentInLog(fileLocation, loggerDefaultMuleApplication);
+  }
+
+  private void assertExpectedContentInDomainLog(String fileLocation) throws Exception {
+    assertExpectedContentInLog(fileLocation, loggerDefaultMuleDomain);
+  }
+
+  private void assertExpectedContentInLog(String fileLocation, TestLogger logger) throws Exception {
     File logContent =
         new File(getResourceAsUrl(fileLocation, ClassloadingTroubleshootingTestCase.class)
             .toURI());
@@ -321,7 +341,8 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
           @Override
           public boolean isSatisfied() {
             try {
-              assertThat(contains(expectedErrorLog), is(true));
+              assertThat(toMessages(logger.getAllLoggingEvents()),
+                         hasItem(expectedErrorLog));
               return true;
             } catch (Exception e) {
               return false;
@@ -331,15 +352,15 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
           @Override
           public String describeFailure() {
             final StringJoiner joiner = new StringJoiner(lineSeparator());
-            appender.getLogLines().forEach(joiner::add);
+            logger.getAllLoggingEvents().forEach(e -> joiner.add(e.getMessage()));
 
             return "expected content ('" + expectedErrorLog + "') not found. Full log is:" + lineSeparator() + joiner.toString();
           }
         });
   }
 
-  private boolean contains(String content) {
-    return appender.getLogLines().anyMatch(event -> event.contains(content));
+  private List<String> toMessages(List<LoggingEvent> loggingEvents) {
+    return loggingEvents.stream().map(LoggingEvent::getMessage).collect(Collectors.toList());
   }
 
 }
