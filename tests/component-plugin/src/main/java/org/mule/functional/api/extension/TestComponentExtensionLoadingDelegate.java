@@ -74,8 +74,6 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
     declareProcessor(extensionDeclarer);
     declareInvocationCounter(extensionDeclarer);
     declareAssert(extensionDeclarer);
-    declareParameterInterceptor(extensionDeclarer);
-    declareDumpInterceptedParameters(extensionDeclarer);
     declareLifecycleTracker(extensionDeclarer);
     declareLifecycleTrackerCheck(extensionDeclarer);
     declareLifecycleTrackerConfig(extensionDeclarer);
@@ -340,16 +338,6 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
   private void declareLifecycleTracker(HasOperationDeclarer declarer) {
     withNameParameter(voidOperation(declarer, "lifecycleTracker")
         .describedAs("Stores the lifecycle method calls received by this processor."));
-  }
-
-  private void declareParameterInterceptor(HasOperationDeclarer declarer) {
-    withNameParameter(voidOperation(declarer, "interceptParameters")
-        .describedAs("Intercepts and stores the current event's parameters"));
-  }
-
-  private void declareDumpInterceptedParameters(HasOperationDeclarer declarer) {
-    voidOperation(declarer, "dumpInterceptedParameters")
-        .describedAs("Returns the entire map of intercepted parameters");
   }
 
   private OperationDeclarer withNameParameter(OperationDeclarer declarer) {

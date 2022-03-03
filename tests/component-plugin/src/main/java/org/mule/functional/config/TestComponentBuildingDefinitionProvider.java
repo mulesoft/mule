@@ -17,7 +17,6 @@ import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfiguratio
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
 import org.mule.functional.api.component.AssertionMessageProcessor;
-import org.mule.functional.api.component.DumpInterceptedParametersProcessor;
 import org.mule.functional.api.component.EqualsLogChecker;
 import org.mule.functional.api.component.EventCallback;
 import org.mule.functional.api.component.FunctionalTestProcessor;
@@ -28,7 +27,6 @@ import org.mule.functional.api.component.LifecycleTrackerScope;
 import org.mule.functional.api.component.LifecycleTrackerSource;
 import org.mule.functional.api.component.LogChecker;
 import org.mule.functional.api.component.OnErrorCheckLogHandler;
-import org.mule.functional.api.component.ParameterInterceptorProcessor;
 import org.mule.functional.api.component.SharedConfig;
 import org.mule.functional.api.component.SharedSource;
 import org.mule.functional.api.component.SkeletonSource;
@@ -195,17 +193,6 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
 
     addOnErrorCheckLogComponentBuildingDefinitions(componentBuildingDefinitions);
-
-    componentBuildingDefinitions.add(baseDefinition
-        .withIdentifier("intercept-parameters")
-        .withTypeDefinition(fromType(ParameterInterceptorProcessor.class))
-        .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition
-        .withIdentifier("dump-intercepted-parameters")
-        .withTypeDefinition(fromType(DumpInterceptedParametersProcessor.class))
-        .build());
 
     return componentBuildingDefinitions;
   }
