@@ -7,9 +7,11 @@
 package org.mule.runtime.module.deployment.logging;
 
 import static java.util.Arrays.asList;
+
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.Assert.assertThat;
+import static uk.org.lidalia.slf4jtest.TestLoggerFactory.getTestLogger;
 
 import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
@@ -21,11 +23,10 @@ import io.qameta.allure.Description;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 import uk.org.lidalia.slf4jtest.TestLogger;
-import uk.org.lidalia.slf4jtest.TestLoggerFactory;
 
 public class LoggingSeparationTestCase extends AbstractApplicationDeploymentTestCase {
 
-  TestLogger logger = TestLoggerFactory.getTestLogger(LoggerMessageProcessor.class);
+  TestLogger logger = getTestLogger(LoggerMessageProcessor.class);
 
   @Parameterized.Parameters(name = "Parallel: {0}")
   public static List<Boolean> params() {
@@ -54,13 +55,13 @@ public class LoggingSeparationTestCase extends AbstractApplicationDeploymentTest
     executeApplicationFlow("logging");
 
     assertThat(logger.getAllLoggingEvents().size(), is(1));
-    //TODO: Change thread name check to TCCL check when available on slf4j-test
+    // TODO: Change thread name check to TCCL check when available on slf4j-test
     assertThat("", logger.getAllLoggingEvents().get(0).getThreadName(), stringContainsInOrder("logging-app-1"));
 
     executeApplicationFlow("logging2", null, 1);
 
     assertThat(logger.getAllLoggingEvents().size(), is(2));
-    //TODO: Change thread name check to TCCL check when available on slf4j-test
+    // TODO: Change thread name check to TCCL check when available on slf4j-test
     assertThat("", logger.getAllLoggingEvents().get(1).getThreadName(), stringContainsInOrder("logging-app-2"));
   }
 }
