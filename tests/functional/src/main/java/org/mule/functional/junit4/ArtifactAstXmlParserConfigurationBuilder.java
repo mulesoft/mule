@@ -16,7 +16,7 @@ import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.ast.internal.serialization.ArtifactAstSerializerFactory.JSON;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.config.internal.ConfigurationPropertiesResolverFactory.createConfigurationPropertiesResolver;
-import static org.mule.runtime.core.api.artifact.ArtifactAstUtils.parseAndBuildAppExtensionModel;
+import static org.mule.runtime.module.artifact.activation.api.ArtifactAstUtils.parseAndBuildAppExtensionModel;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
