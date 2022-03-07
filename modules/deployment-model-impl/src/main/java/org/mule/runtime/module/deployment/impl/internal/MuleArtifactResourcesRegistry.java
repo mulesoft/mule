@@ -45,6 +45,7 @@ import org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescri
 import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.deployment.model.internal.artifact.extension.MuleExtensionModelLoaderManager;
 import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderFactory;
+import org.mule.runtime.internal.memory.management.ArtifactMemoryManagementService;
 import org.mule.runtime.internal.memory.management.DefaultMemoryManagementService;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
@@ -127,10 +128,10 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
 
     /**
      * Configures the {@link ArtifactConfigurationProcessor} to use.
-     * 
+     *
      * @param artifactConfigurationProcessor the processor to use for building the application model.
      * @return the same builder instance
-     * 
+     *
      * @since 4.5
      */
     public Builder artifactConfigurationProcessor(ArtifactConfigurationProcessor artifactConfigurationProcessor) {
@@ -169,8 +170,9 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
 
     this.memoryManagementService = DefaultMemoryManagementService.getInstance();
 
+    MemoryManagementService artifactMemoryManagementService = new ArtifactMemoryManagementService(memoryManagementService);
     // Registers the memory management so that this can be injected.
-    registerObject(MULE_MEMORY_MANAGEMENT_SERVICE, memoryManagementService);
+    registerObject(MULE_MEMORY_MANAGEMENT_SERVICE, artifactMemoryManagementService);
     runtimeLockFactory = new ServerLockFactory();
 
     containerClassLoader = createContainerClassLoader(moduleRepository, getClass().getClassLoader());

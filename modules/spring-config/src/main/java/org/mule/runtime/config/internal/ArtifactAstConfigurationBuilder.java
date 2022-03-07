@@ -50,6 +50,7 @@ import org.mule.runtime.core.internal.context.NullDomainMuleContextLifecycleStra
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
+import org.mule.runtime.internal.memory.management.ArtifactMemoryManagementService;
 import org.mule.runtime.internal.memory.management.DefaultMemoryManagementService;
 
 import java.util.Map;
@@ -202,7 +203,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                          resolveComponentModelInitializer(),
                                          runtimeLockFactory,
                                          resolvedComponentBuildingDefinitionRegistryFactory,
-                                         memoryManagementService,
+                                         new ArtifactMemoryManagementService(memoryManagementService),
                                          featureFlaggingService);
     } else {
       MuleArtifactContext context;
@@ -213,7 +214,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                         errorTypeRepository, errorTypeLocator,
                                         getArtifactProperties(), artifactType,
                                         resolvedComponentBuildingDefinitionRegistryFactory,
-                                        memoryManagementService,
+                                        new ArtifactMemoryManagementService(memoryManagementService),
                                         featureFlaggingService);
       context.initialize();
       return context;

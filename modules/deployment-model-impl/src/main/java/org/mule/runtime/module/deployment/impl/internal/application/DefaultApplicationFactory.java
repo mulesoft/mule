@@ -29,6 +29,7 @@ import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
+import org.mule.runtime.internal.memory.management.ArtifactMemoryManagementService;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
@@ -170,7 +171,8 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
         new DefaultMuleApplication(descriptor, applicationClassLoader, artifactPlugins, domainRepository,
                                    serviceRepository, extensionModelLoaderRepository, descriptor.getArtifactLocation(),
                                    classLoaderRepository, applicationPolicyProvider, getRuntimeLockFactory(),
-                                   getMemoryManagementService(), getArtifactConfigurationProcessor());
+                                   new ArtifactMemoryManagementService(getMemoryManagementService()),
+                                   getArtifactConfigurationProcessor());
 
     applicationPolicyProvider.setApplication(delegate);
     return new ApplicationWrapper(delegate);
