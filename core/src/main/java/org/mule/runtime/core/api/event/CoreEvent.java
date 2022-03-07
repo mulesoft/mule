@@ -173,6 +173,23 @@ public interface CoreEvent extends Serializable, Event {
     Builder clearVariables();
 
     /**
+     * Configures the event's parameters
+     *
+     * @param parameters parameters to be set
+     * @return {@code this} builder
+     * @since 4.5.0
+     */
+    Builder parameters(Map<String, ?> parameters);
+
+    /**
+     * Removes all the parameters
+     *
+     * @return {@code this} builder
+     * @since 4.5.0
+     */
+    Builder clearParameters();
+
+    /**
      * Sets the group correlation information to the produced event.
      *
      * @param groupCorrelation the object containing the group correlation information to set on the produced event

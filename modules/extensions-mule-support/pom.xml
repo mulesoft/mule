@@ -48,6 +48,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-extensions-spring-support</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-dsl-api</artifactId>
         </dependency>
 
@@ -67,6 +72,12 @@
             <!-- provided instead of test so that the test framework doesn't wrongfully assume that this goes in -->
             <!-- the app classpath, this needs to go into the container classloader -->
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-allure</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
@@ -145,15 +156,6 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-dwb-api</artifactId>
             <scope>provided</scope>
-        </dependency>
-
-        <!-- Test Extensions dependencies -->
-        <dependency>
-            <groupId>org.mule.connectors</groupId>
-            <artifactId>mule-objectstore-connector</artifactId>
-            <version>1.1.1</version>
-            <classifier>mule-plugin</classifier>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 

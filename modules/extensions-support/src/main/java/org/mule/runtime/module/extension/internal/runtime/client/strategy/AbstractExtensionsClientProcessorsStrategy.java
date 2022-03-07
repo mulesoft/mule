@@ -11,6 +11,7 @@ import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.findOperation;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
@@ -18,9 +19,6 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.meta.model.util.ExtensionWalker;
-import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -75,7 +73,8 @@ public abstract class AbstractExtensionsClientProcessorsStrategy implements Exte
   protected OperationMessageProcessor createProcessor(String extensionName, String operationName, Optional<String> configName,
                                                       Map<String, ValueResolver> parameters) {
     ExtensionModel extension = findExtension(extensionName);
-    OperationModel operation = findOperation(extension, operationName);
+    OperationModel operation = findOperation(extension, operationName)
+        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("No Operation [" + operationName + "] Found")));
     ConfigurationProvider config = configName.map(this::findConfiguration).orElse(null);
     Map<String, ValueResolver> resolvedParams = parameters;
     try {
@@ -92,25 +91,6 @@ public abstract class AbstractExtensionsClientProcessorsStrategy implements Exte
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not create Operation Message Processor"), e);
     }
-  }
-
-  protected OperationModel findOperation(ExtensionModel extensionModel, String operationName) {
-    Reference<OperationModel> operation = new Reference<>();
-    ExtensionWalker walker = new IdempotentExtensionWalker() {
-
-      @Override
-      protected void onOperation(OperationModel operationModel) {
-        if (operationName.equals(operationModel.getName())) {
-          operation.set(operationModel);
-          stop();
-        }
-      }
-    };
-    walker.walk(extensionModel);
-    if (operation.get() == null) {
-      throw new MuleRuntimeException(createStaticMessage("No Operation [" + operationName + "] Found"));
-    }
-    return operation.get();
   }
 
   protected ConfigurationProvider findConfiguration(String configName) {

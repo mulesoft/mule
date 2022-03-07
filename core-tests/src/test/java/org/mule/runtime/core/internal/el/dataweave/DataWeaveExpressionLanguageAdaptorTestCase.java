@@ -46,6 +46,7 @@ import static org.mule.runtime.api.el.BindingContextUtils.FLOW;
 import static org.mule.runtime.api.el.BindingContextUtils.ITEM_SEQUENCE_INFO;
 import static org.mule.runtime.api.el.BindingContextUtils.MESSAGE;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.api.el.BindingContextUtils.PARAMS;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
@@ -338,6 +339,22 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     assertThat(result.getValue(), is(instanceOf(Map.class)));
     assertThat((Map<String, TypedValue<?>>) result.getValue(), hasEntry(var1, varValue));
     assertThat((Map<String, TypedValue<?>>) result.getValue(), hasEntry(var2, varValue));
+  }
+
+  @Test
+  public void parametersBindings() {
+    CoreEvent event = getEventWithError(empty());
+    String param1 = "params1";
+    String param2 = "params2";
+    when(event.getParameters().keySet()).thenReturn(Sets.newHashSet(param1, param2));
+    TypedValue<?> paramValue = new TypedValue<>(null, OBJECT);
+    when(event.getParameters()).thenReturn(ImmutableMap.<String, TypedValue<?>>builder()
+        .put(param1, paramValue).put(param2, paramValue).build());
+
+    TypedValue<?> result = expressionLanguage.evaluate(PARAMS, event, BindingContext.builder().build());
+    assertThat(result.getValue(), is(instanceOf(Map.class)));
+    assertThat((Map<String, TypedValue<?>>) result.getValue(), hasEntry(param1, paramValue));
+    assertThat((Map<String, TypedValue<?>>) result.getValue(), hasEntry(param2, paramValue));
   }
 
   @Test

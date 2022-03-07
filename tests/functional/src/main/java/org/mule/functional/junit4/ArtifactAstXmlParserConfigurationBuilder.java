@@ -6,17 +6,17 @@
  */
 package org.mule.functional.junit4;
 
+import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
+import static java.lang.Boolean.getBoolean;
+import static java.util.Arrays.asList;
+import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.ast.api.ArtifactType.APPLICATION;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.ast.internal.serialization.ArtifactAstSerializerFactory.JSON;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.config.internal.ConfigurationPropertiesResolverFactory.createConfigurationPropertiesResolver;
-
-import static java.lang.Boolean.getBoolean;
-import static java.util.Arrays.asList;
-import static java.util.Objects.requireNonNull;
-
-import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
+import static org.mule.runtime.module.artifact.activation.api.ArtifactAstUtils.parseAndBuildAppExtensionModel;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -33,10 +33,8 @@ import org.mule.runtime.config.internal.ArtifactAstConfigurationBuilder;
 import org.mule.runtime.config.internal.ComponentBuildingDefinitionRegistryFactoryAware;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
-import org.mule.runtime.dsl.api.ConfigResource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -77,7 +75,7 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
   private ArtifactDeclaration artifactDeclaration;
   private String[] configResources;
 
-  private ArtifactType artifactType = ArtifactType.APPLICATION;
+  private ArtifactType artifactType = APPLICATION;
   private ArtifactContext parentArtifactContext;
 
   private ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory;
@@ -125,9 +123,9 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
     } else if (configResources.length == 0) {
       artifactAst = emptyArtifact();
     } else if (ignoreCaches) {
-      artifactAst = parseArtifactIntoAst(extensions);
+      artifactAst = parseArtifactIntoAst(extensions, muleContext);
     } else {
-      artifactAst = configAstsCache.get(asList(configResources), key -> parseArtifactIntoAst(extensions));
+      artifactAst = configAstsCache.get(asList(configResources), key -> parseArtifactIntoAst(extensions, muleContext));
     }
 
     artifactAstConfigurationBuilder =
@@ -141,33 +139,38 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
     artifactAstConfigurationBuilder.configure(muleContext);
   }
 
-  protected ArtifactAst parseArtifactIntoAst(Set<ExtensionModel> extensions) {
-    XmlParserFactory xmlParserFactory = new XmlParserFactory(disableXmlValidations, extensions, artifactProperties,
+  private AstXmlParser getParser(Set<ExtensionModel> extensions, boolean disableValidations) {
+    XmlParserFactory xmlParserFactory = new XmlParserFactory(disableValidations, extensions, artifactProperties,
                                                              artifactType,
                                                              parentArtifactContext != null
                                                                  ? parentArtifactContext.getArtifactAst()
                                                                  : emptyArtifact());
-    AstXmlParser astXmlParser;
-    if (ignoreCaches) {
-      astXmlParser = xmlParserFactory.createMuleXmlParser();
-    } else {
-      astXmlParser = parsersCache.get(xmlParserFactory);
-    }
 
+    return ignoreCaches
+        ? xmlParserFactory.createMuleXmlParser()
+        : parsersCache.get(xmlParserFactory);
+  }
+
+  protected ArtifactAst parseArtifactIntoAst(Set<ExtensionModel> extensions, MuleContext muleContext) {
     try {
-      ArtifactAst parsedAst = astXmlParser.parse(loadConfigResources(configResources));
+      ArtifactAst ast = parseAndBuildAppExtensionModel(configResources,
+                                                       this::getParser,
+                                                       extensions,
+                                                       artifactType,
+                                                       disableXmlValidations,
+                                                       muleContext);
 
       if (getBoolean(SERIALIZE_DESERIALIZE_AST_PROPERTY)) {
-        return seralizeAndDeserialize(parsedAst);
+        return serializeAndDeserialize(ast);
       } else {
-        return parsedAst;
+        return ast;
       }
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
   }
 
-  private ArtifactAst seralizeAndDeserialize(ArtifactAst artifactAst) throws IOException {
+  private ArtifactAst serializeAndDeserialize(ArtifactAst artifactAst) throws IOException {
     ArtifactAstSerializer jsonArtifactAstSerializer = new ArtifactAstSerializerProvider().getSerializer(JSON, "1.0");
     InputStream inputStream = jsonArtifactAstSerializer.serialize(artifactAst);
     ArtifactAstDeserializer defaultArtifactAstDeserializer = new ArtifactAstSerializerProvider().getDeserializer();
@@ -195,18 +198,6 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
         return org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
       default:
         return null;
-    }
-  }
-
-  private ConfigResource[] loadConfigResources(String[] configs) throws ConfigurationException {
-    try {
-      ConfigResource[] artifactConfigResources = new ConfigResource[configs.length];
-      for (int i = 0; i < configs.length; i++) {
-        artifactConfigResources[i] = new ConfigResource(configs[i]);
-      }
-      return artifactConfigResources;
-    } catch (IOException e) {
-      throw new ConfigurationException(e);
     }
   }
 

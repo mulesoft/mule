@@ -6,10 +6,17 @@
  */
 package org.mule.runtime.config.internal.context;
 
+import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
+import static java.util.Comparator.comparing;
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.ast.api.util.AstTraversalDirection.BOTTOM_UP;
@@ -35,27 +42,11 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.getOptionalLoaderById;
 import static org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider.CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
-import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_ARTIFACT_AST_PROPERTY_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSION_NAME_PROPERTY_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_LOADER_ID;
-import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_TYPE_LOADER_PROPERTY_NAME;
-import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
-import static org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader.VERSION;
+import static org.mule.runtime.module.artifact.activation.api.ArtifactAstUtils.parseArtifactExtensionModel;
 import static org.mule.runtime.module.extension.internal.manager.ExtensionErrorsRegistrant.registerErrorMappings;
-
-import static java.lang.String.format;
-import static java.lang.System.lineSeparator;
-import static java.util.Comparator.comparing;
-import static java.util.Objects.requireNonNull;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
@@ -113,7 +104,6 @@ import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
 import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.config.internal.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
@@ -121,7 +111,6 @@ import org.mule.runtime.core.api.context.notification.MuleContextNotificationLis
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.api.transformer.Converter;
-import org.mule.runtime.core.api.type.catalog.ApplicationTypeLoader;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
@@ -131,7 +120,6 @@ import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
 import org.mule.runtime.core.internal.util.DefaultResourceLocator;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
-import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.CompositeArtifactExtensionManager;
 
 import java.io.IOException;
@@ -146,7 +134,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
-
 import org.slf4j.Logger;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -331,42 +318,38 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       return;
     }
 
-    Optional<ArtifactCoordinates> artifactCoordinates = muleContext.getConfiguration().getArtifactCoordinates();
+    final String appName = muleContext.getConfiguration().getId();
 
-    if (!artifactCoordinates.isPresent()) {
-      logModelNotGenerated("No version specified on muleContext");
+    if (extensionManager.getExtension(appName).isPresent()) {
+      logModelNotGenerated("ExtensionModel already registered");
       return;
     }
 
-    Optional<ExtensionModelLoader> loader = getMuleExtensionLoader();
-    if (loader.isPresent()) {
-      ExtensionModel appExtensionModel = loader.get()
-          .loadExtensionModel(builder(getRegionClassLoader(), getDefault(extensionManager.getExtensions()))
-              .addParameter(VERSION, artifactCoordinates.get().getVersion())
-              .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, applicationModel)
-              .addParameter(MULE_SDK_EXTENSION_NAME_PROPERTY_NAME, muleContext.getConfiguration().getId())
-              .addParameter(MULE_SDK_TYPE_LOADER_PROPERTY_NAME, new ApplicationTypeLoader())
-              .build());
-
+    fetchOrGenerateApplicationExtensionModel(appName).ifPresent(appExtensionModel -> {
       ExtensionManager appManager = extensionManager instanceof CompositeArtifactExtensionManager
           ? ((CompositeArtifactExtensionManager) extensionManager).getChildExtensionManager()
           : extensionManager;
 
       appManager.registerExtension(appExtensionModel);
-    } else {
-      logModelNotGenerated("Mule ExtensionModelLoader not found");
-      return;
+    });
+  }
+
+  private Optional<ExtensionModel> fetchOrGenerateApplicationExtensionModel(String appName) {
+    Optional<ExtensionModel> appExtensionModel = applicationModel.dependencies().stream()
+        .filter(em -> em.getName().equals(appName))
+        .findFirst();
+
+    if (appExtensionModel.isPresent()) {
+      return appExtensionModel;
     }
+
+    return parseArtifactExtensionModel(applicationModel, getRegionClassLoader(), muleContext);
   }
 
   private void logModelNotGenerated(String reason) {
     if (LOGGER.isWarnEnabled()) {
       LOGGER.warn(reason + ". ExtensionModel for app {} not generated", muleContext.getConfiguration().getId());
     }
-  }
-
-  private Optional<ExtensionModelLoader> getMuleExtensionLoader() {
-    return getOptionalLoaderById(getClass().getClassLoader(), MULE_SDK_LOADER_ID);
   }
 
   protected void registerErrors(final ArtifactAst artifactAst) {

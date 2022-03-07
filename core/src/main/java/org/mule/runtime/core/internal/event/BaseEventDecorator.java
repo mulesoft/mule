@@ -118,6 +118,11 @@ abstract class BaseEventDecorator implements InternalEvent, DeserializationPostI
   }
 
   @Override
+  public Map<String, TypedValue<?>> getParameters() {
+    return event.getParameters();
+  }
+
+  @Override
   public Optional<Map<String, String>> getLoggingVariables() {
     return event.getLoggingVariables();
   }

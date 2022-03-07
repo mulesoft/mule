@@ -58,7 +58,7 @@ public interface InternalEvent extends PrivilegedEvent {
    * Sets context related to the source-flow dispatch
    *
    * @return a {@link FlowProcessMediatorContext} with state from source-flow dispatch
-   * @param context an {@link FlowProcessMediatorContext}
+   * @param flowProcessMediatorContext an {@link FlowProcessMediatorContext}
    * @since 4.4, 4.3.1
    */
   void setFlowProcessMediatorContext(FlowProcessMediatorContext flowProcessMediatorContext);
@@ -140,7 +140,7 @@ public interface InternalEvent extends PrivilegedEvent {
   }
 
   @NoImplement
-  public interface Builder extends PrivilegedEvent.Builder {
+  interface Builder extends PrivilegedEvent.Builder {
 
     /**
      * Set a map of parameters to be internal by the runtime to pass information within the context of an event
