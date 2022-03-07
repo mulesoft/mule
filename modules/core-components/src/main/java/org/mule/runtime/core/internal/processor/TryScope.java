@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.errorInvokingMe
 import static org.mule.runtime.core.api.exception.TransactionCheckProcessor.COMMIT_TX;
 import static org.mule.runtime.core.api.exception.TransactionCheckProcessor.CONTINUE_WITH_TX;
 import static org.mule.runtime.core.api.exception.TransactionCheckProcessor.LAST_TRANSACTION_STATE;
+import static org.mule.runtime.core.api.exception.TransactionCheckProcessor.START_TX;
 import static org.mule.runtime.core.api.exception.TransactionCheckProcessor.TRANSACTION_CHECK_ENABLED;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createScopeTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -98,8 +99,11 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
               Transaction previousTx = getCurrentTx();
               try {
                 sink.next(executionTemplate.execute(() -> {
+                  CoreEvent eventWithCheck =
+                      withTransactionCheckIfNeeded(event, txPrevoiuslyActive ? CONTINUE_WITH_TX : START_TX);
                   handlePreviousTransaction(txPrevoiuslyActive, previousTx, getCurrentTx());
-                  return withTransactionCheckIfNeeded(processBlocking(ctx, event));
+                  return withTransactionCheckIfNeeded(processBlocking(ctx, eventWithCheck),
+                                                      txPrevoiuslyActive ? CONTINUE_WITH_TX : COMMIT_TX);
                 }));
               } catch (Exception e) {
                 final Throwable unwrapped = unwrap(e);
@@ -114,11 +118,11 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
 
   }
 
-  private CoreEvent withTransactionCheckIfNeeded(CoreEvent event) {
+  private CoreEvent withTransactionCheckIfNeeded(CoreEvent event, String state) {
     if (!TRANSACTION_CHECK_ENABLED) {
       return event;
     }
-    return CoreEvent.builder(event).addVariable(LAST_TRANSACTION_STATE, COMMIT_TX).build();
+    return CoreEvent.builder(event).addVariable(LAST_TRANSACTION_STATE, state).build();
   }
 
   private Publisher<CoreEvent> withTransactionCheckIfNeeded(Flux<CoreEvent> publisher) {

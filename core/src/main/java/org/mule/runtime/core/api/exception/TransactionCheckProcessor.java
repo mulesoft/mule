@@ -26,6 +26,7 @@ public class TransactionCheckProcessor implements Processor {
   public static final String TRANSACTION_STATES_VARIABLE = "__transaction_states";
   public static final String LAST_TRANSACTION_STATE = "__last_tx_finish_state";
   public static final String ROLLBACK_TX = "rollback";
+  public static final String START_TX = "start";
   public static final String CONTINUE_WITH_TX = "continue";
   public static final String COMMIT_TX = "commit";
 
@@ -34,7 +35,7 @@ public class TransactionCheckProcessor implements Processor {
   public CoreEvent process(CoreEvent event) throws MuleException {
     Map<String, TypedValue<?>> variables = event.getVariables();
     ArrayList<TransactionState> states;
-    if (variables.containsKey(TRANSACTION_STATES_VARIABLE)) {
+    if (variables.containsKey(TRANSACTION_STATES_VARIABLE) && variables.get(TRANSACTION_STATES_VARIABLE).getValue() != null) {
       states = (ArrayList<TransactionState>) variables.get(TRANSACTION_STATES_VARIABLE).getValue();
     } else {
       states = new ArrayList<>();
@@ -44,7 +45,7 @@ public class TransactionCheckProcessor implements Processor {
     String lastState = null;
     if (variables.containsKey(LAST_TRANSACTION_STATE)) {
       lastState = variables.get(LAST_TRANSACTION_STATE).getValue().toString();
-      if (!lastState.equals("continue")) {
+      if (!lastState.equals(CONTINUE_WITH_TX)) {
         event = CoreEvent.builder(event).removeVariable(LAST_TRANSACTION_STATE).build();
       }
     }
@@ -55,8 +56,8 @@ public class TransactionCheckProcessor implements Processor {
 
   public static class TransactionState {
 
-    public final boolean isActive;
-    public final String lastState;
+    public boolean isActive;
+    public String lastState;
 
     public TransactionState(boolean active, String lastState) {
       this.isActive = active;
