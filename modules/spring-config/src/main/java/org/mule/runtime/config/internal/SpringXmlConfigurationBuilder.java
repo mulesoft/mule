@@ -69,6 +69,7 @@ import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.dsl.api.ConfigResource;
+import org.mule.runtime.internal.memory.management.ArtifactMemoryManagementService;
 import org.mule.runtime.internal.memory.management.DefaultMemoryManagementService;
 
 import java.util.List;
@@ -287,7 +288,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                         resolveComponentModelInitializer(),
                                                         runtimeLockFactory,
                                                         componentBuildingDefinitionRegistryFactory,
-                                                        memoryManagementService,
+                                                        new ArtifactMemoryManagementService(memoryManagementService),
                                                         featureFlaggingService);
     } else {
       muleArtifactContext = new MuleArtifactContext(muleContext, artifactAst,
@@ -297,7 +298,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                     errorTypeRepository, errorTypeLocator,
                                                     getArtifactProperties(), artifactType,
                                                     componentBuildingDefinitionRegistryFactory,
-                                                    memoryManagementService,
+                                                    new ArtifactMemoryManagementService(memoryManagementService),
                                                     featureFlaggingService);
       muleArtifactContext.initialize();
     }
