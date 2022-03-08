@@ -10,6 +10,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_BYTE_BUDDY_OBJECT_CREATION_PROPERTY;
 
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
@@ -21,6 +22,7 @@ import org.mockito.junit.MockitoRule;
 import org.mule.runtime.dsl.api.component.ObjectTypeProvider;
 import org.mule.tck.junit4.rule.SystemProperty;
 
+@Issue("W-10672687")
 public class ObjectFactoryClassRepositoryTestCase {
 
   @Rule

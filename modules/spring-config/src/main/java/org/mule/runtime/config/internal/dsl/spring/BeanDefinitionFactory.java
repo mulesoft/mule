@@ -142,11 +142,11 @@ public class BeanDefinitionFactory {
                                boolean disableTrimWhitespaces, boolean disablePojoCdataTrimWhitespaces, boolean enableByteBuddy) {
     this.artifactId = artifactId;
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
+    this.enableByteBuddy = enableByteBuddy;
     this.componentProcessor = buildComponentProcessorChainOfResponsability(disableTrimWhitespaces);
     this.dslParamGroupProcessor = buildDslParamGroupChainOfResponsability(disableTrimWhitespaces);
     this.paramProcessor = buildParamChainOfResponsability(disableTrimWhitespaces, disablePojoCdataTrimWhitespaces);
     this.ignoredMuleExtensionComponentIdentifiers = new HashSet<>();
-    this.enableByteBuddy = enableByteBuddy;
 
     registerConfigurationPropertyProviders();
   }
