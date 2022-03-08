@@ -25,8 +25,8 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 class CommonParamBeanDefinitionCreator extends CommonBeanBaseDefinitionCreator<CreateParamBeanDefinitionRequest> {
 
   public CommonParamBeanDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository,
-                                          boolean disableTrimWhitespaces) {
-    super(objectFactoryClassRepository, disableTrimWhitespaces);
+                                          boolean disableTrimWhitespaces, boolean enableByteBuddy) {
+    super(objectFactoryClassRepository, disableTrimWhitespaces, enableByteBuddy);
   }
 
   @Override

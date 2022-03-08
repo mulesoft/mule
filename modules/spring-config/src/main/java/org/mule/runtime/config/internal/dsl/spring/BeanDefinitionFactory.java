@@ -51,6 +51,7 @@ import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -130,6 +131,7 @@ public class BeanDefinitionFactory {
   private final BeanDefinitionCreator<CreateDslParamGroupBeanDefinitionRequest> dslParamGroupProcessor;
   private final BeanDefinitionCreator<CreateParamBeanDefinitionRequest> paramProcessor;
   private final ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
+  private final boolean enableByteBuddy;
 
   /**
    * @param componentBuildingDefinitionRegistry a registry with all the known {@code ComponentBuildingDefinition}s by the
@@ -137,13 +139,14 @@ public class BeanDefinitionFactory {
    * @param errorTypeRepository
    */
   public BeanDefinitionFactory(String artifactId, ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry,
-                               boolean disableTrimWhitespaces, boolean disablePojoCdataTrimWhitespaces) {
+                               boolean disableTrimWhitespaces, boolean disablePojoCdataTrimWhitespaces, boolean enableByteBuddy) {
     this.artifactId = artifactId;
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.componentProcessor = buildComponentProcessorChainOfResponsability(disableTrimWhitespaces);
     this.dslParamGroupProcessor = buildDslParamGroupChainOfResponsability(disableTrimWhitespaces);
     this.paramProcessor = buildParamChainOfResponsability(disableTrimWhitespaces, disablePojoCdataTrimWhitespaces);
     this.ignoredMuleExtensionComponentIdentifiers = new HashSet<>();
+    this.enableByteBuddy = enableByteBuddy;
 
     registerConfigurationPropertyProviders();
   }
@@ -669,7 +672,7 @@ public class BeanDefinitionFactory {
     SimpleTypeBeanComponentDefinitionCreator simpleTypeBeanDefinitionCreator = new SimpleTypeBeanComponentDefinitionCreator();
     MapEntryBeanDefinitionCreator mapEntryBeanDefinitionCreator = new MapEntryBeanDefinitionCreator();
     CommonComponentBeanDefinitionCreator commonComponentModelProcessor =
-        new CommonComponentBeanDefinitionCreator(objectFactoryClassRepository, disableTrimWhitespaces);
+        new CommonComponentBeanDefinitionCreator(objectFactoryClassRepository, disableTrimWhitespaces, enableByteBuddy);
 
     eagerObjectCreator.setNext(objectBeanDefinitionCreator);
     objectBeanDefinitionCreator.setNext(simpleTypeBeanDefinitionCreator);
@@ -680,7 +683,7 @@ public class BeanDefinitionFactory {
   }
 
   private BeanDefinitionCreator<CreateDslParamGroupBeanDefinitionRequest> buildDslParamGroupChainOfResponsability(boolean disableTrimWhitespaces) {
-    return new CommonDslParamGroupBeanDefinitionCreator(objectFactoryClassRepository, disableTrimWhitespaces);
+    return new CommonDslParamGroupBeanDefinitionCreator(objectFactoryClassRepository, disableTrimWhitespaces, enableByteBuddy);
   }
 
   private BeanDefinitionCreator<CreateParamBeanDefinitionRequest> buildParamChainOfResponsability(boolean disableTrimWhitespaces,
@@ -690,7 +693,7 @@ public class BeanDefinitionFactory {
     CollectionBeanDefinitionCreator collectionBeanDefinitionCreator = new CollectionBeanDefinitionCreator();
     MapBeanDefinitionCreator mapBeanDefinitionCreator = new MapBeanDefinitionCreator();
     CommonParamBeanDefinitionCreator commonComponentModelProcessor =
-        new CommonParamBeanDefinitionCreator(objectFactoryClassRepository, disableTrimWhitespaces);
+        new CommonParamBeanDefinitionCreator(objectFactoryClassRepository, disableTrimWhitespaces, enableByteBuddy);
 
     simpleTypeBeanDefinitionCreator.setNext(collectionBeanDefinitionCreator);
     collectionBeanDefinitionCreator.setNext(mapBeanDefinitionCreator);

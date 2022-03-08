@@ -9,7 +9,6 @@ package org.mule.runtime.config.internal.dsl.spring;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_BYTE_BUDDY_OBJECT_CREATION;
 import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.maskPasswords;
 
 import static java.util.stream.Collectors.toMap;
@@ -19,7 +18,6 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
@@ -30,7 +28,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -44,14 +41,13 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
 
   private final ObjectFactoryClassRepository objectFactoryClassRepository;
   private final boolean disableTrimWhitespaces;
-
-  @Inject
-  private FeatureFlaggingService featureFlaggingService;
+  private final boolean enableByteBuddy;
 
   public CommonBeanBaseDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository,
-                                         boolean disableTrimWhitespaces) {
+                                         boolean disableTrimWhitespaces, boolean enableByteBuddy) {
     this.objectFactoryClassRepository = objectFactoryClassRepository;
     this.disableTrimWhitespaces = disableTrimWhitespaces;
+    this.enableByteBuddy = enableByteBuddy;
   }
 
   @Override
@@ -126,9 +122,10 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
                                                                              final ComponentBuildingDefinition componentBuildingDefinition) {
     Class<?> objectFactoryType = componentBuildingDefinition.getObjectFactoryType();
 
-    if (!featureFlaggingService.isEnabled(ENABLE_BYTE_BUDDY_OBJECT_CREATION)) {
+    if (!enableByteBuddy) {
       return rootBeanDefinition(objectFactoryClassRepository
-          .getObjectFactoryDynamicClass(componentBuildingDefinition, objectFactoryType, componentModel.getType(),
+          .getObjectFactoryDynamicClass(componentBuildingDefinition,
+                                        objectFactoryType, componentModel.getType(),
                                         new LazyValue<>(() -> componentModel.getBeanDefinition().isLazyInit())));
     }
 
