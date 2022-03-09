@@ -38,7 +38,6 @@ import org.mule.expression.transformers.ExpressionArgument;
 import org.mule.expression.transformers.ExpressionTransformer;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.processor.AbstractInterceptingMessageProcessorBase;
 import org.mule.processor.ResponseMessageProcessorAdapter;
 import org.mule.routing.ChoiceRouter;
 import org.mule.util.StringUtils;
