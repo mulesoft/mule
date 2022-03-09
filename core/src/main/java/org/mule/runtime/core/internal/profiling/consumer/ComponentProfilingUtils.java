@@ -14,6 +14,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshot;
 import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.api.profiling.type.context.ByteBufferProviderEventContext;
 import org.mule.runtime.api.profiling.type.context.ComponentProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
@@ -39,6 +40,8 @@ public class ComponentProfilingUtils {
   public static final String WAITED_TIME_KEY = "waitedTimeMillis";
   public static final String CPU_TIME_KEY = "cpuTimeNanos";
   public static final String TASK_ID_KEY = "taskId";
+  public static final String BYTE_BUFFER_PROVIDER_NAME = "BYTE_BUFFER_PROVIDER_NAME";
+  public static final String BYTES_SIZE = "BYTES_SIZE";
 
   private ComponentProfilingUtils() {}
 
@@ -56,6 +59,16 @@ public class ComponentProfilingUtils {
     addComponentData(profilingEventType, profilingEventContext, eventMap);
     addThreadingData(profilingEventContext, eventMap);
     return eventMap;
+  }
+
+  public static Map<String, String> getByteBufferProfilingInfo(ProfilingEventType<ByteBufferProviderEventContext> profilingEventType,
+                                                               ByteBufferProviderEventContext profilingEventContext) {
+    Map<String, String> profilingDataMap = new HashMap<>();
+    ComponentProfilingUtils.addProfilingEventTypeData(profilingEventType, profilingDataMap);
+    profilingDataMap.put(BYTE_BUFFER_PROVIDER_NAME, profilingEventContext.getByteBufferProviderName());
+    profilingDataMap.put(BYTES_SIZE, String.valueOf(profilingEventContext.size()));
+    profilingDataMap.put(PROFILING_EVENT_TIMESTAMP_KEY, valueOf(profilingEventContext.getTriggerTimestamp()));
+    return profilingDataMap;
   }
 
   public static Map<String, String> getTaskSchedulingInfoMap(ProfilingEventType<TaskSchedulingProfilingEventContext> profilingEventType,
@@ -101,7 +114,7 @@ public class ComponentProfilingUtils {
     profilingEventContext.getLocation().ifPresent(loc -> addLocationData(eventMap, loc));
   }
 
-  private static void addProfilingEventTypeData(ProfilingEventType<?> profilingEventType, Map<String, String> eventMap) {
+  public static void addProfilingEventTypeData(ProfilingEventType<?> profilingEventType, Map<String, String> eventMap) {
     eventMap.put(PROFILING_EVENT_TYPE, format("%s:%s", profilingEventType.getProfilingEventTypeNamespace(),
                                               profilingEventType.getProfilingEventTypeIdentifier()));
   }

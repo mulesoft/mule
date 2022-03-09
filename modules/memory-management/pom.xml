@@ -24,6 +24,10 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-profiling-api</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

@@ -8,8 +8,15 @@ package org.mule.runtime.internal.memory.bytebuffer;
 
 import static java.lang.String.format;
 import static java.util.Arrays.fill;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.MEMORY_BYTE_BUFFER_ALLOCATION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.MEMORY_BYTE_BUFFER_DEALLOCATION;
 
 import org.mule.runtime.api.memory.provider.ByteBufferProvider;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.type.context.ByteBufferProviderEventContext;
+import org.mule.runtime.internal.memory.bytebuffer.profiling.ContainerProfilingScope;
+import org.mule.runtime.internal.memory.bytebuffer.profiling.DefaultByteBufferProviderEventContext;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -29,12 +36,20 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
   protected final int maxBufferSize;
 
   private final ByteBufferPool<ByteBuffer>[] pools;
+  private final String name;
+  ProfilingDataProducer<ByteBufferProviderEventContext, Object> allocationDataProducer;
+  ProfilingDataProducer<ByteBufferProviderEventContext, Object> deallocationDataProducer;
 
-  protected ThreadPoolBasedByteBufferProvider() {
-    this(DEFAULT_MAX_BUFFER_SIZE, DEFAULT_BASE_BYTE_BUFFER_SIZE, DEFAULT_GROWTH_FACTOR, DEFAULT_NUMBER_OF_FIX_SIZED_POOLS);
+  protected ThreadPoolBasedByteBufferProvider(String name, ProfilingService profilingService) {
+    this(name, DEFAULT_MAX_BUFFER_SIZE, DEFAULT_BASE_BYTE_BUFFER_SIZE, DEFAULT_GROWTH_FACTOR, DEFAULT_NUMBER_OF_FIX_SIZED_POOLS,
+         profilingService);
   }
 
-  protected ThreadPoolBasedByteBufferProvider(int maxBufferSize, int baseByteBufferSize, int growthFactor, int numberOfPools) {
+  protected ThreadPoolBasedByteBufferProvider(String name, int maxBufferSize, int baseByteBufferSize, int growthFactor,
+                                              int numberOfPools,
+                                              ProfilingService profilingService) {
+
+    this.name = name;
 
     if (maxBufferSize <= 0) {
       throw new IllegalArgumentException("maxBufferSize must be greater than zero");
@@ -59,6 +74,10 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
       pools[i] = new ThreadLocalByteBufferWrapper(bufferSize);
     }
 
+    allocationDataProducer =
+        profilingService.getProfilingDataProducer(MEMORY_BYTE_BUFFER_ALLOCATION, new ContainerProfilingScope());
+    deallocationDataProducer =
+        profilingService.getProfilingDataProducer(MEMORY_BYTE_BUFFER_DEALLOCATION, new ContainerProfilingScope());
     pools[numberOfPools] = new ThreadLocalByteBufferWrapper(maxBufferSize);
   }
 
@@ -70,6 +89,8 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
 
   @Override
   public ByteBuffer allocate(int size) {
+    allocationDataProducer
+        .triggerProfilingEvent(new DefaultByteBufferProviderEventContext(name, System.currentTimeMillis(), size));
     return this.allocateByteBuffer(size);
   }
 
@@ -176,6 +197,8 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
 
   @Override
   public void release(ByteBuffer byteBuffer) {
+    deallocationDataProducer
+        .triggerProfilingEvent(new DefaultByteBufferProviderEventContext(name, System.currentTimeMillis(), byteBuffer.limit()));
     ByteBufferPool<ByteBuffer> memoryPool = getByteBufferThreadLocalPool(byteBuffer.limit());
     if (memoryPool != null) {
       memoryPool.release((ByteBuffer) byteBuffer.clear());

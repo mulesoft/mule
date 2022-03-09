@@ -155,6 +155,7 @@ public class MuleProperties {
   public static final String OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER = "_muleMessageProcessingManager";
   public static final String OBJECT_PROCESSING_TIME_WATCHER = "_muleProcessingTimeWatcher";
   public static final String MULE_MEMORY_MANAGEMENT_SERVICE = "_muleMemoryManagementService";
+  public static final String MULE_CONTAINER_FEATURE_MANAGEMENT_SERVICE = "_muleContainerFeatureManagementService";
 
   /**
    * Registry key for {@link DefaultConnectivityTesterFactory}
@@ -233,6 +234,7 @@ public class MuleProperties {
   public static final String OBJECT_RESOURCE_LOCATOR = "_muleResourceLocator";
   public static final String COMPATIBILITY_PLUGIN_INSTALLED = "_compatibilityPluginInstalled";
   public static final String MULE_PROFILING_SERVICE_KEY = "_muleProfilingService";
+  public static final String SERVER_NOTIFICATION_MANAGER = "_serverNotificationManager";
 
   // Not currently used as these need to be instance variables of the MuleContext.
   public static final String OBJECT_NOTIFICATION_MANAGER = "_muleNotificationManager";

@@ -29,6 +29,7 @@ import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInte
 import org.mule.runtime.core.internal.profiling.notification.ProfilingNotification;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,6 +41,9 @@ import javax.inject.Inject;
  * @since 4.4
  */
 public abstract class AbstractProfilingService implements CoreProfilingService, Initialisable, Startable, Stoppable {
+
+
+  private static AtomicBoolean profilingFeaturesSet = new AtomicBoolean(false);
 
   @Inject
   protected ServerNotificationManager notificationManager;
@@ -131,14 +135,17 @@ public abstract class AbstractProfilingService implements CoreProfilingService, 
    * @since 4.4
    */
   public static void configureEnableProfilingService() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(ENABLE_PROFILING_SERVICE,
-                                                featureContext -> featureContext.getArtifactMinMuleVersion()
-                                                    .filter(muleVersion -> muleVersion
-                                                        .atLeast(ENABLE_PROFILING_SERVICE.getEnabledByDefaultSince()))
-                                                    .isPresent());
-    featureFlaggingRegistry.registerFeatureFlag(FORCE_RUNTIME_PROFILING_CONSUMERS_ENABLEMENT,
-                                                featureContext -> false);
+    // TODO: Refactor Feature Flagging Service Initialization
+    if (!profilingFeaturesSet.getAndSet(true)) {
+      FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+      featureFlaggingRegistry.registerFeatureFlag(ENABLE_PROFILING_SERVICE,
+                                                  featureContext -> featureContext.getArtifactMinMuleVersion()
+                                                      .filter(muleVersion -> muleVersion
+                                                          .atLeast(ENABLE_PROFILING_SERVICE.getEnabledByDefaultSince()))
+                                                      .isPresent());
+      featureFlaggingRegistry.registerFeatureFlag(FORCE_RUNTIME_PROFILING_CONSUMERS_ENABLEMENT,
+                                                  featureContext -> false);
+    }
   }
 
 }

@@ -45,7 +45,7 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingNotificationListener;
 import org.mule.runtime.core.internal.profiling.ResettableProfilingDataProducerDelegate;
-import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
+import org.mule.runtime.core.internal.profiling.consumer.LoggerByteBufferAllocationProfilingDataConsumer;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentThreadingDataConsumer;
 import org.mule.runtime.core.internal.profiling.consumer.TaskSchedulingLoggerDataConsumer;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
@@ -135,9 +135,10 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
     assertThat(profilingService.getDiscoveryStrategy(), instanceOf(CompositeProfilingDataConsumerDiscoveryStrategy.class));
     Set<ProfilingDataConsumer<? extends ProfilingEventContext>> profilingDataConsumers =
         profilingService.getDiscoveryStrategy().discover();
-    assertThat(profilingDataConsumers, hasSize(4));
-    assertThat(profilingDataConsumers, hasItem(is(instanceOf(LoggerComponentProcessingStrategyDataConsumer.class))));
+    assertThat(profilingDataConsumers, hasSize(5));
+    assertThat(profilingDataConsumers, hasItem(is(instanceOf(LoggerByteBufferAllocationProfilingDataConsumer.class))));
     assertThat(profilingDataConsumers, hasItem(is(instanceOf(LoggerComponentThreadingDataConsumer.class))));
+    assertThat(profilingDataConsumers, hasItem(is(instanceOf(LoggerByteBufferAllocationProfilingDataConsumer.class))));
     assertThat(profilingDataConsumers, hasItem(is(instanceOf(TaskSchedulingLoggerDataConsumer.class))));
     assertThat(profilingDataConsumers, hasItem(testProfilingDataConsumer));
   }

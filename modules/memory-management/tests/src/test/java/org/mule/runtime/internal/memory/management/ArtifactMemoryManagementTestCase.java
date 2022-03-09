@@ -12,12 +12,14 @@ import static org.mule.test.allure.AllureConstants.MemoryManagement.MemoryManage
 
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.junit.MockitoJUnit.rule;
 
 import org.mule.runtime.api.memory.management.MemoryManagementService;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.internal.memory.bytebuffer.HeapByteBufferProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -37,6 +39,7 @@ public class ArtifactMemoryManagementTestCase extends AbstractMuleTestCase {
 
   public static final String TEST_BYTE_BUFFER = "testByteBuffer";
   public static final String ANOTHER_BYTE_BUFFER = "AnothertestByteBuffer";
+  public static final String BYTE_BUFFER_NAME = "BYTE_BUFFER_NAME";
 
   @Mock
   MemoryManagementService containerMemoryManagementService;
@@ -60,7 +63,8 @@ public class ArtifactMemoryManagementTestCase extends AbstractMuleTestCase {
     MemoryManagementService anotherArtifactMemoryManagementService =
         new ArtifactMemoryManagementService(containerMemoryManagementService);
 
-    when(containerMemoryManagementService.getByteBufferProvider(any(), any())).thenReturn(new HeapByteBufferProvider());
+    when(containerMemoryManagementService.getByteBufferProvider(any(), any())).thenReturn(new HeapByteBufferProvider(
+      BYTE_BUFFER_NAME, mock(ProfilingService.class)));
 
     artifactMemoryManagementService.getByteBufferProvider(TEST_BYTE_BUFFER, HEAP);
     anotherArtifactMemoryManagementService.getByteBufferProvider(ANOTHER_BYTE_BUFFER, HEAP);
