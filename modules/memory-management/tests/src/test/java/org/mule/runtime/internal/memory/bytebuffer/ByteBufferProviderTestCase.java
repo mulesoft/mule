@@ -16,8 +16,10 @@ import static java.util.Arrays.asList;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
 import static org.junit.Assert.assertThat;
 
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.nio.ByteBuffer;
@@ -38,6 +40,10 @@ public class ByteBufferProviderTestCase extends AbstractMuleTestCase {
   private static final int TEST_BASE_BYTE_BUFFER_SIZE = 4;
   private static final int TEST_GROWTH_FACTOR = 2;
   private static final int TEST_NUMBER_OF_POOLS = 4;
+  public static final String TEST_HEAP_BUFFER_PROVIDER = "test-heap-buffer-provider";
+  public static final String TEST_HEAP_BUFFER_PROVIDER1 = "test-heap-buffer-provider";
+  public static final String TEST_DIRECT_BUFFER_PROVIDER = "test-direct-buffer-provider";
+  public static final String TEST_DIRECT_BUFFER_PROVIDER1 = "test-direct-buffer-provider";
 
   private final ThreadPoolBasedByteBufferProvider defaultByteBufferProvider;
   private final ThreadPoolBasedByteBufferProvider customByteBufferProvider;
@@ -54,13 +60,13 @@ public class ByteBufferProviderTestCase extends AbstractMuleTestCase {
   @Parameterized.Parameters(name = "Testing Byte Buffer provider: {0}, {1}")
   public static List<Object[]> parameters() {
     return asList(new Object[][] {
-        {new HeapByteBufferProvider(),
-            new HeapByteBufferProvider(TEST_MAX_BUFFER_SIZE, TEST_BASE_BYTE_BUFFER_SIZE, TEST_GROWTH_FACTOR,
-                                       TEST_NUMBER_OF_POOLS),
+        {new HeapByteBufferProvider(TEST_HEAP_BUFFER_PROVIDER, mock(ProfilingService.class)),
+            new HeapByteBufferProvider(TEST_HEAP_BUFFER_PROVIDER1, TEST_MAX_BUFFER_SIZE, TEST_BASE_BYTE_BUFFER_SIZE, TEST_GROWTH_FACTOR,
+                                       TEST_NUMBER_OF_POOLS, mock(ProfilingService.class)),
             false},
-        {new DirectByteBufferProvider(),
-            new DirectByteBufferProvider(TEST_MAX_BUFFER_SIZE, TEST_BASE_BYTE_BUFFER_SIZE, TEST_GROWTH_FACTOR,
-                                         TEST_NUMBER_OF_POOLS),
+        {new DirectByteBufferProvider(TEST_DIRECT_BUFFER_PROVIDER, mock(ProfilingService.class)),
+            new DirectByteBufferProvider(TEST_DIRECT_BUFFER_PROVIDER1, TEST_MAX_BUFFER_SIZE, TEST_BASE_BYTE_BUFFER_SIZE, TEST_GROWTH_FACTOR,
+                                         TEST_NUMBER_OF_POOLS, mock(ProfilingService.class)),
             true}
     });
   }

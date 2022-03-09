@@ -10,6 +10,8 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.EXTENSION_PROFILING_EVENT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.MEMORY_BYTE_BUFFER_ALLOCATION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.MEMORY_BYTE_BUFFER_DEALLOCATION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_THREAD_RELEASE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
@@ -29,6 +31,7 @@ import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.core.internal.profiling.ByteBufferProviderDataProducerProvider;
 import org.mule.runtime.core.internal.profiling.ComponentThreadingDataProducerProvider;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.ExtensionDataProducerProvider;
@@ -137,6 +140,15 @@ public class ProfilingDataProducerResolver {
 
     profilingDataProducerProviders
         .put(TASK_EXECUTED, new TaskSchedulingDataProducerProvider(profilingService, TASK_EXECUTED, featureFlaggingService));
+
+    profilingDataProducerProviders
+        .put(MEMORY_BYTE_BUFFER_ALLOCATION,
+             new ByteBufferProviderDataProducerProvider(profilingService, MEMORY_BYTE_BUFFER_ALLOCATION, featureFlaggingService));
+
+    profilingDataProducerProviders
+        .put(MEMORY_BYTE_BUFFER_DEALLOCATION,
+             new ByteBufferProviderDataProducerProvider(profilingService, MEMORY_BYTE_BUFFER_DEALLOCATION,
+                                                        featureFlaggingService));
 
   }
 

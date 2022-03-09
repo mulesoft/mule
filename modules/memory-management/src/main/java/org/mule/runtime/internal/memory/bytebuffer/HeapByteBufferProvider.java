@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.internal.memory.bytebuffer;
 
+import org.mule.runtime.api.profiling.ProfilingService;
+
 import java.nio.ByteBuffer;
 
 /**
@@ -18,12 +20,13 @@ import java.nio.ByteBuffer;
  */
 public class HeapByteBufferProvider extends ThreadPoolBasedByteBufferProvider {
 
-  public HeapByteBufferProvider() {
-    super();
+  public HeapByteBufferProvider(String name, ProfilingService profilingService) {
+    super(name, profilingService);
   }
 
-  public HeapByteBufferProvider(int maxSize, int baseByteBufferSize, int growthFactor, int numberOfPools) {
-    super(maxSize, baseByteBufferSize, growthFactor, numberOfPools);
+  public HeapByteBufferProvider(String name, int maxSize, int baseByteBufferSize, int growthFactor, int numberOfPools,
+                                ProfilingService profilingService) {
+    super(name, maxSize, baseByteBufferSize, growthFactor, numberOfPools, profilingService);
   }
 
   @Override

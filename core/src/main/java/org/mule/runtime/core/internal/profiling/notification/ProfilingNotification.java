@@ -10,12 +10,12 @@ package org.mule.runtime.core.internal.profiling.notification;
 import org.mule.runtime.api.notification.AbstractServerNotification;
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
-import org.mule.runtime.api.profiling.type.ComponentThreadingProfilingEventType;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
 
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.EXTENSION_PROFILING_EVENT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.MEMORY_BYTE_BUFFER_ALLOCATION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.MEMORY_BYTE_BUFFER_DEALLOCATION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_THREAD_RELEASE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_OPERATION_EXECUTED;
@@ -50,6 +50,8 @@ public class ProfilingNotification<T extends ProfilingEventContext> extends Abst
   private static final int SCHEDULING_TASK_EXECUTION_EVENT_ID = PROFILING_ACTION_START_RANGE + 13;
   private static final int STARTING_TASK_EXECUTION_EVENT_ID = PROFILING_ACTION_START_RANGE + 14;
   private static final int TASK_EXECUTED_EVENT_ID = PROFILING_ACTION_START_RANGE + 15;
+  private static final int MEMORY_BYTE_BUFFER_ALLOCATION_ID = PROFILING_ACTION_START_RANGE + 16;
+  private static final int MEMORY_BYTE_BUFFER_DEALLOCATION_ID = PROFILING_ACTION_START_RANGE + 17;
 
 
   /**
@@ -88,6 +90,10 @@ public class ProfilingNotification<T extends ProfilingEventContext> extends Abst
                    SCHEDULING_TASK_EXECUTION_EVENT_ID);
     registerAction(getFullyQualifiedProfilingNotificationIdentifier(STARTING_TASK_EXECUTION), STARTING_TASK_EXECUTION_EVENT_ID);
     registerAction(getFullyQualifiedProfilingNotificationIdentifier(TASK_EXECUTED), TASK_EXECUTED_EVENT_ID);
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(MEMORY_BYTE_BUFFER_ALLOCATION),
+                   MEMORY_BYTE_BUFFER_ALLOCATION_ID);
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(MEMORY_BYTE_BUFFER_DEALLOCATION),
+                   MEMORY_BYTE_BUFFER_DEALLOCATION_ID);
   }
 
   private final ProfilingEventType<T> profilingEventType;

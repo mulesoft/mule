@@ -11,6 +11,7 @@ import static org.mule.runtime.api.memory.provider.type.ByteBufferType.DIRECT;
 import org.mule.runtime.api.memory.provider.ByteBufferPoolConfiguration;
 import org.mule.runtime.api.memory.provider.ByteBufferProvider;
 import org.mule.runtime.api.memory.provider.type.ByteBufferType;
+import org.mule.runtime.api.profiling.ProfilingService;
 
 import java.nio.ByteBuffer;
 
@@ -24,6 +25,8 @@ public final class ByteBufferProviderBuilder {
   private final boolean isDirect;
 
   private ByteBufferPoolConfiguration poolConfiguration;
+  private ProfilingService profilingService;
+  private String name;
 
   private ByteBufferProviderBuilder(boolean isDirect) {
     this.isDirect = isDirect;
@@ -36,23 +39,35 @@ public final class ByteBufferProviderBuilder {
   public ByteBufferProvider<ByteBuffer> build() {
     if (isDirect) {
       if (poolConfiguration != null) {
-        return new DirectByteBufferProvider(poolConfiguration.getMaxBufferSize(), poolConfiguration.getBaseByteBufferSize(),
-                                            poolConfiguration.getGrowthFactor(), poolConfiguration.getNumberOfPools());
+        return new DirectByteBufferProvider(name, poolConfiguration.getMaxBufferSize(), poolConfiguration.getBaseByteBufferSize(),
+                                            poolConfiguration.getGrowthFactor(), poolConfiguration.getNumberOfPools(),
+                                            profilingService);
       } else {
-        return new DirectByteBufferProvider();
+        return new DirectByteBufferProvider(name, profilingService);
       }
     } else {
       if (poolConfiguration != null) {
-        return new HeapByteBufferProvider(poolConfiguration.getMaxBufferSize(), poolConfiguration.getBaseByteBufferSize(),
-                                          poolConfiguration.getGrowthFactor(), poolConfiguration.getNumberOfPools());
+        return new HeapByteBufferProvider(name, poolConfiguration.getMaxBufferSize(), poolConfiguration.getBaseByteBufferSize(),
+                                          poolConfiguration.getGrowthFactor(), poolConfiguration.getNumberOfPools(),
+                                          profilingService);
       } else {
-        return new HeapByteBufferProvider();
+        return new HeapByteBufferProvider(name, profilingService);
       }
     }
   }
 
   public ByteBufferProviderBuilder withPoolConfiguration(ByteBufferPoolConfiguration poolConfiguration) {
     this.poolConfiguration = poolConfiguration;
+    return this;
+  }
+
+  public ByteBufferProviderBuilder withProfilingService(ProfilingService profilingService) {
+    this.profilingService = profilingService;
+    return this;
+  }
+
+  public ByteBufferProviderBuilder withName(String name) {
+    this.name = name;
     return this;
   }
 }

@@ -15,22 +15,24 @@ import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.memory.provider.ByteBufferPoolConfiguration;
 import org.mule.runtime.api.memory.provider.ByteBufferProvider;
 import org.mule.runtime.api.memory.provider.type.ByteBufferType;
+import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.internal.memory.profiling.NoOpMemoryProfilingService;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A Default Implementation of {@link MemoryManagementService}
  */
-public class DefaultMemoryManagementService implements MemoryManagementService {
+public class DefaultMemoryManagementService implements ProfiledMemoryManagementService {
 
   public static final String DUPLICATE_BYTE_BUFFER_PROVIDER_NAME = "A ByteBuffer Provider is already registered with name '%s'.";
 
   private static final DefaultMemoryManagementService INSTANCE = new DefaultMemoryManagementService();
 
   private final Map<String, ByteBufferProvider<ByteBuffer>> byteBufferProviders = new HashMap<>();
+  private ProfilingService profilingService = new NoOpMemoryProfilingService();
 
   public static DefaultMemoryManagementService getInstance() {
     return INSTANCE;
@@ -58,6 +60,7 @@ public class DefaultMemoryManagementService implements MemoryManagementService {
 
     return byteBufferProviders.computeIfAbsent(name, n -> buildByteBufferProviderFrom(byteBufferType)
         .withPoolConfiguration(poolConfiguration)
+        .withProfilingService(profilingService)
         .build());
 
   }
@@ -69,6 +72,8 @@ public class DefaultMemoryManagementService implements MemoryManagementService {
     }
 
     return byteBufferProviders.computeIfAbsent(name, n -> buildByteBufferProviderFrom(byteBufferType)
+        .withName(name)
+        .withProfilingService(profilingService)
         .build());
   }
 
@@ -77,4 +82,8 @@ public class DefaultMemoryManagementService implements MemoryManagementService {
     byteBufferProviders.remove(name).dispose();
   }
 
+  @Override
+  public void setProfilingService(ProfilingService profilingService) {
+    this.profilingService = profilingService;
+  }
 }

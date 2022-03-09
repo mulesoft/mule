@@ -95,6 +95,12 @@
             <artifactId>commons-collections</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-memory-management</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
 

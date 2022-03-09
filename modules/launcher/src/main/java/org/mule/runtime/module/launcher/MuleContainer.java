@@ -14,6 +14,8 @@ import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorInShutdown;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorWhileRunning;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
@@ -213,6 +215,8 @@ public class MuleContainer {
     }
 
     artifactResourcesRegistry.getMemoryManagementService().initialise();
+    artifactResourcesRegistry.inject(artifactResourcesRegistry.getContainerProfilingService());
+    initialiseIfNeeded(artifactResourcesRegistry.getContainerProfilingService());
   }
 
   /**
@@ -249,6 +253,8 @@ public class MuleContainer {
       registerShutdownHook();
     }
     try {
+      startIfNeeded(artifactResourcesRegistry.getContainerProfilingService());
+
       doResourceInitialization();
 
       createExecutionMuleFolder();
