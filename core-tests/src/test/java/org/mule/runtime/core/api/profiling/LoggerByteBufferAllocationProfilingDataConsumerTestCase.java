@@ -23,19 +23,6 @@ import static com.google.common.collect.ImmutableSet.of;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.gson.Gson;
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -53,21 +40,31 @@ import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInte
 import org.mule.runtime.internal.memory.bytebuffer.profiling.DefaultByteBufferProviderEventContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.slf4j.Logger;
 
 import java.util.Collection;
 import java.util.Set;
+
+import com.google.gson.Gson;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.slf4j.Logger;
 
 @Feature(PROFILING)
 @Story(DEFAULT_PROFILING_SERVICE)
 @RunWith(Parameterized.class)
 public class LoggerByteBufferAllocationProfilingDataConsumerTestCase extends AbstractMuleContextTestCase {
 
-  public static final String THREAD_NAME = "threadName";
   public static final String ARTIFACT_ID = "artifactId";
-  public static final String ARTIFACT_TYPE = "artifactType";
-  public static final long PROFILING_EVENT_TIMESTAMP = 5678L;
-  public static final String TEST_DATA_CONSUMER = "TEST_DATA_CONSUMER";
   public static final String TEST_BYTE_BUFFER_PROVIDER = "TEST_BYTE_BUFFER_PROVIDER";
 
   @Rule
@@ -79,9 +76,6 @@ public class LoggerByteBufferAllocationProfilingDataConsumerTestCase extends Abs
   @Rule
   public EnableInternalRuntimeProfilers enableInternalRuntimeProfilers =
       new EnableInternalRuntimeProfilers(new TestLoggerByteBufferAllocationProfilingDataConsumer(null));
-
-  @Mock
-  private CoreEvent event;
 
   @Mock
   private ComponentLocation location;
@@ -128,7 +122,7 @@ public class LoggerByteBufferAllocationProfilingDataConsumerTestCase extends Abs
   }
 
   @Test
-  @Description("When a profiling event related to threading is triggered, the data consumers process the data accordingly.")
+  @Description("When a profiling event related to memory is triggered, the data consumers process the data accordingly.")
   public void dataConsumersForThreadingProfilingEventTypesConsumeDataAccordingly() {
     ProfilingDataProducer<ByteBufferProviderEventContext, Object> dataProducer =
         profilingService.getProfilingDataProducer(profilingEventType);
