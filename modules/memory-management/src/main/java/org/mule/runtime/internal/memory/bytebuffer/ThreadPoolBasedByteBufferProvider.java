@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.internal.memory.bytebuffer;
 
-import static java.lang.String.format;
-import static java.util.Arrays.fill;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.MEMORY_BYTE_BUFFER_ALLOCATION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.MEMORY_BYTE_BUFFER_DEALLOCATION;
+
+import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
+import static java.util.Arrays.fill;
 
 import org.mule.runtime.api.memory.provider.ByteBufferProvider;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
@@ -90,7 +92,7 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
   @Override
   public ByteBuffer allocate(int size) {
     allocationDataProducer
-        .triggerProfilingEvent(new DefaultByteBufferProviderEventContext(name, System.currentTimeMillis(), size));
+        .triggerProfilingEvent(new DefaultByteBufferProviderEventContext(name, currentTimeMillis(), size));
     return this.allocateByteBuffer(size);
   }
 
@@ -198,7 +200,7 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
   @Override
   public void release(ByteBuffer byteBuffer) {
     deallocationDataProducer
-        .triggerProfilingEvent(new DefaultByteBufferProviderEventContext(name, System.currentTimeMillis(), byteBuffer.limit()));
+        .triggerProfilingEvent(new DefaultByteBufferProviderEventContext(name, currentTimeMillis(), byteBuffer.limit()));
     ByteBufferPool<ByteBuffer> memoryPool = getByteBufferThreadLocalPool(byteBuffer.limit());
     if (memoryPool != null) {
       memoryPool.release((ByteBuffer) byteBuffer.clear());
