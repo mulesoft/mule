@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.internal.memory.bytebuffer;
 
+import org.mule.runtime.api.profiling.ProfilingService;
+
 import static java.nio.ByteBuffer.allocateDirect;
 
 import java.nio.ByteBuffer;
@@ -20,12 +22,13 @@ import java.nio.ByteBuffer;
  */
 public class DirectByteBufferProvider extends ThreadPoolBasedByteBufferProvider {
 
-  public DirectByteBufferProvider() {
-    super();
+  public DirectByteBufferProvider(String name, ProfilingService profilingService) {
+    super(name, profilingService);
   }
 
-  public DirectByteBufferProvider(int maxSize, int baseByteBufferSize, int growthFactor, int numberOfPools) {
-    super(maxSize, baseByteBufferSize, growthFactor, numberOfPools);
+  public DirectByteBufferProvider(String name, int maxSize, int baseByteBufferSize, int growthFactor, int numberOfPools,
+                                  ProfilingService profilingService) {
+    super(name, maxSize, baseByteBufferSize, growthFactor, numberOfPools, profilingService);
   }
 
   @Override
