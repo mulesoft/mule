@@ -29,6 +29,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.collections.Transformer;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
@@ -48,6 +50,8 @@ import static org.mule.api.config.MuleProperties.MULE_DISABLE_COMPOUND_CORRELATI
 public abstract class AbstractMessageSequenceSplitter extends AbstractInterceptingMessageProcessor
     implements MuleContextAware
 {
+    private static final Log logger = LogFactory.getLog(AbstractMessageSequenceSplitter.class);
+
     protected MuleContext muleContext;
     protected RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
     protected CorrelationMode enableCorrelation = CorrelationMode.IF_NOT_SET;

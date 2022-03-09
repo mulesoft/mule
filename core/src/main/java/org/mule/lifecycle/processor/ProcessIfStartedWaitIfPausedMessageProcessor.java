@@ -6,6 +6,8 @@
  */
 package org.mule.lifecycle.processor;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -16,6 +18,7 @@ import org.mule.service.Pausable;
 
 public class ProcessIfStartedWaitIfPausedMessageProcessor extends ProcessIfStartedMessageProcessor
 {
+    private static final Log logger = LogFactory.getLog(ProcessIfStartedWaitIfPausedMessageProcessor.class);
 
     public ProcessIfStartedWaitIfPausedMessageProcessor(Startable startable, LifecycleState lifecycleState)
     {
