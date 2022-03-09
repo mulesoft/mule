@@ -45,6 +45,8 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections.buffer.BoundedFifoBuffer;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterceptingMessageProcessorBase
     implements RequestReplyRequesterMessageProcessor, FlowConstructAware, Initialisable, Startable, Stoppable, Disposable
@@ -53,6 +55,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     public static final int UNCLAIMED_TIME_TO_LIVE = 60000;
     public static int UNCLAIMED_INTERVAL = 60000;
 
+    private static final Log logger = LogFactory.getLog(AbstractAsyncRequestReplyRequester.class);
 
     public static final String NAME_TEMPLATE = "%s.%s.%s.asyncReplies";
     protected String name;

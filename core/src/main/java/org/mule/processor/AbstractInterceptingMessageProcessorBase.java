@@ -40,7 +40,7 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractA
         implements MessageProcessor, MuleContextAware, MessageProcessorContainer
 {
 
-    protected Log logger = LogFactory.getLog(getClass());
+    private static final Log logger = LogFactory.getLog(AbstractInterceptingMessageProcessorBase.class);
 
     protected ServerNotificationHandler notificationHandler;
     private MessageProcessorExecutionTemplate messageProcessorExecutorWithoutNotifications = MessageProcessorExecutionTemplate.createExceptionTransformerExecutionTemplate();

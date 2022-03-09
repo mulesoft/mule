@@ -6,6 +6,8 @@
  */
 package org.mule.service.processor;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
@@ -30,6 +32,7 @@ import org.mule.transport.NullPayload;
 @Deprecated
 public class ServiceOutboundMessageProcessor extends AbstractInterceptingMessageProcessor
 {
+    private static final Log logger = LogFactory.getLog(ServiceOutboundMessageProcessor.class);
 
     protected Service service;
 
