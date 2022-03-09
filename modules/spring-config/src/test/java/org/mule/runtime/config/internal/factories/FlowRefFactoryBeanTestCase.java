@@ -10,6 +10,10 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_EAGER_INIT;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_PROTOTYPE;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_SINGLETON;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.OBJECT_TYPE_CLASS;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -382,10 +386,10 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
         .getObjectFactoryClass(SubflowMessageProcessorChainFactoryBean.class))
             .addPropertyValue("name", PARSED_DYNAMIC_REFERENCED_FLOW)
             .addPropertyValue("messageProcessors", subFlowProcessorBeanDefinition)
-            .addPropertyValue("isSingleton", !subFlowComponentBuildingDefinition.isPrototype())
-            .addPropertyValue("objectTypeClass", Object.class)
-            .addPropertyValue("isPrototype", subFlowComponentBuildingDefinition.isPrototype())
-            .addPropertyValue("isEagerInit", new LazyValue<>(() -> true))
+            .addPropertyValue(IS_SINGLETON, !subFlowComponentBuildingDefinition.isPrototype())
+            .addPropertyValue(OBJECT_TYPE_CLASS, Object.class)
+            .addPropertyValue(IS_PROTOTYPE, subFlowComponentBuildingDefinition.isPrototype())
+            .addPropertyValue(IS_EAGER_INIT, new LazyValue<>(() -> true))
             .setScope(BeanDefinition.SCOPE_PROTOTYPE)
             .getBeanDefinition();
     beanFactory.registerBeanDefinition(PARSED_DYNAMIC_REFERENCED_FLOW, subFlowBeanDefinition);

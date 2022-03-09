@@ -9,6 +9,10 @@ package org.mule.runtime.config.internal.dsl.spring;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_EAGER_INIT;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_PROTOTYPE;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_SINGLETON;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.OBJECT_TYPE_CLASS;
 import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.maskPasswords;
 
 import static java.util.stream.Collectors.toMap;
@@ -131,10 +135,10 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
 
     return rootBeanDefinition(objectFactoryClassRepository
         .getObjectFactoryClass(objectFactoryType))
-            .addPropertyValue("isSingleton", !componentBuildingDefinition.isPrototype())
-            .addPropertyValue("objectTypeClass", componentModel.getType())
-            .addPropertyValue("isPrototype", componentBuildingDefinition.isPrototype())
-            .addPropertyValue("isEagerInit", new LazyValue<>(() -> !componentModel.getBeanDefinition().isLazyInit()));
+            .addPropertyValue(IS_SINGLETON, !componentBuildingDefinition.isPrototype())
+            .addPropertyValue(OBJECT_TYPE_CLASS, componentModel.getType())
+            .addPropertyValue(IS_PROTOTYPE, componentBuildingDefinition.isPrototype())
+            .addPropertyValue(IS_EAGER_INIT, new LazyValue<>(() -> !componentModel.getBeanDefinition().isLazyInit()));
 
   }
 

@@ -66,10 +66,12 @@ public class ObjectFactoryClassRepository {
       .weakValues()
       .build(cl -> from(ObjectFactoryClassRepository.class.getClassLoader(), cl));
 
-  private static final String IS_SINGLETON = "isSingleton";
-  private static final String OBJECT_TYPE_CLASS = "objectTypeClass";
-  private static final String IS_PROTOTYPE = "isPrototype";
-  private static final String IS_EAGER_INIT = "isEagerInit";
+  public static final String IS_SINGLETON = "isSingleton";
+  public static final String OBJECT_TYPE_CLASS = "objectTypeClass";
+  public static final String IS_PROTOTYPE = "isPrototype";
+  public static final String IS_EAGER_INIT = "isEagerInit";
+  private final ByteBuddy byteBuddy = new ByteBuddy();
+  final IsEagerInitGetterInterceptor interceptor = new IsEagerInitGetterInterceptor();
 
   /**
    * Retrieves a {@link Class} for the {@link ObjectFactory} defined by the {@code objectFactoryType} parameter. Once acquired the
@@ -95,9 +97,7 @@ public class ObjectFactoryClassRepository {
   }
 
   private Class<ObjectFactory> createObjectFactoryDynamicClass(Class objectFactoryType, String name, ClassLoader classLoader) {
-    final IsEagerInitGetterInterceptor interceptor = new IsEagerInitGetterInterceptor();
-
-    return new ByteBuddy()
+    return byteBuddy
         .subclass(objectFactoryType, IMITATE_SUPER_CLASS)
         .name(name)
         // Add fields to set properties.
@@ -160,7 +160,7 @@ public class ObjectFactoryClassRepository {
         (MethodInterceptor) (obj, method, args, proxy) -> {
           final boolean eager = !isLazyInitFunction.get();
 
-          if (method.getName().equals("isSingleton")) {
+          if (method.getName().equals(IS_SINGLETON)) {
             return !prototype;
           }
           if (method.getName().equals("getObjectType") && !ObjectTypeProvider.class.isAssignableFrom(obj.getClass())) {
@@ -169,10 +169,10 @@ public class ObjectFactoryClassRepository {
           if (method.getName().equals("getObject")) {
             return proxy.invokeSuper(obj, args);
           }
-          if (method.getName().equals("isPrototype")) {
+          if (method.getName().equals(IS_PROTOTYPE)) {
             return prototype;
           }
-          if (method.getName().equals("isEagerInit")) {
+          if (method.getName().equals(IS_EAGER_INIT)) {
             return eager;
           }
           return proxy.invokeSuper(obj, args);
@@ -181,7 +181,7 @@ public class ObjectFactoryClassRepository {
     return factoryBeanClass;
   }
 
-  public class IsEagerInitGetterInterceptor implements InvocationHandler {
+  protected static class IsEagerInitGetterInterceptor implements InvocationHandler {
 
     @Override
     @RuntimeType
@@ -190,6 +190,12 @@ public class ObjectFactoryClassRepository {
     }
   }
 
+  /**
+   * This interface is used to implement the getters and setters of the fields added with Byte Buddy. It also extends from
+   * {@link SmartFactoryBean}.
+   *
+   * @since 4.5.0
+   */
   public interface SmartFactoryBeanInterceptor extends SmartFactoryBean {
 
     Boolean getIsSingleton();

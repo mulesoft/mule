@@ -130,6 +130,7 @@ public class BeanDefinitionFactory {
   private final BeanDefinitionCreator<CreateDslParamGroupBeanDefinitionRequest> dslParamGroupProcessor;
   private final BeanDefinitionCreator<CreateParamBeanDefinitionRequest> paramProcessor;
   private final ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
+  // TODO W-10815440 Remove this
   private final boolean enableByteBuddy;
 
   /**
