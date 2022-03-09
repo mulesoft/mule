@@ -146,7 +146,7 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
   @Test
   @Description("The notification listener is correctly set so that the notifications are managed")
   public void correctNotificationListenerSet() {
-    verify(notificationManager, times(4)).addListenerSubscription(any(DefaultProfilingNotificationListener.class), any());
+    verify(notificationManager, times(5)).addListenerSubscription(any(DefaultProfilingNotificationListener.class), any());
   }
 
   @Test
