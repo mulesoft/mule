@@ -24,7 +24,6 @@ import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
@@ -67,6 +66,11 @@ public class ObjectFactoryClassRepository {
       .weakValues()
       .build(cl -> from(ObjectFactoryClassRepository.class.getClassLoader(), cl));
 
+  private static final String IS_SINGLETON = "isSingleton";
+  private static final String OBJECT_TYPE_CLASS = "objectTypeClass";
+  private static final String IS_PROTOTYPE = "isPrototype";
+  private static final String IS_EAGER_INIT = "isEagerInit";
+
   /**
    * Retrieves a {@link Class} for the {@link ObjectFactory} defined by the {@code objectFactoryType} parameter. Once acquired the
    * {@code Class} instance should not be reused for another {@link ComponentBuildingDefinition}.
@@ -92,26 +96,27 @@ public class ObjectFactoryClassRepository {
 
   private Class<ObjectFactory> createObjectFactoryDynamicClass(Class objectFactoryType, String name, ClassLoader classLoader) {
     final IsEagerInitGetterInterceptor interceptor = new IsEagerInitGetterInterceptor();
+
     return new ByteBuddy()
         .subclass(objectFactoryType, IMITATE_SUPER_CLASS)
         .name(name)
         // Add fields to set properties.
-        .defineField("isSingleton", Boolean.class, PRIVATE)
-        .defineField("objectTypeClass", Class.class, PRIVATE)
-        .defineField("isPrototype", Boolean.class, PRIVATE)
-        .defineField("isEagerInit", Supplier.class, PRIVATE)
+        .defineField(IS_SINGLETON, Boolean.class, PRIVATE)
+        .defineField(OBJECT_TYPE_CLASS, Class.class, PRIVATE)
+        .defineField(IS_PROTOTYPE, Boolean.class, PRIVATE)
+        .defineField(IS_EAGER_INIT, Supplier.class, PRIVATE)
         // Implements the SmartFactoryBeanInterceptor interface to add getters and setters for the fields. This interface extends
         // from SmartFactoryBean.
         .implement(SmartFactoryBeanInterceptor.class).intercept(ofBeanProperty())
         // Implements the SmartFactoryBean methods and delegates to the fields.
-        .method(named("isSingleton").and(isDeclaredBy(FactoryBean.class))).intercept(toField("isSingleton"))
+        .method(named(IS_SINGLETON).and(isDeclaredBy(FactoryBean.class))).intercept(toField(IS_SINGLETON))
         .method(named("getObjectType").and(isDeclaredBy(FactoryBean.class)))
         .intercept(ObjectTypeProvider.class.isAssignableFrom(objectFactoryType) ? invokeSuper()
             : invoke(named("getObjectTypeClass")))
-        .method(named("isPrototype").and(isDeclaredBy(SmartFactoryBean.class))).intercept(toField("isPrototype"))
-        .method(named("isEagerInit").and(isDeclaredBy(SmartFactoryBean.class))).intercept(to(interceptor))
+        .method(named(IS_PROTOTYPE).and(isDeclaredBy(SmartFactoryBean.class))).intercept(toField(IS_PROTOTYPE))
+        .method(named(IS_EAGER_INIT).and(isDeclaredBy(SmartFactoryBean.class))).intercept(to(interceptor))
         .method(named("getObject").and(isDeclaredBy(FactoryBean.class))).intercept(invokeSuper())
-        // Create the class and inject in the current classloader
+        // Create the class and inject it in the current classloader
         .make()
         .load(classLoader, INJECTION)
         .getLoaded();

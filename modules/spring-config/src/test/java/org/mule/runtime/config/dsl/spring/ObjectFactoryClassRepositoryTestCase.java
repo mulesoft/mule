@@ -8,6 +8,7 @@ package org.mule.runtime.config.dsl.spring;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.junit.MockitoJUnit.rule;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_BYTE_BUDDY_OBJECT_CREATION_PROPERTY;
 
 import io.qameta.allure.Issue;
@@ -17,7 +18,6 @@ import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mule.runtime.dsl.api.component.ObjectTypeProvider;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -26,7 +26,7 @@ import org.mule.tck.junit4.rule.SystemProperty;
 public class ObjectFactoryClassRepositoryTestCase {
 
   @Rule
-  public MockitoRule rule = MockitoJUnit.rule();
+  public MockitoRule rule = rule();
 
   @Rule
   public SystemProperty enableByteBuddy = new SystemProperty(ENABLE_BYTE_BUDDY_OBJECT_CREATION_PROPERTY, "true");
