@@ -71,7 +71,7 @@ public class ObjectFactoryClassRepository {
   public static final String IS_PROTOTYPE = "isPrototype";
   public static final String IS_EAGER_INIT = "isEagerInit";
   private final ByteBuddy byteBuddy = new ByteBuddy();
-  final IsEagerInitGetterInterceptor interceptor = new IsEagerInitGetterInterceptor();
+  private final IsEagerInitGetterInterceptor interceptor = new IsEagerInitGetterInterceptor();
 
   /**
    * Retrieves a {@link Class} for the {@link ObjectFactory} defined by the {@code objectFactoryType} parameter. Once acquired the
