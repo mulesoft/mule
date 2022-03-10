@@ -217,13 +217,15 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                         getArtifactProperties(), artifactType,
                                                         resolveComponentModelInitializer(),
                                                         runtimeLockFactory,
-                                                        componentBuildingDefinitionRegistryFactory);
+                                                        componentBuildingDefinitionRegistryFactory,
+                                                        featureFlaggingService);
     } else {
       muleArtifactContext = new MuleArtifactContext(muleContext, artifactAst,
                                                     optionalObjectsController,
                                                     resolveParentConfigurationProperties(),
                                                     getArtifactProperties(), artifactType,
-                                                    componentBuildingDefinitionRegistryFactory);
+                                                    componentBuildingDefinitionRegistryFactory,
+                                                    featureFlaggingService);
       muleArtifactContext.initialize();
     }
 

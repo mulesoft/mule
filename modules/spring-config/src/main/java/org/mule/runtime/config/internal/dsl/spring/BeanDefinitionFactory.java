@@ -131,20 +131,23 @@ public class BeanDefinitionFactory {
   private final BeanDefinitionCreator<CreateDslParamGroupBeanDefinitionRequest> dslParamGroupProcessor;
   private final BeanDefinitionCreator<CreateParamBeanDefinitionRequest> paramProcessor;
   private final ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
+  // TODO W-10815440 Remove this
+  private final boolean enableByteBuddy;
 
   /**
    * @param componentBuildingDefinitionRegistry a registry with all the known {@code ComponentBuildingDefinition}s by the
    *                                            artifact.
    * @param errorTypeRepository
    */
-  public BeanDefinitionFactory(String artifactId, ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry) {
+  public BeanDefinitionFactory(String artifactId, ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry,
+                               boolean enableByteBuddy) {
     this.artifactId = artifactId;
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.componentProcessor = buildComponentProcessorChainOfResponsability();
     this.dslParamGroupProcessor = buildDslParamGroupChainOfResponsability();
     this.paramProcessor = buildParamChainOfResponsability();
     this.ignoredMuleExtensionComponentIdentifiers = new HashSet<>();
-
+    this.enableByteBuddy = enableByteBuddy;
     registerConfigurationPropertyProviders();
   }
 
@@ -680,7 +683,7 @@ public class BeanDefinitionFactory {
     SimpleTypeBeanComponentDefinitionCreator simpleTypeBeanDefinitionCreator = new SimpleTypeBeanComponentDefinitionCreator();
     MapEntryBeanDefinitionCreator mapEntryBeanDefinitionCreator = new MapEntryBeanDefinitionCreator();
     CommonComponentBeanDefinitionCreator commonComponentModelProcessor =
-        new CommonComponentBeanDefinitionCreator(objectFactoryClassRepository);
+        new CommonComponentBeanDefinitionCreator(objectFactoryClassRepository, enableByteBuddy);
 
     eagerObjectCreator.setNext(objectBeanDefinitionCreator);
     objectBeanDefinitionCreator.setNext(simpleTypeBeanDefinitionCreator);
@@ -691,7 +694,7 @@ public class BeanDefinitionFactory {
   }
 
   private BeanDefinitionCreator<CreateDslParamGroupBeanDefinitionRequest> buildDslParamGroupChainOfResponsability() {
-    return new CommonDslParamGroupBeanDefinitionCreator(objectFactoryClassRepository);
+    return new CommonDslParamGroupBeanDefinitionCreator(objectFactoryClassRepository, enableByteBuddy);
   }
 
   private BeanDefinitionCreator<CreateParamBeanDefinitionRequest> buildParamChainOfResponsability() {
@@ -699,7 +702,8 @@ public class BeanDefinitionFactory {
     CollectionBeanDefinitionCreator collectionBeanDefinitionCreator = new CollectionBeanDefinitionCreator();
     MapBeanDefinitionCreator mapBeanDefinitionCreator = new MapBeanDefinitionCreator();
     CommonParamBeanDefinitionCreator commonComponentModelProcessor =
-        new CommonParamBeanDefinitionCreator(objectFactoryClassRepository);
+        new CommonParamBeanDefinitionCreator(objectFactoryClassRepository, enableByteBuddy);
+    new CommonParamBeanDefinitionCreator(objectFactoryClassRepository, enableByteBuddy);
 
     simpleTypeBeanDefinitionCreator.setNext(collectionBeanDefinitionCreator);
     collectionBeanDefinitionCreator.setNext(mapBeanDefinitionCreator);

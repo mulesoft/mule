@@ -41,6 +41,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
@@ -69,7 +70,8 @@ import javax.inject.Inject;
 /**
  * Expression language that uses MVEL (http://mvel.codehaus.org/).
  */
-public class MVELExpressionLanguage extends AbstractComponent implements ExtendedExpressionLanguageAdaptor, Initialisable {
+public class MVELExpressionLanguage extends AbstractComponent implements ExtendedExpressionLanguageAdaptor, Initialisable,
+    ConfigurationExtension {
 
   private static final String OBJECT_FOR_ENRICHMENT = "__object_for_enrichment";
 

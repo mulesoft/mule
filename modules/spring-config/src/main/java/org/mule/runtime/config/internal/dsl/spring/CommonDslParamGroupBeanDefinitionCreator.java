@@ -24,8 +24,9 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
  */
 class CommonDslParamGroupBeanDefinitionCreator extends CommonBeanBaseDefinitionCreator<CreateDslParamGroupBeanDefinitionRequest> {
 
-  public CommonDslParamGroupBeanDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository) {
-    super(objectFactoryClassRepository);
+  public CommonDslParamGroupBeanDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository,
+                                                  boolean enableByteBuddy) {
+    super(objectFactoryClassRepository, enableByteBuddy);
   }
 
   @Override

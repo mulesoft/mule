@@ -6,6 +6,25 @@
  */
 package org.mule.runtime.config.internal.factories;
 
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_EAGER_INIT;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_PROTOTYPE;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_SINGLETON;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.OBJECT_TYPE_CLASS;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
+import static org.mule.test.allure.AllureConstants.ComponentsFeature.FlowReferenceStory.FLOW_REFERENCE;
+
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
@@ -33,20 +52,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
-import static org.mule.runtime.api.metadata.DataType.STRING;
-import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
-import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
-import static org.mule.test.allure.AllureConstants.ComponentsFeature.FlowReferenceStory.FLOW_REFERENCE;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
@@ -56,6 +61,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -63,6 +69,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.MuleArtifactContext;
 import org.mule.runtime.config.internal.ObjectProviderAwareBeanFactory;
@@ -368,12 +375,15 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
         .findFirst()
         .get();
     BeanDefinition subFlowBeanDefinition = genericBeanDefinition(new ObjectFactoryClassRepository()
-        .getObjectFactoryClass(subFlowComponentBuildingDefinition, SubflowMessageProcessorChainFactoryBean.class, Object.class,
-                               () -> true))
-                                   .addPropertyValue("name", PARSED_DYNAMIC_REFERENCED_FLOW)
-                                   .addPropertyValue("messageProcessors", subFlowProcessorBeanDefinition)
-                                   .setScope(BeanDefinition.SCOPE_PROTOTYPE)
-                                   .getBeanDefinition();
+        .getObjectFactoryClass(SubflowMessageProcessorChainFactoryBean.class))
+            .addPropertyValue("name", PARSED_DYNAMIC_REFERENCED_FLOW)
+            .addPropertyValue("messageProcessors", subFlowProcessorBeanDefinition)
+            .addPropertyValue(IS_SINGLETON, !subFlowComponentBuildingDefinition.isPrototype())
+            .addPropertyValue(OBJECT_TYPE_CLASS, Object.class)
+            .addPropertyValue(IS_PROTOTYPE, subFlowComponentBuildingDefinition.isPrototype())
+            .addPropertyValue(IS_EAGER_INIT, new LazyValue<>(() -> true))
+            .setScope(BeanDefinition.SCOPE_PROTOTYPE)
+            .getBeanDefinition();
     beanFactory.registerBeanDefinition(PARSED_DYNAMIC_REFERENCED_FLOW, subFlowBeanDefinition);
     // Additional flow and processing strategy (needed to generate a concurrent subflow instantiation)
     Flow concurrentCallerFlow = mock(Flow.class, INITIALIZABLE_MESSAGE_PROCESSOR);
@@ -459,7 +469,8 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     MuleArtifactContext muleArtifactContext =
         new MuleArtifactContext(mockMuleContext, emptyArtifact(),
                                 mock(OptionalObjectsController.class), empty(), emptyMap(), APP,
-                                new DefaultComponentBuildingDefinitionRegistryFactory()) {
+                                new DefaultComponentBuildingDefinitionRegistryFactory(),
+                                mock(FeatureFlaggingService.class)) {
 
           @Override
           protected DefaultListableBeanFactory createBeanFactory() {

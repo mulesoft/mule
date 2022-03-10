@@ -11,6 +11,10 @@ import static javax.xml.namespace.QName.valueOf;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_EAGER_INIT;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_PROTOTYPE;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_SINGLETON;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.OBJECT_TYPE_CLASS;
 import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.maskPasswords;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
@@ -38,9 +42,11 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionRequest> extends BeanDefinitionCreator<R> {
 
   private final ObjectFactoryClassRepository objectFactoryClassRepository;
+  private final boolean enableByteBuddy;
 
-  public CommonBeanBaseDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository) {
+  public CommonBeanBaseDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository, boolean enableByteBuddy) {
     this.objectFactoryClassRepository = objectFactoryClassRepository;
+    this.enableByteBuddy = enableByteBuddy;
   }
 
   @Override
@@ -115,9 +121,20 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
                                                                              final ComponentBuildingDefinition componentBuildingDefinition) {
     Class<?> objectFactoryType = componentBuildingDefinition.getObjectFactoryType();
 
+    if (!enableByteBuddy) {
+      return rootBeanDefinition(objectFactoryClassRepository
+          .getObjectFactoryDynamicClass(componentBuildingDefinition,
+                                        objectFactoryType, componentModel.getType(),
+                                        new LazyValue<>(() -> componentModel.getBeanDefinition().isLazyInit())));
+    }
+
     return rootBeanDefinition(objectFactoryClassRepository
-        .getObjectFactoryClass(componentBuildingDefinition, objectFactoryType, componentModel.getType(),
-                               new LazyValue<>(() -> componentModel.getBeanDefinition().isLazyInit())));
+        .getObjectFactoryClass(objectFactoryType))
+            .addPropertyValue(IS_SINGLETON, !componentBuildingDefinition.isPrototype())
+            .addPropertyValue(OBJECT_TYPE_CLASS, componentModel.getType())
+            .addPropertyValue(IS_PROTOTYPE, componentBuildingDefinition.isPrototype())
+            .addPropertyValue(IS_EAGER_INIT, new LazyValue<>(() -> !componentModel.getBeanDefinition().isLazyInit()));
+
   }
 
   protected abstract void processComponentDefinitionModel(Map<ComponentAst, SpringComponentModel> springComponentModels,
