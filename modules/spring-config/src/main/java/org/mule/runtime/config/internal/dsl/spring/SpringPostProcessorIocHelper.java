@@ -11,6 +11,10 @@ import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.getPropertyValueFromPropertiesComponent;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_EAGER_INIT;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_PROTOTYPE;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_SINGLETON;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.OBJECT_TYPE_CLASS;
 import static org.mule.runtime.config.internal.dsl.spring.PropertyComponentUtils.getPropertyValueFromPropertyComponent;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.PROPERTIES_ELEMENT;
@@ -20,6 +24,7 @@ import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
@@ -43,11 +48,13 @@ class SpringPostProcessorIocHelper implements PostProcessorIocHelper {
 
   private ObjectFactoryClassRepository objectFactoryClassRepository;
   private AbstractBeanDefinition beanDefinition;
+  private final boolean enableByteBuddy;
 
   public SpringPostProcessorIocHelper(ObjectFactoryClassRepository objectFactoryClassRepository,
-                                      AbstractBeanDefinition beanDefinition) {
+                                      AbstractBeanDefinition beanDefinition, boolean enableByteBuddy) {
     this.objectFactoryClassRepository = objectFactoryClassRepository;
     this.beanDefinition = beanDefinition;
+    this.enableByteBuddy = enableByteBuddy;
   }
 
   @Override
@@ -92,8 +99,20 @@ class SpringPostProcessorIocHelper implements PostProcessorIocHelper {
           .withNamespace("helper")
           .withIdentifier(propertyName)
           .build();
-      builder = genericBeanDefinition(objectFactoryClassRepository.getObjectFactoryClass(definition, beanClass, Object.class,
-                                                                                         () -> true, empty()));
+
+      if (!enableByteBuddy) {
+        builder =
+            genericBeanDefinition(objectFactoryClassRepository.getObjectFactoryDynamicClass(definition, beanClass, Object.class,
+                                                                                            () -> true, empty()));
+      } else {
+        builder = rootBeanDefinition(objectFactoryClassRepository
+            .getObjectFactoryClass(beanClass))
+                .addPropertyValue(IS_SINGLETON, !definition.isPrototype())
+                .addPropertyValue(OBJECT_TYPE_CLASS, Object.class)
+                .addPropertyValue(IS_PROTOTYPE, definition.isPrototype())
+                .addPropertyValue(IS_EAGER_INIT, new LazyValue<>(() -> true));
+      }
+
     } else {
       builder = genericBeanDefinition(beanClass);
     }

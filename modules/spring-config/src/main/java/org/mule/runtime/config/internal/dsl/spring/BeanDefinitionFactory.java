@@ -124,6 +124,8 @@ public class BeanDefinitionFactory {
   private final BeanDefinitionCreator componentModelProcessor;
   private final ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
   private final ErrorTypeRepository errorTypeRepository;
+  private final boolean enableByteBuddy;
+
 
   /**
    * @param componentBuildingDefinitionRegistry a registry with all the known {@code ComponentBuildingDefinition}s by the
@@ -131,8 +133,9 @@ public class BeanDefinitionFactory {
    * @param errorTypeRepository
    */
   public BeanDefinitionFactory(String artifactId, ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry,
-                               ErrorTypeRepository errorTypeRepository) {
+                               ErrorTypeRepository errorTypeRepository, boolean enableByteBuddy) {
     this.artifactId = artifactId;
+    this.enableByteBuddy = enableByteBuddy;
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.componentModelProcessor = buildComponentModelProcessorChainOfResponsability();
     this.ignoredMuleExtensionComponentIdentifiers = new HashSet<>();
@@ -380,7 +383,8 @@ public class BeanDefinitionFactory {
     CollectionBeanDefinitionCreator collectionBeanDefinitionCreator = new CollectionBeanDefinitionCreator();
     MapEntryBeanDefinitionCreator mapEntryBeanDefinitionCreator = new MapEntryBeanDefinitionCreator();
     MapBeanDefinitionCreator mapBeanDefinitionCreator = new MapBeanDefinitionCreator();
-    CommonBeanDefinitionCreator commonComponentModelProcessor = new CommonBeanDefinitionCreator(objectFactoryClassRepository);
+    CommonBeanDefinitionCreator commonComponentModelProcessor =
+        new CommonBeanDefinitionCreator(objectFactoryClassRepository, enableByteBuddy);
 
     eagerObjectCreator.setNext(objectBeanDefinitionCreator);
     objectBeanDefinitionCreator.setNext(propertiesMapBeanDefinitionCreator);

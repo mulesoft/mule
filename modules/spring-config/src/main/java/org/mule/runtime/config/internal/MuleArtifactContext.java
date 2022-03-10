@@ -14,6 +14,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_BYTE_BUDDY_OBJECT_CREATION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
@@ -170,6 +171,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private org.mule.runtime.core.internal.registry.Registry originalRegistry;
   private final ExtensionManager extensionManager;
   private final boolean disableXmlValidations;
+  private final FeatureFlaggingService featureFlaggingService;
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -193,12 +195,13 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                              List<ClassLoader> pluginsClassLoaders,
                              Optional<ConfigurationProperties> parentConfigurationProperties,
                              boolean disableXmlValidations,
-                             ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider)
+                             ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider,
+                             FeatureFlaggingService featureFlaggingService)
       throws BeansException {
     this(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController,
          parentConfigurationProperties, artifactProperties,
          artifactType, pluginsClassLoaders, disableXmlValidations,
-         runtimeComponentBuildingDefinitionProvider);
+         runtimeComponentBuildingDefinitionProvider, featureFlaggingService);
   }
 
   public MuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
@@ -206,9 +209,11 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                              Optional<ConfigurationProperties> parentConfigurationProperties,
                              Map<String, String> artifactProperties, ArtifactType artifactType,
                              List<ClassLoader> pluginsClassLoaders, boolean disableXmlValidations,
-                             ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
+                             ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider,
+                             FeatureFlaggingService featureFlaggingService) {
     checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
     this.muleContext = (MuleContextWithRegistry) muleContext;
+    this.featureFlaggingService = featureFlaggingService;
     this.artifactConfigResources = artifactConfigResources;
     this.optionalObjectsController = optionalObjectsController;
     this.artifactProperties = artifactProperties;
@@ -235,7 +240,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     this.beanDefinitionFactory =
         new BeanDefinitionFactory(muleContext.getConfiguration().getId(), componentBuildingDefinitionRegistry,
-                                  muleContext.getErrorTypeRepository());
+                                  muleContext.getErrorTypeRepository(),
+                                  featureFlaggingService.isEnabled(ENABLE_BYTE_BUDDY_OBJECT_CREATION));
 
     this.applicationModel = createApplicationModel(getMuleRegistry()
         .lookupObject(FEATURE_FLAGGING_SERVICE_KEY));

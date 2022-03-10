@@ -70,6 +70,10 @@
             <artifactId>mule-module-extensions-support</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+        </dependency>
 
         <!-- Unit tests -->
         <dependency>
