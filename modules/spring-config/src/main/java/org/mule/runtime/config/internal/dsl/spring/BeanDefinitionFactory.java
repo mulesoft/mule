@@ -143,11 +143,11 @@ public class BeanDefinitionFactory {
                                boolean enableByteBuddy) {
     this.artifactId = artifactId;
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
+    this.enableByteBuddy = enableByteBuddy;
     this.componentProcessor = buildComponentProcessorChainOfResponsability();
     this.dslParamGroupProcessor = buildDslParamGroupChainOfResponsability();
     this.paramProcessor = buildParamChainOfResponsability();
     this.ignoredMuleExtensionComponentIdentifiers = new HashSet<>();
-    this.enableByteBuddy = enableByteBuddy;
     registerConfigurationPropertyProviders();
   }
 
