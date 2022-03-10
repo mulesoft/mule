@@ -7,6 +7,9 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
+import static java.util.Collections.sort;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
@@ -16,6 +19,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
 
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.NamedDeclaration;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.annotation.Configuration;
@@ -40,6 +44,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelF
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * {@link ConfigurationModelParser} for Java based syntax
@@ -95,12 +100,14 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public List<OperationModelParser> getOperationParsers() {
-    return JavaExtensionModelParserUtils.getOperationParsers(
-                                                             extensionModelParser,
-                                                             extensionElement,
-                                                             configElement,
-                                                             loadingContext)
-        .collect(toList());
+    ArrayList<OperationModelParser> operationModelParsers = new ArrayList<>(JavaExtensionModelParserUtils.getOperationParsers(
+                                                                                                                              extensionModelParser,
+                                                                                                                              extensionElement,
+                                                                                                                              configElement,
+                                                                                                                              loadingContext)
+        .collect(toList()));
+    sort(operationModelParsers, comparing(OperationModelParser::getName));
+    return unmodifiableList(operationModelParsers);
   }
 
   @Override
