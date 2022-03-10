@@ -13,6 +13,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_P
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_BYTE_BUDDY_OBJECT_CREATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_ERROR_TYPES_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_EXPRESSION_VALIDATION;
@@ -323,6 +324,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureParallelForeachFlattenMessage();
       configureDisableRegistryBootstrapOptionalEntries();
       configureDisableApplyObjectProcessor();
+      configureEnableByteBuddyObjectCreation();
     }
   }
 
@@ -1402,6 +1404,17 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureDisableApplyObjectProcessor() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DISABLE_APPLY_OBJECT_PROCESSOR,
+                                                minMuleVersion("4.5.0"));
+  }
+
+  /**
+   * Configures the {@link MuleRuntimeFeature#ENABLE_BYTE_BUDDY_OBJECT_CREATION} feature flag.
+   *
+   * @since 4.3.0-202203
+   */
+  private static void configureEnableByteBuddyObjectCreation() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(ENABLE_BYTE_BUDDY_OBJECT_CREATION,
                                                 minMuleVersion("4.5.0"));
   }
 

@@ -10,6 +10,10 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_EAGER_INIT;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_PROTOTYPE;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_SINGLETON;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.OBJECT_TYPE_CLASS;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -67,6 +71,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
 import org.mule.runtime.config.internal.context.MuleArtifactContext;
@@ -378,12 +383,15 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
         .findFirst()
         .get();
     BeanDefinition subFlowBeanDefinition = genericBeanDefinition(new ObjectFactoryClassRepository()
-        .getObjectFactoryClass(subFlowComponentBuildingDefinition, SubflowMessageProcessorChainFactoryBean.class, Object.class,
-                               () -> true))
-                                   .addPropertyValue("name", PARSED_DYNAMIC_REFERENCED_FLOW)
-                                   .addPropertyValue("messageProcessors", subFlowProcessorBeanDefinition)
-                                   .setScope(BeanDefinition.SCOPE_PROTOTYPE)
-                                   .getBeanDefinition();
+        .getObjectFactoryClass(SubflowMessageProcessorChainFactoryBean.class))
+            .addPropertyValue("name", PARSED_DYNAMIC_REFERENCED_FLOW)
+            .addPropertyValue("messageProcessors", subFlowProcessorBeanDefinition)
+            .addPropertyValue(IS_SINGLETON, !subFlowComponentBuildingDefinition.isPrototype())
+            .addPropertyValue(OBJECT_TYPE_CLASS, Object.class)
+            .addPropertyValue(IS_PROTOTYPE, subFlowComponentBuildingDefinition.isPrototype())
+            .addPropertyValue(IS_EAGER_INIT, new LazyValue<>(() -> true))
+            .setScope(BeanDefinition.SCOPE_PROTOTYPE)
+            .getBeanDefinition();
     beanFactory.registerBeanDefinition(PARSED_DYNAMIC_REFERENCED_FLOW, subFlowBeanDefinition);
     // Additional flow and processing strategy (needed to generate a concurrent subflow instantiation)
     Flow concurrentCallerFlow = mock(Flow.class, INITIALIZABLE_MESSAGE_PROCESSOR);
