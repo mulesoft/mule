@@ -183,78 +183,34 @@ class MuleOperationExtensionModelDeclarer {
   }
 
   private void addParametersDeclaration(ConstructDeclarer def) {
-    final NestedComponentDeclarer parametersDef = def.withOptionalComponent("parameters")
+    final NestedComponentDeclarer<?, ?> parametersDef = def.withOptionalComponent("parameters")
         .describedAs("The operation's parameters")
         .withMinOccurs(0)
         .withMaxOccurs(1);
 
-    final NestedComponentDeclarer parameterDef = parametersDef.withComponent("parameter")
+    final NestedComponentDeclarer<?, ?> parameterDef = parametersDef.withComponent("parameter")
         .describedAs("Defines an operation parameter")
         .withMinOccurs(1)
         .withMaxOccurs(null);
 
-    final ParameterGroupDeclarer parameterDefParameters = parameterDef.onDefaultParameterGroup();
-    parameterDefParameters.withRequiredParameter("name")
-        .describedAs("The parameter's name")
-        .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED)
-        .withDisplayModel(display("Parameter name", "The parameter's name"));
+    final ParameterGroupDeclarer<?> parameterDefParameters = parameterDef.onDefaultParameterGroup();
+    addParameterDeclaration(parameterDefParameters);
 
-    parameterDefParameters.withOptionalParameter("description")
-        .describedAs("Detailed description of the parameter, it's semantics, usage and effects")
-        .ofType(STRING_TYPE)
-        .withDisplayModel(display("Parameter description",
-                                  "Detailed description of the parameter, it's semantics, usage and effects"))
-        .withExpressionSupport(NOT_SUPPORTED)
-        .withLayout(LayoutModel.builder().asText().build());
+    final NestedComponentDeclarer<?, ?> optionalParameterDef = parametersDef.withOptionalComponent("optional-parameter")
+        .describedAs("Defines an optional operation parameter")
+        .withMinOccurs(0)
+        .withMaxOccurs(null);
 
-    parameterDefParameters.withOptionalParameter("summary")
-        .describedAs("A brief description of the parameter")
-        .ofType(STRING_TYPE)
-        .withDisplayModel(display("Summary", "A brief description of the parameter"))
-        .withExpressionSupport(NOT_SUPPORTED);
+    final ParameterGroupDeclarer<?> optionalParameterDefParameters = optionalParameterDef.onDefaultParameterGroup();
+    addOptionalParameterDeclaration(optionalParameterDefParameters);
 
-    parameterDefParameters.withOptionalParameter("type")
-        .describedAs("The parameter's type")
-        .ofType(STRING_TYPE)
-        .withDisplayModel(display("Parameter type", "The Parameter's type", TYPE_EXAMPLE))
-        .withExpressionSupport(NOT_SUPPORTED);
-
-    parameterDefParameters.withOptionalParameter("expressionSupport")
-        .describedAs("The support level this parameter offers regarding expressions")
-        .ofType(EXPRESSION_SUPPORT_TYPE)
-        .defaultingTo(SUPPORTED.name())
-        .withDisplayModel(display("Expression Support", "The support level this parameter offers regarding expressions"))
-        .withExpressionSupport(NOT_SUPPORTED);
-
-    parameterDefParameters.withOptionalParameter("configOverride")
-        .describedAs("Whether the parameter should act as a Config Override.")
-        .ofType(BOOLEAN_TYPE)
-        .defaultingTo("false")
-        .withDisplayModel(display("Config Override", "Whether the parameter should act as a Config Override."))
-        .withExpressionSupport(NOT_SUPPORTED);
-
-    final NestedComponentDeclarer optionalDef = parameterDef.withOptionalComponent("optional")
-        .describedAs("Indicates that the parameter is optional")
-        .withMinOccurs(1)
-        // TODO add stereotype
-        .withMaxOccurs(1);
-
-    final ParameterGroupDeclarer optionalDefParams = optionalDef.onDefaultParameterGroup();
-
-    optionalDefParams.withOptionalParameter("defaultValue")
-        .describedAs("The parameters default value is not provided.")
-        .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED)
-        .withDisplayModel(display("Optional", "The parameters default value is not provided."));
-
-    final NestedComponentDeclarer exclusiveOptionalDef = optionalDef.withOptionalComponent("exclusiveOptional")
-        .describedAs("References other optional parameters which cannot be set at the same time as this one")
+    final NestedComponentDeclarer<?, ?> exclusiveOptionalDef = parametersDef.withOptionalComponent("exclusive-optionals")
+        .describedAs("Defines a set of mutually exclusive parameters")
         .withMinOccurs(0)
         .withMaxOccurs(1);
 
-    exclusiveOptionalDef.onDefaultParameterGroup().withRequiredParameter("parameters")
-        .describedAs("Comma separated list of parameters that this element is optional against")
+    exclusiveOptionalDef.onDefaultParameterGroup().withRequiredParameter("exclusiveOptionals")
+        .describedAs("Comma separated list of parameters that are mutually exclusive")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .withDisplayModel(display("Parameters", "Comma separated list of parameters that this element is optional against"));
@@ -264,5 +220,57 @@ class MuleOperationExtensionModelDeclarer {
         .ofType(BOOLEAN_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .withDisplayModel(display("One required?", "Enforces that one of the parameters must be set at any given time"));
+  }
+
+  private void addParameterDeclaration(ParameterGroupDeclarer<?> parameterGroupDeclarer) {
+    parameterGroupDeclarer.withRequiredParameter("name")
+        .describedAs("The parameter's name")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .withDisplayModel(display("Parameter name", "The parameter's name"));
+
+    parameterGroupDeclarer.withOptionalParameter("description")
+        .describedAs("Detailed description of the parameter, it's semantics, usage and effects")
+        .ofType(STRING_TYPE)
+        .withDisplayModel(display("Parameter description",
+                                  "Detailed description of the parameter, it's semantics, usage and effects"))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .withLayout(LayoutModel.builder().asText().build());
+
+    parameterGroupDeclarer.withOptionalParameter("summary")
+        .describedAs("A brief description of the parameter")
+        .ofType(STRING_TYPE)
+        .withDisplayModel(display("Summary", "A brief description of the parameter"))
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    parameterGroupDeclarer.withOptionalParameter("type")
+        .describedAs("The parameter's type")
+        .ofType(STRING_TYPE)
+        .withDisplayModel(display("Parameter type", "The Parameter's type", TYPE_EXAMPLE))
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    parameterGroupDeclarer.withOptionalParameter("expressionSupport")
+        .describedAs("The support level this parameter offers regarding expressions")
+        .ofType(EXPRESSION_SUPPORT_TYPE)
+        .defaultingTo(SUPPORTED.name())
+        .withDisplayModel(display("Expression Support", "The support level this parameter offers regarding expressions"))
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    parameterGroupDeclarer.withOptionalParameter("configOverride")
+        .describedAs("Whether the parameter should act as a Config Override.")
+        .ofType(BOOLEAN_TYPE)
+        .defaultingTo("false")
+        .withDisplayModel(display("Config Override", "Whether the parameter should act as a Config Override."))
+        .withExpressionSupport(NOT_SUPPORTED);
+  }
+
+  private void addOptionalParameterDeclaration(ParameterGroupDeclarer<?> parameterGroupDeclarer) {
+    addParameterDeclaration(parameterGroupDeclarer);
+
+    parameterGroupDeclarer.withOptionalParameter("defaultValue")
+        .describedAs("The parameter's default value if not provided.")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .withDisplayModel(display("Optional", "The parameter's default value if not provided."));
   }
 }

@@ -11,19 +11,16 @@
 
     <operation:def name="helloWorld" displayName="Hello World operation" summary="Returns a polite greeting">
         <operation:parameters>
-            <operation:parameter name="greeting" type="string" summary="The greeting message">
-                <operation:description>The greeting message appended before the receivers name</operation:description>
-                <operation:optional defaultValue="Hello, "/>
-            </operation:parameter>
             <operation:parameter name="receiver" type="string" summary="The name of the person being greeted"/>
-            <operation:parameter name="prefix" type="string" summary="The receiver's prefix">
+            <operation:optional-parameter name="greeting" type="string" summary="The greeting message" defaultValue="Hello, ">
+                <operation:description>The greeting message appended before the receivers name</operation:description>
+            </operation:optional-parameter>
+            <operation:optional-parameter name="prefix" type="string" summary="The receiver's prefix" defaultValue="">
                 <operation:description>The prefix added to the receiver</operation:description>
-                <operation:optional defaultValue=""/>
-            </operation:parameter>
-            <operation:parameter name="suffix" type="string" summary="The receiver's suffix">
+            </operation:optional-parameter>
+            <operation:optional-parameter name="suffix" type="string" summary="The receiver's suffix">
                 <operation:description>The suffix added to the receiver</operation:description>
-                <operation:optional/>
-            </operation:parameter>
+            </operation:optional-parameter>
         </operation:parameters>
         <operation:output>
             <operation:payload-type type="string"/>
@@ -45,7 +42,7 @@
     <operation:def name="introduceMyself" summary="Returns an introductory message. Like a sir.">
         <operation:parameters>
             <operation:parameter name="name" type="string" summary="The gentleman's name"/>
-            <operation:parameter name="nationalID" type="string" summary="The gentelman's identification"/>
+            <operation:parameter name="nationalID" type="string" summary="The gentleman's identification"/>
         </operation:parameters>
         <operation:output>
             <operation:payload-type type="string"/>
@@ -67,21 +64,19 @@
 
     <operation:def name="helloAndIntroduce" displayName="Hello and Introduce" summary="Says Hello and introduces itself">
         <operation:parameters>
-            <operation:parameter name="greeting" type="string" summary="The greeting message">
-                <operation:description>The greeting message appended before the receivers name</operation:description>
-                <operation:optional defaultValue="Hello, "/>
-            </operation:parameter>
             <operation:parameter name="receiver" type="string" summary="The name of the person being greeted"/>
-            <operation:parameter name="prefix" type="string" summary="The receiver's prefix">
-                <operation:description>The prefix added to the receiver</operation:description>
-                <operation:optional defaultValue=""/>
-            </operation:parameter>
-            <operation:parameter name="suffix" type="string" summary="The receiver's suffix">
-                <operation:description>The suffix added to the receiver</operation:description>
-                <operation:optional/>
-            </operation:parameter>
             <operation:parameter name="myName" type="string" summary="The gentleman's name"/>
-            <operation:parameter name="myNationalID" type="string" summary="The gentelman's identification"/>
+            <operation:parameter name="myNationalID" type="string" summary="The gentleman's identification"/>
+            <operation:optional-parameter name="greeting" type="string" summary="The greeting message" defaultValue="Hello, ">
+                <operation:description>The greeting message appended before the receivers name</operation:description>
+            </operation:optional-parameter>
+            <operation:optional-parameter name="prefix" type="string" summary="The receiver's prefix" defaultValue="">
+                <operation:description>The prefix added to the receiver</operation:description>
+            </operation:optional-parameter>
+            <operation:optional-parameter name="suffix" type="string" summary="The receiver's suffix">
+                <operation:description>The suffix added to the receiver</operation:description>
+            </operation:optional-parameter>
+            <operation:exclusive-optionals exclusiveOptionals="prefix,suffix"/>
         </operation:parameters>
         <operation:output>
             <operation:payload-type type="string"/>

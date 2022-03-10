@@ -68,12 +68,11 @@
                 "type": "String"
               },
               "hasDynamicType": false,
-              "required": false,
+              "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
               "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
-              "defaultValue": "Hello, ",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": false,
@@ -88,11 +87,11 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "name": "greeting",
+              "name": "receiver",
               "displayModel": {
-                "summary": "The greeting message"
+                "summary": "The name of the person being greeted"
               },
-              "description": "The greeting message appended before the receivers name",
+              "description": "",
               "modelProperties": {}
             },
             {
@@ -117,103 +116,6 @@
                 "text": false,
                 "query": false,
                 "order": 2
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "receiver",
-              "displayModel": {
-                "summary": "The name of the person being greeted"
-              },
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "SUPPORTED",
-              "defaultValue": "",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 3
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "prefix",
-              "displayModel": {
-                "summary": "The receiver\u0027s prefix"
-              },
-              "description": "The prefix added to the receiver",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 4
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "suffix",
-              "displayModel": {
-                "summary": "The receiver\u0027s suffix"
-              },
-              "description": "The suffix added to the receiver",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": true,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 5
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -245,19 +147,125 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 6
+                "order": 3
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
               "name": "myNationalID",
               "displayModel": {
-                "summary": "The gentelman\u0027s identification"
+                "summary": "The gentleman\u0027s identification"
               },
               "description": "",
               "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "SUPPORTED",
+              "defaultValue": "Hello, ",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "greeting",
+              "displayModel": {
+                "summary": "The greeting message"
+              },
+              "description": "The greeting message appended before the receivers name",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "SUPPORTED",
+              "defaultValue": "",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 5
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "prefix",
+              "displayModel": {
+                "summary": "The receiver\u0027s prefix"
+              },
+              "description": "The prefix added to the receiver",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 6
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "suffix",
+              "displayModel": {
+                "summary": "The receiver\u0027s suffix"
+              },
+              "description": "The suffix added to the receiver",
+              "modelProperties": {}
             }
           ],
-          "exclusiveParametersModels": [],
+          "exclusiveParametersModels": [
+            {
+              "exclusiveParameterNames": [
+                "prefix",
+                "suffix"
+              ],
+              "isOneRequired": false
+            }
+          ],
           "layoutModel": {
             "password": false,
             "text": false,
@@ -541,6 +549,38 @@
                 "type": "String"
               },
               "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "receiver",
+              "displayModel": {
+                "summary": "The name of the person being greeted"
+              },
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
@@ -557,7 +597,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 1
+                "order": 2
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
@@ -566,38 +606,6 @@
                 "summary": "The greeting message"
               },
               "description": "The greeting message appended before the receivers name",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": true,
-              "isConfigOverride": false,
-              "isComponentId": false,
-              "fieldValueProviderModels": [],
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 2
-              },
-              "allowedStereotypeModels": [],
-              "semanticTerms": [],
-              "name": "receiver",
-              "displayModel": {
-                "summary": "The name of the person being greeted"
-              },
-              "description": "",
               "modelProperties": {}
             },
             {
@@ -1003,7 +1011,7 @@
               "semanticTerms": [],
               "name": "nationalID",
               "displayModel": {
-                "summary": "The gentelman\u0027s identification"
+                "summary": "The gentleman\u0027s identification"
               },
               "description": "",
               "modelProperties": {}
