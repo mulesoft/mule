@@ -7,6 +7,9 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
+import static java.util.Collections.sort;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
@@ -95,12 +98,14 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public List<OperationModelParser> getOperationParsers() {
-    return JavaExtensionModelParserUtils.getOperationParsers(
-                                                             extensionModelParser,
-                                                             extensionElement,
-                                                             configElement,
-                                                             loadingContext)
-        .collect(toList());
+    ArrayList<OperationModelParser> operationModelParsers = new ArrayList<>(JavaExtensionModelParserUtils.getOperationParsers(
+                                                                                                                              extensionModelParser,
+                                                                                                                              extensionElement,
+                                                                                                                              configElement,
+                                                                                                                              loadingContext)
+        .collect(toList()));
+    sort(operationModelParsers, comparing(OperationModelParser::getName));
+    return unmodifiableList(operationModelParsers);
   }
 
   @Override
