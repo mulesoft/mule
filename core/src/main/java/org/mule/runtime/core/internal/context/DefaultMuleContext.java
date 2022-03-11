@@ -1214,7 +1214,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   public static void configurePropertiesResolverFeatureFlag() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(HONOUR_RESERVED_PROPERTIES, featureContext -> featureContext
-        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.newerThan("4.4.2")).isPresent());
+        .getArtifactMinMuleVersion().filter(muleVersion -> muleVersion.newerThan("4.2.2")).isPresent());
   }
 
   private static void configureEnablePolicyIsolation() {
@@ -1257,7 +1257,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING,
                                                 featureContext -> featureContext.getArtifactMinMuleVersion()
-                                                    .filter(muleVersion -> muleVersion.atLeast("4.4.1"))
+                                                    .filter(muleVersion -> muleVersion.atLeast("4.3.1"))
                                                     .isPresent());
   }
 
@@ -1282,7 +1282,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ENABLE_BYTE_BUDDY_OBJECT_CREATION,
                                                 featureContext -> featureContext.getArtifactMinMuleVersion()
-                                                    .filter(muleVersion -> muleVersion.atLeast("4.2.0")).isPresent());
+                                                    .filter(muleVersion -> muleVersion.atLeast("4.5.0")).isPresent());
   }
 
 }
