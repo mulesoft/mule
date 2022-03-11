@@ -76,7 +76,6 @@
             <operation:optional-parameter name="suffix" type="string" summary="The receiver's suffix">
                 <operation:description>The suffix added to the receiver</operation:description>
             </operation:optional-parameter>
-            <operation:exclusive-optionals exclusiveOptionals="prefix,suffix"/>
         </operation:parameters>
         <operation:output>
             <operation:payload-type type="string"/>
@@ -96,6 +95,26 @@
             <!-- TODO: Set attributes -->
 
             <set-variable variableName="doNot" value="escape this chain"/>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="helloPlace" displayName="Hello to a place" summary="Says Hello to a place">
+        <operation:parameters>
+            <operation:parameter name="greeting" type="string" summary="The greeting message"/>
+            <operation:optional-parameter name="city" type="string" summary="The name of a city to say hello to"/>
+            <operation:optional-parameter name="country" type="string" summary="The name of a country to say hello to"/>
+            <operation:exclusive-optionals exclusiveOptionals="city,country" oneRequired="true"/>
+        </operation:parameters>
+        <operation:output>
+            <operation:payload-type type="string"/>
+            <operation:attributes-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <this:hello-world greeting="#[params.greeting]"
+                              receiver="#[params.receiver]"
+                              target="helloWorld"/>
+
+            <set-payload value="#[vars.helloWorld]"/>
         </operation:body>
     </operation:def>
 
