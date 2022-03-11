@@ -9,6 +9,7 @@ package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.io.File.separator;
+import static java.lang.System.getProperty;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
@@ -17,6 +18,7 @@ import static org.mule.test.runner.api.MulePluginBasedLoaderFinder.META_INF_MULE
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.Injector;
@@ -139,8 +141,9 @@ class ExtensionPluginMetadataGenerator {
       }
 
     };
-    muleContext.setMuleConfiguration(new DefaultMuleConfiguration());
-    try {
+    DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
+    muleConfiguration.setMinMuleVersion(new MuleVersion(getProperty("maven.projectVersion")));
+    muleContext.setMuleConfiguration(muleConfiguration);    try {
       initialiseIfNeeded(extensionManager, muleContext);
     } catch (InitialisationException e) {
       throw new RuntimeException("Error while initialising the extension manager", e);
