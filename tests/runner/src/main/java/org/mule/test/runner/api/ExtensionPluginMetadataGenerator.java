@@ -143,7 +143,8 @@ class ExtensionPluginMetadataGenerator {
     };
     DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
     muleConfiguration.setMinMuleVersion(new MuleVersion(getProperty("maven.projectVersion")));
-    muleContext.setMuleConfiguration(muleConfiguration);    try {
+    muleContext.setMuleConfiguration(muleConfiguration);
+    try {
       initialiseIfNeeded(extensionManager, muleContext);
     } catch (InitialisationException e) {
       throw new RuntimeException("Error while initialising the extension manager", e);
