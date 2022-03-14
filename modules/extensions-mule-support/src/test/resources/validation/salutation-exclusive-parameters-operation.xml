@@ -7,7 +7,7 @@
 
     <import file="salutation-operations-def.xml"/>
 
-    <flow name="composedOperation">
+    <flow name="conflictingExclusiveParametersFlow">
         <this:hello-place greeting="Hi, " city="London" country="England"/>
     </flow>
 

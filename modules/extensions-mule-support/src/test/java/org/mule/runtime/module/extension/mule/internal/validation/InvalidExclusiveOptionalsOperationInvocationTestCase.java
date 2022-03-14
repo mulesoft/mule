@@ -13,6 +13,7 @@ import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 
+import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Rule;
@@ -21,7 +22,7 @@ import org.junit.rules.ExpectedException;
 
 @Feature(REUSE)
 @Story(OPERATIONS)
-public class InvalidOperationInvocationTestCase extends MuleArtifactFunctionalTestCase {
+public class InvalidExclusiveOptionalsOperationInvocationTestCase extends MuleArtifactFunctionalTestCase {
 
   private String configFile;
 
@@ -34,6 +35,7 @@ public class InvalidOperationInvocationTestCase extends MuleArtifactFunctionalTe
   }
 
   @Test
+  @Description("Tries to load a configuration file which calls an operation with conflicting exclusive parameters and verifies the error message")
   public void conflictingExclusiveParameters() throws Exception {
     expectedException.expect(ConfigurationException.class);
     expectedException
@@ -43,7 +45,8 @@ public class InvalidOperationInvocationTestCase extends MuleArtifactFunctionalTe
   }
 
   @Test
-  public void missingRequiredExclusiveParametersOperation() throws Exception {
+  @Description("Tries to load a configuration file which calls an operation with missing required exclusive parameters and verifies the error message")
+  public void missingRequiredExclusiveParameters() throws Exception {
     // FIXME W-10831629: there is an inconsistency between the element referred to by this error message and the one where there
     // are conflicting exclusive optionals
     expectedException.expect(ConfigurationException.class);

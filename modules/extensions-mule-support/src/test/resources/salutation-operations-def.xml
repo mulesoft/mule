@@ -111,10 +111,7 @@
         </operation:output>
         <operation:body>
             <this:hello-world greeting="#[params.greeting]"
-                              receiver="#[params.receiver]"
-                              target="helloWorld"/>
-
-            <set-payload value="#[vars.helloWorld]"/>
+                              receiver="#[if(params.city != null) params.city else params.country]"/>
         </operation:body>
     </operation:def>
 

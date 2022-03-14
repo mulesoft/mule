@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
@@ -50,7 +49,7 @@ class MuleSdkParameterGroupModelParser extends BaseMuleSdkExtensionModelParser i
     Stream<ParameterModelParser> optionalParameterParsers = getChildren(parametersComponent, "optional-parameter")
         .map(p -> new MuleSdkOptionalParameterModelParserSdk(p, typeLoader));
 
-    return unmodifiableList(concat(parameterParsers, optionalParameterParsers).collect(toList()));
+    return concat(parameterParsers, optionalParameterParsers).collect(toList());
   }
 
   private Optional<ExclusiveOptionalDescriptor> doParseExclusiveOptionalDescriptorFromGroup(ComponentAst parametersComponent) {

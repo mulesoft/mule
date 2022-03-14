@@ -183,28 +183,28 @@ class MuleOperationExtensionModelDeclarer {
   }
 
   private void addParametersDeclaration(ConstructDeclarer def) {
-    final NestedComponentDeclarer<?, ?> parametersDef = def.withOptionalComponent("parameters")
+    final NestedComponentDeclarer parametersDef = def.withOptionalComponent("parameters")
         .describedAs("The operation's parameters")
         .withMinOccurs(0)
         .withMaxOccurs(1);
 
-    final NestedComponentDeclarer<?, ?> parameterDef = parametersDef.withComponent("parameter")
+    final NestedComponentDeclarer parameterDef = parametersDef.withComponent("parameter")
         .describedAs("Defines an operation parameter")
         .withMinOccurs(1)
         .withMaxOccurs(null);
 
-    final ParameterGroupDeclarer<?> parameterDefParameters = parameterDef.onDefaultParameterGroup();
+    final ParameterGroupDeclarer parameterDefParameters = parameterDef.onDefaultParameterGroup();
     addParameterDeclaration(parameterDefParameters);
 
-    final NestedComponentDeclarer<?, ?> optionalParameterDef = parametersDef.withOptionalComponent("optional-parameter")
+    final NestedComponentDeclarer optionalParameterDef = parametersDef.withOptionalComponent("optional-parameter")
         .describedAs("Defines an optional operation parameter")
         .withMinOccurs(0)
         .withMaxOccurs(null);
 
-    final ParameterGroupDeclarer<?> optionalParameterDefParameters = optionalParameterDef.onDefaultParameterGroup();
+    final ParameterGroupDeclarer optionalParameterDefParameters = optionalParameterDef.onDefaultParameterGroup();
     addOptionalParameterDeclaration(optionalParameterDefParameters);
 
-    final NestedComponentDeclarer<?, ?> exclusiveOptionalDef = parametersDef.withOptionalComponent("exclusive-optionals")
+    final NestedComponentDeclarer exclusiveOptionalDef = parametersDef.withOptionalComponent("exclusive-optionals")
         .describedAs("Defines a set of mutually exclusive parameters")
         .withMinOccurs(0)
         .withMaxOccurs(1);
