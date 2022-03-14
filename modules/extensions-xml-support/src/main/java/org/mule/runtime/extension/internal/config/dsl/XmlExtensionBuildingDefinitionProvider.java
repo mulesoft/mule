@@ -126,8 +126,9 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
             .withConstructorParameterDefinition(fromReferenceObject(Registry.class).build())
             .withSetterParameterDefinition("parameters",
                                            fromMultipleDefinitions(paramsDefinitions
-                                               .toArray(new KeyAttributeDefinitionPair[paramsDefinitions.size()]))
-                                                   .build())
+                                               .toArray(
+                                                        new KeyAttributeDefinitionPair[paramsDefinitions.size()]))
+                                                            .build())
             .build());
       }
 
@@ -164,11 +165,13 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
         .withObjectFactoryType(ModuleOperationMessageProcessorFactoryBean.class)
         .withSetterParameterDefinition("parameters",
                                        fromMultipleDefinitions(paramsDefinitions
-                                           .toArray(new KeyAttributeDefinitionPair[paramsDefinitions.size()]))
-                                               .build())
+                                           .toArray(
+                                                    new KeyAttributeDefinitionPair[paramsDefinitions.size()]))
+                                                        .build())
         .withSetterParameterDefinition("extensionModel", fromFixedValue(extensionModel).build())
         .withSetterParameterDefinition("operationModel", fromFixedValue(operationModel).build())
-        .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
+        .withSetterParameterDefinition(MESSAGE_PROCESSORS,
+                                       fromChildCollectionConfiguration(Processor.class).build())
         .withSetterParameterDefinition(ERROR_MAPPINGS_PARAMETER_NAME,
                                        fromChildCollectionConfiguration(EnrichedErrorMapping.class).build())
         .asPrototype().build());
@@ -209,11 +212,10 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
     Class type = isBehaviour(parameterModel) ? getType(parameterModel.getType()) : String.class;
     DslElementSyntax elementSyntax = dslSyntaxResolver.resolve(parameterModel);
 
-    // Adds the inline parameter definition including its child configuration
+    // Adds the inline parameter definition
     paramsDefinitions.add(newBuilder()
         .withKey(parameterModel.getName())
-        .withAttributeDefinition(fromChildConfiguration(type)
-            .withIdentifier(elementSyntax.getElementName()).build())
+        .withAttributeDefinition(fromSimpleParameter(parameterModel.getName()).build())
         .build());
 
     // Adds the parameter definition parser
@@ -222,10 +224,8 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
         .withTypeDefinition(fromType(type)).build());
 
     if (isBehaviour(parameterModel)) {
-      paramsDefinitions.add(newBuilder()
-          .withKey(parameterModel.getName())
-          .withAttributeDefinition(fromSimpleParameter(elementSyntax.getAttributeName()).build())
-          .build());
+      paramsDefinitions.add(newBuilder().withKey(parameterModel.getName())
+          .withAttributeDefinition(fromChildConfiguration(type).withIdentifier(elementSyntax.getElementName()).build()).build());
 
       // For behaviour inline parameters, also add the definition parser associated to its type
       registerComponentBuildingDefinitionType(baseDefinition, parameterModel, elementSyntax);
@@ -251,7 +251,8 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
               definitions.add(baseDefinition
                   .withIdentifier(itemDsl.get().getElementName())
                   .withNamespace(itemDsl.get().getPrefix())
-                  .withTypeDefinition(fromType(ExtensionMetadataTypeUtils.getType(metadataType).orElse(Object.class)))
+                  .withTypeDefinition(
+                                      fromType(ExtensionMetadataTypeUtils.getType(metadataType).orElse(Object.class)))
                   .build());
             }
           });

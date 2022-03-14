@@ -16,4 +16,8 @@
     <catalog name="ids" format="application/json">
         <schema format="application/json+schema" location="./module-json-custom-types-ids-schema.json"/>
     </catalog>
+
+    <catalog name="input-data-type" format="application/json">
+        <schema format="application/json+schema" location="./module-json-custom-types-input-data-type-schema.json" />
+    </catalog>
 </catalogs>
