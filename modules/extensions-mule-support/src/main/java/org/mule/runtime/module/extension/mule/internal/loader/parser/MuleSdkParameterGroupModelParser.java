@@ -7,10 +7,12 @@
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.runtime.api.meta.model.ModelProperty;
@@ -20,26 +22,49 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * {@link ParameterGroupModelParser} implementation for Mule SDK
  *
  * @since 4.5.0
  */
-class MuleSdkParameterGroupModelParser implements ParameterGroupModelParser {
+class MuleSdkParameterGroupModelParser extends BaseMuleSdkExtensionModelParser implements ParameterGroupModelParser {
 
   private final List<ParameterModelParser> parameters;
+  private final Optional<ExclusiveOptionalDescriptor> exclusiveOptionals;
 
-  public MuleSdkParameterGroupModelParser(List<ComponentAst> parameters, TypeLoader typeLoader) {
-    this.parameters = doParserParameters(parameters, typeLoader);
+  public MuleSdkParameterGroupModelParser(ComponentAst parametersComponent, TypeLoader typeLoader) {
+    parameters = doParserParameters(parametersComponent, typeLoader);
+    exclusiveOptionals = doParseExclusiveOptionalDescriptorFromGroup(parametersComponent);
   }
 
-  private List<ParameterModelParser> doParserParameters(List<ComponentAst> parameters, TypeLoader typeLoader) {
-    return unmodifiableList(parameters.stream()
-        .map(p -> new MuleSdkParameterModelParserSdk(p, typeLoader))
-        .collect(toList()));
+  private List<ParameterModelParser> doParserParameters(ComponentAst parametersComponent, TypeLoader typeLoader) {
+    Stream<ParameterModelParser> parameterParsers = getChildren(parametersComponent, "parameter")
+        .map(p -> new MuleSdkParameterModelParserSdk(p, typeLoader));
+    Stream<ParameterModelParser> optionalParameterParsers = getChildren(parametersComponent, "optional-parameter")
+        .map(p -> new MuleSdkOptionalParameterModelParserSdk(p, typeLoader));
+
+    return concat(parameterParsers, optionalParameterParsers).collect(toList());
+  }
+
+  private Optional<ExclusiveOptionalDescriptor> doParseExclusiveOptionalDescriptorFromGroup(ComponentAst parametersComponent) {
+    return getSingleChild(parametersComponent, "exclusive-optionals")
+        .map(exclusiveOptionals -> doParseExclusiveOptionalDescriptor(exclusiveOptionals));
+  }
+
+  private ExclusiveOptionalDescriptor doParseExclusiveOptionalDescriptor(ComponentAst exclusiveOptionals) {
+    Set<String> parameters = Stream.of(this.<String>getParameter(exclusiveOptionals, "exclusiveOptionals").split(","))
+        .map(String::trim)
+        .filter(p -> !isBlank(p))
+        .collect(toCollection(LinkedHashSet::new));
+
+    return new ExclusiveOptionalDescriptor(parameters,
+                                           (boolean) getOptionalParameter(exclusiveOptionals, "oneRequired").orElse(false));
   }
 
   @Override
@@ -69,7 +94,7 @@ class MuleSdkParameterGroupModelParser implements ParameterGroupModelParser {
 
   @Override
   public Optional<ExclusiveOptionalDescriptor> getExclusiveOptionals() {
-    return empty();
+    return exclusiveOptionals;
   }
 
   @Override

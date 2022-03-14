@@ -142,6 +142,8 @@ public class InvalidExtensionConfigTestCase extends AbstractConfigurationFailure
 
   @Test
   public void petStoreExclusiveParameterRequired() throws Exception {
+    // FIXME W-10831629: there is an inconsistency between the element referred to by this error message and the one where there
+    // are conflicting exclusive optionals
     expectedException.expect(ConfigurationException.class);
     expectedException
         .expectMessage("[validation/petstore-exclusive-required-parameter.xml:9]: "
