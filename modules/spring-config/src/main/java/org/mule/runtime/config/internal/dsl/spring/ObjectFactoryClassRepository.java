@@ -27,6 +27,7 @@ import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
+import net.bytebuddy.implementation.bind.annotation.Super;
 import net.bytebuddy.implementation.bind.annotation.This;
 import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.Enhancer;
@@ -72,8 +73,10 @@ public class ObjectFactoryClassRepository {
   public static final String OBJECT_TYPE_CLASS = "objectTypeClass";
   public static final String IS_PROTOTYPE = "isPrototype";
   public static final String IS_EAGER_INIT = "isEagerInit";
+  public static final String INSTANCE_CUSTOMIZATION_FUNCTION_OPTIONAL = "instanceCustomizationFunctionOptional";
   private final ByteBuddy byteBuddy = new ByteBuddy();
-  private final IsEagerInitGetterInterceptor interceptor = new IsEagerInitGetterInterceptor();
+  private final IsEagerInitGetterInterceptor isEagerInitGetterInterceptor = new IsEagerInitGetterInterceptor();
+  private final GetObjectInterceptor getObjectInterceptor = new GetObjectInterceptor();
 
   /**
    * Retrieves a {@link Class} for the {@link ObjectFactory} defined by the {@code objectFactoryType} parameter. Once acquired the
@@ -107,6 +110,7 @@ public class ObjectFactoryClassRepository {
         .defineField(OBJECT_TYPE_CLASS, Class.class, PRIVATE)
         .defineField(IS_PROTOTYPE, Boolean.class, PRIVATE)
         .defineField(IS_EAGER_INIT, Supplier.class, PRIVATE)
+        .defineField(INSTANCE_CUSTOMIZATION_FUNCTION_OPTIONAL, Optional.class)
         // Implements the SmartFactoryBeanInterceptor interface to add getters and setters for the fields. This interface extends
         // from SmartFactoryBean.
         .implement(SmartFactoryBeanInterceptor.class).intercept(ofBeanProperty())
@@ -116,8 +120,8 @@ public class ObjectFactoryClassRepository {
         .intercept(ObjectTypeProvider.class.isAssignableFrom(objectFactoryType) ? invokeSuper()
             : invoke(named("getObjectTypeClass")))
         .method(named(IS_PROTOTYPE).and(isDeclaredBy(SmartFactoryBean.class))).intercept(toField(IS_PROTOTYPE))
-        .method(named(IS_EAGER_INIT).and(isDeclaredBy(SmartFactoryBean.class))).intercept(to(interceptor))
-        .method(named("getObject").and(isDeclaredBy(FactoryBean.class))).intercept(invokeSuper())
+        .method(named(IS_EAGER_INIT).and(isDeclaredBy(SmartFactoryBean.class))).intercept(to(isEagerInitGetterInterceptor))
+        .method(named("getObject")).intercept(to(getObjectInterceptor))
         // Create the class and inject it in the current classloader
         .make()
         .load(classLoader, INJECTION)
@@ -195,6 +199,17 @@ public class ObjectFactoryClassRepository {
     }
   }
 
+  protected static class GetObjectInterceptor {
+
+    @RuntimeType
+    public Object getObject(@This Object object, @Super ObjectFactory parentObj) throws Throwable {
+      SmartFactoryBeanInterceptor smartFactoryBean = ((SmartFactoryBeanInterceptor) object);
+      Object smartFactoryBeanObject = parentObj.getObject();
+      smartFactoryBean.getInstanceCustomizationFunctionOptional().ifPresent(consumer -> consumer.accept(smartFactoryBeanObject));
+      return smartFactoryBeanObject;
+    }
+  }
+
   /**
    * This interface is used to implement the getters and setters of the fields added with Byte Buddy. It also extends from
    * {@link SmartFactoryBean}.
@@ -218,6 +233,10 @@ public class ObjectFactoryClassRepository {
     Supplier getIsEagerInit();
 
     void setIsEagerInit(Supplier isEagerInit);
+
+    Optional<Consumer<Object>> getInstanceCustomizationFunctionOptional();
+
+    void setInstanceCustomizationFunctionOptional(Optional<Consumer<Object>> instanceCustomizationFunctionOptional);
   }
 
 }

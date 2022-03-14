@@ -14,6 +14,7 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperty;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_PROTOTYPE_OBJECT;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.INSTANCE_CUSTOMIZATION_FUNCTION_OPTIONAL;
 import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_EAGER_INIT;
 import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_PROTOTYPE;
 import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_SINGLETON;
@@ -219,7 +220,8 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
             .addPropertyValue(IS_SINGLETON, !componentBuildingDefinition.isPrototype())
             .addPropertyValue(OBJECT_TYPE_CLASS, componentModel.getType())
             .addPropertyValue(IS_PROTOTYPE, componentBuildingDefinition.isPrototype())
-            .addPropertyValue(IS_EAGER_INIT, new LazyValue<>(() -> !componentModel.getBeanDefinition().isLazyInit()));
+            .addPropertyValue(IS_EAGER_INIT, new LazyValue<>(() -> !componentModel.getBeanDefinition().isLazyInit()))
+            .addPropertyValue(INSTANCE_CUSTOMIZATION_FUNCTION_OPTIONAL, instanceCustomizationFunctionOptional);
   }
 
   private void injectSpringProperties(Map<String, Object> customProperties, Object createdInstance) {

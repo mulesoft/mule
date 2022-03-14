@@ -11,6 +11,7 @@ import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.getPropertyValueFromPropertiesComponent;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.INSTANCE_CUSTOMIZATION_FUNCTION_OPTIONAL;
 import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_EAGER_INIT;
 import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_PROTOTYPE;
 import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_SINGLETON;
@@ -110,7 +111,8 @@ class SpringPostProcessorIocHelper implements PostProcessorIocHelper {
                 .addPropertyValue(IS_SINGLETON, !definition.isPrototype())
                 .addPropertyValue(OBJECT_TYPE_CLASS, Object.class)
                 .addPropertyValue(IS_PROTOTYPE, definition.isPrototype())
-                .addPropertyValue(IS_EAGER_INIT, new LazyValue<>(() -> true));
+                .addPropertyValue(IS_EAGER_INIT, new LazyValue<>(() -> true))
+                .addPropertyValue(INSTANCE_CUSTOMIZATION_FUNCTION_OPTIONAL, empty());
       }
 
     } else {
