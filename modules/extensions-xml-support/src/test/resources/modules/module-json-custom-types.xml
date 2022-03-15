@@ -109,4 +109,13 @@
         <output type="string"/>
     </operation>
 
+    <operation name="operation-with-input-data">
+        <parameters>
+            <parameter name="input-data" type="input-data-type" use="REQUIRED" role="PRIMARY"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[vars['input-data']]"/>
+        </body>
+        <output type="string"/>
+    </operation>
 </module>
