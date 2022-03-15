@@ -17,17 +17,17 @@ import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookup
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
 import java.io.IOException;
 import java.net.URL;
@@ -141,6 +141,14 @@ public class ToolingApplicationClassLoaderBuilder
   @Override
   protected ArtifactClassLoader getParentClassLoader() {
     return parentClassLoader;
+  }
+
+  /**
+   * @param artifactPluginDescriptors set of plugins descriptors that will be used by the application.
+   * @return the builder
+   */
+  public AbstractArtifactClassLoaderBuilder addArtifactPluginDescriptors(org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor... artifactPluginDescriptors) {
+    return super.addArtifactPluginDescriptors(artifactPluginDescriptors);
   }
 
   @Override

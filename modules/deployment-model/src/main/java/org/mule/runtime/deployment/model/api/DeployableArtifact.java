@@ -26,7 +26,8 @@ import java.util.List;
  * @param <D> The type of the artifact's descriptor
  */
 @NoImplement
-public interface DeployableArtifact<D extends DeployableArtifactDescriptor> extends Artifact<D> {
+public interface DeployableArtifact<D extends org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor>
+    extends Artifact<D> {
 
   /**
    * Install the artifact. Most commonly this includes the creation of the class loader and validation of resources.

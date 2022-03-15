@@ -7,7 +7,9 @@
 
 package org.mule.runtime.deployment.model.internal.artifact.extension;
 
-import static com.google.common.collect.Maps.newHashMap;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.lookupExtensionModelLoaders;
+
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Objects.requireNonNull;
@@ -16,17 +18,17 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
+
+import static com.google.common.collect.Maps.newHashMap;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.lookupExtensionModelLoaders;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.deployment.model.api.plugin.LoaderDescriber;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.plugin.LoaderDescriber;
 
 import java.util.Collection;
 import java.util.Map;

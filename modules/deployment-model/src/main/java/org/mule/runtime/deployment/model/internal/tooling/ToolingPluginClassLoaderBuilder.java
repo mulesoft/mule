@@ -16,7 +16,6 @@ import static org.mule.runtime.deployment.model.internal.tooling.ToolingRegionCl
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginResolutionError;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
@@ -26,6 +25,7 @@ import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassL
 import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
 import java.net.URL;
 import java.util.List;

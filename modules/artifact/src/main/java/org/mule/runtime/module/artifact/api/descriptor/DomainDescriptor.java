@@ -4,18 +4,25 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.deployment.model.api.domain;
+package org.mule.runtime.module.artifact.api.descriptor;
+
+import org.mule.api.annotation.NoExtend;
 
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Represents the description of a domain.
- * 
- * @deprecated since 4.5. use org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor instead.
  */
-@Deprecated
-public class DomainDescriptor extends org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor {
+@NoExtend
+public class DomainDescriptor extends DeployableArtifactDescriptor {
+
+  public static final String DEFAULT_DOMAIN_NAME = "default";
+  public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-domain-config.xml";
+  public static final String MULE_DOMAIN_CLASSIFIER = "mule-domain";
 
   /**
    * Creates a new domain descriptor
@@ -36,4 +43,8 @@ public class DomainDescriptor extends org.mule.runtime.module.artifact.api.descr
     super(name, deploymentProperties);
   }
 
+  @Override
+  protected Set<String> getDefaultConfigResources() {
+    return ImmutableSet.<String>builder().add(DEFAULT_CONFIGURATION_RESOURCE).build();
+  }
 }

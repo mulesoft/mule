@@ -9,10 +9,10 @@ package org.mule.runtime.deployment.model.api.builder;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.internal.domain.DefaultDomainClassLoaderBuilder;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
 /**
  * Factory to create instances of {@code DomainClassLoaderBuilder}.
