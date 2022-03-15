@@ -38,7 +38,6 @@ import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.scheduler.SchedulerView;
