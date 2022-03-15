@@ -4,13 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.deployment.model.internal.domain;
+package org.mule.runtime.module.artifact.activation.internal.classloader;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
-import static org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory.getDomainId;
+
+import static java.io.File.separator;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinder;
+import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinder;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
@@ -53,7 +57,7 @@ public class MuleSharedDomainClassLoader extends MuleDeployableArtifactClassLoad
   }
 
   @Override
-  protected String findLibrary(String name) {
+  public String findLibrary(String name) {
     if (nativeLibraryFinder == null) {
       return super.findLibrary(name);
     }
@@ -68,7 +72,7 @@ public class MuleSharedDomainClassLoader extends MuleDeployableArtifactClassLoad
   public URL findResource(String name) {
     URL resource = super.findResource(name);
     if (resource == null) {
-      File file = new File(getDomainFolder(getArtifactDescriptor().getName()) + File.separator + name);
+      File file = new File(getDomainFolder(getArtifactDescriptor().getName()) + separator + name);
       if (file.exists()) {
         try {
           resource = file.toURI().toURL();
@@ -83,5 +87,15 @@ public class MuleSharedDomainClassLoader extends MuleDeployableArtifactClassLoad
   @Override
   protected String[] getLocalResourceLocations() {
     return new String[] {getDomainFolder(getArtifactDescriptor().getName()).getAbsolutePath()};
+  }
+
+  /**
+   * @param domainName name of the domain. Non empty.
+   * @return the unique identifier for the domain in the container.
+   */
+  public static String getDomainId(String domainName) {
+    checkArgument(!isEmpty(domainName), "domainName cannot be empty");
+
+    return "domain/" + domainName;
   }
 }

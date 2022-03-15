@@ -14,6 +14,8 @@ import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_MAC;
 
+import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinder;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;

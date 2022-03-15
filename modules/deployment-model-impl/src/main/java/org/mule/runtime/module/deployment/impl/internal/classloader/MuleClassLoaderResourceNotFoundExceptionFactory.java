@@ -25,8 +25,8 @@ import org.mule.runtime.core.api.exception.ResourceNotFoundException;
 import org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.deployment.model.api.application.ApplicationClassLoader;
-import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
-import org.mule.runtime.deployment.model.internal.domain.MuleSharedDomainClassLoader;
+import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
+import org.mule.runtime.module.artifact.activation.internal.classloader.MuleSharedDomainClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 

@@ -22,6 +22,7 @@ import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.D
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.MULE_DOMAIN_FOLDER;
 
 import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.module.artifact.activation.internal.classloader.MuleSharedDomainClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;

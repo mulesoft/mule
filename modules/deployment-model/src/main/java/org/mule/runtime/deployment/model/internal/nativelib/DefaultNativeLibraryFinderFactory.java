@@ -11,6 +11,9 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 
+import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinder;
+import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinderFactory;
+
 import java.io.File;
 import java.net.URL;
 import java.util.function.Function;

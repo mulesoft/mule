@@ -9,6 +9,8 @@ package org.mule.runtime.deployment.model.internal.nativelib;
 
 import static org.apache.commons.lang3.SystemUtils.IS_OS_MAC;
 
+import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinder;
+
 import java.io.File;
 
 /**

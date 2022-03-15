@@ -4,20 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.deployment.model.internal.application;
+package org.mule.runtime.module.artifact.activation.internal.classloader;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+
 import static org.apache.commons.io.FileUtils.toFile;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.deployment.model.api.application.ApplicationClassLoader;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
-import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinder;
+import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinder;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 
@@ -29,13 +29,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoader implements ApplicationClassLoader {
+public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoader // implements ApplicationClassLoader
+{
 
   static {
     registerAsParallelCapable();
   }
 
-  private NativeLibraryFinder nativeLibraryFinder;
+  private final NativeLibraryFinder nativeLibraryFinder;
 
   public MuleApplicationClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor, ClassLoader parentCl,
                                     NativeLibraryFinder nativeLibraryFinder, List<URL> urls,
@@ -119,7 +120,7 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
     }
 
     final List<ClassLoader> classLoaders =
-        new ArrayList<ClassLoader>((List<ClassLoader>) artifactPluginClassLoaders.stream().map(acl -> {
+        new ArrayList<>((List<ClassLoader>) artifactPluginClassLoaders.stream().map(acl -> {
           try {
             return acl.getClass().getMethod("getClassLoader").invoke(acl);
           } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
