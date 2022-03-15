@@ -141,9 +141,7 @@ class ExtensionPluginMetadataGenerator {
       }
 
     };
-    DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
-    muleConfiguration.setMinMuleVersion(new MuleVersion(getProperty("maven.projectVersion")));
-    muleContext.setMuleConfiguration(muleConfiguration);
+    muleContext.setMuleConfiguration(new DefaultMuleConfiguration());
     try {
       initialiseIfNeeded(extensionManager, muleContext);
     } catch (InitialisationException e) {
