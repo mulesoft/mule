@@ -118,8 +118,9 @@ public class MacroExpansionModuleModel {
     final List<ComponentModel> moduleGlobalElements = getModuleGlobalElements();
     final Set<String> moduleGlobalElementsNames =
         moduleGlobalElements.stream().map(ComponentModel::getNameAttribute).collect(toSet());
-    expandOperations(moduleGlobalElementsNames);
+
     expandGlobalElements(moduleGlobalElements, moduleGlobalElementsNames);
+    expandOperations(moduleGlobalElementsNames);
   }
 
   private void expandOperations(Set<String> moduleGlobalElementsNames) {
@@ -213,6 +214,24 @@ public class MacroExpansionModuleModel {
   }
 
   private void macroExpandGlobalElements(List<ComponentModel> moduleComponentModels, Set<String> moduleGlobalElementsNames) {
+    if (!hasExplicitConfiguration(applicationModel, extensionModel)
+        && extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).isPresent()) {
+      ComponentModel configModel = new ComponentModel.Builder()
+          .setIdentifier(ComponentIdentifier.builder()
+              .namespaceUri(extensionModel.getXmlDslModel().getNamespace())
+              .namespace(extensionModel.getXmlDslModel().getPrefix())
+              .name(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).build())
+          .addParameter("name", MODULE_CONFIG_GLOBAL_ELEMENT_NAME, false)
+          .build();
+      configModel.setComponentLocation(fromSingleComponent(MODULE_CONFIG_GLOBAL_ELEMENT_NAME));
+      configModel.setConfigurationModel(extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).get());
+
+      configModel.setRoot(true);
+      configModel.setParent(applicationModel.getRootComponentModel());
+
+      applicationModel.getRootComponentModel().getInnerComponents().add(configModel);
+    }
+
     // scenario where it will macro expand as many times as needed all the references of the smart connector configurations
     applicationModel.executeOnEveryMuleComponentTree(muleRootComponentModel -> {
       muleRootComponentModel.getInnerComponents()
@@ -238,6 +257,14 @@ public class MacroExpansionModuleModel {
                 });
           });
     });
+  }
+
+  private boolean hasExplicitConfiguration(ApplicationModel applicationModel, ExtensionModel extensionModel) {
+    return applicationModel.getRootComponentModel().getInnerComponents()
+        .stream()
+        .filter(componentModel -> componentModel.getIdentifier().getNamespace()
+            .equals(extensionModel.getXmlDslModel().getPrefix()))
+        .anyMatch(componentModel -> ((ComponentAst) componentModel).getModel(ConfigurationModel.class).isPresent());
   }
 
   private Optional<ConfigurationModel> getConfigurationModel() {
@@ -312,11 +339,15 @@ public class MacroExpansionModuleModel {
 
     operationRefModel.getMetadata().getSourceCode().ifPresent(processorChainBuilder::setSourceCode);
 
+    final Optional<String> implicitConfigRef =
+        !configRefName.isPresent() && extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).isPresent()
+            ? of(MODULE_CONFIG_GLOBAL_ELEMENT_NAME) : configRefName;
+
     bodyProcessors.stream()
         .map(bodyProcessor -> lookForTNSOperation((ComponentAst) bodyProcessor)
             .map(tnsOperation -> createModuleOperationChain(bodyProcessor, tnsOperation, moduleGlobalElementsNames,
-                                                            configRefName, containerName))
-            .orElseGet(() -> copyOperationComponentModel(bodyProcessor, configRefName, moduleGlobalElementsNames,
+                                                            implicitConfigRef, containerName))
+            .orElseGet(() -> copyOperationComponentModel(bodyProcessor, implicitConfigRef, moduleGlobalElementsNames,
                                                          getLiteralParameters(propertiesMap, parametersMap),
                                                          containerName)))
         .forEach(processorChainBuilder::addChildComponentModel);
