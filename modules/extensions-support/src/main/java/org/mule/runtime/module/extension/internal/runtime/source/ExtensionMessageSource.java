@@ -263,17 +263,19 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private RestartContext stopSource(boolean restarting) throws MuleException {
-    if (sourceAdapter != null) {
-      final String sourceName = sourceAdapter.getName();
+    // Using an auxiliary variable so that it isn't nullified by another thread in the middle of the "if" body.
+    final SourceAdapter auxAdapter = sourceAdapter;
+    if (auxAdapter != null) {
+      final String sourceName = auxAdapter.getName();
 
       CoreEvent initialiserEvent = null;
       try {
         initialiserEvent = getInitialiserEvent(muleContext);
         try {
           stopUsingConfiguration(initialiserEvent);
-          return restarting ? sourceAdapter.beginRestart() : null;
+          return restarting ? auxAdapter.beginRestart() : null;
         } finally {
-          sourceAdapter.stop();
+          auxAdapter.stop();
           if (usesDynamicConfiguration()) {
             disposeSource();
           }
