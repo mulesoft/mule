@@ -87,7 +87,7 @@ public class ObjectFactoryClassRepository {
    */
   public Class<ObjectFactory> getObjectFactoryClass(Class objectFactoryType, boolean hasCustomFunction) {
     synchronized (this.getClass().getClassLoader()) {
-      String name = objectFactoryType.getName() + "_ByteBuddy";
+      String name = objectFactoryType.getName() + "_ByteBuddy" + hasCustomFunction;
       ClassLoader classLoader = getClass().getClassLoader();
       if (SmartFactoryBean.class.getClassLoader() != objectFactoryType.getClassLoader()) {
         classLoader = COMPOSITE_CL_CACHE.get(objectFactoryType.getClassLoader());
