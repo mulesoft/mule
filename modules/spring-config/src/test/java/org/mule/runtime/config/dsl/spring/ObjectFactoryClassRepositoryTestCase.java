@@ -38,7 +38,7 @@ public class ObjectFactoryClassRepositoryTestCase {
 
     ObjectFactoryClassRepository.SmartFactoryBeanInterceptor byteBuddyClass =
         (ObjectFactoryClassRepository.SmartFactoryBeanInterceptor) objectFactoryClassRepository
-            .getObjectFactoryClass(FakeObjectConnectionProviderObjectFactory.class).newInstance();
+            .getObjectFactoryClass(FakeObjectConnectionProviderObjectFactory.class, false).newInstance();
 
     byteBuddyClass.setIsSingleton(true);
     byteBuddyClass.setObjectTypeClass(String.class);
@@ -67,12 +67,12 @@ public class ObjectFactoryClassRepositoryTestCase {
 
     ObjectFactoryClassRepository.SmartFactoryBeanInterceptor byteBuddyClass =
         (ObjectFactoryClassRepository.SmartFactoryBeanInterceptor) objectFactoryClassRepository
-            .getObjectFactoryClass(FakeObjectConnectionProviderObjectFactory.class).newInstance();
+            .getObjectFactoryClass(FakeObjectConnectionProviderObjectFactory.class, false).newInstance();
     byteBuddyClass.setObjectTypeClass(String.class);
 
     ObjectFactoryClassRepository.SmartFactoryBeanInterceptor otherByteBuddyClass =
         (ObjectFactoryClassRepository.SmartFactoryBeanInterceptor) objectFactoryClassRepository
-            .getObjectFactoryClass(FakeObjectConnectionProviderObjectFactory.class).newInstance();
+            .getObjectFactoryClass(FakeObjectConnectionProviderObjectFactory.class, false).newInstance();
     otherByteBuddyClass.setObjectTypeClass(Integer.class);
 
     assertThat(byteBuddyClass.getClass(), is(otherByteBuddyClass.getClass()));
@@ -87,7 +87,7 @@ public class ObjectFactoryClassRepositoryTestCase {
 
     ObjectFactoryClassRepository.SmartFactoryBeanInterceptor byteBuddyClass =
         (ObjectFactoryClassRepository.SmartFactoryBeanInterceptor) objectFactoryClassRepository
-            .getObjectFactoryClass(OtherFakeObjectConnectionProviderObjectFactory.class).newInstance();
+            .getObjectFactoryClass(OtherFakeObjectConnectionProviderObjectFactory.class, false).newInstance();
 
     byteBuddyClass.setObjectTypeClass(String.class);
     assertThat(byteBuddyClass.getObjectType(), is(Long.class));

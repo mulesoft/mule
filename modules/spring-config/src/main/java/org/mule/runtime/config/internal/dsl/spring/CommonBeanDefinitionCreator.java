@@ -216,7 +216,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     }
 
     return rootBeanDefinition(objectFactoryClassRepository
-        .getObjectFactoryClass(objectFactoryType))
+        .getObjectFactoryClass(objectFactoryType, instanceCustomizationFunctionOptional.isPresent()))
             .addPropertyValue(IS_SINGLETON, !componentBuildingDefinition.isPrototype())
             .addPropertyValue(OBJECT_TYPE_CLASS, componentModel.getType())
             .addPropertyValue(IS_PROTOTYPE, componentBuildingDefinition.isPrototype())

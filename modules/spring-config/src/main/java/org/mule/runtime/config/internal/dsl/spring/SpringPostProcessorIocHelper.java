@@ -107,7 +107,7 @@ class SpringPostProcessorIocHelper implements PostProcessorIocHelper {
                                                                                             () -> true, empty()));
       } else {
         builder = rootBeanDefinition(objectFactoryClassRepository
-            .getObjectFactoryClass(beanClass))
+            .getObjectFactoryClass(beanClass, false))
                 .addPropertyValue(IS_SINGLETON, !definition.isPrototype())
                 .addPropertyValue(OBJECT_TYPE_CLASS, Object.class)
                 .addPropertyValue(IS_PROTOTYPE, definition.isPrototype())

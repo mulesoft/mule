@@ -85,7 +85,7 @@ public class ObjectFactoryClassRepository {
    * @param objectFactoryType the {@link ObjectFactory} of the component
    * @return the {@code FactoryBean} class to be used by spring for the provided configuration.
    */
-  public Class<ObjectFactory> getObjectFactoryClass(Class objectFactoryType) {
+  public Class<ObjectFactory> getObjectFactoryClass(Class objectFactoryType, boolean hasCustomFunction) {
     synchronized (this.getClass().getClassLoader()) {
       String name = objectFactoryType.getName() + "_ByteBuddy";
       ClassLoader classLoader = getClass().getClassLoader();
@@ -97,11 +97,11 @@ public class ObjectFactoryClassRepository {
       } catch (ClassNotFoundException e) {
         // class doesn't exist, generate
       }
-      return createObjectFactoryDynamicClass(objectFactoryType, name, classLoader);
+      return createObjectFactoryDynamicClass(objectFactoryType, name, classLoader, hasCustomFunction);
     }
   }
 
-  private Class<ObjectFactory> createObjectFactoryDynamicClass(Class objectFactoryType, String name, ClassLoader classLoader) {
+  private Class<ObjectFactory> createObjectFactoryDynamicClass(Class objectFactoryType, String name, ClassLoader classLoader, boolean hasCustomFunction) {
     return byteBuddy
         .subclass(objectFactoryType, IMITATE_SUPER_CLASS)
         .name(name)
@@ -121,7 +121,7 @@ public class ObjectFactoryClassRepository {
             : invoke(named("getObjectTypeClass")))
         .method(named(IS_PROTOTYPE).and(isDeclaredBy(SmartFactoryBean.class))).intercept(toField(IS_PROTOTYPE))
         .method(named(IS_EAGER_INIT).and(isDeclaredBy(SmartFactoryBean.class))).intercept(to(isEagerInitGetterInterceptor))
-        .method(named("getObject")).intercept(to(getObjectInterceptor))
+        .method(named("getObject")).intercept(hasCustomFunction? to(getObjectInterceptor) : invokeSuper())
         // Create the class and inject it in the current classloader
         .make()
         .load(classLoader, INJECTION)
