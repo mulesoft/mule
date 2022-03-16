@@ -1420,7 +1420,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {
     return featureContext -> featureContext.getArtifactMinMuleVersion()
-        .filter(muleVersion -> muleVersion.atLeast(version)).isPresent();
+        .filter(muleVersion -> muleVersion.atLeast("4.6.0")).isPresent();
   }
 
 }
