@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.deployment.model.internal.nativelib;
+package org.mule.runtime.module.artifact.activation.internal.nativelib;
 
 import static java.net.URLDecoder.decode;
 import static java.nio.charset.Charset.defaultCharset;
@@ -13,8 +13,6 @@ import static java.util.Arrays.stream;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_MAC;
-
-import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinder;
 
 import java.io.File;
 import java.io.IOException;

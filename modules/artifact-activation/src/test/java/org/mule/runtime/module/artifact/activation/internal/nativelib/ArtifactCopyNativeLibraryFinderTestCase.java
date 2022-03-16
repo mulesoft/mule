@@ -5,7 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.deployment.model.internal.nativelib;
+package org.mule.runtime.module.artifact.activation.internal.nativelib;
+
+import static org.mule.runtime.module.artifact.activation.internal.nativelib.ArtifactCopyNativeLibraryFinder.JNILIB_EXTENSION;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -14,8 +16,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assume.assumeThat;
-import static org.mule.runtime.deployment.model.internal.nativelib.ArtifactCopyNativeLibraryFinder.JNILIB_EXTENSION;
 
+import org.mule.runtime.module.artifact.activation.internal.nativelib.ArtifactCopyNativeLibraryFinder;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

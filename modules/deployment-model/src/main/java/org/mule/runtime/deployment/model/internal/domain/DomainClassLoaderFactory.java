@@ -16,8 +16,8 @@ import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.D
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 
 import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleSharedDomainClassLoader;
+import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinder;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;

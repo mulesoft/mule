@@ -9,8 +9,8 @@ package org.mule.runtime.deployment.model.internal.application;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 
-import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
+import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinder;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
