@@ -48,6 +48,7 @@ import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
@@ -94,13 +95,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-import java.util.function.Supplier;
-
 import reactor.core.publisher.Mono;
 
 /**
@@ -212,12 +212,14 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     Consumer<Throwable> onFailure;
     if (retryPolicyTemplate.isAsync()) {
       onSuccess = this::onReconnectionSuccessful;
-      onFailure = this::onReconnectionFailed;
+      onFailure = (t) -> {
+        dispatchExceptionNotification(t);
+        onReconnectionFailed(t);
+      };
     } else {
       onSuccess = () -> {
       };
-      onFailure = (t) -> {
-      };
+      onFailure = this::dispatchExceptionNotification;
     }
     Supplier<CompletableFuture<Void>> futureSupplier = () -> {
       CompletableFuture<Void> future = new CompletableFuture<>();
@@ -370,11 +372,19 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void onReconnectionFailed(Throwable exception) {
+    dispatchExceptionNotification(exception);
     LOGGER.error(format("Message source '%s' on flow '%s' could not be reconnected. Will be shutdown. %s",
                         sourceModel.getName(), getLocation().getRootContainerName(), exception.getMessage()),
                  exception);
     shutdown();
     reconnecting.set(false);
+  }
+
+  private void dispatchExceptionNotification(Throwable exception) {
+    SystemExceptionHandler systemExceptionHandler = muleContext.getExceptionListener();
+    RetryPolicyExhaustedException retryPolicyExhaustedException =
+        new RetryPolicyExhaustedException(exception, ExtensionMessageSource.this);
+    systemExceptionHandler.handleException(retryPolicyExhaustedException);
   }
 
   private void restart() throws MuleException {
