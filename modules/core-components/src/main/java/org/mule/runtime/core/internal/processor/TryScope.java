@@ -37,6 +37,7 @@ import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -58,6 +59,8 @@ import org.slf4j.Logger;
 
 import reactor.util.context.Context;
 
+import javax.inject.Inject;
+
 /**
  * Wraps the invocation of a list of nested processors {@link org.mule.runtime.core.api.processor.Processor} with a transaction.
  * If the {@link org.mule.runtime.core.api.transaction.TransactionConfig} is null then no transaction is used and the next
@@ -71,6 +74,9 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   protected MuleTransactionConfig transactionConfig;
   private FlowExceptionHandler messagingExceptionHandler;
   private List<Processor> processors;
+
+  @Inject
+  private ProfilingService profilingService;
 
   @Override
   public CoreEvent process(final CoreEvent event) throws MuleException {
