@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.processor;
 
-import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
@@ -14,8 +13,6 @@ import static org.mule.runtime.api.component.location.Location.builderFromString
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_COMMIT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
-import static org.mule.runtime.api.tx.TransactionType.LOCAL;
-import static org.mule.runtime.api.tx.TransactionType.XA;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.errorInvokingMessageProcessorWithinTransaction;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createScopeTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
