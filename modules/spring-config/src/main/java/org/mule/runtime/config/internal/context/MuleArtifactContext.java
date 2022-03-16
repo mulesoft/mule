@@ -18,6 +18,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_P
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_BYTE_BUDDY_OBJECT_CREATION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.VALIDATE_APPLICATION_MODEL_WITH_REGION_CLASSLOADER;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.ast.api.util.AstTraversalDirection.BOTTOM_UP;
@@ -175,6 +176,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final Map<String, String> artifactProperties;
   protected List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
   private final ExtensionManager extensionManager;
+  // TODO W-10855416: remove this
+  private final boolean validateAppModelWithRegionClassloader;
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -239,6 +242,10 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                   featureFlaggingService.isEnabled(DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING),
                                   featureFlaggingService.isEnabled(ENABLE_BYTE_BUDDY_OBJECT_CREATION));
 
+    // TODO W-10855416: remove this
+    this.validateAppModelWithRegionClassloader =
+        featureFlaggingService.isEnabled(VALIDATE_APPLICATION_MODEL_WITH_REGION_CLASSLOADER);
+
     this.applicationModel = artifactAst;
 
     // TODO MULE-18786 create the providers that depend on the AST only, and for the rest delegate on the resolver from the base
@@ -259,6 +266,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
     registerErrors(applicationModel);
     registerApplicationExtensionModel();
+
   }
 
   protected MuleRegistry getMuleRegistry() {
@@ -282,7 +290,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         })
         .withValidationsFilter(validationsFilter)
         // get the region classloader from the artifact one
-        .withArtifactRegionClassLoader(getRegionClassLoader())
+        .withArtifactRegionClassLoader(getValidationClassloader())
         .build()
         .validate(appModel);
 
@@ -303,6 +311,15 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
           .collect(joining(lineSeparator()))));
     }
   }
+
+  // TODO W-10855416: remove this and only validate it with the region classloader
+  private ClassLoader getValidationClassloader() {
+    if (validateAppModelWithRegionClassloader) {
+      return muleContext.getExecutionClassLoader().getParent();
+    }
+    return muleContext.getExecutionClassLoader();
+  }
+
 
   private ClassLoader getRegionClassLoader() {
     return muleContext.getExecutionClassLoader().getParent();
