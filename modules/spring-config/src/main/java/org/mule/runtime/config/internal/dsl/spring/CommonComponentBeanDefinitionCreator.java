@@ -40,9 +40,9 @@ class CommonComponentBeanDefinitionCreator extends CommonBeanBaseDefinitionCreat
 
   private final BeanDefinitionPostProcessor beanDefinitionPostProcessor;
 
-  public CommonComponentBeanDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository) {
-    super(objectFactoryClassRepository);
-
+  public CommonComponentBeanDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository,
+                                              boolean enableByteBuddy) {
+    super(objectFactoryClassRepository, enableByteBuddy);
     this.beanDefinitionPostProcessor = resolvePostProcessor();
   }
 
