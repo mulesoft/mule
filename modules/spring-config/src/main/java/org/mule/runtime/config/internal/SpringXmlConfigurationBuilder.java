@@ -12,6 +12,7 @@ import static java.util.Optional.of;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.configurePropertiesResolverFeatureFlag;
+import static org.mule.runtime.core.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
@@ -26,6 +27,7 @@ import org.mule.runtime.config.internal.artifact.SpringArtifactContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.builders.AbstractResourceConfigurationBuilder;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
@@ -45,6 +47,8 @@ import java.util.Optional;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+
+import javax.inject.Inject;
 
 /**
  * <code>SpringXmlConfigurationBuilder</code> enables Mule to be configured from a Spring XML Configuration file used with Mule
@@ -191,13 +195,17 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                         resolveComponentModelInitializer(),
                                                         resolveParentConfigurationProperties(), disableXmlValidations,
                                                         runtimeComponentBuildingDefinitionsProvider,
-                                                        runtimeLockFactory);
+                                                        runtimeLockFactory,
+                                                        ((MuleContextWithRegistry) muleContext).getRegistry()
+                                                            .lookupObject(FEATURE_FLAGGING_SERVICE_KEY));
     } else {
       muleArtifactContext =
           new MuleArtifactContext(muleContext, resolveArtifactConfigResources(), artifactDeclaration, optionalObjectsController,
                                   getArtifactProperties(), artifactType, resolveContextArtifactPluginClassLoaders(),
                                   resolveParentConfigurationProperties(), disableXmlValidations,
-                                  runtimeComponentBuildingDefinitionsProvider);
+                                  runtimeComponentBuildingDefinitionsProvider,
+                                  ((MuleContextWithRegistry) muleContext).getRegistry()
+                                      .lookupObject(FEATURE_FLAGGING_SERVICE_KEY));
       muleArtifactContext.initialize();
     }
 

@@ -14,6 +14,11 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperty;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_PROTOTYPE_OBJECT;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.INSTANCE_CUSTOMIZATION_FUNCTION_OPTIONAL;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_EAGER_INIT;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_PROTOTYPE;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_SINGLETON;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.OBJECT_TYPE_CLASS;
 import static org.mule.runtime.config.internal.dsl.spring.PropertyComponentUtils.getPropertyValueFromPropertyComponent;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.CUSTOM_TRANSFORMER_IDENTIFIER;
@@ -74,11 +79,13 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
 
   private final ObjectFactoryClassRepository objectFactoryClassRepository;
   private final BeanDefinitionPostProcessor beanDefinitionPostProcessor;
+  private final boolean enableByteBuddy;
 
-  public CommonBeanDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository) {
+  public CommonBeanDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository, boolean enableByteBuddy) {
     this.objectFactoryClassRepository = objectFactoryClassRepository;
 
     this.beanDefinitionPostProcessor = resolvePostProcessor();
+    this.enableByteBuddy = enableByteBuddy;
   }
 
   private BeanDefinitionPostProcessor resolvePostProcessor() {
@@ -200,10 +207,21 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
       instanceCustomizationFunctionOptional = of(object -> injectSpringProperties(customProperties, object));
     }
 
+    if (!enableByteBuddy) {
+      return rootBeanDefinition(objectFactoryClassRepository
+          .getObjectFactoryDynamicClass(componentBuildingDefinition,
+                                        objectFactoryType, componentModel.getType(),
+                                        new LazyValue<>(() -> componentModel.getBeanDefinition().isLazyInit()),
+                                        instanceCustomizationFunctionOptional));
+    }
+
     return rootBeanDefinition(objectFactoryClassRepository
-        .getObjectFactoryClass(componentBuildingDefinition, objectFactoryType, objectTypeVisitor.getType(),
-                               new LazyValue<>(() -> componentModel.getBeanDefinition().isLazyInit()),
-                               instanceCustomizationFunctionOptional));
+        .getObjectFactoryClass(objectFactoryType, instanceCustomizationFunctionOptional.isPresent()))
+            .addPropertyValue(IS_SINGLETON, !componentBuildingDefinition.isPrototype())
+            .addPropertyValue(OBJECT_TYPE_CLASS, componentModel.getType())
+            .addPropertyValue(IS_PROTOTYPE, componentBuildingDefinition.isPrototype())
+            .addPropertyValue(IS_EAGER_INIT, new LazyValue<>(() -> !componentModel.getBeanDefinition().isLazyInit()))
+            .addPropertyValue(INSTANCE_CUSTOMIZATION_FUNCTION_OPTIONAL, instanceCustomizationFunctionOptional);
   }
 
   private void injectSpringProperties(Map<String, Object> customProperties, Object createdInstance) {
@@ -242,7 +260,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
       componentModel.setType(wrappedBeanDefinition.getBeanClass());
     }
     final SpringPostProcessorIocHelper iocHelper =
-        new SpringPostProcessorIocHelper(objectFactoryClassRepository, wrappedBeanDefinition);
+        new SpringPostProcessorIocHelper(objectFactoryClassRepository, wrappedBeanDefinition, enableByteBuddy);
     componentModel.setBeanDefinition(iocHelper.getBeanDefinition());
   }
 
@@ -308,7 +326,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
       return (AbstractBeanDefinition) newBeanDefinition;
     } else {
       final SpringPostProcessorIocHelper iocHelper =
-          new SpringPostProcessorIocHelper(objectFactoryClassRepository, originalBeanDefinition);
+          new SpringPostProcessorIocHelper(objectFactoryClassRepository, originalBeanDefinition, enableByteBuddy);
       return iocHelper.getBeanDefinition();
     }
   }

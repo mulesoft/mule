@@ -35,6 +35,10 @@ import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_EAGER_INIT;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_PROTOTYPE;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_SINGLETON;
+import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.OBJECT_TYPE_CLASS;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
@@ -60,6 +64,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.config.internal.MuleArtifactContext;
 import org.mule.runtime.config.internal.ObjectProviderAwareBeanFactory;
@@ -67,6 +72,7 @@ import org.mule.runtime.config.internal.OptionalObjectsController;
 import org.mule.runtime.config.internal.dsl.model.CoreComponentBuildingDefinitionProvider;
 import org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -367,12 +373,15 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
         .findFirst()
         .get();
     BeanDefinition subFlowBeanDefinition = genericBeanDefinition(new ObjectFactoryClassRepository()
-        .getObjectFactoryClass(subFlowComponentBuildingDefinition, SubflowMessageProcessorChainFactoryBean.class, Object.class,
-                               () -> true, empty()))
-                                   .addPropertyValue("name", PARSED_DYNAMIC_REFERENCED_FLOW)
-                                   .addPropertyValue("messageProcessors", subFlowProcessorBeanDefinition)
-                                   .setScope(BeanDefinition.SCOPE_PROTOTYPE)
-                                   .getBeanDefinition();
+        .getObjectFactoryClass(SubflowMessageProcessorChainFactoryBean.class, false))
+            .addPropertyValue("name", PARSED_DYNAMIC_REFERENCED_FLOW)
+            .addPropertyValue("messageProcessors", subFlowProcessorBeanDefinition)
+            .addPropertyValue(IS_SINGLETON, !subFlowComponentBuildingDefinition.isPrototype())
+            .addPropertyValue(OBJECT_TYPE_CLASS, Object.class)
+            .addPropertyValue(IS_PROTOTYPE, subFlowComponentBuildingDefinition.isPrototype())
+            .addPropertyValue(IS_EAGER_INIT, new LazyValue<>(() -> true))
+            .setScope(BeanDefinition.SCOPE_PROTOTYPE)
+            .getBeanDefinition();
     beanFactory.registerBeanDefinition(PARSED_DYNAMIC_REFERENCED_FLOW, subFlowBeanDefinition);
     //Additional flow and processing strategy (needed to generate a concurrent subflow instantiation)
     Flow concurrentCallerFlow = mock(Flow.class, INITIALIZABLE_MESSAGE_PROCESSOR);
@@ -458,7 +467,8 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     MuleArtifactContext muleArtifactContext =
         new MuleArtifactContext(mockMuleContext, new ConfigResource[0], new ArtifactDeclaration(),
                                 mock(OptionalObjectsController.class), new HashMap<>(), ArtifactType.APP, new ArrayList<>(),
-                                Optional.empty(), true, mock(CoreComponentBuildingDefinitionProvider.class)) {
+                                Optional.empty(), true, mock(CoreComponentBuildingDefinitionProvider.class),
+                                mock(FeatureFlaggingService.class)) {
 
           @Override
           protected DefaultListableBeanFactory createBeanFactory() {
