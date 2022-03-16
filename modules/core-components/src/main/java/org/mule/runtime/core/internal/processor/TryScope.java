@@ -6,10 +6,16 @@
  */
 package org.mule.runtime.core.internal.processor;
 
+import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_COMMIT;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
+import static org.mule.runtime.api.tx.TransactionType.LOCAL;
+import static org.mule.runtime.api.tx.TransactionType.XA;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.errorInvokingMessageProcessorWithinTransaction;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createScopeTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -22,6 +28,7 @@ import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALW
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_BEGIN_OR_JOIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_INDIFFERENT;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+import static org.mule.runtime.core.api.transaction.TransactionUtils.profileTransactionAction;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.popTxFromSubscriberContext;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.pushTxToSubscriberContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
@@ -85,33 +92,38 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    if (transactionConfig.getAction() != ACTION_INDIFFERENT) {
-      ExecutionTemplate<CoreEvent> executionTemplate = createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
-      final I18nMessage txErrorMessage = errorInvokingMessageProcessorWithinTransaction(nestedChain, transactionConfig);
-
-      return subscriberContext()
-          .flatMapMany(ctx -> from(publisher)
-              .handle((event, sink) -> {
-                final boolean txPrevoiuslyActive = isTransactionActive();
-                Transaction previousTx = getCurrentTx();
-                try {
-                  sink.next(executionTemplate.execute(() -> {
-                    handlePreviousTransaction(txPrevoiuslyActive, previousTx, getCurrentTx());
-                    return processBlocking(ctx, event);
-                  }));
-                } catch (Exception e) {
-                  final Throwable unwrapped = unwrap(e);
-
-                  if (unwrapped instanceof MuleException) {
-                    sink.error(unwrapped);
-                  } else {
-                    sink.error(new DefaultMuleException(txErrorMessage, unwrapped));
-                  }
-                }
-              }));
-    } else {
-      return from(publisher).transform(nestedChain);
+    if (transactionConfig.getAction() == ACTION_INDIFFERENT) {
+      return from(publisher).doOnNext(e -> profileTransactionAction(profilingService, TX_CONTINUE, getLocation()))
+          .transform(nestedChain);
     }
+
+    ExecutionTemplate<CoreEvent> executionTemplate = createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
+    final I18nMessage txErrorMessage = errorInvokingMessageProcessorWithinTransaction(nestedChain, transactionConfig);
+
+    return subscriberContext()
+        .flatMapMany(ctx -> from(publisher)
+            .handle((event, sink) -> {
+              final boolean txPrevoiuslyActive = isTransactionActive();
+              Transaction previousTx = getCurrentTx();
+              try {
+                sink.next(executionTemplate.execute(() -> {
+                  handlePreviousTransaction(txPrevoiuslyActive, previousTx, getCurrentTx());
+                  profileTransactionAction(profilingService, txPrevoiuslyActive ? TX_CONTINUE : TX_START, getLocation());
+                  CoreEvent result = processBlocking(ctx, event);
+                  profileTransactionAction(profilingService, txPrevoiuslyActive ? TX_CONTINUE : TX_COMMIT, getLocation());
+                  return result;
+                }));
+              } catch (Exception e) {
+                final Throwable unwrapped = unwrap(e);
+
+                if (unwrapped instanceof MuleException) {
+                  sink.error(unwrapped);
+                } else {
+                  sink.error(new DefaultMuleException(txErrorMessage, unwrapped));
+                }
+              }
+            }));
+
   }
 
   private void handlePreviousTransaction(final boolean txPrevoiuslyActive, Transaction previousTx, Transaction currentTx) {

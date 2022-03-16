@@ -6,22 +6,27 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_ROLLBACK;
+import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
+import static org.mule.runtime.core.api.transaction.TransactionUtils.profileTransactionAction;
+
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-
-import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
-import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
 
 /**
  * Handler that will propagate errors and rollback transactions. Replaces the rollback-exception-strategy from Mule 3.
@@ -31,6 +36,9 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handle
 public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
   private final SingleErrorTypeMatcher redeliveryExhaustedMatcher;
+
+  @Inject
+  private ProfilingService profilingService;
 
   public OnErrorPropagateHandler() {
     ErrorType redeliveryExhaustedErrorType = MULE_CORE_ERROR_TYPE_REPOSITORY.getErrorType(REDELIVERY_EXHAUSTED)
@@ -58,7 +66,10 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
       Exception exception = getException(event);
       event = super.beforeRouting().apply(event);
       if (!isRedeliveryExhausted(exception) && isOwnedTransaction()) {
+        profileTransactionAction(profilingService, TX_ROLLBACK, getLocation());
         rollback(exception);
+      } else {
+        profileTransactionAction(profilingService, TX_CONTINUE, getLocation());
       }
       return event;
     };
