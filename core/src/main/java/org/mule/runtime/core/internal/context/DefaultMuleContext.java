@@ -1349,7 +1349,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureDefaultErrorHandlerNotRollbackingEveryTx() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING,
-                                                minMuleVersion("4.5.0"));
+                                                realMinMuleVersion("4.5.0"));
   }
 
   /**
@@ -1404,7 +1404,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureDisableApplyObjectProcessor() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DISABLE_APPLY_OBJECT_PROCESSOR,
-                                                minMuleVersion("4.5.0"));
+                                                realMinMuleVersion("4.5.0"));
   }
 
   /**
@@ -1415,7 +1415,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureEnableByteBuddyObjectCreation() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ENABLE_BYTE_BUDDY_OBJECT_CREATION,
-                                                minMuleVersion("4.6.0"));
+                                                realMinMuleVersion("4.6.0"));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {
