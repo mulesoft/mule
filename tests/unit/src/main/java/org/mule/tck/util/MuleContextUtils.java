@@ -45,6 +45,8 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.Injector;
@@ -291,7 +293,9 @@ public class MuleContextUtils {
    * @return the created {@code muleContext}.
    */
   public static MuleContextWithRegistry mockContextWithServices() {
-    return mockContextWithServicesWithProfilingService(mock(CoreProfilingService.class));
+    CoreProfilingService profilingService = mock(CoreProfilingService.class);
+    when(profilingService.getProfilingDataProducer(any(ProfilingEventType.class))).thenReturn(mock(ProfilingDataProducer.class));
+    return mockContextWithServicesWithProfilingService(profilingService);
   }
 
   /**
