@@ -401,4 +401,22 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
         .findFirst().isPresent();
   }
 
+
+  @Override
+  public MuleArtifactClassLoader resolvePluginClassLoader(ArtifactClassLoader ownerClassLoader,
+                                                          ArtifactPluginDescriptor descriptor) {
+    return createMulePluginClassLoader((MuleDeployableArtifactClassLoader) ownerClassLoader,
+                                       descriptor,
+                                       bundleDescriptor -> ((DeployableArtifactDescriptor) ownerClassLoader
+                                           .getArtifactDescriptor())
+                                               .getPlugins()
+                                               .stream()
+                                               .filter(apd -> apd.getBundleDescriptor().getArtifactId()
+                                                   .equals(bundleDescriptor.getArtifactId())
+                                                   && apd.getBundleDescriptor().getGroupId()
+                                                       .equals(bundleDescriptor.getGroupId()))
+                                               .findAny(),
+                                       this::resolvePluginClassLoader);
+  }
+
 }
