@@ -1315,7 +1315,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureRemoveShadowedImplicitInputs() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DW_REMOVE_SHADOWED_IMPLICIT_INPUTS,
-                                                minMuleVersion("4.4.0"));
+                                                realMinMuleVersion("4.4.0"));
   }
 
   /**
@@ -1326,19 +1326,19 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureEnforceErrorTypesValidation() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ENFORCE_ERROR_TYPES_VALIDATION,
-                                                minMuleVersion("4.5.0"));
+                                                realMinMuleVersion("4.5.0"));
   }
 
   private static void configureDisableAttributeParameterWhitespaceTrimming() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING,
-                                                minMuleVersion("4.5.0"));
+                                                realMinMuleVersion("4.5.0"));
   }
 
   private static void configureDisablePojoTextCdataWhitespaceTrimming() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING,
-                                                minMuleVersion("4.5.0"));
+                                                realMinMuleVersion("4.5.0"));
   }
 
   /**
