@@ -29,8 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoader // implements ApplicationClassLoader
-{
+public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoader {
 
   static {
     registerAsParallelCapable();
