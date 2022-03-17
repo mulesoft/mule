@@ -1239,7 +1239,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureSplitterExceptionHandlingFeature() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(HANDLE_SPLITTER_EXCEPTION,
-                                                minMuleVersion("4.4.0"));
+                                                realMinMuleVersion("4.4.0"));
   }
 
   /**
@@ -1260,7 +1260,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   public static void configurePropertiesResolverFeatureFlag() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(HONOUR_RESERVED_PROPERTIES,
-                                                minMuleVersion("4.3.0"));
+                                                realMinMuleVersion("4.3.0"));
   }
 
   /**
@@ -1271,7 +1271,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureEnablePolicyIsolation() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ENABLE_POLICY_ISOLATION,
-                                                minMuleVersion("4.4.0"));
+                                                realMinMuleVersion("4.4.0"));
   }
 
   /**
@@ -1422,5 +1422,12 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     return featureContext -> featureContext.getArtifactMinMuleVersion()
         .filter(muleVersion -> muleVersion.atLeast("4.6.0")).isPresent();
   }
+
+  private static Predicate<FeatureContext> realMinMuleVersion(String version) {
+    return featureContext -> featureContext.getArtifactMinMuleVersion()
+            .filter(muleVersion -> muleVersion.atLeast(version)).isPresent();
+  }
+
+
 
 }
