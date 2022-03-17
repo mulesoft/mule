@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.internal.context;
 
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,11 +40,14 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.VALIDATE_APPLICATIO
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(MuleAstUtils.class)
+@Issue("W-10808757")
+@Story(APP_DEPLOYMENT)
 public class MuleArtifactContextTestCase extends AbstractMuleTestCase {
 
   @Rule
