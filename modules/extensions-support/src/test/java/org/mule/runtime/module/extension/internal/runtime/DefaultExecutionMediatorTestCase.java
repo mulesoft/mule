@@ -673,8 +673,8 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
     try {
       mediator.execute(operationExecutor, operationContext, executorCallback);
-    } catch (Exception e) {
-      fail("Uncaught exception in execution mediator");
+    } catch (Throwable e) {
+      fail("Uncaught throwable in execution mediator");
     }
 
     latch.await(5, SECONDS);
