@@ -41456,6 +41456,7 @@
       "format": "csv",
       "type": "Object",
       "annotations": {
+        "typeId": "csv-object",
         "classInformation": {
           "classname": "java.lang.Integer",
           "hasDefaultConstructor": false,
