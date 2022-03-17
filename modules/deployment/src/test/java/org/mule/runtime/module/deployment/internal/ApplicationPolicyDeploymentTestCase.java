@@ -788,10 +788,6 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Test
   @Issue("MULE-18196")
   public void appliesPolicyAndAppWithCollidingErrorNamespace() throws Exception {
-    if (shareErrorTypeRepository) {
-      expectPolicyRegistrationException();
-    }
-
     ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
 
     policyManager.registerPolicyTemplate(policyWithPluginAndResource().getArtifactFile());
