@@ -212,14 +212,11 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     Consumer<Throwable> onFailure;
     if (retryPolicyTemplate.isAsync()) {
       onSuccess = this::onReconnectionSuccessful;
-      onFailure = (t) -> {
-        dispatchExceptionNotification(t);
-        onReconnectionFailed(t);
-      };
+      onFailure = this::onReconnectionFailed;
     } else {
       onSuccess = () -> {
       };
-      onFailure = this::dispatchExceptionNotification;
+      onFailure = this::handleException;
     }
     Supplier<CompletableFuture<Void>> futureSupplier = () -> {
       CompletableFuture<Void> future = new CompletableFuture<>();
@@ -372,7 +369,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void onReconnectionFailed(Throwable exception) {
-    dispatchExceptionNotification(exception);
+    handleException(exception);
     LOGGER.error(format("Message source '%s' on flow '%s' could not be reconnected. Will be shutdown. %s",
                         sourceModel.getName(), getLocation().getRootContainerName(), exception.getMessage()),
                  exception);
@@ -380,11 +377,15 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     reconnecting.set(false);
   }
 
-  private void dispatchExceptionNotification(Throwable exception) {
-    SystemExceptionHandler systemExceptionHandler = muleContext.getExceptionListener();
+  private void handleException(Throwable exception) {
     RetryPolicyExhaustedException retryPolicyExhaustedException =
         new RetryPolicyExhaustedException(exception, ExtensionMessageSource.this);
-    systemExceptionHandler.handleException(retryPolicyExhaustedException);
+    handleException(retryPolicyExhaustedException);
+  }
+
+  private void handleException(RetryPolicyExhaustedException exception) {
+    SystemExceptionHandler systemExceptionHandler = muleContext.getExceptionListener();
+    systemExceptionHandler.handleException(exception);
   }
 
   private void restart() throws MuleException {
