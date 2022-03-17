@@ -1282,7 +1282,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureEntityResolverFailOnFirstErrorFeature() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR,
-                                                minMuleVersion("4.4.0"));
+                                                realMinMuleVersion("4.4.0"));
   }
 
   /**
@@ -1293,7 +1293,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureSetVariableWithNullVale() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(SET_VARIABLE_WITH_NULL_VALUE,
-                                                minMuleVersion("4.4.0"));
+                                                realMinMuleVersion("4.4.0"));
   }
 
   /**
@@ -1304,7 +1304,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureStartExtensionComponentsWithArtifactClassloader() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER,
-                                                minMuleVersion("4.4.0"));
+                                                realMinMuleVersion("4.4.0"));
   }
 
   /**
