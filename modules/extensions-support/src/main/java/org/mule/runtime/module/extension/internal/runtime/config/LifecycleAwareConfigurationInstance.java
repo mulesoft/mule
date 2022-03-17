@@ -127,6 +127,10 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
 
   @Override
   public synchronized void start() throws MuleException {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(format("Starting LifecycleAwareConfigurationInstance '%s'", getName()));
+    }
+
     if (!started) {
       started = true;
       if (connectionProvider.isPresent()) {
@@ -150,6 +154,10 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
    */
   @Override
   public synchronized void stop() throws MuleException {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(format("Stopping LifecycleAwareConfigurationInstance '%s'", getName()));
+    }
+
     if (started) {
       started = false;
       try {

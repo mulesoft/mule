@@ -45,6 +45,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.junit.MockitoJUnit.rule;
 
+import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -73,10 +74,13 @@ import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.config.LifecycleAwareConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator;
@@ -564,6 +568,19 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     });
   }
 
+  @Test
+  @Description("Tests the exception raised when trying to get the statistics from a configuration instance before " +
+      "initializing it is correctly propagated through the executor's error callback")
+  @Issue("W-10742153")
+  public void getStatisticsFromNotInitializedConfigurationInstance() throws Throwable {
+    expectedException.expect(IllegalStateException.class);
+    ConfigurationInstance configurationInstance =
+        new LifecycleAwareConfigurationInstance("name", mock(ConfigurationModel.class), null, mock(ConfigurationState.class),
+                                                of(mock(ConnectionProvider.class)));
+    when(operationContext.getConfiguration()).thenReturn(of(configurationInstance));
+    execute();
+  }
+
   private void assertException(Consumer<Throwable> assertion) throws Throwable {
     try {
       execute();
@@ -654,14 +671,17 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
       return null;
     }).when(executorCallback).error(any());
 
-    mediator.execute(operationExecutor, operationContext, executorCallback);
+    try {
+      mediator.execute(operationExecutor, operationContext, executorCallback);
+    } catch (Exception e) {
+      fail("Uncaught exception in execution mediator");
+    }
 
     latch.await(5, SECONDS);
 
     if (exception.get() != null) {
       throw exception.get();
     }
-
 
     return result.get();
   }
