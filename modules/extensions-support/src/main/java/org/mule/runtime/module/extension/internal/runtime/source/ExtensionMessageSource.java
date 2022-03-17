@@ -212,7 +212,10 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     Consumer<Throwable> onFailure;
     if (retryPolicyTemplate.isAsync()) {
       onSuccess = this::onReconnectionSuccessful;
-      onFailure = this::onReconnectionFailed;
+      onFailure = (t) -> {
+        handleException(t);
+        onReconnectionFailed(t);
+      };
     } else {
       onSuccess = () -> {
       };
@@ -369,7 +372,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void onReconnectionFailed(Throwable exception) {
-    handleException(exception);
     LOGGER.error(format("Message source '%s' on flow '%s' could not be reconnected. Will be shutdown. %s",
                         sourceModel.getName(), getLocation().getRootContainerName(), exception.getMessage()),
                  exception);
