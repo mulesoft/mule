@@ -1239,7 +1239,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureSplitterExceptionHandlingFeature() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(HANDLE_SPLITTER_EXCEPTION,
-                                                realMinMuleVersion("4.4.0"));
+                                                minMuleVersion("4.4.0"));
   }
 
   /**
@@ -1260,7 +1260,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   public static void configurePropertiesResolverFeatureFlag() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(HONOUR_RESERVED_PROPERTIES,
-                                                realMinMuleVersion("4.3.0"));
+                                                minMuleVersion("4.3.0"));
   }
 
   /**
@@ -1271,7 +1271,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureEnablePolicyIsolation() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ENABLE_POLICY_ISOLATION,
-                                                realMinMuleVersion("4.4.0"));
+                                                minMuleVersion("4.4.0"));
   }
 
   /**
@@ -1282,7 +1282,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureEntityResolverFailOnFirstErrorFeature() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR,
-                                                realMinMuleVersion("4.4.0"));
+                                                minMuleVersion("4.4.0"));
   }
 
   /**
@@ -1293,7 +1293,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureSetVariableWithNullVale() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(SET_VARIABLE_WITH_NULL_VALUE,
-                                                realMinMuleVersion("4.4.0"));
+                                                minMuleVersion("4.4.0"));
   }
 
   /**
@@ -1304,7 +1304,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureStartExtensionComponentsWithArtifactClassloader() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER,
-                                                realMinMuleVersion("4.4.0"));
+                                                minMuleVersion("4.4.0"));
   }
 
   /**
@@ -1315,7 +1315,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureRemoveShadowedImplicitInputs() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DW_REMOVE_SHADOWED_IMPLICIT_INPUTS,
-                                                realMinMuleVersion("4.4.0"));
+                                                minMuleVersion("4.4.0"));
   }
 
   /**
@@ -1326,19 +1326,19 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureEnforceErrorTypesValidation() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ENFORCE_ERROR_TYPES_VALIDATION,
-                                                realMinMuleVersion("4.5.0"));
+                                                minMuleVersion("4.5.0"));
   }
 
   private static void configureDisableAttributeParameterWhitespaceTrimming() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING,
-                                                realMinMuleVersion("4.5.0"));
+                                                minMuleVersion("4.5.0"));
   }
 
   private static void configureDisablePojoTextCdataWhitespaceTrimming() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING,
-                                                realMinMuleVersion("4.5.0"));
+                                                minMuleVersion("4.5.0"));
   }
 
   /**
@@ -1349,7 +1349,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureDefaultErrorHandlerNotRollbackingEveryTx() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING,
-                                                realMinMuleVersion("4.5.0"));
+                                                minMuleVersion("4.5.0"));
   }
 
   /**
@@ -1360,7 +1360,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureEnforceRequiredExpressionValidation() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ENFORCE_REQUIRED_EXPRESSION_VALIDATION,
-                                                realMinMuleVersion("4.5.0"));
+                                                minMuleVersion("4.5.0"));
   }
 
   /**
@@ -1371,7 +1371,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureEnforceExpressionValidation() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ENFORCE_EXPRESSION_VALIDATION,
-                                                realMinMuleVersion("4.5.0"));
+                                                minMuleVersion("4.5.0"));
   }
 
   /**
@@ -1404,7 +1404,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureDisableApplyObjectProcessor() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DISABLE_APPLY_OBJECT_PROCESSOR,
-                                                realMinMuleVersion("4.6.0"));
+                                                minMuleVersion("4.6.0"));
   }
 
   /**
@@ -1415,19 +1415,11 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureEnableByteBuddyObjectCreation() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ENABLE_BYTE_BUDDY_OBJECT_CREATION,
-                                                realMinMuleVersion("4.5.0"));
+                                                minMuleVersion("4.5.0"));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {
     return featureContext -> featureContext.getArtifactMinMuleVersion()
-        .filter(muleVersion -> muleVersion.atLeast("4.6.0")).isPresent();
-  }
-
-  private static Predicate<FeatureContext> realMinMuleVersion(String version) {
-    return featureContext -> featureContext.getArtifactMinMuleVersion()
         .filter(muleVersion -> muleVersion.atLeast(version)).isPresent();
   }
-
-
-
 }
