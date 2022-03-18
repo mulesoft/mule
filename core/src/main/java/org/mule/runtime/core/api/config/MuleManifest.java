@@ -144,7 +144,7 @@ public class MuleManifest {
             && !url.toExternalForm().contains("mule-core-components"))
             || url.toExternalForm().contains("mule-runtime-extension-model")
             || url.toExternalForm().contains("mule-runtime-ee-extension-model")
-            || url.toExternalForm().matches(".*mule.*-.*-embedded.*\\.jar.*")) {
+            || url.toExternalForm().matches("mule[^-]*-[^-]*-embedded(?:(?!\\.jar).)*\\.jar")) {
           candidates.put(url.toExternalForm(), url);
         }
       }
@@ -168,7 +168,7 @@ public class MuleManifest {
         URL url = e.nextElement();
         if ((url.toExternalForm().contains(testManifestPath)
             && !url.toExternalForm().contains("tests.jar"))
-            || url.toExternalForm().matches(".*mule.*-.*-embedded.*\\.jar.*")) {
+            || url.toExternalForm().matches("mule[^-]*-[^-]*-embedded(?:(?!\\.jar).)*\\.jar")) {
           return url;
         }
       }
