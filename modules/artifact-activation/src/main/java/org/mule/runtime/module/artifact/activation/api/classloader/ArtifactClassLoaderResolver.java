@@ -13,7 +13,6 @@ import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
-import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
@@ -22,6 +21,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -37,20 +37,21 @@ import java.util.function.Function;
 public interface ArtifactClassLoaderResolver {
 
   static ArtifactClassLoaderResolver defaultClassLoaderResolver() {
-    return new DefaultArtifactClassLoaderResolver(new DefaultModuleRepository(new ContainerModuleDiscoverer(ArtifactClassLoaderResolver.class
+    return classLoaderResolver(new DefaultModuleRepository(new ContainerModuleDiscoverer(ArtifactClassLoaderResolver.class
         .getClassLoader())),
-                                                  new DefaultNativeLibraryFinderFactory(name -> {
-                                                    try {
-                                                      return createTempDirectory("nativeLibs_" + name).toFile();
-                                                    } catch (IOException e) {
-                                                      throw new IllegalStateException(e);
-                                                    }
-                                                  }));
+                               name -> {
+                                 try {
+                                   return createTempDirectory("nativeLibs_" + name).toFile();
+                                 } catch (IOException e) {
+                                   throw new IllegalStateException(e);
+                                 }
+                               });
   }
 
   static ArtifactClassLoaderResolver classLoaderResolver(ModuleRepository moduleRepository,
-                                                         NativeLibraryFinderFactory nativeLibraryFinderFactory) {
-    return new DefaultArtifactClassLoaderResolver(moduleRepository, nativeLibraryFinderFactory);
+                                                         Function<String, File> tempFolderChildFunction) {
+    return new DefaultArtifactClassLoaderResolver(moduleRepository,
+                                                  new DefaultNativeLibraryFinderFactory(tempFolderChildFunction));
   }
 
   /**
