@@ -213,13 +213,13 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     if (retryPolicyTemplate.isAsync()) {
       onSuccess = this::onReconnectionSuccessful;
       onFailure = (t) -> {
-        handleException(t);
+        handleRetryException(t);
         onReconnectionFailed(t);
       };
     } else {
       onSuccess = () -> {
       };
-      onFailure = this::handleException;
+      onFailure = this::handleRetryException;
     }
     Supplier<CompletableFuture<Void>> futureSupplier = () -> {
       CompletableFuture<Void> future = new CompletableFuture<>();
@@ -379,15 +379,15 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     reconnecting.set(false);
   }
 
-  private void handleException(Throwable exception) {
-    RetryPolicyExhaustedException retryPolicyExhaustedException =
-        new RetryPolicyExhaustedException(exception, ExtensionMessageSource.this);
-    handleException(retryPolicyExhaustedException);
-  }
-
-  private void handleException(RetryPolicyExhaustedException exception) {
+  private void handleRetryException(Throwable throwable) {
+    RetryPolicyExhaustedException retryPolicyExhaustedException;
+    if (throwable instanceof RetryPolicyExhaustedException) {
+      retryPolicyExhaustedException = (RetryPolicyExhaustedException) throwable;
+    } else {
+      retryPolicyExhaustedException = new RetryPolicyExhaustedException(throwable, ExtensionMessageSource.this);
+    }
     SystemExceptionHandler systemExceptionHandler = muleContext.getExceptionListener();
-    systemExceptionHandler.handleException(exception);
+    systemExceptionHandler.handleException(retryPolicyExhaustedException);
   }
 
   private void restart() throws MuleException {
