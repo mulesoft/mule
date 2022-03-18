@@ -210,16 +210,20 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private void startSource(boolean restarting, RestartContext restartContext) throws MuleException {
     Runnable onSuccess;
     Consumer<Throwable> onFailure;
+    SystemExceptionHandler systemExceptionHandler = muleContext.getExceptionListener();
     if (retryPolicyTemplate.isAsync()) {
       onSuccess = this::onReconnectionSuccessful;
       onFailure = (t) -> {
-        handleRetryException(t);
-        onReconnectionFailed(t);
+        RetryPolicyExhaustedException exception = t instanceof RetryPolicyExhaustedException ? (RetryPolicyExhaustedException) t
+            : new RetryPolicyExhaustedException(t, ExtensionMessageSource.this);
+        systemExceptionHandler.handleException(exception);
+        onReconnectionFailed(exception);
       };
     } else {
       onSuccess = () -> {
       };
-      onFailure = this::handleRetryException;
+      onFailure = (t) -> {
+      };
     }
     Supplier<CompletableFuture<Void>> futureSupplier = () -> {
       CompletableFuture<Void> future = new CompletableFuture<>();
@@ -241,11 +245,17 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         this.onReconnectionSuccessful();
       }
     } catch (ExecutionException exception) {
-      throw new RetryPolicyExhaustedException(exception.getCause(), ExtensionMessageSource.this);
+      RetryPolicyExhaustedException retryPolicyExhaustedException =
+          new RetryPolicyExhaustedException(exception.getCause(), ExtensionMessageSource.this);
+      systemExceptionHandler.handleException(retryPolicyExhaustedException);
+      throw retryPolicyExhaustedException;
     } catch (InterruptedException e) {
-      throw new MuleRuntimeException(createStaticMessage(format("Found exception starting source '%s' on flow '%s'",
-                                                                sourceModel.getName(), getLocation().getRootContainerName())),
-                                     e);
+      MuleRuntimeException muleRuntimeException =
+          new MuleRuntimeException(createStaticMessage(format("Found exception starting source '%s' on flow '%s'",
+                                                              sourceModel.getName(), getLocation().getRootContainerName())),
+                                   e);
+      systemExceptionHandler.handleException(muleRuntimeException);
+      throw muleRuntimeException;
     }
   }
 
@@ -377,17 +387,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                  exception);
     shutdown();
     reconnecting.set(false);
-  }
-
-  private void handleRetryException(Throwable throwable) {
-    RetryPolicyExhaustedException retryPolicyExhaustedException;
-    if (throwable instanceof RetryPolicyExhaustedException) {
-      retryPolicyExhaustedException = (RetryPolicyExhaustedException) throwable;
-    } else {
-      retryPolicyExhaustedException = new RetryPolicyExhaustedException(throwable, ExtensionMessageSource.this);
-    }
-    SystemExceptionHandler systemExceptionHandler = muleContext.getExceptionListener();
-    systemExceptionHandler.handleException(retryPolicyExhaustedException);
   }
 
   private void restart() throws MuleException {
