@@ -9,10 +9,8 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
-import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.stream.Collectors.toCollection;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
@@ -24,38 +22,29 @@ import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
-import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.model.parameter.ImmutableExclusiveParametersModel;
-import org.mule.runtime.module.extension.internal.loader.java.property.ExclusiveOptionalModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
 /**
- * {@link ParameterModelParser} implementation for Mule SDK
+ * {@link ParameterModelParser} implementation for Mule SDK (required parameters).
  *
  * @since 4.5.0
  */
 public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelParser implements ParameterModelParser {
 
-  private final ComponentAst parameter;
+  protected final ComponentAst parameter;
   private final TypeLoader typeLoader;
 
   private String name;
-  private boolean required = true;
-  private Object defaultValue = null;
-  private final List<ModelProperty> modelProperties = new LinkedList<>();
 
   public MuleSdkParameterModelParserSdk(ComponentAst parameter, TypeLoader typeLoader) {
     this.parameter = parameter;
@@ -66,27 +55,6 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
 
   private void parseStructure() {
     name = getParameter(parameter, "name");
-    parseOptional();
-  }
-
-  private void parseOptional() {
-    getSingleChild(parameter, "optional").ifPresent(optional -> {
-      required = false;
-      defaultValue = getOptionalParameter(optional, "defaultValue").orElse(null);
-
-      getSingleChild(optional, "exclusiveOptional")
-          .ifPresent(exclusive -> modelProperties
-              .add(new ExclusiveOptionalModelProperty(parseExclusiveParametersModel(exclusive))));
-    });
-  }
-
-  private ExclusiveParametersModel parseExclusiveParametersModel(ComponentAst componentAst) {
-    Set<String> parameters = Stream.of(this.<String>getParameter(componentAst, "parameters").split(","))
-        .map(String::trim)
-        .filter(p -> !isBlank(p))
-        .collect(toCollection(LinkedHashSet::new));
-
-    return new ImmutableExclusiveParametersModel(parameters, getParameter(componentAst, "oneRequired"));
   }
 
   @Override
@@ -114,12 +82,12 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
 
   @Override
   public boolean isRequired() {
-    return required;
+    return true;
   }
 
   @Override
   public Object getDefaultValue() {
-    return defaultValue;
+    return null;
   }
 
   @Override
@@ -159,7 +127,7 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
 
   @Override
   public List<ModelProperty> getAdditionalModelProperties() {
-    return unmodifiableList(modelProperties);
+    return emptyList();
   }
 
   @Override

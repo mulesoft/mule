@@ -53,6 +53,15 @@ public class MuleOperationExecutionTestCase extends MuleArtifactFunctionalTestCa
   }
 
   @Test
+  @Description("Calls a flow that executes the <this:hello-place> operation which takes exclusive optional parameters")
+  public void executeExclusiveOptionalsOperation() throws Exception {
+    CoreEvent resultEvent = flowRunner("exclusiveOptionalsFlow").run();
+    assertThat(resultEvent.getMessage().getPayload().getValue(),
+               equalTo("good morning  London "));
+    assertThat(resultEvent.getMessage().getAttributes().getValue(), is(nullValue()));
+  }
+
+  @Test
   @Description("Verifies that operations params don't exit its own scope when composed")
   public void captureParamsAcrossOperations() throws Exception {
     CoreEvent resultEvent = flowRunner("interceptAndDumpParameters").run();

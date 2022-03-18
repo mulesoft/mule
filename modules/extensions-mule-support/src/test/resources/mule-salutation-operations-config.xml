@@ -23,4 +23,8 @@
         <test-components:dump-intercepted-values />
     </flow>
 
+    <flow name="exclusiveOptionalsFlow">
+        <this:hello-place greeting="good morning" city="London"/>
+    </flow>
+
 </mule>

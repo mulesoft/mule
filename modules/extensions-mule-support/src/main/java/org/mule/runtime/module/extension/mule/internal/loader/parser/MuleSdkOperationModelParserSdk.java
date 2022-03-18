@@ -11,7 +11,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
@@ -113,7 +112,6 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   @Override
   public List<ParameterGroupModelParser> getParameterGroupModelParsers() {
     return getSingleChild(operation, "parameters")
-        .map(p -> getChildren(p, "parameter").collect(toList()))
         .map(parameters -> Collections
             .<ParameterGroupModelParser>singletonList(new MuleSdkParameterGroupModelParser(parameters, typeLoader)))
         .orElse(emptyList());
