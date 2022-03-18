@@ -128,7 +128,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[] {"With simple retry", new SimpleRetryPolicyTemplate(10, RETRY_COUNT)},
+    return Arrays.asList(new Object[] {"With simple retrry", new SimpleRetryPolicyTemplate(10, RETRY_COUNT)},
                          new Object[] {"With no retry", new NoRetryPolicyTemplate()});
   }
 
