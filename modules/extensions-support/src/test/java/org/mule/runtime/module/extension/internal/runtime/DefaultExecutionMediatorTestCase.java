@@ -135,7 +135,6 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   public DefaultExecutionMediatorTestCase(String name, RetryPolicyTemplate retryPolicy) {
     this.name = name;
     this.retryPolicy = retryPolicy;
-
   }
 
   @Rule
