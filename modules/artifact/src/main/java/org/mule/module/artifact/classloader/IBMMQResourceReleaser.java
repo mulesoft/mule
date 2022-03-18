@@ -66,7 +66,14 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
 
     LOGGER.debug("Releasing IBM MQ resources");
 
+    /*
+     * Removes registered mBeans.
+     */
     removeMBeans();
+
+    /*
+     * Removes JUL Custom Logging Levels
+     */
     cleanJULKnownLevels();
 
     /*
@@ -91,6 +98,9 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
      */
     cleanPrivateStaticFieldForClass(IBM_MQ_TRACE_CLASS, "traceController");
 
+    /*
+    * Removes the thread local references to instances of classes loaded by the driver classloader.
+    */
     removeThreadLocals();
 
   }
@@ -124,32 +134,21 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
     }
 
     // Object Name::type=CommonServices,name=TraceControl
+    // IBM WebSphere MQ:type=CommonServices,name=PropertyStoreControl
     final Hashtable<String, String> keys = new Hashtable<>();
     keys.put("type", "CommonServices");
-    keys.put("name", "TraceControl");
+    keys.put("name", "*");
     try {
-      if (driverClassLoader == mBeanServer.getClassLoaderFor(new ObjectName(IBM_MQ_MBEAN_DOMAIN, keys))) {
-        mBeanServer.unregisterMBean(new ObjectName(IBM_MQ_MBEAN_DOMAIN, keys));
-        LOGGER.debug("Unregistered IBM MQ TraceControl MBean");
+      for (ObjectInstance object : mBeanServer.queryMBeans(new ObjectName(IBM_MQ_MBEAN_DOMAIN, keys), null)) {
+        mBeanServer.unregisterMBean(object.getObjectName());
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Unregistered {}", object.getObjectName());
+        }
       }
     } catch (javax.management.InstanceNotFoundException ex) {
       LOGGER.debug("No instance of CommonServices/TraceControl MBean was found.");
     } catch (MalformedObjectNameException | MBeanRegistrationException e) {
       LOGGER.warn("Caught exception unregistering the IBM MQ TraceControl MBean: {}", e.getMessage(), e);
-    }
-
-    // IBM WebSphere MQ:type=CommonServices,name=PropertyStoreControl
-    keys.put("type", "CommonServices");
-    keys.put("name", "PropertyStoreControl");
-    try {
-      if (driverClassLoader == mBeanServer.getClassLoaderFor(new ObjectName(IBM_MQ_MBEAN_DOMAIN, keys))) {
-        mBeanServer.unregisterMBean(new ObjectName(IBM_MQ_MBEAN_DOMAIN, keys));
-      }
-      LOGGER.debug("Unregistered IBM MQ PropertyStoreControl MBean");
-    } catch (javax.management.InstanceNotFoundException ex) {
-      LOGGER.debug("No instance of CommonServices/TraceControl MBean was found.");
-    } catch (MalformedObjectNameException | MBeanRegistrationException e) {
-      LOGGER.warn("Caught exception removing known IBM MQ Mbeans: {}", e.getMessage(), e);
     }
     flushCaches();
   }
