@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.transaction;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.api.profiling.type.TransactionProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.core.internal.profiling.context.DefaultTransactionProfilingEventContext;
@@ -26,6 +27,14 @@ public final class TransactionUtils {
 
   }
 
+  /**
+   * Triggers a Profiling Event of type {@link TransactionProfilingEventType} if there is an ongoing transaction (or it is being
+   * started with this event).
+   * 
+   * @param profilingService
+   * @param type
+   * @param location
+   */
   public static void profileTransactionAction(ProfilingService profilingService,
                                               ProfilingEventType<TransactionProfilingEventContext> type,
                                               ComponentLocation location) {

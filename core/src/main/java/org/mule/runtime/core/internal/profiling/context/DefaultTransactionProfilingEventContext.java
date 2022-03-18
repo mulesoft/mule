@@ -12,6 +12,11 @@ import org.mule.runtime.api.tx.TransactionType;
 
 import java.util.Optional;
 
+/**
+ * A {@link TransactionProfilingEventContext} that encapsulates data for the profiling event.
+ *
+ * @since 4.5
+ */
 public class DefaultTransactionProfilingEventContext implements TransactionProfilingEventContext {
 
   private final Optional<ComponentLocation> originalLocation;

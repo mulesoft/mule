@@ -11,10 +11,14 @@ import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
-import org.mule.runtime.core.internal.profiling.producer.ByteBufferProfilingDataProducer;
 import org.mule.runtime.core.internal.profiling.producer.TransactionProfilingDataProducer;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
+/**
+ * A {@link ProfilingDataProducerProvider} that provides {@link TransactionProfilingDataProducer}
+ *
+ * @since 4.5.0
+ */
 public class TransactionProfilingDataProducerProvider
     implements ProfilingDataProducerProvider<TransactionProfilingEventContext, CoreEvent> {
 

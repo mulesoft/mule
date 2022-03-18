@@ -40,6 +40,10 @@ public class ComponentProfilingUtils {
   public static final String TASK_ID_KEY = "taskId";
   public static final String BYTE_BUFFER_PROVIDER_NAME = "BYTE_BUFFER_PROVIDER_NAME";
   public static final String BYTES_SIZE = "BYTES_SIZE";
+  public static final String TX_ACTION = "action";
+  public static final String TX_TYPE = "type";
+  public static final String TX_CREATION_LOCATION = "createdIn";
+  public static final String TX_CURRENT_LOCATION = "actionIn";
 
   private ComponentProfilingUtils() {}
 
@@ -126,25 +130,11 @@ public class ComponentProfilingUtils {
   public static Map<String, String> getTxInfo(ProfilingEventType<TransactionProfilingEventContext> profilingEventType,
                                               TransactionProfilingEventContext profilingEventContext) {
     Map<String, String> info = new HashMap<>();
-    info.put("action", txTypeToString(profilingEventType));
-    info.put("type", profilingEventContext.getType().toString());
-    info.put("createdIn", profilingEventContext.getTransactionOriginatingLocation());
-    info.put("actionIn", profilingEventContext.getEventOrginatingLocation().getLocation());
+    info.put(TX_ACTION, profilingEventType.toString());
+    info.put(TX_TYPE, profilingEventContext.getType().toString());
+    info.put(TX_CREATION_LOCATION, profilingEventContext.getTransactionOriginatingLocation());
+    info.put(TX_CURRENT_LOCATION, profilingEventContext.getEventOrginatingLocation().getLocation());
     return info;
-  }
-
-  private static String txTypeToString(ProfilingEventType<TransactionProfilingEventContext> profilingEventType) {
-    if (profilingEventType.equals(TX_START)) {
-      return "start";
-    } else if (profilingEventType.equals(TX_CONTINUE)) {
-      return "continue";
-    } else if (profilingEventType.equals(TX_COMMIT)) {
-      return "commit";
-    } else if (profilingEventType.equals(TX_ROLLBACK)) {
-      return "rollback";
-    } else {
-      return "unknown";
-    }
   }
 
 }

@@ -6,18 +6,25 @@
  */
 package org.mule.runtime.core.internal.profiling.producer;
 
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.api.profiling.type.TransactionProfilingEventType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.ResettableProfilingDataProducer;
-import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingDataProducerStatus;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
 import java.util.function.Function;
 
+/**
+ * A {@link ProfilingDataProducer} for producing data related to task scheduling.
+ *
+ * @see TransactionProfilingEventType
+ * @since 4.5
+ */
 public class TransactionProfilingDataProducer implements
     ResettableProfilingDataProducer<TransactionProfilingEventContext, CoreEvent> {
 

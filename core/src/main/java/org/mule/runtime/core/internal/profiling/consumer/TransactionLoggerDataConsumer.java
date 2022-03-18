@@ -27,7 +27,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
-
+/**
+ * A {@link ProfilingDataConsumer} that logs transaction profiling events.
+ */
 @RuntimeInternalProfilingDataConsumer
 public class TransactionLoggerDataConsumer implements ProfilingDataConsumer<TransactionProfilingEventContext> {
 
