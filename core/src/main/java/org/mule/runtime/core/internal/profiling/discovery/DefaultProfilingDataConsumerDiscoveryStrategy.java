@@ -11,10 +11,7 @@ import static com.google.common.collect.ImmutableSet.of;
 
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
-import org.mule.runtime.core.internal.profiling.consumer.LoggerByteBufferAllocationProfilingDataConsumer;
-import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
-import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentThreadingDataConsumer;
-import org.mule.runtime.core.internal.profiling.consumer.TaskSchedulingLoggerDataConsumer;
+import org.mule.runtime.core.internal.profiling.consumer.*;
 
 import java.util.Set;
 
@@ -30,6 +27,7 @@ public class DefaultProfilingDataConsumerDiscoveryStrategy implements ProfilingD
     return of(new LoggerByteBufferAllocationProfilingDataConsumer(),
               new LoggerComponentProcessingStrategyDataConsumer(),
               new LoggerComponentThreadingDataConsumer(),
+              new TransactionLoggerDataConsumer(),
               new TaskSchedulingLoggerDataConsumer());
   }
 

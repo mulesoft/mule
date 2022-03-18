@@ -8,17 +8,15 @@ package org.mule.runtime.core.internal.profiling.consumer;
 
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.*;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_ROLLBACK;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshot;
 import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.api.profiling.type.context.ByteBufferProviderEventContext;
-import org.mule.runtime.api.profiling.type.context.ComponentProfilingEventContext;
-import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
-import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
-import org.mule.runtime.api.profiling.type.context.TaskSchedulingProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -123,6 +121,30 @@ public class ComponentProfilingUtils {
     eventMap.put(LOCATION, location.getLocation());
     ComponentIdentifier identifier = location.getComponentIdentifier().getIdentifier();
     eventMap.put(COMPONENT_IDENTIFIER, format("%s:%s", identifier.getNamespace(), identifier.getName()));
+  }
+
+  public static Map<String, String> getTxInfo(ProfilingEventType<TransactionProfilingEventContext> profilingEventType,
+                                              TransactionProfilingEventContext profilingEventContext) {
+    Map<String, String> info = new HashMap<>();
+    info.put("action", txTypeToString(profilingEventType));
+    info.put("type", profilingEventContext.getType().toString());
+    info.put("createdIn", profilingEventContext.getTransactionOriginatingLocation());
+    info.put("actionIn", profilingEventContext.getEventOrginatingLocation().getLocation());
+    return info;
+  }
+
+  private static String txTypeToString(ProfilingEventType<TransactionProfilingEventContext> profilingEventType) {
+    if (profilingEventType.equals(TX_START)) {
+      return "start";
+    } else if (profilingEventType.equals(TX_CONTINUE)) {
+      return "continue";
+    } else if (profilingEventType.equals(TX_COMMIT)) {
+      return "commit";
+    } else if (profilingEventType.equals(TX_ROLLBACK)) {
+      return "rollback";
+    } else {
+      return "unknown";
+    }
   }
 
 }

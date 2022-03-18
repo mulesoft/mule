@@ -11,6 +11,7 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_ROLLBACK;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
+import static org.mule.runtime.core.internal.profiling.consumer.ComponentProfilingUtils.getTxInfo;
 import static org.slf4j.LoggerFactory.getLogger;
 
 
@@ -56,24 +57,4 @@ public class TransactionLoggerDataConsumer implements ProfilingDataConsumer<Tran
     return LOGGER;
   }
 
-  private Map<String, String> getTxInfo(ProfilingEventType<TransactionProfilingEventContext> profilingEventType, TransactionProfilingEventContext profilingEventContext) {
-        Map<String, String> info = new HashMap<>();
-        info.put("state", txTypeToString(profilingEventType));
-        info.put("", )
-        return info;
-    }
-
-  private String txTypeToString(ProfilingEventType<TransactionProfilingEventContext> profilingEventType) {
-    if (profilingEventType.equals(TX_START)) {
-      return "start";
-    } else if (profilingEventType.equals(TX_CONTINUE)) {
-      return "continue";
-    } else if (profilingEventType.equals(TX_COMMIT)) {
-      return "commit";
-    } else if (profilingEventType.equals(TX_ROLLBACK)) {
-      return "rollback";
-    } else {
-      return "unknown";
-    }
-  }
 }

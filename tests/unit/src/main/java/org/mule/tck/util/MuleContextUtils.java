@@ -46,6 +46,7 @@ import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.store.ObjectStoreManager;
@@ -277,6 +278,7 @@ public class MuleContextUtils {
       injectableObjects.put(ConfigurationProperties.class, configProps);
       injectableObjects.put(FeatureFlaggingService.class, featureFlaggingService);
       injectableObjects.put(CoreProfilingService.class, coreProfilingService);
+      injectableObjects.put(ProfilingService.class, coreProfilingService);
 
       // Ensure injection of consistent mock objects
       when(muleContext.getInjector()).thenReturn(new MocksInjector(injectableObjects));
