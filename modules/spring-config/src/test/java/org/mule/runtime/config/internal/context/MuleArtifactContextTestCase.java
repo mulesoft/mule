@@ -14,6 +14,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.VALIDATE_APPLICATION_MODEL_WITH_REGION_CLASSLOADER;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.validatorBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
@@ -63,8 +64,8 @@ public class MuleArtifactContextTestCase extends AbstractMuleTestCase {
   public void before() throws MuleException {
     astValidatorBuilder = spy(new DefaultValidatorBuilder());
     mockStatic(MuleAstUtils.class);
-    when(MuleAstUtils.validatorBuilder()).thenReturn(astValidatorBuilder);
-    when(MuleAstUtils.emptyArtifact()).thenCallRealMethod();
+    when(validatorBuilder()).thenReturn(astValidatorBuilder);
+    when(emptyArtifact()).thenCallRealMethod();
     mockMuleContext = mockContextWithServices();
     mockMuleContext.getInjector().inject(this);
     when(mockMuleContext.getExecutionClassLoader()).thenReturn(executionClassloader);
