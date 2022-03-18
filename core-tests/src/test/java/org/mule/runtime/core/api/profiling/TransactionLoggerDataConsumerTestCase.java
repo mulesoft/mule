@@ -65,7 +65,8 @@ public class TransactionLoggerDataConsumerTestCase extends AbstractMuleContextTe
   public SystemProperty enableProfilingServiceProperty = new SystemProperty(ENABLE_PROFILING_SERVICE_PROPERTY, "true");
 
   @Rule
-  public EnableInternalRuntimeProfilers enableInternalRuntimeProfilers = new EnableInternalRuntimeProfilers(new TestTransactionLoggerDataConsumer(null));
+  public EnableInternalRuntimeProfilers enableInternalRuntimeProfilers =
+      new EnableInternalRuntimeProfilers(new TestTransactionLoggerDataConsumer(null));
 
   @Mock
   private Logger logger;
@@ -112,7 +113,8 @@ public class TransactionLoggerDataConsumerTestCase extends AbstractMuleContextTe
     ProfilingDataProducer<TransactionProfilingEventContext, Object> dataProducer =
         profilingService.getProfilingDataProducer(profilingEventType);
 
-    TransactionProfilingEventContext profilerEventContext = new DefaultTransactionProfilingEventContext(Optional.of(originalLocation), currentLocation, LOCAL, 0);
+    TransactionProfilingEventContext profilerEventContext =
+        new DefaultTransactionProfilingEventContext(Optional.of(originalLocation), currentLocation, LOCAL, 0);
     dataProducer.triggerProfilingEvent(profilerEventContext);
 
     verify(logger).debug(jsonToLog(profilingEventType, profilerEventContext));
