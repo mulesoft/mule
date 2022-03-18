@@ -6,25 +6,25 @@
  */
 package org.mule.runtime.module.extension.internal.resources;
 
-import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
-import static org.mule.runtime.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase.ResourceExtensionUnitTest.newUnitTest;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 
+import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ComposableModel;
+import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels;
@@ -38,49 +38,60 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
+import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
-import org.mule.runtime.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.test.marvel.MarvelExtension;
-
-import org.skyscreamer.jsonassert.JSONAssert;
 
 @SmallTest
 @RunWith(Parameterized.class)
-public class LegacyJsonDeserializationTestCase extends FileGenerationParameterizedExtensionModelTestCase {
+public class LegacyJsonDeserializationTestCase {
 
-  @Parameterized.Parameters(name = "{1}")
+  @Parameterized.Parameter(0)
+  public String fileName;
+
+  private String fileContent;
+
+  @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
-    List<ResourceExtensionUnitTest> extensions;
-    extensions = asList(
-                        newUnitTest(JAVA_LOADER, MarvelExtension.class, "marvel-old.json"));
+    return asList(new Object[][] {
+        {"vegan.json"},
+        {"petstore.json"},
+        {"metadata.json"},
+        {"heisenberg.json"},
+        {"substitutiongroup.json"},
+        {"tx-ext.json"},
+        {"subtypes.json"},
+        {"marvel.json"},
+        {"ram.json"},
+        {"typed-value.json"},
+        {"test-oauth.json"},
+        {"test-oauth-ocs.json"},
+        {"test-fn.json"},
+        {"values.json"},
+        {"implicit-config.json"},
+        {"non-implicit-config.json"},
+        {"reconnection-extension.json"},
+    });
+  }
 
-    return createExtensionModels(extensions);
+  @Before
+  public void setup() throws IOException {
+    fileContent = getResourceAsString(getExpectedFilesDir() + fileName, getClass());
   }
 
   private final ExtensionModelJsonSerializer generator = new ExtensionModelJsonSerializer(true);
 
-  @Override
   protected String getExpectedFilesDir() {
-    return "models/";
-  }
-
-  @Override
-  protected String doGenerate(ExtensionModel extensionUnderTest) throws Exception {
-    return generator.serialize(extensionUnderTest).trim();
-  }
-
-  @Override
-  protected void assertEquals(String expectedContent, String actualContent) throws Exception {
-    JSONAssert.assertEquals(expectedContent, actualContent, true);
+    return "models/legacy/";
   }
 
   @Test
   public void load() {
-    ExtensionModel result = generator.deserialize(expectedContent);
+    ExtensionModel result = generator.deserialize(fileContent);
     assertLegacyExtensionModelCollections(result);
   }
 
@@ -90,98 +101,109 @@ public class LegacyJsonDeserializationTestCase extends FileGenerationParameteriz
       @Override
       protected void onConfiguration(ConfigurationModel model) {
         assertParameterizedModel(model);
-        model.getOperationModels();
-        model.getConnectionProviders();
-        model.getExternalLibraryModels();
-        model.getModelProperties();
-        model.getSourceModels();
+        assertEnrichableModel(model);
+        assertNotNull(model.getOperationModels());
+        assertNotNull(model.getConnectionProviders());
+        assertNotNull(model.getExternalLibraryModels());
+        assertNotNull(model.getSourceModels());
       }
 
       @Override
       protected void onOperation(HasOperationModels owner, OperationModel model) {
-        assertParameterizedModel(model);
-        model.getModelProperties();
-        model.getErrorModels();
-        model.getNestedComponents();
-        model.getNotificationModels();
-        model.getSemanticTerms();
-        model.getSampleDataProviderModel().ifPresent(sampleDataProviderModel -> {
-          sampleDataProviderModel.getParameters();
-        });
+        assertComponentModel(model);
+        assertNotNull(model.getNotificationModels());
+        assertSampleDataProviderModel(model);
       }
 
       @Override
       protected void onFunction(HasFunctionModels owner, FunctionModel model) {
         assertParameterizedModel(model);
-        model.getModelProperties();
+        assertEnrichableModel(model);
       }
 
       @Override
       protected void onConstruct(HasConstructModels owner, ConstructModel model) {
-        assertParameterizedModel(model);
-        model.getModelProperties();
-        model.getErrorModels();
-        model.getNestedComponents();
-        model.getSemanticTerms();
+        assertComponentModel(model);
       }
 
       @Override
       protected void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
         assertParameterizedModel(model);
-        model.getModelProperties();
-        model.getExternalLibraryModels();
-        model.getSemanticTerms();
+        assertEnrichableModel(model);
+        assertNotNull(model.getExternalLibraryModels());
+        assertNotNull(model.getSemanticTerms());
       }
 
       @Override
       protected void onSource(HasSourceModels owner, SourceModel model) {
-        assertParameterizedModel(model);
-        model.getModelProperties();
-        model.getErrorModels();
-        model.getNotificationModels();
-        model.getNestedComponents();
-        model.getSampleDataProviderModel();
-        model.getSampleDataProviderModel().ifPresent(sampleDataProviderModel -> {
-          sampleDataProviderModel.getParameters();
-        });
-        model.getErrorCallback().ifPresent(sourceCallbackModel -> {
-          assertParameterizedModel(sourceCallbackModel);
-          sourceCallbackModel.getModelProperties();
-        });
-        // All callbacks
+        assertComponentModel(model);
+        assertSampleDataProviderModel(model);
+        assertNotNull(model.getNotificationModels());
+        model.getErrorCallback().ifPresent(LegacyJsonDeserializationTestCase.this::assertSourceCallbackModel);
+        model.getSuccessCallback().ifPresent(LegacyJsonDeserializationTestCase.this::assertSourceCallbackModel);
+        model.getTerminateCallback().ifPresent(LegacyJsonDeserializationTestCase.this::assertSourceCallbackModel);
       }
 
       @Override
       protected void onParameterGroup(ParameterizedModel owner, ParameterGroupModel model) {
-        model.getModelProperties();
-        model.getParameterModels();
-        model.getExclusiveParametersModels();
+        assertEnrichableModel(model);
+        assertNotNull(model.getParameterModels());
+        assertNotNull(model.getExclusiveParametersModels());
       }
 
       @Override
       protected void onParameter(ParameterizedModel owner, ParameterGroupModel groupModel, ParameterModel model) {
-        model.getAllowedStereotypes();
-        model.getModelProperties();
-        model.getFieldValueProviderModels();
-        model.getSemanticTerms();
+        assertEnrichableModel(model);
+        assertNotNull(model.getAllowedStereotypes());
+        assertNotNull(model.getSemanticTerms());
+        assertFieldValueProviderModels(model);
         model.getValueProviderModel().ifPresent(valueProviderModel -> valueProviderModel.getParameters());
       }
 
       @Override
       protected void onNestable(ComposableModel owner, NestableElementModel model) {
-        model.getAllParameterModels();
-        model.getModelProperties();
-        model.getErrorModels();
-        model.getParameterGroupModels();
-        model.getNestedComponents();
-        model.getSemanticTerms();
+        assertComponentModel(model);
       }
     }.walk(result);
   }
 
   public void assertParameterizedModel(ParameterizedModel model) {
-    model.getAllParameterModels();
-    model.getParameterGroupModels();
+    assertNotNull(model.getAllParameterModels());
+    assertNotNull(model.getParameterGroupModels());
+  }
+
+  public void assertEnrichableModel(EnrichableModel model) {
+    assertNotNull(model.getModelProperties());
+  }
+
+  public void assertComponentModel(ComponentModel model) {
+    assertParameterizedModel(model);
+    assertEnrichableModel(model);
+    assertNotNull(model.getErrorModels());
+    assertNotNull(model.getNestedComponents());
+    assertNotNull(model.getSemanticTerms());
+  }
+
+  private void assertSampleDataProviderModel(HasOutputModel model) {
+    assertNotNull(model.getSampleDataProviderModel());
+    model.getSampleDataProviderModel().ifPresent(sampleDataProviderModel -> {
+      assertNotNull(sampleDataProviderModel.getParameters());
+    });
+  }
+
+  private void assertSourceCallbackModel(SourceCallbackModel sourceCallbackModel) {
+    assertParameterizedModel(sourceCallbackModel);
+    assertEnrichableModel(sourceCallbackModel);
+  }
+
+  private void assertFieldValueProviderModels(ParameterModel model) {
+    assertNotNull(model.getFieldValueProviderModels());
+    model.getFieldValueProviderModels().forEach(fieldValueProviderModel -> assertValueProviderModel(fieldValueProviderModel));
+  }
+
+  private void assertValueProviderModel(ValueProviderModel model) {
+    assertEnrichableModel(model);
+    assertNotNull(model.getParameters());
   }
 
   public void assertNotNull(Object value) {
