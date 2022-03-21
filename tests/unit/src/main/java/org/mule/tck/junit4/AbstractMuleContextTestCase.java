@@ -265,6 +265,10 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
                              new MuleVersion(getMavenProjectVersionProperty()));
   }
 
+  protected MuleContext createMuleContext(String contextConfigurationId) throws Exception {
+    return createMuleContext(contextConfigurationId, new MuleVersion(getMavenProjectVersionProperty()));
+  }
+
   protected MuleContext createMuleContext(String contextConfigurationId, MuleVersion minMuleVersion) throws Exception {
     // Should we set up the manager for every method?
     MuleContext context;
