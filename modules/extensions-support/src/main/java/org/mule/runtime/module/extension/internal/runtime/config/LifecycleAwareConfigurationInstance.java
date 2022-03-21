@@ -137,6 +137,10 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
 
   @Override
   public synchronized void initialise() throws InitialisationException {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(format("Initializing LifecycleAwareConfigurationInstance '%s'", getName()));
+    }
+
     if (!initialized) {
       initialized = true;
       testConnectivityLock = lockFactory.createLock(this.getClass().getName() + "-testConnectivity-" + getName());
@@ -144,6 +148,8 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
         initStats();
         doInitialise();
       } catch (Exception e) {
+        LOGGER.error(format("Error initializing LifecycleAwareConfigurationInstance '%s'", getName()), e);
+
         if (e instanceof InitialisationException) {
           throw (InitialisationException) e;
         } else {
@@ -155,6 +161,10 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
 
   @Override
   public synchronized void start() throws MuleException {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(format("Starting LifecycleAwareConfigurationInstance '%s'", getName()));
+    }
+
     if (!started) {
       started = true;
       if (connectionProvider.isPresent()) {
@@ -259,6 +269,10 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
    */
   @Override
   public synchronized void stop() throws MuleException {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(format("Stopping LifecycleAwareConfigurationInstance '%s'", getName()));
+    }
+
     if (started) {
       started = false;
       try {
@@ -283,6 +297,10 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
    */
   @Override
   public synchronized void dispose() {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(format("Disposing LifecycleAwareConfigurationInstance '%s'", getName()));
+    }
+
     if (initialized) {
       initialized = false;
       disposeIfNeeded(value, LOGGER);
