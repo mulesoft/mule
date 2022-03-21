@@ -287,7 +287,9 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         LOGGER.info("Using working directory for test: " + workingDirectory);
         muleConfiguration.setWorkingDirectory(workingDirectory);
         muleConfiguration.setId(contextConfigurationId);
-        muleConfiguration.setMinMuleVersion(new MuleVersion(getMavenProjectVersionProperty()));
+        if (!muleConfiguration.getMinMuleVersion().isPresent()) {
+          muleConfiguration.setMinMuleVersion(new MuleVersion(getMavenProjectVersionProperty()));
+        }
         contextBuilder.setMuleConfiguration(muleConfiguration);
         contextBuilder.setExecutionClassLoader(executionClassLoader);
         contextBuilder.setObjectSerializer(getObjectSerializer());
