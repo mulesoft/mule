@@ -35,7 +35,15 @@ import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.core.internal.profiling.*;
+import org.mule.runtime.core.internal.profiling.ByteBufferProviderDataProducerProvider;
+import org.mule.runtime.core.internal.profiling.ComponentThreadingDataProducerProvider;
+import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
+import org.mule.runtime.core.internal.profiling.ExtensionDataProducerProvider;
+import org.mule.runtime.core.internal.profiling.ProcessingStrategyDataProducerProvider;
+import org.mule.runtime.core.internal.profiling.ProfilingDataProducerProvider;
+import org.mule.runtime.core.internal.profiling.ResettableProfilingDataProducer;
+import org.mule.runtime.core.internal.profiling.TaskSchedulingDataProducerProvider;
+import org.mule.runtime.core.internal.profiling.TransactionProfilingDataProducerProvider;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
 import java.util.HashMap;
