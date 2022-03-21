@@ -41,7 +41,9 @@ import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -82,6 +84,11 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   @Inject
   private ProfilingService profilingService;
 
+  private ProfilingDataProducer<TransactionProfilingEventContext, Object> continueProducer;
+  private ProfilingDataProducer<TransactionProfilingEventContext, Object> startProducer;
+  private ProfilingDataProducer<TransactionProfilingEventContext, Object> commitProducer;
+
+
   @Override
   public CoreEvent process(final CoreEvent event) throws MuleException {
     return processToApply(event, this);
@@ -90,7 +97,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     if (transactionConfig.getAction() == ACTION_INDIFFERENT) {
-      return from(publisher).doOnNext(e -> profileTransactionAction(profilingService, TX_CONTINUE, getLocation()))
+      return from(publisher).doOnNext(e -> profileTransactionAction(continueProducer, TX_CONTINUE, getLocation()))
           .transform(nestedChain);
     }
 
@@ -105,9 +112,9 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
               try {
                 sink.next(executionTemplate.execute(() -> {
                   handlePreviousTransaction(txPrevoiuslyActive, previousTx, getCurrentTx());
-                  profileTransactionAction(profilingService, txPrevoiuslyActive ? TX_CONTINUE : TX_START, getLocation());
+                  profileBeforeExecution(txPrevoiuslyActive);
                   CoreEvent result = processBlocking(ctx, event);
-                  profileTransactionAction(profilingService, txPrevoiuslyActive ? TX_CONTINUE : TX_COMMIT, getLocation());
+                  profileAfterExecution(txPrevoiuslyActive);
                   return result;
                 }));
               } catch (Exception e) {
@@ -120,7 +127,22 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
                 }
               }
             }));
+  }
 
+  private void profileBeforeExecution(boolean txPrevoiuslyActive) {
+    if (txPrevoiuslyActive) {
+      profileTransactionAction(continueProducer, TX_CONTINUE, getLocation());
+    } else {
+      profileTransactionAction(startProducer, TX_START, getLocation());
+    }
+  }
+
+  private void profileAfterExecution(boolean txPrevoiuslyActive) {
+    if (txPrevoiuslyActive) {
+      profileTransactionAction(continueProducer, TX_CONTINUE, getLocation());
+    } else {
+      profileTransactionAction(commitProducer, TX_COMMIT, getLocation());
+    }
   }
 
   private void handlePreviousTransaction(final boolean txPrevoiuslyActive, Transaction previousTx, Transaction currentTx) {
@@ -203,6 +225,9 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, this), processors,
                                                          messagingExceptionHandler);
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
+    continueProducer = profilingService.getProfilingDataProducer(TX_CONTINUE);
+    startProducer = profilingService.getProfilingDataProducer(TX_START);
+    commitProducer = profilingService.getProfilingDataProducer(TX_COMMIT);
     super.initialise();
   }
 

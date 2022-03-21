@@ -6,14 +6,13 @@
  */
 package org.mule.runtime.core.internal.profiling.consumer;
 
-import static com.google.common.collect.ImmutableSet.of;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_COMMIT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_ROLLBACK;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
 import static org.mule.runtime.core.internal.profiling.consumer.ComponentProfilingUtils.getTxInfo;
 import static org.slf4j.LoggerFactory.getLogger;
-
+import static com.google.common.collect.ImmutableSet.of;
 
 import com.google.gson.Gson;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
@@ -22,8 +21,6 @@ import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventCont
 import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInternalProfilingDataConsumer;
 import org.slf4j.Logger;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 

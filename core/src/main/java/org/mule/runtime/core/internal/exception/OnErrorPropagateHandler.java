@@ -13,9 +13,13 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handle
 import static org.mule.runtime.core.api.transaction.TransactionUtils.profileTransactionAction;
 
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.Processor;
@@ -40,11 +44,21 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   @Inject
   private ProfilingService profilingService;
 
+  private ProfilingDataProducer<TransactionProfilingEventContext, Object> continueProducer;
+  private ProfilingDataProducer<TransactionProfilingEventContext, Object> rollbackProducer;
+
   public OnErrorPropagateHandler() {
     ErrorType redeliveryExhaustedErrorType = MULE_CORE_ERROR_TYPE_REPOSITORY.getErrorType(REDELIVERY_EXHAUSTED)
         .orElseThrow(() -> new IllegalStateException("REDELIVERY_EXHAUSTED error type not found"));
 
     redeliveryExhaustedMatcher = new SingleErrorTypeMatcher(redeliveryExhaustedErrorType);
+  }
+
+  @Override
+  protected void doInitialise() throws InitialisationException {
+    super.doInitialise();
+    this.continueProducer = profilingService.getProfilingDataProducer(TX_CONTINUE);
+    this.rollbackProducer = profilingService.getProfilingDataProducer(TX_ROLLBACK);
   }
 
   @Override
@@ -66,10 +80,10 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
       Exception exception = getException(event);
       event = super.beforeRouting().apply(event);
       if (!isRedeliveryExhausted(exception) && isOwnedTransaction()) {
-        profileTransactionAction(profilingService, TX_ROLLBACK, getLocation());
+        profileTransactionAction(rollbackProducer, TX_ROLLBACK, getLocation());
         rollback(exception);
       } else {
-        profileTransactionAction(profilingService, TX_CONTINUE, getLocation());
+        profileTransactionAction(continueProducer, TX_CONTINUE, getLocation());
       }
       return event;
     };

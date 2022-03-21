@@ -21,7 +21,9 @@ import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.notification.Notification;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.internal.execution.NotificationFunction;
@@ -61,6 +63,8 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
   @Inject
   private ProfilingService profilingService;
 
+  private ProfilingDataProducer<TransactionProfilingEventContext, Object> startProducer;
+
   /**
    * Creates a new instance
    *
@@ -93,7 +97,8 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
                                                                       connectionHandler, sourceCallback.getTransactionManager(),
                                                                       sourceCallback.getTimeout());
         if (sourceCallback.getTransactionConfig().isTransacted()) {
-          profileTransactionAction(profilingService, TX_START, sourceCallback.getSourceLocation());
+          initialiseProfilingDataProducerIfNeeded();
+          profileTransactionAction(startProducer, TX_START, sourceCallback.getSourceLocation());
         }
         transactionHandle = DEFAULT_TRANSACTION_HANDLE;
       }
@@ -103,6 +108,12 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
     }
 
     return transactionHandle;
+  }
+
+  private void initialiseProfilingDataProducerIfNeeded() {
+    if (startProducer == null) {
+      startProducer = profilingService.getProfilingDataProducer(TX_START);
+    }
   }
 
   /**

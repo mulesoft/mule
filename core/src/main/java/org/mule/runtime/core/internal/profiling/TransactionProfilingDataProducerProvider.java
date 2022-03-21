@@ -8,9 +8,9 @@ package org.mule.runtime.core.internal.profiling;
 
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingProducerScope;
+import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.producer.TransactionProfilingDataProducer;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 

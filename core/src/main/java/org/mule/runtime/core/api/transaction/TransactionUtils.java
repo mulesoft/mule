@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.transaction;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.TransactionProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
@@ -30,12 +30,8 @@ public final class TransactionUtils {
   /**
    * Triggers a Profiling Event of type {@link TransactionProfilingEventType} if there is an ongoing transaction (or it is being
    * started with this event).
-   * 
-   * @param profilingService
-   * @param type
-   * @param location
    */
-  public static void profileTransactionAction(ProfilingService profilingService,
+  public static void profileTransactionAction(ProfilingDataProducer<TransactionProfilingEventContext, Object> dataProducer,
                                               ProfilingEventType<TransactionProfilingEventContext> type,
                                               ComponentLocation location) {
     if (!isTransactionActive() && !type.equals(TX_START)) {
@@ -43,9 +39,8 @@ public final class TransactionUtils {
     }
     TransactionAdapter tx = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
     TransactionType txType = tx.isXA() ? XA : LOCAL;
-    profilingService.getProfilingDataProducer(type)
-        .triggerProfilingEvent(new DefaultTransactionProfilingEventContext(tx.getComponentLocation(), location, txType,
-                                                                           currentTimeMillis()));
+    dataProducer.triggerProfilingEvent(new DefaultTransactionProfilingEventContext(tx.getComponentLocation(), location, txType,
+                                                                                   currentTimeMillis()));
   }
 
 }

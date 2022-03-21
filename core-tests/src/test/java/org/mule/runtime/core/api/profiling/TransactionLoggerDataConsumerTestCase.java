@@ -6,6 +6,21 @@
  */
 package org.mule.runtime.core.api.profiling;
 
+import static com.google.common.collect.ImmutableSet.of;
+import static java.util.Arrays.asList;
+import static org.mockito.Mockito.*;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_COMMIT;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_ROLLBACK;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
+import static org.mule.runtime.api.tx.TransactionType.LOCAL;
+import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROFILING_SERVICE_PROPERTY;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.internal.profiling.consumer.ComponentProfilingUtils.getTxInfo;
+import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
+import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
+
 import com.google.gson.Gson;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -37,21 +52,6 @@ import org.slf4j.Logger;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
-
-import static com.google.common.collect.ImmutableSet.of;
-import static java.util.Arrays.asList;
-import static org.mockito.Mockito.*;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_COMMIT;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_ROLLBACK;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
-import static org.mule.runtime.api.tx.TransactionType.LOCAL;
-import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROFILING_SERVICE_PROPERTY;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.internal.profiling.consumer.ComponentProfilingUtils.getTxInfo;
-import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
-import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
 
 @Feature(PROFILING)
 @Story(DEFAULT_PROFILING_SERVICE)
@@ -119,7 +119,6 @@ public class TransactionLoggerDataConsumerTestCase extends AbstractMuleContextTe
 
     verify(logger).debug(jsonToLog(profilingEventType, profilerEventContext));
   }
-
 
   private static class TestDefaultProfilingService extends DefaultProfilingService {
 
