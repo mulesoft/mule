@@ -11,14 +11,17 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.metadata.api.TypeLoader;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -36,10 +39,15 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupMo
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.mule.internal.execution.MuleOperationExecutor;
 
+import java.util.ArrayDeque;
 import java.util.Collections;
+import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * {@link OperationModelParser} implementation for Mule SDK
@@ -50,6 +58,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   private final ComponentAst operation;
   private final TypeLoader typeLoader;
+  private Boolean isBlocking;
 
   private String name;
 
@@ -134,8 +143,10 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public boolean isBlocking() {
-    // TODO: MULE-20076
-    return false;
+    if (isBlocking == null) {
+      throw new IllegalStateException("Characteristics have not been computed yet.");
+    }
+    return isBlocking;
   }
 
   @Override
@@ -254,5 +265,73 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
                                                                                getName())));
 
     return output.directChildrenStreamByIdentifier(null, elementName).findFirst();
+  }
+
+  private ComponentAst getBody() {
+    return getSingleChild(operation, "body").get();
+  }
+
+  private Stream<OperationModel> getOperationModelsRecursiveStream() {
+    return getBody().recursiveStream()
+        .map(innerComponent -> innerComponent.getModel(OperationModel.class))
+        .filter(Optional::isPresent)
+        .map(Optional::get);
+  }
+
+  private Stream<ComponentAst> getOperationsWithoutModelRecursiveStream() {
+    return getBody().recursiveStream()
+        .filter(innerComponent -> innerComponent.getComponentType().equals(UNKNOWN))
+        .filter(innerComponent -> !innerComponent.getModel(OperationModel.class).isPresent());
+  }
+
+  private boolean computeIsBlocking(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
+    // We use a stack to perform an iterative DFS traversal skipping already visited elements in case there were cycles.
+    final Set<String> visitedOperations = new HashSet<>();
+    final Deque<MuleSdkOperationModelParserSdk> parsersToCheck = new ArrayDeque<>();
+
+    visitedOperations.add(this.getName());
+    parsersToCheck.push(this);
+
+    while (!parsersToCheck.isEmpty()) {
+      final MuleSdkOperationModelParserSdk operationParser = parsersToCheck.pop();
+
+      // If already computed, don't do it again
+      if (operationParser.isBlocking != null) {
+        if (operationParser.isBlocking()) {
+          return true;
+        }
+        continue;
+      }
+
+      // Inspects the inner operations that have an OperationModel first
+      final boolean hasInnerBlockingOperationModels =
+          operationParser.getOperationModelsRecursiveStream().anyMatch(OperationModel::isBlocking);
+      if (hasInnerBlockingOperationModels) {
+        // At this point we can also update the computed value for the parser currently being checked, this will save time if
+        // other operations also reference it
+        operationParser.isBlocking = true;
+        return true;
+      }
+
+      // Expands inner operations that don't have an OperationModel yet (i.e.: operations from the same extension currently being
+      // parsed)
+      operationParser.getOperationsWithoutModelRecursiveStream()
+          .map(ComponentAst::getIdentifier)
+          .map(ComponentIdentifier::getName)
+          .filter(operationModelParsersByName::containsKey)
+          .map(operationModelParsersByName::get)
+          .forEach(innerOperationParser -> {
+            // Adds inner operations to the stack, only if they haven't been seen yet
+            if (visitedOperations.add(innerOperationParser.getName())) {
+              parsersToCheck.push(innerOperationParser);
+            }
+          });
+    }
+
+    return false;
+  }
+
+  public void computeCharacteristics(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
+    isBlocking = computeIsBlocking(operationModelParsersByName);
   }
 }

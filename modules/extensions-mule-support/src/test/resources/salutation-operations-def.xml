@@ -115,4 +115,75 @@
         </operation:body>
     </operation:def>
 
+    <operation:def name="nonBlockingHelloWorld" displayName="Non Blocking Hello World operation" summary="Returns a polite greeting performed in a non-blocking fashion">
+        <operation:parameters>
+            <operation:parameter name="receiver" type="string" summary="The name of the person being greeted"/>
+            <operation:optional-parameter name="greeting" type="string" summary="The greeting message" defaultValue="Hello, ">
+                <operation:description>The greeting message appended before the receivers name</operation:description>
+            </operation:optional-parameter>
+            <operation:optional-parameter name="prefix" type="string" summary="The receiver's prefix" defaultValue="">
+                <operation:description>The prefix added to the receiver</operation:description>
+            </operation:optional-parameter>
+            <operation:optional-parameter name="suffix" type="string" summary="The receiver's suffix">
+                <operation:description>The suffix added to the receiver</operation:description>
+            </operation:optional-parameter>
+        </operation:parameters>
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <!-- This is for testing that processors are picked up when inside other components -->
+            <choice>
+                <when expression="#[true]">
+                    <test-components:non-blocking/>
+                </when>
+            </choice>
+
+            <test-components:non-blocking>
+                <test-components:content>#['$(params.greeting) $(params.prefix) $(params.receiver) $(if(params.suffix == null) '' else params.suffix)']</test-components:content>
+            </test-components:non-blocking>
+        </operation:body>
+    </operation:def>
+
+    <!-- Implemented recursively for testing purposes -->
+    <operation:def name="repeatedHelloWorld" displayName="Recursive Hello World operation" summary="Returns polite greeting repeated a given number of times">
+        <operation:parameters>
+            <operation:parameter name="receiver" type="string" summary="The name of the person being greeted"/>
+            <operation:parameter name="count" type="number" summary="The number of times to repeat the greeting message"/>
+            <operation:optional-parameter name="greeting" type="string" summary="The greeting message" defaultValue="Hello, ">
+                <operation:description>The greeting message appended before the receivers name</operation:description>
+            </operation:optional-parameter>
+            <operation:optional-parameter name="prefix" type="string" summary="The receiver's prefix" defaultValue="">
+                <operation:description>The prefix added to the receiver</operation:description>
+            </operation:optional-parameter>
+            <operation:optional-parameter name="suffix" type="string" summary="The receiver's suffix">
+                <operation:description>The suffix added to the receiver</operation:description>
+            </operation:optional-parameter>
+        </operation:parameters>
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <choice>
+                <when expression="#[params.count > 0]">
+                    <this:repeated-hello-world receiver="#[params.receiver]"
+                                               count="#[params.count - 1]"
+                                               greeting="#[params.greeting]"
+                                               prefix="#[params.prefix]"
+                                               suffix="#[params.suffix]"
+                                               target="recursionOutput"/>
+
+                    <this:hello-world greeting="#[params.greeting]"
+                                      receiver="#[params.receiver]"
+                                      prefix="#[params.prefix]"
+                                      suffix="#[params.suffix]"/>
+
+                    <test-components:non-blocking>
+                        <test-components:content>#[payload ++ if(vars.recursionOutput != null) vars.recursionOutput else '']</test-components:content>
+                    </test-components:non-blocking>
+                </when>
+            </choice>
+        </operation:body>
+    </operation:def>
+
 </mule>
