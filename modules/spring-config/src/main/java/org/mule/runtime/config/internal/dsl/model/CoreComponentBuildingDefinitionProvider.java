@@ -246,7 +246,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build())
         .withSetterParameterDefinition("exceptionListeners",
                                        fromChildCollectionConfiguration(FlowExceptionHandler.class).build())
-        .asPrototype()
         .build());
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(SET_PAYLOAD).withTypeDefinition(fromType(SetPayloadMessageProcessor.class))
