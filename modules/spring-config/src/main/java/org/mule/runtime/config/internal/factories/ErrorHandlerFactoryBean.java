@@ -11,9 +11,7 @@ import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * An {@link org.mule.runtime.dsl.api.component.ObjectFactory} which produces {@link ErrorHandler} instances.
@@ -22,14 +20,9 @@ import java.util.Map;
  */
 public class ErrorHandlerFactoryBean extends AbstractComponentFactory<ErrorHandler> {
 
-  private static Map<String, ErrorHandler> globalErrorHandlers = new HashMap<String, ErrorHandler>();
   private GlobalErrorHandler delegate;
   private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
   private String name;
-
-  public ErrorHandlerFactoryBean() {
-    globalErrorHandlers.clear();
-  }
 
   @Override
   public ErrorHandler doGetObject() throws Exception {
@@ -39,13 +32,8 @@ public class ErrorHandlerFactoryBean extends AbstractComponentFactory<ErrorHandl
 
     ErrorHandler errorHandler;
     if (isGlobalErrorHandler()) {
-      if (globalErrorHandlers.containsKey(name)) {
-        return globalErrorHandlers.get(name);
-      } else {
-        errorHandler = new GlobalErrorHandler();
-        errorHandler.setName(name);
-        globalErrorHandlers.put(name, errorHandler);
-      }
+      errorHandler = new GlobalErrorHandler();
+      errorHandler.setName(name);
     } else {
       errorHandler = new ErrorHandler();
     }

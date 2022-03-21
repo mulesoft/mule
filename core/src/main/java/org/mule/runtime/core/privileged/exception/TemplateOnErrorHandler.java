@@ -284,10 +284,12 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   @Override
   protected void doInitialise() throws InitialisationException {
     super.doInitialise();
-    Optional<ProcessingStrategy> processingStrategy = getProcessingStrategy(locator, this);
+    Optional<ProcessingStrategy> processingStrategy;
     // When the processing strategy from this location is empty we skip the runtime processing strategy.
-    if (processingStrategy.isPresent() && fromGlobalErrorHandler) {
+    if (fromGlobalErrorHandler) {
       processingStrategy = getProcessingStrategyFromGlobalErrorHandler(locator);
+    } else {
+      processingStrategy = getProcessingStrategy(locator, this);
     }
     configuredMessageProcessors =
         buildNewChainWithListOfProcessors(processingStrategy, getMessageProcessors(), NullExceptionHandler.getInstance());
