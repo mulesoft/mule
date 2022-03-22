@@ -16,13 +16,13 @@ import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.metadata.api.TypeLoader;
-import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
+import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
@@ -45,6 +45,7 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -143,9 +144,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public boolean isBlocking() {
-    if (isBlocking == null) {
-      throw new IllegalStateException("Characteristics have not been computed yet.");
-    }
+    Preconditions.checkState(isBlocking != null, "Characteristics have not been computed yet.");
     return isBlocking;
   }
 
@@ -284,7 +283,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
         .filter(innerComponent -> !innerComponent.getModel(OperationModel.class).isPresent());
   }
 
-  private boolean computeIsBlocking(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
+  private void computeIsBlocking(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
     // We use a stack to perform an iterative DFS traversal skipping already visited elements in case there were cycles.
     final Set<String> visitedOperations = new HashSet<>();
     final Deque<MuleSdkOperationModelParserSdk> parsersToCheck = new ArrayDeque<>();
@@ -298,7 +297,8 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
       // If already computed, don't do it again
       if (operationParser.isBlocking != null) {
         if (operationParser.isBlocking()) {
-          return true;
+          isBlocking = true;
+          return;
         }
         continue;
       }
@@ -309,17 +309,15 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
       if (hasInnerBlockingOperationModels) {
         // At this point we can also update the computed value for the parser currently being checked, this will save time if
         // other operations also reference it
-        operationParser.isBlocking = true;
-        return true;
+        operationParser.isBlocking = isBlocking = true;
+        return;
       }
 
       // Expands inner operations that don't have an OperationModel yet (i.e.: operations from the same extension currently being
       // parsed)
       operationParser.getOperationsWithoutModelRecursiveStream()
-          .map(ComponentAst::getIdentifier)
-          .map(ComponentIdentifier::getName)
-          .filter(operationModelParsersByName::containsKey)
-          .map(operationModelParsersByName::get)
+          .map(component -> operationModelParsersByName.get(component.getIdentifier().getName()))
+          .filter(Objects::nonNull)
           .forEach(innerOperationParser -> {
             // Adds inner operations to the stack, only if they haven't been seen yet
             if (visitedOperations.add(innerOperationParser.getName())) {
@@ -328,10 +326,10 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
           });
     }
 
-    return false;
+    isBlocking = false;
   }
 
   public void computeCharacteristics(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
-    isBlocking = computeIsBlocking(operationModelParsersByName);
+    computeIsBlocking(operationModelParsersByName);
   }
 }

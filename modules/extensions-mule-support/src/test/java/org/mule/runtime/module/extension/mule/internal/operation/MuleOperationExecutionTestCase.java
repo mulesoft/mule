@@ -71,6 +71,15 @@ public class MuleOperationExecutionTestCase extends MuleArtifactFunctionalTestCa
   }
 
   @Test
+  @Description("Calls a flow that executes the <this:blocking-hello-world> operation which is blocking")
+  public void executeBlockingOperation() throws Exception {
+    CoreEvent resultEvent = flowRunner("blockingOperationFlow").run();
+    assertThat(resultEvent.getMessage().getPayload().getValue(),
+               equalTo("Hello,  Malaga! "));
+    assertThat(resultEvent.getMessage().getAttributes().getValue(), is(nullValue()));
+  }
+
+  @Test
   @Description("Calls a flow that executes the <this:repeated-hello-world> operation which is implemented recursively")
   public void executeRecursiveOperation() throws Exception {
     CoreEvent resultEvent = flowRunner("recursiveOperationFlow").run();
