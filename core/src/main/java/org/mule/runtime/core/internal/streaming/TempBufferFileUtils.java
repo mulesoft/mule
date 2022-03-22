@@ -7,8 +7,6 @@
 package org.mule.runtime.core.internal.streaming;
 
 import static java.nio.file.Files.createTempFile;
-import static java.nio.file.attribute.PosixFilePermissions.asFileAttribute;
-import static java.nio.file.attribute.PosixFilePermissions.fromString;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +26,7 @@ public final class TempBufferFileUtils {
    * @throws IOException
    */
   public static File createBufferFile(String name) throws IOException {
-    return createTempFile("mule-buffer-" + name + "-", ".tmp", asFileAttribute(fromString("w+"))).toFile();
+    return createTempFile("mule-buffer-" + name + "-", ".tmp").toFile();
   }
 
   private TempBufferFileUtils() {}

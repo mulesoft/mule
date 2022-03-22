@@ -12,8 +12,6 @@ import static org.mule.tck.ZipUtils.compress;
 
 import static java.io.File.pathSeparator;
 import static java.nio.file.Files.createTempDirectory;
-import static java.nio.file.attribute.PosixFilePermissions.asFileAttribute;
-import static java.nio.file.attribute.PosixFilePermissions.fromString;
 import static java.util.stream.Collectors.toList;
 
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
@@ -90,7 +88,7 @@ public class CompilerUtils {
      */
     protected File createTargetFolder() {
       try {
-        File tempFolder = createTempDirectory(CompilerUtils.class.getSimpleName(), asFileAttribute(fromString("w+"))).toFile();
+        File tempFolder = createTempDirectory(CompilerUtils.class.getSimpleName()).toFile();
         tempFolder.delete();
         tempFolder.mkdir();
         return tempFolder;

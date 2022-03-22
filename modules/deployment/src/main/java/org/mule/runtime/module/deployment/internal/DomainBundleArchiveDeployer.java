@@ -14,8 +14,6 @@ import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 
 import static java.nio.file.Files.createTempDirectory;
-import static java.nio.file.attribute.PosixFilePermissions.asFileAttribute;
-import static java.nio.file.attribute.PosixFilePermissions.fromString;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toSet;
 
@@ -238,7 +236,7 @@ public class DomainBundleArchiveDeployer {
   }
 
   private File unzipDomainBundle(File bundleFile) throws IOException {
-    File tempFolder = createTempDirectory(bundleFile.getName(), asFileAttribute(fromString("w+"))).toFile();
+    File tempFolder = createTempDirectory(bundleFile.getName()).toFile();
     tempFolder.delete();
     tempFolder.mkdirs();
     FileUtils.unzip(bundleFile, tempFolder);

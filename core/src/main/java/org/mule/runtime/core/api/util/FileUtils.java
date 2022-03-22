@@ -10,8 +10,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.util.FilenameUtils.normalizeDecodedPath;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.nio.file.attribute.PosixFilePermissions.asFileAttribute;
-import static java.nio.file.attribute.PosixFilePermissions.fromString;
 import static java.util.Collections.emptyList;
 
 import static org.apache.commons.io.FileUtils.deleteQuietly;
@@ -875,7 +873,7 @@ public class FileUtils {
   @Deprecated
   public static File createTempFile(String prefix, String suffix) {
     try {
-      return Files.createTempFile(prefix, suffix, asFileAttribute(fromString("w+"))).toFile();
+      return Files.createTempFile(prefix, suffix).toFile();
     } catch (IOException e) {
       throw new MuleRuntimeException(e);
     }

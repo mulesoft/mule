@@ -9,8 +9,6 @@ package org.mule.runtime.core.internal.util;
 import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleHome;
 
 import static java.nio.file.Files.createTempFile;
-import static java.nio.file.attribute.PosixFilePermissions.asFileAttribute;
-import static java.nio.file.attribute.PosixFilePermissions.fromString;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
@@ -175,7 +173,7 @@ public final class JarUtils {
     if (entries != null) {
       LinkedHashMap combinedEntries = readJarFileEntries(jarFile);
       combinedEntries.putAll(entries);
-      File tmpJarFile = createTempFile(jarFile.getName(), null, asFileAttribute(fromString("w+"))).toFile();
+      File tmpJarFile = createTempFile(jarFile.getName(), null).toFile();
       createJarFileEntries(tmpJarFile, combinedEntries);
       jarFile.delete();
       FileUtils.renameFile(tmpJarFile, jarFile);
