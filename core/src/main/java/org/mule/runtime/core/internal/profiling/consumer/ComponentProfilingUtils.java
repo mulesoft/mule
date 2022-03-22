@@ -8,8 +8,6 @@ package org.mule.runtime.core.internal.profiling.consumer;
 
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.*;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_ROLLBACK;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
