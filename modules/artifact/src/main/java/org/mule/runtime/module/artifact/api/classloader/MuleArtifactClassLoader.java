@@ -6,14 +6,16 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
 import static java.lang.reflect.Modifier.isAbstract;
+
 import static org.apache.commons.io.FilenameUtils.normalize;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
@@ -61,7 +63,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
   private static final String NO_WILDCARD = "([^\\" + WILDCARD + "]+)";
   private static final String NO_WILDCARD_NO_SPACES = "([^\\" + WILDCARD + "|\\s]+)";
-  private static final String NO_SPACES = "(\\S+)";
+  private static final String NO_SPACES = "([^\\s]+)";
 
   static final Pattern GAV_EXTENDED_PATTERN = Pattern.compile(
                                                               RESOURCE_PREFIX

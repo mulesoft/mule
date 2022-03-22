@@ -93,7 +93,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   private static final Logger LOGGER = getLogger(TemplateOnErrorHandler.class);
 
-  private static final Pattern ERROR_HANDLER_LOCATION_PATTERN = compile(".*/.*/.*");
+  private static final Pattern ERROR_HANDLER_LOCATION_PATTERN = compile("[^/]*/[^/]*/[^/]*");
 
   @Inject
   private ExpressionManager expressionManager;
