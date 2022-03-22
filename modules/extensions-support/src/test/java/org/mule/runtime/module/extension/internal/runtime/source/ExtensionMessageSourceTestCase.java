@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.util.Arrays.asList;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getThrowables;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -217,11 +218,11 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     messageSource.initialise();
     try {
       messageSource.start();
-      latch.await();
+      latch.await(5, SECONDS);
       assertThat(notifications.get(0), is(instanceOf(ExceptionNotification.class)));
       assertThat(notifications.get(0).getException(), instanceOf(RetryPolicyExhaustedException.class));
     } catch (Exception ex) {
-      latch.await();
+      latch.await(5, SECONDS);
       assertThat(notifications.get(0), is(instanceOf(ExceptionNotification.class)));
       assertThat(notifications.get(0).getException(), instanceOf(RetryPolicyExhaustedException.class));
     }
