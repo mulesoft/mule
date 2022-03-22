@@ -13,6 +13,9 @@ import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 
+import static java.nio.file.Files.createTempDirectory;
+import static java.nio.file.attribute.PosixFilePermissions.asFileAttribute;
+import static java.nio.file.attribute.PosixFilePermissions.fromString;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toSet;
 
@@ -235,7 +238,7 @@ public class DomainBundleArchiveDeployer {
   }
 
   private File unzipDomainBundle(File bundleFile) throws IOException {
-    File tempFolder = File.createTempFile(bundleFile.getName(), "tmp");
+    File tempFolder = createTempDirectory(bundleFile.getName(), asFileAttribute(fromString("w+"))).toFile();
     tempFolder.delete();
     tempFolder.mkdirs();
     FileUtils.unzip(bundleFile, tempFolder);

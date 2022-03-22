@@ -9,7 +9,9 @@ package org.mule.runtime.core.api.util;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.util.FilenameUtils.normalizeDecodedPath;
 
-import static java.lang.System.getProperty;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.attribute.PosixFilePermissions.asFileAttribute;
+import static java.nio.file.attribute.PosixFilePermissions.fromString;
 import static java.util.Collections.emptyList;
 
 import static org.apache.commons.io.FileUtils.deleteQuietly;
@@ -38,13 +40,13 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.channels.Channel;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Random;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
@@ -65,19 +67,7 @@ import org.slf4j.LoggerFactory;
 public class FileUtils {
 
   private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
-  private static final String TEMP_DIR_SYSTEM_PROPERTY = "java.io.tmpdir";
-  private static final File TEMP_DIR = new File(getProperty(TEMP_DIR_SYSTEM_PROPERTY));
-  private static final Random random = new Random();
-
-  public static String DEFAULT_ENCODING = "UTF-8";
-
-  static {
-    if (!TEMP_DIR.exists()) {
-      throw new MuleRuntimeException(createStaticMessage("Temp directory '" + TEMP_DIR.getAbsolutePath() + "' does not exist. "
-          + "Please check the value of the '" + TEMP_DIR_SYSTEM_PROPERTY
-          + "' system property."));
-    }
-  }
+  public static String DEFAULT_ENCODING = UTF_8.name();
 
   public static synchronized void copyStreamToFile(InputStream input, File destination) throws IOException {
     if (destination.exists() && !destination.canWrite()) {
@@ -293,8 +283,8 @@ public class FileUtils {
         verifyZipFilePaths(zip);
       }
 
-      for (Enumeration entries = zip.entries(); entries.hasMoreElements();) {
-        ZipEntry entry = (ZipEntry) entries.nextElement();
+      for (Enumeration<? extends ZipEntry> entries = zip.entries(); entries.hasMoreElements();) {
+        ZipEntry entry = entries.nextElement();
         File f = FileUtils.newFile(directory, entry.getName());
         if (entry.isDirectory()) {
           if (!f.exists() && !f.mkdirs()) {
@@ -321,8 +311,8 @@ public class FileUtils {
   }
 
   public static void verifyZipFilePaths(ZipFile zip) throws InvalidZipFileException {
-    for (Enumeration entries = zip.entries(); entries.hasMoreElements();) {
-      verifyZipEntryPath((ZipEntry) entries.nextElement());
+    for (Enumeration<? extends ZipEntry> entries = zip.entries(); entries.hasMoreElements();) {
+      verifyZipEntryPath(entries.nextElement());
     }
   }
 
@@ -563,12 +553,12 @@ public class FileUtils {
       throws IOException {
     try (JarFile jarFile = connection.getJarFile()) {
       JarEntry jarResource = connection.getJarEntry();
-      Enumeration entries = jarFile.entries();
+      Enumeration<JarEntry> entries = jarFile.entries();
       InputStream inputStream = null;
       OutputStream outputStream = null;
       int jarResourceNameLenght = jarResource.getName().length();
       for (; entries.hasMoreElements();) {
-        JarEntry entry = (JarEntry) entries.nextElement();
+        JarEntry entry = entries.nextElement();
         if (entry.getName().startsWith(jarResource.getName())) {
 
           String path = outputDir.getPath() + File.separator + entry.getName();
@@ -813,16 +803,12 @@ public class FileUtils {
       throw new IOException("Destination '" + destFile + "' exists but is a directory");
     }
 
-    FileChannel input = new FileInputStream(srcFile).getChannel();
-    try {
-      FileChannel output = new FileOutputStream(destFile).getChannel();
-      try {
+    try (FileInputStream fileInputStream = new FileInputStream(srcFile);
+        FileChannel input = fileInputStream.getChannel()) {
+      try (FileOutputStream fileOutputStream = new FileOutputStream(destFile);
+          FileChannel output = fileOutputStream.getChannel()) {
         output.transferFrom(input, 0, input.size());
-      } finally {
-        closeQuietly(output);
       }
-    } finally {
-      closeQuietly(input);
     }
 
     if (srcFile.length() != destFile.length()) {
@@ -883,9 +869,16 @@ public class FileUtils {
    * @param suffix the file's suffix
    * @return a {@link File}
    * @throws RuntimeException
+   * 
+   * @deprecated Use {@link Files#createTempFile(String, String, java.nio.file.attribute.FileAttribute...)} instead.
    */
+  @Deprecated
   public static File createTempFile(String prefix, String suffix) {
-    return new File(TEMP_DIR, prefix + random.nextLong() + suffix);
+    try {
+      return Files.createTempFile(prefix, suffix, asFileAttribute(fromString("w+"))).toFile();
+    } catch (IOException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
   private FileUtils() {}

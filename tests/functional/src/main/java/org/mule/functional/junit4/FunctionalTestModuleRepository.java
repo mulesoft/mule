@@ -10,6 +10,8 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import static java.lang.System.currentTimeMillis;
 import static java.nio.file.Files.createTempDirectory;
+import static java.nio.file.attribute.PosixFilePermissions.asFileAttribute;
+import static java.nio.file.attribute.PosixFilePermissions.fromString;
 
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
@@ -57,7 +59,7 @@ public class FunctionalTestModuleRepository implements ModuleRepository {
       result.add(new JreModuleDiscoverer());
 
       try {
-        File temp = createTempDirectory("" + currentTimeMillis()).toFile();
+        File temp = createTempDirectory("" + currentTimeMillis(), asFileAttribute(fromString("w+"))).toFile();
         temp.deleteOnExit();
         result.add(new ClasspathModuleDiscoverer(containerClassLoader, temp));
         return result;

@@ -7,13 +7,18 @@
 
 package org.mule.tck.util;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.tck.ZipUtils.compress;
+
 import static java.io.File.pathSeparator;
+import static java.nio.file.Files.createTempDirectory;
+import static java.nio.file.attribute.PosixFilePermissions.asFileAttribute;
+import static java.nio.file.attribute.PosixFilePermissions.fromString;
 import static java.util.stream.Collectors.toList;
+
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.filefilter.TrueFileFilter.TRUE;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.tck.ZipUtils.compress;
 
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringUtils;
@@ -85,7 +90,7 @@ public class CompilerUtils {
      */
     protected File createTargetFolder() {
       try {
-        File tempFolder = File.createTempFile(CompilerUtils.class.getSimpleName(), "");
+        File tempFolder = createTempDirectory(CompilerUtils.class.getSimpleName(), asFileAttribute(fromString("w+"))).toFile();
         tempFolder.delete();
         tempFolder.mkdir();
         return tempFolder;
