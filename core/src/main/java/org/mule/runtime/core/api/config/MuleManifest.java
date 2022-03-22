@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.config;
 
+import static java.util.regex.Pattern.compile;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -16,6 +18,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,6 +119,7 @@ public class MuleManifest {
 
   static class UrlPrivilegedAction implements PrivilegedAction<URL> {
 
+    private static final Pattern EMBEDDED_JAR_PATTERN = compile("mule[^-]*-[^-]*-embedded");
     private static final String MANIFEST_PATH = "META-INF/MANIFEST.MF";
 
     @Override
@@ -144,7 +148,7 @@ public class MuleManifest {
             && !url.toExternalForm().contains("mule-core-components"))
             || url.toExternalForm().contains("mule-runtime-extension-model")
             || url.toExternalForm().contains("mule-runtime-ee-extension-model")
-            || url.toExternalForm().matches("mule[^-]*-[^-]*-embedded(?:(?!\\.jar).)*\\.jar")) {
+            || (EMBEDDED_JAR_PATTERN.matcher(url.toExternalForm()).find() && url.toExternalForm().endsWith(".jar"))) {
           candidates.put(url.toExternalForm(), url);
         }
       }
@@ -168,7 +172,7 @@ public class MuleManifest {
         URL url = e.nextElement();
         if ((url.toExternalForm().contains(testManifestPath)
             && !url.toExternalForm().contains("tests.jar"))
-            || url.toExternalForm().matches("mule[^-]*-[^-]*-embedded(?:(?!\\.jar).)*\\.jar")) {
+            || (EMBEDDED_JAR_PATTERN.matcher(url.toExternalForm()).find() && url.toExternalForm().endsWith(".jar"))) {
           return url;
         }
       }
