@@ -18,9 +18,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.internal.profiling.consumer.ComponentProfilingUtils.getTxInfo;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
+
+import static java.util.Arrays.asList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static java.util.Arrays.asList;
 import static com.google.common.collect.ImmutableSet.of;
 
 
@@ -38,6 +39,10 @@ import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInte
 import org.mule.runtime.core.internal.profiling.context.DefaultTransactionProfilingEventContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
+
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
 import org.slf4j.Logger;
 import com.google.gson.Gson;
 import io.qameta.allure.Description;
@@ -52,9 +57,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.util.Collection;
-import java.util.Optional;
-import java.util.Set;
+
 
 @Feature(PROFILING)
 @Story(DEFAULT_PROFILING_SERVICE)
