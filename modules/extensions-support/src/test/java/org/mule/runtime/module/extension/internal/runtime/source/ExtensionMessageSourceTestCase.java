@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.util.Arrays.asList;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getThrowables;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -39,6 +40,9 @@ import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.notification.ExceptionNotification;
+import org.mule.runtime.api.notification.ExceptionNotificationListener;
+import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.Injector;
@@ -47,6 +51,9 @@ import org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.api.util.ExceptionUtils;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
@@ -55,7 +62,9 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.resource.spi.work.Work;
@@ -182,6 +191,33 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
 
     messageSource.initialise();
     messageSource.start();
+  }
+
+  @Test
+  public void dispatchNotificationWhenFailToStart() throws Exception {
+    final Latch latch = new Latch();
+    final List<ExceptionNotification> notifications = new ArrayList<>();
+    final ExceptionNotificationListener listener = notification -> {
+      notifications.add(notification);
+      latch.release();
+    };
+    registerNotificationListener(listener);
+
+    ConnectionException connectionException = new ConnectionException(ERROR_MESSAGE);
+    MuleException e = new DefaultMuleException(connectionException);
+    doThrow(e).when(source).onStart(any());
+
+    messageSource.initialise();
+    try {
+      messageSource.start();
+      latch.await(5, SECONDS);
+      assertThat(notifications.get(0), is(instanceOf(ExceptionNotification.class)));
+      assertThat(notifications.get(0).getException(), instanceOf(RetryPolicyExhaustedException.class));
+    } catch (Exception ex) {
+      latch.await(5, SECONDS);
+      assertThat(notifications.get(0), is(instanceOf(ExceptionNotification.class)));
+      assertThat(notifications.get(0).getException(), instanceOf(RetryPolicyExhaustedException.class));
+    }
   }
 
   @Test
@@ -528,6 +564,13 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
       assertThat(muleContext.getStatistics().getApplicationStatistics().getExecutionErrors(), equalTo(2l));
       return true;
     }));
+  }
+
+  private void registerNotificationListener(ExceptionNotificationListener exceptionNotificationListener)
+      throws RegistrationException {
+    MuleRegistry muleRegistry = ((MuleContextWithRegistry) muleContext).getRegistry();
+    NotificationListenerRegistry notificationListenerRegistry = muleRegistry.lookupObject(NotificationListenerRegistry.class);
+    notificationListenerRegistry.registerListener(exceptionNotificationListener);
   }
 
   private class DummySource extends Source {
