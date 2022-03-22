@@ -250,7 +250,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   }
 
   @Override
-  protected final DefaultMuleConfiguration createMuleConfiguration() {
+  protected DefaultMuleConfiguration createMuleConfiguration() {
     if (enableLazyInit()) {
       return new ReconfigurableMuleConfiguration();
     } else {

@@ -261,19 +261,10 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   }
 
   protected MuleContext createMuleContext() throws Exception {
-    return createMuleContext(this.getClass().getSimpleName() + "#" + name.getMethodName(),
-                             new MuleVersion(getMavenProjectVersionProperty()));
+    return createMuleContext(this.getClass().getSimpleName() + "#" + name.getMethodName());
   }
 
   protected MuleContext createMuleContext(String contextConfigurationId) throws Exception {
-    return createMuleContext(contextConfigurationId, new MuleVersion(getMavenProjectVersionProperty()));
-  }
-
-  protected MuleContext createMuleContext(MuleVersion minMuleVersion) throws Exception {
-    return createMuleContext(this.getClass().getSimpleName() + "#" + name.getMethodName(), minMuleVersion);
-  }
-
-  protected MuleContext createMuleContext(String contextConfigurationId, MuleVersion minMuleVersion) throws Exception {
     // Should we set up the manager for every method?
     MuleContext context;
     if (isDisposeContextPerClass() && muleContext != null) {
@@ -296,7 +287,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         LOGGER.info("Using working directory for test: " + workingDirectory);
         muleConfiguration.setWorkingDirectory(workingDirectory);
         muleConfiguration.setId(contextConfigurationId);
-        muleConfiguration.setMinMuleVersion(minMuleVersion);
         contextBuilder.setMuleConfiguration(muleConfiguration);
         contextBuilder.setExecutionClassLoader(executionClassLoader);
         contextBuilder.setObjectSerializer(getObjectSerializer());
@@ -318,7 +308,9 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   }
 
   protected DefaultMuleConfiguration createMuleConfiguration() {
-    return new DefaultMuleConfiguration();
+    DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
+    muleConfiguration.setMinMuleVersion(new MuleVersion(getMavenProjectVersionProperty()));
+    return muleConfiguration;
   }
 
   /**
