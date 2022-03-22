@@ -1,5 +1,4 @@
 /*
-/*
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
@@ -20,6 +19,11 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
+/**
+ * Describes a Mule Application artifact.
+ * 
+ * @since 4.5
+ */
 @NoExtend
 public class ApplicationDescriptor extends DeployableArtifactDescriptor {
 

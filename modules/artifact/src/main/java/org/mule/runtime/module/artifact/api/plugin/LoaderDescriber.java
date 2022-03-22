@@ -25,7 +25,7 @@ import java.util.Map;
  * Each {@link LoaderDescriber} will have an ID that will be used to discover any loader that's responsible of working with the
  * current set of attributes. It's up to each loader to validate the types, size and all that matters around the attributes.
  *
- * @since 4.0
+ * @since 4.5
  */
 @NoInstantiate
 @NoExtend

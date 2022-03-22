@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.artifact.api.descriptor;
 
-
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -20,6 +19,11 @@ import org.mule.runtime.module.artifact.api.plugin.LoaderDescriber;
 import java.util.Optional;
 import java.util.Properties;
 
+/**
+ * Describes an artifact with classifier {@code mule-plugin}, used within an Application or Domain.
+ * 
+ * @since 4.5
+ */
 @NoExtend
 public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
 

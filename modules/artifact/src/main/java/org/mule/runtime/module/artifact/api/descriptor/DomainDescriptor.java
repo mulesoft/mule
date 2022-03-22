@@ -16,6 +16,8 @@ import com.google.common.collect.ImmutableSet;
 
 /**
  * Represents the description of a domain.
+ * 
+ * @since 4.5
  */
 @NoExtend
 public class DomainDescriptor extends DeployableArtifactDescriptor {
