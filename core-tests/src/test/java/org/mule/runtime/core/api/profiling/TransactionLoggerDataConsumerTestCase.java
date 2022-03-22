@@ -20,10 +20,9 @@ import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
 
 import static java.util.Arrays.asList;
+import static com.google.common.collect.ImmutableSet.of;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static com.google.common.collect.ImmutableSet.of;
-
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -44,7 +43,6 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import com.google.gson.Gson;
-import org.slf4j.Logger;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -56,6 +54,7 @@ import org.junit.runners.Parameterized;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.slf4j.Logger;
 
 @Feature(PROFILING)
 @Story(DEFAULT_PROFILING_SERVICE)
