@@ -6,6 +6,12 @@
  */
 package org.mule.runtime.core.api.transaction;
 
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
+import static org.mule.runtime.api.tx.TransactionType.LOCAL;
+import static org.mule.runtime.api.tx.TransactionType.XA;
+import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+import static java.lang.System.currentTimeMillis;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
@@ -14,12 +20,6 @@ import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventCont
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.core.internal.profiling.context.DefaultTransactionProfilingEventContext;
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
-
-import static java.lang.System.currentTimeMillis;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
-import static org.mule.runtime.api.tx.TransactionType.LOCAL;
-import static org.mule.runtime.api.tx.TransactionType.XA;
-import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 
 public final class TransactionUtils {
 

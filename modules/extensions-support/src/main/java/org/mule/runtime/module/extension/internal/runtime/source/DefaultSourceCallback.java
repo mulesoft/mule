@@ -20,6 +20,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MediaType;
@@ -313,7 +314,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     try {
       muleContext.getInjector().inject(context);
     } catch (MuleException e) {
-      // ...
+      throw new MuleRuntimeException(e);
     }
     return context;
   }

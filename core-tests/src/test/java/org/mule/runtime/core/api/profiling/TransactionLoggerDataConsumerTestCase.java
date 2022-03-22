@@ -43,8 +43,8 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
-import org.slf4j.Logger;
 import com.google.gson.Gson;
+import org.slf4j.Logger;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -56,8 +56,6 @@ import org.junit.runners.Parameterized;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-
-
 
 @Feature(PROFILING)
 @Story(DEFAULT_PROFILING_SERVICE)
