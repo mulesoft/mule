@@ -14,7 +14,12 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshot;
 import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.api.profiling.type.context.*;
+import org.mule.runtime.api.profiling.type.context.ByteBufferProviderEventContext;
+import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.ComponentProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.TaskSchedulingProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
 
 import java.util.HashMap;
 import java.util.Map;
