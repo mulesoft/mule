@@ -7,13 +7,14 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
+import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
+
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
 import org.mule.runtime.api.deployment.persistence.MuleApplicationModelJsonSerializer;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.util.PropertiesUtils;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableDescriptorFactory;
@@ -50,7 +51,9 @@ public class ApplicationDescriptorFactory
   @Override
   protected ApplicationDescriptor createArtifactDescriptor(File artifactLocation, String name,
                                                            Optional<Properties> deploymentProperties) {
-    return new ApplicationDescriptor(artifactLocation.getName(), deploymentProperties);
+    // Keep compatibility with usages of the factory that expect the descriptor from previous version.
+    return new org.mule.runtime.deployment.model.api.application.ApplicationDescriptor(artifactLocation.getName(),
+                                                                                       deploymentProperties);
   }
 
   @Override

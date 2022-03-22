@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.Artifact;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 
 import java.io.File;
 import java.io.IOException;

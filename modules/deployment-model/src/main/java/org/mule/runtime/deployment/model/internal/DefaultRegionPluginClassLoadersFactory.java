@@ -20,13 +20,13 @@ import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
 import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DelegateOnlyLookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 
 import java.util.HashMap;

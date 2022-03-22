@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.module.artifact.api.Artifact;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 

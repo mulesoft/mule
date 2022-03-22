@@ -11,8 +11,8 @@ import static org.mule.runtime.module.deployment.impl.internal.artifact.Artifact
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.File;

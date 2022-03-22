@@ -21,7 +21,12 @@
     <dependencies>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-core</artifactId>
+            <artifactId>mule-module-artifact</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-container</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

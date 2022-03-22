@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
-import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
-import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
+
+import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
+
+import static org.apache.commons.lang3.StringUtils.capitalize;
 
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.construct.Flow;
@@ -20,12 +22,12 @@ import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentStopException;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -7,14 +7,14 @@
 package org.mule.runtime.deployment.model.api.builder;
 
 import org.mule.runtime.container.api.ModuleRepository;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
 import java.io.File;
 import java.util.function.Function;

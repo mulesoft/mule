@@ -20,9 +20,9 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

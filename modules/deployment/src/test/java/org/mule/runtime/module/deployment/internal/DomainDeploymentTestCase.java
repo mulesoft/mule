@@ -11,7 +11,6 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
-import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.CREATED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
@@ -19,8 +18,9 @@ import static org.mule.runtime.deployment.model.api.application.ApplicationStatu
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
+import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
+import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveArtifactStatusDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.TestDomainFactory.createDomainFactory;
@@ -94,6 +94,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 
+import javax.inject.Inject;
+
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -102,7 +104,6 @@ import org.junit.Test;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
-import javax.inject.Inject;
 
 /**
  * Contains test for domain deployment

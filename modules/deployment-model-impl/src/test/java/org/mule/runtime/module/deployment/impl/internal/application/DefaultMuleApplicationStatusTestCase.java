@@ -35,7 +35,7 @@ import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
-import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
+import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;

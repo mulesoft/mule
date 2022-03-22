@@ -6,21 +6,22 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.CREATED;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
+import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
+
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.CREATED;
-import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
-import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
-import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
 
 import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
