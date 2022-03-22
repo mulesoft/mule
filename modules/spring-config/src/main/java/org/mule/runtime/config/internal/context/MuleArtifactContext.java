@@ -447,7 +447,14 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   @Override
   public void close() {
     if (isRunning()) {
-      super.close();
+      try {
+        super.close();
+      } catch (Exception e) {
+        for (ObjectProvider objectProvider : objectProviders) {
+          disposeIfNeeded(objectProvider, LOGGER);
+        }
+        throw new MuleRuntimeException(e);
+      }
       disposeIfNeeded(configurationProperties.getConfigurationPropertiesResolver(), LOGGER);
     }
   }
