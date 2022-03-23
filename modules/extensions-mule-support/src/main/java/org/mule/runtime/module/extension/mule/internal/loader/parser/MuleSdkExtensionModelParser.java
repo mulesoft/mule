@@ -10,9 +10,11 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
+import static org.mule.runtime.extension.api.dsl.syntax.DslSyntaxUtils.getSanitizedElementName;
 import static org.mule.runtime.internal.dsl.DslConstants.THIS_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.THIS_PREFIX;
 import static org.mule.sdk.api.annotation.Extension.MULESOFT;
@@ -36,6 +38,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.OperationModelPa
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,11 +53,13 @@ class MuleSdkExtensionModelParser implements ExtensionModelParser {
   private final String extensionName;
   private final ArtifactAst ast;
   private final TypeLoader typeLoader;
+  private final List<OperationModelParser> operationModelParsers;
 
   public MuleSdkExtensionModelParser(String extensionName, ArtifactAst ast, TypeLoader typeLoader) {
     this.extensionName = extensionName;
     this.ast = ast;
     this.typeLoader = typeLoader;
+    operationModelParsers = computeOperationModelParsers();
   }
 
   @Override
@@ -86,10 +91,7 @@ class MuleSdkExtensionModelParser implements ExtensionModelParser {
 
   @Override
   public List<OperationModelParser> getOperationModelParsers() {
-    return ast.topLevelComponentsStream()
-        .filter(c -> c.getComponentType() == OPERATION_DEF)
-        .map(c -> new MuleSdkOperationModelParserSdk(c, typeLoader))
-        .collect(toList());
+    return operationModelParsers;
   }
 
   @Override
@@ -171,5 +173,19 @@ class MuleSdkExtensionModelParser implements ExtensionModelParser {
   @Override
   public List<NotificationModel> getNotificationModels() {
     return emptyList();
+  }
+
+  private List<OperationModelParser> computeOperationModelParsers() {
+    final Map<String, MuleSdkOperationModelParserSdk> operationParsersByName =
+        ast.topLevelComponentsStream()
+            .filter(c -> c.getComponentType() == OPERATION_DEF)
+            .map(c -> new MuleSdkOperationModelParserSdk(c, typeLoader))
+            .collect(toMap(c -> getSanitizedElementName(c::getName), identity()));
+
+    // Some characteristics of the operation model parsers require knowledge about the other operation model parsers
+    operationParsersByName.values()
+        .forEach(operationModelParser -> operationModelParser.computeCharacteristics(operationParsersByName));
+
+    return new ArrayList<>(operationParsersByName.values());
   }
 }
