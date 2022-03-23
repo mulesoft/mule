@@ -48,6 +48,7 @@ import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.c
 import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultPersistentObjectStore;
+import static org.mule.runtime.module.artifact.activation.api.config.boot.RegistryBootstrap.defaultRegistryBoostrap;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -101,7 +102,6 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
-import org.mule.runtime.module.artifact.activation.api.config.boot.SimpleRegistryBootstrap;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -113,7 +113,7 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
   protected void doConfigure(MuleContext muleContext) throws Exception {
     MuleRegistry registry = ((MuleContextWithRegistry) muleContext).getRegistry();
 
-    new SimpleRegistryBootstrap(APP, muleContext).initialise();
+    defaultRegistryBoostrap(APP, muleContext).initialise();
 
     configureQueueManager(muleContext);
 

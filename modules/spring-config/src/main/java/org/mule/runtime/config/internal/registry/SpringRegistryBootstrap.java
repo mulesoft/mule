@@ -17,9 +17,9 @@ import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap;
-import org.mule.runtime.core.internal.config.bootstrap.ObjectBootstrapProperty;
-import org.mule.runtime.core.internal.config.bootstrap.TransformerBootstrapProperty;
+import org.mule.runtime.module.artifact.activation.internal.config.boot.AbstractRegistryBootstrap;
+import org.mule.runtime.module.artifact.activation.internal.config.boot.ObjectBootstrapProperty;
+import org.mule.runtime.module.artifact.activation.internal.config.boot.TransformerBootstrapProperty;
 import org.mule.runtime.core.internal.registry.Registry;
 
 import java.util.function.BiConsumer;

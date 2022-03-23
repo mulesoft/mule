@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.config.bootstrap;
+package org.mule.runtime.module.artifact.activation.internal.config.boot;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
@@ -29,6 +29,7 @@ import org.mule.runtime.core.api.config.bootstrap.BootstrapService;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.PropertiesUtils;
+import org.mule.runtime.module.artifact.activation.api.config.boot.RegistryBootstrap;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -102,7 +103,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 3.7.0
  */
-public abstract class AbstractRegistryBootstrap implements Initialisable {
+public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
 
   private static final String TRANSACTION_RESOURCE_SUFFIX = ".transaction.resource";
   // TODO W-10736276 Remove this

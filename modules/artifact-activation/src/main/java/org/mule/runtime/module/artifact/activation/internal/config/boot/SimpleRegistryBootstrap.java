@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.artifact.activation.api.config.boot;
+package org.mule.runtime.module.artifact.activation.internal.config.boot;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
@@ -16,9 +16,6 @@ import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap;
-import org.mule.runtime.core.internal.config.bootstrap.ObjectBootstrapProperty;
-import org.mule.runtime.core.internal.config.bootstrap.TransformerBootstrapProperty;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 

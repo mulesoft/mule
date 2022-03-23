@@ -28,7 +28,6 @@
         <module>core-mvel</module>
         <module>extensions-support</module>
         <module>extensions-xml-support</module>
-        <module>extensions-tooling</module>
         <module>global-config</module>
         <module>javaee</module>
         <module>launcher</module>
@@ -51,7 +50,6 @@
         <module>tls</module>
         <module>soap-api</module>
         <module>extensions-soap-support</module>
-        <module>tooling-support</module>
     </modules>
 
     <build>
