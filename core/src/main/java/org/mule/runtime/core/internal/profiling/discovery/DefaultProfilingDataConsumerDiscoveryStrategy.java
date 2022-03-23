@@ -15,6 +15,7 @@ import org.mule.runtime.core.internal.profiling.consumer.LoggerByteBufferAllocat
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentThreadingDataConsumer;
 import org.mule.runtime.core.internal.profiling.consumer.TaskSchedulingLoggerDataConsumer;
+import org.mule.runtime.core.internal.profiling.consumer.TransactionLoggerDataConsumer;
 
 import java.util.Set;
 
@@ -30,6 +31,7 @@ public class DefaultProfilingDataConsumerDiscoveryStrategy implements ProfilingD
     return of(new LoggerByteBufferAllocationProfilingDataConsumer(),
               new LoggerComponentProcessingStrategyDataConsumer(),
               new LoggerComponentThreadingDataConsumer(),
+              new TransactionLoggerDataConsumer(),
               new TaskSchedulingLoggerDataConsumer());
   }
 
