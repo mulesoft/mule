@@ -51,6 +51,10 @@ public class ExceptionHandlerManagerTestCase {
   private static final String MULE_NAMESPACE = "MULE";
   private static final String CONNECTIVITY_ERROR_TYPE = "CONNECTIVITY";
   private static final String ERROR_MESSAGE = "ERROR MESSAGE";
+
+  private static final String CUST_EXTENSION_NAME = "SAP 4 HANA";
+  private static final String CUST_EXTENSION_NAMESPACE = "S4HANA";
+  private static final String CUST_EXTENSION_PREFIX = "S4HANA";
   @Mock(lenient = true)
   private ExtensionModel extensionModel;
 
@@ -155,6 +159,28 @@ public class ExceptionHandlerManagerTestCase {
   }
 
   @Test
+  public void handleConnectionExceptionExtensionWithSpacesAndCustomConnectivityError() {
+    Set<ErrorModel> errorModels = new HashSet<>();
+    errorModels.add(ErrorModelBuilder.newError(CONNECTIVITY_ERROR_TYPE, CUST_EXTENSION_NAMESPACE).build());
+    errorModels.add(ErrorModelBuilder.newError(CONNECTIVITY_ERROR_TYPE, MULE_NAMESPACE).build());
+
+    when(extensionModel.getName()).thenReturn(CUST_EXTENSION_NAME);
+    when(extensionModel.getErrorModels()).thenReturn(errorModels);
+    when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix(CUST_EXTENSION_PREFIX).build());
+
+    ExceptionHandlerManager exceptionHandlerManager =
+        new ExceptionHandlerManager(extensionModel, sourceModel, errorTypeRepository);
+    ConnectionException connectionException = new ConnectionException(ERROR_MESSAGE, new Exception());
+
+    Throwable throwable = exceptionHandlerManager.handleThrowable(new Throwable(connectionException));
+    assertThat(throwable, is(instanceOf(ConnectionException.class)));
+    assertThat(throwable.getMessage(), is(ERROR_MESSAGE));
+    assertThat(((ConnectionException) throwable).getErrorType().isPresent(), is(true));
+    assertThat(((ConnectionException) throwable).getErrorType().get().getIdentifier(), is(CONNECTIVITY_ERROR_TYPE));
+    assertThat(((ConnectionException) throwable).getErrorType().get().getNamespace(), is(CUST_EXTENSION_PREFIX));
+  }
+
+  @Test
   public void handleConnectionExceptionExtensionWithoutCustomConnectivityError() {
     Set<ErrorModel> errorModels = new HashSet<>();
     errorModels.add(ErrorModelBuilder.newError(CONNECTIVITY_ERROR_TYPE, MULE_NAMESPACE).build());
@@ -175,11 +201,17 @@ public class ExceptionHandlerManagerTestCase {
   private void mockErrorTypesRepository() {
     ErrorType extensionConnectivityErrorType = createErrorType(CONNECTIVITY_ERROR_TYPE, EXTENSION_NAMESPACE);
     ErrorType muleConnectivityErrorType = createErrorType(CONNECTIVITY_ERROR_TYPE, MULE_NAMESPACE);
+    ErrorType extensionWithSpacesConnectivityErrorType = createErrorType(CONNECTIVITY_ERROR_TYPE, CUST_EXTENSION_NAMESPACE);
 
     when(errorTypeRepository.getErrorType(ComponentIdentifier.builder()
         .namespace(EXTENSION_NAMESPACE)
         .name(CONNECTIVITY_ERROR_TYPE)
         .build())).thenReturn(Optional.of(extensionConnectivityErrorType));
+
+    when(errorTypeRepository.getErrorType(ComponentIdentifier.builder()
+        .namespace(CUST_EXTENSION_NAMESPACE)
+        .name(CONNECTIVITY_ERROR_TYPE)
+        .build())).thenReturn(Optional.of(extensionWithSpacesConnectivityErrorType));
 
     when(errorTypeRepository.getErrorType(ComponentIdentifier.builder()
         .namespace(MULE_NAMESPACE)
