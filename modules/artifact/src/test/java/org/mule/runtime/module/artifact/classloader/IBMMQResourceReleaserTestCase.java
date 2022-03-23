@@ -26,7 +26,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
-import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 import java.io.File;
 import java.lang.ref.Reference;
