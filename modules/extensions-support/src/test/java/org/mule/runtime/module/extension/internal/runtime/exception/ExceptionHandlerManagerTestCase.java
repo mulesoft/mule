@@ -55,6 +55,7 @@ public class ExceptionHandlerManagerTestCase {
   private static final String CUST_EXTENSION_NAME = "SAP 4 HANA";
   private static final String CUST_EXTENSION_NAMESPACE = "S4HANA";
   private static final String CUST_EXTENSION_PREFIX = "S4HANA";
+
   @Mock(lenient = true)
   private ExtensionModel extensionModel;
 
