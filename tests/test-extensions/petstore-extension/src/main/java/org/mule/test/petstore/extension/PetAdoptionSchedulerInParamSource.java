@@ -41,6 +41,7 @@ public class PetAdoptionSchedulerInParamSource extends Source<String, Void> {
   public static int COMPLETED_POLLS;
   public static int REJECTED_ADOPTIONS;
   public static int STARTED_POLLS;
+  public static Long frequency;
   protected List<String> pets;
 
   @Parameter
@@ -62,6 +63,7 @@ public class PetAdoptionSchedulerInParamSource extends Source<String, Void> {
 
     executor = polling.createExecutor("adoption", schedulerService);
     scheduled = polling.getSchedulingStrategy().schedule(executor, () -> this.poll(sourceCallback));
+    frequency = polling.getFrequency().get();
   }
 
   @Override

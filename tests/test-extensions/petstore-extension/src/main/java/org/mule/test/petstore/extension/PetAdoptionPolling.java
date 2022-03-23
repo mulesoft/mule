@@ -18,6 +18,7 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class PetAdoptionPolling {
@@ -59,4 +60,9 @@ public class PetAdoptionPolling {
     }
   }
 
+  public Optional<Long> getFrequency() {
+    return schedulingStrategy instanceof FixedFrequencyScheduler
+        ? Optional.of(((FixedFrequencyScheduler) schedulingStrategy).getFrequency())
+        : Optional.empty();
+  }
 }

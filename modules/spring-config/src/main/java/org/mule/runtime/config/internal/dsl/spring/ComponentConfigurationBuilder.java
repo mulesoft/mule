@@ -346,9 +346,7 @@ class ComponentConfigurationBuilder<T> {
       Object parameterValue;
       if (parameter == null) {
         parameterValue = defaultValue;
-      } else if ("frequency".equals(parameterName)
-          && ownerComponent.getIdentifier().equals(FIXED_FREQUENCY_STRATEGY_IDENTIFIER)
-          && parameter.isDefaultValue()) {
+      } else if (shouldSetDefaultFrequencyForFixedFrequencyStrategy(parameterName, parameter)) {
         // Account for inconsistency in the extension model. Ref: MULE-18262
         parameterValue = getDefaultSchedulerFixedFrequency();
       } else {
@@ -477,6 +475,12 @@ class ComponentConfigurationBuilder<T> {
         definition.getAttributeDefinition().accept(this);
       }
     }
+  }
+
+  private boolean shouldSetDefaultFrequencyForFixedFrequencyStrategy(String parameterName, ComponentParameterAst parameter) {
+    return "frequency".equals(parameterName)
+        && ownerComponent.getIdentifier().equals(FIXED_FREQUENCY_STRATEGY_IDENTIFIER)
+        && parameter.isDefaultValue() && parameter.getResolvedRawValue() == null;
   }
 
   private ManagedList constructManagedList(List<Object> beans) {
