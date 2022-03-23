@@ -15,17 +15,18 @@ import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
 
 import static com.google.common.collect.ImmutableSet.of;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
-import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ExtensionProfilingEventContext;
 import org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils;
 import org.mule.runtime.core.internal.profiling.ArtifactProfilingProducerScope;
+import org.mule.runtime.core.privileged.profiling.CoreProfilingService;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInternalProfilingDataConsumer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -72,7 +73,7 @@ public class ExtensionProfilingDataConsumerTestCase extends AbstractMuleContextT
   @Mock
   private Logger logger;
 
-  private ProfilingService profilingService;
+  private CoreProfilingService profilingService;
 
   @Before
   public void before() throws Exception {
@@ -89,7 +90,18 @@ public class ExtensionProfilingDataConsumerTestCase extends AbstractMuleContextT
   @Test
   @Description("When a profiling event related to an extension is triggered, the data consumers process the data accordingly.")
   public void dataConsumersForComponentProfilingEventAreTriggered() throws Exception {
+    doTestLoggerWhenProfilingDataProducerIsTriggered(logger);
+  }
 
+  @Test
+  @Description("When an extension profiler data consumer is dynamically registered in a connector, it consumes the messages")
+  public void dataConsumersDynamicallyRegistered() {
+    Logger loggerForDynamicDataConsumer = mock(Logger.class);
+    profilingService.registerProfilingDataConsumer(new TestComponentProfilingDataConsumer(loggerForDynamicDataConsumer));
+    doTestLoggerWhenProfilingDataProducerIsTriggered(loggerForDynamicDataConsumer);
+  }
+
+  private void doTestLoggerWhenProfilingDataProducerIsTriggered(Logger logger) {
     ProfilingDataProducer<ExtensionProfilingEventContext, Object> dataProducer =
         profilingService.getProfilingDataProducer(EXTENSION_PROFILING_EVENT,
                                                   new ArtifactProfilingProducerScope(ProfilingUtils.getArtifactId(muleContext)));
@@ -167,5 +179,6 @@ public class ExtensionProfilingDataConsumerTestCase extends AbstractMuleContextT
       return eventContext -> true;
     }
   }
+
 
 }
