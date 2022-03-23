@@ -51,9 +51,11 @@ public final class ExceptionHandlerManager {
 
   private ErrorType resolveConnectionErrorType(ExtensionModel extensionModel, ErrorTypeRepository errorTypeRepository) {
     String extensionNamespace = (extensionModel.getName() != null ? extensionModel.getName().toUpperCase() : null);
+    String namespaceFromXmlDsl = extensionModel.getXmlDslModel().getPrefix().toUpperCase();
     Predicate<ErrorModel> connectivityErrorCondition = errorModel -> errorModel.getType().equals(CONNECTIVITY_ERROR_IDENTIFIER);
     Predicate<ErrorModel> extensionConnectivityErrorCondition =
-        connectivityErrorCondition.and(errorModel -> errorModel.getNamespace().equals(extensionNamespace));
+        connectivityErrorCondition.and(errorModel -> errorModel.getNamespace().equals(extensionNamespace)
+            || errorModel.getNamespace().equals(namespaceFromXmlDsl));
 
     return extensionModel.getErrorModels().stream()
         .filter(extensionConnectivityErrorCondition).findFirst().map(Optional::of)
