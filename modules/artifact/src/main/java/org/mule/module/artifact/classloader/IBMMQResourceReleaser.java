@@ -42,8 +42,11 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
   private static final Logger LOGGER = LoggerFactory.getLogger(IBMMQResourceReleaser.class);
 
   private static final String AVOID_IBM_MQ_CLEANUP_PROPERTY_NAME = "avoid.ibm.mq.cleanup";
-  private static final boolean IBM_MQ_RESOURCE_RELEASER_AVOID_CLEANUP =
-      getBoolean(AVOID_IBM_MQ_CLEANUP_PROPERTY_NAME);
+  private static final String AVOID_IBM_MQ_CLEANUP_MBEANS_PROPERTY_NAME = "avoid.ibm.mq.cleanup.mbeans";
+
+  private static final boolean IBM_MQ_RESOURCE_RELEASER_AVOID_CLEANUP = getBoolean(AVOID_IBM_MQ_CLEANUP_PROPERTY_NAME);
+  private static final boolean IBM_MQ_RESOURCE_RELEASER_AVOID_CLEANUP_MBEANS =
+      getBoolean(AVOID_IBM_MQ_CLEANUP_MBEANS_PROPERTY_NAME);
 
   private final static String THREADLOCALS_FIELD = "threadLocals";
   private final static String INHERITABLE_THREADLOCALS_FIELD = "inheritableThreadLocals";
@@ -63,44 +66,30 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
       LOGGER.debug("Avoiding IBM MQ resources cleanup.");
       return;
     }
-
     LOGGER.debug("Releasing IBM MQ resources");
 
-    /*
-     * Removes registered mBeans.
-     */
-    removeMBeans();
+    if (!IBM_MQ_RESOURCE_RELEASER_AVOID_CLEANUP_MBEANS) {
+      LOGGER.debug("Releasing IBM MQ resources - Removal of registered mBeans is called.");
+      removeMBeans();
+    }
 
-    /*
-     * Removes JUL Custom Logging Levels
-     */
+    LOGGER.debug("Releasing IBM MQ resources - Removal of JUL Custom Logging Levels.");
     cleanJULKnownLevels();
 
-    /*
-     * Removes references held by MQCommonServices.
-     */
+    LOGGER.debug("Releasing IBM MQ resources - Removes references held by MQCommonServices Class.");
     cleanPrivateStaticFieldForClass(IBM_MQ_COMMON_SERVICES_CLASS, "jmqiEnv");
 
-    /*
-     * Removes the static references held by the MQEnvironment Class
-     */
+    LOGGER.debug("Releasing IBM MQ resources - Removes the static references held by the MQEnvironment Class.");
     cleanPrivateStaticFieldForClass(IBM_MQ_ENVIRONMENT_CLASS, "defaultMQCxManager");
 
-    /*
-     * The JmsTls class keep several references in a private static final field This references avoid the proper ClassLoader
-     * disposal. This method performs the JmsTls Class cleanup.
-     */
+    LOGGER.debug("Releasing IBM MQ resources - Removes the static references held by the JmsTls Class.");
     cleanPrivateStaticFieldForClass(IBM_MQ_JMS_TLS_CLASS, "myInstance");
 
-    /*
-     * The TraceController classes keep several references in private static final field This references avoid the proper
-     * ClassLoader disposal. This method performs the TraceController cleanup.
-     */
+    LOGGER.debug("Releasing IBM MQ resources - Removes the static references held by the TraceController Class.");
     cleanPrivateStaticFieldForClass(IBM_MQ_TRACE_CLASS, "traceController");
 
-    /*
-    * Removes the thread local references to instances of classes loaded by the driver classloader.
-    */
+    LOGGER
+        .debug("Releasing IBM MQ resources - Removes the thread local references to instances of classes loaded by the driver classloader.");
     removeThreadLocals();
 
   }

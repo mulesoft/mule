@@ -39,7 +39,6 @@ import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
@@ -53,7 +52,7 @@ import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPrevention
 @Feature(LEAK_PREVENTION)
 @RunWith(Parameterized.class)
 @Story(METASPACE_LEAK_PREVENTION_ON_REDEPLOY)
-public class IBMMQResourceReleaserTriggerTestCase {
+public class IBMMQResourceReleaserPropertiesTriggerTestCase {
 
   static final String KNOWN_DRIVER_CLASS_NAME = "com.ibm.mq.jms.MQConnectionFactory";
   private final static String IBM_MQ_TRACE_CLASS = "com.ibm.msg.client.commonservices.trace.Trace";
@@ -67,7 +66,7 @@ public class IBMMQResourceReleaserTriggerTestCase {
   BundleDependency dependency = null;
 
   // Parameterized
-  public IBMMQResourceReleaserTriggerTestCase(String driverVersion) {
+  public IBMMQResourceReleaserPropertiesTriggerTestCase(String driverVersion) {
     this.driverVersion = driverVersion;
     this.testLookupPolicy = new ClassLoaderLookupPolicy() {
 
@@ -131,33 +130,11 @@ public class IBMMQResourceReleaserTriggerTestCase {
 
   }
 
-
   @Test
   @Description("When redeploying an application which contains the IBM MQ Driver, the proper cleanup should be performed on redeployment")
-  public void releaserTriggerTest() throws Exception {
-    // Driver not loaded yet. Should not cleanup on dispose.
-    Field shouldReleaseIbmMQResourcesField = getField(MuleArtifactClassLoader.class, "shouldReleaseIbmMQResources", false);
-    shouldReleaseIbmMQResourcesField.setAccessible(true);
-    assertThat(shouldReleaseIbmMQResourcesField.get(artifactClassLoader), is(false));
-    // Force to load a Driver class so the resource releaser is flagged to run on dispose
-    Class<?> connectionFactoryClass = Class.forName(KNOWN_DRIVER_CLASS_NAME, true, artifactClassLoader);
-    Object connectionFactory = connectionFactoryClass.newInstance();
-    Class<?> traceClass = Class.forName("com.ibm.msg.client.commonservices.trace.Trace", true, artifactClassLoader);
-    // Driver loaded... should clean on dispose.
-    assertThat(shouldReleaseIbmMQResourcesField.get(artifactClassLoader), is(true));
-    // TraceController is not null
-    Class<?> ibmMQTraceClass = loadClass(IBM_MQ_TRACE_CLASS, artifactClassLoader);
-    Field traceControllerField = getField(ibmMQTraceClass, "traceController", false);
-    traceControllerField.setAccessible(true);
-    assertThat(traceControllerField.get(null), is(notNullValue()));
-    artifactClassLoader.dispose();
-  }
-
-  @Test
-  @Description("When redeploying an application which contains the IBM MQ Driver, the proper cleanup should be performed on redeployment")
-  public void releaserMBeansPropertyFalseTriggerTest() throws Exception {
+  public void releaserMBeansPropertyTrueTriggerTest() throws Exception {
     Properties props = System.getProperties();
-    props.setProperty("avoid.ibm.mq.cleanup.mbeans", "false");
+    props.setProperty("avoid.ibm.mq.cleanup.mbeans", "true");
     Field shouldReleaseIbmMQResourcesField = getField(MuleArtifactClassLoader.class, "shouldReleaseIbmMQResources", false);
     shouldReleaseIbmMQResourcesField.setAccessible(true);
     assertThat(shouldReleaseIbmMQResourcesField.get(artifactClassLoader), is(false));
@@ -165,7 +142,8 @@ public class IBMMQResourceReleaserTriggerTestCase {
     Class<?> connectionFactoryClass = Class.forName(KNOWN_DRIVER_CLASS_NAME, true, artifactClassLoader);
     Object connectionFactory = connectionFactoryClass.newInstance();
     artifactClassLoader.dispose();
-    assertThat(countMBeans(artifactClassLoader), is(0));
+    assertThat(countMBeans(artifactClassLoader), is(2));
+    props.setProperty("avoid.ibm.mq.cleanup.mbeans", "false");
   }
 
   private int countMBeans(MuleArtifactClassLoader artifactClassLoader) throws MalformedObjectNameException {
