@@ -6,21 +6,30 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_ROLLBACK;
+import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
+import static org.mule.runtime.core.api.transaction.TransactionUtils.profileTransactionAction;
+
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.ProfilingEventContext;
+import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-
-import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
-import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
 
 /**
  * Handler that will propagate errors and rollback transactions. Replaces the rollback-exception-strategy from Mule 3.
@@ -31,11 +40,24 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
   private final SingleErrorTypeMatcher redeliveryExhaustedMatcher;
 
+  @Inject
+  private ProfilingService profilingService;
+
+  private ProfilingDataProducer<TransactionProfilingEventContext, Object> continueProducer;
+  private ProfilingDataProducer<TransactionProfilingEventContext, Object> rollbackProducer;
+
   public OnErrorPropagateHandler() {
     ErrorType redeliveryExhaustedErrorType = MULE_CORE_ERROR_TYPE_REPOSITORY.getErrorType(REDELIVERY_EXHAUSTED)
         .orElseThrow(() -> new IllegalStateException("REDELIVERY_EXHAUSTED error type not found"));
 
     redeliveryExhaustedMatcher = new SingleErrorTypeMatcher(redeliveryExhaustedErrorType);
+  }
+
+  @Override
+  protected void doInitialise() throws InitialisationException {
+    super.doInitialise();
+    this.continueProducer = profilingService.getProfilingDataProducer(TX_CONTINUE);
+    this.rollbackProducer = profilingService.getProfilingDataProducer(TX_ROLLBACK);
   }
 
   @Override
@@ -57,7 +79,10 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
       Exception exception = getException(event);
       event = super.beforeRouting().apply(event);
       if (!isRedeliveryExhausted(exception) && isOwnedTransaction()) {
+        profileTransactionAction(rollbackProducer, TX_ROLLBACK, getLocation());
         rollback(exception);
+      } else {
+        profileTransactionAction(continueProducer, TX_CONTINUE, getLocation());
       }
       return event;
     };

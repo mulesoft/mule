@@ -16,6 +16,7 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +37,10 @@ public class ComponentProfilingUtils {
   public static final String BLOCKED_TIME_KEY = "blockedTimeMillis";
   public static final String WAITED_TIME_KEY = "waitedTimeMillis";
   public static final String CPU_TIME_KEY = "cpuTimeNanos";
+  public static final String TX_ACTION = "action";
+  public static final String TX_TYPE = "type";
+  public static final String TX_CREATION_LOCATION = "createdIn";
+  public static final String TX_CURRENT_LOCATION = "actionIn";
 
   public static Map<String, String> getProcessingStrategyComponentInfoMap(ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType,
                                                                           ComponentProcessingStrategyProfilingEventContext profilingEventContext) {
@@ -82,4 +87,15 @@ public class ComponentProfilingUtils {
     ComponentIdentifier identifier = location.getComponentIdentifier().getIdentifier();
     eventMap.put(COMPONENT_IDENTIFIER, format("%s:%s", identifier.getNamespace(), identifier.getName()));
   }
+
+  public static Map<String, String> getTxInfo(ProfilingEventType<TransactionProfilingEventContext> profilingEventType,
+                                              TransactionProfilingEventContext profilingEventContext) {
+    Map<String, String> info = new HashMap<>();
+    info.put(TX_ACTION, profilingEventType.toString());
+    info.put(TX_TYPE, profilingEventContext.getType().toString());
+    info.put(TX_CREATION_LOCATION, profilingEventContext.getTransactionOriginatingLocation());
+    info.put(TX_CURRENT_LOCATION, profilingEventContext.getEventOrginatingLocation().getLocation());
+    return info;
+  }
+
 }

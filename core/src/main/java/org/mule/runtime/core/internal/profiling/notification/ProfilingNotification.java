@@ -25,6 +25,10 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_COMMIT;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_ROLLBACK;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
 
 /**
  * A {@link Notification} that produces data for troubleshooting. This is extended for using notifications for producing profiling
@@ -44,6 +48,10 @@ public class ProfilingNotification<T extends ProfilingEventContext> extends Abst
   private static final int STARTING_OPERATION_EXECUTION_EVENT_ID = PROFILING_ACTION_START_RANGE + 10;
   private static final int OPERATION_EXECUTED_EVENT_ID = PROFILING_ACTION_START_RANGE + 11;
   private static final int OPERATION_THREAD_RELEASE_EVENT_ID = PROFILING_ACTION_START_RANGE + 12;
+  private static final int TRANSACTION_START_ID = PROFILING_ACTION_START_RANGE + 18;
+  private static final int TRANSACTION_CONTINUE_ID = PROFILING_ACTION_START_RANGE + 19;
+  private static final int TRANSACTION_COMMIT_ID = PROFILING_ACTION_START_RANGE + 20;
+  private static final int TRANSACTION_ROLLBACK_ID = PROFILING_ACTION_START_RANGE + 21;
 
   /**
    * The separator between the profiling identifier and the namespace.
@@ -77,6 +85,11 @@ public class ProfilingNotification<T extends ProfilingEventContext> extends Abst
                    STARTING_OPERATION_EXECUTION_EVENT_ID);
     registerAction(getFullyQualifiedProfilingNotificationIdentifier(OPERATION_EXECUTED), OPERATION_EXECUTED_EVENT_ID);
     registerAction(getFullyQualifiedProfilingNotificationIdentifier(OPERATION_THREAD_RELEASE), OPERATION_THREAD_RELEASE_EVENT_ID);
+
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(TX_START), TRANSACTION_START_ID);
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(TX_CONTINUE), TRANSACTION_CONTINUE_ID);
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(TX_COMMIT), TRANSACTION_COMMIT_ID);
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(TX_ROLLBACK), TRANSACTION_ROLLBACK_ID);
   }
 
   private final ProfilingEventType<T> profilingEventType;

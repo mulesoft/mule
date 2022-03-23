@@ -19,6 +19,10 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_COMMIT;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_ROLLBACK;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getFullyQualifiedProfilingEventTypeIdentifier;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -32,6 +36,7 @@ import org.mule.runtime.core.internal.profiling.ExtensionDataProducerProvider;
 import org.mule.runtime.core.internal.profiling.ProcessingStratetegyDataProducerProvider;
 import org.mule.runtime.core.internal.profiling.ProfilingDataProducerProvider;
 import org.mule.runtime.core.internal.profiling.ResettableProfilingDataProducer;
+import org.mule.runtime.core.internal.profiling.TransactionProfilingDataProducerProvider;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
 import java.util.HashMap;
@@ -123,6 +128,14 @@ public class ProfilingDataProducerResolver {
                                                                                                     EXTENSION_PROFILING_EVENT,
                                                                                                     featureFlaggingService));
 
+    profilingDataProducerProviders
+        .put(TX_START, new TransactionProfilingDataProducerProvider(profilingService, TX_START, featureFlaggingService));
+    profilingDataProducerProviders
+        .put(TX_CONTINUE, new TransactionProfilingDataProducerProvider(profilingService, TX_CONTINUE, featureFlaggingService));
+    profilingDataProducerProviders
+        .put(TX_COMMIT, new TransactionProfilingDataProducerProvider(profilingService, TX_COMMIT, featureFlaggingService));
+    profilingDataProducerProviders
+        .put(TX_ROLLBACK, new TransactionProfilingDataProducerProvider(profilingService, TX_ROLLBACK, featureFlaggingService));
   }
 
   public <T extends ProfilingEventContext, S> ResettableProfilingDataProducer<T, S> getProfilingDataProducer(

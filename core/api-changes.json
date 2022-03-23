@@ -158,6 +158,14 @@
           "methodName": "runningNestedTransaction",
           "elementKind": "method",
           "justification": "Method needed to know if the execution is running within a Nested Transaction"
+        },
+        {
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.core.api.transaction.TransactionUtils",
+          "package": "org.mule.runtime.core.api.transaction",
+          "classSimpleName": "TransactionUtils",
+          "elementKind": "class",
+          "justification": "W-10816523: Transaction event support"
         }
       ]
     }

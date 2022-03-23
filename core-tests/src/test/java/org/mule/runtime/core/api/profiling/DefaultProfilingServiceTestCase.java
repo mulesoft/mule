@@ -47,6 +47,7 @@ import org.mule.runtime.core.internal.profiling.DefaultProfilingNotificationList
 import org.mule.runtime.core.internal.profiling.ResettableProfilingDataProducerDelegate;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentThreadingDataConsumer;
+import org.mule.runtime.core.internal.profiling.consumer.TransactionLoggerDataConsumer;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.notification.ProfilingNotification;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
@@ -134,16 +135,17 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
     assertThat(profilingService.getDiscoveryStrategy(), instanceOf(CompositeProfilingDataConsumerDiscoveryStrategy.class));
     Set<ProfilingDataConsumer<? extends ProfilingEventContext>> profilingDataConsumers =
         profilingService.getDiscoveryStrategy().discover();
-    assertThat(profilingDataConsumers, hasSize(3));
+    assertThat(profilingDataConsumers, hasSize(4));
     assertThat(profilingDataConsumers, hasItem(is(instanceOf(LoggerComponentProcessingStrategyDataConsumer.class))));
     assertThat(profilingDataConsumers, hasItem(is(instanceOf(LoggerComponentThreadingDataConsumer.class))));
+    assertThat(profilingDataConsumers, hasItem(is(instanceOf(TransactionLoggerDataConsumer.class))));
     assertThat(profilingDataConsumers, hasItem(testProfilingDataConsumer));
   }
 
   @Test
   @Description("The notification listener is correctly set so that the notifications are managed")
   public void correctNotificationListenerSet() {
-    verify(notificationManager, times(3)).addListenerSubscription(any(DefaultProfilingNotificationListener.class), any());
+    verify(notificationManager, times(4)).addListenerSubscription(any(DefaultProfilingNotificationListener.class), any());
   }
 
   @Test
