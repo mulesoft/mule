@@ -153,7 +153,7 @@ public class IBMMQResourceReleaserTriggerTestCase {
   }
 
   @Test
-  @Description("When redeploying an application which contains the IBM MQ Driver, the proper cleanup should be performed on redeployment")
+  @Description("When redeploying an application which contains the IBM MQ Driver, the proper cleanup should clean mbeans")
   public void releaserMBeansPropertyFalseTriggerTest() throws Exception {
     Properties props = System.getProperties();
     props.setProperty("avoid.ibm.mq.cleanup.mbeans", "false");
