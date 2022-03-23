@@ -77,10 +77,10 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   @Override
   protected Function<CoreEvent, CoreEvent> beforeRouting() {
     return event -> {
-      Exception exception = getException(event);
+      MessagingException exception = (MessagingException) getException(event);
       event = super.beforeRouting().apply(event);
       if (!isRedeliveryExhausted(exception)
-          && isOwnedTransaction(event.getContext().getOriginatingLocation().getRootContainerName())) {
+          && isOwnedTransaction(exception.getFailingComponent().getRootContainerLocation().getGlobalName())) {
         profileTransactionAction(rollbackProducer, TX_ROLLBACK, getLocation());
         rollback(exception);
       } else {
