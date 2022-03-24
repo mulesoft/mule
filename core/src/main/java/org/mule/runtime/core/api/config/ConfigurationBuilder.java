@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.config;
 
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.internal.config.builders.MinimalConfigurationBuilder;
 
 /**
  * A <code>ConfigurationBuilder</code> is used to configure a Mule instance, represented by a MuleContext instance. Multiple
@@ -25,6 +26,10 @@ import org.mule.runtime.core.api.MuleContext;
  * used.
  */
 public interface ConfigurationBuilder {
+
+  static ConfigurationBuilder getMinimalConfigurationBuilder() {
+    return new MinimalConfigurationBuilder();
+  }
 
   /**
    * Adds a service configurator to be used on the context being built.

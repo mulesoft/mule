@@ -14,9 +14,10 @@ import org.mule.runtime.core.internal.registry.Registry;
 import java.util.Map;
 
 /**
- * This simple ConfgurationBuilder implementation. This is useful for registering any Map of objects with the {@link Registry} via
- * the {@link ConfigurationBuilder} interface. This is useful for example for the registration of "startup properties" which are
- * provided at startup and then used to fill "property placeholders" in other configuration mechanisms such as XML.
+ * This simple {@link ConfigurationBuilder} implementation. This is useful for registering any Map of objects with the
+ * {@link Registry} via the {@link ConfigurationBuilder} interface. This is useful for example for the registration of "startup
+ * properties" which are provided at startup and then used to fill "property placeholders" in other configuration mechanisms such
+ * as XML.
  */
 public final class SimpleConfigurationBuilder extends AbstractConfigurationBuilder {
 

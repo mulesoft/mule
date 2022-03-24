@@ -15,7 +15,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.artifact.activation.internal.config.boot.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
+import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.internal.util.EnumerationAdapter;
@@ -23,8 +23,6 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
 import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URL;
@@ -34,6 +32,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.junit.Test;
 
 public class TestBootstrapRegistryConfigurationBuilderTestCase extends AbstractMuleContextTestCase {
 

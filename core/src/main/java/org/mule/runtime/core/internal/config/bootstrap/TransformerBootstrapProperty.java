@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.artifact.activation.internal.config.boot;
+package org.mule.runtime.core.internal.config.bootstrap;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 

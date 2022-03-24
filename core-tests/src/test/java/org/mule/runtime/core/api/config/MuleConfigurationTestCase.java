@@ -26,9 +26,9 @@ import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLO
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.artifact.ArtifactCoordinates;
+import org.mule.runtime.core.internal.config.builders.MinimalConfigurationBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
-import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuilder;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -90,7 +90,7 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase {
     contextBuilder.setArtifactCoordinates(artifactCoordinates);
 
     muleContext = new DefaultMuleContextFactory()
-        .createMuleContext(asList(testServicesConfigurationBuilder, new DefaultsConfigurationBuilder()), contextBuilder);
+        .createMuleContext(asList(testServicesConfigurationBuilder, new MinimalConfigurationBuilder()), contextBuilder);
     muleContext.start();
 
     verifyConfiguration();
@@ -118,7 +118,7 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase {
     setProperty(SYSTEM_PROPERTY_PREFIX + "transform.autoWrap", "false");
 
     muleContext = new DefaultMuleContextFactory()
-        .createMuleContext(testServicesConfigurationBuilder, new DefaultsConfigurationBuilder());
+        .createMuleContext(testServicesConfigurationBuilder, new MinimalConfigurationBuilder());
     muleContext.start();
 
     verifyConfiguration();
@@ -145,7 +145,7 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase {
   @Issue("MULE-3110")
   public void testConfigureAfterInitFails() throws Exception {
     muleContext = new DefaultMuleContextFactory()
-        .createMuleContext(testServicesConfigurationBuilder, new DefaultsConfigurationBuilder());
+        .createMuleContext(testServicesConfigurationBuilder, new MinimalConfigurationBuilder());
 
     DefaultMuleConfiguration mutableConfig = ((DefaultMuleConfiguration) muleContext.getConfiguration());
 
@@ -177,7 +177,7 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase {
   @Issue("MULE-3110")
   public void testConfigureAfterStartFails() throws Exception {
     muleContext = new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder,
-                                                                    new DefaultsConfigurationBuilder());
+                                                                    new MinimalConfigurationBuilder());
     muleContext.start();
 
     DefaultMuleConfiguration mutableConfig = ((DefaultMuleConfiguration) muleContext.getConfiguration());

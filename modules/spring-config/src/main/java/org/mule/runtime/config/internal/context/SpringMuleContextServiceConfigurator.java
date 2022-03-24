@@ -55,8 +55,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMAT
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
-import static org.mule.runtime.module.artifact.activation.internal.config.boot.AbstractRegistryBootstrap.BINDING_PROVIDER_PREDICATE;
-import static org.mule.runtime.module.artifact.activation.internal.config.boot.AbstractRegistryBootstrap.TRANSFORMER_PREDICATE;
+import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.BINDING_PROVIDER_PREDICATE;
+import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.TRANSFORMER_PREDICATE;
 import static org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider.CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY;
 import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
@@ -121,6 +121,7 @@ import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataServ
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import javax.inject.Inject;
 
 import com.google.common.collect.ImmutableMap;

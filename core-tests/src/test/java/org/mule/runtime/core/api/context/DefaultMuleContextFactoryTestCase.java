@@ -37,7 +37,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
-import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuilder;
+import org.mule.runtime.core.internal.config.builders.MinimalConfigurationBuilder;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
@@ -93,7 +93,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testCreateMuleContext() throws InitialisationException, ConfigurationException {
-    context = muleContextFactory.createMuleContext(testServicesConfigurationBuilder, new DefaultsConfigurationBuilder());
+    context = muleContextFactory.createMuleContext(testServicesConfigurationBuilder, new MinimalConfigurationBuilder());
 
     assertMuleContextConfiguration(context);
     assertDefaults(context);

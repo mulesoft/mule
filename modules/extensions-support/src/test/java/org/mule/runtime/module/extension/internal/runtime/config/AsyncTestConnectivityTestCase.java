@@ -31,12 +31,12 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.internal.config.builders.MinimalConfigurationBuilder;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
-import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -50,14 +50,13 @@ import org.mule.tck.util.TestTimeSupplier;
 import java.util.Map;
 import java.util.Optional;
 
+import io.qameta.allure.Description;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-
-import io.qameta.allure.Description;
 
 @SmallTest
 public class AsyncTestConnectivityTestCase extends AbstractMuleContextTestCase {
@@ -94,7 +93,7 @@ public class AsyncTestConnectivityTestCase extends AbstractMuleContextTestCase {
 
   @Override
   protected ConfigurationBuilder getBuilder() throws Exception {
-    return new DefaultsConfigurationBuilder() {
+    return new MinimalConfigurationBuilder() {
 
       @Override
       protected void doConfigure(MuleContext muleContext) throws Exception {
