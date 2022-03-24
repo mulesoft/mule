@@ -121,7 +121,7 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
 
     registerCustomServices(muleContext);
     registerObjectStoreManager(muleContext);
-    registerSchedulerService(muleContext);
+    registerSchedulerPoolsConfig(muleContext);
     registerLockFactory(muleContext);
     registerTransformerRegistry(muleContext);
     registerExpressionManager(muleContext, registry);
@@ -220,7 +220,7 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     registerObject(OBJECT_LOCK_FACTORY, new MuleLockFactory(), muleContext);
   }
 
-  protected void registerSchedulerService(MuleContext muleContext) throws RegistrationException {
+  protected void registerSchedulerPoolsConfig(MuleContext muleContext) throws RegistrationException {
     registerObject(OBJECT_SCHEDULER_POOLS_CONFIG, SchedulerContainerPoolsConfig.getInstance(), muleContext);
     registerObject(OBJECT_SCHEDULER_BASE_CONFIG,
                    config().withPrefix(muleContext.getConfiguration().getId())
