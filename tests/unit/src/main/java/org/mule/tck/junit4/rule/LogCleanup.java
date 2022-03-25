@@ -45,7 +45,7 @@ public class LogCleanup extends ExternalResource {
       // Loading resources once per class for better performance
       if (clearAllMethod == null) {
         Class<?> testLoggerFactoryClass =
-            forName("uk.org.lidalia.slf4jtest.TestLoggerFactory", false, LogCleanup.class.getClassLoader());
+            forName("com.github.valfirst.slf4jtest.TestLoggerFactory", false, LogCleanup.class.getClassLoader());
         clearAllMethod = testLoggerFactoryClass.getMethod("clearAll");
       }
       // clearAll will reset state across all threads
