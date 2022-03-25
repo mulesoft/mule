@@ -11,7 +11,7 @@ import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.internal.profiling.CoreProfilingService;
+import org.mule.runtime.core.privileged.profiling.CoreProfilingService;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Supplier;

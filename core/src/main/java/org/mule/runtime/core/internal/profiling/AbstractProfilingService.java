@@ -28,6 +28,7 @@ import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInternalProfilingDataConsumer;
 import org.mule.runtime.core.internal.profiling.notification.ProfilingNotification;
+import org.mule.runtime.core.privileged.profiling.CoreProfilingService;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
 import javax.inject.Inject;
@@ -62,18 +63,21 @@ public abstract class AbstractProfilingService implements CoreProfilingService, 
 
   private void registerDataConsumers(Set<ProfilingDataConsumer<?>> dataConsumers) {
     for (ProfilingDataConsumer<?> dataConsumer : dataConsumers) {
-      Set<? extends ProfilingEventType<?>> profilingEventTypes = dataConsumer.getProfilingEventTypes();
-      for (ProfilingEventType<?> profilingEventType : profilingEventTypes) {
-        featureFlaggingService.registerProfilingFeature(profilingEventType, dataConsumer.getClass().getName());
-        if (featureFlaggingService.isEnabled(FORCE_RUNTIME_PROFILING_CONSUMERS_ENABLEMENT)) {
-          featureFlaggingService.toggleProfilingFeature(profilingEventType, dataConsumer.getClass().getName(),
-                                                        isInternalDataConsumer(dataConsumer));
-        }
-
-      }
+      doRegisterConsumer(dataConsumer);
     }
     registerNotificationListeners(dataConsumers);
     onDataConsumersRegistered();
+  }
+
+  private void doRegisterConsumer(ProfilingDataConsumer<?> dataConsumer) {
+    Set<? extends ProfilingEventType<?>> profilingEventTypes = dataConsumer.getProfilingEventTypes();
+    for (ProfilingEventType<?> profilingEventType : profilingEventTypes) {
+      featureFlaggingService.registerProfilingFeature(profilingEventType, dataConsumer.getClass().getName());
+      if (featureFlaggingService.isEnabled(FORCE_RUNTIME_PROFILING_CONSUMERS_ENABLEMENT)) {
+        featureFlaggingService.toggleProfilingFeature(profilingEventType, dataConsumer.getClass().getName(),
+                                                      isInternalDataConsumer(dataConsumer));
+      }
+    }
   }
 
   private boolean isInternalDataConsumer(ProfilingDataConsumer<?> dataConsumer) {
@@ -141,4 +145,10 @@ public abstract class AbstractProfilingService implements CoreProfilingService, 
                                                 featureContext -> false);
   }
 
+  @Override
+  public <T extends ProfilingEventContext> void registerProfilingDataConsumer(ProfilingDataConsumer<T> profilingDataConsumer) {
+    doRegisterConsumer(profilingDataConsumer);
+    registerNotificationListener(profilingDataConsumer);
+    onDataConsumersRegistered();
+  }
 }

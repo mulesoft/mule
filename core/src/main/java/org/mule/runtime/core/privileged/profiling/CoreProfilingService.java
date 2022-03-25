@@ -4,8 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.profiling;
+package org.mule.runtime.core.privileged.profiling;
 
+import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingService;
@@ -52,4 +53,12 @@ public interface CoreProfilingService extends ProfilingService {
                                                                             ProfilingDataProducer<T, S> dataProducer,
                                                                             Function<S, T> transformer);
 
+  /**
+   * Registers a {@link ProfilingDataConsumer} dynamically.
+   *
+   * @param profilingDataConsumer the {@link ProfilingDataConsumer} to register.
+   * @param <T>                   the {@link ProfilingEventContext} corresponding to the profiling event types the data consumer
+   *                              listens to.
+   */
+  <T extends ProfilingEventContext> void registerProfilingDataConsumer(ProfilingDataConsumer<T> profilingDataConsumer);
 }

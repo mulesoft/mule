@@ -24,8 +24,8 @@ import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyPr
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
+import org.mule.runtime.core.privileged.profiling.CoreProfilingService;
 import org.reactivestreams.Publisher;
 
 import java.util.concurrent.ScheduledExecutorService;

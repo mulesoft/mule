@@ -30,8 +30,8 @@ import org.mule.runtime.core.internal.processor.strategy.enricher.CpuLiteNonBloc
 import org.mule.runtime.core.internal.processor.strategy.enricher.ProactorProcessingStrategyEnricher;
 import org.mule.runtime.core.internal.processor.strategy.enricher.ProcessingTypeBasedReactiveProcessorEnricher;
 import org.mule.runtime.core.internal.processor.strategy.enricher.ReactiveProcessorEnricher;
-import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.internal.util.rx.ImmediateScheduler;
+import org.mule.runtime.core.privileged.profiling.CoreProfilingService;
 
 import java.util.Collection;
 import java.util.concurrent.Callable;

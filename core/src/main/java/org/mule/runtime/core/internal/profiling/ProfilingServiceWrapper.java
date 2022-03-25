@@ -17,12 +17,14 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.privileged.profiling.CoreProfilingService;
 
 import java.util.function.Function;
 
@@ -63,6 +65,11 @@ public class ProfilingServiceWrapper implements CoreProfilingService, Lifecycle 
   public <T extends ProfilingEventContext, S> void registerProfilingDataProducer(ProfilingEventType<T> profilingEventType,
                                                                                  ProfilingDataProducer<T, S> profilingDataProducer) {
     getProfilingDataProducer().registerProfilingDataProducer(profilingEventType, profilingDataProducer);
+  }
+
+  @Override
+  public <T extends ProfilingEventContext> void registerProfilingDataConsumer(ProfilingDataConsumer<T> profilingDataConsumer) {
+    getProfilingDataProducer().registerProfilingDataConsumer(profilingDataConsumer);
   }
 
   @Override
