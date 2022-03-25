@@ -7,7 +7,10 @@
 
 package org.mule.runtime.config.internal.dsl.model;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
+import static org.mule.runtime.api.util.MuleSystemProperties.REVERT_SIGLETON_ERROR_HANDLER_PROPERTY;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.PARALLEL_FOREACH_ELEMENT;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.SCATTER_GATHER_ELEMENT;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.createNewInstance;
@@ -239,14 +242,18 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(onErrorBaseBuilder.withIdentifier(ON_ERROR_PROPAGATE)
         .withTypeDefinition(fromType(OnErrorPropagateHandler.class))
         .asPrototype().build());
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier(ERROR_HANDLER)
+
+    Builder errorHandlerBuilder = baseDefinition.withIdentifier(ERROR_HANDLER)
         .withTypeDefinition(fromType(ErrorHandler.class))
         .withObjectFactoryType(ErrorHandlerFactoryBean.class)
         .withSetterParameterDefinition("delegate", fromSimpleReferenceParameter("ref").build())
         .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build())
         .withSetterParameterDefinition("exceptionListeners",
-                                       fromChildCollectionConfiguration(FlowExceptionHandler.class).build())
-        .build());
+                                       fromChildCollectionConfiguration(FlowExceptionHandler.class).build());
+    if (parseBoolean(getProperty(REVERT_SIGLETON_ERROR_HANDLER_PROPERTY, "false"))) {
+      errorHandlerBuilder.asPrototype();
+    }
+    componentBuildingDefinitions.add(errorHandlerBuilder.build());
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(SET_PAYLOAD).withTypeDefinition(fromType(SetPayloadMessageProcessor.class))
             .withSetterParameterDefinition("value", fromSimpleParameter("value").build())
