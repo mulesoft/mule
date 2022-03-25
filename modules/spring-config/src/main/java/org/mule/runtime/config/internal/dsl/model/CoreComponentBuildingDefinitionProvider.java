@@ -7,8 +7,6 @@
 
 package org.mule.runtime.config.internal.dsl.model;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.System.getProperty;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.api.util.MuleSystemProperties.REVERT_SIGLETON_ERROR_HANDLER_PROPERTY;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.PARALLEL_FOREACH_ELEMENT;
@@ -55,6 +53,8 @@ import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEME
 import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
 
 import static org.apache.commons.lang3.ArrayUtils.addAll;
+
+import static java.lang.Boolean.getBoolean;
 
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.notification.Notification;
@@ -250,7 +250,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build())
         .withSetterParameterDefinition("exceptionListeners",
                                        fromChildCollectionConfiguration(FlowExceptionHandler.class).build());
-    if (parseBoolean(getProperty(REVERT_SIGLETON_ERROR_HANDLER_PROPERTY, "false"))) {
+    if (getBoolean(REVERT_SIGLETON_ERROR_HANDLER_PROPERTY)) {
       errorHandlerBuilder.asPrototype();
     }
     componentBuildingDefinitions.add(errorHandlerBuilder.build());
