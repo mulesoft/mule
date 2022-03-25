@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-import static org.mule.runtime.core.api.util.FileUtils.createTempFile;
+import static java.nio.file.Files.createTempFile;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Utility methods to handle temporal files
@@ -22,9 +23,10 @@ public final class TempBufferFileUtils {
    *
    * @param name a descriptive name. Not require to contain a path nor an extension
    * @return a {@link File}
+   * @throws IOException
    */
-  public static File createBufferFile(String name) {
-    return createTempFile("mule-buffer-" + name + "-", ".tmp");
+  public static File createBufferFile(String name) throws IOException {
+    return createTempFile("mule-buffer-" + name + "-", ".tmp").toFile();
   }
 
   private TempBufferFileUtils() {}
