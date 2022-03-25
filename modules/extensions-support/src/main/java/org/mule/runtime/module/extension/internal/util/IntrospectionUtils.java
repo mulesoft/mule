@@ -112,7 +112,6 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.MetadataTypeEnricher;
-import org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEncodingModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
@@ -121,6 +120,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 import org.mule.runtime.module.extension.internal.loader.java.property.RuntimeVersionModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser;
 import org.mule.sdk.api.annotation.param.NullSafe;
 import org.mule.sdk.api.annotation.param.RuntimeVersion;
 import org.mule.sdk.api.runtime.parameter.Literal;
@@ -184,7 +184,8 @@ public final class IntrospectionUtils {
     setWeakHashCaches();
   }
 
-  private IntrospectionUtils() {}
+  private IntrospectionUtils() {
+  }
 
   /**
    * Set caches in spring so that they are weakly (and not softly) referenced by default.
@@ -542,14 +543,14 @@ public final class IntrospectionUtils {
    * @param method     a not {@code null} {@link Method}
    * @param typeLoader a {@link ClassTypeLoader} to be used to create the returned {@link MetadataType}s
    * @return an array of {@link MetadataType} matching the method's arguments. If the method doesn't take any, then the array will
-   *         be empty
+   * be empty
    * @throws IllegalArgumentException is method is {@code null}
    */
   public static MetadataType[] getMethodArgumentTypes(Method method, ClassTypeLoader typeLoader) {
     checkArgument(method != null, "Can't introspect a null method");
     Class<?>[] parameters = method.getParameterTypes();
     if (isEmpty(parameters)) {
-      return new MetadataType[] {};
+      return new MetadataType[]{};
     }
 
     MetadataType[] types = new MetadataType[parameters.length];
@@ -590,7 +591,7 @@ public final class IntrospectionUtils {
   public static Optional<Field> getField(Class<?> clazz, ParameterDeclaration parameterDeclaration,
                                          ReflectionCache reflectionCache) {
     return getField(clazz, MuleExtensionAnnotationParser.getMemberName(parameterDeclaration, parameterDeclaration.getName()),
-                    reflectionCache);
+        reflectionCache);
   }
 
   public static Optional<Field> getField(Class<?> clazz, String name, ReflectionCache reflectionCache) {
@@ -654,7 +655,7 @@ public final class IntrospectionUtils {
 
     if (interfaceType == null) {
       throw new IllegalArgumentException(format("Class '%s' does not implement the '%s' interface", type.getTypeName(),
-                                                implementedInterface.getName()));
+          implementedInterface.getName()));
     }
 
     List<ResolvableType> generics = asList(interfaceType.getGenerics());
@@ -728,14 +729,14 @@ public final class IntrospectionUtils {
 
     if (!processingEnvironment.getTypeUtils().isAssignable(type.asType(), superClassTypeMirror)) {
       throw new IllegalArgumentException(
-                                         format("Class '%s' does not extend the '%s' class", type.getQualifiedName(),
-                                                superClass.getSimpleName()));
+          format("Class '%s' does not extend the '%s' class", type.getQualifiedName(),
+              superClass.getSimpleName()));
     }
 
     DeclaredType searchClass = (DeclaredType) type.asType();
     while (!processingEnvironment.getTypeUtils().isAssignable(objectType.asType(), searchClass)) {
       if (processingEnvironment.getTypeUtils().isSameType(superClassTypeMirror,
-                                                          processingEnvironment.getTypeUtils().erasure(searchClass))) {
+          processingEnvironment.getTypeUtils().erasure(searchClass))) {
         List<TypeMirror> typeArguments = (List<TypeMirror>) searchClass.getTypeArguments();
         return typeArguments;
       }
@@ -756,9 +757,9 @@ public final class IntrospectionUtils {
 
     if (!superClass.isAssignableFrom(searchType.getRawClass())) {
       throw new IllegalArgumentException(
-                                         format("Class '%s' does not extend the '%s' class",
-                                                searchType.getRawClass().getCanonicalName(),
-                                                superClass.getName()));
+          format("Class '%s' does not extend the '%s' class",
+              searchType.getRawClass().getCanonicalName(),
+              superClass.getName()));
     }
 
     Map<String, java.lang.reflect.Type> genericTypes = new SmallMap<>();
@@ -985,10 +986,13 @@ public final class IntrospectionUtils {
     return typeElements;
   }
 
-  public static List<Field> getAnnotatedFields(Class<?> clazz, Class<? extends Annotation>... annotationTypes) {
+  public static Stream<Field> getAnnotatedFieldsStream(Class<?> clazz, Class<? extends Annotation>... annotationTypes) {
     return getDescendingHierarchy(clazz).stream().flatMap(type -> stream(type.getDeclaredFields()))
-        .filter(field -> Stream.of(annotationTypes).anyMatch(annotationType -> field.getAnnotation(annotationType) != null))
-        .collect(toImmutableList());
+        .filter(field -> Stream.of(annotationTypes).anyMatch(annotationType -> field.getAnnotation(annotationType) != null));
+  }
+
+  public static List<Field> getAnnotatedFields(Class<?> clazz, Class<? extends Annotation>... annotationTypes) {
+    return getAnnotatedFieldsStream(clazz, annotationTypes).collect(toImmutableList());
   }
 
   public static List<Field> getFields(Class<?> clazz) {
@@ -1055,8 +1059,8 @@ public final class IntrospectionUtils {
   /**
    * @param field a field
    * @return {@link NullSafe#defaultImplementingType()} {@link Optional} or
-   *         {@link org.mule.runtime.extension.api.annotation.param.NullSafe#defaultImplementingType()} {@link Optional} in case
-   *         the given {@link Field field} is annotated.
+   * {@link org.mule.runtime.extension.api.annotation.param.NullSafe#defaultImplementingType()} {@link Optional} in case
+   * the given {@link Field field} is annotated.
    */
   public static Optional<Class<?>> getNullSafeDefaultImplementedType(Field field) {
     return JavaParserUtils.getNullSafeDefaultImplementedType(field);
@@ -1110,13 +1114,13 @@ public final class IntrospectionUtils {
                                                                  String elementType,
                                                                  String elementName) {
     return mapReduceSingleAnnotation(
-                                     annotatedElement,
-                                     elementType,
-                                     elementName,
-                                     Expression.class,
-                                     org.mule.sdk.api.annotation.Expression.class,
-                                     value -> value.getEnumValue(Expression::value),
-                                     value -> toMuleApi(value.getEnumValue(org.mule.sdk.api.annotation.Expression::value)));
+        annotatedElement,
+        elementType,
+        elementName,
+        Expression.class,
+        org.mule.sdk.api.annotation.Expression.class,
+        value -> value.getEnumValue(Expression::value),
+        value -> toMuleApi(value.getEnumValue(org.mule.sdk.api.annotation.Expression::value)));
   }
 
   public static String getSourceName(Class<?> sourceType) {
@@ -1365,8 +1369,8 @@ public final class IntrospectionUtils {
    */
   public static String getImplementingName(ParameterDeclaration parameterDeclaration) {
     return getImplementingName(parameterDeclaration.getName(),
-                               () -> parameterDeclaration.getModelProperty(ImplementingParameterModelProperty.class),
-                               () -> parameterDeclaration.getModelProperty(DeclaringMemberModelProperty.class));
+        () -> parameterDeclaration.getModelProperty(ImplementingParameterModelProperty.class),
+        () -> parameterDeclaration.getModelProperty(DeclaringMemberModelProperty.class));
   }
 
   /**
@@ -1377,8 +1381,8 @@ public final class IntrospectionUtils {
    */
   public static String getImplementingName(ParameterModel parameterModel) {
     return getImplementingName(parameterModel.getName(),
-                               () -> parameterModel.getModelProperty(ImplementingParameterModelProperty.class),
-                               () -> parameterModel.getModelProperty(DeclaringMemberModelProperty.class));
+        () -> parameterModel.getModelProperty(ImplementingParameterModelProperty.class),
+        () -> parameterModel.getModelProperty(DeclaringMemberModelProperty.class));
   }
 
   private static String getImplementingName(String originalName,
@@ -1421,8 +1425,8 @@ public final class IntrospectionUtils {
    * @return an {@link Optional} value of the {@link ConnectionProviderModel}
    */
   public static Optional<ConnectionProviderModel> getConnectionProviderModel(
-                                                                             Class<? extends ConnectionProvider> connectionProvider,
-                                                                             List<ConnectionProviderModel> allConnectionProviders) {
+      Class<? extends ConnectionProvider> connectionProvider,
+      List<ConnectionProviderModel> allConnectionProviders) {
     for (ConnectionProviderModel providerModel : allConnectionProviders) {
       Optional<Class> providerImplementingType = getImplementingType(providerModel);
 
@@ -1446,10 +1450,10 @@ public final class IntrospectionUtils {
 
       if (!field.getDeclaringClass().isInstance(target)) {
         throw new IllegalConfigurationModelDefinitionException(
-                                                               format("field '%s' is annotated with @%s but not defined on an instance of type '%s'",
-                                                                      field.toString(),
-                                                                      annotationClass.getSimpleName(),
-                                                                      target.getClass().getName()));
+            format("field '%s' is annotated with @%s but not defined on an instance of type '%s'",
+                field.toString(),
+                annotationClass.getSimpleName(),
+                target.getClass().getName()));
       }
       new FieldSetter<>(field).set(target, value);
     });
@@ -1468,8 +1472,8 @@ public final class IntrospectionUtils {
       return;
     } else if (fields.size() > 1) {
       throw new IllegalModelDefinitionException(format(
-                                                       "Class '%s' has %d fields of type with @%s. Only one field of that type was expected",
-                                                       type.getName(), fields.size(), fieldType));
+          "Class '%s' has %d fields of type with @%s. Only one field of that type was expected",
+          type.getName(), fields.size(), fieldType));
     }
 
     new FieldSetter<>(fields.get(0)).set(target, value);
@@ -1503,7 +1507,7 @@ public final class IntrospectionUtils {
    */
   public static void injectDefaultEncoding(EnrichableModel model, Object target, String encoding) {
     injectFieldFromModelProperty(target, encoding, model.getModelProperty(DefaultEncodingModelProperty.class),
-                                 DefaultEncoding.class);
+        DefaultEncoding.class);
   }
 
   /**
@@ -1517,7 +1521,7 @@ public final class IntrospectionUtils {
    */
   public static void injectRuntimeVersion(EnrichableModel model, Object target, MuleVersion muleVersion) {
     injectFieldFromModelProperty(target, muleVersion, model.getModelProperty(RuntimeVersionModelProperty.class),
-                                 RuntimeVersion.class);
+        RuntimeVersion.class);
   }
 
   /**
@@ -1585,9 +1589,9 @@ public final class IntrospectionUtils {
         getFieldSetterForAnnotatedField(target, org.mule.sdk.api.annotation.param.RefName.class, reflectionCache);
     if (legacyRefNameFieldSetter.isPresent() & sdkRefNameFieldSetter.isPresent()) {
       throw new IllegalModelDefinitionException(format(
-                                                       "Class '%s' has 2 fields annotated with '@%s' or '@%s'. Only one field may carry those annotations",
-                                                       target.getClass().getName(), RefName.class.getName(),
-                                                       org.mule.sdk.api.annotation.param.RefName.class.getName()));
+          "Class '%s' has 2 fields annotated with '@%s' or '@%s'. Only one field may carry those annotations",
+          target.getClass().getName(), RefName.class.getName(),
+          org.mule.sdk.api.annotation.param.RefName.class.getName()));
     } else if (legacyRefNameFieldSetter.isPresent()) {
       return legacyRefNameFieldSetter;
     } else if (sdkRefNameFieldSetter.isPresent()) {
@@ -1676,7 +1680,7 @@ public final class IntrospectionUtils {
         .filter(ParameterGroupModel::isShowInDsl)
         .forEach(groupModel -> groupModel.getParameterModels()
             .forEach(param -> showInDslMap.put(IntrospectionUtils.getImplementingName(param),
-                                               getGroupModelContainerName(groupModel))));
+                getGroupModelContainerName(groupModel))));
 
     return showInDslMap;
   }
@@ -1734,7 +1738,7 @@ public final class IntrospectionUtils {
 
   /**
    * Returns, for each parameter group defined on the component model, all the parameters matching with the given filter
-   * 
+   *
    * @param componentModel the component model used to filter the parameters
    * @param filter         the filter to apply to the group model parameters
    * @return The map having the parameter group as key and a set of its parameters matching the filter as value
@@ -1753,7 +1757,7 @@ public final class IntrospectionUtils {
   /**
    * Returns the value associated to a parameter with model {@code parameterModel} on the group {@code parameterGroupModel} or
    * {@code defaultValue} if such parameter is not present
-   * 
+   *
    * @param ctx                 the execution where to look for the parameter
    * @param parameterGroupModel the parameter group where the parameter is defined
    * @param parameterModel      the parameter model which value will be returned
@@ -1802,7 +1806,6 @@ public final class IntrospectionUtils {
    *
    * @param object the source object
    * @return an Optional containing the config field if any
-   *
    * @since 4.5
    */
   public static Optional<Field> fetchConfigFieldFromSourceObject(Object object) {
@@ -1814,7 +1817,6 @@ public final class IntrospectionUtils {
    *
    * @param object the source object
    * @return an Optional containing the connection field if any
-   *
    * @since 4.5
    */
   public static Optional<Field> fetchConnectionFieldFromSourceObject(Object object) {
@@ -1833,10 +1835,10 @@ public final class IntrospectionUtils {
     if (fields.size() > 1) {
       // TODO: MULE-9220 Move this to a syntax validator
       throw new IllegalModelDefinitionException(
-                                                format("Message Source defined on class '%s' has more than one field annotated with '@%s'. "
-                                                    + "Only one field in the class can bare such annotation",
-                                                       object.getClass().getName(),
-                                                       annotations[0].getClass().getSimpleName()));
+          format("Message Source defined on class '%s' has more than one field annotated with '@%s'. "
+                  + "Only one field in the class can bare such annotation",
+              object.getClass().getName(),
+              annotations[0].getClass().getSimpleName()));
     }
 
     return of(fields.iterator().next());
