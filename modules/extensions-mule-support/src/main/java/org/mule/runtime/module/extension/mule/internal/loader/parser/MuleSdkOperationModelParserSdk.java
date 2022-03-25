@@ -42,13 +42,10 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupMo
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.mule.internal.execution.MuleOperationExecutor;
 
-import java.util.ArrayDeque;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -287,63 +284,47 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
     return getSingleChild(operation, BODY_CHILD).get();
   }
 
-  private Stream<OperationModel> getOperationModelsRecursiveStream() {
-    return getBody().recursiveStream()
-        .map(innerComponent -> innerComponent.getModel(OperationModel.class))
-        .filter(Optional::isPresent)
-        .map(Optional::get);
+  private Stream<OperationModel> expandOperationWithoutModel(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName,
+                                                             Set<String> visitedOperations,
+                                                             ComponentAst componentAst) {
+    final MuleSdkOperationModelParserSdk operationParser =
+        operationModelParsersByName.get(componentAst.getIdentifier().getName());
+
+    if (operationParser != null) {
+      return operationParser.getOperationModelsRecursiveStream(operationModelParsersByName, visitedOperations);
+    } else {
+      // Null here represents an empty stream, but it is more efficient because we avoid constructing one.
+      return null;
+    }
   }
 
-  private Stream<ComponentAst> getOperationsWithoutModelRecursiveStream() {
+  private Stream<OperationModel> getOperationModelsRecursiveStream(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
+    final Set<String> visitedOperations = new HashSet<>();
+    return getOperationModelsRecursiveStream(operationModelParsersByName, visitedOperations);
+  }
+
+  private Stream<OperationModel> getOperationModelsRecursiveStream(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName,
+                                                                   Set<String> visitedOperations) {
+    if (!visitedOperations.add(this.getName())) {
+      return Stream.empty();
+    }
+
     return getBody().recursiveStream()
-        .filter(innerComponent -> innerComponent.getComponentType().equals(UNKNOWN))
-        .filter(innerComponent -> !innerComponent.getModel(OperationModel.class).isPresent());
+        .flatMap(componentAst -> {
+          Optional<OperationModel> operationModel = componentAst.getModel(OperationModel.class);
+          if (operationModel.isPresent()) {
+            return Stream.of(operationModel.get());
+          } else if (componentAst.getComponentType().equals(UNKNOWN)) {
+            return expandOperationWithoutModel(operationModelParsersByName, visitedOperations, componentAst);
+          } else {
+            // Null here represents an empty stream, but it is more efficient because we avoid constructing one.
+            return null;
+          }
+        });
   }
 
   private void computeIsBlocking(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
-    // We use a stack to perform an iterative DFS traversal skipping already visited elements in case there were cycles.
-    final Set<String> visitedOperations = new HashSet<>();
-    final Deque<MuleSdkOperationModelParserSdk> parsersToCheck = new ArrayDeque<>();
-
-    visitedOperations.add(this.getName());
-    parsersToCheck.push(this);
-
-    while (!parsersToCheck.isEmpty()) {
-      final MuleSdkOperationModelParserSdk operationParser = parsersToCheck.pop();
-
-      // If already computed, don't do it again
-      if (operationParser.isBlocking != null) {
-        if (operationParser.isBlocking()) {
-          isBlocking = true;
-          return;
-        }
-        continue;
-      }
-
-      // Inspects the inner operations that have an OperationModel first
-      final boolean hasInnerBlockingOperationModels =
-          operationParser.getOperationModelsRecursiveStream().anyMatch(OperationModel::isBlocking);
-      if (hasInnerBlockingOperationModels) {
-        // At this point we can also update the computed value for the parser currently being checked, this will save time if
-        // other operations also reference it
-        operationParser.isBlocking = isBlocking = true;
-        return;
-      }
-
-      // Expands inner operations that don't have an OperationModel yet (i.e.: operations from the same extension currently being
-      // parsed)
-      operationParser.getOperationsWithoutModelRecursiveStream()
-          .map(component -> operationModelParsersByName.get(component.getIdentifier().getName()))
-          .filter(Objects::nonNull)
-          .forEach(innerOperationParser -> {
-            // Adds inner operations to the stack, only if they haven't been seen yet
-            if (visitedOperations.add(innerOperationParser.getName())) {
-              parsersToCheck.push(innerOperationParser);
-            }
-          });
-    }
-
-    isBlocking = false;
+    isBlocking = getOperationModelsRecursiveStream(operationModelParsersByName).anyMatch(OperationModel::isBlocking);
   }
 
   public void computeCharacteristics(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
