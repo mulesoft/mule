@@ -7,15 +7,15 @@
 
 package org.mule.functional.junit4;
 
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
-import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
-
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
+import static org.mule.runtime.module.artifact.activation.api.service.ServiceDiscoverer.create;
+import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
 
 import org.mule.functional.services.NullPolicyProvider;
 import org.mule.runtime.api.exception.MuleException;
@@ -29,12 +29,12 @@ import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.module.artifact.activation.internal.service.discoverer.IsolatedServiceProviderDiscoverer;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer;
-import org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
 import org.mule.test.runner.ApplicationClassLoaderAware;
 import org.mule.test.runner.ArtifactClassLoaderRunner;
@@ -44,7 +44,6 @@ import org.mule.test.runner.RunnerDelegateTo;
 import org.mule.test.runner.ServiceClassLoadersAware;
 import org.mule.test.runner.api.ClassPathClassifier;
 import org.mule.test.runner.api.IsolatedClassLoaderExtensionsManagerConfigurationBuilder;
-import org.mule.test.runner.api.IsolatedServiceProviderDiscoverer;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -241,7 +240,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
 
   private static void createServiceManager() {
     serviceRepository =
-        ServiceManager.create(ServiceDiscoverer.create(new IsolatedServiceProviderDiscoverer(serviceClassLoaders)));
+        ServiceManager.create(create(new IsolatedServiceProviderDiscoverer(serviceClassLoaders)));
     try {
       serviceRepository.start();
     } catch (MuleException e) {

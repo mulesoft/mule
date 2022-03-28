@@ -13,10 +13,11 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.lifecycle.StartException;
-import org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer;
+import org.mule.runtime.module.artifact.activation.api.service.ServiceDiscoverer;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
 
 import java.io.File;

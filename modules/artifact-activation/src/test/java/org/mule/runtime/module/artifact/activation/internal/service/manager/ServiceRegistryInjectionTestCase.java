@@ -18,7 +18,7 @@ import static org.junit.rules.ExpectedException.none;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.module.artifact.activation.api.service.ImmutableServiceAssembly;
+import org.mule.runtime.module.artifact.activation.internal.service.artifact.ImmutableServiceAssembly;
 import org.mule.runtime.module.artifact.activation.api.service.ServiceResolutionError;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

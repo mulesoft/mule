@@ -30,6 +30,13 @@
             <artifactId>mule-artifact-ast-serialization</artifactId> 
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-artifact-activation</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+            <type>test-jar</type>
+        </dependency>
 
         <dependency>
             <groupId>org.mule.runtime</groupId>

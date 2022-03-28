@@ -3,14 +3,65 @@
     "revapi": {
       "ignore": [
         {
-          "code": "java.class.nonFinalClassInheritsFromNewClass",
+          "code": "java.class.removed",
           "old": "class org.mule.runtime.module.service.api.discoverer.ImmutableServiceAssembly",
-          "new": "class org.mule.runtime.module.service.api.discoverer.ImmutableServiceAssembly",
-          "superClass": "org.mule.runtime.module.artifact.activation.api.service.ImmutableServiceAssembly",
           "package": "org.mule.runtime.module.service.api.discoverer",
           "classSimpleName": "ImmutableServiceAssembly",
           "elementKind": "class",
-          "justification": "RevApi overreacting to Standard deprecation technique"
+          "justification": "Moved to artifact-activation. Maintaining compatibility too hard and not worth it"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.module.service.api.discoverer.ServiceAssembly",
+          "package": "org.mule.runtime.module.service.api.discoverer",
+          "classSimpleName": "ServiceAssembly",
+          "elementKind": "interface",
+          "justification": "Moved to artifact-activation. Maintaining compatibility too hard and not worth it"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer",
+          "package": "org.mule.runtime.module.service.api.discoverer",
+          "classSimpleName": "ServiceDiscoverer",
+          "elementKind": "interface",
+          "justification": "Moved to artifact-activation. Maintaining compatibility too hard and not worth it"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer",
+          "package": "org.mule.runtime.module.service.api.discoverer",
+          "classSimpleName": "ServiceProviderDiscoverer",
+          "elementKind": "interface",
+          "justification": "Moved to artifact-activation. Maintaining compatibility too hard and not worth it"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.service.api.discoverer.ServiceResolutionError",
+          "package": "org.mule.runtime.module.service.api.discoverer",
+          "classSimpleName": "ServiceResolutionError",
+          "elementKind": "class",
+          "justification": "Moved to artifact-activation. Maintaining compatibility too hard and not worth it"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter org.mule.runtime.module.service.api.manager.ServiceManager org.mule.runtime.module.service.api.manager.ServiceManager::create(===org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer===)",
+          "new": "parameter org.mule.runtime.module.service.api.manager.ServiceManager org.mule.runtime.module.service.api.manager.ServiceManager::create(===org.mule.runtime.module.artifact.activation.api.service.ServiceDiscoverer===)",
+          "oldType": "org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer",
+          "newType": "org.mule.runtime.module.artifact.activation.api.service.ServiceDiscoverer",
+          "package": "org.mule.runtime.module.service.api.manager",
+          "classSimpleName": "ServiceManager",
+          "methodName": "create",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "Moved to artifact-activation. Maintaining compatibility too hard and not worth it"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.module.service.api.manager.ServiceRepository",
+          "package": "org.mule.runtime.module.service.api.manager",
+          "classSimpleName": "ServiceRepository",
+          "elementKind": "interface",
+          "justification": "Moved to artifact-activation. Maintaining compatibility too hard and not worth it"
         }
       ]
     }
