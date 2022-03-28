@@ -10,6 +10,8 @@ package org.mule.runtime.module.service.api.discoverer;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.service.ServiceProvider;
+import org.mule.runtime.module.artifact.activation.api.service.ServiceAssembly;
+import org.mule.runtime.module.artifact.activation.api.service.ServiceResolutionError;
 
 import java.util.List;
 
@@ -17,13 +19,10 @@ import java.util.List;
  * Discovers the {@link ServiceProvider} available in the container.
  */
 @NoImplement
-public interface ServiceProviderDiscoverer {
+@Deprecated
+public interface ServiceProviderDiscoverer
+    extends org.mule.runtime.module.artifact.activation.api.service.ServiceProviderDiscoverer {
 
-  /**
-   * Discovers available service assemblies.
-   *
-   * @return a non null list of {@link ServiceAssembly} found in the container.
-   * @throws ServiceResolutionError when a {@link ServiceProvider} cannot be properly instantiated.
-   */
-  List<ServiceAssembly> discover() throws ServiceResolutionError;
+  @Override
+  List<ServiceAssembly> discover() throws ServiceResolutionError, org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 }

@@ -122,7 +122,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-service</artifactId>
+            <artifactId>mule-module-artifact-activation</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
             <type>test-jar</type>

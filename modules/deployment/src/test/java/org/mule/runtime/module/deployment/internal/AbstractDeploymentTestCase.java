@@ -124,6 +124,7 @@ import org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescri
 import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
+import org.mule.runtime.module.artifact.activation.internal.service.ServiceFileBuilder;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
@@ -146,7 +147,6 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DefaultMuleDomain
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
-import org.mule.runtime.module.service.builder.ServiceFileBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;

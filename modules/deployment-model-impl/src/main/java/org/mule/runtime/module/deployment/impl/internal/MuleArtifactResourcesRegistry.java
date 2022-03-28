@@ -84,12 +84,12 @@ import org.mule.runtime.module.deployment.impl.internal.policy.ApplicationPolicy
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.license.api.LicenseValidator;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
-import org.mule.runtime.module.service.internal.artifact.ServiceClassLoaderFactory;
-import org.mule.runtime.module.service.internal.artifact.ServiceDescriptor;
-import org.mule.runtime.module.service.internal.discoverer.DefaultServiceDiscoverer;
-import org.mule.runtime.module.service.internal.discoverer.FileSystemServiceProviderDiscoverer;
-import org.mule.runtime.module.service.internal.discoverer.ReflectionServiceResolver;
-import org.mule.runtime.module.service.internal.manager.ServiceRegistry;
+import org.mule.runtime.module.artifact.activation.internal.service.artifact.ServiceClassLoaderFactory;
+import org.mule.runtime.module.artifact.activation.internal.service.artifact.ServiceDescriptor;
+import org.mule.runtime.module.artifact.activation.internal.service.discoverer.DefaultServiceDiscoverer;
+import org.mule.runtime.module.artifact.activation.internal.service.discoverer.FileSystemServiceProviderDiscoverer;
+import org.mule.runtime.module.artifact.activation.internal.service.discoverer.ReflectionServiceResolver;
+import org.mule.runtime.module.artifact.activation.internal.service.manager.ServiceRegistry;
 
 /**
  * Registry of mule artifact resources required to construct new artifacts.

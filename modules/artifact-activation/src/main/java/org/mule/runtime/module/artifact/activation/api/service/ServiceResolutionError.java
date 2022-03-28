@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.service.api.discoverer;
+package org.mule.runtime.module.artifact.activation.api.service;
 
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.service.Service;
@@ -14,13 +14,18 @@ import org.mule.runtime.api.service.Service;
  * Thrown to indicate an error during the resolution process of {@link Service} instances.
  */
 @NoInstantiate
-@Deprecated
-public final class ServiceResolutionError extends org.mule.runtime.module.artifact.activation.api.service.ServiceResolutionError {
+public class ServiceResolutionError extends Exception {
 
+  /**
+   * @inherited
+   */
   public ServiceResolutionError(String message) {
     super(message);
   }
 
+  /**
+   * @inherited
+   */
   public ServiceResolutionError(String message, Throwable cause) {
     super(message, cause);
   }

@@ -14,7 +14,7 @@ import org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer;
 import org.mule.runtime.module.service.internal.manager.MuleServiceManager;
 
 /**
- * Manages the lifecycle of the services avaialbe in the {@link ServiceRepository}
+ * Manages the lifecycle of the services available in the {@link ServiceRepository}
  */
 @NoImplement
 public interface ServiceManager extends Startable, Stoppable, ServiceRepository {
