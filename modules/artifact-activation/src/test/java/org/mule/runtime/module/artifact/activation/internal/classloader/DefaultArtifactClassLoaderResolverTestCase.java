@@ -21,6 +21,7 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -60,7 +61,6 @@ import io.qameta.allure.Story;
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.After;
@@ -176,7 +176,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
     final String onlyDomainPackageName = "domain-package";
 
     final MuleDeployableArtifactClassLoader domainClassLoader =
-        getTestDomainClassLoader(emptySet(), Stream.of(onlyDomainPackageName, repeatedPackageName).collect(Collectors.toSet()));
+        getTestDomainClassLoader(emptySet(), Stream.of(onlyDomainPackageName, repeatedPackageName).collect(toSet()));
     final RegionClassLoader regionClassLoader = (RegionClassLoader) domainClassLoader.getParent();
 
     assertThat(domainClassLoader.getClassLoaderLookupPolicy().getPackageLookupStrategy(repeatedPackageName),
@@ -191,7 +191,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
   @Test
   public void createDomainClassLoaderWithPlugins() {
     final MuleDeployableArtifactClassLoader domainClassLoader =
-        getTestDomainClassLoader(Stream.of(plugin1Descriptor, plugin2Descriptor).collect(Collectors.toSet()));
+        getTestDomainClassLoader(Stream.of(plugin1Descriptor, plugin2Descriptor).collect(toSet()));
     final RegionClassLoader regionClassLoader = (RegionClassLoader) domainClassLoader.getParent();
 
     assertThat(regionClassLoader.getArtifactPluginClassLoaders().stream().map(ArtifactClassLoader::getArtifactDescriptor)
@@ -226,7 +226,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
     final String onlyAppPackageName = "app-package";
 
     final MuleDeployableArtifactClassLoader applicationClassLoader =
-        getTestApplicationClassLoader(emptySet(), Stream.of(onlyAppPackageName, repeatedPackageName).collect(Collectors.toSet()));
+        getTestApplicationClassLoader(emptySet(), Stream.of(onlyAppPackageName, repeatedPackageName).collect(toSet()));
     final RegionClassLoader regionClassLoader = (RegionClassLoader) applicationClassLoader.getParent();
 
     assertThat(applicationClassLoader.getClassLoaderLookupPolicy().getPackageLookupStrategy(repeatedPackageName),
@@ -240,7 +240,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
   @Test
   public void createApplicationClassLoaderWithPlugins() {
     final MuleDeployableArtifactClassLoader applicationClassLoader =
-        getTestApplicationClassLoader(Stream.of(plugin1Descriptor, plugin2Descriptor).collect(Collectors.toSet()));
+        getTestApplicationClassLoader(Stream.of(plugin1Descriptor, plugin2Descriptor).collect(toSet()));
     final RegionClassLoader regionClassLoader = (RegionClassLoader) applicationClassLoader.getParent();
 
     assertThat(regionClassLoader.getArtifactPluginClassLoaders().stream().map(ArtifactClassLoader::getArtifactDescriptor)
@@ -340,14 +340,14 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
     MuleModule muleModule = mock(MuleModule.class);
     final String package1Name = "module&plugin-package";
     final String package2Name = "org.mule.sdk.api.package";
-    when(muleModule.getExportedPackages()).thenReturn(Stream.of(package1Name, package2Name).collect(Collectors.toSet()));
+    when(muleModule.getExportedPackages()).thenReturn(Stream.of(package1Name, package2Name).collect(toSet()));
     when(moduleRepository.getModules()).thenReturn(singletonList(muleModule));
 
     MuleDeployableArtifactClassLoader applicationClassLoader = getTestApplicationClassLoader(emptySet());
 
     plugin1Descriptor
         .setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder()
-            .withLocalPackages(Stream.of(package1Name, package2Name).collect(Collectors.toSet())).build());
+            .withLocalPackages(Stream.of(package1Name, package2Name).collect(toSet())).build());
 
     final MuleArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
         .createMulePluginClassLoader(applicationClassLoader, plugin1Descriptor,
