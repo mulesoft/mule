@@ -26,7 +26,6 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ExtensionProfilingEventContext;
 import org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils;
 import org.mule.runtime.core.internal.profiling.ArtifactProfilingProducerScope;
-import org.mule.runtime.core.privileged.profiling.CoreProfilingService;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInternalProfilingDataConsumer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -73,7 +72,7 @@ public class ExtensionProfilingDataConsumerTestCase extends AbstractMuleContextT
   @Mock
   private Logger logger;
 
-  private CoreProfilingService profilingService;
+  private TestDefaultProfilingService profilingService;
 
   @Before
   public void before() throws Exception {

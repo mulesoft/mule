@@ -25,7 +25,7 @@ import java.util.function.Function;
  *
  * @since 4.5.0
  */
-public class NoOpProfilingService implements CoreProfilingService {
+public class NoOpProfilingService implements ReactorAwareProfilingService, CoreProfilingService {
 
   @SuppressWarnings("rawtypes")
   private final ProfilingDataProducer<?, ?> profilingDataProducer = new ProfilingDataProducer() {

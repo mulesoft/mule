@@ -11,7 +11,7 @@ import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.privileged.profiling.CoreProfilingService;
+import org.mule.runtime.core.internal.profiling.ReactorAwareProfilingService;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Supplier;
@@ -25,13 +25,13 @@ public class CpuLiteAsyncNonBlockingProcessingStrategyEnricher implements Reacti
 
   private final Supplier<Scheduler> liteSchedulerSupplier;
   private final Supplier<ScheduledExecutorService> nonBlockingSchedulerSupplier;
-  private final CoreProfilingService profilingService;
+  private final ReactorAwareProfilingService profilingService;
   private final String artifactId;
   private final String artifactType;
 
   public CpuLiteAsyncNonBlockingProcessingStrategyEnricher(Supplier<Scheduler> liteSchedulerSupplier,
                                                            Supplier<ScheduledExecutorService> nonBlockingSchedulerSupplier,
-                                                           CoreProfilingService profilingService,
+                                                           ReactorAwareProfilingService profilingService,
                                                            String artifactId,
                                                            String artifactType) {
     this.liteSchedulerSupplier = liteSchedulerSupplier;

@@ -11,7 +11,7 @@ import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
-import org.mule.runtime.core.privileged.profiling.CoreProfilingService;
+import org.mule.runtime.core.internal.profiling.ReactorAwareProfilingService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.reactivestreams.Publisher;
@@ -79,7 +79,7 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
    */
   ReactorPublisherBuilder<T> doOnSubscribe(Consumer<? super Subscription> onSubscribe);
 
-  ReactorPublisherBuilder<T> profileProcessingStrategyEvent(CoreProfilingService profilingService,
+  ReactorPublisherBuilder<T> profileProcessingStrategyEvent(ReactorAwareProfilingService profilingService,
                                                             ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> dataProducer,
                                                             Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transformer);
 
@@ -132,7 +132,7 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     }
 
     @Override
-    public ReactorPublisherBuilder<Mono<CoreEvent>> profileProcessingStrategyEvent(CoreProfilingService profilingService,
+    public ReactorPublisherBuilder<Mono<CoreEvent>> profileProcessingStrategyEvent(ReactorAwareProfilingService profilingService,
                                                                                    ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> dataProducer,
                                                                                    Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transformer) {
       mono = profilingService.enrichWithProfilingEventMono(mono, dataProducer, transformer);
@@ -190,7 +190,7 @@ public interface ReactorPublisherBuilder<T extends Publisher> {
     }
 
     @Override
-    public ReactorPublisherBuilder<Flux<CoreEvent>> profileProcessingStrategyEvent(CoreProfilingService profilingService,
+    public ReactorPublisherBuilder<Flux<CoreEvent>> profileProcessingStrategyEvent(ReactorAwareProfilingService profilingService,
                                                                                    ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> dataProducer,
                                                                                    Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transformer) {
       flux = profilingService.enrichWithProfilingEventFlux(flux, dataProducer, transformer);

@@ -40,7 +40,8 @@ import java.util.Set;
  *
  * @since 4.4
  */
-public abstract class AbstractProfilingService implements CoreProfilingService, Initialisable, Startable, Stoppable {
+public abstract class AbstractProfilingService
+    implements ReactorAwareProfilingService, CoreProfilingService, Initialisable, Startable, Stoppable {
 
   @Inject
   protected ServerNotificationManager notificationManager;

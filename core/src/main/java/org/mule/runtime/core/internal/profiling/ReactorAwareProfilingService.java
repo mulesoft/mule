@@ -4,9 +4,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.privileged.profiling;
+package org.mule.runtime.core.internal.profiling;
 
-import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingService;
@@ -17,9 +16,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * A {@link ProfilingService} that allows to perform some extra privileged operations.
+ * A Profiling Service that adds some extra internal functionality related to reactor. This is used only by the runtime core.
+ *
+ * @since 4.5.0
  */
-public interface CoreProfilingService extends ProfilingService {
+public interface ReactorAwareProfilingService extends ProfilingService {
 
   /**
    * Enriches {@link Mono} with profiling event.
@@ -51,12 +52,4 @@ public interface CoreProfilingService extends ProfilingService {
                                                                             ProfilingDataProducer<T, S> dataProducer,
                                                                             Function<S, T> transformer);
 
-  /**
-   * Registers a {@link ProfilingDataConsumer} dynamically.
-   *
-   * @param profilingDataConsumer the {@link ProfilingDataConsumer} to register.
-   * @param <T>                   the {@link ProfilingEventContext} corresponding to the profiling event types the data consumer
-   *                              listens to.
-   */
-  <T extends ProfilingEventContext> void registerProfilingDataConsumer(ProfilingDataConsumer<T> profilingDataConsumer);
 }

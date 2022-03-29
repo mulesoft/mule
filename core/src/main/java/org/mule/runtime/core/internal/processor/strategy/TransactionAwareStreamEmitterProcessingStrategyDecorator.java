@@ -38,7 +38,7 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
-import org.mule.runtime.core.privileged.profiling.CoreProfilingService;
+import org.mule.runtime.core.internal.profiling.ReactorAwareProfilingService;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
@@ -58,7 +58,7 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
   };
 
   @Inject
-  private CoreProfilingService profilingService;
+  private ReactorAwareProfilingService profilingService;
 
   @Inject
   private MuleContext muleContext;
