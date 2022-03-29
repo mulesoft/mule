@@ -1,6 +1,7 @@
 package org.mule.runtime.module.artifact.activation.api;
 
 import org.mule.api.annotation.NoExtend;
+import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 
@@ -10,6 +11,7 @@ import org.mule.runtime.api.i18n.I18nMessage;
  * @since 4.5
  */
 @NoExtend
+@NoInstantiate
 public class ArtifactActivationException extends MuleRuntimeException {
 
   /**

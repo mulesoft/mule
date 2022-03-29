@@ -33,8 +33,6 @@ import static org.mockito.Mockito.when;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_GENERATION;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
@@ -54,6 +52,9 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 import java.io.File;
 import java.io.IOException;
@@ -334,22 +335,24 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
   }
 
   @Test
-  public void createPluginClassLoaderWithIgnoredLocalPackage() {
+  public void createPluginClassLoaderWithIgnoredLocalPackages() {
     MuleModule muleModule = mock(MuleModule.class);
-    final String packageName = "module&plugin-package";
-    when(muleModule.getExportedPackages()).thenReturn(singleton(packageName));
+    final String package1Name = "module&plugin-package";
+    final String package2Name = "org.mule.sdk.api.package";
+    when(muleModule.getExportedPackages()).thenReturn(Stream.of(package1Name, package2Name).collect(Collectors.toSet()));
     when(moduleRepository.getModules()).thenReturn(singletonList(muleModule));
 
     MuleDeployableArtifactClassLoader applicationClassLoader = getTestApplicationClassLoader(emptySet());
 
     plugin1Descriptor
-        .setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().withLocalPackages(singleton(packageName)).build());
+        .setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder()
+            .withLocalPackages(Stream.of(package1Name, package2Name).collect(Collectors.toSet())).build());
 
     final MuleArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
         .createMulePluginClassLoader(applicationClassLoader, plugin1Descriptor,
                                      d -> empty(), artifactClassLoaderResolver::resolvePluginClassLoader);
 
-    assertThat(pluginClassLoader.getClassLoaderLookupPolicy().getPackageLookupStrategy(packageName),
+    assertThat(pluginClassLoader.getClassLoaderLookupPolicy().getPackageLookupStrategy(package1Name),
                instanceOf(ContainerOnlyLookupStrategy.class));
   }
 

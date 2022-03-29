@@ -70,10 +70,8 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
   public static final String PLUGIN_CLASSLOADER_IDENTIFIER = "/plugin/";
 
   private final ModuleRepository moduleRepository;
-  // TODO what about native libraries?
   private final NativeLibraryFinderFactory nativeLibraryFinderFactory;
 
-  // TODO provide a default constructor as well
   public DefaultArtifactClassLoaderResolver(ModuleRepository moduleRepository,
                                             NativeLibraryFinderFactory nativeLibraryFinderFactory) {
     this.moduleRepository = moduleRepository;
