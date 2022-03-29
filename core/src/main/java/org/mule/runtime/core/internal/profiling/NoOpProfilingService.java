@@ -27,7 +27,7 @@ import reactor.core.publisher.Mono;
  *
  * @since 4.5.0
  */
-public class NoOpProfilingService implements CoreProfilingService {
+public class NoOpProfilingService implements ReactorAwareProfilingService, CoreProfilingService {
 
   private final TracingService noOpTracingService = new TracingService() {
 

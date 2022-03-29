@@ -40,7 +40,7 @@ import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessi
 import org.mule.runtime.core.internal.profiling.tracing.DefaultComponentMetadata;
 import org.mule.runtime.core.internal.profiling.tracing.DefaultExecutionContext;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
-import org.mule.runtime.core.privileged.profiling.CoreProfilingService;
+import org.mule.runtime.core.internal.profiling.ReactorAwareProfilingService;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
@@ -60,7 +60,7 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
   };
 
   @Inject
-  private CoreProfilingService profilingService;
+  private ReactorAwareProfilingService profilingService;
 
   @Inject
   private MuleContext muleContext;
