@@ -9,10 +9,10 @@ package org.mule.runtime.core.internal.profiling;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 
 import java.util.function.Function;
 
-import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
