@@ -159,6 +159,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
 
     try {
       mBeanServer.unregisterMBean(new ObjectName("com.oracle.jdbc", keys));
+
     } catch (javax.management.InstanceNotFoundException e) {
       if (logger.isDebugEnabled()) {
         logger.debug(format("No Oracle's '%s' MBean found.", DIAGNOSABILITY_BEAN_NAME));

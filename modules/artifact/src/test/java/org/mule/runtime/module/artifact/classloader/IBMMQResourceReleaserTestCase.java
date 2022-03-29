@@ -31,10 +31,7 @@ import java.io.File;
 import java.lang.ref.Reference;
 import java.lang.reflect.Field;
 import java.net.URL;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 
@@ -122,6 +119,9 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setup() throws Exception {
+    Properties props = System.getProperties();
+    props.remove("avoid.ibm.mq.cleanup");
+    props.remove("avoid.ibm.mq.cleanup.mbeans");
 
     URL settingsUrl = getClass().getClassLoader().getResource("custom-settings.xml");
     final MavenClientProvider mavenClientProvider = discoverProvider(this.getClass().getClassLoader());
@@ -140,7 +140,7 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
 
     BundleDependency dependency = mavenClient.resolveBundleDescriptor(bundleDescriptor);
 
-    artifactClassLoader = new MuleArtifactClassLoader("test", mock(ArtifactDescriptor.class),
+    artifactClassLoader = new MuleArtifactClassLoader("IBMMQResourceReleaserTestCase", mock(ArtifactDescriptor.class),
                                                       new URL[] {dependency.getBundleUri().toURL()},
                                                       currentThread().getContextClassLoader(), testLookupPolicy);
 

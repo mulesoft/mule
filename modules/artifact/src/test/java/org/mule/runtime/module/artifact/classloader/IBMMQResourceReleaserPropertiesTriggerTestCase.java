@@ -9,6 +9,7 @@ package org.mule.runtime.module.artifact.classloader;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,7 +54,6 @@ import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPrevention
 public class IBMMQResourceReleaserPropertiesTriggerTestCase {
 
   static final String KNOWN_DRIVER_CLASS_NAME = "com.ibm.mq.jms.MQConnectionFactory";
-  private final static String IBM_MQ_TRACE_CLASS = "com.ibm.msg.client.commonservices.trace.Trace";
   private final static String DRIVER_GROUP_ID = "com.ibm.mq";
   private final static String DRIVER_ARTIFACT_ID = "com.ibm.mq.allclient";
   private final static String IBM_MQ_MBEAN_DOMAIN = "IBM MQ";
@@ -104,6 +104,8 @@ public class IBMMQResourceReleaserPropertiesTriggerTestCase {
 
   @Before
   public void setup() throws Exception {
+    Properties props = System.getProperties();
+    props.setProperty("avoid.ibm.mq.cleanup.mbeans", "true");
     URL settingsUrl = getClass().getClassLoader().getResource("custom-settings.xml");
     final MavenClientProvider mavenClientProvider = discoverProvider(this.getClass().getClassLoader());
 
@@ -121,19 +123,16 @@ public class IBMMQResourceReleaserPropertiesTriggerTestCase {
 
     dependency = mavenClient.resolveBundleDescriptor(bundleDescriptor);
 
-    artifactClassLoader = new MuleArtifactClassLoader("test", mock(ArtifactDescriptor.class),
-                                                      new URL[] {dependency.getBundleUri().toURL()},
-                                                      currentThread().getContextClassLoader(), testLookupPolicy);
-
-
+    artifactClassLoader =
+        new MuleArtifactClassLoader("IBMMQResourceReleaserPropertiesTriggerTestCase", mock(ArtifactDescriptor.class),
+                                    new URL[] {dependency.getBundleUri().toURL()},
+                                    currentThread().getContextClassLoader(), testLookupPolicy);
   }
 
   @Test
   @Description("When redeploying an application which contains the IBM MQ Driver, the proper cleanup should be performed " +
       "on redeployment but, if the property avoid.ibm.mq.cleanup.mbeans=true, the mbeans clean should be skiped.")
   public void releaserMBeansPropertyTrueTriggerTest() throws Exception {
-    Properties props = System.getProperties();
-    props.setProperty("avoid.ibm.mq.cleanup.mbeans", "true");
     Field shouldReleaseIbmMQResourcesField = getField(MuleArtifactClassLoader.class, "shouldReleaseIbmMQResources", false);
     shouldReleaseIbmMQResourcesField.setAccessible(true);
     assertThat(shouldReleaseIbmMQResourcesField.get(artifactClassLoader), is(false));
@@ -142,7 +141,6 @@ public class IBMMQResourceReleaserPropertiesTriggerTestCase {
     Object connectionFactory = connectionFactoryClass.newInstance();
     artifactClassLoader.dispose();
     assertThat(countMBeans(artifactClassLoader), is(2));
-    props.setProperty("avoid.ibm.mq.cleanup.mbeans", "false");
   }
 
   private int countMBeans(MuleArtifactClassLoader artifactClassLoader) throws MalformedObjectNameException {
@@ -152,4 +150,11 @@ public class IBMMQResourceReleaserPropertiesTriggerTestCase {
     keys.put("name", "*");
     return mBeanServer.queryMBeans(new ObjectName(IBM_MQ_MBEAN_DOMAIN, keys), null).size();
   }
+
+  @After
+  public void cleanUp() throws Exception {
+    Properties props = System.getProperties();
+    props.remove("avoid.ibm.mq.cleanup.mbeans");
+  }
+
 }

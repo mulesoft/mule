@@ -44,8 +44,8 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
   private static final String AVOID_IBM_MQ_CLEANUP_PROPERTY_NAME = "avoid.ibm.mq.cleanup";
   private static final String AVOID_IBM_MQ_CLEANUP_MBEANS_PROPERTY_NAME = "avoid.ibm.mq.cleanup.mbeans";
 
-  private static final boolean IBM_MQ_RESOURCE_RELEASER_AVOID_CLEANUP = getBoolean(AVOID_IBM_MQ_CLEANUP_PROPERTY_NAME);
-  private static final boolean IBM_MQ_RESOURCE_RELEASER_AVOID_CLEANUP_MBEANS =
+  private boolean IBM_MQ_RESOURCE_RELEASER_AVOID_CLEANUP = getBoolean(AVOID_IBM_MQ_CLEANUP_PROPERTY_NAME);
+  private boolean IBM_MQ_RESOURCE_RELEASER_AVOID_CLEANUP_MBEANS =
       getBoolean(AVOID_IBM_MQ_CLEANUP_MBEANS_PROPERTY_NAME);
 
   private final static String THREADLOCALS_FIELD = "threadLocals";
@@ -179,15 +179,15 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
       try {
         nameToLevels = getStaticFieldValue(knownLevelClass, "nameToLevels", false);
       } catch (NoSuchFieldException | IllegalAccessException ex) {
-        LOGGER.debug("Caught exception when accessing the nameToLevels field for {} class: {}", knownLevelClass, ex.getMessage(),
-                     ex);
+        LOGGER.warn("Caught exception when accessing the nameToLevels field for {} class: {}", knownLevelClass, ex.getMessage(),
+                    ex);
       }
 
       try {
         intToLevels = getStaticFieldValue(knownLevelClass, "intToLevels", false);
       } catch (NoSuchFieldException | IllegalAccessException ex) {
-        LOGGER.debug("Caught exception when accessing the intToLevels field for {} class: {}", knownLevelClass, ex.getMessage(),
-                     ex);
+        LOGGER.warn("Caught exception when accessing the intToLevels field for {} class: {}", knownLevelClass, ex.getMessage(),
+                    ex);
       }
 
       if (nameToLevels != null) {
@@ -302,7 +302,9 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
     }
 
     for (Thread thread : getAllStackTraces().keySet()) {
-      LOGGER.debug("Processing Thread: {} / {}", thread.getThreadGroup().getName(), thread.getName());
+      if (LOGGER.isDebugEnabled() && thread.getThreadGroup() != null) {
+        LOGGER.debug("Processing Thread: {} / {}", thread.getThreadGroup().getName(), thread.getName());
+      }
 
       if (threadLocalsField != null) {
         try {
@@ -353,13 +355,14 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
 
           Object x = threadLocal.get();
           if (x != null) {
-
-            LOGGER.debug("ThreadLocal ClassLoader: {}", x.getClass().getClassLoader());
-            LOGGER.debug("ThreadLocal Class: {}", x.getClass().getCanonicalName());
-
+            if (LOGGER.isDebugEnabled()) {
+              LOGGER.debug("ThreadLocal ClassLoader: {}", x.getClass().getClassLoader());
+              LOGGER.debug("ThreadLocal Class: {}", x.getClass().getCanonicalName());
+            }
             if (driverClassLoader == x.getClass().getClassLoader()) {
-
-              LOGGER.debug("Removing instance of {}", x.getClass().getCanonicalName());
+              if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Removing instance of {}", x.getClass().getCanonicalName());
+              }
               threadLocal.remove();
               threadLocal.set(null);
               reference.clear();
