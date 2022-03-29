@@ -29,7 +29,7 @@ import org.mule.runtime.core.internal.processor.strategy.enricher.CpuLiteNonBloc
 import org.mule.runtime.core.internal.processor.strategy.enricher.ReactiveProcessorEnricher;
 import org.mule.runtime.core.internal.processor.strategy.enricher.ProcessingTypeBasedReactiveProcessorEnricher;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.privileged.profiling.CoreProfilingService;
+import org.mule.runtime.core.internal.profiling.ReactorAwareProfilingService;
 
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -60,7 +60,7 @@ public abstract class AbstractReactorStreamProcessingStrategy extends AbstractSt
   private ReactiveProcessorEnricher processorEnricher = null;
 
   @Inject
-  CoreProfilingService profilingService;
+  ReactorAwareProfilingService profilingService;
 
   @Inject
   MuleContext muleContext;
@@ -158,7 +158,7 @@ public abstract class AbstractReactorStreamProcessingStrategy extends AbstractSt
         .register(CPU_LITE_ASYNC, cpuLiteAsyncEnricher);
   }
 
-  protected CoreProfilingService getProfilingService() {
+  protected ReactorAwareProfilingService getProfilingService() {
     return profilingService;
   }
 

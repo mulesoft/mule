@@ -63,7 +63,7 @@ import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
-import org.mule.runtime.core.privileged.profiling.CoreProfilingService;
+import org.mule.runtime.core.internal.profiling.ReactorAwareProfilingService;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -101,7 +101,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
   @Before
   public void createMocks() throws Exception {
     muleContext.dispose();
-    CoreProfilingService coreProfilingService = mock(CoreProfilingService.class);
+    ReactorAwareProfilingService coreProfilingService = mock(ReactorAwareProfilingService.class);
     mockProcessingStrategyProfilingChainWithoutTriggeringEvent(coreProfilingService);
     muleContext = mockContextWithServicesWithProfilingService(coreProfilingService);
     when(muleContext.getStatistics()).thenReturn(new AllStatistics());
