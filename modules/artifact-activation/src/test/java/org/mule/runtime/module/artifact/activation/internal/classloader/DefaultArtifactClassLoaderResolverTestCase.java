@@ -6,6 +6,35 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader;
 
+import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleLibFolder;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver.getApplicationId;
+import static org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver.getDomainId;
+import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.COMPILE;
+import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
+
+import static org.apache.commons.io.FileUtils.deleteQuietly;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.core.Is.is;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_GENERATION;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
@@ -39,31 +68,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleLibFolder;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver.getApplicationId;
-import static org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver.getDomainId;
-import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.COMPILE;
-import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
-
-import static java.util.Collections.emptySet;
-import static java.util.Collections.singleton;
-import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
-
-import static org.apache.commons.io.FileUtils.deleteQuietly;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
+@Feature(CLASSLOADING_ISOLATION)
+@Story(CLASSLOADER_GENERATION)
 public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTestCase {
 
   public static final String MULE_DOMAIN_FOLDER = "domains";
@@ -160,6 +166,27 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
   }
 
   @Test
+  public void createDomainClassLoaderWithExportedPackages() {
+    MuleModule muleModule = mock(MuleModule.class);
+    final String repeatedPackageName = "module&domain-package";
+    when(muleModule.getExportedPackages()).thenReturn(singleton(repeatedPackageName));
+    when(moduleRepository.getModules()).thenReturn(singletonList(muleModule));
+    final String onlyDomainPackageName = "domain-package";
+
+    final MuleDeployableArtifactClassLoader domainClassLoader =
+        getTestDomainClassLoader(emptySet(), Stream.of(onlyDomainPackageName, repeatedPackageName).collect(Collectors.toSet()));
+    final RegionClassLoader regionClassLoader = (RegionClassLoader) domainClassLoader.getParent();
+
+    assertThat(domainClassLoader.getClassLoaderLookupPolicy().getPackageLookupStrategy(repeatedPackageName),
+               instanceOf(ContainerOnlyLookupStrategy.class));
+    assertThat(regionClassLoader.filterForClassLoader(regionClassLoader.getOwnerClassLoader())
+        .exportsPackage(repeatedPackageName), is(false));
+    assertThat(regionClassLoader.filterForClassLoader(regionClassLoader.getOwnerClassLoader())
+        .exportsPackage(onlyDomainPackageName),
+               is(true));
+  }
+
+  @Test
   public void createDomainClassLoaderWithPlugins() {
     final MuleDeployableArtifactClassLoader domainClassLoader =
         getTestDomainClassLoader(Stream.of(plugin1Descriptor, plugin2Descriptor).collect(Collectors.toSet()));
@@ -197,7 +224,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
     final String onlyAppPackageName = "app-package";
 
     final MuleDeployableArtifactClassLoader applicationClassLoader =
-        getTestApplicationClassloader(emptySet(), Stream.of(onlyAppPackageName, repeatedPackageName).collect(Collectors.toSet()));
+        getTestApplicationClassLoader(emptySet(), Stream.of(onlyAppPackageName, repeatedPackageName).collect(Collectors.toSet()));
     final RegionClassLoader regionClassLoader = (RegionClassLoader) applicationClassLoader.getParent();
 
     assertThat(applicationClassLoader.getClassLoaderLookupPolicy().getPackageLookupStrategy(repeatedPackageName),
@@ -211,7 +238,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
   @Test
   public void createApplicationClassLoaderWithPlugins() {
     final MuleDeployableArtifactClassLoader applicationClassLoader =
-        getTestApplicationClassloader(Stream.of(plugin1Descriptor, plugin2Descriptor).collect(Collectors.toSet()));
+        getTestApplicationClassLoader(Stream.of(plugin1Descriptor, plugin2Descriptor).collect(Collectors.toSet()));
     final RegionClassLoader regionClassLoader = (RegionClassLoader) applicationClassLoader.getParent();
 
     assertThat(regionClassLoader.getArtifactPluginClassLoaders().stream().map(ArtifactClassLoader::getArtifactDescriptor)
@@ -220,7 +247,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
 
   @Test
   public void createDependantPluginClassLoader() {
-    MuleDeployableArtifactClassLoader applicationClassLoader = getTestApplicationClassloader(emptySet());
+    MuleDeployableArtifactClassLoader applicationClassLoader = getTestApplicationClassLoader(emptySet());
     String plugin2ExportedPackage = "plugin2-package";
     BundleDependency pluginDependency = new BundleDependency.Builder().setScope(COMPILE).setDescriptor(
                                                                                                        PLUGIN2_BUNDLE_DESCRIPTOR)
@@ -241,8 +268,8 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
   }
 
   @Test
-  public void createPluginWithPrivilegedContainerAccess() {
-    MuleDeployableArtifactClassLoader applicationClassLoader = getTestApplicationClassloader(emptySet());
+  public void createPluginClassLoaderWithPrivilegedContainerAccess() {
+    MuleDeployableArtifactClassLoader applicationClassLoader = getTestApplicationClassLoader(emptySet());
 
     MuleModule privilegedModule = mock(MuleModule.class);
     when(privilegedModule.getPrivilegedArtifacts()).thenReturn(singleton(PLUGIN_ARTIFACT_ID1));
@@ -258,8 +285,8 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
   }
 
   @Test
-  public void createsPluginWithPrivilegedPluginAccess() {
-    MuleDeployableArtifactClassLoader applicationClassLoader = getTestApplicationClassloader(emptySet());
+  public void createsPluginClassLoaderWithPrivilegedPluginAccess() {
+    MuleDeployableArtifactClassLoader applicationClassLoader = getTestApplicationClassLoader(emptySet());
 
     ClassLoaderModel plugin2ClassLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder()
         .exportingPrivilegedPackages(singleton(PRIVILEGED_PACKAGE), singleton(PLUGIN_ARTIFACT_ID1)).build();
@@ -281,8 +308,8 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
   }
 
   @Test
-  public void createsPluginWithExportedLocalPackage() {
-    MuleDeployableArtifactClassLoader applicationClassLoader = getTestApplicationClassloader(emptySet());
+  public void createPluginClassLoaderWithExportedLocalPackage() {
+    MuleDeployableArtifactClassLoader applicationClassLoader = getTestApplicationClassLoader(emptySet());
     String pluginPackage = "plugin-package";
 
     ClassLoaderModel plugin2ClassLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder()
@@ -307,13 +334,13 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
   }
 
   @Test
-  public void createPluginWithIgnoredLocalPackage() {
+  public void createPluginClassLoaderWithIgnoredLocalPackage() {
     MuleModule muleModule = mock(MuleModule.class);
     final String packageName = "module&plugin-package";
     when(muleModule.getExportedPackages()).thenReturn(singleton(packageName));
     when(moduleRepository.getModules()).thenReturn(singletonList(muleModule));
 
-    MuleDeployableArtifactClassLoader applicationClassLoader = getTestApplicationClassloader(emptySet());
+    MuleDeployableArtifactClassLoader applicationClassLoader = getTestApplicationClassLoader(emptySet());
 
     plugin1Descriptor
         .setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().withLocalPackages(singleton(packageName)).build());
@@ -327,19 +354,25 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
   }
 
   private MuleDeployableArtifactClassLoader getTestDomainClassLoader(Set<ArtifactPluginDescriptor> plugins) {
+    return getTestDomainClassLoader(plugins, emptySet());
+  }
+
+  private MuleDeployableArtifactClassLoader getTestDomainClassLoader(Set<ArtifactPluginDescriptor> plugins,
+                                                                     Set<String> exportedPackages) {
     final String domainName = "custom-domain";
     DomainDescriptor descriptor = getTestDomainDescriptor(domainName);
     descriptor.setRootFolder(createDomainDir(MULE_DOMAIN_FOLDER, domainName));
     descriptor.setPlugins(plugins);
+    descriptor.setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().exportingPackages(exportedPackages).build());
 
     return artifactClassLoaderResolver.createDomainClassLoader(descriptor, artifactClassLoaderResolver::resolvePluginClassLoader);
   }
 
-  private MuleDeployableArtifactClassLoader getTestApplicationClassloader(Set<ArtifactPluginDescriptor> plugins) {
-    return getTestApplicationClassloader(plugins, emptySet());
+  private MuleDeployableArtifactClassLoader getTestApplicationClassLoader(Set<ArtifactPluginDescriptor> plugins) {
+    return getTestApplicationClassLoader(plugins, emptySet());
   }
 
-  private MuleDeployableArtifactClassLoader getTestApplicationClassloader(Set<ArtifactPluginDescriptor> plugins,
+  private MuleDeployableArtifactClassLoader getTestApplicationClassLoader(Set<ArtifactPluginDescriptor> plugins,
                                                                           Set<String> exportedPackages) {
     final String applicationName = "app";
     final MuleDeployableArtifactClassLoader domainClassLoader = getTestDomainClassLoader(emptySet());

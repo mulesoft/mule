@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.classloader.ChildOnlyLookupStrategy.CHILD_ONLY;
@@ -18,6 +17,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toSet;
+import static java.lang.String.format;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 

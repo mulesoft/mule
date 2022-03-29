@@ -7,6 +7,7 @@
 
 package org.mule.runtime.deployment.model.internal;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
@@ -148,8 +149,8 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
         factory.createPluginClassLoaders(regionClassLoader, artifactPluginDescriptors, regionOwnerLookupPolicy);
 
     assertThat(pluginClassLoaders.stream().map(ArtifactClassLoader::getArtifactDescriptor).collect(toList()),
-               contains(Arrays.asList(equalTo(pluginClassLoader1.getArtifactDescriptor()),
-                                      equalTo(pluginClassLoader2.getArtifactDescriptor()))));
+               contains(asList(equalTo(pluginClassLoader1.getArtifactDescriptor()),
+                               equalTo(pluginClassLoader2.getArtifactDescriptor()))));
   }
 
   @Test
@@ -174,8 +175,8 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
         factory.createPluginClassLoaders(regionClassLoader, artifactPluginDescriptors, regionOwnerLookupPolicy);
 
     assertThat(pluginClassLoaders.stream().map(ArtifactClassLoader::getArtifactDescriptor).collect(toList()),
-               contains(Arrays.asList(equalTo(pluginClassLoader1.getArtifactDescriptor()),
-                                      equalTo(pluginClassLoader2.getArtifactDescriptor()))));
+               contains(asList(equalTo(pluginClassLoader1.getArtifactDescriptor()),
+                               equalTo(pluginClassLoader2.getArtifactDescriptor()))));
   }
 
   @Test
@@ -228,8 +229,8 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
         factory.createPluginClassLoaders(regionClassLoader, artifactPluginDescriptors, regionOwnerLookupPolicy);
 
     assertThat(pluginClassLoaders.stream().map(ArtifactClassLoader::getArtifactDescriptor).collect(toList()),
-               contains(Arrays.asList(equalTo(pluginClassLoader1.getArtifactDescriptor()),
-                                      equalTo(pluginClassLoader2.getArtifactDescriptor()))));
+               contains(asList(equalTo(pluginClassLoader1.getArtifactDescriptor()),
+                               equalTo(pluginClassLoader2.getArtifactDescriptor()))));
     assertThat((Map<String, LookupStrategy>) mapArgumentCaptor.getAllValues().get(0),
                not(hasEntry(equalTo(PRIVILEGED_PACKAGE), instanceOf(DelegateOnlyLookupStrategy.class))));
     assertThat((Map<String, LookupStrategy>) mapArgumentCaptor.getAllValues().get(1),

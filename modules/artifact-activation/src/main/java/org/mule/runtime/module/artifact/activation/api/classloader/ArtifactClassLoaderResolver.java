@@ -33,7 +33,7 @@ import java.util.function.Function;
  * @since 4.5
  */
 // TODO Check that the plugin classLoader cache works fine for things like db if the actual driver changes.
-// TODO Test with native libraries at all levels: domain, app, plugin.
+// TODO W-10914518 - Test with native libraries at all levels: domain, app, plugin.
 public interface ArtifactClassLoaderResolver {
 
   static ArtifactClassLoaderResolver defaultClassLoaderResolver() {
