@@ -43,6 +43,7 @@ import org.mule.runtime.module.artifact.api.classloader.ChildOnlyLookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.DelegateOnlyLookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
@@ -354,6 +355,8 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
 
     assertThat(pluginClassLoader.getClassLoaderLookupPolicy().getPackageLookupStrategy(package1Name),
                instanceOf(ContainerOnlyLookupStrategy.class));
+    assertThat(pluginClassLoader.getClassLoaderLookupPolicy().getPackageLookupStrategy(package2Name),
+               instanceOf(ParentFirstLookupStrategy.class));
   }
 
   private MuleDeployableArtifactClassLoader getTestDomainClassLoader(Set<ArtifactPluginDescriptor> plugins) {
