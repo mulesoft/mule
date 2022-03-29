@@ -44,8 +44,8 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
   private static final String AVOID_IBM_MQ_CLEANUP_PROPERTY_NAME = "avoid.ibm.mq.cleanup";
   private static final String AVOID_IBM_MQ_CLEANUP_MBEANS_PROPERTY_NAME = "avoid.ibm.mq.cleanup.mbeans";
 
-  private final boolean IBM_MQ_RESOURCE_RELEASER_AVOID_CLEANUP = getBoolean(AVOID_IBM_MQ_CLEANUP_PROPERTY_NAME);
-  private final boolean IBM_MQ_RESOURCE_RELEASER_AVOID_CLEANUP_MBEANS =
+  private boolean IBM_MQ_RESOURCE_RELEASER_AVOID_CLEANUP = getBoolean(AVOID_IBM_MQ_CLEANUP_PROPERTY_NAME);
+  private boolean IBM_MQ_RESOURCE_RELEASER_AVOID_CLEANUP_MBEANS =
       getBoolean(AVOID_IBM_MQ_CLEANUP_MBEANS_PROPERTY_NAME);
 
   private final static String THREADLOCALS_FIELD = "threadLocals";
