@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:module-global-element-default-params="http://www.mulesoft.org/schema/mule/module-global-element-default-params"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/module-global-element-default-params http://www.mulesoft.org/schema/mule/module-global-element-default-params/current/mule-module-global-element-default-params.xsd">
+
+    <module-global-element-default-params:config name="globalElementName" username="john" password="changeit"/>
+
+    <flow name="testDoGetClient">
+        <module-global-element-default-params:do-get-client />
+    </flow>
+
+    <flow name="testDoGetClientWithPrivateOperation">
+        <module-global-element-default-params:do-get-client-with-private-operation />
+    </flow>
+
+    <flow name="testDoGetPets">
+        <module-global-element-default-params:do-get-pets owner="#[vars.ownerTest]" />
+    </flow>
+
+    <flow name="testDoGetClientCustomProperties">
+        <module-global-element-default-params:do-get-client config-ref="globalElementName"/>
+    </flow>
+
+    <flow name="testDoGetClientWithPrivateOperationCustomProperties">
+        <module-global-element-default-params:do-get-client-with-private-operation config-ref="globalElementName"/>
+    </flow>
+
+    <flow name="testDoGetPetsCustomProperties">
+        <module-global-element-default-params:do-get-pets owner="#[vars.ownerTest]" config-ref="globalElementName"/>
+    </flow>
+</mule>

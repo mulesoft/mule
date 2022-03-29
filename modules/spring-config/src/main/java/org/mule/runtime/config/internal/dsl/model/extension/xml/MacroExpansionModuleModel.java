@@ -214,7 +214,7 @@ public class MacroExpansionModuleModel {
   }
 
   private void macroExpandGlobalElements(List<ComponentModel> moduleComponentModels, Set<String> moduleGlobalElementsNames) {
-    if (!hasExplicitConfiguration(applicationModel, extensionModel)
+    if (existOperationThatUsesImplicitConfiguration()
         && extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).isPresent()) {
       ComponentModel configModel = new ComponentModel.Builder()
           .setIdentifier(ComponentIdentifier.builder()
@@ -259,12 +259,14 @@ public class MacroExpansionModuleModel {
     });
   }
 
-  private boolean hasExplicitConfiguration(ApplicationModel applicationModel, ExtensionModel extensionModel) {
-    return applicationModel.getRootComponentModel().getInnerComponents()
-        .stream()
+  private boolean existOperationThatUsesImplicitConfiguration() {
+    return applicationModel.getRootComponentModel().getInnerComponents().stream()
+        .filter(componentModel -> componentModel.getIdentifier().getName().equals("flow"))
+        .flatMap(componentModel -> componentModel.getInnerComponents().stream())
         .filter(componentModel -> componentModel.getIdentifier().getNamespace()
             .equals(extensionModel.getXmlDslModel().getPrefix()))
-        .anyMatch(componentModel -> ((ComponentAst) componentModel).getModel(ConfigurationModel.class).isPresent());
+        .filter(componentModel -> ((ComponentAst) componentModel).getModel(OperationModel.class).isPresent())
+        .anyMatch(componentModel -> !componentModel.getRawParameters().containsKey("config-ref"));
   }
 
   private Optional<ConfigurationModel> getConfigurationModel() {
