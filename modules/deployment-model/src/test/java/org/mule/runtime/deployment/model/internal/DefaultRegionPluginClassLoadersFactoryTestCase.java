@@ -34,8 +34,6 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFacto
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DelegateOnlyLookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
-import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -45,6 +43,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -78,8 +77,7 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
       new DefaultRegionPluginClassLoadersFactory(pluginClassLoaderFactory,
                                                  moduleRepository);
   private final ClassLoaderLookupPolicy regionOwnerLookupPolicy = mock(ClassLoaderLookupPolicy.class);
-  private MuleDeployableArtifactClassLoader artifactClassLoader;
-  private RegionClassLoader regionClassLoader;
+  private final ArtifactClassLoader regionClassLoader = mock(ArtifactClassLoader.class);
 
   private final ArtifactPluginDescriptor plugin1Descriptor = new ArtifactPluginDescriptor(PLUGIN_ID1);
   private final ArtifactPluginDescriptor plugin2Descriptor = new ArtifactPluginDescriptor(PLUGIN_ID2);
@@ -113,7 +111,7 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
   }
 
   @Test
-  public void createsNoPlugins() throws Exception {
+  public void createsNoPlugins() {
     List<ArtifactClassLoader> pluginClassLoaders =
         factory.createPluginClassLoaders(regionClassLoader, emptyList(), regionOwnerLookupPolicy);
 
@@ -121,14 +119,13 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
   }
 
   @Test
-  public void createsSinglePlugin() throws Exception {
+  public void createsSinglePlugin() {
     List<ArtifactPluginDescriptor> artifactPluginDescriptors = singletonList(plugin1Descriptor);
 
     ClassLoaderLookupPolicy pluginBaseLookupPolicy = mock(ClassLoaderLookupPolicy.class);
-    when(regionOwnerLookupPolicy.extend(argThat(any(Stream.class)), argThat(any(LookupStrategy.class))))
-        .thenReturn(pluginBaseLookupPolicy);
-    when(pluginBaseLookupPolicy.extend(argThat(any(Map.class)))).thenReturn(pluginBaseLookupPolicy);
-    when(pluginBaseLookupPolicy.extend(argThat(any(Map.class)), eq(true))).thenReturn(pluginLookupPolicy);
+    when(regionOwnerLookupPolicy.extend(argThat(any(Map.class)))).thenReturn(pluginBaseLookupPolicy);
+    when(pluginBaseLookupPolicy.extend(argThat(any(Stream.class)), argThat(any(LookupStrategy.class)), eq(true)))
+        .thenReturn(pluginLookupPolicy);
 
     List<ArtifactClassLoader> pluginClassLoaders =
         factory.createPluginClassLoaders(regionClassLoader, artifactPluginDescriptors, regionOwnerLookupPolicy);
@@ -137,27 +134,26 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
   }
 
   @Test
-  public void createsIndependentPlugins() throws Exception {
+  public void createsIndependentPlugins() {
     List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
     artifactPluginDescriptors.add(plugin1Descriptor);
     artifactPluginDescriptors.add(plugin2Descriptor);
 
     ClassLoaderLookupPolicy pluginBaseLookupPolicy = mock(ClassLoaderLookupPolicy.class);
-    when(regionOwnerLookupPolicy.extend(argThat(any(Stream.class)), argThat(any(LookupStrategy.class))))
-        .thenReturn(pluginBaseLookupPolicy);
-    when(pluginBaseLookupPolicy.extend(argThat(any(Map.class)))).thenReturn(pluginBaseLookupPolicy);
-    when(pluginBaseLookupPolicy.extend(argThat(any(Map.class)), eq(true))).thenReturn(pluginLookupPolicy);
+    when(regionOwnerLookupPolicy.extend(argThat(any(Map.class)))).thenReturn(pluginBaseLookupPolicy);
+    when(pluginBaseLookupPolicy.extend(argThat(any(Stream.class)), argThat(any(LookupStrategy.class)), eq(true)))
+        .thenReturn(pluginLookupPolicy);
 
     List<ArtifactClassLoader> pluginClassLoaders =
         factory.createPluginClassLoaders(regionClassLoader, artifactPluginDescriptors, regionOwnerLookupPolicy);
 
-    assertThat(pluginClassLoaders.stream().map(pcl -> pcl.getArtifactDescriptor()).collect(toList()),
-               contains(pluginClassLoader1.getArtifactDescriptor(),
-                        pluginClassLoader2.getArtifactDescriptor()));
+    assertThat(pluginClassLoaders.stream().map(ArtifactClassLoader::getArtifactDescriptor).collect(toList()),
+               contains(Arrays.asList(equalTo(pluginClassLoader1.getArtifactDescriptor()),
+                                      equalTo(pluginClassLoader2.getArtifactDescriptor()))));
   }
 
   @Test
-  public void createsDependantPlugins() throws Exception {
+  public void createsDependantPlugins() {
     BundleDependency pluginDependency = new BundleDependency.Builder().setScope(BundleScope.COMPILE).setDescriptor(
                                                                                                                    PLUGIN1_BUNDLE_DESCRIPTOR)
         .setBundleUri(new File("test").toURI())
@@ -170,21 +166,20 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
     artifactPluginDescriptors.add(plugin2Descriptor);
 
     ClassLoaderLookupPolicy pluginBaseLookupPolicy = mock(ClassLoaderLookupPolicy.class);
-    when(regionOwnerLookupPolicy.extend(argThat(any(Stream.class)), argThat(any(LookupStrategy.class))))
-        .thenReturn(pluginBaseLookupPolicy);
-    when(pluginBaseLookupPolicy.extend(argThat(any(Map.class)))).thenReturn(pluginBaseLookupPolicy);
-    when(pluginBaseLookupPolicy.extend(argThat(any(Map.class)), eq(true))).thenReturn(pluginLookupPolicy);
+    when(regionOwnerLookupPolicy.extend(argThat(any(Map.class)))).thenReturn(pluginBaseLookupPolicy);
+    when(pluginBaseLookupPolicy.extend(argThat(any(Stream.class)), argThat(any(LookupStrategy.class)), eq(true)))
+        .thenReturn(pluginLookupPolicy);
 
     List<ArtifactClassLoader> pluginClassLoaders =
         factory.createPluginClassLoaders(regionClassLoader, artifactPluginDescriptors, regionOwnerLookupPolicy);
 
-    assertThat(pluginClassLoaders.stream().map(pcl -> pcl.getArtifactDescriptor()).collect(toList()),
-               contains(pluginClassLoader1.getArtifactDescriptor(),
-                        pluginClassLoader2.getArtifactDescriptor()));
+    assertThat(pluginClassLoaders.stream().map(ArtifactClassLoader::getArtifactDescriptor).collect(toList()),
+               contains(Arrays.asList(equalTo(pluginClassLoader1.getArtifactDescriptor()),
+                                      equalTo(pluginClassLoader2.getArtifactDescriptor()))));
   }
 
   @Test
-  public void createsPluginWithPrivilegedContainerAccess() throws Exception {
+  public void createsPluginWithPrivilegedContainerAccess() {
     MuleModule privilegedModule = mock(MuleModule.class);
     when(privilegedModule.getPrivilegedArtifacts()).thenReturn(singleton(PLUGIN_ARTIFACT_ID1));
     when(privilegedModule.getPrivilegedExportedPackages()).thenReturn(singleton(PRIVILEGED_PACKAGE));
@@ -194,10 +189,9 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
 
     ClassLoaderLookupPolicy pluginBaseLookupPolicy = mock(ClassLoaderLookupPolicy.class);
     ArgumentCaptor<Map> mapArgumentCaptor = forClass(Map.class);
-    when(regionOwnerLookupPolicy.extend(argThat(any(Stream.class)), argThat(any(LookupStrategy.class))))
-        .thenReturn(pluginBaseLookupPolicy);
-    when(pluginBaseLookupPolicy.extend(mapArgumentCaptor.capture())).thenReturn(pluginBaseLookupPolicy);
-    when(pluginBaseLookupPolicy.extend(argThat(any(Map.class)), eq(true))).thenReturn(pluginLookupPolicy);
+    when(regionOwnerLookupPolicy.extend(mapArgumentCaptor.capture())).thenReturn(pluginBaseLookupPolicy);
+    when(pluginBaseLookupPolicy.extend(argThat(any(Stream.class)), argThat(any(LookupStrategy.class)), eq(true)))
+        .thenReturn(pluginLookupPolicy);
 
     List<ArtifactClassLoader> pluginClassLoaders =
         factory.createPluginClassLoaders(regionClassLoader, artifactPluginDescriptors, regionOwnerLookupPolicy);
@@ -208,7 +202,7 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
   }
 
   @Test
-  public void createsPluginWithPrivilegedPluginAccess() throws Exception {
+  public void createsPluginWithPrivilegedPluginAccess() {
     ClassLoaderModel plugin1ClassLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder()
         .exportingPrivilegedPackages(singleton(PRIVILEGED_PACKAGE), singleton(PLUGIN_ARTIFACT_ID2)).build();
     plugin1Descriptor.setClassLoaderModel(plugin1ClassLoaderModel);
@@ -226,17 +220,16 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
 
     ClassLoaderLookupPolicy pluginBaseLookupPolicy = mock(ClassLoaderLookupPolicy.class);
     ArgumentCaptor<Map> mapArgumentCaptor = forClass(Map.class);
-    when(regionOwnerLookupPolicy.extend(argThat(any(Stream.class)), argThat(any(LookupStrategy.class))))
-        .thenReturn(pluginBaseLookupPolicy);
-    when(pluginBaseLookupPolicy.extend(mapArgumentCaptor.capture())).thenReturn(pluginBaseLookupPolicy);
-    when(pluginBaseLookupPolicy.extend(argThat(any(Map.class)), eq(true))).thenReturn(pluginLookupPolicy);
+    when(regionOwnerLookupPolicy.extend(mapArgumentCaptor.capture())).thenReturn(pluginBaseLookupPolicy);
+    when(pluginBaseLookupPolicy.extend(argThat(any(Stream.class)), argThat(any(LookupStrategy.class)), eq(true)))
+        .thenReturn(pluginLookupPolicy);
 
     List<ArtifactClassLoader> pluginClassLoaders =
         factory.createPluginClassLoaders(regionClassLoader, artifactPluginDescriptors, regionOwnerLookupPolicy);
 
-    assertThat(pluginClassLoaders.stream().map(pcl -> pcl.getArtifactDescriptor()).collect(toList()),
-               contains(pluginClassLoader1.getArtifactDescriptor(),
-                        pluginClassLoader2.getArtifactDescriptor()));
+    assertThat(pluginClassLoaders.stream().map(ArtifactClassLoader::getArtifactDescriptor).collect(toList()),
+               contains(Arrays.asList(equalTo(pluginClassLoader1.getArtifactDescriptor()),
+                                      equalTo(pluginClassLoader2.getArtifactDescriptor()))));
     assertThat((Map<String, LookupStrategy>) mapArgumentCaptor.getAllValues().get(0),
                not(hasEntry(equalTo(PRIVILEGED_PACKAGE), instanceOf(DelegateOnlyLookupStrategy.class))));
     assertThat((Map<String, LookupStrategy>) mapArgumentCaptor.getAllValues().get(1),

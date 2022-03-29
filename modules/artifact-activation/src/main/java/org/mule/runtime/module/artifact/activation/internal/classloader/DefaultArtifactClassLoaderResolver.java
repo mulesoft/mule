@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader;
 
+import static java.lang.String.format;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.classloader.ChildOnlyLookupStrategy.CHILD_ONLY;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
@@ -19,11 +21,11 @@ import static java.util.stream.Collectors.toSet;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
-import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
+import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinder;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinderFactory;
@@ -46,8 +48,11 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -122,7 +127,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
   private MuleSharedDomainClassLoader getCustomDomainClassLoader(ArtifactClassLoader parent, DomainDescriptor domain,
                                                                  NativeLibraryFinder nativeLibraryFinder) {
-    // validateDomain(domain);
+    validateDomain(domain);
 
     return new MuleSharedDomainClassLoader(domain, parent.getClassLoader(),
                                            getArtifactClassLoaderLookupPolicy(parent, domain),
@@ -130,14 +135,21 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
                                            emptyList(), nativeLibraryFinder);
   }
 
+  private void validateDomain(DomainDescriptor domainDescriptor) {
+    File domainFolder = domainDescriptor.getRootFolder();
+    if (!(domainFolder.exists() && domainFolder.isDirectory())) {
+      throw new ArtifactActivationException(createStaticMessage(format("Domain %s does not exist", domainDescriptor.getName())));
+    }
+  }
+
   /**
    * @param domainName name of the domain. Non empty.
    * @return the unique identifier for the domain in the container.
    */
-  private String getDomainId(String domainName) {
+  public static String getDomainId(String domainName) {
     checkArgument(!isEmpty(domainName), "domainName cannot be empty");
 
-    return "/domain/" + domainName;
+    return "domain/" + domainName;
   }
 
   private ClassLoaderLookupPolicy getDomainParentLookupPolicy(ArtifactClassLoader parentClassLoader) {
@@ -148,9 +160,6 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
   public MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
                                                                         Function<Optional<BundleDescriptor>, MuleDeployableArtifactClassLoader> domainClassLoaderResolver,
                                                                         BiFunction<ArtifactClassLoader, ArtifactPluginDescriptor, ArtifactClassLoader> pluginClassLoaderResolver) {
-
-
-
     ArtifactClassLoader parentClassLoader = domainClassLoaderResolver.apply(descriptor.getDomainDescriptor());
     String artifactId = getApplicationId(parentClassLoader.getArtifactId(), descriptor.getName());
 
@@ -188,19 +197,16 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
   }
 
   private ClassLoaderLookupPolicy getApplicationParentLookupPolicy(ArtifactClassLoader parentClassLoader) {
-    Map<String, LookupStrategy> lookupStrategies = new SmallMap<>();
-
     ArtifactDescriptor descriptor = parentClassLoader.getArtifactDescriptor();
-    descriptor.getClassLoaderModel().getExportedPackages().forEach(p -> lookupStrategies.put(p, PARENT_FIRST));
+    List<String> packages = new ArrayList<>(descriptor.getClassLoaderModel().getExportedPackages());
 
     if (descriptor instanceof DeployableArtifactDescriptor) {
       for (ArtifactPluginDescriptor artifactPluginDescriptor : ((DeployableArtifactDescriptor) descriptor).getPlugins()) {
-        artifactPluginDescriptor.getClassLoaderModel().getExportedPackages()
-            .forEach(p -> lookupStrategies.put(p, PARENT_FIRST));
+        packages.addAll(artifactPluginDescriptor.getClassLoaderModel().getExportedPackages());
       }
     }
 
-    return parentClassLoader.getClassLoaderLookupPolicy().extend(lookupStrategies);
+    return parentClassLoader.getClassLoaderLookupPolicy().extend(packages.stream(), PARENT_FIRST);
   }
 
   /**
@@ -208,7 +214,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
    * @param applicationId id of the application. Non empty.
    * @return the unique identifier for the application in the container.
    */
-  public String getApplicationId(String domainId, String applicationId) {
+  public static String getApplicationId(String domainId, String applicationId) {
     checkArgument(!isEmpty(domainId), "domainId cannot be empty");
     checkArgument(!isEmpty(applicationId), "applicationName cannot be empty");
 
@@ -223,15 +229,13 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
   private ClassLoaderLookupPolicy getArtifactClassLoaderLookupPolicy(ArtifactClassLoader parent,
                                                                      DeployableArtifactDescriptor descriptor) {
-
-    final Map<String, LookupStrategy> pluginsLookupStrategies = new HashMap<>();
+    final List<String> packages = new ArrayList<>();
 
     for (ArtifactPluginDescriptor artifactPluginDescriptor : descriptor.getPlugins()) {
-      artifactPluginDescriptor.getClassLoaderModel().getExportedPackages()
-          .forEach(p -> pluginsLookupStrategies.put(p, PARENT_FIRST));
+      packages.addAll(artifactPluginDescriptor.getClassLoaderModel().getExportedPackages());
     }
 
-    return parent.getClassLoaderLookupPolicy().extend(pluginsLookupStrategies);
+    return parent.getClassLoaderLookupPolicy().extend(packages.stream(), PARENT_FIRST);
   }
 
   private ArtifactClassLoaderFilter createArtifactClassLoaderFilter(DeployableArtifactDescriptor artifactDescriptor,
@@ -359,7 +363,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
       muleModulesExportedPackages.addAll(module.getExportedPackages());
     }
 
-    Map<String, LookupStrategy> pluginLocalPolicies = new HashMap<>();
+    List<String> pluginLocalPackages = new ArrayList<>();
     for (String localPackage : descriptor.getClassLoaderModel().getLocalPackages()) {
       // packages exported from another artifact in the region will be ParentFirst,
       // even if they are also exported by the container.
@@ -369,11 +373,11 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
         LOGGER.debug("Plugin '" + descriptor.getName() + "' contains a local package '" + localPackage
             + "', but it will be ignored since it is already available from the container.");
       } else {
-        pluginLocalPolicies.put(localPackage, CHILD_ONLY);
+        pluginLocalPackages.add(localPackage);
       }
     }
 
-    return baseLookupPolicy.extend(pluginsLookupPolicies).extend(pluginLocalPolicies, true);
+    return baseLookupPolicy.extend(pluginsLookupPolicies).extend(pluginLocalPackages.stream(), CHILD_ONLY, true);
   }
 
   /**
