@@ -52,6 +52,7 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfigurati
 import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
+import org.mule.runtime.module.artifact.activation.internal.service.config.ContainerServicesMuleContextConfigurator;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationMuleContextBuilder;

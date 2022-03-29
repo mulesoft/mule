@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.artifact.activation.internal.service.discoverer;
+package org.mule.runtime.module.artifact.activation.api.service.discoverer;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;

@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.deployment.impl.internal.artifact;
+package org.mule.runtime.module.artifact.activation.internal.service.config;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;

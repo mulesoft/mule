@@ -29,7 +29,7 @@ import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.module.artifact.activation.internal.service.discoverer.IsolatedServiceProviderDiscoverer;
+import org.mule.runtime.module.artifact.activation.api.service.discoverer.IsolatedServiceProviderDiscoverer;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;
@@ -177,6 +177,10 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     createServiceManager();
   }
 
+  public static List<ArtifactClassLoader> getServiceClassLoaders() {
+    return serviceClassLoaders;
+  }
+
   @ContainerClassLoaderAware
   private static final void setContainerClassLoader(ClassLoader containerClassLoader) {
     if (containerClassLoader == null) {
@@ -190,6 +194,10 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     ArtifactFunctionalTestCase.containerClassLoader = containerClassLoader;
   }
 
+  public static ClassLoader getContainerClassLoader() {
+    return containerClassLoader;
+  }
+
   @ApplicationClassLoaderAware
   private static final void setApplicationClassLoader(ClassLoader applicationClassLoader) {
     if (applicationClassLoader == null) {
@@ -201,6 +209,10 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     }
 
     ArtifactFunctionalTestCase.applicationClassLoader = applicationClassLoader;
+  }
+
+  public static ClassLoader getApplicationClassLoader() {
+    return applicationClassLoader;
   }
 
   @Override

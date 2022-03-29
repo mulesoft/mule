@@ -47,12 +47,16 @@ public class DefaultServiceDiscoverer implements ServiceDiscoverer {
   @Override
   public List<Service> discoverServices() throws ServiceResolutionError {
     try {
-      final List<ServiceAssembly> assemblies = serviceProviderDiscoverer.discover();
+      final List<ServiceAssembly> assemblies = discoverAssemblies();
       return serviceResolver.resolveServices(assemblies);
     } catch (ServiceResolutionError e) {
       throw e;
     } catch (Exception e) {
       throw new ServiceResolutionError(e.getMessage(), e);
     }
+  }
+
+  protected List<ServiceAssembly> discoverAssemblies() throws ServiceResolutionError {
+    return serviceProviderDiscoverer.discover();
   }
 }
