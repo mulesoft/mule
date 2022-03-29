@@ -29,6 +29,7 @@ import org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrateg
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -154,7 +155,7 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
       muleModulesExportedPackages.addAll(module.getExportedPackages());
     }
 
-    Map<String, LookupStrategy> pluginLocalPolicies = new HashMap<>();
+    List<String> pluginLocalPolicies = new ArrayList<>();
     for (String localPackage : descriptor.getClassLoaderModel().getLocalPackages()) {
       // packages exported from another artifact in the region will be ParentFirst,
       // even if they are also exported by the container.
@@ -164,11 +165,11 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
         LOGGER.debug("Plugin '" + descriptor.getName() + "' contains a local package '" + localPackage
             + "', but it will be ignored since it is already available from the container.");
       } else {
-        pluginLocalPolicies.put(localPackage, CHILD_ONLY);
+        pluginLocalPolicies.add(localPackage);
       }
     }
 
-    return baseLookupPolicy.extend(pluginsLookupPolicies).extend(pluginLocalPolicies, true);
+    return baseLookupPolicy.extend(pluginsLookupPolicies).extend(pluginLocalPolicies.stream(), CHILD_ONLY, true);
   }
 
   private List<ArtifactPluginDescriptor> getPluginDescriptors(ArtifactPluginDescriptor descriptor,
