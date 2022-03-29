@@ -8,13 +8,10 @@ package org.mule.tck.junit4.rule;
 
 import static java.lang.Class.forName;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.junit.rules.ExternalResource;
-import org.slf4j.MDC;
-import org.slf4j.spi.MDCAdapter;
 
 /**
  * Cleans up resources stored by slf4j-test library used for testing logging behaviour
@@ -22,8 +19,6 @@ import org.slf4j.spi.MDCAdapter;
 public class LogCleanup extends ExternalResource {
 
   private static Method clearAllMethod;
-  private static Object testMDCThreadLocals;
-  private static Method resetMethod;
 
   @Override
   protected void before() throws Throwable {
@@ -32,12 +27,12 @@ public class LogCleanup extends ExternalResource {
 
   @Override
   protected void after() {
-    clearLogsAndMDCThreadReferences();
+    clearAllLogs();
   }
 
   /**
    * Logs that are stored for later assert need to be cleared before every test
-   * 
+   * <p>
    * Reflection needs to be used because slf4j-test is not included on every module
    */
   public static void clearAllLogs() {
@@ -54,42 +49,6 @@ public class LogCleanup extends ExternalResource {
       // In this case, the class was not loaded because it does not exist in the current classpath so the method must finish
     } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
       throw new RuntimeException("Could not clear TestLoggerFactory logs", e);
-    }
-  }
-
-  /**
-   * TestMDCAdapter contains its own implementation of ThreadLocal variables which hold strong references to Threads that should
-   * be released to prevent possible leakages
-   * 
-   * Reflection needs to be used because slf4j-test is not included on every module
-   */
-  public static void clearLogsAndMDCThreadReferences() {
-    clearAllLogs();
-    // Loading resources once per class for better performance
-    if (testMDCThreadLocals == null || resetMethod == null) {
-      Class<?> adapterClass;
-      Class<?> threadLocalClass;
-      try {
-        adapterClass = forName("uk.org.lidalia.slf4jtest.TestMDCAdapter", false, LogCleanup.class.getClassLoader());
-        threadLocalClass = forName("uk.org.lidalia.lang.ThreadLocal", false, LogCleanup.class.getClassLoader());
-      } catch (ClassNotFoundException e) {
-        // In this case, the class was not loaded because it does not exist in the current classpath so the method must finish
-        return;
-      }
-      MDCAdapter testMDCAdapter = MDC.getMDCAdapter();
-      try {
-        Field valueField = adapterClass.getDeclaredField("value");
-        valueField.setAccessible(true);
-        testMDCThreadLocals = valueField.get(testMDCAdapter);
-        resetMethod = threadLocalClass.getMethod("reset");
-      } catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException e) {
-        throw new RuntimeException("Could not reset ThreadLocals", e);
-      }
-    }
-    try {
-      resetMethod.invoke(testMDCThreadLocals);
-    } catch (IllegalAccessException | InvocationTargetException e) {
-      throw new RuntimeException("Could not reset ThreadLocals", e);
     }
   }
 }

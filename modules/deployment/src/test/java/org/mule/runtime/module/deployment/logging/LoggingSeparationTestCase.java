@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
+import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.internal.AbstractApplicationDeploymentTestCase;
 
@@ -55,13 +56,13 @@ public class LoggingSeparationTestCase extends AbstractApplicationDeploymentTest
     executeApplicationFlow("logging");
 
     assertThat(logger.getAllLoggingEvents().size(), is(1));
-    // TODO: Change thread name check to TCCL check when available on slf4j-test
-    assertThat("", logger.getAllLoggingEvents().get(0).getThreadName(), stringContainsInOrder("logging-app-1"));
+    assertThat("", ((MuleArtifactClassLoader) logger.getAllLoggingEvents().get(0).getThreadContextClassLoader()).getArtifactId(),
+               stringContainsInOrder("logging-app-1"));
 
     executeApplicationFlow("logging2", null, 1);
 
     assertThat(logger.getAllLoggingEvents().size(), is(2));
-    // TODO: Change thread name check to TCCL check when available on slf4j-test
-    assertThat("", logger.getAllLoggingEvents().get(1).getThreadName(), stringContainsInOrder("logging-app-2"));
+    assertThat("", ((MuleArtifactClassLoader) logger.getAllLoggingEvents().get(1).getThreadContextClassLoader()).getArtifactId(),
+               stringContainsInOrder("logging-app-2"));
   }
 }
