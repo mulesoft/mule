@@ -8,7 +8,6 @@ package org.mule.module.http.internal.listener.grizzly;
 
 import static org.glassfish.grizzly.http.HttpServerFilter.RESPONSE_COMPLETE_EVENT;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-
 import org.mule.api.DefaultMuleException;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.response.HttpResponse;
@@ -16,10 +15,8 @@ import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
 
 import com.google.common.base.Preconditions;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.glassfish.grizzly.Buffer;
 import org.glassfish.grizzly.WriteResult;
@@ -36,6 +33,7 @@ import org.glassfish.grizzly.memory.MemoryManager;
 public class ResponseStreamingCompletionHandler
         extends BaseResponseCompletionHandler
 {
+
     private final MemoryManager memoryManager;
     private final HttpResponsePacket httpResponsePacket;
     private final InputStream inputStream;
@@ -108,27 +106,34 @@ public class ResponseStreamingCompletionHandler
      * @param result the result
      */
     @Override
-    public void completed(WriteResult result) {
-        try {
-            if (!isDone) {
-
+    public void completed(WriteResult result)
+    {
+        try
+        {
+            if (!isDone)
+            {
                 sendInputStreamChunk();
-
                 // In HTTP 1.0 (no chunk supported) there is no more data sent to the client after the input stream is completed.
                 // As there is no more data to be sent (in HTTP 1.1 a last chunk with '0' is sent) the #completed method is not called
                 // So, we have to call it manually here
-                if (isDone && !httpResponsePacket.isChunked()) {
+                if (isDone && !httpResponsePacket.isChunked())
+                {
                     doComplete();
                 }
-            } else {
+            }
+            else
+            {
                 doComplete();
             }
-        } catch (Exception e) {
+        }
+        catch (IOException e)
+        {
             failed(e);
         }
     }
 
-    private void doComplete() {
+    private void doComplete()
+    {
         close();
         responseStatusCallback.responseSendSuccessfully();
         ctx.getConnection().getAttributes().removeAttribute(MULE_CLASSLOADER);
@@ -140,7 +145,8 @@ public class ResponseStreamingCompletionHandler
      * The method will be called, when file transferring was canceled
      */
     @Override
-    public void cancelled() {
+    public void cancelled()
+    {
         super.cancelled();
         ctx.getConnection().getAttributes().removeAttribute(MULE_CLASSLOADER);
         close();
@@ -154,7 +160,8 @@ public class ResponseStreamingCompletionHandler
      * @param throwable the cause
      */
     @Override
-    public void failed(Throwable throwable) {
+    public void failed(Throwable throwable)
+    {
         super.failed(throwable);
         ctx.getConnection().getAttributes().removeAttribute(MULE_CLASSLOADER);
         close();
@@ -164,10 +171,14 @@ public class ResponseStreamingCompletionHandler
     /**
      * Close the local file input stream.
      */
-    private void close() {
-        try {
+    private void close()
+    {
+        try
+        {
             inputStream.close();
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
 
         }
     }
@@ -175,7 +186,8 @@ public class ResponseStreamingCompletionHandler
     /**
      * Resume the HttpRequestPacket processing
      */
-    private void resume() {
+    private void resume()
+    {
         ctx.resume(ctx.getStopAction());
     }
 }
