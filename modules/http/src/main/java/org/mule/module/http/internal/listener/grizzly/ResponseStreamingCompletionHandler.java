@@ -86,17 +86,14 @@ public class ResponseStreamingCompletionHandler
         boolean isDone = false;
         byte[] bufferByteArray = buffer.array();
         int bytesRead = -1;
-        try {
-            int c;
-            while ((c = inputStream.read()) != -1 && offset < length) {
-                bufferByteArray[offset++] = (byte) c;
-            }
-            if (c == -1)
-                isDone = true;
-            else buffer.limit(bytesRead);
-        } catch (IOException e) {
-
+        int c;
+        while ((c = inputStream.read()) != -1 && offset < length) {
+            bufferByteArray[offset++] = (byte) c;
         }
+        if (c == -1)
+            isDone = true;
+        else buffer.limit(bytesRead);
+
         return isDone;
     }
 
