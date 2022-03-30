@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.oc
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -35,8 +36,12 @@ import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.api.connection.PoolingListener;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
@@ -57,12 +62,16 @@ import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantTypeVisitor;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
 import org.mule.runtime.extension.api.connectivity.oauth.PlatformManagedOAuthGrantType;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConnectionProviderWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeValueResolverWrapper;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -71,6 +80,7 @@ import org.mule.runtime.oauth.api.PlatformManagedOAuthDancer;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -195,12 +205,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
   }
 
   private ConnectionProvider<C> createDelegate(PlatformManagedConnectionDescriptor descriptor) throws MuleException {
-    ParametersResolver resolver = fromValues(descriptor.getParameters(),
-                                             muleContext,
-                                             false,
-                                             new ReflectionCache(),
-                                             expressionManager,
-                                             this.toString());
+    ParametersResolver resolver = getParameterResolverFromParameterValues(descriptor.getParameters());
     Class<?> connectionProviderDelegateClass =
         getImplementingType(oauthConfig.getDelegateConnectionProviderModel())
             .orElseThrow(() -> new IllegalStateException("Delegate connection provider must have an implementing type."));
@@ -233,6 +238,64 @@ public class PlatformManagedOAuthConnectionProvider<C>
         }
       }
     }, MuleException.class, e -> e);
+  }
+
+  private ParametersResolver getParameterResolverFromParameterValues(Map<String, Object> parameters) {
+    // Map<String, Object> parameterValueResolvers = new HashMap<>();
+    // for (Map.Entry<String, Object> parameter : parameters.entrySet()) {
+    // ValueResolver valueResolver = new StaticValueResolver(parameter.getValue());
+    //
+    // Optional<Class> parameterClass = getParameterClass(parameter.getKey());
+    //
+    // if (parameterClass.isPresent()) {
+    // valueResolver = new TypeSafeValueResolverWrapper(valueResolver, parameterClass.get());
+    // ((TypeSafeValueResolverWrapper) valueResolver).setTransformationService(muleContext.getTransformationService());
+    // try {
+    // ((Initialisable) valueResolver).initialise(); // change for initialise if necessary
+    // } catch (InitialisationException e) {
+    // e.printStackTrace();
+    // }
+    // }
+    //
+    // parameterValueResolvers.put(parameter.getKey(), valueResolver);
+    // }
+
+    Map<String, Object> resolvers = new HashMap<>();
+
+    ParameterizedModel parameterizedModel = oauthConfig.getDelegateConnectionProviderModel();
+
+    for(ParameterGroupModel parameterGroupModel : parameterizedModel.getParameterGroupModels()) {
+      Map<String, Object> currentResolvers = resolvers;
+      if(parameterGroupModel.isShowInDsl()) {
+        currentResolvers = new HashMap<>();
+        resolvers.put(parameterGroupModel.getName(), currentResolvers);
+      }
+
+    }
+
+
+
+    return fromValues(parameters,
+                      muleContext,
+                      false,
+                      new ReflectionCache(),
+                      expressionManager,
+                      this.toString());
+  }
+
+  private Optional<Class> getParameterClass(String key) {
+    ParameterizedModel parameterizedModel = oauthConfig.getDelegateConnectionProviderModel();
+    for (ParameterGroupModel parameterGroupModel : parameterizedModel.getParameterGroupModels()) {
+      for (ParameterModel parameterModel : parameterGroupModel.getParameterModels()) {
+        if (key.equals(parameterModel.getName())) {
+          // Check that class might be null
+          // return parameterModel.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
+          // .map(extensionParameterDescriptorModelProperty -> extensionParameterDescriptorModelProperty.getExtensionParameter()
+          // .getType().getDeclaringClass().orElse(Object.class));
+        }
+      }
+    }
+    return empty();
   }
 
   private PlatformManagedConnectionDescriptor fetchConnectionDescriptor() throws MuleException {
