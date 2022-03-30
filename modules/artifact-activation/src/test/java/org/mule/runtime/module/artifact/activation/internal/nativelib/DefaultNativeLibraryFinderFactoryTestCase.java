@@ -12,6 +12,9 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
+import org.mule.runtime.module.artifact.activation.internal.nativelib.ArtifactCopyNativeLibraryFinder;
+import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
+import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

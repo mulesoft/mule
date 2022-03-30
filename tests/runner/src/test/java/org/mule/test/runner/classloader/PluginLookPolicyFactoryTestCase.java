@@ -7,13 +7,10 @@
 
 package org.mule.test.runner.classloader;
 
-import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
-
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
-
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
@@ -21,6 +18,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
@@ -30,11 +28,9 @@ import org.mule.test.runner.api.PluginUrlClassification;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import org.junit.Before;
 import org.junit.Test;
-
 import org.mockito.ArgumentCaptor;
 
 @SmallTest
@@ -106,17 +102,7 @@ public class PluginLookPolicyFactoryTestCase extends AbstractMuleTestCase {
       }
 
       @Override
-      public ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy) {
-        throw new UnsupportedOperationException("Cannot be extended");
-      }
-
-      @Override
       public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies, boolean overwrite) {
-        throw new UnsupportedOperationException("Cannot be extended");
-      }
-
-      @Override
-      public ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy, boolean overwrite) {
         throw new UnsupportedOperationException("Cannot be extended");
       }
     };
