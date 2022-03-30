@@ -7,6 +7,11 @@
 
 package org.mule.runtime.core.api.profiling;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.spy;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.END_SPAN;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
@@ -14,6 +19,7 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.START_SPAN;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROFILING_SERVICE_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -27,6 +33,8 @@ import static com.google.common.collect.ImmutableSet.of;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.ImmutableSet;
+import org.junit.After;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -37,8 +45,10 @@ import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.SpanProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
+import org.mule.runtime.core.internal.profiling.NoOpProfilingService;
 import org.mule.runtime.core.internal.profiling.consumer.ComponentProcessingStrategyDataConsumer;
 import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInternalProfilingDataConsumer;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
@@ -48,6 +58,7 @@ import org.slf4j.Logger;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import com.google.gson.Gson;
 import io.qameta.allure.Description;
@@ -81,7 +92,7 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
 
   @Rule
   public EnableInternalRuntimeProfilers enableInternalRuntimeProfilers =
-      new EnableInternalRuntimeProfilers(new TestLoggerComponentProcessingStrategyDataConsumer(null, null));
+    new EnableInternalRuntimeProfilers(new TestComponentProcessingStrategyDataConsumer(new NoOpProfilingService(), null));
 
   @Mock
   private CoreEvent event;
@@ -91,6 +102,8 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
 
   @Mock
   private Logger logger;
+
+  private final TestSpanDataConsumer testSpanDataConsumer = spy(new TestSpanDataConsumer());
 
   @Mock
   private TypedComponentIdentifier componentIdentifier;
@@ -114,8 +127,13 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
     profilingService = getTestProfilingService();
   }
 
+  @After
+  public void after() {
+    reset(testSpanDataConsumer);
+  }
+
   private ProfilingService getTestProfilingService() throws MuleException {
-    ProfilingService profilingService = new TestDefaultProfilingService(logger);
+    ProfilingService profilingService = new TestDefaultProfilingService(logger, testSpanDataConsumer);
     initialiseIfNeeded(profilingService, muleContext);
     startIfNeeded(profilingService);
     return profilingService;
@@ -128,7 +146,8 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
                   FLOW_EXECUTED);
   }
 
-  public ProcessingStrategyDataConsumersTestCase(ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType) {
+  public ProcessingStrategyDataConsumersTestCase(
+    ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType) {
     this.profilingEventType = profilingEventType;
   }
 
@@ -136,14 +155,24 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
   @Description("When a profiling event related to processing strategy is triggered, the data consumers process the data accordingly.")
   public void dataConsumersForProcessingStrategiesProfilingEventTypesConsumeDataAccordingly() {
     ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, Object> dataProducer =
-        profilingService.getProfilingDataProducer(profilingEventType);
+      profilingService.getProfilingDataProducer(profilingEventType);
 
     ComponentProcessingStrategyProfilingEventContext profilerEventContext =
-        new DefaultComponentProcessingStrategyProfilingEventContext(event, location, THREAD_NAME, ARTIFACT_ID, ARTIFACT_TYPE,
-                                                                    PROFILING_EVENT_TIMESTAMP);
+      new DefaultComponentProcessingStrategyProfilingEventContext(event, location, THREAD_NAME, ARTIFACT_ID, ARTIFACT_TYPE,
+                                                                  PROFILING_EVENT_TIMESTAMP);
     dataProducer.triggerProfilingEvent(profilerEventContext);
 
     verify(logger).debug(jsonToLog(profilingEventType, profilerEventContext));
+    verifySpans(profilingEventType);
+  }
+
+  private void verifySpans(ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType) {
+    if (profilingEventType == PS_SCHEDULING_OPERATION_EXECUTION || profilingEventType == PS_FLOW_MESSAGE_PASSING ||
+      profilingEventType == STARTING_FLOW_EXECUTION || profilingEventType == FLOW_EXECUTED) {
+      verify(testSpanDataConsumer).onProfilingEvent(any(), any());
+    } else {
+      verify(testSpanDataConsumer, never()).onProfilingEvent(any(), any());
+    }
   }
 
   /**
@@ -152,18 +181,21 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
   private static class TestDefaultProfilingService extends DefaultProfilingService {
 
     private final Logger logger;
+    private final TestSpanDataConsumer testSpanDataConsumer;
 
-    public TestDefaultProfilingService(Logger logger) {
+    public TestDefaultProfilingService(Logger logger, TestSpanDataConsumer testSpanDataConsumer) {
+      this.testSpanDataConsumer = testSpanDataConsumer;
       this.logger = logger;
 
     }
 
     @Override
     public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
-      return new TestProfilingDataConsumerDiscoveryStrategy(this, logger);
+      return new TestProfilingDataConsumerDiscoveryStrategy(this, testSpanDataConsumer, logger);
     }
 
   }
+
 
   /**
    * Stub {@link ProfilingDataConsumerDiscoveryStrategy}
@@ -172,40 +204,56 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
 
     private final Logger logger;
     private final TestDefaultProfilingService profilingService;
+    private final TestSpanDataConsumer testSpanDataConsumer;
 
-    public TestProfilingDataConsumerDiscoveryStrategy(TestDefaultProfilingService profilingService, Logger logger) {
+    public TestProfilingDataConsumerDiscoveryStrategy(TestDefaultProfilingService profilingService,
+                                                      TestSpanDataConsumer testSpanDataConsumer, Logger logger) {
+      this.testSpanDataConsumer = testSpanDataConsumer;
       this.profilingService = profilingService;
       this.logger = logger;
     }
 
     @Override
     public Set<ProfilingDataConsumer<?>> discover() {
-      return of(new TestLoggerComponentProcessingStrategyDataConsumer(profilingService, logger));
+      return of(new TestComponentProcessingStrategyDataConsumer(profilingService, logger), testSpanDataConsumer);
     }
   }
+
 
   /**
    * Stub {@link ComponentProcessingStrategyDataConsumer} for injecting a mocked {@link Logger}
    */
   @RuntimeInternalProfilingDataConsumer
-  private static class TestLoggerComponentProcessingStrategyDataConsumer extends ComponentProcessingStrategyDataConsumer {
+  private static class TestComponentProcessingStrategyDataConsumer extends ComponentProcessingStrategyDataConsumer {
 
-    private final Logger logger;
-
-    public TestLoggerComponentProcessingStrategyDataConsumer(ProfilingService profilingService, Logger logger) {
-      super(profilingService);
-      this.logger = logger;
-    }
-
-    @Override
-    protected Logger getDataConsumerLogger() {
-      return logger;
+    public TestComponentProcessingStrategyDataConsumer(ProfilingService profilingService, Logger logger) {
+      super(profilingService, logger);
     }
   }
 
   private String jsonToLog(ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType,
                            ComponentProcessingStrategyProfilingEventContext profilingEventContext) {
     return gson.toJson(getProcessingStrategyComponentInfoMap(profilingEventType, profilingEventContext));
+  }
+
+  /**
+   * Stub {@link ProfilingDataConsumer} that consumes spans start/end profiling events.
+   */
+  @RuntimeInternalProfilingDataConsumer
+  private static class TestSpanDataConsumer implements ProfilingDataConsumer<SpanProfilingEventContext> {
+
+    @Override public void onProfilingEvent(ProfilingEventType<SpanProfilingEventContext> profilingEventType,
+                                           SpanProfilingEventContext profilingEventContext) {
+      // Nothing to do
+    }
+
+    @Override public Set<ProfilingEventType<SpanProfilingEventContext>> getProfilingEventTypes() {
+      return ImmutableSet.of(START_SPAN, END_SPAN);
+    }
+
+    @Override public Predicate<SpanProfilingEventContext> getEventContextFilter() {
+      return context -> true;
+    }
   }
 
 }

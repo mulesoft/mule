@@ -44,19 +44,27 @@ public class ComponentProcessingStrategyDataConsumer
   private static final Logger LOGGER = getLogger(ComponentProcessingStrategyDataConsumer.class);
   private final ImmutableMultimap<ProfilingEventType<ComponentProcessingStrategyProfilingEventContext>, ProfilingExecutionOperation<ComponentProcessingStrategyProfilingEventContext>> operations;
   private final ProfilingService profilingService;
+  private final Logger logger;
 
   public ComponentProcessingStrategyDataConsumer(ProfilingService profilingService) {
+    this(profilingService, LOGGER);
+  }
+
+  public ComponentProcessingStrategyDataConsumer(ProfilingService profilingService, Logger logger) {
     this.profilingService = profilingService;
+    this.logger = logger;
     this.operations =
         ImmutableMultimap
             .<ProfilingEventType<ComponentProcessingStrategyProfilingEventContext>, ProfilingExecutionOperation<ComponentProcessingStrategyProfilingEventContext>>builder()
-            .put(PS_SCHEDULING_OPERATION_EXECUTION, new LoggerProfilingEventOperation(LOGGER, PS_STARTING_OPERATION_EXECUTION))
-            .put(PS_STARTING_OPERATION_EXECUTION, new LoggerProfilingEventOperation(LOGGER, PS_STARTING_OPERATION_EXECUTION))
-            .put(PS_OPERATION_EXECUTED, new LoggerProfilingEventOperation(LOGGER, PS_OPERATION_EXECUTED))
-            .put(PS_FLOW_MESSAGE_PASSING, new LoggerProfilingEventOperation(LOGGER, PS_SCHEDULING_FLOW_EXECUTION))
-            .put(PS_SCHEDULING_FLOW_EXECUTION, new LoggerProfilingEventOperation(LOGGER, PS_SCHEDULING_FLOW_EXECUTION))
-            .put(STARTING_FLOW_EXECUTION, new LoggerProfilingEventOperation(LOGGER, STARTING_FLOW_EXECUTION))
-            .put(FLOW_EXECUTED, new LoggerProfilingEventOperation(LOGGER, FLOW_EXECUTED))
+            .put(PS_SCHEDULING_OPERATION_EXECUTION, new LoggerProfilingEventOperation(logger, PS_SCHEDULING_OPERATION_EXECUTION))
+            .put(PS_STARTING_OPERATION_EXECUTION, new LoggerProfilingEventOperation(logger, PS_STARTING_OPERATION_EXECUTION))
+            .put(PS_OPERATION_EXECUTED, new LoggerProfilingEventOperation(logger, PS_OPERATION_EXECUTED))
+            .put(PS_FLOW_MESSAGE_PASSING, new LoggerProfilingEventOperation(logger, PS_FLOW_MESSAGE_PASSING))
+            .put(PS_SCHEDULING_FLOW_EXECUTION, new LoggerProfilingEventOperation(logger, PS_SCHEDULING_FLOW_EXECUTION))
+            .put(STARTING_FLOW_EXECUTION, new LoggerProfilingEventOperation(logger, STARTING_FLOW_EXECUTION))
+            .put(FLOW_EXECUTED, new LoggerProfilingEventOperation(logger, FLOW_EXECUTED))
+            .put(STARTING_FLOW_EXECUTION, new StartOperationSpanProfilingExecutionCommand(profilingService))
+            .put(FLOW_EXECUTED, new EndOperationSpanProfilingExecutionCommand(profilingService))
             .put(PS_SCHEDULING_OPERATION_EXECUTION, new StartOperationSpanProfilingExecutionCommand(profilingService))
             .put(PS_FLOW_MESSAGE_PASSING, new EndOperationSpanProfilingExecutionCommand(profilingService))
             .build();
@@ -84,6 +92,6 @@ public class ComponentProcessingStrategyDataConsumer
    * @return the logger used for consuming the profiling data.
    */
   protected Logger getDataConsumerLogger() {
-    return LOGGER;
+    return logger;
   }
 }

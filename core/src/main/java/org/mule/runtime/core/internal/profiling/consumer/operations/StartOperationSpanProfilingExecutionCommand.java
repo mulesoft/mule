@@ -10,6 +10,7 @@ import static java.lang.System.currentTimeMillis;
 
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.SpanProfilingEventContext;
@@ -45,6 +46,10 @@ public class StartOperationSpanProfilingExecutionCommand
     @Override
     public long getTriggerTimestamp() {
       return triggerTimeStamp;
+    }
+
+    @Override public Span getSpan() {
+      return null;
     }
   }
 }
