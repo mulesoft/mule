@@ -14,7 +14,9 @@ import org.reactivestreams.Publisher;
 
 import java.util.List;
 
+import static java.lang.Boolean.getBoolean;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.util.MuleSystemProperties.REVERT_SIGLETON_ERROR_HANDLER_PROPERTY;
 
 public class GlobalErrorHandler extends ErrorHandler {
 
@@ -24,7 +26,12 @@ public class GlobalErrorHandler extends ErrorHandler {
   }
 
   public ErrorHandler createLocalErrorHandler(Location flowLocation) {
-    ErrorHandler local = new LocalErrorHandler();
+    ErrorHandler local;
+    if (getBoolean(REVERT_SIGLETON_ERROR_HANDLER_PROPERTY)) {
+      local = new ErrorHandler();
+    } else {
+      local = new LocalErrorHandler();
+    }
     local.setName(this.name);
     local.setExceptionListeners(this.getExceptionListeners());
     local.setExceptionListenersLocation(flowLocation);

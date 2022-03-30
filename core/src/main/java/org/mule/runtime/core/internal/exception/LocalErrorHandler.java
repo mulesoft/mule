@@ -13,14 +13,14 @@ public class LocalErrorHandler extends ErrorHandler {
   @Override
   public void start() throws MuleException {
     if (logger.isDebugEnabled()) {
-      logger.debug("In start of local error handler: {}", this);
+      logger.debug("Starting local error handler: {}. Nothing will be done as this depends on a global error handler.", this);
     }
   }
 
   @Override
   public void stop() throws MuleException {
     if (logger.isDebugEnabled()) {
-      logger.debug("In stop of local error handler: {}", this);
+      logger.debug("Stopping local error handler: {}. Nothing will be done as this depends on a global error handler.", this);
     }
   }
 }
