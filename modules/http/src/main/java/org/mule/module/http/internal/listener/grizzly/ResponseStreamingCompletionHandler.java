@@ -93,7 +93,7 @@ public class ResponseStreamingCompletionHandler
         }
         if (c == -1)
             isDone = true;
-        else buffer.limit(bytesRead);
+        buffer.limit(bytesRead);
 
         return isDone;
     }
