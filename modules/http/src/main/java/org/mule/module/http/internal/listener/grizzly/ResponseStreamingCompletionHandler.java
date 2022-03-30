@@ -8,6 +8,7 @@ package org.mule.module.http.internal.listener.grizzly;
 
 import static org.glassfish.grizzly.http.HttpServerFilter.RESPONSE_COMPLETE_EVENT;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+
 import org.mule.api.DefaultMuleException;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.response.HttpResponse;
@@ -15,8 +16,10 @@ import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
 
 import com.google.common.base.Preconditions;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.glassfish.grizzly.Buffer;
 import org.glassfish.grizzly.WriteResult;
@@ -31,9 +34,9 @@ import org.glassfish.grizzly.memory.MemoryManager;
  * when the response body is an input stream.
  */
 public class ResponseStreamingCompletionHandler
-        extends BaseResponseCompletionHandler
-{
+        extends BaseResponseCompletionHandler {
 
+    private final HttpContent EMPTY_CONTENT;
     private final MemoryManager memoryManager;
     private final HttpResponsePacket httpResponsePacket;
     private final InputStream inputStream;
@@ -44,8 +47,7 @@ public class ResponseStreamingCompletionHandler
     public static final String MULE_CLASSLOADER = "MULE_CLASSLOADER";
 
     public ResponseStreamingCompletionHandler(final FilterChainContext ctx,
-                                              final HttpRequestPacket request, final HttpResponse httpResponse, ResponseStatusCallback responseStatusCallback)
-    {
+                                              final HttpRequestPacket request, final HttpResponse httpResponse, ResponseStatusCallback responseStatusCallback) {
 
         super(ctx);
         Preconditions.checkArgument((httpResponse.getEntity() instanceof InputStreamHttpEntity), "http response must have an input stream entity");
@@ -54,38 +56,54 @@ public class ResponseStreamingCompletionHandler
         memoryManager = ctx.getConnection().getTransport().getMemoryManager();
         this.responseStatusCallback = responseStatusCallback;
         loggerClassLoader = Thread.currentThread().getContextClassLoader();
+        EMPTY_CONTENT = httpResponsePacket.httpTrailerBuilder().content(memoryManager.allocate(0)).build();
     }
 
     @Override
-    protected void doStart() throws IOException
-    {
+    protected void doStart() throws IOException {
         sendInputStreamChunk();
     }
 
-    public void sendInputStreamChunk() throws IOException
-    {
+    public void sendInputStreamChunk() throws IOException {
         final Buffer buffer = memoryManager.allocate(DEFAULT_BUFFER_SIZE);
 
-        final byte[] bufferByteArray = buffer.array();
         final int offset = buffer.arrayOffset();
         final int length = buffer.remaining();
 
-        int bytesRead = inputStream.read(bufferByteArray, offset, length);
-        final HttpContent content;
-
-        if (bytesRead == -1)
-        {
-            content = httpResponsePacket.httpTrailerBuilder().build();
-            isDone = true;
-        }
-        else
-        {
-            buffer.limit(bytesRead);
-            content = httpResponsePacket.httpContentBuilder().content(buffer).build();
-        }
+        System.out.println(Thread.currentThread().getName());
+        isDone = readStreamManually(buffer, offset, length);
 
         ctx.getConnection().getAttributes().setAttribute(MULE_CLASSLOADER, loggerClassLoader);
+
+        HttpContent content = httpResponsePacket.httpContentBuilder().content(buffer).build();
         ctx.write(content, this);
+        System.out.println("Wrote a content block:" + isDone);
+
+        if (isDone) {
+            content = httpResponsePacket.httpContentBuilder().build();
+            ctx.write(content, this);
+            System.out.println("Wrote:EMPTY_CONTENT");
+        }
+        System.out.println("Exiting:sendInputStreamChunk");
+    }
+
+    private boolean readStreamManually(final Buffer buffer, int offset, int length) throws IOException {
+        System.out.println("In:readStream");
+        boolean isDone = false;
+        byte[] bufferByteArray = buffer.array();
+        int bytesRead = -1;
+        try {
+            int c;
+            while ((c = inputStream.read()) != -1 && offset < length) {
+                bufferByteArray[offset++] = (byte) c;
+            }
+            if (c == -1)
+                isDone = true;
+            else buffer.limit(bytesRead);
+        } catch (IOException e) {
+
+        }
+        return isDone;
     }
 
     /**
@@ -94,34 +112,28 @@ public class ResponseStreamingCompletionHandler
      * @param result the result
      */
     @Override
-    public void completed(WriteResult result)
-    {
-        try
-        {
-            if (!isDone)
-            {
+    public void completed(WriteResult result) {
+        System.out.println("completed:" + isDone);
+        try {
+            if (!isDone) {
+
                 sendInputStreamChunk();
+
                 // In HTTP 1.0 (no chunk supported) there is no more data sent to the client after the input stream is completed.
                 // As there is no more data to be sent (in HTTP 1.1 a last chunk with '0' is sent) the #completed method is not called
                 // So, we have to call it manually here
-                if (isDone && !httpResponsePacket.isChunked())
-                {
+                if (isDone && !httpResponsePacket.isChunked()) {
                     doComplete();
                 }
-            }
-            else
-            {
+            } else {
                 doComplete();
             }
-        }
-        catch (IOException e)
-        {
+        } catch (Exception e) {
             failed(e);
         }
     }
 
-    private void doComplete()
-    {
+    private void doComplete() {
         close();
         responseStatusCallback.responseSendSuccessfully();
         ctx.getConnection().getAttributes().removeAttribute(MULE_CLASSLOADER);
@@ -133,8 +145,7 @@ public class ResponseStreamingCompletionHandler
      * The method will be called, when file transferring was canceled
      */
     @Override
-    public void cancelled()
-    {
+    public void cancelled() {
         super.cancelled();
         ctx.getConnection().getAttributes().removeAttribute(MULE_CLASSLOADER);
         close();
@@ -148,8 +159,7 @@ public class ResponseStreamingCompletionHandler
      * @param throwable the cause
      */
     @Override
-    public void failed(Throwable throwable)
-    {
+    public void failed(Throwable throwable) {
         super.failed(throwable);
         ctx.getConnection().getAttributes().removeAttribute(MULE_CLASSLOADER);
         close();
@@ -159,14 +169,10 @@ public class ResponseStreamingCompletionHandler
     /**
      * Close the local file input stream.
      */
-    private void close()
-    {
-        try
-        {
+    private void close() {
+        try {
             inputStream.close();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
 
         }
     }
@@ -174,8 +180,7 @@ public class ResponseStreamingCompletionHandler
     /**
      * Resume the HttpRequestPacket processing
      */
-    private void resume()
-    {
+    private void resume() {
         ctx.resume(ctx.getStopAction());
     }
 }
