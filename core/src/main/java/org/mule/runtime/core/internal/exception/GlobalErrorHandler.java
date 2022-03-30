@@ -24,7 +24,7 @@ public class GlobalErrorHandler extends ErrorHandler {
   }
 
   public ErrorHandler createLocalErrorHandler(Location flowLocation) {
-    ErrorHandler local = new ErrorHandler();
+    ErrorHandler local = new LocalErrorHandler();
     local.setName(this.name);
     local.setExceptionListeners(this.getExceptionListeners());
     local.setExceptionListenersLocation(flowLocation);
