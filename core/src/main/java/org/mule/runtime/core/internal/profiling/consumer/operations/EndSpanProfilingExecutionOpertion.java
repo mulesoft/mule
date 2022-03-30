@@ -17,14 +17,14 @@ import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyPr
 import org.mule.runtime.api.profiling.type.context.SpanProfilingEventContext;;
 
 /**
- *
+ * A {@link ProfilingExecutionOperation} that triggers a profiling event indicating the end of a span.
  */
-public class EndOperationSpanProfilingExecutionCommand implements
+public class EndSpanProfilingExecutionOpertion implements
     ProfilingExecutionOperation<ComponentProcessingStrategyProfilingEventContext> {
 
   private final ProfilingDataProducer<SpanProfilingEventContext, ComponentProcessingStrategyProfilingEventContext> profilingDataProducer;
 
-  public EndOperationSpanProfilingExecutionCommand(ProfilingService profilingService) {
+  public EndSpanProfilingExecutionOpertion(ProfilingService profilingService) {
     profilingDataProducer = profilingService.getProfilingDataProducer(END_SPAN);
   }
 
@@ -48,7 +48,8 @@ public class EndOperationSpanProfilingExecutionCommand implements
       return triggerTimeStamp;
     }
 
-    @Override public Span getSpan() {
+    @Override
+    public Span getSpan() {
       return null;
     }
   }

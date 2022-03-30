@@ -18,12 +18,12 @@ import org.mule.runtime.api.profiling.type.context.SpanProfilingEventContext;
 /**
  * A {@link ProfilingExecutionOperation} that triggers a profiling event indicating the start of a span.
  */
-public class StartOperationSpanProfilingExecutionCommand
+public class StartSpanProfilingExecutionOperation
     implements ProfilingExecutionOperation<ComponentProcessingStrategyProfilingEventContext> {
 
   private final ProfilingDataProducer<SpanProfilingEventContext, ComponentProcessingStrategyProfilingEventContext> profilingDataProducer;
 
-  public StartOperationSpanProfilingExecutionCommand(ProfilingService profilingService) {
+  public StartSpanProfilingExecutionOperation(ProfilingService profilingService) {
     profilingDataProducer = profilingService.getProfilingDataProducer(RuntimeProfilingEventTypes.START_SPAN);
   }
 
@@ -48,7 +48,8 @@ public class StartOperationSpanProfilingExecutionCommand
       return triggerTimeStamp;
     }
 
-    @Override public Span getSpan() {
+    @Override
+    public Span getSpan() {
       return null;
     }
   }

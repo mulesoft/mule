@@ -10,15 +10,13 @@ import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
-import org.mule.runtime.api.profiling.type.context.ComponentProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.SpanProfilingEventContext;
-import org.mule.runtime.core.internal.profiling.producer.EndSpanProfilingDataProducer;
 import org.mule.runtime.core.internal.profiling.producer.StartSpanProfilingDataProducer;
-import org.mule.runtime.feature.internal.config.profiling.ProfilingDataProducerStatus;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
-import java.util.function.Function;
-
+/**
+ * A {@link ProfilingDataProducerProvider} that provides {@link StartSpanProfilingDataProducer}
+ */
 public class StartSpanProfilingDataProducerProvider
     implements ProfilingDataProducerProvider<SpanProfilingEventContext, ComponentProcessingStrategyProfilingEventContext> {
 

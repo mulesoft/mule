@@ -7,14 +7,17 @@
 
 package org.mule.runtime.core.internal.profiling.consumer.operations;
 
-import com.google.gson.Gson;
+import static org.mule.runtime.core.internal.profiling.consumer.ComponentProfilingUtils.getProcessingStrategyComponentInfoMap;
+
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 
-import static org.mule.runtime.core.internal.profiling.consumer.ComponentProfilingUtils.getProcessingStrategyComponentInfoMap;
-
+/**
+ * A {@link ProfilingExecutionOperation} that logs the data of a profiling event.
+ */
 public class LoggerProfilingEventOperation implements
     ProfilingExecutionOperation<ComponentProcessingStrategyProfilingEventContext> {
 

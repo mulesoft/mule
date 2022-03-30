@@ -8,7 +8,7 @@
 package org.mule.runtime.core.internal.profiling.consumer.operations;
 
 /**
- * An Operation executed in the context a {@link org.mule.runtime.api.profiling.ProfilingDataConsumer}
+ * An operation executed in the context a {@link org.mule.runtime.api.profiling.ProfilingDataConsumer}
  *
  * @param <T> the type for the parameter.
  */

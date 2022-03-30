@@ -9,13 +9,15 @@ package org.mule.runtime.core.internal.profiling;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.SpanProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.producer.EndSpanProfilingDataProducer;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
+/**
+ * A {@link ProfilingDataProducerProvider} that provides {@link EndSpanProfilingDataProducer}
+ */
 public class EndSpanProfilingDataProducerProvider
-    implements ProfilingDataProducerProvider<SpanProfilingEventContext, ComponentProcessingStrategyProfilingEventContext> {
+    implements ProfilingDataProducerProvider<SpanProfilingEventContext, EndSpanProfilingDataProducer> {
 
   private final DefaultProfilingService profilingService;
   private final ProfilingEventType<SpanProfilingEventContext> profilingEventType;
