@@ -128,7 +128,7 @@ public class DefaultProfilingService extends AbstractProfilingService {
   @Override
   public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
     Set<ProfilingDataConsumerDiscoveryStrategy> discoveryStrategies = new HashSet<>();
-    discoveryStrategies.add(new DefaultProfilingDataConsumerDiscoveryStrategy());
+    discoveryStrategies.add(new DefaultProfilingDataConsumerDiscoveryStrategy(this));
     this.profilingDataConsumerDiscoveryStrategies.ifPresent(discoveryStrategies::addAll);
     return new CompositeProfilingDataConsumerDiscoveryStrategy(discoveryStrategies);
   }

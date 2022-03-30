@@ -39,7 +39,7 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
-import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
+import org.mule.runtime.core.internal.profiling.consumer.ComponentProcessingStrategyDataConsumer;
 import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInternalProfilingDataConsumer;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -81,7 +81,7 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
 
   @Rule
   public EnableInternalRuntimeProfilers enableInternalRuntimeProfilers =
-      new EnableInternalRuntimeProfilers(new TestLoggerComponentProcessingStrategyDataConsumer(null));
+      new EnableInternalRuntimeProfilers(new TestLoggerComponentProcessingStrategyDataConsumer(null, null));
 
   @Mock
   private CoreEvent event;
@@ -160,7 +160,7 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
 
     @Override
     public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
-      return new TestProfilingDataConsumerDiscoveryStrategy(logger);
+      return new TestProfilingDataConsumerDiscoveryStrategy(this, logger);
     }
 
   }
@@ -171,27 +171,29 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
   private static class TestProfilingDataConsumerDiscoveryStrategy implements ProfilingDataConsumerDiscoveryStrategy {
 
     private final Logger logger;
+    private final TestDefaultProfilingService profilingService;
 
-    public TestProfilingDataConsumerDiscoveryStrategy(Logger logger) {
+    public TestProfilingDataConsumerDiscoveryStrategy(TestDefaultProfilingService profilingService, Logger logger) {
+      this.profilingService = profilingService;
       this.logger = logger;
     }
 
     @Override
     public Set<ProfilingDataConsumer<?>> discover() {
-      return of(new TestLoggerComponentProcessingStrategyDataConsumer(logger));
+      return of(new TestLoggerComponentProcessingStrategyDataConsumer(profilingService, logger));
     }
   }
 
   /**
-   * Stub {@link LoggerComponentProcessingStrategyDataConsumer} for injecting a mocked {@link Logger}
+   * Stub {@link ComponentProcessingStrategyDataConsumer} for injecting a mocked {@link Logger}
    */
   @RuntimeInternalProfilingDataConsumer
-  private static class TestLoggerComponentProcessingStrategyDataConsumer extends LoggerComponentProcessingStrategyDataConsumer {
+  private static class TestLoggerComponentProcessingStrategyDataConsumer extends ComponentProcessingStrategyDataConsumer {
 
     private final Logger logger;
 
-    public TestLoggerComponentProcessingStrategyDataConsumer(Logger logger) {
-      super();
+    public TestLoggerComponentProcessingStrategyDataConsumer(ProfilingService profilingService, Logger logger) {
+      super(profilingService);
       this.logger = logger;
     }
 
