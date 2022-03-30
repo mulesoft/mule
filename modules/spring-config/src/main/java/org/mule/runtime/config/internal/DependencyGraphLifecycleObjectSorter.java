@@ -145,10 +145,10 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
   }
 
   /**
-   * Provides the graph(bucket) the current object should be added to
+   * Provides the edge reversed graph(bucket) the current object should be added to
    *
    * @param graphIndex index of the graph for the current object
-   * @return relevant dependency graph(bucket)
+   * @return edge reversed dependency graph(bucket)
    */
   private DefaultDirectedGraph<BeanWrapper, DefaultEdge> getReverseGraphForLifecycleType(int graphIndex) {
     return reverseGraphs.get(graphIndex);
