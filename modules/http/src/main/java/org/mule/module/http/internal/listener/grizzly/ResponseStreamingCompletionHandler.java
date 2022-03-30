@@ -36,8 +36,6 @@ import org.glassfish.grizzly.memory.MemoryManager;
 public class ResponseStreamingCompletionHandler
         extends BaseResponseCompletionHandler
 {
-
-    private final HttpContent EMPTY_CONTENT;
     private final MemoryManager memoryManager;
     private final HttpResponsePacket httpResponsePacket;
     private final InputStream inputStream;
@@ -58,7 +56,6 @@ public class ResponseStreamingCompletionHandler
         memoryManager = ctx.getConnection().getTransport().getMemoryManager();
         this.responseStatusCallback = responseStatusCallback;
         loggerClassLoader = Thread.currentThread().getContextClassLoader();
-        EMPTY_CONTENT = httpResponsePacket.httpTrailerBuilder().content(memoryManager.allocate(0)).build();
     }
 
     @Override
