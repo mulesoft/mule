@@ -34,7 +34,8 @@ import org.glassfish.grizzly.memory.MemoryManager;
  * when the response body is an input stream.
  */
 public class ResponseStreamingCompletionHandler
-        extends BaseResponseCompletionHandler {
+        extends BaseResponseCompletionHandler
+{
 
     private final HttpContent EMPTY_CONTENT;
     private final MemoryManager memoryManager;
@@ -47,7 +48,8 @@ public class ResponseStreamingCompletionHandler
     public static final String MULE_CLASSLOADER = "MULE_CLASSLOADER";
 
     public ResponseStreamingCompletionHandler(final FilterChainContext ctx,
-                                              final HttpRequestPacket request, final HttpResponse httpResponse, ResponseStatusCallback responseStatusCallback) {
+                                              final HttpRequestPacket request, final HttpResponse httpResponse, ResponseStatusCallback responseStatusCallback)
+    {
 
         super(ctx);
         Preconditions.checkArgument((httpResponse.getEntity() instanceof InputStreamHttpEntity), "http response must have an input stream entity");
@@ -60,35 +62,32 @@ public class ResponseStreamingCompletionHandler
     }
 
     @Override
-    protected void doStart() throws IOException {
+    protected void doStart() throws IOException
+    {
         sendInputStreamChunk();
     }
 
-    public void sendInputStreamChunk() throws IOException {
+    public void sendInputStreamChunk() throws IOException
+    {
         final Buffer buffer = memoryManager.allocate(DEFAULT_BUFFER_SIZE);
 
         final int offset = buffer.arrayOffset();
         final int length = buffer.remaining();
 
-        System.out.println(Thread.currentThread().getName());
         isDone = readStreamManually(buffer, offset, length);
-
         ctx.getConnection().getAttributes().setAttribute(MULE_CLASSLOADER, loggerClassLoader);
 
         HttpContent content = httpResponsePacket.httpContentBuilder().content(buffer).build();
         ctx.write(content, this);
-        System.out.println("Wrote a content block:" + isDone);
 
         if (isDone) {
             content = httpResponsePacket.httpContentBuilder().build();
             ctx.write(content, this);
-            System.out.println("Wrote:EMPTY_CONTENT");
         }
-        System.out.println("Exiting:sendInputStreamChunk");
     }
 
-    private boolean readStreamManually(final Buffer buffer, int offset, int length) throws IOException {
-        System.out.println("In:readStream");
+    private boolean readStreamManually(final Buffer buffer, int offset, int length) throws IOException
+    {
         boolean isDone = false;
         byte[] bufferByteArray = buffer.array();
         int bytesRead = -1;
@@ -113,7 +112,6 @@ public class ResponseStreamingCompletionHandler
      */
     @Override
     public void completed(WriteResult result) {
-        System.out.println("completed:" + isDone);
         try {
             if (!isDone) {
 
