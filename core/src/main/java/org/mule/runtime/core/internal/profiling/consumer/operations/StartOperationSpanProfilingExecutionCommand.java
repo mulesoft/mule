@@ -12,7 +12,7 @@ import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
-import org.mule.runtime.api.profiling.type.context.SpanStartProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.SpanProfilingEventContext;
 
 /**
  * A {@link ProfilingExecutionOperation} that triggers a profiling event indicating the start of a span.
@@ -20,7 +20,7 @@ import org.mule.runtime.api.profiling.type.context.SpanStartProfilingEventContex
 public class StartOperationSpanProfilingExecutionCommand
     implements ProfilingExecutionOperation<ComponentProcessingStrategyProfilingEventContext> {
 
-  private final ProfilingDataProducer<SpanStartProfilingEventContext, ComponentProcessingStrategyProfilingEventContext> profilingDataProducer;
+  private final ProfilingDataProducer<SpanProfilingEventContext, ComponentProcessingStrategyProfilingEventContext> profilingDataProducer;
 
   public StartOperationSpanProfilingExecutionCommand(ProfilingService profilingService) {
     profilingDataProducer = profilingService.getProfilingDataProducer(RuntimeProfilingEventTypes.START_SPAN);
@@ -32,7 +32,7 @@ public class StartOperationSpanProfilingExecutionCommand
 
   }
 
-  private class OperationExecutionStartEventContext implements SpanStartProfilingEventContext {
+  private class OperationExecutionStartEventContext implements SpanProfilingEventContext {
 
     private final ComponentProcessingStrategyProfilingEventContext eventContext;
     private long triggerTimeStamp;

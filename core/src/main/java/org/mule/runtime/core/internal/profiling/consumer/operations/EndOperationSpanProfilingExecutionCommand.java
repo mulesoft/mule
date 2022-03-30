@@ -13,7 +13,7 @@ import static java.lang.System.currentTimeMillis;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
-import org.mule.runtime.api.profiling.type.context.SpanEndProfilingEventContext;;
+import org.mule.runtime.api.profiling.type.context.SpanProfilingEventContext;;
 
 /**
  *
@@ -21,7 +21,7 @@ import org.mule.runtime.api.profiling.type.context.SpanEndProfilingEventContext;
 public class EndOperationSpanProfilingExecutionCommand implements
     ProfilingExecutionOperation<ComponentProcessingStrategyProfilingEventContext> {
 
-  private final ProfilingDataProducer<SpanEndProfilingEventContext, ComponentProcessingStrategyProfilingEventContext> profilingDataProducer;
+  private final ProfilingDataProducer<SpanProfilingEventContext, ComponentProcessingStrategyProfilingEventContext> profilingDataProducer;
 
   public EndOperationSpanProfilingExecutionCommand(ProfilingService profilingService) {
     profilingDataProducer = profilingService.getProfilingDataProducer(END_SPAN);
@@ -32,7 +32,7 @@ public class EndOperationSpanProfilingExecutionCommand implements
     profilingDataProducer.triggerProfilingEvent(eventContext, context -> new OperationExecutionEndEventContext(context));
   }
 
-  private class OperationExecutionEndEventContext implements SpanEndProfilingEventContext {
+  private class OperationExecutionEndEventContext implements SpanProfilingEventContext {
 
     private final ComponentProcessingStrategyProfilingEventContext eventContext;
     private long triggerTimeStamp;
