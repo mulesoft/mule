@@ -12,6 +12,7 @@ import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.END_SPAN;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.EXTENSION_PROFILING_EVENT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.MEMORY_BYTE_BUFFER_ALLOCATION;
@@ -27,6 +28,7 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STA
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_TASK_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.START_SPAN;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TASK_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_COMMIT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
@@ -60,6 +62,8 @@ public class ProfilingNotification<T extends ProfilingEventContext> extends Abst
   private static final int TRANSACTION_CONTINUE_ID = PROFILING_ACTION_START_RANGE + 19;
   private static final int TRANSACTION_COMMIT_ID = PROFILING_ACTION_START_RANGE + 20;
   private static final int TRANSACTION_ROLLBACK_ID = PROFILING_ACTION_START_RANGE + 21;
+  private static final int START_SPAN_ID = PROFILING_ACTION_START_RANGE + 22;
+  private static final int END_SPAN_ID = PROFILING_ACTION_START_RANGE + 23;
 
 
   /**
@@ -107,6 +111,8 @@ public class ProfilingNotification<T extends ProfilingEventContext> extends Abst
     registerAction(getFullyQualifiedProfilingNotificationIdentifier(TX_CONTINUE), TRANSACTION_CONTINUE_ID);
     registerAction(getFullyQualifiedProfilingNotificationIdentifier(TX_COMMIT), TRANSACTION_COMMIT_ID);
     registerAction(getFullyQualifiedProfilingNotificationIdentifier(TX_ROLLBACK), TRANSACTION_ROLLBACK_ID);
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(START_SPAN), START_SPAN_ID);
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(END_SPAN), END_SPAN_ID);
 
   }
 

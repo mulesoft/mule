@@ -27,7 +27,7 @@ import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInternalProfilingDataConsumer;
 import org.mule.runtime.core.internal.profiling.notification.ProfilingNotification;
-import org.mule.runtime.core.privileged.profiling.CoreProfilingService;
+import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -42,7 +42,7 @@ import javax.inject.Inject;
  * @since 4.4
  */
 public abstract class AbstractProfilingService
-    implements ReactorAwareProfilingService, CoreProfilingService, Initialisable, Startable, Stoppable {
+    implements InternalProfilingService, PrivilegedProfilingService, Initialisable, Startable, Stoppable {
 
 
   private static AtomicBoolean profilingFeaturesSet = new AtomicBoolean(false);

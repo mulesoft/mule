@@ -25,7 +25,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.enricher.AbstractEnrichedReactiveProcessorTestCase;
 import org.mule.runtime.core.internal.util.rx.ImmediateScheduler;
-import org.mule.runtime.core.internal.profiling.ReactorAwareProfilingService;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 
 import java.util.concurrent.Callable;
 
@@ -54,7 +54,7 @@ public class PipelineProcessingStrategyReactiveProcessorBuilderTestCase extends 
   private CoreEvent coreEvent;
 
   @Mock(answer = RETURNS_MOCKS)
-  private ReactorAwareProfilingService profilingService;
+  private InternalProfilingService profilingService;
 
   @Mock
   private ProfilingDataProducer profilingDataProducer;

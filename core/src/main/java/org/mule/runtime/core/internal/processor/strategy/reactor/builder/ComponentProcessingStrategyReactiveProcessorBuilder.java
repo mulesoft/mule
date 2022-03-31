@@ -24,7 +24,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
-import org.mule.runtime.core.internal.profiling.ReactorAwareProfilingService;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
@@ -54,7 +54,7 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
   private int parallelism = 1;
   private ScheduledExecutorService dispatcherScheduler;
   private ScheduledExecutorService callbackScheduler;
-  private ReactorAwareProfilingService profilingService;
+  private InternalProfilingService profilingService;
 
   public ComponentProcessingStrategyReactiveProcessorBuilder(ReactiveProcessor processor, Scheduler contextScheduler,
                                                              String artifactId, String artifactType) {
@@ -112,7 +112,7 @@ public class ComponentProcessingStrategyReactiveProcessorBuilder {
    * @param profilingService {@link ProfilingService} for profiling processing strategy logic.
    * @return the builder being created.
    */
-  public ComponentProcessingStrategyReactiveProcessorBuilder withProfilingService(ReactorAwareProfilingService profilingService) {
+  public ComponentProcessingStrategyReactiveProcessorBuilder withProfilingService(InternalProfilingService profilingService) {
     this.profilingService = profilingService;
     return this;
   }
