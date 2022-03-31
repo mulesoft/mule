@@ -9,6 +9,7 @@ package org.mule.runtime.module.artifact.classloader;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -168,11 +169,35 @@ public class IBMMQResourceReleaserTriggerTestCase {
     assertThat(countMBeans(artifactClassLoader), is(0));
   }
 
+  @Test
+  @Description("When redeploying an application which contains the IBM MQ Driver, the proper cleanup should be performed " +
+          "on redeployment but, if the property avoid.ibm.mq.cleanup.mbeans=true, the mbeans clean should be skiped.")
+  public void releaserMBeansPropertyTrueTriggerTest() throws Exception {
+    Field shouldReleaseIbmMQResourcesField = getField(MuleArtifactClassLoader.class, "shouldReleaseIbmMQResources", false);
+    shouldReleaseIbmMQResourcesField.setAccessible(true);
+    assertThat(shouldReleaseIbmMQResourcesField.get(artifactClassLoader), is(false));
+    // Force to load a Driver class so the resource releaser is flagged to run on dispose
+    Class<?> connectionFactoryClass = Class.forName(KNOWN_DRIVER_CLASS_NAME, true, artifactClassLoader);
+    Object connectionFactory = connectionFactoryClass.newInstance();
+    Properties props = System.getProperties();
+    props.setProperty("avoid.ibm.mq.cleanup.mbeans", "true");
+    int countMBeans  = countMBeans(artifactClassLoader);
+    artifactClassLoader.dispose();
+    assertThat(countMBeans(artifactClassLoader), is(countMBeans));
+  }
+
   private int countMBeans(MuleArtifactClassLoader artifactClassLoader) throws MalformedObjectNameException {
     MBeanServer mBeanServer = getPlatformMBeanServer();
     final Hashtable<String, String> keys = new Hashtable<>();
     keys.put("type", "CommonServices");
     keys.put("name", "*");
     return mBeanServer.queryMBeans(new ObjectName(IBM_MQ_MBEAN_DOMAIN, keys), null).size();
+  }
+
+  @After
+  public void cleanUp() throws Exception {
+    Properties props = System.getProperties();
+    props.remove("avoid.ibm.mq.cleanup");
+    props.remove("avoid.ibm.mq.cleanup.mbeans");
   }
 }
