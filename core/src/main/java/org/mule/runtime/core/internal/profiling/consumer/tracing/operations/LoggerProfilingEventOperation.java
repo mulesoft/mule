@@ -28,7 +28,6 @@ public class LoggerProfilingEventOperation implements
 
   private final Gson gson = new Gson();
 
-
   public LoggerProfilingEventOperation(Logger logger,
                                        ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> profilingEventType) {
     this.logger = logger;
