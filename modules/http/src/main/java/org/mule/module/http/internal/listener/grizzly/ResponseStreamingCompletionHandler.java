@@ -34,7 +34,6 @@ public class ResponseStreamingCompletionHandler
         extends BaseResponseCompletionHandler
 {
 
-    private final HttpContent EMPTY_CONTENT;
     private final MemoryManager memoryManager;
     private final HttpResponsePacket httpResponsePacket;
     private final InputStream inputStream;
@@ -55,7 +54,6 @@ public class ResponseStreamingCompletionHandler
         memoryManager = ctx.getConnection().getTransport().getMemoryManager();
         this.responseStatusCallback = responseStatusCallback;
         loggerClassLoader = Thread.currentThread().getContextClassLoader();
-        EMPTY_CONTENT = httpResponsePacket.httpTrailerBuilder().content(memoryManager.allocate(0)).build();
     }
 
     @Override
@@ -71,33 +69,30 @@ public class ResponseStreamingCompletionHandler
         final int offset = buffer.arrayOffset();
         final int length = buffer.remaining();
 
-        isDone = readStreamManually(buffer, length);
+        isDone = readStreamManually(buffer);
 
         HttpContent content = httpResponsePacket.httpContentBuilder().content(buffer).build();
         ctx.getConnection().getAttributes().setAttribute(MULE_CLASSLOADER, loggerClassLoader);
         ctx.write(content, this);
 
         if (isDone) {
-            System.out.println("Writig out closing chunk");
-            //content = httpResponsePacket.httpContentBuilder().build();
-            ctx.write(EMPTY_CONTENT, this);
+            content = httpResponsePacket.httpContentBuilder().build();
+            ctx.write(content, this);
         }
     }
 
-    private boolean readStreamManually(final Buffer buffer, int length) throws IOException {
-        System.out.println("In:readStream");
+    private boolean readStreamManually(final Buffer buffer) throws IOException {
         buffer.clear();
         boolean isDone = false;
         byte[] bufferByteArray = buffer.array();
         int bytesRead = 0;
         int c;
-        while ((c = inputStream.read()) != -1 && bytesRead < length) {
+        while ((c = inputStream.read()) != -1 && bytesRead < DEFAULT_BUFFER_SIZE) {
             bufferByteArray[bytesRead++] = (byte) c;
         }
         if (c == -1)
             isDone = true;
         buffer.limit(bytesRead);
-        System.out.println("read" + (new String(bufferByteArray)).trim());
         return isDone;
     }
 
