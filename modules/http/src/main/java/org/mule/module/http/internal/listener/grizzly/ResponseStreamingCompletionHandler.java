@@ -34,6 +34,7 @@ public class ResponseStreamingCompletionHandler
         extends BaseResponseCompletionHandler
 {
 
+    private final HttpContent EMPTY_CONTENT;
     private final MemoryManager memoryManager;
     private final HttpResponsePacket httpResponsePacket;
     private final InputStream inputStream;
@@ -54,6 +55,7 @@ public class ResponseStreamingCompletionHandler
         memoryManager = ctx.getConnection().getTransport().getMemoryManager();
         this.responseStatusCallback = responseStatusCallback;
         loggerClassLoader = Thread.currentThread().getContextClassLoader();
+        EMPTY_CONTENT = httpResponsePacket.httpTrailerBuilder().content(memoryManager.allocate(0)).build();
     }
 
     @Override
@@ -69,34 +71,34 @@ public class ResponseStreamingCompletionHandler
         final int offset = buffer.arrayOffset();
         final int length = buffer.remaining();
 
-        isDone = readStreamManually(buffer, offset, length);
-        ctx.getConnection().getAttributes().setAttribute(MULE_CLASSLOADER, loggerClassLoader);
+        isDone = readStreamManually(buffer, length);
 
         HttpContent content = httpResponsePacket.httpContentBuilder().content(buffer).build();
+        ctx.getConnection().getAttributes().setAttribute(MULE_CLASSLOADER, loggerClassLoader);
         ctx.write(content, this);
 
         if (isDone) {
-            content = httpResponsePacket.httpContentBuilder().build();
-            ctx.write(content, this);
+            System.out.println("Writig out closing chunk");
+            ctx.write(EMPTY_CONTENT, this);
         }
     }
 
-    private boolean readStreamManually(final Buffer buffer, int offset, int length) throws IOException
-    {
+    private boolean readStreamManually(final Buffer buffer, int length) throws IOException {
+        System.out.println("In:readStream");
+        buffer.clear();
         boolean isDone = false;
         byte[] bufferByteArray = buffer.array();
         int bytesRead = 0;
         int c;
-        while ((c = inputStream.read()) != -1 && offset < length) {
-            bufferByteArray[offset++] = (byte) c;
-            bytesRead++;
+        while ((c = inputStream.read()) != -1 && bytesRead < length) {
+            bufferByteArray[bytesRead++] = (byte) c;
         }
         if (c == -1)
             isDone = true;
         buffer.limit(bytesRead);
-
         return isDone;
     }
+
 
     /**
      * Method gets called, when file chunk was successfully sent.
