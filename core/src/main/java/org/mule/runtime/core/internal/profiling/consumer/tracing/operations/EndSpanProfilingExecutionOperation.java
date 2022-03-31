@@ -8,18 +8,16 @@ package org.mule.runtime.core.internal.profiling.consumer.tracing.operations;
 
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.END_SPAN;
 
+import static org.mule.runtime.core.internal.profiling.consumer.tracing.operations.SpanUtils.getBuilder;
+
 import static java.lang.System.currentTimeMillis;
 
-import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.SpanProfilingEventContext;
-import org.mule.runtime.core.internal.profiling.consumer.tracing.span.builder.ComponentSpanBuilder;
-import org.mule.runtime.core.internal.profiling.consumer.tracing.span.builder.FlowSpanBuilder;
-import org.mule.runtime.core.internal.profiling.consumer.tracing.span.builder.SpanBuilder;;
 
 /**
  * A {@link ProfilingExecutionOperation} that triggers a profiling event indicating the end of a span.
@@ -60,20 +58,12 @@ public class EndSpanProfilingExecutionOperation implements
 
     @Override
     public Span getSpan() {
-      return getBuilder(eventContext.getLocation().get())
+      ComponentLocation location = eventContext.getLocation().get();
+      return getBuilder(location)
           .withArtifactId(eventContext.getArtifactId())
-          .withLocation(eventContext.getLocation().get())
+          .withLocation(location)
           .withCorrelationId(eventContext.getCorrelationId())
           .build();
-    }
-
-    private SpanBuilder getBuilder(ComponentLocation location) {
-      if (location.getComponentIdentifier()
-          .getType().equals(TypedComponentIdentifier.ComponentType.FLOW)) {
-        return ComponentSpanBuilder.builder();
-      } else {
-        return FlowSpanBuilder.builder();
-      }
     }
   }
 }

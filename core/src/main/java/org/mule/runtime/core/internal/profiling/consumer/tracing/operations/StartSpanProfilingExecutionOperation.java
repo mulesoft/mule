@@ -7,10 +7,11 @@
 package org.mule.runtime.core.internal.profiling.consumer.tracing.operations;
 
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.START_SPAN;
-import static org.mule.runtime.core.internal.profiling.consumer.tracing.span.builder.ComponentSpanBuilder.builder;
+import static org.mule.runtime.core.internal.profiling.consumer.tracing.operations.SpanUtils.getBuilder;
 
 import static java.lang.System.currentTimeMillis;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.tracing.Span;
@@ -57,8 +58,10 @@ public class StartSpanProfilingExecutionOperation
 
     @Override
     public Span getSpan() {
-      return builder().withArtifactId(eventContext.getArtifactId())
-          .withLocation(eventContext.getLocation().get())
+      ComponentLocation location = eventContext.getLocation().get();
+      return getBuilder(location)
+          .withLocation(location)
+          .withArtifactId(eventContext.getArtifactId())
           .withCorrelationId(eventContext.getCorrelationId())
           .build();
     }
