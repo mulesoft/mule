@@ -61,6 +61,7 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.util.queue.QueueManager;
@@ -181,7 +182,7 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     registerObject(OBJECT_EXPRESSION_MANAGER, getExpressionManager(muleContext, registry), muleContext);
   }
 
-  protected DefaultExpressionManager getExpressionManager(MuleContext muleContext, MuleRegistry registry)
+  protected ExtendedExpressionManager getExpressionManager(MuleContext muleContext, MuleRegistry registry)
       throws RegistrationException {
     DefaultExpressionManager expressionManager = new DefaultExpressionManager();
     DefaultExpressionLanguageFactoryService service = getExpressionLanguageFactoryService(registry);
