@@ -244,9 +244,7 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
 
     @Override
     public void onProfilingEvent(ProfilingEventType<SpanProfilingEventContext> profilingEventType,
-                                 SpanProfilingEventContext profilingEventContext) {
-      // Nothing to do
-    }
+                                 SpanProfilingEventContext profilingEventContext) {}
 
     @Override
     public Set<ProfilingEventType<SpanProfilingEventContext>> getProfilingEventTypes() {

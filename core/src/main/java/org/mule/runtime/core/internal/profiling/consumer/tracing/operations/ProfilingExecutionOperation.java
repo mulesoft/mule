@@ -5,12 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.internal.profiling.consumer.operations;
+package org.mule.runtime.core.internal.profiling.consumer.tracing.operations;
 
 /**
- * An operation executed in the context a {@link org.mule.runtime.api.profiling.ProfilingDataConsumer}
+ * An operation executed in the context of a {@link org.mule.runtime.api.profiling.ProfilingDataConsumer}
  *
- * @param <T> the type for the parameter.
+ * @param <T> the type for the parameter of the operation.
  */
 public interface ProfilingExecutionOperation<T> {
 

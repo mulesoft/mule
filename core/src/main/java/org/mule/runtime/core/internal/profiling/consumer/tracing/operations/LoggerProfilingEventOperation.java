@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.internal.profiling.consumer.operations;
+package org.mule.runtime.core.internal.profiling.consumer.tracing.operations;
 
 import static org.mule.runtime.core.internal.profiling.consumer.ComponentProfilingUtils.getProcessingStrategyComponentInfoMap;
 
@@ -17,6 +17,8 @@ import org.slf4j.Logger;
 
 /**
  * A {@link ProfilingExecutionOperation} that logs the data of a profiling event.
+ *
+ * @since 4.5.0
  */
 public class LoggerProfilingEventOperation implements
     ProfilingExecutionOperation<ComponentProcessingStrategyProfilingEventContext> {

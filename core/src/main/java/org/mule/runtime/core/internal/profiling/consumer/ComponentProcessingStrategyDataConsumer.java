@@ -23,10 +23,10 @@ import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInternalProfilingDataConsumer;
-import org.mule.runtime.core.internal.profiling.consumer.operations.EndSpanProfilingExecutionOpertion;
-import org.mule.runtime.core.internal.profiling.consumer.operations.LoggerProfilingEventOperation;
-import org.mule.runtime.core.internal.profiling.consumer.operations.ProfilingExecutionOperation;
-import org.mule.runtime.core.internal.profiling.consumer.operations.StartSpanProfilingExecutionOperation;
+import org.mule.runtime.core.internal.profiling.consumer.tracing.operations.EndSpanProfilingExecutionOperation;
+import org.mule.runtime.core.internal.profiling.consumer.tracing.operations.LoggerProfilingEventOperation;
+import org.mule.runtime.core.internal.profiling.consumer.tracing.operations.ProfilingExecutionOperation;
+import org.mule.runtime.core.internal.profiling.consumer.tracing.operations.StartSpanProfilingExecutionOperation;
 
 import java.util.Set;
 import java.util.function.Predicate;
@@ -64,9 +64,9 @@ public class ComponentProcessingStrategyDataConsumer
             .put(STARTING_FLOW_EXECUTION, new LoggerProfilingEventOperation(logger, STARTING_FLOW_EXECUTION))
             .put(FLOW_EXECUTED, new LoggerProfilingEventOperation(logger, FLOW_EXECUTED))
             .put(STARTING_FLOW_EXECUTION, new StartSpanProfilingExecutionOperation(profilingService))
-            .put(FLOW_EXECUTED, new EndSpanProfilingExecutionOpertion(profilingService))
+            .put(FLOW_EXECUTED, new EndSpanProfilingExecutionOperation(profilingService))
             .put(PS_SCHEDULING_OPERATION_EXECUTION, new StartSpanProfilingExecutionOperation(profilingService))
-            .put(PS_FLOW_MESSAGE_PASSING, new EndSpanProfilingExecutionOpertion(profilingService))
+            .put(PS_FLOW_MESSAGE_PASSING, new EndSpanProfilingExecutionOperation(profilingService))
             .build();
   }
 

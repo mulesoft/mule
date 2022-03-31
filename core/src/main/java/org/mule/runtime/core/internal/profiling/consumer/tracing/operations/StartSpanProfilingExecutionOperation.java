@@ -4,19 +4,23 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.profiling.consumer.operations;
+package org.mule.runtime.core.internal.profiling.consumer.tracing.operations;
+
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.START_SPAN;
+import static org.mule.runtime.core.internal.profiling.consumer.tracing.span.builder.ComponentSpanBuilder.builder;
 
 import static java.lang.System.currentTimeMillis;
 
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.tracing.Span;
-import org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.SpanProfilingEventContext;
 
 /**
  * A {@link ProfilingExecutionOperation} that triggers a profiling event indicating the start of a span.
+ *
+ * @since 4.5.0
  */
 public class StartSpanProfilingExecutionOperation
     implements ProfilingExecutionOperation<ComponentProcessingStrategyProfilingEventContext> {
@@ -24,7 +28,7 @@ public class StartSpanProfilingExecutionOperation
   private final ProfilingDataProducer<SpanProfilingEventContext, ComponentProcessingStrategyProfilingEventContext> profilingDataProducer;
 
   public StartSpanProfilingExecutionOperation(ProfilingService profilingService) {
-    profilingDataProducer = profilingService.getProfilingDataProducer(RuntimeProfilingEventTypes.START_SPAN);
+    profilingDataProducer = profilingService.getProfilingDataProducer(START_SPAN);
   }
 
   @Override
@@ -33,6 +37,9 @@ public class StartSpanProfilingExecutionOperation
 
   }
 
+  /**
+   * A {@link SpanProfilingEventContext} that corresponds to an end span profiling event.
+   */
   private class OperationExecutionStartEventContext implements SpanProfilingEventContext {
 
     private final ComponentProcessingStrategyProfilingEventContext eventContext;
@@ -50,7 +57,10 @@ public class StartSpanProfilingExecutionOperation
 
     @Override
     public Span getSpan() {
-      return null;
+      return builder().withArtifactId(eventContext.getArtifactId())
+          .withLocation(eventContext.getLocation().get())
+          .withCorrelationId(eventContext.getCorrelationId())
+          .build();
     }
   }
 }
