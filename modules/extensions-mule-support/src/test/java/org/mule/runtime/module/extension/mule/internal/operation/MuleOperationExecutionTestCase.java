@@ -65,26 +65,21 @@ public class MuleOperationExecutionTestCase extends MuleArtifactFunctionalTestCa
   @Description("Calls a flow that executes the <this:non-blocking-hello-world> operation which is non blocking")
   public void executeNonBlockingOperation() throws Exception {
     CoreEvent resultEvent = flowRunner("nonBlockingOperationFlow").run();
-    assertThat(resultEvent.getMessage().getPayload().getValue(),
-               equalTo("Hello,  Malaga! "));
-    assertThat(resultEvent.getMessage().getAttributes().getValue(), is(nullValue()));
+    assertHelloWorldResponse(resultEvent);
   }
 
   @Test
   @Description("Calls a flow that executes the <this:blocking-hello-world> operation which is blocking")
   public void executeBlockingOperation() throws Exception {
     CoreEvent resultEvent = flowRunner("blockingOperationFlow").run();
-    assertThat(resultEvent.getMessage().getPayload().getValue(),
-               equalTo("Hello,  Malaga! "));
-    assertThat(resultEvent.getMessage().getAttributes().getValue(), is(nullValue()));
+    assertHelloWorldResponse(resultEvent);
   }
 
   @Test
   @Description("Calls a flow that executes the <this:repeated-hello-world> operation which is implemented recursively")
   public void executeRecursiveOperation() throws Exception {
     CoreEvent resultEvent = flowRunner("recursiveOperationFlow").run();
-    assertThat(resultEvent.getMessage().getPayload().getValue(),
-               equalTo("Hello,  Malaga! Hello,  Malaga! Hello,  Malaga! "));
+    assertThat(resultEvent.getMessage().getPayload().getValue(), equalTo("Hello,   Malaga! Hello,   Malaga! Hello,   Malaga! "));
     assertThat(resultEvent.getMessage().getAttributes().getValue(), is(nullValue()));
   }
 
@@ -146,7 +141,7 @@ public class MuleOperationExecutionTestCase extends MuleArtifactFunctionalTestCa
   }
 
   private void assertHelloWorldResponse(CoreEvent resultEvent) {
-    assertThat(resultEvent.getMessage().getPayload().getValue(), equalTo("Hello,  Malaga! "));
+    assertThat(resultEvent.getMessage().getPayload().getValue(), equalTo("Hello,   Malaga! "));
     assertThat(resultEvent.getMessage().getAttributes().getValue(), is(nullValue()));
   }
 }
