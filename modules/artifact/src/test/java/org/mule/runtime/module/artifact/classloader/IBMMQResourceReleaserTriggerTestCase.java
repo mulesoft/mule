@@ -171,7 +171,7 @@ public class IBMMQResourceReleaserTriggerTestCase {
 
   @Test
   @Description("When redeploying an application which contains the IBM MQ Driver, the proper cleanup should be performed " +
-          "on redeployment but, if the property avoid.ibm.mq.cleanup.mbeans=true, the mbeans clean should be skiped.")
+      "on redeployment but, if the property avoid.ibm.mq.cleanup.mbeans=true, the mbeans clean should be skiped.")
   public void releaserMBeansPropertyTrueTriggerTest() throws Exception {
     Field shouldReleaseIbmMQResourcesField = getField(MuleArtifactClassLoader.class, "shouldReleaseIbmMQResources", false);
     shouldReleaseIbmMQResourcesField.setAccessible(true);
@@ -181,7 +181,7 @@ public class IBMMQResourceReleaserTriggerTestCase {
     Object connectionFactory = connectionFactoryClass.newInstance();
     Properties props = System.getProperties();
     props.setProperty("avoid.ibm.mq.cleanup.mbeans", "true");
-    int countMBeans  = countMBeans(artifactClassLoader);
+    int countMBeans = countMBeans(artifactClassLoader);
     artifactClassLoader.dispose();
     assertThat(countMBeans(artifactClassLoader), is(countMBeans));
   }
