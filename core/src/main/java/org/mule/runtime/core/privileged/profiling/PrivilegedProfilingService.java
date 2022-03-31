@@ -13,7 +13,7 @@ import org.mule.runtime.api.profiling.ProfilingService;
 /**
  * A {@link ProfilingService} that allows to perform some extra privileged operations.
  */
-public interface CoreProfilingService extends ProfilingService {
+public interface PrivilegedProfilingService extends ProfilingService {
 
   /**
    * Registers a {@link ProfilingDataConsumer} dynamically.

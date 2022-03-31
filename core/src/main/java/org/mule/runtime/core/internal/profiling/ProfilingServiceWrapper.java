@@ -32,7 +32,7 @@ import java.util.function.Function;
 import javax.inject.Inject;
 
 import org.mule.runtime.core.internal.profiling.consumer.tracing.span.SpanManager;
-import org.mule.runtime.core.privileged.profiling.CoreProfilingService;
+import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -42,7 +42,7 @@ import reactor.core.publisher.Mono;
  * @see DefaultProfilingService
  * @see NoOpProfilingService
  */
-public class ProfilingServiceWrapper implements InternalProfilingService, CoreProfilingService, Lifecycle {
+public class ProfilingServiceWrapper implements InternalProfilingService, PrivilegedProfilingService, Lifecycle {
 
   @Inject
   MuleContext muleContext;
@@ -75,8 +75,8 @@ public class ProfilingServiceWrapper implements InternalProfilingService, CorePr
   public <T extends ProfilingEventContext> void registerProfilingDataConsumer(ProfilingDataConsumer<T> profilingDataConsumer) {
     // This is a privileged operation that has only to be invoked by a certain test connectors
     // The API for this will not be generally available.
-    if (profilingService instanceof CoreProfilingService) {
-      ((CoreProfilingService) getProfilingService()).registerProfilingDataConsumer(profilingDataConsumer);
+    if (profilingService instanceof PrivilegedProfilingService) {
+      ((PrivilegedProfilingService) getProfilingService()).registerProfilingDataConsumer(profilingDataConsumer);
     }
   }
 

@@ -19,7 +19,7 @@ import java.util.function.Function;
 
 import org.mule.runtime.core.internal.profiling.consumer.tracing.span.DefaultSpanManager;
 import org.mule.runtime.core.internal.profiling.consumer.tracing.span.SpanManager;
-import org.mule.runtime.core.privileged.profiling.CoreProfilingService;
+import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -29,7 +29,7 @@ import reactor.core.publisher.Mono;
  *
  * @since 4.5.0
  */
-public class NoOpProfilingService implements InternalProfilingService, CoreProfilingService {
+public class NoOpProfilingService implements InternalProfilingService, PrivilegedProfilingService {
 
   private SpanManager spanManager = new DefaultSpanManager();
 
