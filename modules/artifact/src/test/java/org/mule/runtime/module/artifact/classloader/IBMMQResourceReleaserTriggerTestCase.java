@@ -25,6 +25,7 @@ import static org.mockito.Mockito.mock;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -184,7 +185,7 @@ public class IBMMQResourceReleaserTriggerTestCase {
 
   @Test
   @Description("When redeploying an application which contains the IBM MQ Driver, the proper cleanup should be performed " +
-      "on redeployment but, if the property avoid.ibm.mq.cleanup.mbeans=true, the mbeans clean should be skiped.")
+          "on redeployment but, if the property avoid.ibm.mq.cleanup.mbeans=true, the mbeans clean should be skiped.")
   public void releaserMBeansPropertyTrueTriggerTest() throws Exception {
     Field shouldReleaseIbmMQResourcesField = getField(MuleArtifactClassLoader.class, "shouldReleaseIbmMQResources", false);
     shouldReleaseIbmMQResourcesField.setAccessible(true);
