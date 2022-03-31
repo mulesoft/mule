@@ -7,14 +7,8 @@
 package org.mule.runtime.core.internal.profiling.consumer.tracing.operations;
 
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.START_SPAN;
-import static org.mule.runtime.core.internal.profiling.consumer.tracing.operations.SpanUtils.getBuilder;
-
-import static java.lang.System.currentTimeMillis;
-
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
-import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.SpanProfilingEventContext;
 
@@ -34,36 +28,7 @@ public class StartSpanProfilingExecutionOperation
 
   @Override
   public void execute(ComponentProcessingStrategyProfilingEventContext eventContext) {
-    profilingDataProducer.triggerProfilingEvent(eventContext, context -> new OperationExecutionStartEventContext(context));
+    profilingDataProducer.triggerProfilingEvent(eventContext, context -> new DefaultProfilingEventContext(context));
 
-  }
-
-  /**
-   * A {@link SpanProfilingEventContext} that corresponds to an end span profiling event.
-   */
-  private class OperationExecutionStartEventContext implements SpanProfilingEventContext {
-
-    private final ComponentProcessingStrategyProfilingEventContext eventContext;
-    private long triggerTimeStamp;
-
-    public OperationExecutionStartEventContext(ComponentProcessingStrategyProfilingEventContext eventContext) {
-      this.eventContext = eventContext;
-      triggerTimeStamp = currentTimeMillis();
-    }
-
-    @Override
-    public long getTriggerTimestamp() {
-      return triggerTimeStamp;
-    }
-
-    @Override
-    public Span getSpan() {
-      ComponentLocation location = eventContext.getLocation().get();
-      return getBuilder(location)
-          .withLocation(location)
-          .withArtifactId(eventContext.getArtifactId())
-          .withCorrelationId(eventContext.getCorrelationId())
-          .build();
-    }
   }
 }
