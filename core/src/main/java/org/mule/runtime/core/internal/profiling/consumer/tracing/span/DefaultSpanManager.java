@@ -19,7 +19,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 
 public class DefaultSpanManager implements SpanManager {
 
-  // TODO: a removal listener has to be added to end the span in case it is not closed by the runtime.
+  // TODO W-10930532: a removal listener has to be added to end the span in case it is not closed by the runtime.
   private static Cache<SpanIdentifier, Span> cache = newBuilder().weakValues().expireAfterAccess(60, MINUTES).build();
 
   @Override
