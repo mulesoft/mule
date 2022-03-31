@@ -79,6 +79,7 @@ public class ResponseStreamingCompletionHandler
 
         if (isDone) {
             System.out.println("Writig out closing chunk");
+            //content = httpResponsePacket.httpContentBuilder().build();
             ctx.write(EMPTY_CONTENT, this);
         }
     }
@@ -96,6 +97,7 @@ public class ResponseStreamingCompletionHandler
         if (c == -1)
             isDone = true;
         buffer.limit(bytesRead);
+        System.out.println("read" + (new String(bufferByteArray)).trim());
         return isDone;
     }
 
