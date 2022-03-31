@@ -54,6 +54,11 @@ public class FlowSpanBuilder extends SpanBuilder {
   }
 
   @Override
+  public Span build() {
+    return cache.get(getSpanIdentifer(), id -> super.build());
+  }
+
+  @Override
   protected String getSpanName() {
     return getSpanIdentifer().getId();
   }

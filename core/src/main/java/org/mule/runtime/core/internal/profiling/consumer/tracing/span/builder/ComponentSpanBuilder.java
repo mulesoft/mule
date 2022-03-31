@@ -40,7 +40,6 @@ public class ComponentSpanBuilder extends SpanBuilder {
     return new ComponentSpanBuilder();
   }
 
-
   @Override
   protected List<SpanIdentifier> getLinkedSpans() {
     return new ArrayList<>();
@@ -72,6 +71,11 @@ public class ComponentSpanBuilder extends SpanBuilder {
     if (correlationId == null) {
       throw new IllegalStateException("No correlationId found for the span");
     }
+  }
+
+  @Override
+  public Span build() {
+    return cache.get(getSpanIdentifer(), id -> super.build());
   }
 
   @Override
