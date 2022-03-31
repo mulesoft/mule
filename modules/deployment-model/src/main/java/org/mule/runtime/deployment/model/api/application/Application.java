@@ -13,7 +13,8 @@ import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.artifact.api.classloader.RegionOwnerArtifact;
 
 @NoImplement
-public interface Application extends DeployableArtifact<ApplicationDescriptor>, RegionOwnerArtifact {
+public interface Application
+    extends DeployableArtifact<org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor>, RegionOwnerArtifact {
 
   /**
    * @return the domain associated with the application.

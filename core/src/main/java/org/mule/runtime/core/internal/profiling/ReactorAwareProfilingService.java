@@ -9,19 +9,19 @@ package org.mule.runtime.core.internal.profiling;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 
 import java.util.function.Function;
 
-import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * A Profiling Service that adds some extra internal functionality. This is used only by the runtime core.
+ * A Profiling Service that adds some extra internal functionality related to reactor. This is used only by the runtime core.
  *
  * @since 4.5.0
  */
-public interface CoreProfilingService extends ProfilingService {
+public interface ReactorAwareProfilingService extends ProfilingService {
 
   /**
    * Enriches {@link Mono} with profiling event.
@@ -56,4 +56,5 @@ public interface CoreProfilingService extends ProfilingService {
   <S> Mono<S> setCurrentExecutionContext(Mono<S> original, Function<S, ExecutionContext> executionContextSupplier);
 
   <S> Flux<S> setCurrentExecutionContext(Flux<S> original, Function<S, ExecutionContext> executionContextSupplier);
+
 }

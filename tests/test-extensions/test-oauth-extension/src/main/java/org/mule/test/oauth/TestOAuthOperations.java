@@ -27,6 +27,7 @@ import org.mule.runtime.extension.api.dsql.QueryTranslator;
 import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.sdk.api.annotation.data.sample.SampleData;
 import org.mule.test.oauth.metadata.OAuthMetadataResolver;
@@ -52,6 +53,21 @@ public class TestOAuthOperations {
       } else {
         throw new AccessTokenExpiredException();
       }
+    }
+  }
+
+  @MediaType(TEXT_PLAIN)
+  public void tokenExpiredAsync(@Connection TestOAuthConnection connection,
+                                CompletionCallback<String, String> completionCallback) {
+    final OAuthState state = connection.getState().getState();
+    if (state != null && !state.getAccessToken().endsWith("refreshed")) {
+      if (state instanceof AuthorizationCodeState) {
+        completionCallback.error(new AccessTokenExpiredException(((AuthorizationCodeState) state).getResourceOwnerId()));
+      } else {
+        completionCallback.error(new AccessTokenExpiredException());
+      }
+    } else {
+      completionCallback.success(Result.<String, String>builder().output("Success!").attributes("Success!").build());
     }
   }
 

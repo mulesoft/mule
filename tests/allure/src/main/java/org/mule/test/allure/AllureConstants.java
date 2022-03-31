@@ -118,6 +118,13 @@ public interface AllureConstants {
 
     String CLASSLOADING_ISOLATION = "Classloading Isolation";
 
+    interface ClassloadingIsolationStory {
+
+      String ARTIFACT_DESCRIPTORS = "Artifact descriptors";
+      String CLASSLOADER_MODEL = "ClassLoader model";
+      String CLASSLOADER_GENERATION = "ClassLoader generation";
+    }
+
   }
 
   interface PackagerFeature {

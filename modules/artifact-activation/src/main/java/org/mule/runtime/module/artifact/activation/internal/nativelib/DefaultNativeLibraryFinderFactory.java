@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.deployment.model.internal.nativelib;
+package org.mule.runtime.module.artifact.activation.internal.nativelib;
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;

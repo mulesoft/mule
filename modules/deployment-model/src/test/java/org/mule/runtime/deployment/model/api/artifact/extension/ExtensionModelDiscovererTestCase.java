@@ -20,11 +20,11 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.LoaderDescriber;
 import org.mule.runtime.deployment.model.internal.artifact.extension.DefaultExtensionDiscoveryRequest;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.plugin.LoaderDescriber;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.concurrent.atomic.AtomicBoolean;

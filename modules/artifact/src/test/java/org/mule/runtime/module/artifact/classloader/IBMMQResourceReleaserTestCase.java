@@ -6,13 +6,27 @@
  */
 package org.mule.runtime.module.artifact.classloader;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
+import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
+import static org.mule.runtime.core.api.util.ClassUtils.getField;
+import static org.mule.runtime.core.api.util.ClassUtils.getStaticFieldValue;
+import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
+import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
+import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
+import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
+
+import static java.lang.Thread.currentThread;
+import static java.lang.Thread.getAllStackTraces;
+import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
+
+import static org.apache.commons.io.FileUtils.toFile;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assume.assumeThat;
+import static org.mockito.Mockito.mock;
+
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.model.BundleDependency;
@@ -34,25 +48,16 @@ import java.net.URL;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.logging.Level;
+import java.util.stream.Stream;
 
-import static java.lang.Thread.currentThread;
-import static java.lang.Thread.getAllStackTraces;
-import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
-import static org.apache.commons.io.FileUtils.toFile;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assume.assumeThat;
-import static org.mockito.Mockito.mock;
-import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
-import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
-import static org.mule.runtime.core.api.util.ClassUtils.getField;
-import static org.mule.runtime.core.api.util.ClassUtils.getStaticFieldValue;
-import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
-import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
-import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
-import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(LEAK_PREVENTION)
 @RunWith(Parameterized.class)
@@ -98,7 +103,17 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
       }
 
       @Override
+      public ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy) {
+        return null;
+      }
+
+      @Override
       public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies, boolean overwrite) {
+        return null;
+      }
+
+      @Override
+      public ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy, boolean overwrite) {
         return null;
       }
     };

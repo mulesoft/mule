@@ -24,6 +24,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PRO
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.VALIDATE_APPLICATION_MODEL_WITH_REGION_CLASSLOADER;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
@@ -325,6 +326,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureDisableRegistryBootstrapOptionalEntries();
       configureDisableApplyObjectProcessor();
       configureEnableByteBuddyObjectCreation();
+      configureValidateAppModelWithRegionClassloader();
     }
   }
 
@@ -1404,7 +1406,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureDisableApplyObjectProcessor() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DISABLE_APPLY_OBJECT_PROCESSOR,
-                                                minMuleVersion("4.5.0"));
+                                                minMuleVersion("4.6.0"));
   }
 
   /**
@@ -1418,9 +1420,19 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
                                                 minMuleVersion("4.5.0"));
   }
 
+  /**
+   * Configures the {@link MuleRuntimeFeature#VALIDATE_APPLICATION_MODEL_WITH_REGION_CLASSLOADER} feature flag.
+   *
+   * @since 4.5.0
+   */
+  private static void configureValidateAppModelWithRegionClassloader() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(VALIDATE_APPLICATION_MODEL_WITH_REGION_CLASSLOADER,
+                                                minMuleVersion("4.5.0"));
+  }
+
   private static Predicate<FeatureContext> minMuleVersion(String version) {
     return featureContext -> featureContext.getArtifactMinMuleVersion()
         .filter(muleVersion -> muleVersion.atLeast(version)).isPresent();
   }
-
 }

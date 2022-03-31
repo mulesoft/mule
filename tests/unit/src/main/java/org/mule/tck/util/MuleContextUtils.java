@@ -45,6 +45,9 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.Injector;
@@ -65,12 +68,12 @@ import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.core.internal.profiling.ReactorAwareProfilingService;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
@@ -219,7 +222,8 @@ public class MuleContextUtils {
    *
    * @return the created {@code muleContext}.
    */
-  public static MuleContextWithRegistry mockContextWithServicesWithProfilingService(CoreProfilingService coreProfilingService) {
+  public static MuleContextWithRegistry mockContextWithServicesWithProfilingService(
+                                                                                    ReactorAwareProfilingService coreProfilingService) {
     final MuleContextWithRegistry muleContext = mockMuleContext();
 
     final ExtensionManager extensionManager = mock(ExtensionManager.class, withSettings().lenient());
@@ -274,7 +278,8 @@ public class MuleContextUtils {
       injectableObjects.put(ConfigurationComponentLocator.class, configurationComponentLocator);
       injectableObjects.put(ConfigurationProperties.class, configProps);
       injectableObjects.put(FeatureFlaggingService.class, featureFlaggingService);
-      injectableObjects.put(CoreProfilingService.class, coreProfilingService);
+      injectableObjects.put(ReactorAwareProfilingService.class, coreProfilingService);
+      injectableObjects.put(ProfilingService.class, coreProfilingService);
 
       // Ensure injection of consistent mock objects
       when(muleContext.getInjector()).thenReturn(new MocksInjector(injectableObjects));
@@ -291,7 +296,9 @@ public class MuleContextUtils {
    * @return the created {@code muleContext}.
    */
   public static MuleContextWithRegistry mockContextWithServices() {
-    return mockContextWithServicesWithProfilingService(mock(CoreProfilingService.class));
+    ReactorAwareProfilingService profilingService = mock(ReactorAwareProfilingService.class);
+    when(profilingService.getProfilingDataProducer(any(ProfilingEventType.class))).thenReturn(mock(ProfilingDataProducer.class));
+    return mockContextWithServicesWithProfilingService(profilingService);
   }
 
   /**

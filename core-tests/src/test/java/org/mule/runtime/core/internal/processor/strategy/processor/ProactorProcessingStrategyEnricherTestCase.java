@@ -27,8 +27,8 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.enricher.AbstractEnrichedReactiveProcessorTestCase;
 import org.mule.runtime.core.internal.processor.strategy.enricher.ProactorProcessingStrategyEnricher;
-import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.internal.util.rx.ImmediateScheduler;
+import org.mule.runtime.core.internal.profiling.ReactorAwareProfilingService;
 
 import io.qameta.allure.Description;
 import org.junit.Rule;
@@ -55,7 +55,7 @@ public class ProactorProcessingStrategyEnricherTestCase extends AbstractEnriched
   @Mock
   private CoreEvent coreEvent;
   @Mock(answer = RETURNS_MOCKS)
-  private CoreProfilingService profilingService;
+  private ReactorAwareProfilingService profilingService;
 
   @Before
   public void before() {

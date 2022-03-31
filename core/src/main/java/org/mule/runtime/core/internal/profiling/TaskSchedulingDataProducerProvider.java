@@ -15,7 +15,7 @@ import org.mule.runtime.core.internal.profiling.producer.TaskSchedulingProfiling
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
 /**
- * A {@link ProfilingDataProducerProvider} that provides {@link TaskSchedulingDataProducerProvider}
+ * A {@link ProfilingDataProducerProvider} that provides {@link TaskSchedulingProfilingDataProducer}
  *
  * @since 4.5.0
  */

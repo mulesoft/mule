@@ -27,4 +27,16 @@
         <this:hello-place greeting="good morning" city="London"/>
     </flow>
 
+    <flow name="nonBlockingOperationFlow">
+        <this:non-blocking-hello-world receiver="Malaga!"/>
+    </flow>
+
+    <flow name="blockingOperationFlow">
+        <this:blocking-hello-world receiver="Malaga!"/>
+    </flow>
+
+    <flow name="recursiveOperationFlow">
+        <this:repeated-hello-world receiver="Malaga!" count="3"/>
+    </flow>
+
 </mule>

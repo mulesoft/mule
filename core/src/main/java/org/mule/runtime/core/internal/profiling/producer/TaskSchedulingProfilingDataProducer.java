@@ -15,7 +15,6 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.ResettableProfilingDataProducer;
-import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInternalProfilingDataConsumer;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingDataProducerStatus;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
@@ -28,7 +27,6 @@ import java.util.function.Function;
  * @see Scheduler
  * @since 4.5
  */
-@RuntimeInternalProfilingDataConsumer
 public class TaskSchedulingProfilingDataProducer
     implements ResettableProfilingDataProducer<TaskSchedulingProfilingEventContext, CoreEvent> {
 

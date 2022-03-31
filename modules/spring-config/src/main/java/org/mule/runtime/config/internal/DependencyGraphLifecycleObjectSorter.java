@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 
-import org.jgrapht.alg.cycle.CycleDetector;
+import org.jgrapht.alg.connectivity.ConnectivityInspector;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.traverse.TopologicalOrderIterator;
@@ -43,24 +43,28 @@ import org.springframework.beans.factory.config.BeanDefinition;
 public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSorter {
 
   private List<DefaultDirectedGraph<BeanWrapper, DefaultEdge>> dependencyGraphs;
+  private List<DefaultDirectedGraph<BeanWrapper, DefaultEdge>> reverseGraphs;
   private DependencyGraphBeanDependencyResolver resolver;
   protected final Class<?>[] orderedLifecycleTypes;
   private Map<String, Integer> lifecycleObjectNameOrderMap;
 
   public DependencyGraphLifecycleObjectSorter(DependencyGraphBeanDependencyResolver resolver, Class<?>[] orderedLifecycleTypes) {
     this.dependencyGraphs = new ArrayList<>(orderedLifecycleTypes.length);
+    this.reverseGraphs = new ArrayList<>(orderedLifecycleTypes.length);
     this.resolver = resolver;
     this.orderedLifecycleTypes = orderedLifecycleTypes;
     for (int i = 0; i < orderedLifecycleTypes.length; i++) {
       DefaultDirectedGraph<BeanWrapper, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
       dependencyGraphs.add(graph);
+      DefaultDirectedGraph<BeanWrapper, DefaultEdge> reverseGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
+      reverseGraphs.add(reverseGraph);
     }
     this.lifecycleObjectNameOrderMap = new HashMap<>();
   }
 
   /**
    * Building a single dependency graph(bucket) for each lifecycle type
-   * 
+   *
    * @param beanName      current object(bean)'s name to resolve dependencies
    * @param currentObject current object that is going to be added to the graph(bucket)
    */
@@ -75,10 +79,12 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
     int graphIndex = getDependencyGraphIndex(currentObject);
 
     DefaultDirectedGraph<BeanWrapper, DefaultEdge> dependencyGraph = getDependencyGraphForLifecycleType(graphIndex);
-    CycleDetector<BeanWrapper, DefaultEdge> cycleDetector = new CycleDetector<>(dependencyGraph);
+    DefaultDirectedGraph<BeanWrapper, DefaultEdge> reverseGraph = getReverseGraphForLifecycleType(graphIndex);
+    ConnectivityInspector pathInspector = new ConnectivityInspector(reverseGraph);
 
     BeanWrapper currentVertex = new BeanWrapper(beanName, currentObject);
     dependencyGraph.addVertex(currentVertex);
+    reverseGraph.addVertex(currentVertex);
 
     // get (direct) prerequisite objects for the current object
     Map<BeanWrapper, List<BeanWrapper>> prerequisiteObjectsMap =
@@ -89,6 +95,8 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
       List<BeanWrapper> prerequisiteObjects = prerequisiteObjectsMap.get(source);
       BeanWrapper current = new BeanWrapper(source.getName(), source.getWrappedObject());
       dependencyGraph.addVertex(current);
+      reverseGraph.addVertex(current);
+
       if (prerequisiteObjects.isEmpty()) {
         continue;
       }
@@ -99,14 +107,13 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
 
                                     BeanWrapper preReqVertex = new BeanWrapper(preReqName, preReqObject);
                                     dependencyGraph.addVertex(preReqVertex);
+                                    reverseGraph.addVertex(preReqVertex);
 
-                                    // remove any additional edge that creates cycle
-                                    // todo: W-10704588 Reduce time to detect cycles in a directed graph
-                                    if (!dependencyGraph.containsEdge(preReqVertex, current)) {
+                                    // check if a path exists in the edge reversed graph to avoid cycles
+                                    // (W-10704588 : tested multiple options for faster cycle detection)
+                                    if (!pathInspector.pathExists(current, preReqVertex)) {
+                                      reverseGraph.addEdge(preReqVertex, current);
                                       dependencyGraph.addEdge(current, preReqVertex);
-                                      if (cycleDetector.detectCycles()) {
-                                        dependencyGraph.removeEdge(current, preReqVertex);
-                                      }
                                     }
                                   });
     }
@@ -135,6 +142,16 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
    */
   private DefaultDirectedGraph<BeanWrapper, DefaultEdge> getDependencyGraphForLifecycleType(int graphIndex) {
     return dependencyGraphs.get(graphIndex);
+  }
+
+  /**
+   * Provides the edge reversed graph(bucket) the current object should be added to
+   *
+   * @param graphIndex index of the graph for the current object
+   * @return edge reversed dependency graph(bucket)
+   */
+  private DefaultDirectedGraph<BeanWrapper, DefaultEdge> getReverseGraphForLifecycleType(int graphIndex) {
+    return reverseGraphs.get(graphIndex);
   }
 
   /**

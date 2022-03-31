@@ -8,9 +8,9 @@ package org.mule.runtime.deployment.model.api.builder;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.internal.application.DefaultApplicationClassLoaderBuilder;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 
 /**
  * Factory to create instances of {@code ApplicationClassLoaderBuilder}.

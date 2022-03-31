@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.deployment.model.api.plugin.resolver;
 
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
 import java.util.List;
 import java.util.Set;
