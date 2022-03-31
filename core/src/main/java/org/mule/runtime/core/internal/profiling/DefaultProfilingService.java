@@ -19,6 +19,8 @@ import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import org.mule.runtime.api.profiling.tracing.TracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.core.internal.profiling.consumer.tracing.span.DefaultSpanManager;
+import org.mule.runtime.core.internal.profiling.consumer.tracing.span.SpanManager;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.discovery.DefaultProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.producer.provider.ProfilingDataProducerResolver;
@@ -49,6 +51,8 @@ public class DefaultProfilingService extends AbstractProfilingService {
 
   @Inject
   private ProfilingFeatureFlaggingService featureFlaggingService;
+
+  private SpanManager spanManager = new DefaultSpanManager();
 
   private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies = empty();
 
@@ -161,5 +165,10 @@ public class DefaultProfilingService extends AbstractProfilingService {
   @Override
   public <S> Flux<S> setCurrentExecutionContext(Flux<S> original, Function<S, ExecutionContext> executionContextSupplier) {
     return original.doOnNext(s -> getTracingService().setCurrentExecutionContext(executionContextSupplier.apply(s)));
+  }
+
+  @Override
+  public SpanManager getSpanManager() {
+    return spanManager;
   }
 }

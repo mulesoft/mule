@@ -10,6 +10,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.SpanProfilingEventContext;
+import org.mule.runtime.core.internal.profiling.consumer.tracing.span.SpanManager;
 
 import static java.lang.System.currentTimeMillis;
 import static org.mule.runtime.core.internal.profiling.consumer.tracing.operations.SpanUtils.getBuilder;
@@ -22,11 +23,14 @@ import static org.mule.runtime.core.internal.profiling.consumer.tracing.operatio
 public class DefaultSpanProfilingEventContext implements SpanProfilingEventContext {
 
   private final ComponentProcessingStrategyProfilingEventContext eventContext;
-  private long triggerTimeStamp;
+  private final long triggerTimeStamp;
+  private final SpanManager spanManager;
 
-  public DefaultSpanProfilingEventContext(ComponentProcessingStrategyProfilingEventContext eventContext) {
+  public DefaultSpanProfilingEventContext(ComponentProcessingStrategyProfilingEventContext eventContext,
+                                          SpanManager spanManager) {
     this.eventContext = eventContext;
     triggerTimeStamp = currentTimeMillis();
+    this.spanManager = spanManager;
   }
 
   @Override
@@ -38,6 +42,7 @@ public class DefaultSpanProfilingEventContext implements SpanProfilingEventConte
   public Span getSpan() {
     ComponentLocation location = eventContext.getLocation().get();
     return getBuilder(location)
+        .withSpanManager(spanManager)
         .withArtifactId(eventContext.getArtifactId())
         .withLocation(location)
         .withCorrelationId(eventContext.getCorrelationId())

@@ -10,9 +10,6 @@ import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 
-import java.util.List;
-import java.util.Map;
-
 /**
  * A {@link Span} that represents the trace corresponding to the execution of mule flow or component.
  *
@@ -22,31 +19,22 @@ public class ExecutionSpan implements Span {
 
   private final String name;
   private final SpanIdentifier identifier;
-  private final Map<String, Object> attributes;
   private final Span parent;
-  private final List<SpanIdentifier> linkedSpans;
   private final Long startTime;
   private final Long endTime;
 
-  public ExecutionSpan(String name, SpanIdentifier identifier, Long startTime, Long endTime, Map<String, Object> attributes,
-                       Span parent, List<SpanIdentifier> linkedSpans) {
+  public ExecutionSpan(String name, SpanIdentifier identifier, Long startTime, Long endTime,
+                       Span parent) {
     this.name = name;
     this.identifier = identifier;
     this.startTime = startTime;
     this.endTime = endTime;
-    this.attributes = attributes;
     this.parent = parent;
-    this.linkedSpans = linkedSpans;
   }
 
   @Override
   public Span getParent() {
     return parent;
-  }
-
-  @Override
-  public List<SpanIdentifier> getLinkedSpans() {
-    return linkedSpans;
   }
 
   @Override
@@ -62,11 +50,6 @@ public class ExecutionSpan implements Span {
   @Override
   public SpanDuration getDuration() {
     return new DefaultSpanDuration(startTime, endTime);
-  }
-
-  @Override
-  public Map<String, Object> getAttributes() {
-    return attributes;
   }
 
   /**

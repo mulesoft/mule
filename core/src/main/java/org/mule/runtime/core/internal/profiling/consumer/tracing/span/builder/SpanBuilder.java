@@ -12,9 +12,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.core.internal.profiling.consumer.tracing.span.ExecutionSpan;
-
-import java.util.HashMap;
-import java.util.List;
+import org.mule.runtime.core.internal.profiling.consumer.tracing.span.SpanManager;
 
 /**
  * This builder creates a {@link Span} from mule core objects.
@@ -26,7 +24,12 @@ public abstract class SpanBuilder {
   protected String artifactId;
   protected String correlationId;
   protected ComponentLocation location;
+  protected SpanManager spanManager;
 
+  public SpanBuilder withSpanManager(SpanManager spanManager) {
+    this.spanManager = spanManager;
+    return this;
+  }
 
   public SpanBuilder withArtifactId(String artifactId) {
     this.artifactId = artifactId;
@@ -49,11 +52,11 @@ public abstract class SpanBuilder {
    * @return the {@link} the span built
    */
   public Span build() {
-    return new ExecutionSpan(getSpanName(), getSpanIdentifer(), currentTimeMillis(), null, new HashMap<>(), getParent(),
-                             getLinkedSpans());
+    SpanIdentifier spanIdentifier = getSpanIdentifer();
+    return spanManager.getSpan(spanIdentifier,
+                               id -> new ExecutionSpan(getSpanName(), getSpanIdentifer(), currentTimeMillis(), null,
+                                                       getParent()));
   }
-
-  protected abstract List<SpanIdentifier> getLinkedSpans();
 
   protected abstract Span getParent();
 

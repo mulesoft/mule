@@ -42,7 +42,7 @@ import javax.inject.Inject;
  * @since 4.4
  */
 public abstract class AbstractProfilingService
-    implements ReactorAwareProfilingService, CoreProfilingService, Initialisable, Startable, Stoppable {
+    implements InternalProfilingService, CoreProfilingService, Initialisable, Startable, Stoppable {
 
 
   private static AtomicBoolean profilingFeaturesSet = new AtomicBoolean(false);

@@ -19,9 +19,9 @@ import static com.google.common.collect.ImmutableSet.of;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
-import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInternalProfilingDataConsumer;
 import org.mule.runtime.core.internal.profiling.consumer.tracing.operations.EndSpanProfilingExecutionOperation;
 import org.mule.runtime.core.internal.profiling.consumer.tracing.operations.LoggerProfilingEventOperation;
@@ -43,26 +43,26 @@ public class ComponentProcessingStrategyDataConsumer
 
   private static final Logger LOGGER = getLogger(ComponentProcessingStrategyDataConsumer.class);
   private final ImmutableMultimap<ProfilingEventType<ComponentProcessingStrategyProfilingEventContext>, ProfilingExecutionOperation<ComponentProcessingStrategyProfilingEventContext>> operations;
-  private final ProfilingService profilingService;
-  private final Logger logger;
+  private final Logger customLogger;
 
-  public ComponentProcessingStrategyDataConsumer(ProfilingService profilingService) {
+  public ComponentProcessingStrategyDataConsumer(InternalProfilingService profilingService) {
     this(profilingService, LOGGER);
   }
 
-  public ComponentProcessingStrategyDataConsumer(ProfilingService profilingService, Logger logger) {
-    this.profilingService = profilingService;
-    this.logger = logger;
+  public ComponentProcessingStrategyDataConsumer(InternalProfilingService profilingService, Logger customLogger) {
+    this.customLogger = customLogger;
     this.operations =
         ImmutableMultimap
             .<ProfilingEventType<ComponentProcessingStrategyProfilingEventContext>, ProfilingExecutionOperation<ComponentProcessingStrategyProfilingEventContext>>builder()
-            .put(PS_SCHEDULING_OPERATION_EXECUTION, new LoggerProfilingEventOperation(logger, PS_SCHEDULING_OPERATION_EXECUTION))
-            .put(PS_STARTING_OPERATION_EXECUTION, new LoggerProfilingEventOperation(logger, PS_STARTING_OPERATION_EXECUTION))
-            .put(PS_OPERATION_EXECUTED, new LoggerProfilingEventOperation(logger, PS_OPERATION_EXECUTED))
-            .put(PS_FLOW_MESSAGE_PASSING, new LoggerProfilingEventOperation(logger, PS_FLOW_MESSAGE_PASSING))
-            .put(PS_SCHEDULING_FLOW_EXECUTION, new LoggerProfilingEventOperation(logger, PS_SCHEDULING_FLOW_EXECUTION))
-            .put(STARTING_FLOW_EXECUTION, new LoggerProfilingEventOperation(logger, STARTING_FLOW_EXECUTION))
-            .put(FLOW_EXECUTED, new LoggerProfilingEventOperation(logger, FLOW_EXECUTED))
+            .put(PS_SCHEDULING_OPERATION_EXECUTION,
+                 new LoggerProfilingEventOperation(customLogger, PS_SCHEDULING_OPERATION_EXECUTION))
+            .put(PS_STARTING_OPERATION_EXECUTION,
+                 new LoggerProfilingEventOperation(customLogger, PS_STARTING_OPERATION_EXECUTION))
+            .put(PS_OPERATION_EXECUTED, new LoggerProfilingEventOperation(customLogger, PS_OPERATION_EXECUTED))
+            .put(PS_FLOW_MESSAGE_PASSING, new LoggerProfilingEventOperation(customLogger, PS_FLOW_MESSAGE_PASSING))
+            .put(PS_SCHEDULING_FLOW_EXECUTION, new LoggerProfilingEventOperation(customLogger, PS_SCHEDULING_FLOW_EXECUTION))
+            .put(STARTING_FLOW_EXECUTION, new LoggerProfilingEventOperation(customLogger, STARTING_FLOW_EXECUTION))
+            .put(FLOW_EXECUTED, new LoggerProfilingEventOperation(customLogger, FLOW_EXECUTED))
             .put(STARTING_FLOW_EXECUTION, new StartSpanProfilingExecutionOperation(profilingService))
             .put(FLOW_EXECUTED, new EndSpanProfilingExecutionOperation(profilingService))
             .put(PS_SCHEDULING_OPERATION_EXECUTION, new StartSpanProfilingExecutionOperation(profilingService))
@@ -92,6 +92,6 @@ public class ComponentProcessingStrategyDataConsumer
    * @return the logger used for consuming the profiling data.
    */
   protected Logger getDataConsumerLogger() {
-    return logger;
+    return customLogger;
   }
 }

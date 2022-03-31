@@ -73,7 +73,7 @@ import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
-import org.mule.runtime.core.internal.profiling.ReactorAwareProfilingService;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
@@ -223,7 +223,7 @@ public class MuleContextUtils {
    * @return the created {@code muleContext}.
    */
   public static MuleContextWithRegistry mockContextWithServicesWithProfilingService(
-                                                                                    ReactorAwareProfilingService coreProfilingService) {
+                                                                                    InternalProfilingService coreProfilingService) {
     final MuleContextWithRegistry muleContext = mockMuleContext();
 
     final ExtensionManager extensionManager = mock(ExtensionManager.class, withSettings().lenient());
@@ -278,7 +278,7 @@ public class MuleContextUtils {
       injectableObjects.put(ConfigurationComponentLocator.class, configurationComponentLocator);
       injectableObjects.put(ConfigurationProperties.class, configProps);
       injectableObjects.put(FeatureFlaggingService.class, featureFlaggingService);
-      injectableObjects.put(ReactorAwareProfilingService.class, coreProfilingService);
+      injectableObjects.put(InternalProfilingService.class, coreProfilingService);
       injectableObjects.put(ProfilingService.class, coreProfilingService);
 
       // Ensure injection of consistent mock objects
@@ -296,7 +296,7 @@ public class MuleContextUtils {
    * @return the created {@code muleContext}.
    */
   public static MuleContextWithRegistry mockContextWithServices() {
-    ReactorAwareProfilingService profilingService = mock(ReactorAwareProfilingService.class);
+    InternalProfilingService profilingService = mock(InternalProfilingService.class);
     when(profilingService.getProfilingDataProducer(any(ProfilingEventType.class))).thenReturn(mock(ProfilingDataProducer.class));
     return mockContextWithServicesWithProfilingService(profilingService);
   }

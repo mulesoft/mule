@@ -17,6 +17,8 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 
 import java.util.function.Function;
 
+import org.mule.runtime.core.internal.profiling.consumer.tracing.span.DefaultSpanManager;
+import org.mule.runtime.core.internal.profiling.consumer.tracing.span.SpanManager;
 import org.mule.runtime.core.privileged.profiling.CoreProfilingService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -27,7 +29,9 @@ import reactor.core.publisher.Mono;
  *
  * @since 4.5.0
  */
-public class NoOpProfilingService implements ReactorAwareProfilingService, CoreProfilingService {
+public class NoOpProfilingService implements InternalProfilingService, CoreProfilingService {
+
+  private SpanManager spanManager = new DefaultSpanManager();
 
   private final TracingService noOpTracingService = new TracingService() {
 
@@ -121,5 +125,10 @@ public class NoOpProfilingService implements ReactorAwareProfilingService, CoreP
   @Override
   public <S> Flux<S> setCurrentExecutionContext(Flux<S> original, Function<S, ExecutionContext> executionContextSupplier) {
     return original;
+  }
+
+  @Override
+  public SpanManager getSpanManager() {
+    return spanManager;
   }
 }

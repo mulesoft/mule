@@ -53,6 +53,7 @@ import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyPr
 import org.mule.runtime.api.profiling.type.context.SpanProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.profiling.NoOpProfilingService;
 import org.mule.runtime.core.internal.profiling.consumer.ComponentProcessingStrategyDataConsumer;
 import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInternalProfilingDataConsumer;
@@ -253,7 +254,7 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
   @RuntimeInternalProfilingDataConsumer
   private static class TestComponentProcessingStrategyDataConsumer extends ComponentProcessingStrategyDataConsumer {
 
-    public TestComponentProcessingStrategyDataConsumer(ProfilingService profilingService, Logger logger) {
+    public TestComponentProcessingStrategyDataConsumer(InternalProfilingService profilingService, Logger logger) {
       super(profilingService, logger);
     }
   }

@@ -13,6 +13,7 @@ import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 
 import java.util.function.Function;
 
+import org.mule.runtime.core.internal.profiling.consumer.tracing.span.SpanManager;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -21,7 +22,7 @@ import reactor.core.publisher.Mono;
  *
  * @since 4.5.0
  */
-public interface ReactorAwareProfilingService extends ProfilingService {
+public interface InternalProfilingService extends ProfilingService {
 
   /**
    * Enriches {@link Mono} with profiling event.
@@ -56,5 +57,7 @@ public interface ReactorAwareProfilingService extends ProfilingService {
   <S> Mono<S> setCurrentExecutionContext(Mono<S> original, Function<S, ExecutionContext> executionContextSupplier);
 
   <S> Flux<S> setCurrentExecutionContext(Flux<S> original, Function<S, ExecutionContext> executionContextSupplier);
+
+  SpanManager getSpanManager();
 
 }

@@ -14,7 +14,7 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.profiling.ReactorAwareProfilingService;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 import reactor.core.publisher.Flux;
@@ -36,9 +36,9 @@ public class ProfilingTestUtils {
    *
    * @param coreProfilingService  the core profiling service to mock
    * @param profilingDataProducer the profiling service data producer
-   * @see ReactorAwareProfilingService
+   * @see InternalProfilingService
    */
-  public static void mockProcessingStrategyProfilingChain(ReactorAwareProfilingService coreProfilingService,
+  public static void mockProcessingStrategyProfilingChain(InternalProfilingService coreProfilingService,
                                                           ProfilingDataProducer profilingDataProducer) {
     when(coreProfilingService.enrichWithProfilingEventFlux(any(), any(), any()))
         .thenAnswer(i -> ((Flux<CoreEvent>) i.getArgument(0)).doOnNext(e -> profilingDataProducer.triggerProfilingEvent(null)));
@@ -57,10 +57,10 @@ public class ProfilingTestUtils {
    * mocks the return of the transformation of a reactive chain for the processing strategy, without triggering a profiling event.
    *
    * @param reactorAwareProfilingService the core profiling service to mock
-   * @see ReactorAwareProfilingService
+   * @see InternalProfilingService
    */
   public static void mockProcessingStrategyProfilingChainWithoutTriggeringEvent(
-                                                                                ReactorAwareProfilingService reactorAwareProfilingService) {
+                                                                                InternalProfilingService reactorAwareProfilingService) {
     when(reactorAwareProfilingService.enrichWithProfilingEventFlux(any(), any(), any()))
         .thenAnswer(i -> ((Flux<CoreEvent>) i.getArgument(0)));
 

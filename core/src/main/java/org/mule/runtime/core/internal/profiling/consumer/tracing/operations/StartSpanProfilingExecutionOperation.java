@@ -7,10 +7,10 @@
 package org.mule.runtime.core.internal.profiling.consumer.tracing.operations;
 
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.START_SPAN;
-import org.mule.runtime.api.profiling.ProfilingDataProducer;
-import org.mule.runtime.api.profiling.ProfilingService;
-import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
+
+import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.SpanProfilingEventContext;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 
 /**
  * A {@link ProfilingExecutionOperation} that triggers a profiling event indicating the start of a span.
@@ -18,17 +18,14 @@ import org.mule.runtime.api.profiling.type.context.SpanProfilingEventContext;
  * @since 4.5.0
  */
 public class StartSpanProfilingExecutionOperation
-    implements ProfilingExecutionOperation<ComponentProcessingStrategyProfilingEventContext> {
+    extends SpanProfilingExecutionOperation {
 
-  private final ProfilingDataProducer<SpanProfilingEventContext, ComponentProcessingStrategyProfilingEventContext> profilingDataProducer;
-
-  public StartSpanProfilingExecutionOperation(ProfilingService profilingService) {
-    profilingDataProducer = profilingService.getProfilingDataProducer(START_SPAN);
+  public StartSpanProfilingExecutionOperation(InternalProfilingService profilingService) {
+    super(profilingService);
   }
 
   @Override
-  public void execute(ComponentProcessingStrategyProfilingEventContext eventContext) {
-    profilingDataProducer.triggerProfilingEvent(eventContext, context -> new DefaultSpanProfilingEventContext(context));
-
+  protected ProfilingEventType<SpanProfilingEventContext> getProfilingEventType() {
+    return START_SPAN;
   }
 }

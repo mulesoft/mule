@@ -31,22 +31,23 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
+import org.mule.runtime.core.internal.profiling.consumer.tracing.span.SpanManager;
 import org.mule.runtime.core.privileged.profiling.CoreProfilingService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * A {@link ReactorAwareProfilingService} that may not produce profiling data if the profiling functionality is totally disabled.
+ * A {@link InternalProfilingService} that may not produce profiling data if the profiling functionality is totally disabled.
  *
  * @see DefaultProfilingService
  * @see NoOpProfilingService
  */
-public class ProfilingServiceWrapper implements ReactorAwareProfilingService, CoreProfilingService, Lifecycle {
+public class ProfilingServiceWrapper implements InternalProfilingService, CoreProfilingService, Lifecycle {
 
   @Inject
   MuleContext muleContext;
 
-  ReactorAwareProfilingService profilingService;
+  InternalProfilingService profilingService;
 
   @Inject
   FeatureFlaggingService featureFlaggingService;
@@ -89,14 +90,14 @@ public class ProfilingServiceWrapper implements ReactorAwareProfilingService, Co
     return getProfilingService().getTracingService();
   }
 
-  public ReactorAwareProfilingService getProfilingService() throws MuleRuntimeException {
+  public InternalProfilingService getProfilingService() throws MuleRuntimeException {
     if (profilingService != null) {
       return profilingService;
     }
     return initialiseProfilingService();
   }
 
-  private ReactorAwareProfilingService initialiseProfilingService() throws MuleRuntimeException {
+  private InternalProfilingService initialiseProfilingService() throws MuleRuntimeException {
     if (featureFlaggingService.isEnabled(ENABLE_PROFILING_SERVICE)) {
       profilingService = new DefaultProfilingService();
     } else {
@@ -134,6 +135,11 @@ public class ProfilingServiceWrapper implements ReactorAwareProfilingService, Co
   @Override
   public <S> Flux<S> setCurrentExecutionContext(Flux<S> original, Function<S, ExecutionContext> executionContextSupplier) {
     return profilingService.setCurrentExecutionContext(original, executionContextSupplier);
+  }
+
+  @Override
+  public SpanManager getSpanManager() {
+    return profilingService.getSpanManager();
   }
 
   @Override
