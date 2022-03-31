@@ -42,6 +42,8 @@ public class ResponseStreamingCompletionHandler
     private volatile boolean isDone;
 
     public static final String MULE_CLASSLOADER = "MULE_CLASSLOADER";
+    public boolean isFirst = true;
+    StringBuffer tempBuffer = new StringBuffer();
 
     public ResponseStreamingCompletionHandler(final FilterChainContext ctx,
                                               final HttpRequestPacket request, final HttpResponse httpResponse, ResponseStatusCallback responseStatusCallback)
@@ -64,9 +66,17 @@ public class ResponseStreamingCompletionHandler
 
     public void sendInputStreamChunk() throws IOException
     {
-        final Buffer buffer = memoryManager.allocate(DEFAULT_BUFFER_SIZE);
+        if(isDone)
+            return;
+        System.out.println("sendInputStreamChunk was called" + Thread.currentThread().getName());
+        Buffer buffer = memoryManager.allocate(DEFAULT_BUFFER_SIZE);
+        if(isFirst) {
+            System.out.println("isFirst  release was - called from a second thread" + Thread.currentThread().getName());
+            memoryManager.release(buffer);
+            buffer = memoryManager.allocate(DEFAULT_BUFFER_SIZE);
+            isFirst = false;
+        }
 
-        final int offset = buffer.arrayOffset();
         final int length = buffer.remaining();
 
         isDone = readStreamManually(buffer);
@@ -76,7 +86,7 @@ public class ResponseStreamingCompletionHandler
         ctx.write(content, this);
 
         if (isDone) {
-            content = httpResponsePacket.httpContentBuilder().build();
+            content =  httpResponsePacket.httpTrailerBuilder().build();
             ctx.write(content, this);
         }
     }
@@ -85,6 +95,7 @@ public class ResponseStreamingCompletionHandler
         buffer.clear();
         boolean isDone = false;
         byte[] bufferByteArray = buffer.array();
+        //System.out.println("Offset:" + buffer.arrayOffset());
         int bytesRead = 0;
         int c;
         while ((c = inputStream.read()) != -1 && bytesRead < DEFAULT_BUFFER_SIZE) {
@@ -96,7 +107,9 @@ public class ResponseStreamingCompletionHandler
         return isDone;
     }
 
-
+    private void writeWithLog(byte[] bufferByteArray) {
+        System.out.println("About to write" + (new String(bufferByteArray)).toString());
+    }
     /**
      * Method gets called, when file chunk was successfully sent.
      *
