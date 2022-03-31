@@ -56,21 +56,21 @@ public class ProfilingTestUtils {
   /**
    * mocks the return of the transformation of a reactive chain for the processing strategy, without triggering a profiling event.
    *
-   * @param reactorAwareProfilingService the core profiling service to mock
+   * @param internalProfilingService the core profiling service to mock
    * @see InternalProfilingService
    */
   public static void mockProcessingStrategyProfilingChainWithoutTriggeringEvent(
-                                                                                InternalProfilingService reactorAwareProfilingService) {
-    when(reactorAwareProfilingService.enrichWithProfilingEventFlux(any(), any(), any()))
+                                                                                InternalProfilingService internalProfilingService) {
+    when(internalProfilingService.enrichWithProfilingEventFlux(any(), any(), any()))
         .thenAnswer(i -> ((Flux<CoreEvent>) i.getArgument(0)));
 
-    when(reactorAwareProfilingService.enrichWithProfilingEventMono(any(), any(), any()))
+    when(internalProfilingService.enrichWithProfilingEventMono(any(), any(), any()))
         .thenAnswer(i -> ((Mono<CoreEvent>) i.getArgument(0)));
 
-    when(reactorAwareProfilingService.setCurrentExecutionContext(any(Flux.class), any()))
+    when(internalProfilingService.setCurrentExecutionContext(any(Flux.class), any()))
         .thenAnswer(i -> i.getArgument(0));
 
-    when(reactorAwareProfilingService.setCurrentExecutionContext(any(Mono.class), any()))
+    when(internalProfilingService.setCurrentExecutionContext(any(Mono.class), any()))
         .thenAnswer(i -> i.getArgument(0));
   }
 
