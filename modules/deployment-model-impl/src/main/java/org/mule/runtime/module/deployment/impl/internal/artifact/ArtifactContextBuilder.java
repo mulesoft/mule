@@ -446,7 +446,7 @@ public class ArtifactContextBuilder {
           @Override
           public void configure(MuleContext muleContext) throws ConfigurationException {
             if (serviceRepository != null) {
-              serviceConfigurators.add(new ContainerServicesMuleContextConfigurator(serviceRepository));
+              serviceConfigurators.add(new ContainerServicesMuleContextConfigurator(serviceRepository.getServices()));
             }
             if (classLoaderRepository != null) {
               serviceConfigurators.add(customizationService -> customizationService
