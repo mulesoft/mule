@@ -19,12 +19,12 @@ import static org.mule.runtime.core.internal.profiling.consumer.tracing.operatio
  *
  * @since 4.5.0
  */
-public class DefaultProfilingEventContext implements SpanProfilingEventContext {
+public class DefaultSpanProfilingEventContext implements SpanProfilingEventContext {
 
   private final ComponentProcessingStrategyProfilingEventContext eventContext;
   private long triggerTimeStamp;
 
-  public DefaultProfilingEventContext(ComponentProcessingStrategyProfilingEventContext eventContext) {
+  public DefaultSpanProfilingEventContext(ComponentProcessingStrategyProfilingEventContext eventContext) {
     this.eventContext = eventContext;
     triggerTimeStamp = currentTimeMillis();
   }

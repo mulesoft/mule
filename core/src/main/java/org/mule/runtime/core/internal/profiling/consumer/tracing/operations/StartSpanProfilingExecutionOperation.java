@@ -28,7 +28,7 @@ public class StartSpanProfilingExecutionOperation
 
   @Override
   public void execute(ComponentProcessingStrategyProfilingEventContext eventContext) {
-    profilingDataProducer.triggerProfilingEvent(eventContext, context -> new DefaultProfilingEventContext(context));
+    profilingDataProducer.triggerProfilingEvent(eventContext, context -> new DefaultSpanProfilingEventContext(context));
 
   }
 }

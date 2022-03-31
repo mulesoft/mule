@@ -29,7 +29,7 @@ public class EndSpanProfilingExecutionOperation implements
 
   @Override
   public void execute(ComponentProcessingStrategyProfilingEventContext eventContext) {
-    profilingDataProducer.triggerProfilingEvent(eventContext, DefaultProfilingEventContext::new);
+    profilingDataProducer.triggerProfilingEvent(eventContext, DefaultSpanProfilingEventContext::new);
   }
 
 }
