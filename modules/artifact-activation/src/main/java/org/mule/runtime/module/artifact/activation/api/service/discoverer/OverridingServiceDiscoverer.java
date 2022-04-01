@@ -11,11 +11,11 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.module.artifact.activation.api.service.ServiceAssembly;
-import org.mule.runtime.module.artifact.activation.api.service.ServiceDiscoverer;
-import org.mule.runtime.module.artifact.activation.api.service.ServiceProviderDiscoverer;
-import org.mule.runtime.module.artifact.activation.api.service.ServiceResolutionError;
-import org.mule.runtime.module.artifact.activation.internal.service.discoverer.DefaultServiceDiscoverer;
+import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
+import org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer;
+import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
+import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
+import org.mule.runtime.module.service.internal.discoverer.DefaultServiceDiscoverer;
 
 import java.util.LinkedList;
 import java.util.List;

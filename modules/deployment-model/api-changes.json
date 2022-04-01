@@ -3,6 +3,16 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.class.nonFinalClassInheritsFromNewClass",
+          "old": "class org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants",
+          "new": "class org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants",
+          "superClass": "org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants",
+          "package": "org.mule.runtime.deployment.model.api.artifact",
+          "classSimpleName": "ArtifactDescriptorConstants",
+          "elementKind": "class",
+          "justification": "te cabio por gil"
+        },
+        {
           "code": "java.method.returnTypeChanged",
           "old": "method D org.mule.runtime.deployment.model.api.DeployableArtifact<D extends org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor>::getDescriptor()",
           "new": "method D org.mule.runtime.deployment.model.api.DeployableArtifact<D extends org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor>::getDescriptor()",

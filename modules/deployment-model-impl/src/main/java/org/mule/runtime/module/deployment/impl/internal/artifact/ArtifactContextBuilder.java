@@ -52,7 +52,7 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfigurati
 import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.module.artifact.activation.internal.service.config.ContainerServicesMuleContextConfigurator;
+import org.mule.runtime.module.artifact.activation.api.service.config.ContainerServiceConfigurator;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationMuleContextBuilder;
@@ -446,7 +446,7 @@ public class ArtifactContextBuilder {
           @Override
           public void configure(MuleContext muleContext) throws ConfigurationException {
             if (serviceRepository != null) {
-              serviceConfigurators.add(new ContainerServicesMuleContextConfigurator(serviceRepository.getServices()));
+              serviceConfigurators.add(new ContainerServiceConfigurator(serviceRepository.getServices()));
             }
             if (classLoaderRepository != null) {
               serviceConfigurators.add(customizationService -> customizationService

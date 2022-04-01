@@ -33,9 +33,14 @@
 
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-deployment-model</artifactId>
+            <artifactId>mule-module-artifact</artifactId>
             <version>${project.version}</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.mule.runtime</groupId>-->
+<!--            <artifactId>mule-module-deployment-model</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>dependency-->
 
         <dependency>
             <groupId>org.mule.tests</groupId>
