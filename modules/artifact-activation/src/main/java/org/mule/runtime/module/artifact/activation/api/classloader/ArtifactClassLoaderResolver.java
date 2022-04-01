@@ -23,6 +23,7 @@ import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -56,33 +57,62 @@ public interface ArtifactClassLoaderResolver {
   /**
    * Creates a classLoader for a domain. This will create the classLoader itself and all of its internal required state:
    * regionClassLoader, classLoaders for plugins.
-   * 
+   *
    * @param descriptor                the descriptor of the domain to generate a classLoader for.
-   * @param pluginClassLoaderResolver a wrapper function around
-   *                                  {@link #createMulePluginClassLoader(MuleDeployableArtifactClassLoader, ArtifactPluginDescriptor, Function, BiFunction)}.
-   *                                  This is usually just a call to
-   *                                  {@link #resolvePluginClassLoader(ArtifactClassLoader, ArtifactPluginDescriptor)}.
+   * @param artifactPluginDescriptors resolved descriptors of all the plugins to include in the region, sorted according to their
+   *                                  dependencies.
    * @return a classLoader for a domain.
    */
   MuleDeployableArtifactClassLoader createDomainClassLoader(DomainDescriptor descriptor,
-                                                            BiFunction<ArtifactClassLoader, ArtifactPluginDescriptor, ArtifactClassLoader> pluginClassLoaderResolver);
+                                                            List<ArtifactPluginDescriptor> artifactPluginDescriptors);
+
+  /**
+   * Creates a classLoader for a domain. This will create the classLoader itself and all of its internal required state:
+   * regionClassLoader, classLoaders for plugins.
+   * 
+   * @param descriptor                the descriptor of the domain to generate a classLoader for.
+   * @param artifactPluginDescriptors resolved descriptors of all the plugins to include in the region, sorted according to their
+   *                                  dependencies.
+   * @param pluginClassLoaderResolver allows the user to provide a class loader for the given plugin, otherwise it will be
+   *                                  created.
+   * @return a classLoader for a domain.
+   */
+  MuleDeployableArtifactClassLoader createDomainClassLoader(DomainDescriptor descriptor,
+                                                            List<ArtifactPluginDescriptor> artifactPluginDescriptors,
+                                                            BiFunction<ArtifactClassLoader, ArtifactPluginDescriptor, Optional<ArtifactClassLoader>> pluginClassLoaderResolver);
 
   /**
    * Creates a classLoader for an application. This will create the classLoader itself and all of its internal required state:
    * regionClassLoader, classLoaders for plugins.
    * 
    * @param descriptor                the descriptor of the application to generate a classLoader for.
-   * @param domainClassLoaderResolver a wrapper function for {@link #createDomainClassLoader(DomainDescriptor, BiFunction)}. An
-   *                                  {@link Optional#empty()} input means that the application does not use a domain.
-   * @param pluginClassLoaderResolver a wrapper function around
-   *                                  {@link #createMulePluginClassLoader(MuleDeployableArtifactClassLoader, ArtifactPluginDescriptor, Function, BiFunction)}.
-   *                                  This is usually just a call to
-   *                                  {@link #resolvePluginClassLoader(ArtifactClassLoader, ArtifactPluginDescriptor)}.
+   * @param artifactPluginDescriptors resolved descriptors of all the plugins to include in the region, sorted according to their
+   *                                  dependencies.
+   * @param domainClassLoaderResolver a wrapper function for {@link #createDomainClassLoader(DomainDescriptor, List, BiFunction)}.
+   *                                  An {@link Optional#empty()} input means that the application does not use a domain.
    * @return a classLoader for an application.
    */
   MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
-                                                                 Function<Optional<BundleDescriptor>, MuleDeployableArtifactClassLoader> domainClassLoaderResolver,
-                                                                 BiFunction<ArtifactClassLoader, ArtifactPluginDescriptor, ArtifactClassLoader> pluginClassLoaderResolver);
+                                                                 List<ArtifactPluginDescriptor> artifactPluginDescriptors,
+                                                                 Function<Optional<BundleDescriptor>, ArtifactClassLoader> domainClassLoaderResolver);
+
+  /**
+   * Creates a classLoader for an application. This will create the classLoader itself and all of its internal required state:
+   * regionClassLoader, classLoaders for plugins.
+   *
+   * @param descriptor                the descriptor of the application to generate a classLoader for.
+   * @param artifactPluginDescriptors resolved descriptors of all the plugins to include in the region, sorted according to their
+   *                                  dependencies.
+   * @param domainClassLoaderResolver a wrapper function for {@link #createDomainClassLoader(DomainDescriptor, List, BiFunction)}.
+   *                                  An {@link Optional#empty()} input means that the application does not use a domain.
+   * @param pluginClassLoaderResolver allows the user to provide a class loader for the given plugin, otherwise it will be
+   *                                  created.
+   * @return a classLoader for an application.
+   */
+  MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
+                                                                 List<ArtifactPluginDescriptor> artifactPluginDescriptors,
+                                                                 Function<Optional<BundleDescriptor>, ArtifactClassLoader> domainClassLoaderResolver,
+                                                                 BiFunction<ArtifactClassLoader, ArtifactPluginDescriptor, Optional<ArtifactClassLoader>> pluginClassLoaderResolver);
 
   /**
    * Creates a classLoader for a plugin.
@@ -91,35 +121,16 @@ public interface ArtifactClassLoaderResolver {
    * packages/resources. For that reason, a classLoader for a plugin in one application may be different from the same plugin in
    * another application.
    * 
-   * @param ownerArtifactClassLoader  the classLoader for the artifact that has the plugin dependency for the target classLoader.
-   * @param descriptor                the descriptor of the plugin to generate a classLoader for.
-   * @param pluginDescriptorResolver  a wrapper function around the logic to extract an {@link ArtifactPluginDescriptor} from the
-   *                                  jar described by the {@link BundleDescriptor}. The function must return
-   *                                  {@link Optional#empty()} if the plugin represented by the {@link BundleDescriptor} is not a
-   *                                  dependency of the artifact for {@code ownerArtifactClassLoader}.
-   * @param pluginClassLoaderResolver a wrapper function around
-   *                                  {@link #createMulePluginClassLoader(MuleDeployableArtifactClassLoader, ArtifactPluginDescriptor, Function, BiFunction)}.
-   *                                  This is needed to resolve classLoaders for plugins that are dependencies of other plugins.
-   *                                  This is usually just a call to
-   *                                  {@link #resolvePluginClassLoader(ArtifactClassLoader, ArtifactPluginDescriptor)}.
+   * @param ownerArtifactClassLoader the classLoader for the artifact that has the plugin dependency for the target classLoader.
+   * @param descriptor               the descriptor of the plugin to generate a classLoader for.
+   * @param pluginDescriptorResolver a wrapper function around the logic to extract an {@link ArtifactPluginDescriptor} from the
+   *                                 jar described by the {@link BundleDescriptor}. The function must return
+   *                                 {@link Optional#empty()} if the plugin represented by the {@link BundleDescriptor} is not a
+   *                                 dependency of the artifact for {@code ownerArtifactClassLoader}.
    * @return a classloader for a plugin within a given application or domain.
    */
   MuleArtifactClassLoader createMulePluginClassLoader(MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
                                                       ArtifactPluginDescriptor descriptor,
-                                                      Function<BundleDescriptor, Optional<ArtifactPluginDescriptor>> pluginDescriptorResolver,
-                                                      BiFunction<ArtifactClassLoader, ArtifactPluginDescriptor, ArtifactClassLoader> pluginClassLoaderResolver);
-
-  /**
-   * Creates a classLoader for a plugin.
-   * <p>
-   * The classLoader for a plugin is based on the classLoader of its owner artifact for some scenarios regarding exported
-   * packages/resources. For that reason, a classLoader for a plugin in one application may be different than the same plugin in
-   * another application.
-   * 
-   * @param ownerClassLoader the classLoader for the artifact that has the plugin dependency for the target classLoader.
-   * @param descriptor       the descriptor of the plugin to generate a classLoader for.
-   * @return a classloader for a plugin within a given application or domain.
-   */
-  MuleArtifactClassLoader resolvePluginClassLoader(ArtifactClassLoader ownerClassLoader, ArtifactPluginDescriptor descriptor);
+                                                      Function<BundleDescriptor, Optional<ArtifactPluginDescriptor>> pluginDescriptorResolver);
 
 }
