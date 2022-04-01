@@ -71,7 +71,7 @@ public class DefaultProfilingService extends AbstractProfilingService {
     profilingDataProducers
         .computeIfAbsent(profilingEventType,
                          profEventType -> new ConcurrentHashMap<>())
-        .put(new ArtifactProfilingProducerScope(getArtifactId(muleContext)),
+        .put(new ArtifactProfilingProducerScope(getScope()),
              new ResettableProfilingDataProducerDelegate<>(profilingDataProducer, profDataProducer -> {
                if (profDataProducer instanceof ResettableProfilingDataProducer) {
                  ((ResettableProfilingDataProducer<T, S>) profDataProducer).reset();
@@ -106,7 +106,7 @@ public class DefaultProfilingService extends AbstractProfilingService {
   public <T extends ProfilingEventContext, S> ProfilingDataProducer<T, S> getProfilingDataProducer(
                                                                                                    ProfilingEventType<T> profilingEventType) {
     return getProfilingDataProducer(profilingEventType,
-                                    new ArtifactProfilingProducerScope(getArtifactId(muleContext)));
+                                    new ArtifactProfilingProducerScope(getScope()));
   }
 
   @Override
@@ -170,5 +170,14 @@ public class DefaultProfilingService extends AbstractProfilingService {
   @Override
   public SpanManager getSpanManager() {
     return spanManager;
+  }
+
+  private String getScope() {
+    if (muleContext == null) {
+      // No scope in this case. We are in the context of the profiling service for the container
+      return "";
+    } else {
+      return getArtifactId(muleContext);
+    }
   }
 }
