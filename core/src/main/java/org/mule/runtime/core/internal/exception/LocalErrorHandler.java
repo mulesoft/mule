@@ -11,16 +11,13 @@ import org.mule.runtime.api.exception.MuleException;
 public class LocalErrorHandler extends ErrorHandler {
 
   @Override
-  public void start() throws MuleException {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Starting local error handler: {}. Nothing will be done as this depends on a global error handler.", this);
-    }
-  }
-
-  @Override
   public void stop() throws MuleException {
     if (logger.isDebugEnabled()) {
       logger.debug("Stopping local error handler: {}. Nothing will be done as this depends on a global error handler.", this);
     }
+  }
+
+  public void stopParent() throws MuleException {
+    super.stop();
   }
 }
