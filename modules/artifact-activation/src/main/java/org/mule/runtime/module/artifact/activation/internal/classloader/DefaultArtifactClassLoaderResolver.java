@@ -359,11 +359,9 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
                                      .equals(dependencyPluginDescriptor
                                          .getBundleDescriptor()
                                          .getArtifactId()))
-                .findAny().orElseThrow(() -> new ArtifactActivationException(createStaticMessage("message")));
-            if (pluginClassLoader == null) {
-              throw new IllegalStateException("Cannot find classloader for plugin: "
-                  + dependencyPluginDescriptor.getBundleDescriptor().getArtifactId());
-            }
+                .findAny()
+                .orElseThrow(() -> new ArtifactActivationException(createStaticMessage("Cannot find classloader for plugin: "
+                    + dependencyPluginDescriptor.getBundleDescriptor().getArtifactId())));
             LookupStrategy lookupStrategy = new DelegateOnlyLookupStrategy(pluginClassLoader.getClassLoader());
 
             for (String exportedPackage : dependencyPluginDescriptor.getClassLoaderModel().getPrivilegedExportedPackages()) {
