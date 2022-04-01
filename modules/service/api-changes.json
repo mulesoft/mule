@@ -1,20 +1,4 @@
 {
-  "4.5.0": {
-    "revapi": {
-      "ignore": [
-        {
-          "code": "java.class.nonFinalClassInheritsFromNewClass",
-          "old": "class org.mule.runtime.module.service.api.discoverer.ImmutableServiceAssembly",
-          "new": "class org.mule.runtime.module.service.api.discoverer.ImmutableServiceAssembly",
-          "superClass": "org.mule.runtime.module.artifact.activation.api.service.ImmutableServiceAssembly",
-          "package": "org.mule.runtime.module.service.api.discoverer",
-          "classSimpleName": "ImmutableServiceAssembly",
-          "elementKind": "class",
-          "justification": "RevApi overreacting to Standard deprecation technique"
-        }
-      ]
-    }
-  },
   "4.2.0": {
     "revapi": {
       "ignore": [
