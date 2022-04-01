@@ -32,7 +32,8 @@ public class PluginsDependenciesProcessor {
 
   private static final Logger LOGGER = getLogger(PluginsDependenciesProcessor.class);
 
-  public static <T> List<T> process(List<ArtifactPluginDescriptor> artifactPlugins, boolean parallelize, BiConsumer<List<T>, ArtifactPluginDescriptor> processor) {
+  public static <T> List<T> process(List<ArtifactPluginDescriptor> artifactPlugins, boolean parallelize,
+                                    BiConsumer<List<T>, ArtifactPluginDescriptor> processor) {
     final List<T> processedDependencies = synchronizedList(new ArrayList<>());
 
     SimpleDirectedGraph<BundleDescriptor, DefaultEdge> depsGraph = new SimpleDirectedGraph<>(DefaultEdge.class);
@@ -75,7 +76,8 @@ public class PluginsDependenciesProcessor {
     return processedDependencies;
   }
 
-  private static Stream<ArtifactPluginDescriptor> artifactPluginsStream(List<ArtifactPluginDescriptor> artifactPlugins, boolean parallelize) {
+  private static Stream<ArtifactPluginDescriptor> artifactPluginsStream(List<ArtifactPluginDescriptor> artifactPlugins,
+                                                                        boolean parallelize) {
     return parallelize ? artifactPlugins.parallelStream() : artifactPlugins.stream();
   }
 }
