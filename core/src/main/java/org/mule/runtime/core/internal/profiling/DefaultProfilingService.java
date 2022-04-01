@@ -173,6 +173,7 @@ public class DefaultProfilingService extends AbstractProfilingService {
   }
 
   private String getScope() {
+    // TODO W-10933826 Refactor Container / Artifact Profiling Service so to avoid null verifications for muleContext
     if (muleContext == null) {
       // No scope in this case. We are in the context of the profiling service for the container
       return "";
