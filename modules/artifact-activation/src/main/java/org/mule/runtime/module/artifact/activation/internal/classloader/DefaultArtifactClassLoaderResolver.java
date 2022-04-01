@@ -28,7 +28,7 @@ import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
-import org.mule.runtime.module.artifact.activation.internal.PluginDependenciesProcessor;
+import org.mule.runtime.module.artifact.activation.internal.PluginsDependenciesProcessor;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinder;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -112,7 +112,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
     regionClassLoader.addClassLoader(domainClassLoader, artifactClassLoaderFilter);
 
-    List<ArtifactPluginDescriptor> artifactPluginDescriptors = PluginDependenciesProcessor.processPluginDependencies(new ArrayList<>(descriptor.getPlugins()), false, List::add);
+    List<ArtifactPluginDescriptor> artifactPluginDescriptors = PluginsDependenciesProcessor.process(new ArrayList<>(descriptor.getPlugins()), false, List::add);
 
     artifactPluginDescriptors
         .stream()
@@ -199,7 +199,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
     regionClassLoader.addClassLoader(appClassLoader, artifactClassLoaderFilter);
 
-    List<ArtifactPluginDescriptor> artifactPluginDescriptors = PluginDependenciesProcessor.processPluginDependencies(new ArrayList<>(descriptor.getPlugins()), false, List::add);
+    List<ArtifactPluginDescriptor> artifactPluginDescriptors = PluginsDependenciesProcessor.process(new ArrayList<>(descriptor.getPlugins()), false, List::add);
 
     artifactPluginDescriptors
         .stream()

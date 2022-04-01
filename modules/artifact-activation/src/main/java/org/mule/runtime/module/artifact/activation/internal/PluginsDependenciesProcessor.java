@@ -28,11 +28,11 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 import org.slf4j.Logger;
 
-public class PluginDependenciesProcessor {
+public class PluginsDependenciesProcessor {
 
-  private static final Logger LOGGER = getLogger(PluginDependenciesProcessor.class);
+  private static final Logger LOGGER = getLogger(PluginsDependenciesProcessor.class);
 
-  public static <T> List<T> processPluginDependencies(List<ArtifactPluginDescriptor> artifactPlugins, boolean parallelize, BiConsumer<List<T>, ArtifactPluginDescriptor> processor) {
+  public static <T> List<T> process(List<ArtifactPluginDescriptor> artifactPlugins, boolean parallelize, BiConsumer<List<T>, ArtifactPluginDescriptor> processor) {
     final List<T> processedDependencies = synchronizedList(new ArrayList<>());
 
     SimpleDirectedGraph<BundleDescriptor, DefaultEdge> depsGraph = new SimpleDirectedGraph<>(DefaultEdge.class);
@@ -60,7 +60,7 @@ public class PluginDependenciesProcessor {
           .filter(artifactPlugin -> depsGraph.vertexSet().contains(artifactPlugin.getBundleDescriptor())
               && depsGraph.outDegreeOf(artifactPlugin.getBundleDescriptor()) == 0)
           .forEach(artifactPlugin -> {
-            LOGGER.debug("pluginsDependenciesProcessor(parallel): {}", artifactPlugin.toString());
+            LOGGER.debug("pluginsDependenciesProcessor(parallel): {}", artifactPlugin);
 
             // need this auxiliary structure because the graph does not support concurrent modifications
             seenDependencies.add(artifactPlugin.getBundleDescriptor());
