@@ -150,7 +150,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
                                                                                    apiClassLoader.getClassLoader(),
                                                                                    apiClassLoader
                                                                                        .getClassLoaderLookupPolicy()),
-                                                                                          ACCESS_CONTROL_CTX));
+                                                                                                        ACCESS_CONTROL_CTX));
 
       for (MuleServiceContractModel contract : serviceDescriptor.getContractModels()) {
         ServiceAssembly assembly = LazyServiceAssembly.builder()

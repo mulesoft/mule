@@ -4,11 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.artifact.activation.internal.service.artifact;
+package org.mule.runtime.module.artifact.activation.api.service;
 
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.module.artifact.activation.api.service.ServiceAssembly;
 
 /**
  * Immutable implementation of {@link ServiceAssembly}

@@ -5,14 +5,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.artifact.activation.api.service.discoverer;
+package org.mule.test.runner.api;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-
 import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
 import org.mule.runtime.api.deployment.meta.MuleServiceModel;
 import org.mule.runtime.api.deployment.persistence.MuleServiceModelJsonSerializer;
@@ -20,11 +19,11 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.module.artifact.activation.internal.service.artifact.ImmutableServiceAssembly;
-import org.mule.runtime.module.artifact.activation.api.service.ServiceAssembly;
-import org.mule.runtime.module.artifact.activation.api.service.ServiceProviderDiscoverer;
-import org.mule.runtime.module.artifact.activation.api.service.ServiceResolutionError;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
+import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
+import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
+import org.mule.runtime.module.service.api.discoverer.ImmutableServiceAssembly;
 
 import java.io.InputStream;
 import java.util.LinkedList;
@@ -42,6 +41,11 @@ public class IsolatedServiceProviderDiscoverer implements ServiceProviderDiscove
   /**
    * Creates a new instance.
    *
+   * @param serviceArtifactClassLoaders {@link List} of {@link ArtifactClassLoader}s created for services discovered during
+   *                                    classification process. The {@code artifactName} of each {@link ArtifactClassLoader}
+   *                                    represents the {@value AetherClassPathClassifier#SERVICE_PROVIDER_CLASS_NAME} defined by
+   *                                    the service in its {@value AetherClassPathClassifier##SERVICE_PROPERTIES_FILE_NAME}and it
+   *                                    is used for instantiating the {@link ServiceProvider}.
    */
   public IsolatedServiceProviderDiscoverer(final List<ArtifactClassLoader> serviceArtifactClassLoaders) {
     checkNotNull(serviceArtifactClassLoaders, "serviceArtifactClassLoaders cannot be null");
