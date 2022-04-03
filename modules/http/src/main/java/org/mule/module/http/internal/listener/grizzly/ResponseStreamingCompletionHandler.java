@@ -104,16 +104,12 @@ public class ResponseStreamingCompletionHandler
         buffer.clear();*/
         boolean isDone = false;
         byte[] bufferByteArray = buffer.array();
-        System.out.println(String.format(" Input stream position before with invoctaion counter $ - %s",  inputStream.getPosition(), invocatioCter));
+        //System.out.println(String.format(" Input stream position before with invoctaion counter $ - %s",  inputStream.getPosition(), invocatioCter));
         //StringBuffer readDataBuf = new StringBuffer();
         int c;
         //int bytesRead = 0;
         int offset = buffer.arrayOffset();
         int length = buffer.remaining();
-        System.out.println("Array len:" + bufferByteArray.length);
-        System.out.println("ArrayOffset:" + buffer.arrayOffset());
-        System.out.println("Position:" + buffer.position());
-        System.out.println("Length:" + length);
 
         int current = 0;
 
@@ -123,11 +119,6 @@ public class ResponseStreamingCompletionHandler
             //readDataBuf.append((char)c);
             current++;
         }
-
-        System.out.println("Buffer arrayOffet after write:" + buffer.arrayOffset() );
-        System.out.println(" Input stream position After" + inputStream.getPosition());
-        //System.out.println("Data inn String buffer" + readDataBuf.toString());
-        System.out.println("Ending value of current" + current);
 
         if (c == -1)
             isDone = true;

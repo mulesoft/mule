@@ -214,10 +214,8 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                         if (isStream) {
                             try {
 
-
                                 System.out.println("Payload:-orig" + payload.toString());
-
-/*                                byte[] source = payload.toString().getBytes();
+                        /*    byte[] source = payload.toString().getBytes();
                                 System.out.println("Payload:-source" + new String(source));
                                 byte[] destn = new byte[source.length];
                                 System.arraycopy(source, 0, destn, 0, source.length);
