@@ -23,6 +23,7 @@ import static org.mule.module.http.api.requester.HttpStreamingType.AUTO;
 import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_0_9;
 import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_1_0;
 
+import org.apache.commons.io.IOUtils;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -55,6 +56,7 @@ import org.mule.util.DataTypeUtils;
 import org.mule.util.NumberUtils;
 import org.mule.util.UUID;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
@@ -164,6 +166,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         else
         {
             final Object payload = event.getMessage().getPayload();
+
             if (payload == NullPayload.getInstance())
             {
                 setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
@@ -209,12 +212,28 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                             setupChunkedEncoding(httpResponseHeaderBuilder);
                         }
                         if (isStream) {
-                            httpEntity = new InputStreamHttpEntity((InputStream) payload);
+                            try {
+
+
+                                System.out.println("Payload:-orig" + payload.toString());
+
+/*                                byte[] source = payload.toString().getBytes();
+                                System.out.println("Payload:-source" + new String(source));
+                                byte[] destn = new byte[source.length];
+                                System.arraycopy(source, 0, destn, 0, source.length);
+                                InputStream copiedPayLoad = new ByteArrayInputStream(destn);
+                                System.out.println("Payload:-copy" + new String(destn));
+                         */
+                                httpEntity = new InputStreamHttpEntity(IOUtils.toInputStream(payload.toString()));
+                            } catch (Exception e) {
+                                throw new MessagingException(event, new Throwable("Error preparing message for streaming"));
+                            }
                         }
                         else
                         {
                             httpEntity = new OutputHandlerHttpEntity((OutputHandler) payload);
                         }
+                        //System.out.println("Payload:" + payload);
                     }
                     else
                     {
