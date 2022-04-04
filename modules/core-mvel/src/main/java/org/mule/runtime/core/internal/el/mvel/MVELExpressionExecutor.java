@@ -16,7 +16,6 @@ import org.mule.mvel2.optimizers.impl.refl.ReflectiveAccessorOptimizer;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
-import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.io.Serializable;
 
@@ -49,8 +48,7 @@ public class MVELExpressionExecutor {
     this.parserConfiguration = parserConfiguration;
 
     MVEL.COMPILER_OPT_PROPERTY_ACCESS_DOESNT_FAIL = true;
-    // Since the DynamicOptimizer class grabs the TCCL, it could grab the app's classloader and that could lead to memory leakages
-    ClassUtils.withContextClassLoader(MVELExpressionLanguage.class.getClassLoader(), () -> OptimizerFactory.setDefaultOptimizer(OptimizerFactory.SAFE_REFLECTIVE));
+    OptimizerFactory.setDefaultOptimizer(OptimizerFactory.SAFE_REFLECTIVE);
 
     compiledExpressionsCache =
         CacheBuilder.newBuilder().maximumSize(getCompiledExpressionMaxCacheSize()).build(new CacheLoader<String, Serializable>() {
