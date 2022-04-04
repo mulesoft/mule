@@ -166,7 +166,6 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         else
         {
             final Object payload = event.getMessage().getPayload();
-
             if (payload == NullPayload.getInstance())
             {
                 setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
