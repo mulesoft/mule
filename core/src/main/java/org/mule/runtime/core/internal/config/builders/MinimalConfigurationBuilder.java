@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.config.builders;
 
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
@@ -41,14 +43,14 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMAT
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMERS_REGISTRY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMER_RESOLVER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.config.builders.RegistryBootstrap.defaultRegistryBoostrap;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultPersistentObjectStore;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
@@ -56,10 +58,13 @@ import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.SchedulerContainerPoolsConfig;
+import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.util.queue.QueueManager;
@@ -102,73 +107,43 @@ import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map.Entry;
 
 /**
- * Configures defaults required by Mule. This configuration builder is used to configure mule with these defaults when no other
- * ConfigurationBuilder that sets these is being used. This is used by both AbstractMuleTestCase and MuleClient. <br>
- * <br>
- * Default instances of the following are configured:
- * <ul>
- * <li>{@link SimpleRegistryBootstrap}
- * <li>{@link QueueManager}
- * <li>{@link SecurityManager}
- * <li>{@link ObjectStore}
- * </ul>
+ * Configures a {@link MuleContext} {@link Registry} with the bare minimum elements needed for functioning. This instance will
+ * configure the elements related to a particular {@link MuleContext} only. It will not configure container related elements such
+ * as {@link Service mule services}.
+ *
+ * @return a {@link ConfigurationBuilder}
+ * @since 4.5.0
  */
-public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
+public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
 
   @Override
   protected void doConfigure(MuleContext muleContext) throws Exception {
     MuleRegistry registry = ((MuleContextWithRegistry) muleContext).getRegistry();
 
-    new SimpleRegistryBootstrap(APP, muleContext).initialise();
+    defaultRegistryBoostrap(APP, muleContext).initialise();
 
     configureQueueManager(muleContext);
 
     registry.registerObject(OBJECT_MULE_CONTEXT, muleContext);
 
-    for (Entry<String, CustomService> entry : ((CustomServiceRegistry) (muleContext.getCustomizationService()))
-        .getCustomServices()
-        .entrySet()) {
-      entry.getValue().getServiceImpl().ifPresent(s -> {
-        try {
-          registerObject(entry.getKey(), s, muleContext);
-        } catch (RegistrationException e) {
-          throw new MuleRuntimeException(e);
-        }
-      });
-    }
+    registerCustomServices(muleContext);
+    registerObjectStoreManager(muleContext);
+    registerSchedulerPoolsConfig(muleContext);
+    registerLockFactory(muleContext);
+    registerTransformerRegistry(muleContext);
+    registerExpressionManager(muleContext, registry);
+    registerConnectionManager(muleContext);
+    registerConnectivityTester(muleContext);
 
     registerObject(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager(), muleContext);
-
-    registerObject(BASE_IN_MEMORY_OBJECT_STORE_KEY, createDefaultInMemoryObjectStore(), muleContext);
-    registerObject(BASE_PERSISTENT_OBJECT_STORE_KEY, createDefaultPersistentObjectStore(), muleContext);
-
-    registerLocalObjectStoreManager(muleContext, registry);
-
-    registerObject(OBJECT_SCHEDULER_POOLS_CONFIG, SchedulerContainerPoolsConfig.getInstance(), muleContext);
-    registerObject(OBJECT_SCHEDULER_BASE_CONFIG,
-                   config().withPrefix(muleContext.getConfiguration().getId())
-                       .withShutdownTimeout(() -> muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS),
-                   muleContext);
-
-    registerObject(OBJECT_STORE_MANAGER, new MuleObjectStoreManager(), muleContext);
     registerObject(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER, new MuleMessageProcessingManager(), muleContext);
-
     registerObject(OBJECT_MULE_STREAM_CLOSER_SERVICE, new DefaultStreamCloserService(), muleContext);
-
-    registerObject(OBJECT_LOCK_PROVIDER, new SingleServerLockProvider(), muleContext);
-    registerObject(OBJECT_LOCK_FACTORY, new MuleLockFactory(), muleContext);
-
     registerObject(OBJECT_PROCESSING_TIME_WATCHER, new DefaultProcessingTimeWatcher(), muleContext);
-
-    TransformersRegistry transformersRegistry = new DefaultTransformersRegistry();
-    registerObject(OBJECT_TRANSFORMERS_REGISTRY, transformersRegistry, muleContext);
-    registerObject(OBJECT_CONVERTER_RESOLVER, new DynamicDataTypeConversionResolver(transformersRegistry), muleContext);
-    registerObject(OBJECT_TRANSFORMATION_SERVICE, new ExtendedTransformationService(muleContext), muleContext);
-    registerObject(OBJECT_TRANSFORMER_RESOLVER, new TypeBasedTransformerResolver(), muleContext);
-
     registerObject(DEFAULT_OBJECT_SERIALIZER_NAME, new JavaObjectSerializer(), muleContext);
 
     final ContributedErrorTypeRepository contributedErrorTypeRepository = new ContributedErrorTypeRepository();
@@ -177,24 +152,11 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
     contributedErrorTypeLocator.setDelegate(createDefaultErrorTypeLocator(contributedErrorTypeRepository));
     registerObject(ErrorTypeLocator.class.getName(), contributedErrorTypeLocator, muleContext);
 
-    try {
-      Class<?> mvelLangCls = Class.forName("org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage");
-      mvelLangCls.getConstructor(MuleContext.class).newInstance(muleContext);
-      registerObject(OBJECT_EXPRESSION_LANGUAGE, mvelLangCls.getConstructor(MuleContext.class).newInstance(muleContext),
-                     muleContext);
-      registerObject(COMPATIBILITY_PLUGIN_INSTALLED, true, muleContext);
-    } catch (ClassNotFoundException cnfe) {
-      // no mvel in classpath, move on
-    }
+    tryRegisterMvel(muleContext);
 
     registerObject(OBJECT_STREAMING_GHOST_BUSTER, new StreamingGhostBuster(), muleContext);
     registerObject(OBJECT_STREAMING_MANAGER, new DefaultStreamingManager(), muleContext);
-    DefaultExpressionManager expressionManager = new DefaultExpressionManager();
-    DefaultExpressionLanguageFactoryService service = registry.lookupObject(DefaultExpressionLanguageFactoryService.class);
-    expressionManager.setExpressionLanguage(new DataWeaveExpressionLanguageAdaptor(muleContext, null, service, null));
-    registerObject(OBJECT_EXPRESSION_MANAGER, expressionManager, muleContext);
     registerObject(OBJECT_TIME_SUPPLIER, new LocalTimeSupplier(), muleContext);
-    registerObject(OBJECT_CONNECTION_MANAGER, new DefaultConnectionManager(muleContext), muleContext);
     registerObject(METADATA_SERVICE_KEY, new MuleMetadataService(), muleContext);
     registerObject(VALUE_PROVIDER_SERVICE_KEY, new MuleValueProviderService(), muleContext);
     registerObject(INTERCEPTOR_MANAGER_REGISTRY_KEY, new DefaultProcessorInterceptorManager(), muleContext);
@@ -203,7 +165,6 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
     registerObject(EventContextService.REGISTRY_KEY, new DefaultEventContextService(), muleContext);
     registerObject(OBJECT_TRANSACTION_FACTORY_LOCATOR, new TransactionFactoryLocator(), muleContext);
     registerObject(OBJECT_CLUSTER_SERVICE, new DefaultClusterService(), muleContext);
-    registerObject(OBJECT_CONNECTIVITY_TESTER_FACTORY, new DefaultConnectivityTesterFactory(), muleContext);
 
     // This is overridden only if no other test configurator has set the profiling service.
     if (((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(MULE_PROFILING_SERVICE_KEY) == null) {
@@ -220,6 +181,79 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
     registerObject(OBJECT_RESOURCE_LOCATOR, new DefaultResourceLocator(), muleContext);
   }
 
+  protected void registerConnectivityTester(MuleContext muleContext) throws RegistrationException {
+    registerObject(OBJECT_CONNECTIVITY_TESTER_FACTORY, new DefaultConnectivityTesterFactory(), muleContext);
+  }
+
+  protected void registerConnectionManager(MuleContext muleContext) throws RegistrationException {
+    registerObject(OBJECT_CONNECTION_MANAGER, new DefaultConnectionManager(muleContext), muleContext);
+  }
+
+  protected void registerExpressionManager(MuleContext muleContext, MuleRegistry registry) throws RegistrationException {
+    registerObject(OBJECT_EXPRESSION_MANAGER, getExpressionManager(muleContext, registry), muleContext);
+  }
+
+  protected ExtendedExpressionManager getExpressionManager(MuleContext muleContext, MuleRegistry registry)
+      throws RegistrationException {
+    DefaultExpressionManager expressionManager = new DefaultExpressionManager();
+    DefaultExpressionLanguageFactoryService service = getExpressionLanguageFactoryService(registry);
+    expressionManager.setExpressionLanguage(new DataWeaveExpressionLanguageAdaptor(muleContext, null, service, null));
+    return expressionManager;
+  }
+
+  protected DefaultExpressionLanguageFactoryService getExpressionLanguageFactoryService(MuleRegistry registry)
+      throws RegistrationException {
+    return registry.lookupObject(DefaultExpressionLanguageFactoryService.class);
+  }
+
+  protected void tryRegisterMvel(MuleContext muleContext) throws InstantiationException, IllegalAccessException,
+      InvocationTargetException, NoSuchMethodException, RegistrationException {
+    try {
+      Class<?> mvelLangCls = Class.forName("org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage");
+      mvelLangCls.getConstructor(MuleContext.class).newInstance(muleContext);
+      registerObject(OBJECT_EXPRESSION_LANGUAGE, mvelLangCls.getConstructor(MuleContext.class).newInstance(muleContext),
+                     muleContext);
+      registerObject(COMPATIBILITY_PLUGIN_INSTALLED, true, muleContext);
+    } catch (ClassNotFoundException cnfe) {
+      // no mvel in classpath, move on
+    }
+  }
+
+  protected void registerTransformerRegistry(MuleContext muleContext) throws RegistrationException {
+    TransformersRegistry transformersRegistry = new DefaultTransformersRegistry();
+    registerObject(OBJECT_TRANSFORMERS_REGISTRY, transformersRegistry, muleContext);
+    registerObject(OBJECT_CONVERTER_RESOLVER, new DynamicDataTypeConversionResolver(transformersRegistry), muleContext);
+    registerObject(OBJECT_TRANSFORMATION_SERVICE, new ExtendedTransformationService(muleContext), muleContext);
+    registerObject(OBJECT_TRANSFORMER_RESOLVER, new TypeBasedTransformerResolver(), muleContext);
+  }
+
+  protected void registerLockFactory(MuleContext muleContext) throws RegistrationException {
+    registerObject(OBJECT_LOCK_PROVIDER, new SingleServerLockProvider(), muleContext);
+    registerObject(OBJECT_LOCK_FACTORY, new MuleLockFactory(), muleContext);
+  }
+
+  protected void registerSchedulerPoolsConfig(MuleContext muleContext) throws RegistrationException {
+    registerObject(OBJECT_SCHEDULER_POOLS_CONFIG, SchedulerContainerPoolsConfig.getInstance(), muleContext);
+    registerObject(OBJECT_SCHEDULER_BASE_CONFIG,
+                   config().withPrefix(muleContext.getConfiguration().getId())
+                       .withShutdownTimeout(() -> muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS),
+                   muleContext);
+  }
+
+  protected void registerCustomServices(MuleContext muleContext) {
+    for (Entry<String, CustomService> entry : ((CustomServiceRegistry) (muleContext.getCustomizationService()))
+        .getCustomServices()
+        .entrySet()) {
+      entry.getValue().getServiceImpl().ifPresent(s -> {
+        try {
+          registerObject(entry.getKey(), s, muleContext);
+        } catch (RegistrationException e) {
+          throw new MuleRuntimeException(e);
+        }
+      });
+    }
+  }
+
   protected void registerObject(String serviceId, Object serviceImpl, MuleContext muleContext) throws RegistrationException {
     if (serviceImpl instanceof MuleContextAware) {
       ((MuleContextAware) serviceImpl).setMuleContext(muleContext);
@@ -227,12 +261,27 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(serviceId, serviceImpl);
   }
 
-  private void registerLocalObjectStoreManager(MuleContext muleContext, MuleRegistry registry) throws RegistrationException {
+  protected void registerObjectStoreManager(MuleContext muleContext) throws RegistrationException {
+    registerObjectStorePartitions(muleContext);
+
     MuleObjectStoreManager osm = new MuleObjectStoreManager();
     osm.setBasePersistentStoreKey(BASE_PERSISTENT_OBJECT_STORE_KEY);
     osm.setBaseTransientStoreKey(BASE_IN_MEMORY_OBJECT_STORE_KEY);
     osm.setMuleContext(muleContext);
-    registry.registerObject(OBJECT_STORE_MANAGER, osm);
+    registerObject(OBJECT_STORE_MANAGER, osm, muleContext);
+  }
+
+  protected void registerObjectStorePartitions(MuleContext muleContext) throws RegistrationException {
+    registerObject(BASE_IN_MEMORY_OBJECT_STORE_KEY, getDefaultInMemoryObjectStore(), muleContext);
+    registerObject(BASE_PERSISTENT_OBJECT_STORE_KEY, getDefaultPersistentObjectStore(), muleContext);
+  }
+
+  protected ObjectStore<Serializable> getDefaultPersistentObjectStore() {
+    return createDefaultPersistentObjectStore();
+  }
+
+  protected ObjectStore<Serializable> getDefaultInMemoryObjectStore() {
+    return createDefaultInMemoryObjectStore();
   }
 
   protected void configureQueueManager(MuleContext muleContext) throws RegistrationException {

@@ -112,7 +112,6 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.MetadataTypeEnricher;
-import org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEncodingModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
@@ -121,6 +120,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 import org.mule.runtime.module.extension.internal.loader.java.property.RuntimeVersionModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser;
 import org.mule.sdk.api.annotation.param.NullSafe;
 import org.mule.sdk.api.annotation.param.RuntimeVersion;
 import org.mule.sdk.api.runtime.parameter.Literal;
@@ -985,10 +985,21 @@ public final class IntrospectionUtils {
     return typeElements;
   }
 
-  public static List<Field> getAnnotatedFields(Class<?> clazz, Class<? extends Annotation>... annotationTypes) {
+  /**
+   * Returns a {@link Stream} with the fields annotated with any of the given {@code annotationTypes}
+   *
+   * @param clazz           The class to instrospect
+   * @param annotationTypes the annotation types
+   * @return a {@link Stream}
+   * @since 4.5.0
+   */
+  public static Stream<Field> getAnnotatedFieldsStream(Class<?> clazz, Class<? extends Annotation>... annotationTypes) {
     return getDescendingHierarchy(clazz).stream().flatMap(type -> stream(type.getDeclaredFields()))
-        .filter(field -> Stream.of(annotationTypes).anyMatch(annotationType -> field.getAnnotation(annotationType) != null))
-        .collect(toImmutableList());
+        .filter(field -> Stream.of(annotationTypes).anyMatch(annotationType -> field.getAnnotation(annotationType) != null));
+  }
+
+  public static List<Field> getAnnotatedFields(Class<?> clazz, Class<? extends Annotation>... annotationTypes) {
+    return getAnnotatedFieldsStream(clazz, annotationTypes).collect(toImmutableList());
   }
 
   public static List<Field> getFields(Class<?> clazz) {
@@ -1734,7 +1745,7 @@ public final class IntrospectionUtils {
 
   /**
    * Returns, for each parameter group defined on the component model, all the parameters matching with the given filter
-   * 
+   *
    * @param componentModel the component model used to filter the parameters
    * @param filter         the filter to apply to the group model parameters
    * @return The map having the parameter group as key and a set of its parameters matching the filter as value
@@ -1753,7 +1764,7 @@ public final class IntrospectionUtils {
   /**
    * Returns the value associated to a parameter with model {@code parameterModel} on the group {@code parameterGroupModel} or
    * {@code defaultValue} if such parameter is not present
-   * 
+   *
    * @param ctx                 the execution where to look for the parameter
    * @param parameterGroupModel the parameter group where the parameter is defined
    * @param parameterModel      the parameter model which value will be returned
@@ -1802,7 +1813,6 @@ public final class IntrospectionUtils {
    *
    * @param object the source object
    * @return an Optional containing the config field if any
-   *
    * @since 4.5
    */
   public static Optional<Field> fetchConfigFieldFromSourceObject(Object object) {
@@ -1814,7 +1824,6 @@ public final class IntrospectionUtils {
    *
    * @param object the source object
    * @return an Optional containing the connection field if any
-   *
    * @since 4.5
    */
   public static Optional<Field> fetchConnectionFieldFromSourceObject(Object object) {

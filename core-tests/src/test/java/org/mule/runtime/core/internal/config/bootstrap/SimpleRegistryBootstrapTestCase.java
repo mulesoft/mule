@@ -6,25 +6,21 @@
  */
 package org.mule.runtime.core.internal.config.bootstrap;
 
+import static java.lang.String.format;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.BINDING_PROVIDER_PREDICATE;
 
-import static java.lang.String.format;
-
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertThat;
-
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
-import org.mule.runtime.core.internal.config.builders.SimpleRegistryBootstrap;
-import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -32,10 +28,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 
+import io.qameta.allure.Issue;
 import org.junit.Assert;
 import org.junit.Test;
-
-import io.qameta.allure.Issue;
 
 public class SimpleRegistryBootstrapTestCase extends AbstractMuleContextTestCase {
 
@@ -95,7 +90,7 @@ public class SimpleRegistryBootstrapTestCase extends AbstractMuleContextTestCase
     properties.put("test.singletx.transaction.resource1", FakeTransactionResource.class.getName());
 
     final BootstrapServiceDiscoverer bootstrapServiceDiscoverer = new TestBootstrapServiceDiscoverer(properties);
-    ((DefaultMuleContext) muleContext).setBootstrapServiceDiscoverer(bootstrapServiceDiscoverer);
+    muleContext.setBootstrapServiceDiscoverer(bootstrapServiceDiscoverer);
 
     SimpleRegistryBootstrap simpleRegistryBootstrap = new SimpleRegistryBootstrap(artifactType, muleContext);
     simpleRegistryBootstrap.initialise();

@@ -33,7 +33,7 @@
 
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-deployment-model</artifactId>
+            <artifactId>mule-module-artifact</artifactId>
             <version>${project.version}</version>
         </dependency>
 

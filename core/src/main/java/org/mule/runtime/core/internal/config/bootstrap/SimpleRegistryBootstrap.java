@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.config.builders;
+package org.mule.runtime.core.internal.config.bootstrap;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
@@ -12,23 +12,19 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.config.builders.RegistryBootstrap;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap;
-import org.mule.runtime.core.internal.config.bootstrap.ObjectBootstrapProperty;
-import org.mule.runtime.core.internal.config.bootstrap.TransformerBootstrapProperty;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.registry.SimpleRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 /**
- * An implementation of {@link AbstractRegistryBootstrap} to populate instances of {@link SimpleRegistry}
+ * Basic implementation of {@link RegistryBootstrap}
  *
- * @deprecated as of 3.7.0. Try to use {@see org.mule.runtime.core.config.spring.SpringRegistryBootstrap} instead.
+ * @since 4.5.0
  */
-@Deprecated
 public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap {
 
   /**
