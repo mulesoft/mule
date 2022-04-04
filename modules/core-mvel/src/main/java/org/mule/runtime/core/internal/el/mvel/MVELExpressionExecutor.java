@@ -7,6 +7,11 @@
 
 package org.mule.runtime.core.internal.el.mvel;
 
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
+import static java.lang.Thread.currentThread;
+
 import org.mule.mvel2.MVEL;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ParserContext;
@@ -16,7 +21,7 @@ import org.mule.mvel2.optimizers.impl.refl.ReflectiveAccessorOptimizer;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
-import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.internal.util.CompositeClassLoader;
 
 import java.io.Serializable;
 
@@ -50,7 +55,17 @@ public class MVELExpressionExecutor {
 
     MVEL.COMPILER_OPT_PROPERTY_ACCESS_DOESNT_FAIL = true;
     // Since the DynamicOptimizer class grabs the TCCL, it could grab the app's classloader and that could lead to memory leakages
-    ClassUtils.withContextClassLoader(MVELExpressionLanguage.class.getClassLoader(), () -> OptimizerFactory.setDefaultOptimizer(OptimizerFactory.SAFE_REFLECTIVE));
+//    withContextClassLoader(MVELExpressionLanguage.class.getClassLoader(),
+//                           () -> OptimizerFactory.setDefaultOptimizer(OptimizerFactory.SAFE_REFLECTIVE));
+    Thread currentThread = currentThread();
+    ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+    ClassLoader newClassLoader = MVELExpressionLanguage.class.getClassLoader();
+    setContextClassLoader(currentThread, originalClassLoader, newClassLoader);
+    try {
+      OptimizerFactory.setDefaultOptimizer(OptimizerFactory.SAFE_REFLECTIVE);
+    } finally {
+      setContextClassLoader(currentThread, newClassLoader, originalClassLoader);
+    }
 
     compiledExpressionsCache =
         CacheBuilder.newBuilder().maximumSize(getCompiledExpressionMaxCacheSize()).build(new CacheLoader<String, Serializable>() {
