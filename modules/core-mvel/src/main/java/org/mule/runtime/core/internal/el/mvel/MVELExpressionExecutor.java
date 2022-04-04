@@ -55,6 +55,8 @@ public class MVELExpressionExecutor {
 
     MVEL.COMPILER_OPT_PROPERTY_ACCESS_DOESNT_FAIL = true;
     // Since the DynamicOptimizer class grabs the TCCL, it could grab the app's classloader and that could lead to memory leakages
+    // withContextClassLoader(MVELExpressionLanguage.class.getClassLoader(),
+    // () -> OptimizerFactory.setDefaultOptimizer(OptimizerFactory.SAFE_REFLECTIVE));
     Thread currentThread = currentThread();
     ClassLoader originalClassLoader = currentThread.getContextClassLoader();
     ClassLoader newClassLoader = MVELExpressionLanguage.class.getClassLoader();
