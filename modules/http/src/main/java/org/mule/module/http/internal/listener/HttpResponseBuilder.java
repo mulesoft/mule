@@ -56,7 +56,6 @@ import org.mule.util.DataTypeUtils;
 import org.mule.util.NumberUtils;
 import org.mule.util.UUID;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
