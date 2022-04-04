@@ -14,10 +14,10 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.internal.config.bootstrap.SimpleRegistryBootstrap;
 
 /**
- * Loads objects defined in a file called <code>registry-bootstrap.properties</code> into the local
- * registry. This allows modules and transports to make certain objects available by default. The most common use case is for a
- * module or transport to load stateless transformers into the registry. For this file to be located it must be present in the
- * modules META-INF directory under
+ * Loads objects defined in a file called <code>registry-bootstrap.properties</code> into the local registry. This allows modules
+ * and transports to make certain objects available by default. The most common use case is for a module or transport to load
+ * stateless transformers into the registry. For this file to be located it must be present in the modules META-INF directory
+ * under
  *
  * <pre>
  * META-INF/org/mule/config/

@@ -112,9 +112,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Map.Entry;
 
 /**
- * Configures a {@link MuleContext} {@link Registry} with the bare minimum elements needed for functioning.
- * This instance will configure the elements related to a particular {@link MuleContext} only. It will
- * not configure container related elements such as {@link Service mule services}.
+ * Configures a {@link MuleContext} {@link Registry} with the bare minimum elements needed for functioning. This instance will
+ * configure the elements related to a particular {@link MuleContext} only. It will not configure container related elements such
+ * as {@link Service mule services}.
  *
  * @return a {@link ConfigurationBuilder}
  * @since 4.5.0

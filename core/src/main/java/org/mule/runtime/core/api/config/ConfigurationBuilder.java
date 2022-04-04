@@ -30,9 +30,9 @@ import org.mule.runtime.core.internal.config.builders.MinimalConfigurationBuilde
 public interface ConfigurationBuilder {
 
   /**
-   * Returns an instance which configures a {@link MuleContext} {@link Registry} with the bare minimum elements
-   * needed for functioning. This instance will configure the elements related to a particular {@link MuleContext} only. It will
-   * not configure container related elements such as {@link Service mule services}.
+   * Returns an instance which configures a {@link MuleContext} {@link Registry} with the bare minimum elements needed for
+   * functioning. This instance will configure the elements related to a particular {@link MuleContext} only. It will not
+   * configure container related elements such as {@link Service mule services}.
    *
    * @return a {@link ConfigurationBuilder}
    * @since 4.5.0
