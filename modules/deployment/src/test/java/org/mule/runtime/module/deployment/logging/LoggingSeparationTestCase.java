@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.deployment.logging;
 
+import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.LoggerStory.LOGGER;
-import static org.mule.test.allure.AllureConstants.IntegrationTestsFeature.INTEGRATIONS_TESTS;
 
 import static java.util.Arrays.asList;
 
@@ -30,7 +30,7 @@ import io.qameta.allure.Story;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-@Feature(INTEGRATIONS_TESTS)
+@Feature(CORE_COMPONENTS)
 @Story(LOGGER)
 public class LoggingSeparationTestCase extends AbstractApplicationDeploymentTestCase {
 
@@ -63,13 +63,13 @@ public class LoggingSeparationTestCase extends AbstractApplicationDeploymentTest
     executeApplicationFlow("logging");
 
     assertThat(logger.getAllLoggingEvents().size(), is(1));
-    assertThat("", ((MuleArtifactClassLoader) logger.getAllLoggingEvents().get(0).getThreadContextClassLoader()).getArtifactId(),
+    assertThat(((MuleArtifactClassLoader) logger.getAllLoggingEvents().get(0).getThreadContextClassLoader()).getArtifactId(),
                stringContainsInOrder("logging-app-1"));
 
     executeApplicationFlow("logging2", null, 1);
 
     assertThat(logger.getAllLoggingEvents().size(), is(2));
-    assertThat("", ((MuleArtifactClassLoader) logger.getAllLoggingEvents().get(1).getThreadContextClassLoader()).getArtifactId(),
+    assertThat(((MuleArtifactClassLoader) logger.getAllLoggingEvents().get(1).getThreadContextClassLoader()).getArtifactId(),
                stringContainsInOrder("logging-app-2"));
   }
 }

@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 
 import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
 import static org.apache.commons.io.FileUtils.copyFile;
@@ -360,8 +361,8 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
         });
   }
 
-  private List<String> toMessages(ImmutableList<LoggingEvent> loggingEvents) {
-    return loggingEvents.stream().map(LoggingEvent::getMessage).collect(Collectors.toList());
+  private List<String> toMessages(List<LoggingEvent> loggingEvents) {
+    return loggingEvents.stream().map(LoggingEvent::getMessage).collect(toList());
   }
 
 }
