@@ -6,20 +6,24 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.REVERT_SIGLETON_ERROR_HANDLER_PROPERTY;
+
+import static java.lang.Boolean.getBoolean;
+
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.reactivestreams.Publisher;
 
-import static java.lang.Boolean.getBoolean;
-import static org.mule.runtime.api.util.MuleSystemProperties.REVERT_SIGLETON_ERROR_HANDLER_PROPERTY;
+import org.reactivestreams.Publisher;
 
 public class GlobalErrorHandler extends ErrorHandler {
 
   private static final boolean IS_PROTOTYPE = getBoolean(REVERT_SIGLETON_ERROR_HANDLER_PROPERTY);
 
   // We need to keep a reference to one of the local error handlers to be able to stop its inner processors.
-  ErrorHandler local;
+  // This is a temporary solution and won't be necessary after W-10674245.
+  //TODO: W-10674245 remove this
+  private ErrorHandler local;
 
   @Override
   public Publisher<CoreEvent> apply(Exception exception) {
