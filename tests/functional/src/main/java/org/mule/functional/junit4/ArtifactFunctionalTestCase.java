@@ -178,6 +178,10 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     createServiceManager();
   }
 
+  /**
+   * @return The discovered {@link Service services} {@link ArtifactClassLoader classloaders}
+   * @since 4.5.0
+   */
   public static List<ArtifactClassLoader> getServiceClassLoaders() {
     return serviceClassLoaders;
   }
@@ -208,6 +212,10 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     ArtifactFunctionalTestCase.applicationClassLoader = applicationClassLoader;
   }
 
+  /**
+   * @return The application {@link ArtifactClassLoader}
+   * @since 4.5.0
+   */
   public static ClassLoader getApplicationClassLoader() {
     return applicationClassLoader;
   }

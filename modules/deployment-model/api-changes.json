@@ -10,7 +10,7 @@
           "package": "org.mule.runtime.deployment.model.api.artifact",
           "classSimpleName": "ArtifactDescriptorConstants",
           "elementKind": "class",
-          "justification": "te cabio por gil"
+          "justification": "Not a real issue"
         },
         {
           "code": "java.method.returnTypeChanged",

@@ -14,7 +14,7 @@ import org.mule.runtime.api.deployment.meta.MulePluginModel;
  * {@link org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel} when working with the
  * {@link MulePluginModel#getExtensionModelLoaderDescriptor()}.
  *
- * @since 4.0
+ * @since 4.5.0
  */
 public class ArtifactDescriptorConstants {
 

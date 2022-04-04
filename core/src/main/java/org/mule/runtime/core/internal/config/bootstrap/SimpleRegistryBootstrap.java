@@ -12,6 +12,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.config.builders.RegistryBootstrap;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -19,6 +20,11 @@ import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
+/**
+ * Basic implementation of {@link RegistryBootstrap}
+ *
+ * @since 4.5.0
+ */
 public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap {
 
   /**

@@ -985,6 +985,14 @@ public final class IntrospectionUtils {
     return typeElements;
   }
 
+  /**
+   * Returns a {@link Stream} with the fields annotated with any of the given {@code annotationTypes}
+   *
+   * @param clazz           The class to instrospect
+   * @param annotationTypes the annotation types
+   * @return a {@link Stream}
+   * @since 4.5.0
+   */
   public static Stream<Field> getAnnotatedFieldsStream(Class<?> clazz, Class<? extends Annotation>... annotationTypes) {
     return getDescendingHierarchy(clazz).stream().flatMap(type -> stream(type.getDeclaredFields()))
         .filter(field -> Stream.of(annotationTypes).anyMatch(annotationType -> field.getAnnotation(annotationType) != null));

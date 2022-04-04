@@ -21,6 +21,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * {@link ServiceDiscoverer} implementation which performs an initial discovery by delegating into a
+ * {@link ServiceProviderDiscoverer} but augments/overrides the found services with a fix list.
+ *
+ * @since 4.5.0
+ */
 public class OverridingServiceDiscoverer implements ServiceDiscoverer {
 
   private final Map<String, Service> overridesMap;

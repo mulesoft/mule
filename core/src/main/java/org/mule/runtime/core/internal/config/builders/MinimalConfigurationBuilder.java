@@ -50,6 +50,7 @@ import static org.mule.runtime.core.internal.interception.InterceptorManager.INT
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultPersistentObjectStore;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
@@ -57,8 +58,10 @@ import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.SchedulerContainerPoolsConfig;
+import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -108,6 +111,14 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map.Entry;
 
+/**
+ * Configures a {@link MuleContext} {@link Registry} with the bare minimum elements needed for functioning.
+ * This instance will configure the elements related to a particular {@link MuleContext} only. It will
+ * not configure container related elements such as {@link Service mule services}.
+ *
+ * @return a {@link ConfigurationBuilder}
+ * @since 4.5.0
+ */
 public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
 
   @Override

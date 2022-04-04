@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.api.config;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
+import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.config.builders.MinimalConfigurationBuilder;
 
@@ -27,6 +29,14 @@ import org.mule.runtime.core.internal.config.builders.MinimalConfigurationBuilde
  */
 public interface ConfigurationBuilder {
 
+  /**
+   * Returns an instance which configures a {@link MuleContext} {@link Registry} with the bare minimum elements
+   * needed for functioning. This instance will configure the elements related to a particular {@link MuleContext} only. It will
+   * not configure container related elements such as {@link Service mule services}.
+   *
+   * @return a {@link ConfigurationBuilder}
+   * @since 4.5.0
+   */
   static ConfigurationBuilder getMinimalConfigurationBuilder() {
     return new MinimalConfigurationBuilder();
   }
