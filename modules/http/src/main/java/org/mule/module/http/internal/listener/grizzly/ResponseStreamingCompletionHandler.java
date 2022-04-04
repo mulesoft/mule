@@ -33,17 +33,15 @@ import org.glassfish.grizzly.memory.MemoryManager;
 public class ResponseStreamingCompletionHandler
         extends BaseResponseCompletionHandler
 {
-    private Integer objectCounter = Integer.valueOf(0);
+
     private final MemoryManager memoryManager;
     private final HttpResponsePacket httpResponsePacket;
-    private final PositionInputStream inputStream;
+    private final InputStream inputStream;
     private final ResponseStatusCallback responseStatusCallback;
     private final ClassLoader loggerClassLoader;
     private volatile boolean isDone;
 
     public static final String MULE_CLASSLOADER = "MULE_CLASSLOADER";
-    public boolean isFirst = true;
-    int invocatioCter = 0;
 
     public ResponseStreamingCompletionHandler(final FilterChainContext ctx,
                                               final HttpRequestPacket request, final HttpResponse httpResponse, ResponseStatusCallback responseStatusCallback)
@@ -52,14 +50,10 @@ public class ResponseStreamingCompletionHandler
         super(ctx);
         Preconditions.checkArgument((httpResponse.getEntity() instanceof InputStreamHttpEntity), "http response must have an input stream entity");
         httpResponsePacket = buildHttpResponsePacket(request, httpResponse);
-        inputStream = new PositionInputStream( ((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream() );
+        inputStream = ((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream();
         memoryManager = ctx.getConnection().getTransport().getMemoryManager();
         this.responseStatusCallback = responseStatusCallback;
         loggerClassLoader = Thread.currentThread().getContextClassLoader();
-        synchronized (objectCounter) {
-            objectCounter = objectCounter+ 1;
-        }
-
     }
 
     @Override
@@ -70,65 +64,28 @@ public class ResponseStreamingCompletionHandler
 
     public void sendInputStreamChunk() throws IOException
     {
-        System.out.println("Entered sendInputStreamChunk for Object"  + objectCounter +" with Invocation:" + invocatioCter + ":Thread" + Thread.currentThread().getName());
-        invocatioCter++;
-        if(isDone)
-            return;
-        Buffer buffer = memoryManager.allocate(DEFAULT_BUFFER_SIZE);
-        if(isFirst) {
-            System.out.println("isFirst  release was - called from a second thread" + Thread.currentThread().getName());
-            memoryManager.release(buffer);
-            buffer = memoryManager.allocate(DEFAULT_BUFFER_SIZE);
-            isFirst = false;
+        final Buffer buffer = memoryManager.allocate(DEFAULT_BUFFER_SIZE);
+
+        final byte[] bufferByteArray = buffer.array();
+        final int offset = buffer.arrayOffset();
+        final int length = buffer.remaining();
+
+        int bytesRead = inputStream.read(bufferByteArray, offset, length);
+        final HttpContent content;
+
+        if (bytesRead == -1)
+        {
+            content = httpResponsePacket.httpTrailerBuilder().build();
+            isDone = true;
+        }
+        else
+        {
+            buffer.limit(bytesRead);
+            content = httpResponsePacket.httpContentBuilder().content(buffer).build();
         }
 
-        isDone = readStreamManually(buffer, invocatioCter);
-
-        HttpContent content = httpResponsePacket.httpContentBuilder().content(buffer).build();
         ctx.getConnection().getAttributes().setAttribute(MULE_CLASSLOADER, loggerClassLoader);
         ctx.write(content, this);
-
-        if (isDone) {
-            content =  httpResponsePacket.httpTrailerBuilder().build();
-            ctx.write(content, this);
-        }
-        System.out.println("Exiting sendInputStreamChunk for Object"  + objectCounter +" with Invocation:" + invocatioCter + ":Thread" + Thread.currentThread().getName());
-
-    }
-
-    private boolean readStreamManually(final Buffer buffer, int invocatioCter) throws IOException {
-        /*
-        System.out.println("Offset before:"
-        + buffer.arrayOffset() + ":"
-        + buffer.arrayOffset());
-        buffer.clear();*/
-        boolean isDone = false;
-        byte[] bufferByteArray = buffer.array();
-        //System.out.println(String.format(" Input stream position before with invoctaion counter $ - %s",  inputStream.getPosition(), invocatioCter));
-        //StringBuffer readDataBuf = new StringBuffer();
-        int c;
-        //int bytesRead = 0;
-        int offset = buffer.arrayOffset();
-        int length = buffer.remaining();
-
-        int current = 0;
-
-        while ((c = inputStream.read()) != -1 && current < length) {
-            bufferByteArray[offset++] = (byte) c;
-            //readDataBuf.append((char)c);
-            //readDataBuf.append((char)c);
-            current++;
-        }
-
-        if (c == -1)
-            isDone = true;
-        buffer.limit(current);
-        //buffer.limit(current);
-        return isDone;
-    }
-
-    private void writeWithLog(byte[] bufferByteArray) {
-        System.out.println("About to write" + (new String(bufferByteArray)).toString());
     }
 
     /**
@@ -165,15 +122,11 @@ public class ResponseStreamingCompletionHandler
 
     private void doComplete()
     {
-        try {
-            close();
-            responseStatusCallback.responseSendSuccessfully();
-            ctx.getConnection().getAttributes().removeAttribute(MULE_CLASSLOADER);
-            ctx.notifyDownstream(RESPONSE_COMPLETE_EVENT);
-            resume();
-        } catch (Exception e) {
-
-        }
+        close();
+        responseStatusCallback.responseSendSuccessfully();
+        ctx.getConnection().getAttributes().removeAttribute(MULE_CLASSLOADER);
+        ctx.notifyDownstream(RESPONSE_COMPLETE_EVENT);
+        resume();
     }
 
     /**

@@ -213,15 +213,6 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                         }
                         if (isStream) {
                             try {
-
-                                System.out.println("Payload:-orig" + payload.toString());
-                        /*    byte[] source = payload.toString().getBytes();
-                                System.out.println("Payload:-source" + new String(source));
-                                byte[] destn = new byte[source.length];
-                                System.arraycopy(source, 0, destn, 0, source.length);
-                                InputStream copiedPayLoad = new ByteArrayInputStream(destn);
-                                System.out.println("Payload:-copy" + new String(destn));
-                         */
                                 httpEntity = new InputStreamHttpEntity(IOUtils.toInputStream(payload.toString()));
                             } catch (Exception e) {
                                 throw new MessagingException(event, new Throwable("Error preparing message for streaming"));
@@ -231,7 +222,6 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                         {
                             httpEntity = new OutputHandlerHttpEntity((OutputHandler) payload);
                         }
-                        //System.out.println("Payload:" + payload);
                     }
                     else
                     {
