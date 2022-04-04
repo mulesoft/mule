@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.deployment.logging;
 
+import static org.mule.test.allure.AllureConstants.ComponentsFeature.LoggerStory.LOGGER;
+import static org.mule.test.allure.AllureConstants.IntegrationTestsFeature.INTEGRATIONS_TESTS;
+
 import static java.util.Arrays.asList;
 
 import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
@@ -22,9 +25,13 @@ import java.util.List;
 
 import com.github.valfirst.slf4jtest.TestLogger;
 import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
+@Feature(INTEGRATIONS_TESTS)
+@Story(LOGGER)
 public class LoggingSeparationTestCase extends AbstractApplicationDeploymentTestCase {
 
   TestLogger logger = getTestLogger(LoggerMessageProcessor.class);
