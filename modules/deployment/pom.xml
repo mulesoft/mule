@@ -200,7 +200,7 @@
         <dependency>
             <groupId>com.github.valfirst</groupId>
             <artifactId>slf4j-test</artifactId>
-            <version>2.6.1-SNAPSHOT</version>
+            <version>2.6.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
