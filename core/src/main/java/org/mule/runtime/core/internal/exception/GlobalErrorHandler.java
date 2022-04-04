@@ -22,7 +22,7 @@ public class GlobalErrorHandler extends ErrorHandler {
 
   // We need to keep a reference to one of the local error handlers to be able to stop its inner processors.
   // This is a temporary solution and won't be necessary after W-10674245.
-  //TODO: W-10674245 remove this
+  // TODO: W-10674245 remove this
   private ErrorHandler local;
 
   @Override
