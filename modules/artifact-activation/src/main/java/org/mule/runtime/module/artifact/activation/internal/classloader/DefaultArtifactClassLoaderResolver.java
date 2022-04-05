@@ -60,6 +60,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,7 +88,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
   @Override
   public MuleDeployableArtifactClassLoader createDomainClassLoader(DomainDescriptor descriptor,
-                                                                   BiFunction<ArtifactClassLoader, ArtifactPluginDescriptor, Optional<ArtifactClassLoader>> pluginClassLoaderResolver) {
+                                                                   BiFunction<ArtifactClassLoader, ArtifactPluginDescriptor, Optional<Supplier<ArtifactClassLoader>>> pluginClassLoaderResolver) {
     ArtifactClassLoader parentClassLoader =
         new ContainerClassLoaderFactory(moduleRepository).createContainerClassLoader(this.getClass().getClassLoader());
     String artifactId = getDomainId(descriptor.getName());
@@ -118,7 +119,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
     artifactPluginDescriptors
         .stream()
         .map(pluginDependencyDescriptor -> pluginClassLoaderResolver.apply(domainClassLoader, pluginDependencyDescriptor)
-            .orElseGet(() -> resolvePluginClassLoader(domainClassLoader, pluginDependencyDescriptor)))
+            .orElse(() -> resolvePluginClassLoader(domainClassLoader, pluginDependencyDescriptor)).get())
         .forEach(artifactPluginClassLoader -> regionClassLoader
             .addClassLoader(artifactPluginClassLoader,
                             createPluginClassLoaderFilter(descriptor,
@@ -175,7 +176,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
   @Override
   public MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
                                                                         Function<Optional<BundleDescriptor>, ArtifactClassLoader> domainClassLoaderResolver,
-                                                                        BiFunction<ArtifactClassLoader, ArtifactPluginDescriptor, Optional<ArtifactClassLoader>> pluginClassLoaderResolver) {
+                                                                        BiFunction<ArtifactClassLoader, ArtifactPluginDescriptor, Optional<Supplier<ArtifactClassLoader>>> pluginClassLoaderResolver) {
     ArtifactClassLoader parentClassLoader = domainClassLoaderResolver.apply(descriptor.getDomainDescriptor());
     String artifactId = getApplicationId(parentClassLoader.getArtifactId(), descriptor.getName());
 
@@ -206,7 +207,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
     artifactPluginDescriptors
         .stream()
         .map(pluginDependencyDescriptor -> pluginClassLoaderResolver.apply(appClassLoader, pluginDependencyDescriptor)
-            .orElseGet(() -> resolvePluginClassLoader(appClassLoader, pluginDependencyDescriptor)))
+            .orElse(() -> resolvePluginClassLoader(appClassLoader, pluginDependencyDescriptor)).get())
         .forEach(artifactPluginClassLoader -> regionClassLoader
             .addClassLoader(artifactPluginClassLoader,
                             createPluginClassLoaderFilter(descriptor,

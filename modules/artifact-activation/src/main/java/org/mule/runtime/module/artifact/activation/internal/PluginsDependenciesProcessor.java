@@ -28,10 +28,25 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 import org.slf4j.Logger;
 
+/**
+ * Utility to process plugins in order according to their dependencies.
+ *
+ * @since 4.5
+ */
 public class PluginsDependenciesProcessor {
 
   private static final Logger LOGGER = getLogger(PluginsDependenciesProcessor.class);
 
+  /**
+   * Processes the given plugins in an ordered way.
+   *
+   * @param artifactPlugins plugin artifacts to be processed.
+   * @param parallelize whether the processing of each plugin dependencies can be parallelized.
+   * @param processor does the actual processing on the plugin.
+   * @param <T> the resulting object after plugin processing.
+   *
+   * @return a {@link List} with the result of the plugins processing.
+   */
   public static <T> List<T> process(List<ArtifactPluginDescriptor> artifactPlugins, boolean parallelize,
                                     BiConsumer<List<T>, ArtifactPluginDescriptor> processor) {
     final List<T> processedDependencies = synchronizedList(new ArrayList<>());
@@ -61,7 +76,7 @@ public class PluginsDependenciesProcessor {
           .filter(artifactPlugin -> depsGraph.vertexSet().contains(artifactPlugin.getBundleDescriptor())
               && depsGraph.outDegreeOf(artifactPlugin.getBundleDescriptor()) == 0)
           .forEach(artifactPlugin -> {
-            LOGGER.debug("pluginsDependenciesProcessor(parallel): {}", artifactPlugin);
+            LOGGER.debug("process({}): {}", parallelize ? "parallel" : "", artifactPlugin);
 
             // need this auxiliary structure because the graph does not support concurrent modifications
             seenDependencies.add(artifactPlugin.getBundleDescriptor());
@@ -70,7 +85,7 @@ public class PluginsDependenciesProcessor {
           });
 
       seenDependencies.forEach(depsGraph::removeVertex);
-      LOGGER.debug("pluginsDependenciesProcessor(parallel): next iteration on the depsGraph...");
+      LOGGER.debug("process({}): next iteration on the depsGraph...", parallelize ? "parallel" : "");
     }
 
     return processedDependencies;

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Provides a way to create classLoaders for different artifact types.
@@ -73,7 +74,7 @@ public interface ArtifactClassLoaderResolver {
    * @return a classLoader for a domain.
    */
   MuleDeployableArtifactClassLoader createDomainClassLoader(DomainDescriptor descriptor,
-                                                            BiFunction<ArtifactClassLoader, ArtifactPluginDescriptor, Optional<ArtifactClassLoader>> pluginClassLoaderResolver);
+                                                            BiFunction<ArtifactClassLoader, ArtifactPluginDescriptor, Optional<Supplier<ArtifactClassLoader>>> pluginClassLoaderResolver);
 
   /**
    * Creates a classLoader for an application. This will create the classLoader itself and all of its internal required state:
@@ -100,7 +101,7 @@ public interface ArtifactClassLoaderResolver {
    */
   MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
                                                                  Function<Optional<BundleDescriptor>, ArtifactClassLoader> domainClassLoaderResolver,
-                                                                 BiFunction<ArtifactClassLoader, ArtifactPluginDescriptor, Optional<ArtifactClassLoader>> pluginClassLoaderResolver);
+                                                                 BiFunction<ArtifactClassLoader, ArtifactPluginDescriptor, Optional<Supplier<ArtifactClassLoader>>> pluginClassLoaderResolver);
 
   /**
    * Creates a classLoader for a plugin.

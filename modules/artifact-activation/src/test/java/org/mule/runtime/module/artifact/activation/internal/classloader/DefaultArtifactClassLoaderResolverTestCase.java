@@ -227,7 +227,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
                                                                   .equals(plugin2Descriptor
                                                                       .getBundleDescriptor()
                                                                       .getArtifactId())) {
-                                                                return of(plugin2ClassLoader);
+                                                                return of(() -> plugin2ClassLoader);
                                                               } else {
                                                                 return empty();
                                                               }
@@ -314,7 +314,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
                                                                        .equals(plugin2Descriptor
                                                                            .getBundleDescriptor()
                                                                            .getArtifactId())) {
-                                                                     return of(plugin2ClassLoader);
+                                                                     return of(() -> plugin2ClassLoader);
                                                                    } else {
                                                                      return empty();
                                                                    }
