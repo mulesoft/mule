@@ -24,8 +24,8 @@ public abstract class SpanBuilder {
   protected String correlationId;
   protected ComponentLocation location;
   protected SpanManager spanManager;
-  private Long start;
-  private Long end;
+  private long start;
+  private long end;
 
   public SpanBuilder withSpanManager(SpanManager spanManager) {
     this.spanManager = spanManager;
@@ -47,12 +47,12 @@ public abstract class SpanBuilder {
     return this;
   }
 
-  public SpanBuilder withStart(Long start) {
+  public SpanBuilder withStart(long start) {
     this.start = start;
     return this;
   }
 
-  public SpanBuilder withEnd(Long end) {
+  public SpanBuilder withEnd(long end) {
     this.end = end;
     return this;
   }
