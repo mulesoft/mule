@@ -10,6 +10,8 @@ import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 
+import java.util.Optional;
+
 /**
  * A {@link Span} that represents the trace corresponding to the execution of mule flow or component.
  *
@@ -20,21 +22,19 @@ public class ExecutionSpan implements Span {
   private final String name;
   private final SpanIdentifier identifier;
   private final Span parent;
-  private final Long startTime;
-  private final Long endTime;
+  private SpanDuration spanDuration;
 
-  public ExecutionSpan(String name, SpanIdentifier identifier, Long startTime, Long endTime,
+  public ExecutionSpan(String name, SpanIdentifier identifier, SpanDuration spanDuration,
                        Span parent) {
     this.name = name;
     this.identifier = identifier;
-    this.startTime = startTime;
-    this.endTime = endTime;
+    this.spanDuration = spanDuration;
     this.parent = parent;
   }
 
   @Override
-  public Span getParent() {
-    return parent;
+  public Optional<Span> getParent() {
+    return Optional.ofNullable(parent);
   }
 
   @Override
@@ -49,30 +49,12 @@ public class ExecutionSpan implements Span {
 
   @Override
   public SpanDuration getDuration() {
-    return new DefaultSpanDuration(startTime, endTime);
+    return spanDuration;
   }
 
-  /**
-   * An default implementation for a {@link SpanDuration}
-   */
-  private class DefaultSpanDuration implements SpanDuration {
-
-    private final Long startTime;
-    private final Long endTime;
-
-    public DefaultSpanDuration(Long startTime, Long endTime) {
-      this.startTime = startTime;
-      this.endTime = endTime;
-    }
-
-    @Override
-    public Long getStart() {
-      return startTime;
-    }
-
-    @Override
-    public Long getEnd() {
-      return endTime;
-    }
+  @Override
+  public void end(long endTimestamp) {
+    spanDuration = new DefaultSpanDuration(spanDuration.getStart(), endTimestamp);
   }
+
 }

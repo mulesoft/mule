@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.profiling.consumer.tracing.span.builder;
 
 import static org.mule.runtime.core.internal.profiling.consumer.tracing.span.builder.ComponentSpanIdentifier.componentSpanIdentifierFrom;
 import static org.mule.runtime.core.internal.profiling.consumer.tracing.span.builder.FlowSpanIdentifier.flowSpanIdentifierFrom;
+import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
@@ -26,33 +27,23 @@ public class ComponentSpanBuilder extends SpanBuilder {
   @Override
   protected Span getParent() {
     verifyBuilderParameters();
-
     return spanManager.getSpanIfPresent(getParentIdentifier());
   }
 
   private FlowSpanIdentifier getParentIdentifier() {
-
     verifyBuilderParameters();
     return flowSpanIdentifierFrom(artifactId, location.getRootContainerName(), correlationId);
   }
 
 
   private void verifyBuilderParameters() {
-    if (location == null) {
-      throw new IllegalStateException("No location found for the span");
-    }
-
-    if (artifactId == null) {
-      throw new IllegalStateException("No artifact id found for the span");
-    }
-
-    if (correlationId == null) {
-      throw new IllegalStateException("No correlationId found for the span");
-    }
+    requireNonNull(location, "No location found for the span");
+    requireNonNull(artifactId, "No artifact id found for the span");
+    requireNonNull(correlationId, "No correlationId found for the span");
   }
 
   @Override
-  protected SpanIdentifier getSpanIdentifer() {
+  protected SpanIdentifier getSpanIdentifier() {
     return componentSpanIdentifierFrom(artifactId, location, correlationId);
   }
 

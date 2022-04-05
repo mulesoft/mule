@@ -28,12 +28,12 @@ public class FlowSpanBuilder extends SpanBuilder {
   }
 
   @Override
-  protected SpanIdentifier getSpanIdentifer() {
+  protected SpanIdentifier getSpanIdentifier() {
     return flowSpanIdentifierFrom(artifactId, location.getLocation(), correlationId);
   }
 
   @Override
   protected String getSpanName() {
-    return getSpanIdentifer().getId();
+    return getSpanIdentifier().getId();
   }
 }
