@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.profiling.consumer.tracing.span;
 
+import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
@@ -34,7 +36,7 @@ public class ExecutionSpan implements Span {
 
   @Override
   public Optional<Span> getParent() {
-    return Optional.ofNullable(parent);
+    return ofNullable(parent);
   }
 
   @Override

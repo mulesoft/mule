@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.profiling.consumer.tracing.span;
 
-import static java.util.Objects.requireNonNull;
-
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 
 /**
@@ -15,22 +13,21 @@ import org.mule.runtime.api.profiling.tracing.SpanDuration;
  */
 public class DefaultSpanDuration implements SpanDuration {
 
-  private final Long startTime;
-  private final Long endTime;
+  private final long startTime;
+  private final long endTime;
 
-  public DefaultSpanDuration(Long startTime, Long endTime) {
-    requireNonNull(startTime);
+  public DefaultSpanDuration(long startTime, long endTime) {
     this.startTime = startTime;
     this.endTime = endTime;
   }
 
   @Override
-  public Long getStart() {
+  public long getStart() {
     return startTime;
   }
 
   @Override
-  public Long getEnd() {
+  public long getEnd() {
     return endTime;
   }
 }
