@@ -10,6 +10,9 @@ import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+
+import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -20,7 +23,6 @@ import static org.mule.runtime.core.api.util.ClassUtils.MULE_DESIGN_MODE;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
-import static uk.org.lidalia.slf4jtest.TestLoggerFactory.getTestLogger;
 
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultMuleApplication;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
@@ -41,15 +43,15 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
+import com.github.valfirst.slf4jtest.LoggingEvent;
+import com.github.valfirst.slf4jtest.TestLogger;
+import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 import io.qameta.allure.Feature;
-import uk.org.lidalia.slf4jtest.LoggingEvent;
-import uk.org.lidalia.slf4jtest.TestLogger;
-import uk.org.lidalia.slf4jtest.TestLoggerFactory;
 
 @Feature(CLASSLOADING_ISOLATION)
 public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestCase {
@@ -360,7 +362,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
   }
 
   private List<String> toMessages(List<LoggingEvent> loggingEvents) {
-    return loggingEvents.stream().map(LoggingEvent::getMessage).collect(Collectors.toList());
+    return loggingEvents.stream().map(LoggingEvent::getMessage).collect(toList());
   }
 
 }

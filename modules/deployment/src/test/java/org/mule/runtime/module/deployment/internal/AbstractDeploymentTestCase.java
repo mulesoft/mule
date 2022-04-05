@@ -58,6 +58,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.joining;
 
+import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
@@ -91,7 +92,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.slf4j.LoggerFactory.getLogger;
-import static uk.org.lidalia.slf4jtest.TestLoggerFactory.getTestLogger;
 
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.functional.config.TestComponentBuildingDefinitionProvider;
@@ -178,6 +178,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import com.github.valfirst.slf4jtest.TestLogger;
 import org.apache.logging.log4j.LogManager;
 import org.slf4j.Logger;
 
@@ -192,7 +193,6 @@ import org.junit.runners.Parameterized;
 import org.mockito.verification.VerificationMode;
 
 import uk.org.lidalia.slf4jext.Level;
-import uk.org.lidalia.slf4jtest.TestLogger;
 
 @RunWith(Parameterized.class)
 /**
