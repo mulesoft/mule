@@ -209,11 +209,9 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                             setupChunkedEncoding(httpResponseHeaderBuilder);
                         }
                         if (isStream) {
-                            if(payload.getClass().getSimpleName().equals("ByteArraySeekableStream")) {
+                            if (payload.getClass().getSimpleName().equals("ByteArraySeekableStream")) {
                                 try {
-                                    System.out.println("Its a ByteArraySeekableStream");
-                                    InputStream clonedInputStream = IOUtils.toBufferedInputStream((InputStream) payload);
-                                    httpEntity = new InputStreamHttpEntity(clonedInputStream);
+                                    httpEntity = new InputStreamHttpEntity(IOUtils.toInputStream(payload.toString()));
                                 } catch (Exception e) {
                                     throw new MessagingException(event, new Throwable("Error preparing message for streaming"));
                                 }
