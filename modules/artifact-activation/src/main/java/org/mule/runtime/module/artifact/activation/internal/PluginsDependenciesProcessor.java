@@ -41,9 +41,9 @@ public class PluginsDependenciesProcessor {
    * Processes the given plugins in an ordered way.
    *
    * @param artifactPlugins plugin artifacts to be processed.
-   * @param parallelize whether the processing of each plugin dependencies can be parallelized.
-   * @param processor does the actual processing on the plugin.
-   * @param <T> the resulting object after plugin processing.
+   * @param parallelize     whether the processing of each plugin dependencies can be parallelized.
+   * @param processor       does the actual processing on the plugin.
+   * @param <T>             the resulting object after plugin processing.
    *
    * @return a {@link List} with the result of the plugins processing.
    */
