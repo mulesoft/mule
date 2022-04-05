@@ -9,8 +9,10 @@ package org.mule.runtime.core.internal.profiling.consumer.tracing.operations;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.START_SPAN;
 
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.SpanProfilingEventContext;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
+import org.mule.runtime.core.internal.profiling.consumer.tracing.span.SpanManager;
 
 /**
  * A {@link ProfilingExecutionOperation} that triggers a profiling event indicating the start of a span.
@@ -27,5 +29,11 @@ public class StartSpanProfilingExecutionOperation
   @Override
   protected ProfilingEventType<SpanProfilingEventContext> getProfilingEventType() {
     return START_SPAN;
+  }
+
+  @Override
+  protected SpanProfilingEventContext getSpanEventContext(ComponentProcessingStrategyProfilingEventContext processingStrategyEventContext,
+                                                          SpanManager spanManager) {
+    return new DefaultSpanProfilingEventContext(processingStrategyEventContext, spanManager);
   }
 }

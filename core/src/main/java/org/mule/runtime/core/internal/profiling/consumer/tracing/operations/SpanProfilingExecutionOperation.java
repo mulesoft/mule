@@ -25,11 +25,14 @@ public abstract class SpanProfilingExecutionOperation implements
   }
 
   @Override
-  public void execute(ComponentProcessingStrategyProfilingEventContext eventContext) {
-    profilingDataProducer.triggerProfilingEvent(eventContext,
-                                                context -> new DefaultSpanProfilingEventContext(context, spanManager));
+  public void execute(ComponentProcessingStrategyProfilingEventContext processingStrategyEventContext) {
+    profilingDataProducer.triggerProfilingEvent(processingStrategyEventContext,
+                                                sourceContext -> getSpanEventContext(sourceContext, spanManager));
   }
 
   protected abstract ProfilingEventType<SpanProfilingEventContext> getProfilingEventType();
+
+  protected abstract SpanProfilingEventContext getSpanEventContext(ComponentProcessingStrategyProfilingEventContext processingStrategyEventContext,
+                                                                   SpanManager spanManager);
 
 }

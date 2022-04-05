@@ -9,8 +9,11 @@ package org.mule.runtime.core.internal.profiling.consumer.tracing.operations;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.END_SPAN;
 
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.SpanProfilingEventContext;
+
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
+import org.mule.runtime.core.internal.profiling.consumer.tracing.span.SpanManager;
 
 /**
  * A {@link ProfilingExecutionOperation} that triggers a profiling event indicating the end of a span.
@@ -27,4 +30,14 @@ public class EndSpanProfilingExecutionOperation extends SpanProfilingExecutionOp
   protected ProfilingEventType<SpanProfilingEventContext> getProfilingEventType() {
     return END_SPAN;
   }
+
+  @Override
+  protected SpanProfilingEventContext getSpanEventContext(ComponentProcessingStrategyProfilingEventContext processingStrategyEventContext,
+                                                          SpanManager spanManager) {
+    SpanProfilingEventContext spanProfilingEventContext =
+        new DefaultSpanProfilingEventContext(processingStrategyEventContext, spanManager);
+    spanProfilingEventContext.getSpan().end(processingStrategyEventContext.getTriggerTimestamp());
+    return spanProfilingEventContext;
+  }
+
 }

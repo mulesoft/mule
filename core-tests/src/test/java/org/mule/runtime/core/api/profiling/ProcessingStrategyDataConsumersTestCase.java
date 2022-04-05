@@ -224,7 +224,6 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
 
   }
 
-
   /**
    * Stub {@link ProfilingDataConsumerDiscoveryStrategy}
    */
