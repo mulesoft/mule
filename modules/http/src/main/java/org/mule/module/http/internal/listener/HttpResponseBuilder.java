@@ -22,7 +22,6 @@ import static org.mule.module.http.api.requester.HttpStreamingType.ALWAYS;
 import static org.mule.module.http.api.requester.HttpStreamingType.AUTO;
 import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_0_9;
 import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_1_0;
-
 import org.apache.commons.io.IOUtils;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -210,10 +209,16 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                             setupChunkedEncoding(httpResponseHeaderBuilder);
                         }
                         if (isStream) {
-                            try {
-                                httpEntity = new InputStreamHttpEntity(IOUtils.toInputStream(payload.toString()));
-                            } catch (Exception e) {
-                                throw new MessagingException(event, new Throwable("Error preparing message for streaming"));
+                            if(payload.getClass().getSimpleName().equals("ByteArraySeekableStream")) {
+                                try {
+                                    System.out.println("Its a ByteArraySeekableStream");
+                                    InputStream clonedInputStream = IOUtils.toBufferedInputStream((InputStream) payload);
+                                    httpEntity = new InputStreamHttpEntity(clonedInputStream);
+                                } catch (Exception e) {
+                                    throw new MessagingException(event, new Throwable("Error preparing message for streaming"));
+                                }
+                            } else {
+                                httpEntity = new InputStreamHttpEntity((InputStream) payload);
                             }
                         }
                         else
