@@ -19,6 +19,8 @@ import org.mule.runtime.core.internal.profiling.consumer.tracing.span.builder.Sp
  */
 public final class SpanUtils {
 
+  private SpanUtils() {}
+
   public static SpanBuilder getBuilder(ComponentLocation location) {
     if (location.getComponentIdentifier()
         .getType().equals(TypedComponentIdentifier.ComponentType.FLOW)) {
