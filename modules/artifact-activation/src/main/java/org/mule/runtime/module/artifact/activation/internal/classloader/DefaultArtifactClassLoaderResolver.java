@@ -168,16 +168,16 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
   @Override
   public MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
-                                                                        Function<Optional<BundleDescriptor>, ArtifactClassLoader> domainClassLoaderResolver) {
-    return createApplicationClassLoader(descriptor, domainClassLoaderResolver,
+                                                                        Supplier<ArtifactClassLoader> domainClassLoader) {
+    return createApplicationClassLoader(descriptor, domainClassLoader,
                                         (ownerClassLoader, artifactPluginDescriptor) -> empty());
   }
 
   @Override
   public MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
-                                                                        Function<Optional<BundleDescriptor>, ArtifactClassLoader> domainClassLoaderResolver,
+                                                                        Supplier<ArtifactClassLoader> domainClassLoader,
                                                                         BiFunction<ArtifactClassLoader, ArtifactPluginDescriptor, Optional<Supplier<ArtifactClassLoader>>> pluginClassLoaderResolver) {
-    ArtifactClassLoader parentClassLoader = domainClassLoaderResolver.apply(descriptor.getDomainDescriptor());
+    ArtifactClassLoader parentClassLoader = domainClassLoader.get();
     String artifactId = getApplicationId(parentClassLoader.getArtifactId(), descriptor.getName());
 
     ClassLoaderLookupPolicy parentLookupPolicy = getApplicationParentLookupPolicy(parentClassLoader);

@@ -80,27 +80,25 @@ public interface ArtifactClassLoaderResolver {
    * Creates a classLoader for an application. This will create the classLoader itself and all of its internal required state:
    * regionClassLoader, classLoaders for plugins.
    * 
-   * @param descriptor                the descriptor of the application to generate a classLoader for.
-   * @param domainClassLoaderResolver a wrapper function for {@link #createDomainClassLoader(DomainDescriptor, BiFunction)}. An
-   *                                  {@link Optional#empty()} input means that the application does not use a domain.
+   * @param descriptor        the descriptor of the application to generate a classLoader for.
+   * @param domainClassLoader the class loader of the domain the application belongs to.
    * @return a classLoader for an application.
    */
   MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
-                                                                 Function<Optional<BundleDescriptor>, ArtifactClassLoader> domainClassLoaderResolver);
+                                                                 Supplier<ArtifactClassLoader> domainClassLoader);
 
   /**
    * Creates a classLoader for an application. This will create the classLoader itself and all of its internal required state:
    * regionClassLoader, classLoaders for plugins.
    *
    * @param descriptor                the descriptor of the application to generate a classLoader for.
-   * @param domainClassLoaderResolver a wrapper function for {@link #createDomainClassLoader(DomainDescriptor, BiFunction)}. An
-   *                                  {@link Optional#empty()} input means that the application does not use a domain.
+   * @param domainClassLoader         the class loader of the domain the application belongs to.
    * @param pluginClassLoaderResolver allows the user to provide a class loader for the given plugin, otherwise it will be
    *                                  created.
    * @return a classLoader for an application.
    */
   MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
-                                                                 Function<Optional<BundleDescriptor>, ArtifactClassLoader> domainClassLoaderResolver,
+                                                                 Supplier<ArtifactClassLoader> domainClassLoader,
                                                                  BiFunction<ArtifactClassLoader, ArtifactPluginDescriptor, Optional<Supplier<ArtifactClassLoader>>> pluginClassLoaderResolver);
 
   /**

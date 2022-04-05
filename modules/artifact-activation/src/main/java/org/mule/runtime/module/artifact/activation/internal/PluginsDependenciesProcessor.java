@@ -43,9 +43,9 @@ public class PluginsDependenciesProcessor {
    * @param artifactPlugins plugin artifacts to be processed.
    * @param parallelize     whether the processing of each plugin dependencies can be parallelized.
    * @param processor       does the actual processing on the plugin.
-   * @param <T>             the resulting object after plugin processing.
+   * @param <T>             generic type of the resulting object after plugin processing.
    *
-   * @return a {@link List} with the result of the plugins processing.
+   * @return {@link List} with the result of the plugins processing.
    */
   public static <T> List<T> process(List<ArtifactPluginDescriptor> artifactPlugins, boolean parallelize,
                                     BiConsumer<List<T>, ArtifactPluginDescriptor> processor) {
