@@ -16,6 +16,8 @@ import java.util.function.Supplier;
 /**
  * Optionally generates a {@link Supplier} for a plugin class loader given the plugin's {@link ArtifactPluginDescriptor
  * descriptor} and owner artifact's class loader.
+ *
+ * @since 4.5
  */
 public interface PluginClassLoaderResolver
     extends BiFunction<ArtifactClassLoader, ArtifactPluginDescriptor, Optional<Supplier<ArtifactClassLoader>>> {
