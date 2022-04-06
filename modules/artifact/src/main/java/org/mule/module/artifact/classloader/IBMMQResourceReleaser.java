@@ -6,15 +6,16 @@
  */
 package org.mule.module.artifact.classloader;
 
-import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.mule.runtime.core.api.util.ClassUtils.getField;
+import static org.mule.runtime.core.api.util.ClassUtils.getStaticFieldValue;
+import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
+import static org.mule.runtime.core.api.util.ClassUtils.setStaticFieldValue;
+import static java.beans.Introspector.flushCaches;
+import static java.lang.Boolean.getBoolean;
+import static java.lang.Thread.getAllStackTraces;
+import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 
-import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectInstance;
-import javax.management.ObjectName;
+import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 import java.lang.ref.Reference;
 import java.lang.reflect.Field;
 import java.util.HashSet;
@@ -24,15 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-
-import static java.beans.Introspector.flushCaches;
-import static java.lang.Boolean.getBoolean;
-import static java.lang.Thread.getAllStackTraces;
-import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
-import static org.mule.runtime.core.api.util.ClassUtils.getField;
-import static org.mule.runtime.core.api.util.ClassUtils.getStaticFieldValue;
-import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
-import static org.mule.runtime.core.api.util.ClassUtils.setStaticFieldValue;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectInstance;
+import javax.management.ObjectName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A Utility class for releasing all the known references that may lead to a ClassLoader leak.
