@@ -28,6 +28,7 @@ import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
+import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.internal.PluginsDependenciesProcessor;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinder;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinderFactory;
@@ -58,7 +59,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -88,7 +88,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
   @Override
   public MuleDeployableArtifactClassLoader createDomainClassLoader(DomainDescriptor descriptor,
-                                                                   BiFunction<ArtifactClassLoader, ArtifactPluginDescriptor, Optional<Supplier<ArtifactClassLoader>>> pluginClassLoaderResolver) {
+                                                                   PluginClassLoaderResolver pluginClassLoaderResolver) {
     ArtifactClassLoader parentClassLoader =
         new ContainerClassLoaderFactory(moduleRepository).createContainerClassLoader(this.getClass().getClassLoader());
     String artifactId = getDomainId(descriptor.getName());
@@ -176,7 +176,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
   @Override
   public MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
                                                                         Supplier<ArtifactClassLoader> domainClassLoader,
-                                                                        BiFunction<ArtifactClassLoader, ArtifactPluginDescriptor, Optional<Supplier<ArtifactClassLoader>>> pluginClassLoaderResolver) {
+                                                                        PluginClassLoaderResolver pluginClassLoaderResolver) {
     ArtifactClassLoader parentClassLoader = domainClassLoader.get();
     String artifactId = getApplicationId(parentClassLoader.getArtifactId(), descriptor.getName());
 

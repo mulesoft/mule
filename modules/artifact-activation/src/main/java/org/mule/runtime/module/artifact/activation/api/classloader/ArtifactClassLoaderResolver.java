@@ -11,6 +11,7 @@ import static java.nio.file.Files.createTempDirectory;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
+import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -23,9 +24,7 @@ import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -74,7 +73,7 @@ public interface ArtifactClassLoaderResolver {
    * @return a classLoader for a domain.
    */
   MuleDeployableArtifactClassLoader createDomainClassLoader(DomainDescriptor descriptor,
-                                                            BiFunction<ArtifactClassLoader, ArtifactPluginDescriptor, Optional<Supplier<ArtifactClassLoader>>> pluginClassLoaderResolver);
+                                                            PluginClassLoaderResolver pluginClassLoaderResolver);
 
   /**
    * Creates a classLoader for an application. This will create the classLoader itself and all of its internal required state:
@@ -99,7 +98,7 @@ public interface ArtifactClassLoaderResolver {
    */
   MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
                                                                  Supplier<ArtifactClassLoader> domainClassLoader,
-                                                                 BiFunction<ArtifactClassLoader, ArtifactPluginDescriptor, Optional<Supplier<ArtifactClassLoader>>> pluginClassLoaderResolver);
+                                                                 PluginClassLoaderResolver pluginClassLoaderResolver);
 
   /**
    * Creates a classLoader for a plugin.
