@@ -62,6 +62,7 @@ import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantTypeVisitor;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
 import org.mule.runtime.extension.api.connectivity.oauth.PlatformManagedOAuthGrantType;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
+import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultConnectionProviderObjectBuilder;
@@ -264,18 +265,26 @@ public class PlatformManagedOAuthConnectionProvider<C>
 
     ParameterizedModel parameterizedModel = oauthConfig.getDelegateConnectionProviderModel();
 
-    for(ParameterGroupModel parameterGroupModel : parameterizedModel.getParameterGroupModels()) {
+    for (ParameterGroupModel parameterGroupModel : parameterizedModel.getParameterGroupModels()) {
       Map<String, Object> currentResolvers = resolvers;
-      if(parameterGroupModel.isShowInDsl()) {
-        currentResolvers = new HashMap<>();
-        resolvers.put(parameterGroupModel.getName(), currentResolvers);
+      if (parameterGroupModel.isShowInDsl()) {
+        if (parameterGroupModel.getModelProperty(ParameterGroupModelProperty.class).isPresent()) {
+          currentResolvers = new HashMap<>();
+          // CHECK NOT TO PUT THIS ALWAYS
+          resolvers.put(((Field) parameterGroupModel.getModelProperty(ParameterGroupModelProperty.class).get().getDescriptor()
+              .getContainer()).getName(), currentResolvers);
+        }
+      }
+
+      for (ParameterModel parameterModel : parameterGroupModel.getParameterModels()) {
+        if (parameters.containsKey(parameterModel.getName())) {
+          currentResolvers.put(parameterModel.getName(), parameters.get(parameterModel.getName()));
+        }
       }
 
     }
 
-
-
-    return fromValues(parameters,
+    return fromValues(resolvers,
                       muleContext,
                       false,
                       new ReflectionCache(),
