@@ -6,14 +6,16 @@
  */
 package org.mule.runtime.deployment.model.internal.domain;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
+import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleSharedDomainClassLoader;
@@ -40,6 +42,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Creates {@link ArtifactClassLoader} for domain artifacts.
  */
+// TODO remove
 public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFactory<DomainDescriptor> {
 
   protected static final Logger logger = LoggerFactory.getLogger(DomainClassLoaderFactory.class);
@@ -79,8 +82,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
   }
 
   @Override
-  public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, DomainDescriptor descriptor,
-                                    List<ArtifactClassLoader> artifactClassLoaders) {
+  public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, DomainDescriptor descriptor) {
     final String domainId = getDomainId(descriptor.getName());
 
     ArtifactClassLoader domainClassLoader = domainArtifactClassLoaders.get(domainId);
@@ -95,7 +97,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
           } else {
             NativeLibraryFinder nativeLibraryFinder =
                 nativeLibraryFinderFactory.create(descriptor.getDataFolderName(), descriptor.getClassLoaderModel().getUrls());
-            domainClassLoader = getCustomDomainClassLoader(parent, descriptor, artifactClassLoaders, nativeLibraryFinder);
+            domainClassLoader = getCustomDomainClassLoader(parent, descriptor, nativeLibraryFinder);
           }
 
           domainClassLoader.addShutdownListener(() -> {
@@ -112,16 +114,21 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
     return domainClassLoader;
   }
 
+  @Override
+  public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, DomainDescriptor descriptor,
+                                    List<ArtifactClassLoader> artifactPluginClassLoaders) {
+    return create(artifactId, parent, descriptor);
+  }
+
   private ArtifactClassLoader getCustomDomainClassLoader(ArtifactClassLoader parent, DomainDescriptor domain,
-                                                         List<ArtifactClassLoader> artifactClassLoaders,
                                                          NativeLibraryFinder nativeLibraryFinder) {
-    validateDomain(domain);
+    // validateDomain(domain);
 
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = getApplicationClassLoaderLookupPolicy(parent, domain);
 
     ArtifactClassLoader classLoader =
         new MuleSharedDomainClassLoader(domain, parent.getClassLoader(), classLoaderLookupPolicy, Arrays
-            .asList(domain.getClassLoaderModel().getUrls()), artifactClassLoaders, nativeLibraryFinder);
+            .asList(domain.getClassLoaderModel().getUrls()), nativeLibraryFinder);
 
     return classLoader;
   }
@@ -142,7 +149,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
   private ArtifactClassLoader getDefaultDomainClassLoader(ArtifactClassLoader parent,
                                                           ClassLoaderLookupPolicy containerLookupPolicy) {
     return new MuleSharedDomainClassLoader(new DomainDescriptor(DEFAULT_DOMAIN_NAME), parent.getClassLoader(),
-                                           containerLookupPolicy.extend(emptyMap()), emptyList(), emptyList());
+                                           containerLookupPolicy.extend(emptyMap()), emptyList());
   }
 
   private void validateDomain(DomainDescriptor domainDescriptor) {

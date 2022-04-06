@@ -7,7 +7,8 @@
 
 package org.mule.runtime.deployment.model.internal.policy;
 
-import static java.util.Collections.emptyList;
+import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
 import static junit.framework.TestCase.fail;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -16,12 +17,13 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -43,8 +45,9 @@ public class PolicyTemplateClassLoaderFactoryTestCase extends AbstractMuleTestCa
   private final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
   @Rule
   public TemporaryFolder policyFolder = new TemporaryFolder();
-  private PolicyTemplateClassLoaderFactory factory = new PolicyTemplateClassLoaderFactory();
+  private final PolicyTemplateClassLoaderFactory factory = new PolicyTemplateClassLoaderFactory();
   private PolicyTemplateDescriptor descriptor;
+  private RegionClassLoader regionClassLoader;
   private ArtifactClassLoader parentClassLoader;
 
   @Before
@@ -52,15 +55,18 @@ public class PolicyTemplateClassLoaderFactoryTestCase extends AbstractMuleTestCa
     descriptor = new PolicyTemplateDescriptor("testPolicy");
     descriptor.setRootFolder(policyFolder.getRoot());
 
+    regionClassLoader = mock(RegionClassLoader.class);
+    when(regionClassLoader.getClassLoader()).thenReturn(getClass().getClassLoader());
+
     parentClassLoader = mock(ArtifactClassLoader.class);
-    when(parentClassLoader.getClassLoader()).thenReturn(getClass().getClassLoader());
+    when(parentClassLoader.getClassLoader()).thenReturn(regionClassLoader);
     when(lookupPolicy.getClassLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
     when(parentClassLoader.getClassLoaderLookupPolicy()).thenReturn(lookupPolicy);
   }
 
   @Test
   public void createsEmptyClassLoader() throws Exception {
-    final ArtifactClassLoader artifactClassLoader = factory.create(POLICY_ID, parentClassLoader, descriptor, emptyList());
+    final ArtifactClassLoader artifactClassLoader = factory.create(POLICY_ID, parentClassLoader, descriptor);
     final MuleArtifactClassLoader classLoader = (MuleArtifactClassLoader) artifactClassLoader.getClassLoader();
     assertThat(classLoader.getURLs(), equalTo(new URL[0]));
   }
@@ -69,15 +75,16 @@ public class PolicyTemplateClassLoaderFactoryTestCase extends AbstractMuleTestCa
   public void validatesPolicyFolder() throws Exception {
     File fakePolicyFolder = new File("./fake/folder/for/test");
     descriptor.setRootFolder(fakePolicyFolder);
-    factory.create(POLICY_ID, null, descriptor, emptyList());
+    factory.create(POLICY_ID, null, descriptor);
   }
 
   @Test
   public void usesClassLoaderLookupPolicy() throws Exception {
-    final ArtifactClassLoader artifactClassLoader = factory.create(POLICY_ID, parentClassLoader, descriptor, emptyList());
+    final ArtifactClassLoader artifactClassLoader = factory.create(POLICY_ID, parentClassLoader, descriptor);
     final MuleArtifactClassLoader classLoader = (MuleArtifactClassLoader) artifactClassLoader.getClassLoader();
 
     final String className = "com.dummy.Foo";
+    when(regionClassLoader.loadClass(className)).thenThrow(ClassNotFoundException.class);
     try {
       classLoader.loadClass(className);
       fail("Able to load an un-existent class");
@@ -96,8 +103,9 @@ public class PolicyTemplateClassLoaderFactoryTestCase extends AbstractMuleTestCa
     artifactPluginClassLoaders.add(pluginClassLoader1);
     artifactPluginClassLoaders.add(pluginClassLoader2);
 
-    final ArtifactClassLoader artifactClassLoader = factory.create(POLICY_ID, parentClassLoader, descriptor,
-                                                                   artifactPluginClassLoaders);
+    when(regionClassLoader.getArtifactPluginClassLoaders()).thenReturn(artifactPluginClassLoaders);
+
+    final ArtifactClassLoader artifactClassLoader = factory.create(POLICY_ID, parentClassLoader, descriptor);
     final MuleDeployableArtifactClassLoader classLoader =
         (MuleDeployableArtifactClassLoader) artifactClassLoader.getClassLoader();
 

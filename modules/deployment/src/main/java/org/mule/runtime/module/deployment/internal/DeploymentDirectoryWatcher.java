@@ -15,6 +15,7 @@ import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer
 
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.sort;
 import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
@@ -320,8 +321,12 @@ public class DeploymentDirectoryWatcher implements Runnable {
       sort(apps);
       deployExplodedApps(apps);
     } catch (Exception e) {
-      // preserve the flag for the thread
-      Thread.currentThread().interrupt();
+      if (e instanceof InterruptedException) {
+        // preserve the flag for the thread
+        currentThread().interrupt();
+      } else {
+        logger.error("Exception processing deplymnet watch dir.", e);
+      }
     } finally {
       if (deploymentLock.isHeldByCurrentThread()) {
         deploymentLock.unlock();

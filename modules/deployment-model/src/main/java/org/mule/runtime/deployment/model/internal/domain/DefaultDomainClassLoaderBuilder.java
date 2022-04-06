@@ -6,45 +6,53 @@
  */
 package org.mule.runtime.deployment.model.internal.domain;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
+import static java.lang.String.format;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
+import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilder;
 import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
+import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
+
+import java.io.File;
 
 /**
  * {@link ArtifactClassLoader} builder for class loaders required by {@link Domain} artifacts
  *
  * @since 4.0
  */
-public class DefaultDomainClassLoaderBuilder extends AbstractArtifactClassLoaderBuilder<DefaultDomainClassLoaderBuilder>
-    implements DomainClassLoaderBuilder {
+public class DefaultDomainClassLoaderBuilder implements DomainClassLoaderBuilder {
 
-  private final ArtifactClassLoader parentClassLoader;
-  private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
+  private ArtifactDescriptor artifactDescriptor;
+  private final ArtifactClassLoaderResolver artifactClassLoaderResolver;
 
   /**
    * Creates a new builder for creating {@link Domain} artifacts.
    *
-   * @param parentClassLoader          classloader that will be the parent of the created classloaders. Non null
-   * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes
-   * @param pluginClassLoadersFactory  creates the class loaders for the plugins included in the domain's region. Non null
+   * @param artifactClassLoaderResolver resolver that will be used to create the class loader. Non-null
    */
-  public DefaultDomainClassLoaderBuilder(ArtifactClassLoader parentClassLoader,
-                                         DeployableArtifactClassLoaderFactory<DomainDescriptor> artifactClassLoaderFactory,
-                                         RegionPluginClassLoadersFactory pluginClassLoadersFactory) {
-    super(pluginClassLoadersFactory);
-    this.parentClassLoader = parentClassLoader;
-    this.artifactClassLoaderFactory = artifactClassLoaderFactory;
+  public DefaultDomainClassLoaderBuilder(ArtifactClassLoaderResolver artifactClassLoaderResolver) {
+    this.artifactClassLoaderResolver = artifactClassLoaderResolver;
+  }
+
+  @Override
+  public DomainClassLoaderBuilder setArtifactDescriptor(ArtifactDescriptor artifactDescriptor) {
+    this.artifactDescriptor = artifactDescriptor;
+    return this;
   }
 
   /**
@@ -55,34 +63,7 @@ public class DefaultDomainClassLoaderBuilder extends AbstractArtifactClassLoader
    */
   @Override
   public MuleDeployableArtifactClassLoader build() {
-    return (MuleDeployableArtifactClassLoader) super.build();
-  }
-
-  @Override
-  protected ArtifactClassLoader createArtifactClassLoader(String artifactId, RegionClassLoader regionClassLoader) {
-    return artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor, artifactPluginClassLoaders);
-  }
-
-  @Override
-  protected String getArtifactId(ArtifactDescriptor artifactDescriptor) {
-    return getDomainId(artifactDescriptor.getName());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected ArtifactClassLoader getParentClassLoader() {
-    return parentClassLoader;
-  }
-
-  /**
-   * @param domainName name of the domain. Non empty.
-   * @return the unique identifier for the domain in the container.
-   */
-  public static String getDomainId(String domainName) {
-    checkArgument(!isEmpty(domainName), "domainName cannot be empty");
-
-    return "/domain/" + domainName;
+    return artifactClassLoaderResolver
+        .createDomainClassLoader((DomainDescriptor) artifactDescriptor);
   }
 }

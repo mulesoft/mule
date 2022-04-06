@@ -30,6 +30,7 @@ import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.artifact.activation.internal.TrackingArtifactClassLoaderResolverDecorator;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
@@ -48,7 +49,6 @@ import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepository
 import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory;
@@ -59,6 +59,9 @@ import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoad
 import org.mule.runtime.internal.memory.management.ArtifactMemoryManagementService;
 import org.mule.runtime.internal.memory.management.DefaultMemoryManagementService;
 import org.mule.runtime.internal.memory.management.ProfiledMemoryManagementService;
+import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
+import org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver;
+import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
@@ -107,7 +110,6 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
   private final ArtifactClassLoader containerClassLoader;
   private final ServiceManager serviceManager;
   private final ExtensionModelLoaderManager extensionModelLoaderManager;
-  private final ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory;
   private final DefaultClassLoaderManager artifactClassLoaderManager;
   private final ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory;
   private final DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory;
@@ -214,8 +216,6 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     this.domainClassLoaderFactory =
         trackDeployableArtifactClassLoaderFactory(domainClassLoaderFactory(name -> getAppDataFolder(name)));
 
-    this.artifactPluginClassLoaderFactory =
-        trackArtifactClassLoaderFactory(new ArtifactPluginClassLoaderFactory());
     final AbstractArtifactDescriptorFactory<MulePluginModel, ArtifactPluginDescriptor> artifactPluginDescriptorFactory =
         artifactDescriptorFactoryProvider()
             .createArtifactPluginDescriptorFactory(new DescriptorLoaderRepositoryFactory().createDescriptorLoaderRepository(),
@@ -232,12 +232,15 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
 
     DeployableArtifactClassLoaderFactory<ApplicationDescriptor> applicationClassLoaderFactory =
         trackDeployableArtifactClassLoaderFactory(applicationClassLoaderFactory(name -> getAppDataFolder(name)));
-    pluginClassLoadersFactory = new DefaultRegionPluginClassLoadersFactory(artifactPluginClassLoaderFactory, moduleRepository);
-    applicationClassLoaderBuilderFactory =
-        new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory, pluginClassLoadersFactory);
-    domainClassLoaderBuilderFactory =
-        new DomainClassLoaderBuilderFactory(containerClassLoader, domainClassLoaderFactory,
-                                            pluginClassLoadersFactory);
+
+    ArtifactClassLoaderResolver artifactClassLoaderResolver =
+        new TrackingArtifactClassLoaderResolverDecorator(artifactClassLoaderManager,
+                                                         new DefaultArtifactClassLoaderResolver(moduleRepository,
+                                                                                                new DefaultNativeLibraryFinderFactory(name -> getAppDataFolder(name))));
+
+    pluginClassLoadersFactory = new DefaultRegionPluginClassLoadersFactory(artifactClassLoaderResolver);
+    applicationClassLoaderBuilderFactory = new ApplicationClassLoaderBuilderFactory(artifactClassLoaderResolver);
+    domainClassLoaderBuilderFactory = new DomainClassLoaderBuilderFactory(artifactClassLoaderResolver);
 
     this.artifactConfigurationProcessor = artifactConfigurationProcessor;
 
@@ -341,13 +344,6 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
    */
   public DeployableArtifactClassLoaderFactory<DomainDescriptor> getDomainClassLoaderFactory() {
     return domainClassLoaderFactory;
-  }
-
-  /**
-   * @return factory for creating artifact plugin class loaders
-   */
-  public ArtifactClassLoaderFactory<ArtifactPluginDescriptor> getArtifactPluginClassLoaderFactory() {
-    return artifactPluginClassLoaderFactory;
   }
 
   /**

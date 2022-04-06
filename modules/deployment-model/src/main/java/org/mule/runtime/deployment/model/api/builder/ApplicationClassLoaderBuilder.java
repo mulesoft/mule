@@ -28,12 +28,6 @@ public interface ApplicationClassLoaderBuilder {
   ApplicationClassLoaderBuilder setDomainParentClassLoader(ArtifactClassLoader domainArtifactClassLoader);
 
   /**
-   * @param artifactPluginDescriptors plugin descriptors that will be used by the application.
-   * @return the builder
-   */
-  ApplicationClassLoaderBuilder addArtifactPluginDescriptors(ArtifactPluginDescriptor... artifactPluginDescriptors);
-
-  /**
    * @param artifactDescriptor the descriptor of the artifact for which the class loader is going to be created.
    * @return the builder
    */

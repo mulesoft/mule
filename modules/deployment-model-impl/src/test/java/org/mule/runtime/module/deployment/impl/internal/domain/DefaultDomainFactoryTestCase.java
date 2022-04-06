@@ -78,8 +78,6 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
 
     DomainClassLoaderBuilder domainClassLoaderBuilderMock = mock(DomainClassLoaderBuilder.class);
     when(domainClassLoaderBuilderMock.setArtifactDescriptor(any())).thenReturn(domainClassLoaderBuilderMock);
-    when(domainClassLoaderBuilderMock.addArtifactPluginDescriptors(new ArtifactPluginDescriptor[0]))
-        .thenReturn(domainClassLoaderBuilderMock);
     when(domainClassLoaderBuilderMock.build()).thenReturn(domainArtifactClassLoader);
     when(domainClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()).thenReturn(domainClassLoaderBuilderMock);
 
@@ -102,9 +100,6 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
     DomainClassLoaderBuilder domainClassLoaderBuilderMock = mock(DomainClassLoaderBuilder.class);
     when(domainClassLoaderBuilderMock.setArtifactDescriptor(any()))
         .thenReturn(domainClassLoaderBuilderMock);
-    when(domainClassLoaderBuilderMock
-        .addArtifactPluginDescriptors(descriptor.getPlugins().toArray(new ArtifactPluginDescriptor[0])))
-            .thenReturn(domainClassLoaderBuilderMock);
     when(domainClassLoaderBuilderMock.build()).thenReturn(domainArtifactClassLoader);
     when(domainClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()).thenReturn(domainClassLoaderBuilderMock);
 

@@ -8,8 +8,6 @@ package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
-import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.applicationClassLoaderFactory;
-import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.regionPluginClassLoadersFactory;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 
@@ -25,6 +23,8 @@ import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepository
 import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
+import org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver;
+import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
@@ -94,9 +94,10 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
     PluginDependenciesResolver pluginDependenciesResolver =
         new DefaultArtifactDescriptorFactoryProvider().createBundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
 
+    DefaultArtifactClassLoaderResolver artifactClassLoaderResolver = new DefaultArtifactClassLoaderResolver(moduleRepository,
+                                                                                                            new DefaultNativeLibraryFinderFactory(name -> getAppDataFolder(name)));
     ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory =
-        new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory(name -> getAppDataFolder(name)),
-                                                 regionPluginClassLoadersFactory(moduleRepository));
+        new ApplicationClassLoaderBuilderFactory(artifactClassLoaderResolver);
 
     return new TestApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
                                       domainManager, serviceRepository,

@@ -132,7 +132,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
   private MuleSharedDomainClassLoader getDefaultDomainClassLoader(ArtifactClassLoader parent,
                                                                   ClassLoaderLookupPolicy containerLookupPolicy) {
     return new MuleSharedDomainClassLoader(new DomainDescriptor(DEFAULT_DOMAIN_NAME), parent.getClassLoader(),
-                                           containerLookupPolicy.extend(emptyMap()), emptyList(), emptyList());
+                                           containerLookupPolicy.extend(emptyMap()), emptyList());
   }
 
   private MuleSharedDomainClassLoader getCustomDomainClassLoader(ArtifactClassLoader parent, DomainDescriptor domain,
@@ -141,8 +141,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
     return new MuleSharedDomainClassLoader(domain, parent.getClassLoader(),
                                            getArtifactClassLoaderLookupPolicy(parent, domain),
-                                           asList(domain.getClassLoaderModel().getUrls()),
-                                           emptyList(), nativeLibraryFinder);
+                                           asList(domain.getClassLoaderModel().getUrls()), nativeLibraryFinder);
   }
 
   private void validateDomain(DomainDescriptor domainDescriptor) {
@@ -196,8 +195,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
                                        nativeLibraryFinderFactory.create(descriptor.getDataFolderName(),
                                                                          descriptor.getClassLoaderModel().getUrls()),
                                        asList(descriptor.getClassLoaderModel().getUrls()),
-                                       classLoaderLookupPolicy,
-                                       emptyList());
+                                       classLoaderLookupPolicy);
 
     regionClassLoader.addClassLoader(appClassLoader, artifactClassLoaderFilter);
 

@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.deployment.model.internal;
 
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
+import static java.util.Arrays.asList;
+import static java.util.function.UnaryOperator.identity;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 
 import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -24,8 +27,6 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,8 +48,6 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
   private final RegionPluginClassLoadersFactory pluginClassLoadersFactory;
   private final List<ArtifactPluginDescriptor> artifactPluginDescriptors = new LinkedList<>();
   protected ArtifactDescriptor artifactDescriptor;
-  private ArtifactClassLoader parentClassLoader;
-  protected List<ArtifactClassLoader> artifactPluginClassLoaders = new ArrayList<>();
 
   /**
    * Creates an {@link AbstractArtifactClassLoaderBuilder}.
@@ -96,7 +95,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
    */
   public ArtifactClassLoader build() {
     checkState(artifactDescriptor != null, "artifact descriptor cannot be null");
-    parentClassLoader = getParentClassLoader();
+    ArtifactClassLoader parentClassLoader = getParentClassLoader();
     checkState(parentClassLoader != null, "parent class loader cannot be null");
     final String artifactId = getArtifactId(artifactDescriptor);
     ClassLoaderLookupPolicy parentLookupPolicy = getParentLookupPolicy(parentClassLoader);
@@ -109,17 +108,17 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
         createArtifactClassLoaderFilter(artifactDescriptor.getClassLoaderModel(),
                                         parentLookupPolicy);
 
-    Map<String, LookupStrategy> appAdditionalLookupStrategy = new HashMap<>();
-    artifactClassLoaderFilter.getExportedClassPackages().stream().forEach(p -> appAdditionalLookupStrategy.put(p, PARENT_FIRST));
+    Map<String, LookupStrategy> appAdditionalLookupStrategy =
+        artifactClassLoaderFilter.getExportedClassPackages().stream()
+            .collect(toMap(identity(), p -> PARENT_FIRST));
 
-    artifactPluginClassLoaders =
+    final ArtifactClassLoader artifactClassLoader = createArtifactClassLoader(artifactId, regionClassLoader);
+    regionClassLoader.addClassLoader(artifactClassLoader, artifactClassLoaderFilter);
+
+    List<ArtifactClassLoader> artifactPluginClassLoaders =
         pluginClassLoadersFactory.createPluginClassLoaders(regionClassLoader, artifactPluginDescriptors,
                                                            regionClassLoader.getClassLoaderLookupPolicy()
                                                                .extend(appAdditionalLookupStrategy));
-
-    final ArtifactClassLoader artifactClassLoader = createArtifactClassLoader(artifactId, regionClassLoader);
-
-    regionClassLoader.addClassLoader(artifactClassLoader, artifactClassLoaderFilter);
 
     int artifactPluginIndex = 0;
     for (ArtifactPluginDescriptor artifactPluginDescriptor : artifactPluginDescriptors) {

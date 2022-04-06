@@ -42,17 +42,14 @@ public class MuleSharedDomainClassLoader extends MuleDeployableArtifactClassLoad
   private final NativeLibraryFinder nativeLibraryFinder;
 
   public MuleSharedDomainClassLoader(ArtifactDescriptor artifactDescriptor, ClassLoader parent,
-                                     ClassLoaderLookupPolicy lookupPolicy, List<URL> urls,
-                                     List<ArtifactClassLoader> artifactPluginClassLoaders) {
-    this(artifactDescriptor, parent, lookupPolicy, urls, artifactPluginClassLoaders, null);
+                                     ClassLoaderLookupPolicy lookupPolicy, List<URL> urls) {
+    this(artifactDescriptor, parent, lookupPolicy, urls, null);
   }
 
   public MuleSharedDomainClassLoader(ArtifactDescriptor artifactDescriptor, ClassLoader parent,
                                      ClassLoaderLookupPolicy lookupPolicy, List<URL> urls,
-                                     List<ArtifactClassLoader> artifactPluginClassLoaders,
                                      NativeLibraryFinder nativeLibraryFinder) {
-    super(getDomainId(artifactDescriptor.getName()), artifactDescriptor, urls.toArray(new URL[0]), parent, lookupPolicy,
-          artifactPluginClassLoaders);
+    super(getDomainId(artifactDescriptor.getName()), artifactDescriptor, urls.toArray(new URL[0]), parent, lookupPolicy);
     this.nativeLibraryFinder = nativeLibraryFinder;
   }
 
