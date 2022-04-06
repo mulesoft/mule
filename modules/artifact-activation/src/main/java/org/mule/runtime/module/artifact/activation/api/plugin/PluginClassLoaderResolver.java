@@ -19,7 +19,9 @@ import java.util.function.Supplier;
  *
  * @since 4.5
  */
-public interface PluginClassLoaderResolver
-    extends BiFunction<ArtifactClassLoader, ArtifactPluginDescriptor, Optional<Supplier<ArtifactClassLoader>>> {
+public interface PluginClassLoaderResolver {
+
+  Optional<Supplier<ArtifactClassLoader>> resolve(ArtifactClassLoader ownerArtifactClassLoader,
+                                                  ArtifactPluginDescriptor artifactPluginDescriptor);
 
 }

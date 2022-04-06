@@ -118,7 +118,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
     artifactPluginDescriptors
         .stream()
-        .map(pluginDependencyDescriptor -> pluginClassLoaderResolver.apply(domainClassLoader, pluginDependencyDescriptor)
+        .map(pluginDependencyDescriptor -> pluginClassLoaderResolver.resolve(domainClassLoader, pluginDependencyDescriptor)
             .orElse(() -> resolvePluginClassLoader(domainClassLoader, pluginDependencyDescriptor)).get())
         .forEach(artifactPluginClassLoader -> regionClassLoader
             .addClassLoader(artifactPluginClassLoader,
@@ -206,7 +206,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
     artifactPluginDescriptors
         .stream()
-        .map(pluginDependencyDescriptor -> pluginClassLoaderResolver.apply(appClassLoader, pluginDependencyDescriptor)
+        .map(pluginDependencyDescriptor -> pluginClassLoaderResolver.resolve(appClassLoader, pluginDependencyDescriptor)
             .orElse(() -> resolvePluginClassLoader(appClassLoader, pluginDependencyDescriptor)).get())
         .forEach(artifactPluginClassLoader -> regionClassLoader
             .addClassLoader(artifactPluginClassLoader,
@@ -371,7 +371,6 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
               pluginsLookupPolicies.put(exportedPackage, lookupStrategy);
             }
           }
-
         });
 
     ContainerOnlyLookupStrategy containerOnlyLookupStrategy = new ContainerOnlyLookupStrategy(this.getClass().getClassLoader());
