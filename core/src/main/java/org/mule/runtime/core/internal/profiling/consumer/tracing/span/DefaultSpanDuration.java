@@ -6,28 +6,39 @@
  */
 package org.mule.runtime.core.internal.profiling.consumer.tracing.span;
 
-import org.mule.runtime.api.profiling.tracing.SpanDuration;
-
 /**
  * Dafault implementation for {@link SpanDuration}
  */
 public class DefaultSpanDuration implements SpanDuration {
 
-  private final long startTime;
-  private final long endTime;
+  private final long startTimestamp;
+  private long endTimestamp;
 
-  public DefaultSpanDuration(long startTime, long endTime) {
-    this.startTime = startTime;
-    this.endTime = endTime;
+  public DefaultSpanDuration(long startTime) {
+    this.startTimestamp = startTime;
   }
 
   @Override
-  public long getStart() {
-    return startTime;
+  public long getStartEpochMillis() {
+    return startTimestamp;
   }
 
   @Override
-  public long getEnd() {
-    return endTime;
+  public long getEndEpochMillis() {
+    return endTimestamp;
+  }
+
+  @Override
+  public long elapsedMillis() {
+    if (endTimestamp == 0L) {
+      return System.currentTimeMillis() - startTimestamp;
+    } else {
+      return endTimestamp - startTimestamp;
+    }
+  }
+
+  @Override
+  public void finish(long finishEpochMillis) {
+    this.endTimestamp = finishEpochMillis;
   }
 }

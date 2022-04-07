@@ -36,7 +36,7 @@ public class EndSpanProfilingExecutionOperation extends SpanProfilingExecutionOp
                                                           SpanManager spanManager) {
     SpanProfilingEventContext spanProfilingEventContext =
         new DefaultSpanProfilingEventContext(processingStrategyEventContext, spanManager);
-    spanProfilingEventContext.getSpan().end(processingStrategyEventContext.getTriggerTimestamp());
+    spanProfilingEventContext.getSpan().finish(processingStrategyEventContext.getTriggerTimestamp());
     return spanProfilingEventContext;
   }
 

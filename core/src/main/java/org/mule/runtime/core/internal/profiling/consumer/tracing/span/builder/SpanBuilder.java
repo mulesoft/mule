@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.profiling.consumer.tracing.span.builder;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
+
 import org.mule.runtime.core.internal.profiling.consumer.tracing.span.DefaultSpanDuration;
 import org.mule.runtime.core.internal.profiling.consumer.tracing.span.ExecutionSpan;
 import org.mule.runtime.core.internal.profiling.consumer.tracing.span.SpanManager;
@@ -25,7 +26,6 @@ public abstract class SpanBuilder {
   protected ComponentLocation location;
   protected SpanManager spanManager;
   private long start;
-  private long end;
 
   public SpanBuilder withSpanManager(SpanManager spanManager) {
     this.spanManager = spanManager;
@@ -52,11 +52,6 @@ public abstract class SpanBuilder {
     return this;
   }
 
-  public SpanBuilder withEnd(long end) {
-    this.end = end;
-    return this;
-  }
-
   /**
    * builds the {@link Span}
    *
@@ -65,7 +60,7 @@ public abstract class SpanBuilder {
   public Span build() {
     SpanIdentifier spanIdentifier = getSpanIdentifier();
     return spanManager.getSpan(spanIdentifier,
-                               id -> new ExecutionSpan(getSpanName(), getSpanIdentifier(), new DefaultSpanDuration(start, end),
+                               id -> new ExecutionSpan(getSpanName(), getSpanIdentifier(), new DefaultSpanDuration(start),
                                                        getParent()));
   }
 

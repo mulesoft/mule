@@ -9,22 +9,23 @@ package org.mule.runtime.core.internal.profiling.consumer.tracing.span;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.profiling.tracing.Span;
-import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A {@link Span} that represents the trace corresponding to the execution of mule flow or component.
  *
  * @since 4.5.0
  */
-public class ExecutionSpan implements Span {
+public class ExecutionSpan implements Span, InternalSpan {
 
   private final String name;
   private final SpanIdentifier identifier;
   private final Span parent;
-  private SpanDuration spanDuration;
+  private final AtomicBoolean isActive = new AtomicBoolean(true);
+  private final SpanDuration spanDuration;
 
   public ExecutionSpan(String name, SpanIdentifier identifier, SpanDuration spanDuration,
                        Span parent) {
@@ -50,13 +51,21 @@ public class ExecutionSpan implements Span {
   }
 
   @Override
-  public SpanDuration getDuration() {
-    return spanDuration;
+  public boolean isActive() {
+    return !isActive.get();
   }
 
   @Override
-  public void end(long endTimestamp) {
-    spanDuration = new DefaultSpanDuration(spanDuration.getStart(), endTimestamp);
+  public void finish(long finishTimestamp) throws IllegalStateException {
+    if (isActive.getAndSet(false)) {
+      spanDuration.finish(finishTimestamp);
+    } else {
+      throw new IllegalStateException("Cannot end a Span twice");
+    }
   }
 
+  @Override
+  public SpanDuration getDuration() {
+    return spanDuration;
+  }
 }

@@ -6,7 +6,7 @@
  */
 
 package org.mule.runtime.core.api.profiling;
-;
+
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.END_SPAN;
