@@ -22,7 +22,6 @@ import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepository
 import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
-import org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.deployment.model.internal.artifact.extension.MuleExtensionModelLoaderManager;
 import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;

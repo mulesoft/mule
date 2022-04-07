@@ -148,7 +148,10 @@ public class ToolingApplicationClassLoaderBuilder
   /**
    * @param artifactPluginDescriptors set of plugins descriptors that will be used by the application.
    * @return the builder
+   *
+   * @since 4.5
    */
+  // Keep compatibility with usages of the factory that expect the descriptor from previous version.
   public AbstractArtifactClassLoaderBuilder addArtifactPluginDescriptors(org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor... artifactPluginDescriptors) {
     return super.addArtifactPluginDescriptors(artifactPluginDescriptors);
   }

@@ -23,12 +23,20 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-
+/**
+ * Tracks {@link ArtifactClassLoader}s created by {@link ArtifactClassLoaderResolver}.
+ */
 public class TrackingArtifactClassLoaderResolverDecorator implements ArtifactClassLoaderResolver {
 
   private final ArtifactClassLoaderManager artifactClassLoaderManager;
   private final ArtifactClassLoaderResolver delegate;
 
+  /**
+   * Tracks the class loaders created by {@link ArtifactClassLoaderResolver}.
+   *
+   * @param artifactClassLoaderManager tracks each created class loader. Non-null.
+   * @param delegate                   resolver that creates the class loaders to be tracked. Non-null.
+   */
   public TrackingArtifactClassLoaderResolverDecorator(ArtifactClassLoaderManager artifactClassLoaderManager,
                                                       ArtifactClassLoaderResolver delegate) {
     this.artifactClassLoaderManager = requireNonNull(artifactClassLoaderManager, "artifactClassLoaderManager");
@@ -37,26 +45,36 @@ public class TrackingArtifactClassLoaderResolverDecorator implements ArtifactCla
 
   @Override
   public MuleDeployableArtifactClassLoader createDomainClassLoader(DomainDescriptor descriptor) {
-    return delegate.createDomainClassLoader(descriptor);
+    MuleDeployableArtifactClassLoader artifactClassLoader = delegate.createDomainClassLoader(descriptor);
+    track(artifactClassLoader);
+    return artifactClassLoader;
   }
 
   @Override
   public MuleDeployableArtifactClassLoader createDomainClassLoader(DomainDescriptor descriptor,
                                                                    PluginClassLoaderResolver pluginClassLoaderResolver) {
-    return delegate.createDomainClassLoader(descriptor, pluginClassLoaderResolver);
+    MuleDeployableArtifactClassLoader artifactClassLoader =
+        delegate.createDomainClassLoader(descriptor, pluginClassLoaderResolver);
+    track(artifactClassLoader);
+    return artifactClassLoader;
   }
 
   @Override
   public MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
                                                                         Supplier<ArtifactClassLoader> domainClassLoader) {
-    return delegate.createApplicationClassLoader(descriptor, domainClassLoader);
+    MuleDeployableArtifactClassLoader artifactClassLoader = delegate.createApplicationClassLoader(descriptor, domainClassLoader);
+    track(artifactClassLoader);
+    return artifactClassLoader;
   }
 
   @Override
   public MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
                                                                         Supplier<ArtifactClassLoader> domainClassLoader,
                                                                         PluginClassLoaderResolver pluginClassLoaderResolver) {
-    return delegate.createApplicationClassLoader(descriptor, domainClassLoader, pluginClassLoaderResolver);
+    MuleDeployableArtifactClassLoader artifactClassLoader =
+        delegate.createApplicationClassLoader(descriptor, domainClassLoader, pluginClassLoaderResolver);
+    track(artifactClassLoader);
+    return artifactClassLoader;
   }
 
   @Override
@@ -73,6 +91,5 @@ public class TrackingArtifactClassLoaderResolverDecorator implements ArtifactCla
     artifactClassLoaderManager.register(artifactClassLoader);
     artifactClassLoader.addShutdownListener(() -> artifactClassLoaderManager.unregister(artifactClassLoader.getArtifactId()));
   }
-
 
 }

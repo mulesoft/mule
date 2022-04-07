@@ -42,7 +42,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Creates {@link ArtifactClassLoader} for domain artifacts.
  */
-// TODO remove
 public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFactory<DomainDescriptor> {
 
   protected static final Logger logger = LoggerFactory.getLogger(DomainClassLoaderFactory.class);
@@ -122,7 +121,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
 
   private ArtifactClassLoader getCustomDomainClassLoader(ArtifactClassLoader parent, DomainDescriptor domain,
                                                          NativeLibraryFinder nativeLibraryFinder) {
-    // validateDomain(domain);
+    validateDomain(domain);
 
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = getApplicationClassLoaderLookupPolicy(parent, domain);
 

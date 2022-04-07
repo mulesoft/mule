@@ -30,7 +30,6 @@ import java.util.List;
  *
  * @since 4.0
  */
-// TODO remove
 public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClassLoadersFactory {
 
   public static final String PLUGIN_CLASSLOADER_IDENTIFIER = "/plugin/";

@@ -325,7 +325,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
         // preserve the flag for the thread
         currentThread().interrupt();
       } else {
-        logger.error("Exception processing deplymnet watch dir.", e);
+        logger.error("Exception processing deployment watch dir.", e);
       }
     } finally {
       if (deploymentLock.isHeldByCurrentThread()) {

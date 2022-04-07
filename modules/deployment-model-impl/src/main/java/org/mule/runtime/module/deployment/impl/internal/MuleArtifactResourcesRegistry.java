@@ -15,7 +15,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEMORY_MANAGE
 import static org.mule.runtime.core.api.config.MuleProperties.SERVER_NOTIFICATION_MANAGER;
 import static org.mule.runtime.core.internal.profiling.AbstractProfilingService.configureEnableProfilingService;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
-import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.applicationClassLoaderFactory;
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 
@@ -229,9 +228,6 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                                           artifactDescriptorValidatorBuilder);
     applicationDescriptorFactory = new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
                                                                     artifactDescriptorValidatorBuilder);
-
-    DeployableArtifactClassLoaderFactory<ApplicationDescriptor> applicationClassLoaderFactory =
-        trackDeployableArtifactClassLoaderFactory(applicationClassLoaderFactory(name -> getAppDataFolder(name)));
 
     ArtifactClassLoaderResolver artifactClassLoaderResolver =
         new TrackingArtifactClassLoaderResolverDecorator(artifactClassLoaderManager,

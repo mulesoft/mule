@@ -7,13 +7,8 @@
 
 package org.mule.runtime.deployment.model.api.builder;
 
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
 import org.mule.runtime.deployment.model.internal.domain.DefaultDomainClassLoaderBuilder;
 import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
-import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
 /**
  * Factory to create instances of {@code DomainClassLoaderBuilder}.
@@ -23,9 +18,6 @@ import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 public class DomainClassLoaderBuilderFactory {
 
   private final ArtifactClassLoaderResolver artifactClassLoaderResolver;
-  // private final DeployableArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory;
-  // private final ArtifactClassLoader parentClassLoader;
-  // private final RegionPluginClassLoadersFactory pluginClassLoadersFactory;
 
   /**
    * Creates an {@code DomainClassLoaderBuilderFactory} to create {@code DomainClassLoaderBuilder} instances.
