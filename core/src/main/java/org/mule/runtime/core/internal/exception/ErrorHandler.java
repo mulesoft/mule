@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.runtime.api.component.location.Location.ERROR_HANDLER;
+import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -198,11 +200,11 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
     acceptsAllOnErrorPropagate.setExceptionListener(new DefaultExceptionListener());
     initialiseIfNeeded(acceptsAllOnErrorPropagate, muleContext);
 
-    // if (this.getLocation() != null && shouldAddLocationToDefaultErrorHandler()) {
-    // String location = this.getLocation().getLocation();
-    // String containerLocation = location.substring(0, location.length() - ERROR_HANDLER.length() - 1);
-    // acceptsAllOnErrorPropagate.setFlowLocation(builderFromStringRepresentation(containerLocation).build());
-    // }
+    if (this.getLocation() != null && shouldAddLocationToDefaultErrorHandler()) {
+      String location = this.getLocation().getLocation();
+      String containerLocation = location.substring(0, location.length() - ERROR_HANDLER.length() - 1);
+      acceptsAllOnErrorPropagate.setFlowLocation(builderFromStringRepresentation(containerLocation).build());
+    }
     this.exceptionListeners.add(acceptsAllOnErrorPropagate);
   }
 
