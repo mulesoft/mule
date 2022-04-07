@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -25,9 +26,12 @@ import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
+import org.mule.runtime.module.extension.internal.runtime.config.DeferredConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.RegistryLookupValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Map;
@@ -153,9 +157,36 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   }
 
   protected ConfigurationProvider getConfigurationProvider() {
-    return parameters.values().stream()
-        .filter(v -> v instanceof ConfigurationProvider)
-        .map(v -> ((ConfigurationProvider) v)).findAny()
-        .orElse(configurationProvider);
+    ConfigurationProvider explicitConfigProvider = getConfigurationProvider(parameters.get("config-ref"));
+    return explicitConfigProvider != null ? explicitConfigProvider : configurationProvider;
+  }
+
+  private ConfigurationProvider getConfigurationProvider(Object configRefParameter) {
+    if (configRefParameter instanceof RegistryLookupValueResolver) {
+      // Attempts to perform registry lookup resolution (which does not require an event).
+      RegistryLookupValueResolver<?> resolver = (RegistryLookupValueResolver<?>) configRefParameter;
+      resolver.setRegistry(registry);
+      try {
+        configRefParameter = resolver.resolve(null);
+      } catch (MuleException e) {
+        // TODO: log?
+        return null;
+      }
+    } else if (configRefParameter instanceof ValueResolver) {
+      // Other resolvers may require an event, so we create a deferred configuration provider.
+      ValueResolver<ConfigurationProvider> resolver;
+      try {
+        resolver = (ValueResolver<ConfigurationProvider>) configRefParameter;
+      } catch (ClassCastException e) {
+        return null;
+      }
+      configRefParameter = new DeferredConfigurationProvider(extensionModel, operationModel, resolver, expressionManager);
+    }
+
+    if (configRefParameter instanceof ConfigurationProvider) {
+      return (ConfigurationProvider) configRefParameter;
+    }
+
+    return null;
   }
 }
