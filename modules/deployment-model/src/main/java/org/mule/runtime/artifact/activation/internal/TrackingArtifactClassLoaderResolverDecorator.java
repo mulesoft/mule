@@ -25,6 +25,8 @@ import java.util.function.Supplier;
 
 /**
  * Tracks {@link ArtifactClassLoader}s created by {@link ArtifactClassLoaderResolver}.
+ *
+ * @since 4.5
  */
 public class TrackingArtifactClassLoaderResolverDecorator implements ArtifactClassLoaderResolver {
 
