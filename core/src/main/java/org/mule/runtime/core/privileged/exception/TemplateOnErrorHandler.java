@@ -225,8 +225,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       try {
         logger.error("Exception during exception strategy execution");
         getExceptionListener().resolveAndLogException(me);
-        MessagingException exception = (MessagingException) getException((CoreEvent) event);
-        if (isOwnedTransaction(exception)) {
+        if (isOwnedTransaction(getException((CoreEvent) event))) {
           TransactionCoordination.getInstance().rollbackCurrentTransaction();
         }
       } catch (Exception ex) {
@@ -503,13 +502,13 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
    */
   public abstract TemplateOnErrorHandler duplicateFor(Location location);
 
-  protected boolean isOwnedTransaction(MessagingException exception) {
+  protected boolean isOwnedTransaction(Exception exception) {
     TransactionAdapter transaction = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
     if (transaction == null || !transaction.getComponentLocation().isPresent()) {
       return false;
     }
 
-    String location = exception.getFailingComponent().getRootContainerLocation().getGlobalName();
+    String location = ((MessagingException) exception).getFailingComponent().getRootContainerLocation().getGlobalName();
 
     if (inDefaultErrorHandler()) {
       return defaultErrorHandlerOwnsTransaction(transaction);
