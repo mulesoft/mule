@@ -9,9 +9,9 @@ package org.mule.runtime.core.internal.profiling.consumer.tracing.operations;
 import static org.mule.runtime.core.internal.profiling.consumer.tracing.operations.SpanUtils.getBuilder;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.SpanProfilingEventContext;
+import org.mule.runtime.core.internal.profiling.consumer.tracing.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.consumer.tracing.span.SpanManager;
 
 /**
@@ -38,7 +38,7 @@ public class DefaultSpanProfilingEventContext implements SpanProfilingEventConte
   }
 
   @Override
-  public Span getSpan() {
+  public InternalSpan getSpan() {
     ComponentLocation location = eventContext.getLocation().get();
     return getBuilder(location)
         .withSpanManager(spanManager)

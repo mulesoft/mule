@@ -25,7 +25,7 @@ public interface SpanManager {
    * @param spanCreator function to create a span.
    * @return the {@link Span} corresponding to the identifier.
    */
-  Span getSpan(SpanIdentifier identifier, Function<SpanIdentifier, Span> spanCreator);
+  InternalSpan getSpan(SpanIdentifier identifier, Function<SpanIdentifier, InternalSpan> spanCreator);
 
   /**
    * Gets the span corresponding to the identifier if present.
@@ -33,7 +33,7 @@ public interface SpanManager {
    * @param identifier the identifier.
    * @return the {@link Span} corresponding to the identifier or null otherwise.
    */
-  Span getSpanIfPresent(SpanIdentifier identifier);
+  InternalSpan getSpanIfPresent(SpanIdentifier identifier);
 
   /**
    * Removes the span corresponding to the identifier.

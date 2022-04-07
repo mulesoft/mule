@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @since 4.5.0
  */
-public class ExecutionSpan implements Span, InternalSpan {
+public class ExecutionSpan implements InternalSpan {
 
   private final String name;
   private final SpanIdentifier identifier;

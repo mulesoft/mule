@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.core.internal.profiling.consumer.tracing.span;
 
+import org.mule.runtime.api.profiling.tracing.Span;
+
 /**
  * Provides access to the non-API (internals) of a {@link org.mule.runtime.api.profiling.tracing.Span}
  */
-public interface InternalSpan {
+public interface InternalSpan extends Span {
 
   /**
    * @return The {@link SpanDuration} of a {@link org.mule.runtime.api.profiling.tracing.Span}

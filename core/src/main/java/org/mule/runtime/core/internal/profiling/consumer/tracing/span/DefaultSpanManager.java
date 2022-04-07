@@ -20,15 +20,16 @@ import com.github.benmanes.caffeine.cache.Cache;
 public class DefaultSpanManager implements SpanManager {
 
   // TODO W-10930532: a removal listener has to be added to end the span in case it is not closed by the runtime.
-  private static Cache<SpanIdentifier, Span> cache = newBuilder().weakValues().expireAfterAccess(60, MINUTES).build();
+  private static final Cache<SpanIdentifier, InternalSpan> cache =
+      newBuilder().weakValues().expireAfterAccess(60, MINUTES).build();
 
   @Override
-  public Span getSpan(SpanIdentifier identifier, Function<SpanIdentifier, Span> spanCreator) {
+  public InternalSpan getSpan(SpanIdentifier identifier, Function<SpanIdentifier, InternalSpan> spanCreator) {
     return cache.get(identifier, spanCreator);
   }
 
   @Override
-  public Span getSpanIfPresent(SpanIdentifier identifier) {
+  public InternalSpan getSpanIfPresent(SpanIdentifier identifier) {
     return cache.getIfPresent(identifier);
   }
 

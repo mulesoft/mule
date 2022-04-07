@@ -12,6 +12,7 @@ import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 
 import org.mule.runtime.core.internal.profiling.consumer.tracing.span.DefaultSpanDuration;
 import org.mule.runtime.core.internal.profiling.consumer.tracing.span.ExecutionSpan;
+import org.mule.runtime.core.internal.profiling.consumer.tracing.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.consumer.tracing.span.SpanManager;
 
 /**
@@ -57,7 +58,7 @@ public abstract class SpanBuilder {
    *
    * @return the {@link} the span built
    */
-  public Span build() {
+  public InternalSpan build() {
     SpanIdentifier spanIdentifier = getSpanIdentifier();
     return spanManager.getSpan(spanIdentifier,
                                id -> new ExecutionSpan(getSpanName(), getSpanIdentifier(), new DefaultSpanDuration(start),
