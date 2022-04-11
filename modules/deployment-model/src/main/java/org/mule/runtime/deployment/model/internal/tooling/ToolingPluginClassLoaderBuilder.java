@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.deployment.model.internal.tooling;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.tooling.ToolingRegionClassLoader.newToolingRegionClassLoader;
+
+import static java.lang.String.format;
+import static java.util.Collections.emptySet;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -74,7 +75,7 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
 
   @Override
   protected ArtifactClassLoader createArtifactClassLoader(String artifactId, RegionClassLoader regionClassLoader) {
-    return artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor, artifactPluginClassLoaders);
+    return artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor);
   }
 
   /**

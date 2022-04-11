@@ -16,6 +16,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 /**
  * Creates {@link ArtifactClassLoader} for application or domain plugin descriptors.
  */
+// TODO W-10964385: make this a delegate to an ArtifactClassLoaderResolver
 public final class ArtifactPluginClassLoaderFactory implements ArtifactClassLoaderFactory<ArtifactPluginDescriptor> {
 
   @Override

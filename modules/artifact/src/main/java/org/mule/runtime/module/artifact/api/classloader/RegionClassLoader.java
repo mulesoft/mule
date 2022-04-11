@@ -13,7 +13,6 @@ import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
-import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
@@ -106,7 +105,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
                            ArtifactDescriptor artifactDescriptor,
                            ClassLoader parent,
                            ClassLoaderLookupPolicy lookupPolicy) {
-    super(artifactId, artifactDescriptor, new URL[0], parent, lookupPolicy, emptyList());
+    super(artifactId, artifactDescriptor, new URL[0], parent, lookupPolicy);
   }
 
   /**
@@ -123,7 +122,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
                               ClassLoader parent,
                               ClassLoaderLookupPolicy lookupPolicy,
                               ResourceReleaser regionResourceReleaser) {
-    super(artifactId, artifactDescriptor, new URL[0], parent, lookupPolicy, emptyList());
+    super(artifactId, artifactDescriptor, new URL[0], parent, lookupPolicy);
     this.regionResourceReleaser = regionResourceReleaser;
   }
 

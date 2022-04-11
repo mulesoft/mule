@@ -54,7 +54,7 @@ public class ToolingDomainClassLoaderBuilder extends AbstractArtifactClassLoader
 
   @Override
   protected ArtifactClassLoader createArtifactClassLoader(String artifactId, RegionClassLoader regionClassLoader) {
-    return artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor, artifactPluginClassLoaders);
+    return artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor);
   }
 
   /**

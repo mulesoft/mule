@@ -7,6 +7,9 @@
 
 package org.mule.runtime.module.artifact.api.classloader;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import static java.lang.Boolean.valueOf;
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
@@ -14,8 +17,6 @@ import static java.lang.System.getProperty;
 import static java.lang.System.identityHashCode;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.core.internal.util.EnumerationAdapter;
@@ -265,5 +266,9 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
   @Override
   public URL findLocalResource(String resourceName) {
     return artifactClassLoader.findLocalResource(resourceName);
+  }
+
+  public ArtifactClassLoader getArtifactClassLoader() {
+    return artifactClassLoader;
   }
 }

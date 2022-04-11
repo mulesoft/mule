@@ -160,8 +160,6 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
         domainClassLoaderBuilderFactory.createArtifactClassLoaderBuilder();
     MuleDeployableArtifactClassLoader domainClassLoader =
         artifactClassLoaderBuilder
-            .addArtifactPluginDescriptors(resolvedArtifactPluginDescriptors
-                .toArray(new ArtifactPluginDescriptor[resolvedArtifactPluginDescriptors.size()]))
             .setArtifactDescriptor(domainDescriptor).build();
 
     List<ArtifactPlugin> artifactPlugins =

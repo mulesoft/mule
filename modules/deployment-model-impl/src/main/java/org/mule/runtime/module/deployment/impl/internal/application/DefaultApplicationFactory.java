@@ -151,9 +151,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     MuleDeployableArtifactClassLoader applicationClassLoader =
         artifactClassLoaderBuilder
             .setDomainParentClassLoader((ArtifactClassLoader) domain.getArtifactClassLoader().getClassLoader().getParent())
-            .addArtifactPluginDescriptors(resolvedArtifactPluginDescriptors.toArray(new ArtifactPluginDescriptor[0]))
             .setArtifactDescriptor(descriptor).build();
-
 
     List<ArtifactPlugin> artifactPlugins =
         createArtifactPluginList(applicationClassLoader, resolvedArtifactPluginDescriptors);
