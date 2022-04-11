@@ -6,25 +6,33 @@
  */
 package org.mule.runtime.deployment.model.internal.domain;
 
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleLibFolder;
+import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
+import static org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory.getDomainId;
+import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.MULE_DOMAIN_FOLDER;
+
 import static java.util.Collections.emptyList;
+
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleLibFolder;
-import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
-import static org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory.getDomainId;
-import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.MULE_DOMAIN_FOLDER;
+import static org.mockito.Mockito.mock;
 
+import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver;
+import org.mule.runtime.module.artifact.activation.internal.classloader.MuleSharedDomainClassLoader;
+import org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory;
+import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -86,8 +94,14 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
     DomainDescriptor descriptor = getTestDescriptor("someDomain");
     descriptor.setRootFolder(new File("unexistent"));
 
-    domainClassLoaderFactory(name -> getAppDataFolder(name)).create(null, containerClassLoader,
-                                                                    descriptor, emptyList());
+
+    DefaultArtifactClassLoaderResolver artifactClassLoaderResolver =
+        new DefaultArtifactClassLoaderResolver(mock(ModuleRepository.class),
+                                               new DefaultNativeLibraryFinderFactory(name -> getAppDataFolder(name)));
+    DefaultDomainClassLoaderBuilder domainClassLoaderBuilder = new DefaultDomainClassLoaderBuilder(artifactClassLoaderResolver);
+
+    domainClassLoaderBuilder.setArtifactDescriptor(descriptor);
+    domainClassLoaderBuilder.build();
   }
 
   @Test

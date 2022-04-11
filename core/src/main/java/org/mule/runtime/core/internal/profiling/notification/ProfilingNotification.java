@@ -12,6 +12,7 @@ import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.END_SPAN;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.EXTENSION_PROFILING_EVENT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.MEMORY_BYTE_BUFFER_ALLOCATION;
@@ -27,7 +28,12 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STA
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_TASK_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.START_SPAN;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TASK_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_COMMIT;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_ROLLBACK;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
 
 /**
  * A {@link Notification} that produces data for troubleshooting. This is extended for using notifications for producing profiling
@@ -52,6 +58,12 @@ public class ProfilingNotification<T extends ProfilingEventContext> extends Abst
   private static final int TASK_EXECUTED_EVENT_ID = PROFILING_ACTION_START_RANGE + 15;
   private static final int MEMORY_BYTE_BUFFER_ALLOCATION_ID = PROFILING_ACTION_START_RANGE + 16;
   private static final int MEMORY_BYTE_BUFFER_DEALLOCATION_ID = PROFILING_ACTION_START_RANGE + 17;
+  private static final int TRANSACTION_START_ID = PROFILING_ACTION_START_RANGE + 18;
+  private static final int TRANSACTION_CONTINUE_ID = PROFILING_ACTION_START_RANGE + 19;
+  private static final int TRANSACTION_COMMIT_ID = PROFILING_ACTION_START_RANGE + 20;
+  private static final int TRANSACTION_ROLLBACK_ID = PROFILING_ACTION_START_RANGE + 21;
+  private static final int START_SPAN_ID = PROFILING_ACTION_START_RANGE + 22;
+  private static final int END_SPAN_ID = PROFILING_ACTION_START_RANGE + 23;
 
 
   /**
@@ -94,6 +106,14 @@ public class ProfilingNotification<T extends ProfilingEventContext> extends Abst
                    MEMORY_BYTE_BUFFER_ALLOCATION_ID);
     registerAction(getFullyQualifiedProfilingNotificationIdentifier(MEMORY_BYTE_BUFFER_DEALLOCATION),
                    MEMORY_BYTE_BUFFER_DEALLOCATION_ID);
+
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(TX_START), TRANSACTION_START_ID);
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(TX_CONTINUE), TRANSACTION_CONTINUE_ID);
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(TX_COMMIT), TRANSACTION_COMMIT_ID);
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(TX_ROLLBACK), TRANSACTION_ROLLBACK_ID);
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(START_SPAN), START_SPAN_ID);
+    registerAction(getFullyQualifiedProfilingNotificationIdentifier(END_SPAN), END_SPAN_ID);
+
   }
 
   private final ProfilingEventType<T> profilingEventType;

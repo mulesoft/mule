@@ -13,7 +13,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAI
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.config.internal.ApplicationFilteredFromPolicyArtifactAst.applicationFilteredFromPolicyArtifactAst;
-import static org.mule.runtime.module.artifact.activation.api.ArtifactAstUtils.parseAndBuildAppExtensionModel;
+import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.parseAndBuildAppExtensionModel;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;

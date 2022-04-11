@@ -6,12 +6,15 @@
  */
 package org.mule.runtime.module.deployment.logging;
 
+import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
+import static org.mule.test.allure.AllureConstants.ComponentsFeature.LoggerStory.LOGGER;
+
 import static java.util.Arrays.asList;
 
+import static com.github.valfirst.slf4jtest.LoggingEvent.error;
+import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static uk.org.lidalia.slf4jtest.LoggingEvent.error;
-import static uk.org.lidalia.slf4jtest.TestLoggerFactory.getTestLogger;
 
 import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
@@ -20,11 +23,15 @@ import org.mule.runtime.module.deployment.internal.AbstractApplicationDeployment
 import java.util.HashMap;
 import java.util.List;
 
+import com.github.valfirst.slf4jtest.TestLogger;
 import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
-import uk.org.lidalia.slf4jtest.TestLogger;
 
+@Feature(CORE_COMPONENTS)
+@Story(LOGGER)
 public class LoggingSupportabilityContextTestCase extends AbstractApplicationDeploymentTestCase {
 
   TestLogger logger = getTestLogger(LoggerMessageProcessor.class);

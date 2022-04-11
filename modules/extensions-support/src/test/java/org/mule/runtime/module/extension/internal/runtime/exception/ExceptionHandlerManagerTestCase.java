@@ -15,6 +15,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -51,6 +53,8 @@ public class ExceptionHandlerManagerTestCase {
   private static final String MULE_NAMESPACE = "MULE";
   private static final String CONNECTIVITY_ERROR_TYPE = "CONNECTIVITY";
   private static final String ERROR_MESSAGE = "ERROR MESSAGE";
+  private static final String EXTENSION_NAME_WITH_SPACES = "extension With Spaces";
+
   @Mock(lenient = true)
   private ExtensionModel extensionModel;
 
@@ -141,6 +145,30 @@ public class ExceptionHandlerManagerTestCase {
     errorModels.add(ErrorModelBuilder.newError(CONNECTIVITY_ERROR_TYPE, EXTENSION_NAMESPACE).build());
     errorModels.add(ErrorModelBuilder.newError(CONNECTIVITY_ERROR_TYPE, MULE_NAMESPACE).build());
     when(extensionModel.getErrorModels()).thenReturn(errorModels);
+
+    ExceptionHandlerManager exceptionHandlerManager =
+        new ExceptionHandlerManager(extensionModel, sourceModel, errorTypeRepository);
+    ConnectionException connectionException = new ConnectionException(ERROR_MESSAGE, new Exception());
+
+    Throwable throwable = exceptionHandlerManager.handleThrowable(new Throwable(connectionException));
+    assertThat(throwable, is(instanceOf(ConnectionException.class)));
+    assertThat(throwable.getMessage(), is(ERROR_MESSAGE));
+    assertThat(((ConnectionException) throwable).getErrorType().isPresent(), is(true));
+    assertThat(((ConnectionException) throwable).getErrorType().get().getIdentifier(), is(CONNECTIVITY_ERROR_TYPE));
+    assertThat(((ConnectionException) throwable).getErrorType().get().getNamespace(), is(EXTENSION_NAMESPACE));
+  }
+
+  @Test
+  @Issue("W-10617943")
+  @Description("This test checks for extension names with spaces and verifies that correct error type is picked based on namespace")
+  public void handleConnectionExceptionExtensionWithSpacesAndCustomConnectivityError() {
+    Set<ErrorModel> errorModels = new HashSet<>();
+    errorModels.add(ErrorModelBuilder.newError(CONNECTIVITY_ERROR_TYPE, EXTENSION_NAMESPACE).build());
+    errorModels.add(ErrorModelBuilder.newError(CONNECTIVITY_ERROR_TYPE, MULE_NAMESPACE).build());
+
+    when(extensionModel.getName()).thenReturn(EXTENSION_NAME_WITH_SPACES);
+    when(extensionModel.getErrorModels()).thenReturn(errorModels);
+    when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix(EXTENSION_NAMESPACE).build());
 
     ExceptionHandlerManager exceptionHandlerManager =
         new ExceptionHandlerManager(extensionModel, sourceModel, errorTypeRepository);

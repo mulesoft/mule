@@ -30,9 +30,9 @@ import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
-import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
 import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.deployment.model.internal.domain.AbstractDomainTestCase;
+import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
@@ -100,9 +100,6 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
     DomainClassLoaderBuilder domainClassLoaderBuilderMock = mock(DomainClassLoaderBuilder.class);
     when(domainClassLoaderBuilderMock.setArtifactDescriptor(any()))
         .thenReturn(domainClassLoaderBuilderMock);
-    when(domainClassLoaderBuilderMock
-        .addArtifactPluginDescriptors(descriptor.getPlugins().toArray(new ArtifactPluginDescriptor[0])))
-            .thenReturn(domainClassLoaderBuilderMock);
     when(domainClassLoaderBuilderMock.build()).thenReturn(domainArtifactClassLoader);
     when(domainClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()).thenReturn(domainClassLoaderBuilderMock);
 

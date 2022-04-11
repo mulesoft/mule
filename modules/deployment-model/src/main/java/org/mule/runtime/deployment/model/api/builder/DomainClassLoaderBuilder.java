@@ -7,7 +7,6 @@
 package org.mule.runtime.deployment.model.api.builder;
 
 import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -18,12 +17,6 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
  * @since 4.5
  */
 public interface DomainClassLoaderBuilder {
-
-  /**
-   * @param artifactPluginDescriptors plugin descriptors that will be used by the application.
-   * @return the builder
-   */
-  DomainClassLoaderBuilder addArtifactPluginDescriptors(ArtifactPluginDescriptor... artifactPluginDescriptors);
 
   /**
    * @param artifactDescriptor the descriptor of the artifact for which the class loader is going to be created.

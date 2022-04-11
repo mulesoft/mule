@@ -7,7 +7,12 @@
 
 package org.mule.test.runner.classloader;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
+import static org.mule.runtime.container.internal.ContainerClassLoaderFactory.SYSTEM_PACKAGES;
+import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
+import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+import static org.mule.test.runner.RunnerConfiguration.TEST_RUNNER_ARTIFACT_ID;
+
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
 import static java.util.Collections.emptyList;
@@ -16,12 +21,9 @@ import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+
+import static com.google.common.collect.Lists.newArrayList;
 import static org.apache.commons.io.FileUtils.toFile;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
-import static org.mule.runtime.container.internal.ContainerClassLoaderFactory.SYSTEM_PACKAGES;
-import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
-import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
-import static org.mule.test.runner.RunnerConfiguration.TEST_RUNNER_ARTIFACT_ID;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -32,8 +34,8 @@ import org.mule.runtime.container.internal.ContainerClassLoaderFilterFactory;
 import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
-import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
-import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
+import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
+import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilterFactory;
@@ -185,8 +187,7 @@ public class IsolatedClassLoaderFactory {
       }
 
       ArtifactClassLoader appClassLoader =
-          createApplicationArtifactClassLoader(regionClassLoader, appLookupPolicy, artifactsUrlClassification,
-                                               pluginsArtifactClassLoaders);
+          createApplicationArtifactClassLoader(regionClassLoader, appLookupPolicy, artifactsUrlClassification);
 
       regionClassLoader.addClassLoader(appClassLoader,
                                        new DefaultArtifactClassLoaderFilter(testJarInfo.getPackages(),
@@ -528,13 +529,11 @@ public class IsolatedClassLoaderFactory {
    * @param parent                       the parent class loader to be assigned to the new one created here
    * @param childClassLoaderLookupPolicy look policy to be used
    * @param artifactsUrlClassification   the url classifications to get plugins urls
-   * @param pluginsArtifactClassLoaders  the classloaders of the plugins used by the application
    * @return the {@link ArtifactClassLoader} to be used for running the test
    */
   protected ArtifactClassLoader createApplicationArtifactClassLoader(ClassLoader parent,
                                                                      ClassLoaderLookupPolicy childClassLoaderLookupPolicy,
-                                                                     ArtifactsUrlClassification artifactsUrlClassification,
-                                                                     List<ArtifactClassLoader> pluginsArtifactClassLoaders) {
+                                                                     ArtifactsUrlClassification artifactsUrlClassification) {
 
     List<URL> applicationUrls = new ArrayList<>();
     applicationUrls.addAll(artifactsUrlClassification.getApplicationLibUrls());
@@ -545,7 +544,7 @@ public class IsolatedClassLoaderFactory {
                                           new DefaultNativeLibraryFinderFactory()
                                               .create(APP_NAME, applicationUrls.toArray(new URL[applicationUrls.size()])),
                                           applicationUrls,
-                                          childClassLoaderLookupPolicy, pluginsArtifactClassLoaders);
+                                          childClassLoaderLookupPolicy);
   }
 
   /**

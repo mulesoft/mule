@@ -38,6 +38,7 @@ import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.scheduler.SchedulerView;
@@ -55,7 +56,7 @@ import org.mule.runtime.core.api.context.notification.MuleContextNotificationLis
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuilder;
+import org.mule.runtime.core.internal.config.builders.MinimalConfigurationBuilder;
 import org.mule.runtime.core.internal.config.builders.ServiceCustomizationsConfigurationBuilder;
 import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 import org.mule.runtime.http.api.HttpService;
@@ -307,7 +308,12 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   }
 
   protected DefaultMuleConfiguration createMuleConfiguration() {
-    return new DefaultMuleConfiguration();
+    if (getMavenProjectVersionProperty() == null) {
+      return new DefaultMuleConfiguration();
+    }
+    DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
+    muleConfiguration.setMinMuleVersion(new MuleVersion(getMavenProjectVersionProperty()));
+    return muleConfiguration;
   }
 
   /**
@@ -360,7 +366,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   protected void configureMuleContext(MuleContextBuilder contextBuilder) {}
 
   protected ConfigurationBuilder getBuilder() throws Exception {
-    return new DefaultsConfigurationBuilder();
+    return new MinimalConfigurationBuilder();
   }
 
   protected String getConfigurationResources() {

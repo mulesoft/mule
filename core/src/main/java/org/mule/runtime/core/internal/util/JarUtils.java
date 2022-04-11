@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.core.internal.util;
 
+import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleHome;
+
+import static java.nio.file.Files.createTempFile;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.apache.commons.io.IOUtils.toByteArray;
-import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleHome;
 
 import org.mule.runtime.core.api.util.FileUtils;
 
@@ -147,13 +150,10 @@ public final class JarUtils {
         while (iter.hasMoreElements()) {
           ZipEntry zipEntry = (ZipEntry) iter.nextElement();
           InputStream entryStream = jarFileWrapper.getInputStream(zipEntry);
-          ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream();
-          try {
+          try (ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream()) {
             IOUtils.copy(entryStream, byteArrayStream);
             entries.put(zipEntry.getName(), byteArrayStream.toByteArray());
             logger.debug("Read jar entry " + zipEntry.getName() + " from " + jarFile.getAbsolutePath());
-          } finally {
-            byteArrayStream.close();
           }
         }
       } finally {
@@ -173,7 +173,7 @@ public final class JarUtils {
     if (entries != null) {
       LinkedHashMap combinedEntries = readJarFileEntries(jarFile);
       combinedEntries.putAll(entries);
-      File tmpJarFile = File.createTempFile(jarFile.getName(), null);
+      File tmpJarFile = createTempFile(jarFile.getName(), null).toFile();
       createJarFileEntries(tmpJarFile, combinedEntries);
       jarFile.delete();
       FileUtils.renameFile(tmpJarFile, jarFile);

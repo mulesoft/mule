@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 
+import static java.nio.file.Files.createTempDirectory;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toSet;
 
@@ -22,10 +23,10 @@ import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
@@ -235,7 +236,7 @@ public class DomainBundleArchiveDeployer {
   }
 
   private File unzipDomainBundle(File bundleFile) throws IOException {
-    File tempFolder = File.createTempFile(bundleFile.getName(), "tmp");
+    File tempFolder = createTempDirectory(bundleFile.getName()).toFile();
     tempFolder.delete();
     tempFolder.mkdirs();
     FileUtils.unzip(bundleFile, tempFolder);

@@ -15,10 +15,11 @@ import org.mule.runtime.api.profiling.threading.ThreadSnapshot;
 import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ByteBufferProviderEventContext;
+import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.ComponentProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
-import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.api.profiling.type.context.TaskSchedulingProfilingEventContext;
+import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +43,10 @@ public class ComponentProfilingUtils {
   public static final String TASK_ID_KEY = "taskId";
   public static final String BYTE_BUFFER_PROVIDER_NAME = "BYTE_BUFFER_PROVIDER_NAME";
   public static final String BYTES_SIZE = "BYTES_SIZE";
+  public static final String TX_ACTION = "action";
+  public static final String TX_TYPE = "type";
+  public static final String TX_CREATION_LOCATION = "createdIn";
+  public static final String TX_CURRENT_LOCATION = "actionIn";
 
   private ComponentProfilingUtils() {}
 
@@ -123,6 +128,16 @@ public class ComponentProfilingUtils {
     eventMap.put(LOCATION, location.getLocation());
     ComponentIdentifier identifier = location.getComponentIdentifier().getIdentifier();
     eventMap.put(COMPONENT_IDENTIFIER, format("%s:%s", identifier.getNamespace(), identifier.getName()));
+  }
+
+  public static Map<String, String> getTxInfo(ProfilingEventType<TransactionProfilingEventContext> profilingEventType,
+                                              TransactionProfilingEventContext profilingEventContext) {
+    Map<String, String> info = new HashMap<>();
+    info.put(TX_ACTION, profilingEventType.toString());
+    info.put(TX_TYPE, profilingEventContext.getType().toString());
+    info.put(TX_CREATION_LOCATION, profilingEventContext.getTransactionOriginatingLocation());
+    info.put(TX_CURRENT_LOCATION, profilingEventContext.getEventOrginatingLocation().getLocation());
+    return info;
   }
 
 }

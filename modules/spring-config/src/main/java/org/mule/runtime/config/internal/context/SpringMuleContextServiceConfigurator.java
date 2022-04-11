@@ -121,6 +121,7 @@ import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataServ
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import javax.inject.Inject;
 
 import com.google.common.collect.ImmutableMap;

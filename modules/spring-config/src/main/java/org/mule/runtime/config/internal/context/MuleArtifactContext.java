@@ -6,18 +6,11 @@
  */
 package org.mule.runtime.config.internal.context;
 
-import static java.lang.String.format;
-import static java.lang.System.lineSeparator;
-import static java.util.Comparator.comparing;
-import static java.util.Objects.requireNonNull;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_BYTE_BUDDY_OBJECT_CREATION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.VALIDATE_APPLICATION_MODEL_WITH_REGION_CLASSLOADER;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.ast.api.util.AstTraversalDirection.BOTTOM_UP;
@@ -46,8 +39,18 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider.CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
-import static org.mule.runtime.module.artifact.activation.api.ArtifactAstUtils.parseArtifactExtensionModel;
+import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.parseArtifactExtensionModel;
 import static org.mule.runtime.module.extension.internal.manager.ExtensionErrorsRegistrant.registerErrorMappings;
+
+import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
+import static java.util.Comparator.comparing;
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
@@ -135,6 +138,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -175,6 +179,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final Map<String, String> artifactProperties;
   protected List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
   private final ExtensionManager extensionManager;
+  // TODO W-10855416: remove this
+  private final boolean validateAppModelWithRegionClassloader;
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -239,6 +245,10 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                   featureFlaggingService.isEnabled(DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING),
                                   featureFlaggingService.isEnabled(ENABLE_BYTE_BUDDY_OBJECT_CREATION));
 
+    // TODO W-10855416: remove this
+    this.validateAppModelWithRegionClassloader =
+        featureFlaggingService.isEnabled(VALIDATE_APPLICATION_MODEL_WITH_REGION_CLASSLOADER);
+
     this.applicationModel = artifactAst;
 
     // TODO MULE-18786 create the providers that depend on the AST only, and for the rest delegate on the resolver from the base
@@ -259,6 +269,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
     registerErrors(applicationModel);
     registerApplicationExtensionModel();
+
   }
 
   protected MuleRegistry getMuleRegistry() {
@@ -282,7 +293,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         })
         .withValidationsFilter(validationsFilter)
         // get the region classloader from the artifact one
-        .withArtifactRegionClassLoader(getRegionClassLoader())
+        .withArtifactRegionClassLoader(getValidationClassloader())
         .build()
         .validate(appModel);
 
@@ -303,6 +314,15 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
           .collect(joining(lineSeparator()))));
     }
   }
+
+  // TODO W-10855416: remove this and only validate it with the region classloader
+  private ClassLoader getValidationClassloader() {
+    if (validateAppModelWithRegionClassloader) {
+      return muleContext.getExecutionClassLoader().getParent();
+    }
+    return muleContext.getExecutionClassLoader();
+  }
+
 
   private ClassLoader getRegionClassLoader() {
     return muleContext.getExecutionClassLoader().getParent();
@@ -444,7 +464,14 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   @Override
   public void close() {
     if (isRunning()) {
-      super.close();
+      try {
+        super.close();
+      } catch (Exception e) {
+        for (ObjectProvider objectProvider : objectProviders) {
+          disposeIfNeeded(objectProvider, LOGGER);
+        }
+        throw new MuleRuntimeException(e);
+      }
       disposeIfNeeded(configurationProperties.getConfigurationPropertiesResolver(), LOGGER);
     }
   }
@@ -452,18 +479,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   @Override
   protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException {
     createApplicationComponents(beanFactory, applicationModel, true);
-  }
-
-  @Override
-  public void destroy() {
-    try {
-      super.destroy();
-    } catch (Exception e) {
-      for (ObjectProvider objectProvider : objectProviders) {
-        disposeIfNeeded(objectProvider, LOGGER);
-      }
-      throw new MuleRuntimeException(e);
-    }
   }
 
   /**

@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFieldsStream;
 
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.functional.Either;
@@ -53,7 +53,7 @@ public class StaticConfigurationProvider extends LifecycleAwareConfigurationProv
 
   @Override
   public Collection<Either<Class<?>, String>> getInjectedDependencies() {
-    return getAnnotatedFields(configuration.getValue().getClass(), Inject.class).stream()
+    return getAnnotatedFieldsStream(configuration.getValue().getClass(), Inject.class)
         .map(field -> {
           Named name = field.getAnnotation(Named.class);
           return name != null

@@ -31,8 +31,8 @@ import org.mule.runtime.core.internal.processor.strategy.enricher.CpuLiteNonBloc
 import org.mule.runtime.core.internal.processor.strategy.enricher.ProactorProcessingStrategyEnricher;
 import org.mule.runtime.core.internal.processor.strategy.enricher.ProcessingTypeBasedReactiveProcessorEnricher;
 import org.mule.runtime.core.internal.processor.strategy.enricher.ReactiveProcessorEnricher;
-import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.internal.util.rx.ImmediateScheduler;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 
 import java.util.Collection;
 import java.util.concurrent.Callable;
@@ -75,7 +75,7 @@ public class ProcessingTypeBasedReactiveProcessorEnricherTestCase extends Abstra
   private ImmediateScheduler cpuLiteAsyncScheduler;
 
   @Mock(answer = RETURNS_MOCKS)
-  private CoreProfilingService profilingService;
+  private InternalProfilingService profilingService;
 
   @Mock
   private CoreEvent coreEvent;

@@ -90,6 +90,7 @@ public class CoreValidationsProvider implements ValidationsProvider {
       validateExpressions = Boolean.valueOf(validateExpressionsPropValue);
     }
 
+    // TODO W-10883564 Remove this
     return validateExpressions && featureFlaggingService.map(ffs -> ffs.isEnabled(ENFORCE_EXPRESSION_VALIDATION)).orElse(true)
         ? ERROR
         : WARN;

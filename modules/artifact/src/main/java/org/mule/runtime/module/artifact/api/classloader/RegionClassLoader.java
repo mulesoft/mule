@@ -7,16 +7,17 @@
 
 package org.mule.runtime.module.artifact.api.classloader;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS;
+
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
-import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+
 import static org.apache.commons.io.FilenameUtils.normalize;
 import static org.apache.commons.lang3.ClassUtils.getPackageName;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
@@ -82,6 +83,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   private final Map<BundleDescriptor, URLClassLoader> descriptorMapping = new HashMap<>();
 
   private ArtifactClassLoader ownerClassLoader;
+  private ArtifactClassLoaderFilter ownerFilter;
 
   /**
    * Region specific {@link ResourceReleaser} to add behaviour in the {@link RegionClassLoader#dispose()} execution. By default it
@@ -103,7 +105,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
                            ArtifactDescriptor artifactDescriptor,
                            ClassLoader parent,
                            ClassLoaderLookupPolicy lookupPolicy) {
-    super(artifactId, artifactDescriptor, new URL[0], parent, lookupPolicy, emptyList());
+    super(artifactId, artifactDescriptor, new URL[0], parent, lookupPolicy);
   }
 
   /**
@@ -120,7 +122,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
                               ClassLoader parent,
                               ClassLoaderLookupPolicy lookupPolicy,
                               ResourceReleaser regionResourceReleaser) {
-    super(artifactId, artifactDescriptor, new URL[0], parent, lookupPolicy, emptyList());
+    super(artifactId, artifactDescriptor, new URL[0], parent, lookupPolicy);
     this.regionResourceReleaser = regionResourceReleaser;
   }
 
@@ -149,6 +151,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
       if (ownerClassLoader == null) {
         ownerClassLoader = artifactClassLoader;
+        ownerFilter = filter;
       } else {
         registeredClassLoaders.add(new RegionMemberClassLoader(artifactClassLoader, filter));
       }
@@ -210,6 +213,14 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
                                              ArtifactClassLoader overridingDefinitionClassLoader) {
     return format("Attempt to redefine mapping for package: '%s'. Original definition classloader is %s, Overriding definition classloader is %s",
                   packageName, originalDefinitionClassLoader.toString(), overridingDefinitionClassLoader.toString());
+  }
+
+  public ArtifactClassLoaderFilter filterForClassLoader(ArtifactClassLoader artifactClassLoader) {
+    if (ownerClassLoader == artifactClassLoader) {
+      return ownerFilter;
+    } else {
+      return findRegisteredClassLoader(artifactClassLoader).filter;
+    }
   }
 
   private RegionMemberClassLoader findRegisteredClassLoader(ArtifactClassLoader artifactClassLoader) {

@@ -9,15 +9,16 @@ package org.mule.runtime.deployment.model.internal.application;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
-import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinder;
-import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinderFactory;
+import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
+import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
+import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinder;
+import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
 import java.io.File;
 import java.util.Arrays;
@@ -55,15 +56,20 @@ public class MuleApplicationClassLoaderFactory implements DeployableArtifactClas
   }
 
   @Override
-  public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, ApplicationDescriptor descriptor,
-                                    List<ArtifactClassLoader> artifactPluginClassLoaders) {
+  public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, ApplicationDescriptor descriptor) {
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = getApplicationClassLoaderLookupPolicy(parent, descriptor);
 
     return new MuleApplicationClassLoader(artifactId, descriptor, parent.getClassLoader(),
                                           nativeLibraryFinderFactory.create(descriptor.getDataFolderName(),
                                                                             descriptor.getClassLoaderModel().getUrls()),
                                           Arrays.asList(descriptor.getClassLoaderModel().getUrls()),
-                                          classLoaderLookupPolicy, artifactPluginClassLoaders);
+                                          classLoaderLookupPolicy);
+  }
+
+  @Override
+  public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, ApplicationDescriptor descriptor,
+                                    List<ArtifactClassLoader> artifactPluginClassLoaders) {
+    return create(artifactId, parent, descriptor);
   }
 
   private ClassLoaderLookupPolicy getApplicationClassLoaderLookupPolicy(ArtifactClassLoader parent,

@@ -37,7 +37,7 @@ import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
-import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
+import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
@@ -123,9 +123,6 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     when(applicationClassLoaderBuilderMock.setDomainParentClassLoader(any())).thenReturn(applicationClassLoaderBuilderMock);
     when(applicationClassLoaderBuilderMock.setArtifactDescriptor(any()))
         .thenReturn(applicationClassLoaderBuilderMock);
-    when(applicationClassLoaderBuilderMock
-        .addArtifactPluginDescriptors(descriptor.getPlugins().toArray(new ArtifactPluginDescriptor[0])))
-            .thenReturn(applicationClassLoaderBuilderMock);
     when(applicationClassLoaderBuilderMock.build()).thenReturn(applicationArtifactClassLoader);
     when(applicationClassLoaderBuilderFactory.createArtifactClassLoaderBuilder())
         .thenReturn(applicationClassLoaderBuilderMock);
@@ -146,8 +143,6 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     verify(domainRepository, times(1)).getDomain(any());
     verify(applicationClassLoaderBuilderMock)
         .setDomainParentClassLoader((ArtifactClassLoader) domain.getArtifactClassLoader().getClassLoader().getParent());
-    verify(applicationClassLoaderBuilderMock)
-        .addArtifactPluginDescriptors(descriptor.getPlugins().toArray(new ArtifactPluginDescriptor[0]));
     verify(applicationClassLoaderBuilderMock).setArtifactDescriptor(descriptor);
   }
 

@@ -6,6 +6,12 @@
  */
 package org.mule.runtime.core.internal.config.bootstrap;
 
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.Collections.singleton;
+import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getCause;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY;
@@ -13,19 +19,11 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.createFromString;
 
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Arrays.stream;
-import static java.util.Collections.singleton;
-import static java.util.stream.Collectors.toSet;
-
-import static org.apache.commons.lang3.exception.ExceptionUtils.getCause;
-
-import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapService;
+import org.mule.runtime.core.api.config.builders.RegistryBootstrap;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.PropertiesUtils;
@@ -44,65 +42,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Base class for an object will load objects defined in a file called <code>registry-bootstrap.properties</code> into the local
- * registry. This allows modules and transports to make certain objects available by default. The most common use case is for a
- * module or transport to load stateless transformers into the registry. For this file to be located it must be present in the
- * modules META-INF directory under
- *
- * <pre>
- * META-INF/org/mule/config/
- * </pre>
- * <p/>
- * The format of this file is a simple key / value pair. i.e.
- *
- * <pre>
- * myobject = org.foo.MyObject
- * </pre>
- *
- * Will register an instance of MyObject with a key of 'myobject'. If you don't care about the object name and want to ensure that
- * the ojbect gets a unique name you can use -
- *
- * <pre>
- * object.1=org.foo.MyObject
- * object.2=org.bar.MyObject
- * </pre>
- *
- * or
- *
- * <pre>
- * myFoo=org.foo.MyObject
- * myBar=org.bar.MyObject
- * </pre>
- *
- * It's also possible to define if the entry must be applied to a domain, an application, or both by using the parameter
- * applyToArtifactType.
- *
- * <pre>
- * myFoo=org.foo.MyObject will be applied to any mule application since the parameter applyToArtifactType default value is app
- * myFoo=org.foo.MyObject;applyToArtifactType=app will be applied to any mule application
- * myFoo=org.foo.MyObject;applyToArtifactType=domain will be applied to any mule domain
- * myFoo=org.foo.MyObject;applyToArtifactType=app/domain will be applied to any mule application and any mule domain
- * </pre>
- *
- * Loading transformers has a slightly different notation since you can define the 'returnClass' with optional mime type, and
- * 'name'of the transformer as parameters i.e.
- *
- * <pre>
- * transformer.1=org.mule.compatibility.core.transport.jms.transformers.JMSMessageToObject,returnClass=byte[]
- * transformer.2=org.mule.compatibility.core.transport.jms.transformers.JMSMessageToObject,returnClass=java.lang.String:text/xml, name=JMSMessageToString
- * transformer.3=org.mule.compatibility.core.transport.jms.transformers.JMSMessageToObject,returnClass=java.util.Hashtable)
- * </pre>
- *
- * Note that the key used for transformers must be 'transformer.x' where 'x' is a sequential number. The transformer name will be
- * automatically generated as JMSMessageToXXX where XXX is the return class name i.e. JMSMessageToString unless a 'name' parameter
- * is specified. If no 'returnClass' is specified the default in the transformer will be used.
- * <p/>
- * Note that all objects defined have to have a default constructor. They can implement injection interfaces such as
- * {@link org.mule.runtime.core.api.context.MuleContextAware} and lifecycle interfaces such as {@link Initialisable}.
+ * Base class for {@link RegistryBootstrap} implementations
  *
  * @since 3.7.0
  */
-public abstract class AbstractRegistryBootstrap implements Initialisable {
+public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
 
   private static final String TRANSACTION_RESOURCE_SUFFIX = ".transaction.resource";
   // TODO W-10736276 Remove this

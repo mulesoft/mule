@@ -6,29 +6,30 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.classloader;
 
-import static java.lang.String.format;
-import static java.lang.String.join;
-import static java.lang.System.lineSeparator;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory.getClassNotFoundErrorMessage;
 import static org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory.getResourceNotFoundErrorMessage;
 import static org.mule.runtime.deployment.model.internal.artifact.CompositeClassLoaderArtifactFinder.findClassLoader;
 
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import static java.lang.String.format;
+import static java.lang.String.join;
+import static java.lang.System.lineSeparator;
 
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.container.internal.FilteringContainerClassLoader;
 import org.mule.runtime.core.api.exception.ResourceNotFoundException;
 import org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
-import org.mule.runtime.deployment.model.api.application.ApplicationClassLoader;
-import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
-import org.mule.runtime.deployment.model.internal.domain.MuleSharedDomainClassLoader;
+import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
+import org.mule.runtime.module.artifact.activation.internal.classloader.MuleSharedDomainClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
+
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 
@@ -147,7 +148,7 @@ public class MuleClassLoaderResourceNotFoundExceptionFactory implements ClassLoa
   private ClassLoaderNode createFromPluginClassLoaderNode(ArtifactClassLoader artifactClassLoader) {
     ArtifactClassLoader ownerClassLoader =
         ((RegionClassLoader) artifactClassLoader.getClassLoader().getParent()).getOwnerClassLoader();
-    if (ownerClassLoader instanceof ApplicationClassLoader) {
+    if (ownerClassLoader.getArtifactDescriptor() instanceof ApplicationDescriptor) {
       return createFromApplicationClassLoader((MuleApplicationClassLoader) ownerClassLoader);
     }
     return createFromDomainClassLoaderNode((MuleSharedDomainClassLoader) ownerClassLoader);

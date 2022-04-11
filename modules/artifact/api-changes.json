@@ -1,4 +1,32 @@
 {
+  "4.5.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader",
+          "annotationType": "org.mule.api.annotation.NoExtend",
+          "annotation": "@org.mule.api.annotation.NoExtend",
+          "package": "org.mule.runtime.module.artifact.api.classloader",
+          "classSimpleName": "MuleDeployableArtifactClassLoader",
+          "elementKind": "class",
+          "justification": "W-10742243: This is meant to just be consumed"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "annotation": "@org.mule.api.annotation.NoInstantiate",
+          "package": "org.mule.runtime.module.artifact.api.classloader",
+          "classSimpleName": "MuleDeployableArtifactClassLoader",
+          "elementKind": "class",
+          "justification": "W-10742243: This is meant to just be consumed"
+        }
+      ]
+    }
+  },
   "4.2.0": {
     "revapi": {
       "ignore": [

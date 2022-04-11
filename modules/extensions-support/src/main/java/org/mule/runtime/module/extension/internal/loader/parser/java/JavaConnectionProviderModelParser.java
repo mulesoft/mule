@@ -17,8 +17,8 @@ import static org.mule.runtime.api.meta.model.connection.ConnectionManagementTyp
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.extension.internal.semantic.SemanticTermsHelper.getConnectionTermsFromAnnotations;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConnectionProvider;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.connection.JavaConnectionProviderModelParserUtils.isCachedConnectionProvider;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.connection.JavaConnectionProviderModelParserUtils.isDefinedThroughSdkApi;
@@ -27,7 +27,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.conn
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLibModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFieldsStream;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -201,10 +201,10 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
   }
 
   private Optional<OAuthCallbackValuesModelProperty> getOAuthCallbackValuesModelProperty(Class<?> clazz) {
-    Map<Field, String> values = getAnnotatedFields(clazz, OAuthCallbackValue.class).stream()
+    Map<Field, String> values = getAnnotatedFieldsStream(clazz, OAuthCallbackValue.class)
         .collect(toMap(identity(), field -> field.getAnnotation(OAuthCallbackValue.class).expression()));
 
-    values.putAll(getAnnotatedFields(clazz, org.mule.sdk.api.annotation.connectivity.oauth.OAuthCallbackValue.class).stream()
+    values.putAll(getAnnotatedFieldsStream(clazz, org.mule.sdk.api.annotation.connectivity.oauth.OAuthCallbackValue.class)
         .collect(toMap(identity(), field -> field
             .getAnnotation(org.mule.sdk.api.annotation.connectivity.oauth.OAuthCallbackValue.class).expression())));
 

@@ -17,6 +17,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingProducerScope;
@@ -30,21 +31,23 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
+import org.mule.runtime.core.internal.profiling.consumer.tracing.span.SpanManager;
+import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * A {@link CoreProfilingService} that may not produce profiling data if the profiling functionality is totally disabled.
+ * A {@link InternalProfilingService} that may not produce profiling data if the profiling functionality is totally disabled.
  *
  * @see DefaultProfilingService
  * @see NoOpProfilingService
  */
-public class ProfilingServiceWrapper implements CoreProfilingService, Lifecycle {
+public class ProfilingServiceWrapper implements InternalProfilingService, PrivilegedProfilingService, Lifecycle {
 
   @Inject
   MuleContext muleContext;
 
-  CoreProfilingService profilingService;
+  InternalProfilingService profilingService;
 
   @Inject
   FeatureFlaggingService featureFlaggingService;
@@ -69,6 +72,15 @@ public class ProfilingServiceWrapper implements CoreProfilingService, Lifecycle 
   }
 
   @Override
+  public <T extends ProfilingEventContext> void registerProfilingDataConsumer(ProfilingDataConsumer<T> profilingDataConsumer) {
+    // This is a privileged operation that has only to be invoked by a certain test connectors
+    // The API for this will not be generally available.
+    if (profilingService instanceof PrivilegedProfilingService) {
+      ((PrivilegedProfilingService) getProfilingService()).registerProfilingDataConsumer(profilingDataConsumer);
+    }
+  }
+
+  @Override
   public ThreadSnapshotCollector getThreadSnapshotCollector() {
     return getProfilingService().getThreadSnapshotCollector();
   }
@@ -78,14 +90,14 @@ public class ProfilingServiceWrapper implements CoreProfilingService, Lifecycle 
     return getProfilingService().getTracingService();
   }
 
-  public CoreProfilingService getProfilingService() throws MuleRuntimeException {
+  public InternalProfilingService getProfilingService() throws MuleRuntimeException {
     if (profilingService != null) {
       return profilingService;
     }
     return initialiseProfilingService();
   }
 
-  private CoreProfilingService initialiseProfilingService() throws MuleRuntimeException {
+  private InternalProfilingService initialiseProfilingService() throws MuleRuntimeException {
     if (featureFlaggingService.isEnabled(ENABLE_PROFILING_SERVICE)) {
       profilingService = new DefaultProfilingService();
     } else {
@@ -123,6 +135,11 @@ public class ProfilingServiceWrapper implements CoreProfilingService, Lifecycle 
   @Override
   public <S> Flux<S> setCurrentExecutionContext(Flux<S> original, Function<S, ExecutionContext> executionContextSupplier) {
     return profilingService.setCurrentExecutionContext(original, executionContextSupplier);
+  }
+
+  @Override
+  public SpanManager getSpanManager() {
+    return profilingService.getSpanManager();
   }
 
   @Override

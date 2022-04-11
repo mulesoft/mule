@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.profiling.producer.provider;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.END_SPAN;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.EXTENSION_PROFILING_EVENT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.MEMORY_BYTE_BUFFER_ALLOCATION;
@@ -23,7 +24,12 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.SCH
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_TASK_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.START_SPAN;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TASK_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_COMMIT;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_ROLLBACK;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getFullyQualifiedProfilingEventTypeIdentifier;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -38,7 +44,10 @@ import org.mule.runtime.core.internal.profiling.ExtensionDataProducerProvider;
 import org.mule.runtime.core.internal.profiling.ProcessingStrategyDataProducerProvider;
 import org.mule.runtime.core.internal.profiling.ProfilingDataProducerProvider;
 import org.mule.runtime.core.internal.profiling.ResettableProfilingDataProducer;
+import org.mule.runtime.core.internal.profiling.EndSpanProfilingDataProducerProvider;
+import org.mule.runtime.core.internal.profiling.StartSpanProfilingDataProducerProvider;
 import org.mule.runtime.core.internal.profiling.TaskSchedulingDataProducerProvider;
+import org.mule.runtime.core.internal.profiling.TransactionProfilingDataProducerProvider;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
 import java.util.HashMap;
@@ -149,6 +158,19 @@ public class ProfilingDataProducerResolver {
         .put(MEMORY_BYTE_BUFFER_DEALLOCATION,
              new ByteBufferProviderDataProducerProvider(profilingService, MEMORY_BYTE_BUFFER_DEALLOCATION,
                                                         featureFlaggingService));
+
+    profilingDataProducerProviders
+        .put(TX_START, new TransactionProfilingDataProducerProvider(profilingService, TX_START, featureFlaggingService));
+    profilingDataProducerProviders
+        .put(TX_CONTINUE, new TransactionProfilingDataProducerProvider(profilingService, TX_CONTINUE, featureFlaggingService));
+    profilingDataProducerProviders
+        .put(TX_COMMIT, new TransactionProfilingDataProducerProvider(profilingService, TX_COMMIT, featureFlaggingService));
+    profilingDataProducerProviders
+        .put(TX_ROLLBACK, new TransactionProfilingDataProducerProvider(profilingService, TX_ROLLBACK, featureFlaggingService));
+    profilingDataProducerProviders
+        .put(START_SPAN, new StartSpanProfilingDataProducerProvider(profilingService, START_SPAN, featureFlaggingService));
+    profilingDataProducerProviders
+        .put(END_SPAN, new EndSpanProfilingDataProducerProvider(profilingService, END_SPAN, featureFlaggingService));
 
   }
 

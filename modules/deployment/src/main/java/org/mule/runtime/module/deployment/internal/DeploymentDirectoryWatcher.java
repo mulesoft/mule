@@ -15,6 +15,7 @@ import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer
 
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.sort;
 import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
@@ -30,14 +31,14 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
 
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.artifact.api.Artifact;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.runtime.module.deployment.internal.util.DebuggableReentrantLock;
 import org.mule.runtime.module.deployment.internal.util.ElementAddedEvent;
 import org.mule.runtime.module.deployment.internal.util.ElementRemovedEvent;
@@ -320,8 +321,12 @@ public class DeploymentDirectoryWatcher implements Runnable {
       sort(apps);
       deployExplodedApps(apps);
     } catch (Exception e) {
-      // preserve the flag for the thread
-      Thread.currentThread().interrupt();
+      if (e instanceof InterruptedException) {
+        // preserve the flag for the thread
+        currentThread().interrupt();
+      } else {
+        logger.error("Exception processing deployment watch dir.", e);
+      }
     } finally {
       if (deploymentLock.isHeldByCurrentThread()) {
         deploymentLock.unlock();

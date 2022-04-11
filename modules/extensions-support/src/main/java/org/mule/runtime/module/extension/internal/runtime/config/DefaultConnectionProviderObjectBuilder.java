@@ -39,9 +39,9 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
  */
 public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProviderObjectBuilder<C> {
 
-  DefaultConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet,
-                                         ExtensionModel extensionModel, ExpressionManager expressionManager,
-                                         MuleContext muleContext) {
+  public DefaultConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet,
+                                                ExtensionModel extensionModel, ExpressionManager expressionManager,
+                                                MuleContext muleContext) {
     super(providerModel, resolverSet, extensionModel, expressionManager, muleContext);
   }
 

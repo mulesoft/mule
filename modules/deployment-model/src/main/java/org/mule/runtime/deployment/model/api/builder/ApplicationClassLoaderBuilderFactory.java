@@ -8,9 +8,10 @@ package org.mule.runtime.deployment.model.api.builder;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.internal.application.DefaultApplicationClassLoaderBuilder;
+import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 
 /**
  * Factory to create instances of {@code ApplicationClassLoaderBuilder}.
@@ -19,20 +20,15 @@ import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassL
  */
 public class ApplicationClassLoaderBuilderFactory {
 
-  private final DeployableArtifactClassLoaderFactory<ApplicationDescriptor> applicationClassLoaderFactory;
-  private final RegionPluginClassLoadersFactory pluginClassLoadersFactory;
+  private final ArtifactClassLoaderResolver artifactClassLoaderResolver;
 
   /**
    * Creates an {@code ApplicationClassLoaderBuilderFactory} to create {@code ApplicationClassLoaderBuilder} instances.
    *
-   * @param applicationClassLoaderFactory factory for the class loader of the artifact resources and classes
-   * @param pluginClassLoadersFactory     creates the class loaders for the plugins included in the application's region. Non null
+   * @param artifactClassLoaderResolver resolver that will be used to create the class loader. Non-null
    */
-  public ApplicationClassLoaderBuilderFactory(DeployableArtifactClassLoaderFactory<ApplicationDescriptor> applicationClassLoaderFactory,
-                                              RegionPluginClassLoadersFactory pluginClassLoadersFactory) {
-    checkArgument(pluginClassLoadersFactory != null, "pluginClassLoadersFactory cannot be null");
-    this.applicationClassLoaderFactory = applicationClassLoaderFactory;
-    this.pluginClassLoadersFactory = pluginClassLoadersFactory;
+  public ApplicationClassLoaderBuilderFactory(ArtifactClassLoaderResolver artifactClassLoaderResolver) {
+    this.artifactClassLoaderResolver = artifactClassLoaderResolver;
   }
 
   /**
@@ -41,7 +37,7 @@ public class ApplicationClassLoaderBuilderFactory {
    * @return a {@code ApplicationClassLoaderBuilder} instance.
    */
   public ApplicationClassLoaderBuilder createArtifactClassLoaderBuilder() {
-    return new DefaultApplicationClassLoaderBuilder(applicationClassLoaderFactory, pluginClassLoadersFactory);
+    return new DefaultApplicationClassLoaderBuilder(artifactClassLoaderResolver);
   }
 
 }

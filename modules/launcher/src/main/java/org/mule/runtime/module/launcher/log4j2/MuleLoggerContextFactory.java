@@ -6,18 +6,19 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
-import static java.lang.System.getProperty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.launcher.log4j2.ArtifactAwareContextSelector.LOGGER;
 import static org.mule.runtime.module.launcher.log4j2.ArtifactAwareContextSelector.resolveLoggerContextClassLoader;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleBase;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleConfDir;
 
+import static java.lang.System.getProperty;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.DirectoryResourceLocator;
 import org.mule.runtime.module.artifact.api.classloader.LocalResourceLocator;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 
 import java.io.File;
 import java.net.URI;

@@ -22,8 +22,7 @@ import java.util.List;
 public class PolicyTemplateClassLoaderFactory implements DeployableArtifactClassLoaderFactory<PolicyTemplateDescriptor> {
 
   @Override
-  public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, PolicyTemplateDescriptor descriptor,
-                                    List<ArtifactClassLoader> artifactPluginClassLoaders) {
+  public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, PolicyTemplateDescriptor descriptor) {
     File rootFolder = descriptor.getRootFolder();
     if (rootFolder == null || !rootFolder.exists()) {
       throw new IllegalArgumentException("Policy folder does not exists: " + (rootFolder != null ? rootFolder.getName() : null));
@@ -34,8 +33,14 @@ public class PolicyTemplateClassLoaderFactory implements DeployableArtifactClass
     MuleDeployableArtifactClassLoader deployableArtifactClassLoader =
         new MuleDeployableArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderModel().getUrls(),
                                               parent.getClassLoader(),
-                                              classLoaderLookupPolicy, artifactPluginClassLoaders);
+                                              classLoaderLookupPolicy);
 
     return deployableArtifactClassLoader;
+  }
+
+  @Override
+  public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, PolicyTemplateDescriptor descriptor,
+                                    List<ArtifactClassLoader> artifactPluginClassLoaders) {
+    return create(artifactId, parent, descriptor);
   }
 }

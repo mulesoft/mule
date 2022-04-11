@@ -6,20 +6,22 @@
  */
 package org.mule.runtime.deployment.model.internal.domain;
 
+import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+
 import static java.util.Collections.emptyList;
+
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 
-import org.junit.rules.TemporaryFolder;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.util.FileUtils;
-import org.mule.runtime.deployment.model.internal.nativelib.ArtifactCopyNativeLibraryFinder;
-import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinder;
+import org.mule.runtime.module.artifact.activation.internal.classloader.MuleSharedDomainClassLoader;
+import org.mule.runtime.module.artifact.activation.internal.nativelib.ArtifactCopyNativeLibraryFinder;
+import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinder;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -33,6 +35,7 @@ import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 @SmallTest
 public class MuleSharedDomainClassLoaderTestCase extends AbstractMuleTestCase {
@@ -57,8 +60,7 @@ public class MuleSharedDomainClassLoaderTestCase extends AbstractMuleTestCase {
     final List<URL> urls = Collections.singletonList(resourceFile.toURI().toURL());
 
     MuleSharedDomainClassLoader classLoader = new MuleSharedDomainClassLoader(new ArtifactDescriptor(DEFAULT_DOMAIN_NAME),
-                                                                              getClass().getClassLoader(), lookupPolicy, urls,
-                                                                              emptyList());
+                                                                              getClass().getClassLoader(), lookupPolicy, urls);
 
     assertThat(classLoader.findResource(RESOURCE_FILE_NAME), notNullValue());
   }
@@ -78,7 +80,7 @@ public class MuleSharedDomainClassLoaderTestCase extends AbstractMuleTestCase {
   public void defaultDomainNotUseNativeLibrary() {
     MuleSharedDomainClassLoader classLoader = new MuleSharedDomainClassLoader(new ArtifactDescriptor(DEFAULT_DOMAIN_NAME),
                                                                               getClass().getClassLoader(), lookupPolicy,
-                                                                              emptyList(), emptyList());
+                                                                              emptyList());
 
     assertThat(classLoader.findLibrary(NATIVE_LIBRARY), is(nullValue()));
   }
@@ -92,7 +94,6 @@ public class MuleSharedDomainClassLoaderTestCase extends AbstractMuleTestCase {
 
     MuleSharedDomainClassLoader classLoader = new MuleSharedDomainClassLoader(new ArtifactDescriptor(CUSTOM_DOMAIN_NAME),
                                                                               getClass().getClassLoader(), lookupPolicy,
-                                                                              emptyList(),
                                                                               emptyList(), nativeLibraryFinder);
 
     assertThat(classLoader.findLibrary(NATIVE_LIBRARY), is(notNullValue()));

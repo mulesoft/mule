@@ -48,6 +48,7 @@ import org.mule.runtime.core.internal.profiling.ResettableProfilingDataProducerD
 import org.mule.runtime.core.internal.profiling.consumer.LoggerByteBufferAllocationProfilingDataConsumer;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentThreadingDataConsumer;
 import org.mule.runtime.core.internal.profiling.consumer.TaskSchedulingLoggerDataConsumer;
+import org.mule.runtime.core.internal.profiling.consumer.TransactionLoggerDataConsumer;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.notification.ProfilingNotification;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
@@ -135,18 +136,19 @@ public class DefaultProfilingServiceTestCase extends AbstractMuleContextTestCase
     assertThat(profilingService.getDiscoveryStrategy(), instanceOf(CompositeProfilingDataConsumerDiscoveryStrategy.class));
     Set<ProfilingDataConsumer<? extends ProfilingEventContext>> profilingDataConsumers =
         profilingService.getDiscoveryStrategy().discover();
-    assertThat(profilingDataConsumers, hasSize(5));
+    assertThat(profilingDataConsumers, hasSize(6));
     assertThat(profilingDataConsumers, hasItem(is(instanceOf(LoggerByteBufferAllocationProfilingDataConsumer.class))));
     assertThat(profilingDataConsumers, hasItem(is(instanceOf(LoggerComponentThreadingDataConsumer.class))));
     assertThat(profilingDataConsumers, hasItem(is(instanceOf(LoggerByteBufferAllocationProfilingDataConsumer.class))));
     assertThat(profilingDataConsumers, hasItem(is(instanceOf(TaskSchedulingLoggerDataConsumer.class))));
+    assertThat(profilingDataConsumers, hasItem(is(instanceOf(TransactionLoggerDataConsumer.class))));
     assertThat(profilingDataConsumers, hasItem(testProfilingDataConsumer));
   }
 
   @Test
   @Description("The notification listener is correctly set so that the notifications are managed")
   public void correctNotificationListenerSet() {
-    verify(notificationManager, times(5)).addListenerSubscription(any(DefaultProfilingNotificationListener.class), any());
+    verify(notificationManager, times(6)).addListenerSubscription(any(DefaultProfilingNotificationListener.class), any());
   }
 
   @Test

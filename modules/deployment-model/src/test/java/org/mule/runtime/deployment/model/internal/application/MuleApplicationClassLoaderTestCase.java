@@ -6,8 +6,13 @@
  */
 package org.mule.runtime.deployment.model.internal.application;
 
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
+
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -15,14 +20,13 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
-import org.mule.runtime.deployment.model.internal.domain.MuleSharedDomainClassLoader;
+import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
+import org.mule.runtime.module.artifact.activation.internal.classloader.MuleSharedDomainClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -93,14 +97,14 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
     // Create app class loader
     domainCL =
         new MuleSharedDomainClassLoader(new DomainDescriptor(DOMAIN_NAME), currentThread().getContextClassLoader(),
-                                        mock(ClassLoaderLookupPolicy.class), emptyList(), emptyList());
+                                        mock(ClassLoaderLookupPolicy.class), emptyList());
 
     final ApplicationDescriptor applicationDescriptor = new ApplicationDescriptor(APP_NAME);
     ClassLoaderModel classLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder(applicationDescriptor.getClassLoaderModel())
         .containing(getAppFolder(APP_NAME).toURI().toURL()).build();
     applicationDescriptor.setClassLoaderModel(classLoaderModel);
     appCL = new MuleApplicationClassLoader(APP_NAME, applicationDescriptor, domainCL, null, urls,
-                                           mock(ClassLoaderLookupPolicy.class), emptyList());
+                                           mock(ClassLoaderLookupPolicy.class));
   }
 
   @After

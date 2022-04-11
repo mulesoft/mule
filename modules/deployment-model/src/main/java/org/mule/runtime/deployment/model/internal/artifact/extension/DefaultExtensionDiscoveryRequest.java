@@ -10,8 +10,8 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionDiscoveryRequest;
 import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
 import java.util.List;
 import java.util.Set;

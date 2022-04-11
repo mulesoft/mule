@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.profiling;
 
+import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingProducerScope;
@@ -16,6 +17,9 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 
 import java.util.function.Function;
 
+import org.mule.runtime.core.internal.profiling.consumer.tracing.span.DefaultSpanManager;
+import org.mule.runtime.core.internal.profiling.consumer.tracing.span.SpanManager;
+import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -25,7 +29,9 @@ import reactor.core.publisher.Mono;
  *
  * @since 4.5.0
  */
-public class NoOpProfilingService implements CoreProfilingService {
+public class NoOpProfilingService implements InternalProfilingService, PrivilegedProfilingService {
+
+  private SpanManager spanManager = new DefaultSpanManager();
 
   private final TracingService noOpTracingService = new TracingService() {
 
@@ -83,6 +89,11 @@ public class NoOpProfilingService implements CoreProfilingService {
   }
 
   @Override
+  public <T extends ProfilingEventContext> void registerProfilingDataConsumer(ProfilingDataConsumer<T> profilingDataConsumer) {
+    // Nothing to do
+  }
+
+  @Override
   public ThreadSnapshotCollector getThreadSnapshotCollector() {
     throw new UnsupportedOperationException();
   }
@@ -114,5 +125,10 @@ public class NoOpProfilingService implements CoreProfilingService {
   @Override
   public <S> Flux<S> setCurrentExecutionContext(Flux<S> original, Function<S, ExecutionContext> executionContextSupplier) {
     return original;
+  }
+
+  @Override
+  public SpanManager getSpanManager() {
+    return spanManager;
   }
 }

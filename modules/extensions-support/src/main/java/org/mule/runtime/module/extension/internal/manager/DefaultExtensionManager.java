@@ -49,6 +49,7 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -71,6 +72,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
 
   private final ImplicitConfigurationProviderFactory implicitConfigurationProviderFactory =
       new DefaultImplicitConfigurationProviderFactory();
+  private final AtomicBoolean initialised = new AtomicBoolean(false);
 
   @Inject
   private ReflectionCache reflectionCache;
@@ -89,9 +91,11 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
 
   @Override
   public void initialise() throws InitialisationException {
-    extensionRegistry = new ExtensionRegistry(new DefaultRegistry(muleContext));
-    extensionActivator = new ExtensionActivator(muleContext);
-    initialiseIfNeeded(implicitConfigurationProviderFactory, muleContext);
+    if (initialised.compareAndSet(false, true)) {
+      extensionRegistry = new ExtensionRegistry(new DefaultRegistry(muleContext));
+      extensionActivator = new ExtensionActivator(muleContext);
+      initialiseIfNeeded(implicitConfigurationProviderFactory, muleContext);
+    }
   }
 
   /**

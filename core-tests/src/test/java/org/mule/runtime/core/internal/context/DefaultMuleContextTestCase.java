@@ -43,7 +43,7 @@ import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.internal.config.ClusterConfiguration;
-import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuilder;
+import org.mule.runtime.core.internal.config.builders.MinimalConfigurationBuilder;
 import org.mule.runtime.core.internal.connector.SchedulerController;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
@@ -223,7 +223,7 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
   public void securityManagerIsRegisteredAndCached() throws Exception {
     SecurityManager securityManager = mock(SecurityManager.class);
     context = muleContextFactory.createMuleContext(testServicesConfigurationBuilder,
-                                                   new DefaultsConfigurationBuilder(),
+                                                   new MinimalConfigurationBuilder(),
                                                    new AbstractConfigurationBuilder() {
 
                                                      @Override
@@ -240,6 +240,6 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
   }
 
   protected void createMuleContext() throws MuleException {
-    context = muleContextFactory.createMuleContext(testServicesConfigurationBuilder, new DefaultsConfigurationBuilder());
+    context = muleContextFactory.createMuleContext(testServicesConfigurationBuilder, new MinimalConfigurationBuilder());
   }
 }

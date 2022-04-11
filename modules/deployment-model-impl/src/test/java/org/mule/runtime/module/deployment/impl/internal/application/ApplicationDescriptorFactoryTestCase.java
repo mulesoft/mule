@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
-import static java.util.Optional.empty;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
-import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
+import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import static java.util.Optional.empty;
+
 import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepositoryFactory;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DeployableArtifactDescriptorFactoryTestCase;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;

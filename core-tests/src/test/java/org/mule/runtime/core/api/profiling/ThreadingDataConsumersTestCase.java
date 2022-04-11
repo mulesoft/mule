@@ -48,7 +48,7 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
-import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
+import org.mule.runtime.core.internal.profiling.consumer.ComponentProcessingStrategyDataConsumer;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentThreadingDataConsumer;
 import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInternalProfilingDataConsumer;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadingProfilingEventContext;
@@ -176,7 +176,7 @@ public class ThreadingDataConsumersTestCase extends AbstractMuleContextTestCase 
   }
 
   /**
-   * Stub {@link LoggerComponentProcessingStrategyDataConsumer} for injecting a mocked {@link Logger}
+   * Stub {@link ComponentProcessingStrategyDataConsumer} for injecting a mocked {@link Logger}
    */
   @RuntimeInternalProfilingDataConsumer
   private static class TestLoggerComponentThreadingDataConsumer extends LoggerComponentThreadingDataConsumer {

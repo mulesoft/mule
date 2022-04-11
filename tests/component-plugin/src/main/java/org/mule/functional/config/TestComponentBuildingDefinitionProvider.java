@@ -253,6 +253,10 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         internalIsRunningTests = true;
         return true;
       }
+      if (element.getClassName().startsWith("org.openjdk.jmh.runner.")) {
+        internalIsRunningTests = true;
+        return true;
+      }
     }
     internalIsRunningTests = false;
     return false;

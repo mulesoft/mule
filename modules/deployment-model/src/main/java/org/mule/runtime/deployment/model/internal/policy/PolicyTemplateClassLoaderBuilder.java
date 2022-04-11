@@ -7,8 +7,9 @@
 
 package org.mule.runtime.deployment.model.internal.policy;
 
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
@@ -42,7 +43,7 @@ public class PolicyTemplateClassLoaderBuilder extends AbstractArtifactClassLoade
 
   @Override
   protected ArtifactClassLoader createArtifactClassLoader(String artifactId, RegionClassLoader regionClassLoader) {
-    return artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor, artifactPluginClassLoaders);
+    return artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor);
   }
 
   @Override
