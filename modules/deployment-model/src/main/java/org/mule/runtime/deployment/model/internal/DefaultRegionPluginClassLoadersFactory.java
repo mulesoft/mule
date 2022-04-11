@@ -10,6 +10,7 @@ package org.mule.runtime.deployment.model.internal;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.of;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -17,14 +18,12 @@ import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFac
 import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Creates the class loaders for plugins that are contained in a given region
@@ -66,16 +65,16 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
                                                    && apd.getBundleDescriptor().getGroupId()
                                                        .equals(bundleDescriptor.getGroupId()))
                                                .findAny(),
-                                           (ownerArtifactClassLoader, dependencyPluginDescriptor) -> Optional
-                                               .of(() -> classLoaders.stream().filter(
-                                                                                      c -> c
-                                                                                          .getArtifactDescriptor()
-                                                                                          .getBundleDescriptor()
-                                                                                          .getArtifactId()
-                                                                                          .equals(dependencyPluginDescriptor
-                                                                                              .getBundleDescriptor()
-                                                                                              .getArtifactId()))
-                                                   .findAny().get()));
+                                           (ownerArtifactClassLoader, dependencyPluginDescriptor) -> of(() -> classLoaders
+                                               .stream().filter(
+                                                                c -> c
+                                                                    .getArtifactDescriptor()
+                                                                    .getBundleDescriptor()
+                                                                    .getArtifactId()
+                                                                    .equals(dependencyPluginDescriptor
+                                                                        .getBundleDescriptor()
+                                                                        .getArtifactId()))
+                                               .findAny().get()));
 
       classLoaders.add(artifactClassLoader);
     }
