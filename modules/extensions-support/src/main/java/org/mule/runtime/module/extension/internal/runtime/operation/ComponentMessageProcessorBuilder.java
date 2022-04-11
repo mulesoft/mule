@@ -157,8 +157,8 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   }
 
   protected ConfigurationProvider getConfigurationProvider() {
-    ConfigurationProvider explicitConfigProvider = getConfigurationProvider(parameters.get("config-ref"));
-    return explicitConfigProvider != null ? explicitConfigProvider : configurationProvider;
+    // Uses the configurationProvider given to the builder if any, otherwise evaluates the parameters.
+    return configurationProvider != null ? configurationProvider : getConfigurationProvider(parameters.get("config-ref"));
   }
 
   private ConfigurationProvider getConfigurationProvider(Object configRefParameter) {
