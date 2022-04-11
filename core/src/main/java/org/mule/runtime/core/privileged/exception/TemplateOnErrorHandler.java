@@ -508,13 +508,12 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       return false;
     }
 
-    String location = ((MessagingException) exception).getFailingComponent().getRootContainerLocation().getGlobalName();
-
     if (inDefaultErrorHandler()) {
       return defaultErrorHandlerOwnsTransaction(transaction);
     }
 
     if (fromGlobalErrorHandler) {
+      String location = ((MessagingException) exception).getFailingComponent().getRootContainerLocation().getGlobalName();
       return transaction.getComponentLocation().get().getRootContainerName().equals(location);
     } else {
       // We are in a simple scenario where the error handler's location ends with "/error-handler/1".
