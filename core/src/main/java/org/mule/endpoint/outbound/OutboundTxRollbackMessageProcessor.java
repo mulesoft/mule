@@ -6,6 +6,8 @@
  */
 package org.mule.endpoint.outbound;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.transaction.Transaction;
@@ -19,6 +21,8 @@ import org.mule.transaction.TransactionCoordination;
  */
 public class OutboundTxRollbackMessageProcessor extends AbstractInterceptingMessageProcessor
 {
+    private static final Log logger = LogFactory.getLog(OutboundTxRollbackMessageProcessor.class);
+
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         // No point continuing if the service has rolledback the transaction

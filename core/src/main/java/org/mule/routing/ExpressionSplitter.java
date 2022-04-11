@@ -6,6 +6,8 @@
  */
 package org.mule.routing;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -38,6 +40,8 @@ import org.w3c.dom.NodeList;
 public class ExpressionSplitter extends AbstractSplitter
     implements Initialisable
 {
+    private static final Log logger = LogFactory.getLog(ExpressionSplitter.class);
+
     protected ExpressionManager expressionManager;
     protected ExpressionConfig config = new ExpressionConfig();
 

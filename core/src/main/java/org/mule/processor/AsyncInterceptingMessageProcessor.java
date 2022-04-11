@@ -8,6 +8,8 @@ package org.mule.processor;
 
 import static org.mule.config.i18n.CoreMessages.errorSchedulingMessageProcessorForAsyncInvocation;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -45,6 +47,8 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 {
 
     public static final String SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE = "Unable to process a synchronous or non-blocking event asynchronously";
+
+    private static final Log logger = LogFactory.getLog(AsyncInterceptingMessageProcessor.class);
 
     protected WorkManagerSource workManagerSource;
     protected boolean doThreading = true;

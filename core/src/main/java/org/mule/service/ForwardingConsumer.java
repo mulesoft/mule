@@ -6,6 +6,8 @@
  */
 package org.mule.service;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -23,6 +25,7 @@ import org.mule.routing.MessageFilter;
 @Deprecated
 public class ForwardingConsumer extends MessageFilter
 {
+    private static final Log logger = LogFactory.getLog(ForwardingConsumer.class);
     @Override
     public MuleEvent processNext(MuleEvent event) throws MessagingException
     {

@@ -147,18 +147,18 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
                 }
                 catch (ObjectStoreNotAvaliableException e)
                 {
-                    logger.error("ObjectStore not available: " + e.getMessage());
+                    LOGGER.error("ObjectStore not available: " + e.getMessage());
                     return false;
                 }
                 catch (ObjectStoreException e)
                 {
-                    logger.warn("ObjectStore exception: " + e.getMessage());
+                    LOGGER.warn("ObjectStore exception: " + e.getMessage());
                     return false;
                 }
             }
             catch (MessagingException e)
             {
-                logger.warn("Could not retrieve Id or Value for event: " + e.getMessage());
+                LOGGER.warn("Could not retrieve Id or Value for event: " + e.getMessage());
                 return false;
             }
         }
@@ -176,7 +176,7 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
         }
         else
         {
-            logger.error("This IdempotentMessageFilter was configured on the service: "
+            LOGGER.error("This IdempotentMessageFilter was configured on the service: "
                          + storePrefix + " but has received an event for service: "
                          + flowConstruct.getName() + ". Please check your config to make sure each service"
                          + "has its own instance of IdempotentMessageFilter.");
@@ -200,7 +200,7 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
         }
         catch (MuleException e)
         {
-            logger.error("Exception attempting to determine idempotency of incoming message for "
+            LOGGER.error("Exception attempting to determine idempotency of incoming message for "
                          + event.getFlowConstruct().getName() + " from the endpoint "
                          + event.getMessageSourceURI(), e);
             return false;

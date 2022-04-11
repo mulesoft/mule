@@ -9,6 +9,8 @@ package org.mule.construct;
 import java.util.Collections;
 
 import org.apache.commons.lang.Validate;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.MessageExchangePattern;
 import org.mule.VoidMuleEvent;
 import org.mule.RequestContext;
@@ -225,6 +227,7 @@ public class Validator extends AbstractConfigurationPattern
     private static class ErrorAwareEventReturningMessageProcessor extends
         AbstractInterceptingMessageProcessor
     {
+        private static final Log logger = LogFactory.getLog(ErrorAwareEventReturningMessageProcessor.class);
         /*
          * Returns the incoming event whatever the outcome of the rest of the chain maybe. Sets an exception payload on
          * the incoming event if an error occurred downstream.

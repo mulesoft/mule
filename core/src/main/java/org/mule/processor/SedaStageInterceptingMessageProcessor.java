@@ -6,6 +6,8 @@
  */
 package org.mule.processor;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
@@ -51,6 +53,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
     implements Work, Lifecycle, Pausable, Resumable
 {
     protected static final String QUEUE_NAME_PREFIX = "seda.queue";
+    private static final Log logger = LogFactory.getLog(SedaStageInterceptingMessageProcessor.class);
     public static int DEFAULT_QUEUE_SIZE_MAX_THREADS_FACTOR = 4;
 
     protected QueueProfile queueProfile;

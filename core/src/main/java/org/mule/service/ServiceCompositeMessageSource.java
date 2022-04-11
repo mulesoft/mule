@@ -6,6 +6,8 @@
  */
 package org.mule.service;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstructAware;
@@ -39,6 +41,7 @@ import java.util.List;
 @Deprecated
 public class ServiceCompositeMessageSource extends StartableCompositeMessageSource implements Initialisable, RouterStatisticsRecorder
 {
+    private static final Log logger = LogFactory.getLog(ServiceCompositeMessageSource.class);
     protected List<MessageProcessor> processors = new LinkedList<MessageProcessor>();
     protected RouterStatistics statistics;
     protected List<InboundEndpoint> endpoints = new ArrayList<InboundEndpoint>();
