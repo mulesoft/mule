@@ -17,11 +17,13 @@ public class BeanWrapper {
 
   private final Object wrappedObject;
   private final String name;
+  private final int cachedHashCode;
 
   public BeanWrapper(String name, Object o) {
     requireNonNull(o, "bean must not be null");
     this.name = name;
     this.wrappedObject = o;
+    this.cachedHashCode = calculateHashCode();
   }
 
   public Object getWrappedObject() {
@@ -54,9 +56,12 @@ public class BeanWrapper {
     return this.wrappedObject.equals(((BeanWrapper) obj).wrappedObject);
   }
 
-  // todo: W-10704535 use cached hashCodes to improve performance
   @Override
   public int hashCode() {
+    return cachedHashCode;
+  }
+
+  private int calculateHashCode() {
     return wrappedObject.hashCode();
   }
 
