@@ -477,15 +477,18 @@ public class MacroExpansionModuleModel {
               .filteredComponents(equalsNamespace(extensionModel.getXmlDslModel().getPrefix()))
               .filter(componentModel -> componentModel.getModel(ConfigurationModel.class).isPresent()
                   && configParameter.equals(componentModel.getComponentId().orElse(null)))
-              .findFirst() // Else look for the element in the parent ast (domain containing the config for the child app)
-              .orElse(applicationModel.getParent().get()
-                  .filteredComponents(equalsNamespace(extensionModel.getXmlDslModel().getPrefix()))
-                  .filter(componentModel -> componentModel.getModel(ConfigurationModel.class).isPresent()
-                      && configParameter.equals(componentModel.getComponentId().orElse(null)))
-                  .findFirst()
-                  .orElseThrow(() -> new IllegalArgumentException(format("There's no <%s:config> named [%s] in the current mule app nor in its domain",
-                                                                         extensionModel.getXmlDslModel().getPrefix(),
-                                                                         configParameter))));
+              .findFirst()
+              .orElseGet(() -> { // Else look for the element in the parent ast (domain containing the config for the child app)
+                if (applicationModel.getParent().isPresent()) {
+                  return applicationModel.getParent().get()
+                      .filteredComponents(equalsNamespace(extensionModel.getXmlDslModel().getPrefix()))
+                      .filter(componentModel -> componentModel.getModel(ConfigurationModel.class).isPresent() &&
+                          configParameter.equals(componentModel.getComponentId().orElse(null)))
+                      .findFirst().orElseThrow(() -> configNotFoundException(configParameter));
+                } else {
+                  throw configNotFoundException(configParameter);
+                }
+              });
           // as configParameter != null, a ConfigurationModel must exist
           final ConfigurationModel configurationModel = getConfigurationModel().get();
           configRefComponentModel.getParameters().stream()
@@ -494,6 +497,11 @@ public class MacroExpansionModuleModel {
           valuesMap.putAll(extractConnectionProperties(configRefComponentModel, configurationModel));
         });
     return valuesMap;
+  }
+
+  private IllegalArgumentException configNotFoundException(String configParameter) {
+    return new IllegalArgumentException(format("There's no <%s:config> named [%s] in the current mule app nor in its domain",
+                                               extensionModel.getXmlDslModel().getPrefix(), configParameter));
   }
 
   /**
