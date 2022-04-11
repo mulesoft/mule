@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -158,7 +159,8 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
 
   protected ConfigurationProvider getConfigurationProvider() {
     // Uses the configurationProvider given to the builder if any, otherwise evaluates the parameters.
-    return configurationProvider != null ? configurationProvider : getConfigurationProvider(parameters.get("config-ref"));
+    return configurationProvider != null ? configurationProvider
+        : getConfigurationProvider(parameters.get(CONFIG_ATTRIBUTE_NAME));
   }
 
   private ConfigurationProvider getConfigurationProvider(Object configRefParameter) {
