@@ -24,6 +24,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Creates the class loaders for plugins that are contained in a given region
@@ -64,7 +65,17 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
                                                    .equals(bundleDescriptor.getArtifactId())
                                                    && apd.getBundleDescriptor().getGroupId()
                                                        .equals(bundleDescriptor.getGroupId()))
-                                               .findAny());
+                                               .findAny(),
+                                           (ownerArtifactClassLoader, dependencyPluginDescriptor) -> Optional
+                                               .of(() -> classLoaders.stream().filter(
+                                                                                      c -> c
+                                                                                          .getArtifactDescriptor()
+                                                                                          .getBundleDescriptor()
+                                                                                          .getArtifactId()
+                                                                                          .equals(dependencyPluginDescriptor
+                                                                                              .getBundleDescriptor()
+                                                                                              .getArtifactId()))
+                                                   .findAny().get()));
 
       classLoaders.add(artifactClassLoader);
     }

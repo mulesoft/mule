@@ -25,10 +25,9 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.container.api.ModuleRepository;
-import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleSharedDomainClassLoader;
-import org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
@@ -89,7 +88,7 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
     assertThat(domainClassLoader.getArtifactId(), equalTo(artifactId));
   }
 
-  @Test(expected = DeploymentException.class)
+  @Test(expected = ArtifactActivationException.class)
   public void validateDomainBeforeCreatingClassLoader() {
     DomainDescriptor descriptor = getTestDescriptor("someDomain");
     descriptor.setRootFolder(new File("unexistent"));

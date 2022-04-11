@@ -58,6 +58,8 @@ public class TrackingArtifactClassLoaderResolverDecoratorTestCase extends Abstra
         .thenReturn(classLoaderFactory.apply("Class loader 4"));
     when(artifactClassLoaderResolver.createMulePluginClassLoader(any(), any(), any()))
         .thenReturn(classLoaderFactory.apply("Class loader 5"));
+    when(artifactClassLoaderResolver.createMulePluginClassLoader(any(), any(), any(), any()))
+        .thenReturn(classLoaderFactory.apply("Class loader 6"));
   }
 
   @Test
@@ -70,15 +72,19 @@ public class TrackingArtifactClassLoaderResolverDecoratorTestCase extends Abstra
     ArtifactClassLoader applicationClassLoader2 =
         decorator.createApplicationClassLoader(mock(ApplicationDescriptor.class), mock(Supplier.class),
                                                mock(PluginClassLoaderResolver.class));
-    ArtifactClassLoader pluginClassLoader =
+    ArtifactClassLoader pluginClassLoader1 =
         decorator.createMulePluginClassLoader(mock(MuleDeployableArtifactClassLoader.class), mock(ArtifactPluginDescriptor.class),
                                               mock(Function.class));
+    ArtifactClassLoader pluginClassLoader2 =
+        decorator.createMulePluginClassLoader(mock(MuleDeployableArtifactClassLoader.class), mock(ArtifactPluginDescriptor.class),
+                                              mock(Function.class), mock(PluginClassLoaderResolver.class));
 
     verify(artifactClassLoaderManager).register(domainClassLoader1);
     verify(artifactClassLoaderManager).register(domainClassLoader2);
     verify(artifactClassLoaderManager).register(applicationClassLoader1);
     verify(artifactClassLoaderManager).register(applicationClassLoader2);
-    verify(artifactClassLoaderManager).register(pluginClassLoader);
+    verify(artifactClassLoaderManager).register(pluginClassLoader1);
+    verify(artifactClassLoaderManager).register(pluginClassLoader2);
   }
 
   @Test
@@ -91,21 +97,26 @@ public class TrackingArtifactClassLoaderResolverDecoratorTestCase extends Abstra
     ArtifactClassLoader applicationClassLoader2 =
         decorator.createApplicationClassLoader(mock(ApplicationDescriptor.class), mock(Supplier.class),
                                                mock(PluginClassLoaderResolver.class));
-    ArtifactClassLoader pluginClassLoader =
+    ArtifactClassLoader pluginClassLoader1 =
         decorator.createMulePluginClassLoader(mock(MuleDeployableArtifactClassLoader.class), mock(ArtifactPluginDescriptor.class),
                                               mock(Function.class));
+    ArtifactClassLoader pluginClassLoader2 =
+        decorator.createMulePluginClassLoader(mock(MuleDeployableArtifactClassLoader.class), mock(ArtifactPluginDescriptor.class),
+                                              mock(Function.class), mock(PluginClassLoaderResolver.class));
 
     domainClassLoader1.dispose();
     domainClassLoader2.dispose();
     applicationClassLoader1.dispose();
     applicationClassLoader2.dispose();
-    pluginClassLoader.dispose();
+    pluginClassLoader1.dispose();
+    pluginClassLoader2.dispose();
 
     verify(artifactClassLoaderManager).unregister(domainClassLoader1.getArtifactId());
     verify(artifactClassLoaderManager).unregister(domainClassLoader2.getArtifactId());
     verify(artifactClassLoaderManager).unregister(applicationClassLoader1.getArtifactId());
     verify(artifactClassLoaderManager).unregister(applicationClassLoader2.getArtifactId());
-    verify(artifactClassLoaderManager).unregister(pluginClassLoader.getArtifactId());
+    verify(artifactClassLoaderManager).unregister(pluginClassLoader1.getArtifactId());
+    verify(artifactClassLoaderManager).unregister(pluginClassLoader2.getArtifactId());
   }
 
 }

@@ -89,6 +89,17 @@ public class TrackingArtifactClassLoaderResolverDecorator implements ArtifactCla
     return mulePluginClassLoader;
   }
 
+  @Override
+  public MuleArtifactClassLoader createMulePluginClassLoader(MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
+                                                             ArtifactPluginDescriptor descriptor,
+                                                             Function<BundleDescriptor, Optional<ArtifactPluginDescriptor>> pluginDescriptorResolver,
+                                                             PluginClassLoaderResolver pluginClassLoaderResolver) {
+    MuleArtifactClassLoader mulePluginClassLoader = delegate
+        .createMulePluginClassLoader(ownerArtifactClassLoader, descriptor, pluginDescriptorResolver, pluginClassLoaderResolver);
+    track(mulePluginClassLoader);
+    return mulePluginClassLoader;
+  }
+
   private void track(ArtifactClassLoader artifactClassLoader) {
     artifactClassLoaderManager.register(artifactClassLoader);
     artifactClassLoader.addShutdownListener(() -> artifactClassLoaderManager.unregister(artifactClassLoader.getArtifactId()));

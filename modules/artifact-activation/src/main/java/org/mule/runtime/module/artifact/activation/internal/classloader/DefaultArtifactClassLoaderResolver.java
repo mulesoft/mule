@@ -314,12 +314,23 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
   public MuleArtifactClassLoader createMulePluginClassLoader(MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
                                                              ArtifactPluginDescriptor descriptor,
                                                              Function<BundleDescriptor, Optional<ArtifactPluginDescriptor>> pluginDescriptorResolver) {
+    return createMulePluginClassLoader(ownerArtifactClassLoader, descriptor, pluginDescriptorResolver,
+                                       (ownerClassLoader, artifactPluginDescriptor) -> empty());
+
+  }
+
+  @Override
+  public MuleArtifactClassLoader createMulePluginClassLoader(MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
+                                                             ArtifactPluginDescriptor descriptor,
+                                                             Function<BundleDescriptor, Optional<ArtifactPluginDescriptor>> pluginDescriptorResolver,
+                                                             PluginClassLoaderResolver pluginClassLoaderResolver) {
     RegionClassLoader regionClassLoader = (RegionClassLoader) ownerArtifactClassLoader.getParent();
     final String pluginArtifactId = getArtifactPluginId(regionClassLoader.getArtifactId(), descriptor.getName());
 
     ClassLoaderLookupPolicy pluginLookupPolicy = createPluginLookupPolicy(descriptor,
                                                                           regionClassLoader,
-                                                                          pluginDescriptorResolver);
+                                                                          pluginDescriptorResolver,
+                                                                          pluginClassLoaderResolver);
 
     MuleArtifactClassLoader pluginClassLoader =
         new MuleArtifactClassLoader(pluginArtifactId, descriptor, descriptor.getClassLoaderModel().getUrls(),
@@ -329,7 +340,8 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
   protected ClassLoaderLookupPolicy createPluginLookupPolicy(ArtifactPluginDescriptor descriptor,
                                                              RegionClassLoader regionClassLoader,
-                                                             Function<BundleDescriptor, Optional<ArtifactPluginDescriptor>> pluginDescriptorResolver) {
+                                                             Function<BundleDescriptor, Optional<ArtifactPluginDescriptor>> pluginDescriptorResolver,
+                                                             PluginClassLoaderResolver pluginClassLoaderResolver) {
     ClassLoaderLookupPolicy baseLookupPolicy = regionClassLoader.getClassLoaderLookupPolicy()
         .extend(regionClassLoader.filterForClassLoader(regionClassLoader.getOwnerClassLoader())
             .getExportedClassPackages()
@@ -351,18 +363,21 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
           }
 
           if (isPrivilegedPluginDependency(descriptor, dependencyPluginDescriptor)) {
-            ArtifactClassLoader pluginClassLoader = regionClassLoader.getArtifactPluginClassLoaders()
-                .stream().filter(
-                                 c -> c
-                                     .getArtifactDescriptor()
-                                     .getBundleDescriptor()
-                                     .getArtifactId()
-                                     .equals(dependencyPluginDescriptor
+            ArtifactClassLoader pluginClassLoader = pluginClassLoaderResolver
+                .resolve(regionClassLoader.getOwnerClassLoader(), dependencyPluginDescriptor)
+                .orElse(() -> regionClassLoader.getArtifactPluginClassLoaders()
+                    .stream().filter(
+                                     c -> c
+                                         .getArtifactDescriptor()
                                          .getBundleDescriptor()
-                                         .getArtifactId()))
-                .findAny()
-                .orElseThrow(() -> new ArtifactActivationException(createStaticMessage("Cannot find classloader for plugin: "
-                    + dependencyPluginDescriptor.getBundleDescriptor().getArtifactId())));
+                                         .getArtifactId()
+                                         .equals(dependencyPluginDescriptor
+                                             .getBundleDescriptor()
+                                             .getArtifactId()))
+                    .findAny()
+                    .orElseThrow(() -> new ArtifactActivationException(createStaticMessage("Cannot find classloader for plugin: "
+                        + dependencyPluginDescriptor.getBundleDescriptor().getArtifactId()))))
+                .get();
             LookupStrategy lookupStrategy = new DelegateOnlyLookupStrategy(pluginClassLoader.getClassLoader());
 
             for (String exportedPackage : dependencyPluginDescriptor.getClassLoaderModel().getPrivilegedExportedPackages()) {
