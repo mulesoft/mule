@@ -10,7 +10,6 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 /**

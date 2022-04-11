@@ -29,6 +29,7 @@ import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderResolver;
+import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.internal.PluginsDependenciesProcessor;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinder;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinderFactory;
@@ -47,7 +48,6 @@ import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
@@ -59,7 +59,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
@@ -313,7 +312,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
   @Override
   public MuleArtifactClassLoader createMulePluginClassLoader(MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
                                                              ArtifactPluginDescriptor descriptor,
-                                                             Function<BundleDescriptor, Optional<ArtifactPluginDescriptor>> pluginDescriptorResolver) {
+                                                             PluginDescriptorResolver pluginDescriptorResolver) {
     return createMulePluginClassLoader(ownerArtifactClassLoader, descriptor, pluginDescriptorResolver,
                                        (ownerClassLoader, artifactPluginDescriptor) -> empty());
 
@@ -322,7 +321,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
   @Override
   public MuleArtifactClassLoader createMulePluginClassLoader(MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
                                                              ArtifactPluginDescriptor descriptor,
-                                                             Function<BundleDescriptor, Optional<ArtifactPluginDescriptor>> pluginDescriptorResolver,
+                                                             PluginDescriptorResolver pluginDescriptorResolver,
                                                              PluginClassLoaderResolver pluginClassLoaderResolver) {
     RegionClassLoader regionClassLoader = (RegionClassLoader) ownerArtifactClassLoader.getParent();
     final String pluginArtifactId = getArtifactPluginId(regionClassLoader.getArtifactId(), descriptor.getName());
@@ -340,7 +339,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
   protected ClassLoaderLookupPolicy createPluginLookupPolicy(ArtifactPluginDescriptor descriptor,
                                                              RegionClassLoader regionClassLoader,
-                                                             Function<BundleDescriptor, Optional<ArtifactPluginDescriptor>> pluginDescriptorResolver,
+                                                             PluginDescriptorResolver pluginDescriptorResolver,
                                                              PluginClassLoaderResolver pluginClassLoaderResolver) {
     ClassLoaderLookupPolicy baseLookupPolicy = regionClassLoader.getClassLoaderLookupPolicy()
         .extend(regionClassLoader.filterForClassLoader(regionClassLoader.getOwnerClassLoader())
@@ -354,7 +353,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
         .filter(dependency -> dependency.getDescriptor().getClassifier()
             .map(MULE_PLUGIN_CLASSIFIER::equals)
             .orElse(false))
-        .map(pluginDescriptorResolver.compose(BundleDependency::getDescriptor))
+        .map(dependency -> pluginDescriptorResolver.resolve(dependency.getDescriptor()))
         .filter(Optional::isPresent)
         .map(Optional::get)
         .forEach(dependencyPluginDescriptor -> {

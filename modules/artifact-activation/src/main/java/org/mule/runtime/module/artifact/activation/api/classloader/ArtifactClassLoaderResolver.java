@@ -12,6 +12,7 @@ import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderResolver;
+import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -117,7 +118,7 @@ public interface ArtifactClassLoaderResolver {
    */
   MuleArtifactClassLoader createMulePluginClassLoader(MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
                                                       ArtifactPluginDescriptor descriptor,
-                                                      Function<BundleDescriptor, Optional<ArtifactPluginDescriptor>> pluginDescriptorResolver);
+                                                      PluginDescriptorResolver pluginDescriptorResolver);
 
   /**
    * Creates a classLoader for a plugin.
@@ -138,7 +139,7 @@ public interface ArtifactClassLoaderResolver {
    */
   MuleArtifactClassLoader createMulePluginClassLoader(MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
                                                       ArtifactPluginDescriptor descriptor,
-                                                      Function<BundleDescriptor, Optional<ArtifactPluginDescriptor>> pluginDescriptorResolver,
+                                                      PluginDescriptorResolver pluginDescriptorResolver,
                                                       PluginClassLoaderResolver pluginClassLoaderResolver);
 
 }

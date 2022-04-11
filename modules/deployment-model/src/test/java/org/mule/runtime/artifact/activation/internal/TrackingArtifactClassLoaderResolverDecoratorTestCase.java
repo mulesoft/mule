@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderResolver;
+import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.api.classloader.*;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -74,10 +75,10 @@ public class TrackingArtifactClassLoaderResolverDecoratorTestCase extends Abstra
                                                mock(PluginClassLoaderResolver.class));
     ArtifactClassLoader pluginClassLoader1 =
         decorator.createMulePluginClassLoader(mock(MuleDeployableArtifactClassLoader.class), mock(ArtifactPluginDescriptor.class),
-                                              mock(Function.class));
+                                              mock(PluginDescriptorResolver.class));
     ArtifactClassLoader pluginClassLoader2 =
         decorator.createMulePluginClassLoader(mock(MuleDeployableArtifactClassLoader.class), mock(ArtifactPluginDescriptor.class),
-                                              mock(Function.class), mock(PluginClassLoaderResolver.class));
+                                              mock(PluginDescriptorResolver.class), mock(PluginClassLoaderResolver.class));
 
     verify(artifactClassLoaderManager).register(domainClassLoader1);
     verify(artifactClassLoaderManager).register(domainClassLoader2);
@@ -99,10 +100,10 @@ public class TrackingArtifactClassLoaderResolverDecoratorTestCase extends Abstra
                                                mock(PluginClassLoaderResolver.class));
     ArtifactClassLoader pluginClassLoader1 =
         decorator.createMulePluginClassLoader(mock(MuleDeployableArtifactClassLoader.class), mock(ArtifactPluginDescriptor.class),
-                                              mock(Function.class));
+                                              mock(PluginDescriptorResolver.class));
     ArtifactClassLoader pluginClassLoader2 =
         decorator.createMulePluginClassLoader(mock(MuleDeployableArtifactClassLoader.class), mock(ArtifactPluginDescriptor.class),
-                                              mock(Function.class), mock(PluginClassLoaderResolver.class));
+                                              mock(PluginDescriptorResolver.class), mock(PluginClassLoaderResolver.class));
 
     domainClassLoader1.dispose();
     domainClassLoader2.dispose();
