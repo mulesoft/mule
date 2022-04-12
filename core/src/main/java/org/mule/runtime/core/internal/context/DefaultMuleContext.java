@@ -14,14 +14,12 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDL
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_BYTE_BUDDY_OBJECT_CREATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
@@ -129,7 +127,6 @@ import org.mule.runtime.core.internal.connector.DefaultSchedulerController;
 import org.mule.runtime.core.internal.connector.SchedulerController;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
-import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.LifecycleStrategy;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
@@ -924,17 +921,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       if (defaultErrorHandler == null) {
         throw new MuleRuntimeException(createStaticMessage(format("No global error handler named %s",
                                                                   config.getDefaultErrorHandlerName())));
-      }
-
-      if (rootContainerName.isPresent()) {
-        defaultErrorHandler = ((GlobalErrorHandler) defaultErrorHandler)
-            .createLocalErrorHandler(Location.builder().globalName(rootContainerName.get()).build());
-      } else {
-        try {
-          defaultErrorHandler = new ErrorHandlerFactory().createDefault(getRegistry().lookupObject(NotificationDispatcher.class));
-        } catch (RegistrationException e) {
-          throw new MuleRuntimeException(e);
-        }
       }
     } else {
       try {
