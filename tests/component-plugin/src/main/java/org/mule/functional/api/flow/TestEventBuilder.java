@@ -268,7 +268,7 @@ public class TestEventBuilder {
 
     EventContext eventContext;
     if (externalCompletionCallback != null) {
-      eventContext = create(flow, TEST_CONNECTOR_LOCATION, sourceCorrelationId, of(externalCompletionCallback));
+      eventContext = create(flow, flow.getLocation(), sourceCorrelationId, of(externalCompletionCallback));
     } else {
       eventContext = create(flow, flow.getLocation(), sourceCorrelationId);
     }

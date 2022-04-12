@@ -15,6 +15,8 @@ import org.reactivestreams.Publisher;
 
 public class GlobalErrorHandler extends ErrorHandler {
 
+  private boolean disposed;
+
   @Override
   public Publisher<CoreEvent> apply(Exception exception) {
     throw new IllegalStateException("GlobalErrorHandlers should be used only as template for local ErrorHandlers");
@@ -37,9 +39,13 @@ public class GlobalErrorHandler extends ErrorHandler {
 
   @Override
   public void dispose() {
+    if (disposed) {
+      return;
+    }
     try {
       super.stop();
       super.dispose();
+      disposed = true;
     } catch (MuleException e) {
       logger.error("Could not stop global error handler.", e);
     }
