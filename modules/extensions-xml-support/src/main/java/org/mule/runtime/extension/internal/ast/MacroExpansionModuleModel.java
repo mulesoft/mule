@@ -478,9 +478,10 @@ public class MacroExpansionModuleModel {
               .filter(componentModel -> componentModel.getModel(ConfigurationModel.class).isPresent()
                   && configParameter.equals(componentModel.getComponentId().orElse(null)))
               .findFirst()
-              .orElseGet(() -> { // Else look for the element in the parent ast (domain containing the config for the child app)
-                if (applicationModel.getParent().isPresent()) {
-                  return applicationModel.getParent().get()
+              .orElseGet(() -> { // Else look for the element in the parent ast (e.g. the domain of the app)
+                Optional<ArtifactAst> parent = applicationModel.getParent();
+                if (parent.isPresent()) {
+                  return parent.get()
                       .filteredComponents(equalsNamespace(extensionModel.getXmlDslModel().getPrefix()))
                       .filter(componentModel -> componentModel.getModel(ConfigurationModel.class).isPresent() &&
                           configParameter.equals(componentModel.getComponentId().orElse(null)))
