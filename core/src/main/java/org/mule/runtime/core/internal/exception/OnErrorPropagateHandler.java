@@ -17,7 +17,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
-import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -79,7 +78,8 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     return event -> {
       Exception exception = getException(event);
       event = super.beforeRouting().apply(event);
-      if (!isRedeliveryExhausted(exception) && isOwnedTransaction()) {
+      if (!isRedeliveryExhausted(exception)
+          && isOwnedTransaction(exception)) {
         profileTransactionAction(rollbackProducer, TX_ROLLBACK, getLocation());
         rollback(exception);
       } else {
