@@ -12,6 +12,7 @@ import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderResolver;
+import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -106,7 +107,7 @@ public interface ArtifactClassLoaderResolver {
    * The classLoader for a plugin is based on the classLoader of its owner artifact for some scenarios regarding exported
    * packages/resources. For that reason, a classLoader for a plugin in one application may be different from the same plugin in
    * another application.
-   * 
+   *
    * @param ownerArtifactClassLoader the classLoader for the artifact that has the plugin dependency for the target classLoader.
    * @param descriptor               the descriptor of the plugin to generate a classLoader for.
    * @param pluginDescriptorResolver a wrapper function around the logic to extract an {@link ArtifactPluginDescriptor} from the
@@ -117,6 +118,28 @@ public interface ArtifactClassLoaderResolver {
    */
   MuleArtifactClassLoader createMulePluginClassLoader(MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
                                                       ArtifactPluginDescriptor descriptor,
-                                                      Function<BundleDescriptor, Optional<ArtifactPluginDescriptor>> pluginDescriptorResolver);
+                                                      PluginDescriptorResolver pluginDescriptorResolver);
+
+  /**
+   * Creates a classLoader for a plugin.
+   * <p>
+   * The classLoader for a plugin is based on the classLoader of its owner artifact for some scenarios regarding exported
+   * packages/resources. For that reason, a classLoader for a plugin in one application may be different from the same plugin in
+   * another application.
+   * 
+   * @param ownerArtifactClassLoader  the classLoader for the artifact that has the plugin dependency for the target classLoader.
+   * @param descriptor                the descriptor of the plugin to generate a classLoader for.
+   * @param pluginDescriptorResolver  a wrapper function around the logic to extract an {@link ArtifactPluginDescriptor} from the
+   *                                  jar described by the {@link BundleDescriptor}. The function must return
+   *                                  {@link Optional#empty()} if the plugin represented by the {@link BundleDescriptor} is not a
+   *                                  dependency of the artifact for {@code ownerArtifactClassLoader}.
+   * @param pluginClassLoaderResolver allows the user to provide a class loader for the given dependency plugin, otherwise it will
+   *                                  be obtained from the owner artifact class loaders.
+   * @return a classloader for a plugin within a given application or domain.
+   */
+  MuleArtifactClassLoader createMulePluginClassLoader(MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
+                                                      ArtifactPluginDescriptor descriptor,
+                                                      PluginDescriptorResolver pluginDescriptorResolver,
+                                                      PluginClassLoaderResolver pluginClassLoaderResolver);
 
 }
