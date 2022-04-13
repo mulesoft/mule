@@ -140,10 +140,12 @@ public class ResolverSetUtils {
     return getParameterValueResolver(parameterType, value, reflectionCache, muleContext);
   }
 
+  // TODO W-10992158: Already existing value resolving processing must be reviewed to avoid code duplication.
   private static ValueResolver getParameterValueResolver(Type parameterType, Object value, ReflectionCache reflectionCache,
                                                          MuleContext muleContext)
       throws MuleException {
     ValueResolver valueResolver;
+    // TODO W-10992158: Value resolution must take into account stackable types, utilizing the StackableTypesValueResolverFactory
     Class expectedType = parameterType.getDeclaringClass().orElse(null);
 
     if (expectedType == null) {
@@ -155,10 +157,10 @@ public class ResolverSetUtils {
     } else if (value instanceof Map && Map.class.isAssignableFrom(expectedType)) {
       valueResolver = getParameterValueResolverForMap(parameterType, (Map) value, reflectionCache, muleContext);
     } else {
+      // TODO W-10992158: Resolution must take into account the way date type are converted from DSL in
+      // org.mule.runtime.module.extension.internal.config.dsl.resolver.ValueResolverFactoryTypeVisitor.doParseDate
       valueResolver = new ExpressionLanguageTransformationValueResolver(new StaticValueResolver(value), expectedType,
                                                                         muleContext.getExpressionManager());
-      muleContext.getInjector().inject(valueResolver);
-      initialiseIfNeeded(valueResolver);
     }
 
     valueResolver = new TypeSafeValueResolverWrapper(valueResolver, expectedType);

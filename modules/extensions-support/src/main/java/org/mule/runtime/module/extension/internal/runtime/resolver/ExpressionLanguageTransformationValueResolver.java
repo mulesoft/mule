@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.runtime.api.metadata.DataType.fromObject;
+import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 
 import org.mule.runtime.api.el.BindingContext;
@@ -13,9 +15,6 @@ import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.MuleContext;
-
-import javax.inject.Inject;
 
 /**
  * Value resolver that relies on a expression language transformation to convert the delegate resolver into the expected type.
@@ -41,13 +40,20 @@ public class ExpressionLanguageTransformationValueResolver implements ValueResol
   @Override
   public Object resolve(ValueResolvingContext context) throws MuleException {
     Object resolvedValue = valueResolverDelegate.resolve(context);
+    DataType dataType;
+    if (resolvedValue instanceof TypedValue) {
+      dataType = ((TypedValue<?>) resolvedValue).getDataType();
+      resolvedValue = ((TypedValue<?>) resolvedValue).getValue();
+    } else {
+      dataType = fromObject(resolvedValue);
+    }
     if (isInstance(expectedType, resolvedValue)) {
       return resolvedValue;
     } else {
       return expressionLanguage
-          .evaluate(PAYLOAD_EXPRESSION, DataType.fromType(expectedType),
+          .evaluate(PAYLOAD_EXPRESSION, fromType(expectedType),
                     BindingContext.builder()
-                        .addBinding(PAYLOAD_IDENTIFIER, new TypedValue(resolvedValue, DataType.fromObject(resolvedValue)))
+                        .addBinding(PAYLOAD_IDENTIFIER, new TypedValue(resolvedValue, dataType))
                         .build())
           .getValue();
     }
