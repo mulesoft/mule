@@ -14,10 +14,9 @@ import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
-
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.getAllStackTraces;
-
+import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -36,23 +35,25 @@ import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
 import java.io.File;
 import java.lang.ref.Reference;
 import java.lang.reflect.Field;
 import java.net.URL;
-import java.util.Iterator;
-import java.util.List;
+import java.util.Hashtable;
 import java.util.Map;
+import java.util.Properties;
+import java.util.List;
+import java.util.Iterator;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.stream.Stream;
-
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -73,6 +74,7 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
   private final static String THREADLOCAL_MAP_TABLE_CLASS = "java.lang.ThreadLocal$ThreadLocalMap";
   private final static String DRIVER_GROUP_ID = "com.ibm.mq";
   private final static String DRIVER_ARTIFACT_ID = "com.ibm.mq.allclient";
+  private final static String IBM_MQ_MBEAN_DOMAIN = "IBM MQ";
 
   String driverVersion;
   private final ClassLoaderLookupPolicy testLookupPolicy;
@@ -120,6 +122,8 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
   @Parameterized.Parameters(name = "Testing Driver {0}")
   public static String[] data() throws NoSuchFieldException, IllegalAccessException {
     return new String[] {
+        "9.2.5.0",
+        "9.2.4.0",
         "9.2.3.0",
         "9.2.2.0",
         "9.1.1.0"
@@ -129,6 +133,9 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setup() throws Exception {
+    Properties props = System.getProperties();
+    props.remove("avoid.ibm.mq.cleanup");
+    props.remove("avoid.ibm.mq.cleanup.mbeans");
 
     URL settingsUrl = getClass().getClassLoader().getResource("custom-settings.xml");
     final MavenClientProvider mavenClientProvider = discoverProvider(this.getClass().getClassLoader());
@@ -147,7 +154,7 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
 
     BundleDependency dependency = mavenClient.resolveBundleDescriptor(bundleDescriptor);
 
-    artifactClassLoader = new MuleArtifactClassLoader("test", mock(ArtifactDescriptor.class),
+    artifactClassLoader = new MuleArtifactClassLoader("IBMMQResourceReleaserTestCase", mock(ArtifactDescriptor.class),
                                                       new URL[] {dependency.getBundleUri().toURL()},
                                                       currentThread().getContextClassLoader(), testLookupPolicy);
 
@@ -200,6 +207,20 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
   @Description("When removing an application which contains the IBM MQ Driver, there should not be threadLocal references left")
   public void threadLocalsTest() throws Exception {
     assertThat(countThreadLocals(artifactClassLoader), is(0));
+  }
+
+  @Test
+  @Description("When removing an application which contains the IBM MQ Driver, there should not be mbeans references registered")
+  public void mBeansTest() throws Exception {
+    assertThat(countMBeans(artifactClassLoader), is(0));
+  }
+
+  private int countMBeans(MuleArtifactClassLoader artifactClassLoader) throws MalformedObjectNameException {
+    MBeanServer mBeanServer = getPlatformMBeanServer();
+    final Hashtable<String, String> keys = new Hashtable<>();
+    keys.put("type", "CommonServices");
+    keys.put("name", "*");
+    return mBeanServer.queryMBeans(new ObjectName(IBM_MQ_MBEAN_DOMAIN, keys), null).size();
   }
 
   private int countThreadLocals(ClassLoader artifactClassLoader) throws Exception {
