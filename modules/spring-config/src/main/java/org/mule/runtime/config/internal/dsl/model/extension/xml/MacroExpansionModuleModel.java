@@ -487,19 +487,19 @@ public class MacroExpansionModuleModel {
     // look for the global element which "name" attribute maps to "configParameter" value
     // or a nested element to a config that was added by the macroexpansion of another module before
     return applicationModel
-            .filteredComponents(equalsNamespace(extensionModel.getXmlDslModel().getPrefix()))
-            .filter(componentModel -> componentModel.getModel(ConfigurationModel.class).isPresent()
-                    && configParameter.equals(componentModel.getComponentId().orElse(null)))
-            .findFirst()
-            .orElseGet(() -> { // Else look for the element in the parent ast (e.g. the domain of the app)
-              Optional<ArtifactAst> parent = applicationModel.getParent();
-              if (parent.isPresent()) {
-                return getComponentAst(parent.get(), configParameter);
-              } else {
-                throw new IllegalArgumentException(format("There's no <%s:config> named [%s] in the current mule app nor in its domain",
-                        extensionModel.getXmlDslModel().getPrefix(), configParameter));
-              }
-            });
+        .filteredComponents(equalsNamespace(extensionModel.getXmlDslModel().getPrefix()))
+        .filter(componentModel -> componentModel.getModel(ConfigurationModel.class).isPresent()
+            && configParameter.equals(componentModel.getComponentId().orElse(null)))
+        .findFirst()
+        .orElseGet(() -> { // Else look for the element in the parent ast (e.g. the domain of the app)
+          Optional<ArtifactAst> parent = applicationModel.getParent();
+          if (parent.isPresent()) {
+            return getComponentAst(parent.get(), configParameter);
+          } else {
+            throw new IllegalArgumentException(format("There's no <%s:config> named [%s] in the current mule app nor in its domain",
+                                                      extensionModel.getXmlDslModel().getPrefix(), configParameter));
+          }
+        });
   }
 
   /**
