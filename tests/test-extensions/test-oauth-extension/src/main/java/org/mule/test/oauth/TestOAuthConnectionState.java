@@ -16,6 +16,9 @@ import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
 import org.mule.sdk.api.annotation.semantics.security.TenantIdentifier;
 
+import java.util.List;
+import java.util.Map;
+
 public class TestOAuthConnectionState {
 
   @RefName
@@ -65,6 +68,18 @@ public class TestOAuthConnectionState {
   @Parameter
   @Optional
   private ConnectionType oauthConnectionType;
+
+  @Parameter
+  @Optional
+  private List<ConnectionProperties> someOauthConnectionProperties;
+
+  @Parameter
+  @Optional
+  private List<Integer> someConnectionNumbers;
+
+  @Parameter
+  @Optional
+  private Map<String, ConnectionProperties> someMapOfConnectionProperties;
 
   @Parameter
   @Optional
@@ -124,4 +139,15 @@ public class TestOAuthConnectionState {
     return securityLevel;
   }
 
+  public List<ConnectionProperties> getSomeOauthConnectionProperties() {
+    return someOauthConnectionProperties;
+  }
+
+  public List<Integer> getSomeConnectionNumbers() {
+    return someConnectionNumbers;
+  }
+
+  public Map<String, ConnectionProperties> getSomeMapOfConnectionProperties() {
+    return someMapOfConnectionProperties;
+  }
 }
