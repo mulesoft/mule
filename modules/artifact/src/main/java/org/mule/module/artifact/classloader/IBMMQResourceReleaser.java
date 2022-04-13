@@ -6,15 +6,16 @@
  */
 package org.mule.module.artifact.classloader;
 
-import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.mule.runtime.core.api.util.ClassUtils.getField;
+import static org.mule.runtime.core.api.util.ClassUtils.getStaticFieldValue;
+import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
+import static org.mule.runtime.core.api.util.ClassUtils.setStaticFieldValue;
+import static java.beans.Introspector.flushCaches;
+import static java.lang.Boolean.getBoolean;
+import static java.lang.Thread.getAllStackTraces;
+import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 
-import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectInstance;
-import javax.management.ObjectName;
+import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 import java.lang.ref.Reference;
 import java.lang.reflect.Field;
 import java.util.HashSet;
@@ -24,15 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-
-import static java.beans.Introspector.flushCaches;
-import static java.lang.Boolean.getBoolean;
-import static java.lang.Thread.getAllStackTraces;
-import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
-import static org.mule.runtime.core.api.util.ClassUtils.getField;
-import static org.mule.runtime.core.api.util.ClassUtils.getStaticFieldValue;
-import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
-import static org.mule.runtime.core.api.util.ClassUtils.setStaticFieldValue;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectInstance;
+import javax.management.ObjectName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A Utility class for releasing all the known references that may lead to a ClassLoader leak.
@@ -42,8 +41,11 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
   private static final Logger LOGGER = LoggerFactory.getLogger(IBMMQResourceReleaser.class);
 
   private static final String AVOID_IBM_MQ_CLEANUP_PROPERTY_NAME = "avoid.ibm.mq.cleanup";
-  private static final boolean IBM_MQ_RESOURCE_RELEASER_AVOID_CLEANUP =
-      getBoolean(AVOID_IBM_MQ_CLEANUP_PROPERTY_NAME);
+  private static final String AVOID_IBM_MQ_CLEANUP_MBEANS_PROPERTY_NAME = "avoid.ibm.mq.cleanup.mbeans";
+
+  private final boolean IBM_MQ_RESOURCE_RELEASER_AVOID_CLEANUP = getBoolean(AVOID_IBM_MQ_CLEANUP_PROPERTY_NAME);
+  private final boolean IBM_MQ_RESOURCE_RELEASER_AVOID_CLEANUP_MBEANS =
+      getBoolean(AVOID_IBM_MQ_CLEANUP_MBEANS_PROPERTY_NAME);
 
   private final static String THREADLOCALS_FIELD = "threadLocals";
   private final static String INHERITABLE_THREADLOCALS_FIELD = "inheritableThreadLocals";
@@ -63,34 +65,30 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
       LOGGER.debug("Avoiding IBM MQ resources cleanup.");
       return;
     }
-
     LOGGER.debug("Releasing IBM MQ resources");
 
-    removeMBeans();
+    if (!IBM_MQ_RESOURCE_RELEASER_AVOID_CLEANUP_MBEANS) {
+      LOGGER.debug("Releasing IBM MQ resources - Removal of registered mBeans is called.");
+      removeMBeans();
+    }
+
+    LOGGER.debug("Releasing IBM MQ resources - Removal of JUL Custom Logging Levels.");
     cleanJULKnownLevels();
 
-    /*
-     * Removes references held by MQCommonServices.
-     */
+    LOGGER.debug("Releasing IBM MQ resources - Removes references held by MQCommonServices Class.");
     cleanPrivateStaticFieldForClass(IBM_MQ_COMMON_SERVICES_CLASS, "jmqiEnv");
 
-    /*
-     * Removes the static references held by the MQEnvironment Class
-     */
+    LOGGER.debug("Releasing IBM MQ resources - Removes the static references held by the MQEnvironment Class.");
     cleanPrivateStaticFieldForClass(IBM_MQ_ENVIRONMENT_CLASS, "defaultMQCxManager");
 
-    /*
-     * The JmsTls class keep several references in a private static final field This references avoid the proper ClassLoader
-     * disposal. This method performs the JmsTls Class cleanup.
-     */
+    LOGGER.debug("Releasing IBM MQ resources - Removes the static references held by the JmsTls Class.");
     cleanPrivateStaticFieldForClass(IBM_MQ_JMS_TLS_CLASS, "myInstance");
 
-    /*
-     * The TraceController classes keep several references in private static final field This references avoid the proper
-     * ClassLoader disposal. This method performs the TraceController cleanup.
-     */
+    LOGGER.debug("Releasing IBM MQ resources - Removes the static references held by the TraceController Class.");
     cleanPrivateStaticFieldForClass(IBM_MQ_TRACE_CLASS, "traceController");
 
+    LOGGER
+        .debug("Releasing IBM MQ resources - Removes the thread local references to instances of classes loaded by the driver classloader.");
     removeThreadLocals();
 
   }
@@ -124,32 +122,21 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
     }
 
     // Object Name::type=CommonServices,name=TraceControl
+    // IBM WebSphere MQ:type=CommonServices,name=PropertyStoreControl
     final Hashtable<String, String> keys = new Hashtable<>();
     keys.put("type", "CommonServices");
-    keys.put("name", "TraceControl");
+    keys.put("name", "*");
     try {
-      if (driverClassLoader == mBeanServer.getClassLoaderFor(new ObjectName(IBM_MQ_MBEAN_DOMAIN, keys))) {
-        mBeanServer.unregisterMBean(new ObjectName(IBM_MQ_MBEAN_DOMAIN, keys));
-        LOGGER.debug("Unregistered IBM MQ TraceControl MBean");
+      for (ObjectInstance object : mBeanServer.queryMBeans(new ObjectName(IBM_MQ_MBEAN_DOMAIN, keys), null)) {
+        mBeanServer.unregisterMBean(object.getObjectName());
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Unregistered {}", object.getObjectName());
+        }
       }
     } catch (javax.management.InstanceNotFoundException ex) {
       LOGGER.debug("No instance of CommonServices/TraceControl MBean was found.");
     } catch (MalformedObjectNameException | MBeanRegistrationException e) {
       LOGGER.warn("Caught exception unregistering the IBM MQ TraceControl MBean: {}", e.getMessage(), e);
-    }
-
-    // IBM WebSphere MQ:type=CommonServices,name=PropertyStoreControl
-    keys.put("type", "CommonServices");
-    keys.put("name", "PropertyStoreControl");
-    try {
-      if (driverClassLoader == mBeanServer.getClassLoaderFor(new ObjectName(IBM_MQ_MBEAN_DOMAIN, keys))) {
-        mBeanServer.unregisterMBean(new ObjectName(IBM_MQ_MBEAN_DOMAIN, keys));
-      }
-      LOGGER.debug("Unregistered IBM MQ PropertyStoreControl MBean");
-    } catch (javax.management.InstanceNotFoundException ex) {
-      LOGGER.debug("No instance of CommonServices/TraceControl MBean was found.");
-    } catch (MalformedObjectNameException | MBeanRegistrationException e) {
-      LOGGER.warn("Caught exception removing known IBM MQ Mbeans: {}", e.getMessage(), e);
     }
     flushCaches();
   }
@@ -191,15 +178,15 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
       try {
         nameToLevels = getStaticFieldValue(knownLevelClass, "nameToLevels", false);
       } catch (NoSuchFieldException | IllegalAccessException ex) {
-        LOGGER.debug("Caught exception when accessing the nameToLevels field for {} class: {}", knownLevelClass, ex.getMessage(),
-                     ex);
+        LOGGER.warn("Caught exception when accessing the nameToLevels field for {} class: {}", knownLevelClass, ex.getMessage(),
+                    ex);
       }
 
       try {
         intToLevels = getStaticFieldValue(knownLevelClass, "intToLevels", false);
       } catch (NoSuchFieldException | IllegalAccessException ex) {
-        LOGGER.debug("Caught exception when accessing the intToLevels field for {} class: {}", knownLevelClass, ex.getMessage(),
-                     ex);
+        LOGGER.warn("Caught exception when accessing the intToLevels field for {} class: {}", knownLevelClass, ex.getMessage(),
+                    ex);
       }
 
       if (nameToLevels != null) {
@@ -314,7 +301,9 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
     }
 
     for (Thread thread : getAllStackTraces().keySet()) {
-      LOGGER.debug("Processing Thread: {} / {}", thread.getThreadGroup().getName(), thread.getName());
+      if (LOGGER.isDebugEnabled() && thread.getThreadGroup() != null) {
+        LOGGER.debug("Processing Thread: {} / {}", thread.getThreadGroup().getName(), thread.getName());
+      }
 
       if (threadLocalsField != null) {
         try {
@@ -365,13 +354,14 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
 
           Object x = threadLocal.get();
           if (x != null) {
-
-            LOGGER.debug("ThreadLocal ClassLoader: {}", x.getClass().getClassLoader());
-            LOGGER.debug("ThreadLocal Class: {}", x.getClass().getCanonicalName());
-
+            if (LOGGER.isDebugEnabled()) {
+              LOGGER.debug("ThreadLocal ClassLoader: {}", x.getClass().getClassLoader());
+              LOGGER.debug("ThreadLocal Class: {}", x.getClass().getCanonicalName());
+            }
             if (driverClassLoader == x.getClass().getClassLoader()) {
-
-              LOGGER.debug("Removing instance of {}", x.getClass().getCanonicalName());
+              if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Removing instance of {}", x.getClass().getCanonicalName());
+              }
               threadLocal.remove();
               threadLocal.set(null);
               reference.clear();
