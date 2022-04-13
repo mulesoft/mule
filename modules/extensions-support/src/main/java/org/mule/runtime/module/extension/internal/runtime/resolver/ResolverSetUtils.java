@@ -31,14 +31,14 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Utils class to create {@link ParametersResolver}.
+ * Utils class to create {@link ResolverSet}s.
  *
  * @since 4.5
  */
-public class ParameterResolverUtils {
+public class ResolverSetUtils {
 
   /**
-   * Creates a {@link ParametersResolver} of a {@link ParameterizedModel} based on static values of its parameters.
+   * Creates a {@link ResolverSet} of a {@link ParameterizedModel} based on static values of its parameters.
    *
    * @param parameters         static parameter values.
    * @param parameterizedModel the parameterized group.
@@ -47,16 +47,16 @@ public class ParameterResolverUtils {
    * @param reflectionCache    a reflection cache.
    * @param expressionManager  the expression manager.
    * @param parametersOwner    the owner of the parameters from the parameters resolver.
-   * @return the corresponding {@link ParametersResolver}
+   * @return the corresponding {@link ResolverSet}
    * @throws MuleException
    */
-  public static ParametersResolver getParameterResolverForParameterizedModelFromStaticValues(Map<String, Object> parameters,
-                                                                                             ParameterizedModel parameterizedModel,
-                                                                                             MuleContext muleContext,
-                                                                                             boolean disableValidations,
-                                                                                             ReflectionCache reflectionCache,
-                                                                                             ExpressionManager expressionManager,
-                                                                                             String parametersOwner)
+  public static ResolverSet getResolverSetFromStaticValues(ParameterizedModel parameterizedModel,
+                                                           Map<String, Object> parameters,
+                                                           MuleContext muleContext,
+                                                           boolean disableValidations,
+                                                           ReflectionCache reflectionCache,
+                                                           ExpressionManager expressionManager,
+                                                           String parametersOwner)
       throws MuleException {
     Map<String, ValueResolver> resolvers = new HashMap<>();
 
@@ -69,7 +69,7 @@ public class ParameterResolverUtils {
                       disableValidations,
                       reflectionCache,
                       expressionManager,
-                      parametersOwner);
+                      parametersOwner).getParametersAsResolverSet(parameterizedModel, muleContext);
   }
 
   private static Map<String, ValueResolver> getParameterGroupValueResolvers(ParameterGroupModel parameterGroupModel,
@@ -155,7 +155,8 @@ public class ParameterResolverUtils {
     } else if (value instanceof Map && Map.class.isAssignableFrom(expectedType)) {
       valueResolver = getParameterValueResolverForMap(parameterType, (Map) value, reflectionCache, muleContext);
     } else {
-      valueResolver = new ExpressionLanguageTransformationValueResolver(new StaticValueResolver(value), expectedType);
+      valueResolver = new ExpressionLanguageTransformationValueResolver(new StaticValueResolver(value), expectedType,
+                                                                        muleContext.getExpressionManager());
       muleContext.getInjector().inject(valueResolver);
       initialiseIfNeeded(valueResolver);
     }

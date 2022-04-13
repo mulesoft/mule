@@ -27,19 +27,15 @@ public class ExpressionLanguageTransformationValueResolver implements ValueResol
   private static final String PAYLOAD_IDENTIFIER = "payload";
   private static final String PAYLOAD_EXPRESSION = "#[" + PAYLOAD_IDENTIFIER + "]";
 
-  private Class expectedType;
-  private ValueResolver valueResolverDelegate;
+  private final Class expectedType;
+  private final ValueResolver valueResolverDelegate;
+  private final ExpressionLanguage expressionLanguage;
 
-  @Inject
-  private ExpressionLanguage expressionLanguage;
-
-  @Inject
-  private MuleContext muleContext;
-
-  public ExpressionLanguageTransformationValueResolver(ValueResolver valueResolverDelegate, Class expectedType) {
-    this.expectedType = expectedType;
-    this.expectedType = this.expectedType == null ? Object.class : this.expectedType;
+  public ExpressionLanguageTransformationValueResolver(ValueResolver valueResolverDelegate, Class expectedType,
+                                                       ExpressionLanguage expressionLanguage) {
+    this.expectedType = expectedType == null ? Object.class : expectedType;
     this.valueResolverDelegate = valueResolverDelegate;
+    this.expressionLanguage = expressionLanguage;
   }
 
   @Override

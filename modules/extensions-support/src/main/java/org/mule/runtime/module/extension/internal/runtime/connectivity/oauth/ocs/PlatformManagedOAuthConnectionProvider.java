@@ -22,7 +22,7 @@ import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getCallbackValuesExtractors;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.updateOAuthParameters;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.validateOAuthConnection;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverUtils.getParameterResolverForParameterizedModelFromStaticValues;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromStaticValues;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -62,7 +62,6 @@ import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProvi
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConnectionProviderWrapper;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
@@ -196,14 +195,12 @@ public class PlatformManagedOAuthConnectionProvider<C>
   }
 
   private ConnectionProvider<C> createDelegate(PlatformManagedConnectionDescriptor descriptor) throws MuleException {
-    ParametersResolver resolver = getParameterResolverFromParameterValues(descriptor.getParameters());
     Class<?> connectionProviderDelegateClass =
         getImplementingType(oauthConfig.getDelegateConnectionProviderModel())
             .orElseThrow(() -> new IllegalStateException("Delegate connection provider must have an implementing type."));
 
     return (ConnectionProvider<C>) withContextClassLoader(getClassLoader(oauthConfig.getExtensionModel()), () -> {
-      ResolverSet delegateResolverSet =
-          resolver.getParametersAsResolverSet(oauthConfig.getDelegateConnectionProviderModel(), muleContext);
+      ResolverSet delegateResolverSet = getResolverSetFromParameterValues(descriptor.getParameters());
       ConnectionProviderObjectBuilder builder =
           new DefaultConnectionProviderObjectBuilder<>(connectionProviderDelegateClass,
                                                        oauthConfig.getDelegateConnectionProviderModel(),
@@ -231,20 +228,20 @@ public class PlatformManagedOAuthConnectionProvider<C>
     }, MuleException.class, e -> e);
   }
 
-  private ParametersResolver getParameterResolverFromParameterValues(Map<String, Object> parameters) throws MuleException {
-    return getParameterResolverForParameterizedModel(parameters, oauthConfig.getDelegateConnectionProviderModel());
+  private ResolverSet getResolverSetFromParameterValues(Map<String, Object> parameters) throws MuleException {
+    return getResolverSetForParameterizedModel(oauthConfig.getDelegateConnectionProviderModel(), parameters);
   }
 
-  private ParametersResolver getParameterResolverForParameterizedModel(Map<String, Object> parameters,
-                                                                       ParameterizedModel parameterizedModel)
+  private ResolverSet getResolverSetForParameterizedModel(ParameterizedModel parameterizedModel,
+                                                          Map<String, Object> parameters)
       throws MuleException {
-    return getParameterResolverForParameterizedModelFromStaticValues(parameters,
-                                                                     parameterizedModel,
-                                                                     muleContext,
-                                                                     false,
-                                                                     new ReflectionCache(),
-                                                                     expressionManager,
-                                                                     this.toString());
+    return getResolverSetFromStaticValues(parameterizedModel,
+                                          parameters,
+                                          muleContext,
+                                          false,
+                                          new ReflectionCache(),
+                                          expressionManager,
+                                          this.toString());
   }
 
   private PlatformManagedConnectionDescriptor fetchConnectionDescriptor() throws MuleException {
