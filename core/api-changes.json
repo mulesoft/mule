@@ -3,6 +3,23 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.core.privileged.exception.OnRuntimeProcessingStrategy",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "OnRuntimeProcessingStrategy",
+          "elementKind": "class",
+          "justification": "Improvement in global error handlers"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::setFromGlobalErrorHandler(boolean)",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "setFromGlobalErrorHandler",
+          "elementKind": "method",
+          "justification": "Improvement in global error handlers"
+        },
+        {
           "code": "java.method.added",
           "new": "method boolean org.mule.runtime.core.api.util.SystemUtils::isAdoptiumTemurinJDK()",
           "package": "org.mule.runtime.core.api.util",
