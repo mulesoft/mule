@@ -5,47 +5,42 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.deployment.model.internal.artifact.extension;
-
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.lookupExtensionModelLoaders;
-
-import static java.lang.String.format;
-import static java.lang.System.lineSeparator;
-import static java.util.Objects.requireNonNull;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-
-import static com.google.common.collect.Maps.newHashMap;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.slf4j.LoggerFactory.getLogger;
+package org.mule.runtime.module.artifact.activation.internal.extension;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.activation.api.extension.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.api.plugin.LoaderDescriber;
+import org.slf4j.Logger;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.slf4j.Logger;
+import static com.google.common.collect.Maps.newHashMap;
+import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.lookupExtensionModelLoaders;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * Implementation of {@link MuleExtensionModelLoaderManager} that uses SPI to look for the {@link ExtensionModelLoader} available
+ * Implementation of {@link ExtensionModelLoaderRepository} that uses SPI to look for the {@link ExtensionModelLoader} available
  * from the container.
  *
- * @since 4.0
- * @deprecated Since 4.5, use {@link #MuleExtensionModelLoaderManager(ArtifactClassLoader)} instead.
+ * @since 4.5
  */
-@Deprecated
-public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderManager {
+public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderRepository, Startable, Stoppable {
 
   private static final Logger LOGGER = getLogger(MuleExtensionModelLoaderManager.class);
 
@@ -58,13 +53,13 @@ public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderMana
    *
    * @param containerClassLoader {@link ClassLoader} from the container.
    */
-  public MuleExtensionModelLoaderManager(ArtifactClassLoader containerClassLoader) {
+  public MuleExtensionModelLoaderManager(ClassLoader containerClassLoader) {
     requireNonNull(containerClassLoader, "containerClassLoader cannot be null");
     this.extModelLoadersLookup = () -> lookupLoadersFromSpi(containerClassLoader);
   }
 
-  private Collection<ExtensionModelLoader> lookupLoadersFromSpi(ArtifactClassLoader containerClassLoader) {
-    Collection<ExtensionModelLoader> loaders = lookupExtensionModelLoaders(containerClassLoader.getClassLoader())
+  private Collection<ExtensionModelLoader> lookupLoadersFromSpi(ClassLoader containerClassLoader) {
+    Collection<ExtensionModelLoader> loaders = lookupExtensionModelLoaders(containerClassLoader)
         .collect(toList());
 
     if (LOGGER.isDebugEnabled()) {

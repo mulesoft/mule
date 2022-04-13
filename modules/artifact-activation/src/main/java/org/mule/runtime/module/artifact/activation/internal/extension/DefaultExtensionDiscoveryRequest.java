@@ -4,33 +4,26 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.deployment.model.internal.artifact.extension;
+package org.mule.runtime.module.artifact.activation.internal.extension;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionDiscoveryRequest;
-import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.activation.api.extension.ExtensionDiscoveryRequest;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
 import java.util.List;
 import java.util.Set;
 
-@Deprecated
 public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryRequest {
 
-  private final ExtensionModelLoaderRepository loaderRepository;
-  private final List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> artifactPlugins;
+  private final List<ArtifactPluginDescriptor> artifactPlugins;
   private final Set<ExtensionModel> parentArtifactExtensions;
   private final boolean parallelDiscovery;
   private final boolean enrichDescriptions;
 
-  public DefaultExtensionDiscoveryRequest(ExtensionModelLoaderRepository loaderRepository,
-                                          List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> artifactPlugins,
+  public DefaultExtensionDiscoveryRequest(List<ArtifactPluginDescriptor> artifactPlugins,
                                           Set<ExtensionModel> parentArtifactExtensions,
                                           boolean parallelDiscovery,
                                           boolean enrichDescriptions) {
-    this.loaderRepository = loaderRepository;
     this.artifactPlugins = artifactPlugins;
     this.parentArtifactExtensions = parentArtifactExtensions;
     this.parallelDiscovery = parallelDiscovery;
@@ -38,12 +31,7 @@ public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryReque
   }
 
   @Override
-  public ExtensionModelLoaderRepository getLoaderRepository() {
-    return loaderRepository;
-  }
-
-  @Override
-  public List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> getArtifactPlugins() {
+  public List<ArtifactPluginDescriptor> getArtifactPlugins() {
     return artifactPlugins;
   }
 

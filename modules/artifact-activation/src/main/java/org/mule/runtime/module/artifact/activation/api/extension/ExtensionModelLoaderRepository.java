@@ -5,31 +5,24 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.deployment.model.api.artifact.extension;
+package org.mule.runtime.module.artifact.activation.api.extension;
 
-import org.mule.runtime.deployment.model.internal.artifact.extension.MuleExtensionModelLoaderManager;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.plugin.LoaderDescriber;
 
-import java.util.Collection;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 /**
  * Provides access to the {@link ExtensionModelLoader} available in the container.
  *
  * @since 4.0, moved to api in 4.5
- * @deprecated Use {@link org.mule.runtime.module.artifact.activation.api.extension.ExtensionModelLoaderRepository} instead.
  */
-@Deprecated
 @FunctionalInterface
-public interface ExtensionModelLoaderRepository
-    extends org.mule.runtime.module.artifact.activation.api.extension.ExtensionModelLoaderRepository {
+public interface ExtensionModelLoaderRepository {
 
   /**
    * Retrieves the {@link ExtensionModelLoader} for the given {@link LoaderDescriber}.
-   * 
+   *
    * @param loaderDescriber {@link LoaderDescriber} describes the loader needed.
    * @return {@link ExtensionModelLoader} for the given {@link LoaderDescriber} or {@link Optional#empty()}.
    */
