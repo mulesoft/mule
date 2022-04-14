@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.api.metadata.DataType.fromType;
+import static org.mule.runtime.api.metadata.TypedValue.of;
+import static org.mule.runtime.api.metadata.TypedValue.unwrap;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 
 import org.mule.runtime.api.el.BindingContext;
@@ -40,20 +42,13 @@ public class ExpressionLanguageTransformationValueResolver implements ValueResol
   @Override
   public Object resolve(ValueResolvingContext context) throws MuleException {
     Object resolvedValue = valueResolverDelegate.resolve(context);
-    DataType dataType;
-    if (resolvedValue instanceof TypedValue) {
-      dataType = ((TypedValue<?>) resolvedValue).getDataType();
-      resolvedValue = ((TypedValue<?>) resolvedValue).getValue();
-    } else {
-      dataType = fromObject(resolvedValue);
-    }
-    if (isInstance(expectedType, resolvedValue)) {
+    if (isInstance(expectedType, unwrap(resolvedValue))) {
       return resolvedValue;
     } else {
       return expressionLanguage
           .evaluate(PAYLOAD_EXPRESSION, fromType(expectedType),
                     BindingContext.builder()
-                        .addBinding(PAYLOAD_IDENTIFIER, new TypedValue(resolvedValue, dataType))
+                        .addBinding(PAYLOAD_IDENTIFIER, of(resolvedValue))
                         .build())
           .getValue();
     }

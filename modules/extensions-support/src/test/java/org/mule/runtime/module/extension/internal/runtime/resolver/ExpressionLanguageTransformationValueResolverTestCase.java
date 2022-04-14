@@ -68,10 +68,11 @@ public class ExpressionLanguageTransformationValueResolverTestCase extends Abstr
 
   @Test
   public void noTransformationNeededForTypedValueValue() throws Exception {
+    TypedValue<String> typedValue = new TypedValue(STRING_VALUE, DataType.STRING);
     ExpressionLanguageTransformationValueResolver valueResolver =
-        new ExpressionLanguageTransformationValueResolver(new StaticValueResolver(new TypedValue(STRING_VALUE, DataType.STRING)),
+        new ExpressionLanguageTransformationValueResolver(new StaticValueResolver(typedValue),
                                                           String.class, expressionManager);
-    assertThat(valueResolver.resolve(NULL_VALUE_RESOLVING_CONTEXT), equalTo(STRING_VALUE));
+    assertThat(valueResolver.resolve(NULL_VALUE_RESOLVING_CONTEXT), equalTo(typedValue));
   }
 
   @Test
