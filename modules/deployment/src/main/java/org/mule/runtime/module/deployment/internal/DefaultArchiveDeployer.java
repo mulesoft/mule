@@ -10,6 +10,7 @@ import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
@@ -202,6 +203,12 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   private T deployExplodedApp(String addedApp, Optional<Properties> deploymentProperties) throws DeploymentException {
+    return deployExplodedApp(addedApp, deploymentProperties, empty());
+  }
+
+  private T deployExplodedApp(String addedApp, Optional<Properties> deploymentProperties,
+                              Optional<Properties> artifactStatusProperties)
+      throws DeploymentException {
     if (logger.isDebugEnabled()) {
       logger.debug("================== New Exploded Artifact: " + addedApp);
     }
@@ -236,7 +243,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       }
     }
 
-    deployArtifact(artifact, deploymentProperties);
+    deployArtifact(artifact, deploymentProperties, artifactStatusProperties);
     return artifact;
   }
 
@@ -460,12 +467,19 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   @Override
   public void deployArtifact(T artifact, Optional<Properties> deploymentProperties) throws DeploymentException {
+    deployArtifact(artifact, deploymentProperties, empty());
+  }
+
+  public void deployArtifact(T artifact, Optional<Properties> deploymentProperties, Optional<Properties> artifactStatusProperties)
+      throws DeploymentException {
     try {
       // add to the list of known artifacts first to avoid deployment loop on failure
       trackArtifact(artifact);
 
       deploymentListener.onDeploymentStart(artifact.getArtifactName());
-      deployer.deploy(artifact, shouldStartArtifact(artifact, deploymentProperties.orElse(null)));
+      deployer
+          .deploy(artifact,
+                  shouldStartArtifactAccordingToStatusBeforeDomainRedeployment(artifact, artifactStatusProperties.orElse(null)));
 
       artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
       deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
@@ -492,12 +506,17 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     }
   }
 
-  private boolean shouldStartArtifact(T artifact, Properties deploymentProperties) {
-    if (!(artifact instanceof Application) || deploymentProperties == null) {
+  /**
+   * Checks the stored but not persisted property START_ARTIFACT_ON_DEPLOYMENT_PROPERTY to know if the artifact should be started
+   * or not. If the artifact was purposely stopped and then its domain was redeployed, the artifact should maintain its status and
+   * not start on deployment.
+   */
+  private boolean shouldStartArtifactAccordingToStatusBeforeDomainRedeployment(T artifact, Properties artifactStatusProperties) {
+    if (!(artifact instanceof Application) || artifactStatusProperties == null) {
       return true;
     }
 
-    return valueOf(deploymentProperties.getProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, "true"));
+    return valueOf(artifactStatusProperties.getProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, "true"));
   }
 
   private T deployOrRedeployPackagedArtifact(final URI artifactUri, String artifactName,
@@ -572,11 +591,16 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   @Override
   public T deployExplodedArtifact(String artifactDir, Optional<Properties> deploymentProperties) {
+    return deployExplodedArtifact(artifactDir, deploymentProperties, empty());
+  }
+
+  public T deployExplodedArtifact(String artifactDir, Optional<Properties> deploymentProperties,
+                                  Optional<Properties> artifactStatusProperties) {
     if (!isUpdatedZombieArtifact(artifactDir)) {
       return null;
     }
 
-    return deployExplodedApp(artifactDir, deploymentProperties);
+    return deployExplodedApp(artifactDir, deploymentProperties, artifactStatusProperties);
   }
 
   @Override
