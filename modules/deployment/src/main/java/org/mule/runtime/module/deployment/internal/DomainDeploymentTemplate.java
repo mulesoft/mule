@@ -76,7 +76,8 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
         if (applicationDeployer.isUpdatedZombieArtifact(domainApplication.getArtifactName())) {
           try {
             applicationDeployer.deployExplodedArtifact(domainApplication.getArtifactName(), empty(),
-                getArtifactStatusProperties(appStatusPreRedeployment.get(domainApplication)));
+                                                       getArtifactStatusProperties(appStatusPreRedeployment
+                                                           .get(domainApplication)));
             applicationDeploymentListener.onRedeploymentSuccess(domainApplication.getArtifactName());
           } catch (RuntimeException e) {
             applicationDeploymentListener.onRedeploymentFailure(domainApplication.getArtifactName(), e);

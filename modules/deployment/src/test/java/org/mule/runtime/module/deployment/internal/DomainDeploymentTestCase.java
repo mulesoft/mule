@@ -730,7 +730,8 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
     assertStatus(dummyDomainApp1FileBuilder.getId(), STARTED);
     // no deberia ser dummyDomainFileBuilder?
-    Properties artifactStatusDeploymentProperties = resolveArtifactStatusDeploymentProperties(emptyDomainFileBuilder.getId(), empty());
+    Properties artifactStatusDeploymentProperties =
+        resolveArtifactStatusDeploymentProperties(emptyDomainFileBuilder.getId(), empty());
     assertThat(artifactStatusDeploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 

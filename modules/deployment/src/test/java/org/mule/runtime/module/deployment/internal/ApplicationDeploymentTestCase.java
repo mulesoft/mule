@@ -361,8 +361,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     deploymentProperties.put(FLOW_PROPERTY_NAME, FLOW_PROPERTY_NAME_VALUE);
     startDeployment();
     deployAndVerifyPropertyInRegistry(dummyAppDescriptorWithPropsFileBuilder.getArtifactFile().toURI(), deploymentProperties,
-        (registry) -> registry.lookupByName(FLOW_PROPERTY_NAME).get()
-            .equals(FLOW_PROPERTY_NAME_VALUE));
+                                      (registry) -> registry.lookupByName(FLOW_PROPERTY_NAME).get()
+                                          .equals(FLOW_PROPERTY_NAME_VALUE));
 
     stopAppAndVerifyDeploymentAndAppStatusProperties(FLOW_PROPERTY_NAME_VALUE);
 
@@ -376,8 +376,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     deploymentProperties.clear();
     deploymentProperties.put(FLOW_PROPERTY_NAME, FLOW_PROPERTY_NAME_VALUE_ON_REDEPLOY);
     redeployAndVerifyPropertyInRegistry(dummyAppDescriptorWithPropsFileBuilder.getId(), deploymentProperties,
-        (registry) -> registry.lookupByName(FLOW_PROPERTY_NAME).get()
-            .equals(FLOW_PROPERTY_NAME_VALUE_ON_REDEPLOY));
+                                        (registry) -> registry.lookupByName(FLOW_PROPERTY_NAME).get()
+                                            .equals(FLOW_PROPERTY_NAME_VALUE_ON_REDEPLOY));
 
     stopAppAndVerifyDeploymentAndAppStatusProperties(FLOW_PROPERTY_NAME_VALUE_ON_REDEPLOY);
   }
@@ -386,7 +386,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     Application app = findApp(dummyAppDescriptorWithPropsFileBuilder.getId(), 1);
     app.stop();
 
-    Properties artifactStatusDeploymentProperties = resolveArtifactStatusDeploymentProperties(dummyAppDescriptorWithPropsFileBuilder.getId(), empty());
+    Properties artifactStatusDeploymentProperties =
+        resolveArtifactStatusDeploymentProperties(dummyAppDescriptorWithPropsFileBuilder.getId(), empty());
     assertThat(artifactStatusDeploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
 
     Properties updatedDeploymentProperties = resolveDeploymentProperties(dummyAppDescriptorWithPropsFileBuilder.getId(), empty());
