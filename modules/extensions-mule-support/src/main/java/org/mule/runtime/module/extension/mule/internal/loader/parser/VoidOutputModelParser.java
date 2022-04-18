@@ -18,7 +18,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParse
  */
 public class VoidOutputModelParser implements OutputModelParser {
 
-  public static OutputModelParser INSTANCE = new VoidOutputModelParser();
+  public static final OutputModelParser INSTANCE = new VoidOutputModelParser();
 
   @Override
   public MetadataType getType() {

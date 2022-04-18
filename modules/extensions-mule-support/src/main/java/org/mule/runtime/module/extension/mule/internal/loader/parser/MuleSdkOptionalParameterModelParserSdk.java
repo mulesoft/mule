@@ -22,10 +22,10 @@ public class MuleSdkOptionalParameterModelParserSdk extends MuleSdkParameterMode
   public MuleSdkOptionalParameterModelParserSdk(ComponentAst parameter, TypeLoader typeLoader) {
     super(parameter, typeLoader);
 
-    parseStructure();
+    parseOptionalStructure();
   }
 
-  private void parseStructure() {
+  private void parseOptionalStructure() {
     defaultValue = getOptionalParameter(parameter, "defaultValue").orElse(null);
   }
 

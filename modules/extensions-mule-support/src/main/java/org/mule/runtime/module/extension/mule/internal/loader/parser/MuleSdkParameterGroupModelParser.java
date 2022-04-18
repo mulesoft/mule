@@ -35,36 +35,37 @@ import java.util.stream.Stream;
  */
 class MuleSdkParameterGroupModelParser extends BaseMuleSdkExtensionModelParser implements ParameterGroupModelParser {
 
-  private final List<ParameterModelParser> parameters;
+  private final List<ParameterModelParser> parameterParsers;
   private final Optional<ExclusiveOptionalDescriptor> exclusiveOptionals;
 
   public MuleSdkParameterGroupModelParser(ComponentAst parametersComponent, TypeLoader typeLoader) {
-    parameters = doParserParameters(parametersComponent, typeLoader);
+    parameterParsers = doParserParameters(parametersComponent, typeLoader);
     exclusiveOptionals = doParseExclusiveOptionalDescriptorFromGroup(parametersComponent);
   }
 
   private List<ParameterModelParser> doParserParameters(ComponentAst parametersComponent, TypeLoader typeLoader) {
-    Stream<ParameterModelParser> parameterParsers = getChildren(parametersComponent, "parameter")
+    Stream<ParameterModelParser> parsers = getChildren(parametersComponent, "parameter")
         .map(p -> new MuleSdkParameterModelParserSdk(p, typeLoader));
     Stream<ParameterModelParser> optionalParameterParsers = getChildren(parametersComponent, "optional-parameter")
         .map(p -> new MuleSdkOptionalParameterModelParserSdk(p, typeLoader));
 
-    return concat(parameterParsers, optionalParameterParsers).collect(toList());
+    return concat(parsers, optionalParameterParsers).collect(toList());
   }
 
   private Optional<ExclusiveOptionalDescriptor> doParseExclusiveOptionalDescriptorFromGroup(ComponentAst parametersComponent) {
     return getSingleChild(parametersComponent, "exclusive-optionals")
-        .map(exclusiveOptionals -> doParseExclusiveOptionalDescriptor(exclusiveOptionals));
+        .map(this::doParseExclusiveOptionalDescriptor);
   }
 
-  private ExclusiveOptionalDescriptor doParseExclusiveOptionalDescriptor(ComponentAst exclusiveOptionals) {
-    Set<String> parameters = Stream.of(this.<String>getParameter(exclusiveOptionals, "exclusiveOptionals").split(","))
-        .map(String::trim)
-        .filter(p -> !isBlank(p))
-        .collect(toCollection(LinkedHashSet::new));
+  private ExclusiveOptionalDescriptor doParseExclusiveOptionalDescriptor(ComponentAst exclusiveOptionalsAst) {
+    Set<String> exclusiveOptionalsParameters =
+        Stream.of(this.<String>getParameter(exclusiveOptionalsAst, "exclusiveOptionals").split(","))
+            .map(String::trim)
+            .filter(p -> !isBlank(p))
+            .collect(toCollection(LinkedHashSet::new));
 
-    return new ExclusiveOptionalDescriptor(parameters,
-                                           (boolean) getOptionalParameter(exclusiveOptionals, "oneRequired").orElse(false));
+    return new ExclusiveOptionalDescriptor(exclusiveOptionalsParameters,
+                                           (boolean) getOptionalParameter(exclusiveOptionalsAst, "oneRequired").orElse(false));
   }
 
   @Override
@@ -79,7 +80,7 @@ class MuleSdkParameterGroupModelParser extends BaseMuleSdkExtensionModelParser i
 
   @Override
   public List<ParameterModelParser> getParameterParsers() {
-    return parameters;
+    return parameterParsers;
   }
 
   @Override

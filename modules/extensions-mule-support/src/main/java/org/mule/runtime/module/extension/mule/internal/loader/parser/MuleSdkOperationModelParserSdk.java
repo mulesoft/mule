@@ -57,21 +57,21 @@ import java.util.stream.Stream;
  */
 class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser implements OperationModelParser {
 
-  private final ComponentAst operation;
+  private final ComponentAst operationAst;
   private final TypeLoader typeLoader;
   private Boolean isBlocking;
 
   private String name;
 
   public MuleSdkOperationModelParserSdk(ComponentAst operation, TypeLoader typeLoader) {
-    this.operation = operation;
+    this.operationAst = operation;
     this.typeLoader = typeLoader;
 
     parseStructure();
   }
 
   private void parseStructure() {
-    name = getParameter(operation, "name");
+    name = getParameter(operationAst, "name");
   }
 
   private OutputModelParser asOutputModelParser(ComponentAst outputTypeElement) {
@@ -79,11 +79,11 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
     return typeLoader.load(type)
         .map(mt -> new DefaultOutputModelParser(mt, false))
-        .orElseThrow(() -> new IllegalModelDefinitionException(format(
-                                                                      "Component <%s:%s> defines %s as '%s' but such type is not defined in the application",
+        .orElseThrow(() -> new IllegalModelDefinitionException(format("Component <%s:%s> defines %s as '%s' but such type is not defined in the application",
                                                                       outputTypeElement.getIdentifier().getNamespace(),
                                                                       outputTypeElement.getIdentifier().getName(),
-                                                                      outputTypeElement.getIdentifier().getName())));
+                                                                      outputTypeElement.getIdentifier().getName(),
+                                                                      type)));
   }
 
   @Override
@@ -93,7 +93,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public String getDescription() {
-    return this.<String>getOptionalParameter(operation, "description").orElse("");
+    return this.<String>getOptionalParameter(operationAst, "description").orElse("");
   }
 
   @Override
@@ -121,7 +121,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public List<ParameterGroupModelParser> getParameterGroupModelParsers() {
-    return getSingleChild(operation, "parameters")
+    return getSingleChild(operationAst, "parameters")
         .map(parameters -> Collections
             .<ParameterGroupModelParser>singletonList(new MuleSdkParameterGroupModelParser(parameters, typeLoader)))
         .orElse(emptyList());
@@ -216,8 +216,8 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public Optional<DisplayModel> getDisplayModel() {
-    String summary = this.<String>getOptionalParameter(operation, "summary").orElse(null);
-    String displayName = this.<String>getOptionalParameter(operation, "displayName").orElse(null);
+    String summary = this.<String>getOptionalParameter(operationAst, "summary").orElse(null);
+    String displayName = this.<String>getOptionalParameter(operationAst, "displayName").orElse(null);
 
     if (!isBlank(displayName) || !isBlank(summary)) {
       return of(DisplayModel.builder()
@@ -257,7 +257,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   }
 
   private Optional<ComponentAst> getOutputElement(String elementName) {
-    ComponentAst output = operation.directChildrenStreamByIdentifier(null, "output")
+    ComponentAst output = operationAst.directChildrenStreamByIdentifier(null, "output")
         .findFirst()
         .orElseThrow(() -> new IllegalOperationModelDefinitionException(format(
                                                                                "Operation '%s' is missing its <output> declaration",
@@ -267,7 +267,8 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   }
 
   private ComponentAst getBody() {
-    return getSingleChild(operation, "body").get();
+    // TODO: What happens if the operation AST doesn't have a body? Is this code reachable in that case?
+    return getSingleChild(operationAst, "body").get();
   }
 
   private Stream<OperationModel> getOperationModelsRecursiveStream() {
