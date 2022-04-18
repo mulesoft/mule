@@ -12,6 +12,7 @@ import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer
 
 import static java.lang.String.valueOf;
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -74,8 +75,9 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
         applicationDeployer.preTrackArtifact(domainApplication);
         if (applicationDeployer.isUpdatedZombieArtifact(domainApplication.getArtifactName())) {
           try {
-            applicationDeployer.deployExplodedArtifact(domainApplication.getArtifactName(),
-                                                       getProperties(appStatusPreRedeployment.get(domainApplication)));
+            applicationDeployer.deployExplodedArtifact(domainApplication.getArtifactName(), empty(),
+                                                       getArtifactStatusProperties(appStatusPreRedeployment
+                                                           .get(domainApplication)));
             applicationDeploymentListener.onRedeploymentSuccess(domainApplication.getArtifactName());
           } catch (RuntimeException e) {
             applicationDeploymentListener.onRedeploymentFailure(domainApplication.getArtifactName(), e);
@@ -92,7 +94,7 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
     domainApplications = Collections.emptyList();
   }
 
-  private Optional<Properties> getProperties(ApplicationStatus applicationStatus) {
+  private Optional<Properties> getArtifactStatusProperties(ApplicationStatus applicationStatus) {
     Properties properties = new Properties();
     boolean startArtifact = applicationStatus.equals(STARTED) || applicationStatus.equals(DEPLOYMENT_FAILED);
     properties.setProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, valueOf(startArtifact));
