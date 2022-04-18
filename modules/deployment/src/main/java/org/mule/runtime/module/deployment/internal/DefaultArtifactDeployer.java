@@ -16,7 +16,6 @@ import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZ
 import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.withArtifactMuleContext;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveArtifactStatusDeploymentProperties;
-import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -55,12 +54,12 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
   }
 
   @Override
-  public void deploy(T artifact, boolean startArtifactOnDomainRedeployment) {
+  public void deploy(T artifact, boolean startArtifact) {
     try {
       artifact.install();
       doInit(artifact);
       addFlowStoppedListeners(artifact);
-      if (startArtifactOnDomainRedeployment && shouldStartArtifact(artifact)) {
+      if (startArtifact && shouldStartArtifactAccordingToPersistedStatus(artifact)) {
         // The purpose of dispatching this to a separate thread is to have a clean call stack when starting the app.
         // This is needed in order to prevent an StackOverflowError when starting apps with really long flows.
         final Future<?> startTask = artifactStartExecutor.get().submit(() -> {
@@ -173,16 +172,21 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
     }
   }
 
-  private Boolean shouldStartArtifact(T artifact) {
-    Properties deploymentProperties = null;
+  /**
+   * Checks the persisted property START_ARTIFACT_ON_DEPLOYMENT_PROPERTY to know if the artifact should be started or not. If the
+   * artifact was purposely stopped and then the mule was restarted, the artifact should maintain its status and not start on
+   * deployment.
+   */
+  private Boolean shouldStartArtifactAccordingToPersistedStatus(T artifact) {
+    Properties artifactStatusProperties = null;
     try {
-      deploymentProperties = resolveArtifactStatusDeploymentProperties(artifact.getArtifactName(), empty());
+      artifactStatusProperties = resolveArtifactStatusDeploymentProperties(artifact.getArtifactName(), empty());
     } catch (IOException e) {
       logger.error("Failed to load deployment property for artifact "
           + artifact.getArtifactName(), e);
     }
-    return deploymentProperties != null
-        && parseBoolean(deploymentProperties.getProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, "true"));
+    return artifactStatusProperties != null
+        && parseBoolean(artifactStatusProperties.getProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, "true"));
   }
 
   @Override

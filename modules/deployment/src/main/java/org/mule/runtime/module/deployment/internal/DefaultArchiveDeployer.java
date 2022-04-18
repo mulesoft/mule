@@ -480,7 +480,9 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
       trackArtifact(artifact);
 
       deploymentListener.onDeploymentStart(artifact.getArtifactName());
-      deployer.deploy(artifact, shouldStartArtifact(artifact, artifactStatusProperties.orElse(null)));
+      deployer
+          .deploy(artifact,
+                  shouldStartArtifactAccordingToStatusBeforeDomainRedeployment(artifact, artifactStatusProperties.orElse(null)));
 
       artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
       deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
@@ -507,8 +509,12 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
     }
   }
 
-
-  private boolean shouldStartArtifact(T artifact, Properties artifactStatusProperties) {
+  /**
+   * Checks the stored but not persisted property START_ARTIFACT_ON_DEPLOYMENT_PROPERTY to know if the artifact should be started
+   * or not. If the artifact was purposely stopped and then its domain was redeployed, the artifact should maintain its status and
+   * not start on deployment.
+   */
+  private boolean shouldStartArtifactAccordingToStatusBeforeDomainRedeployment(T artifact, Properties artifactStatusProperties) {
     if (!(artifact instanceof Application) || artifactStatusProperties == null) {
       return true;
     }

@@ -364,13 +364,13 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
                                       (registry) -> registry.lookupByName(FLOW_PROPERTY_NAME).get()
                                           .equals(FLOW_PROPERTY_NAME_VALUE));
 
-    stopAppAndVerifyDeploymentAndAppStatusProperties(FLOW_PROPERTY_NAME_VALUE);
+    stopAppAndVerifyDeploymentAndAppStatusProperties(dummyAppDescriptorWithPropsFileBuilder.getId(), FLOW_PROPERTY_NAME_VALUE);
 
     // Redeploys without deployment properties (remains the same, as it takes the deployment properties from the persisted file)
     redeployAndVerifyPropertyInRegistry(dummyAppDescriptorWithPropsFileBuilder
         .getId(), null, (registry) -> registry.lookupByName(FLOW_PROPERTY_NAME).get().equals(FLOW_PROPERTY_NAME_VALUE));
 
-    stopAppAndVerifyDeploymentAndAppStatusProperties(FLOW_PROPERTY_NAME_VALUE);
+    stopAppAndVerifyDeploymentAndAppStatusProperties(dummyAppDescriptorWithPropsFileBuilder.getId(), FLOW_PROPERTY_NAME_VALUE);
 
     // Redeploy with new deployment properties
     deploymentProperties.clear();
@@ -379,10 +379,12 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
                                         (registry) -> registry.lookupByName(FLOW_PROPERTY_NAME).get()
                                             .equals(FLOW_PROPERTY_NAME_VALUE_ON_REDEPLOY));
 
-    stopAppAndVerifyDeploymentAndAppStatusProperties(FLOW_PROPERTY_NAME_VALUE_ON_REDEPLOY);
+    stopAppAndVerifyDeploymentAndAppStatusProperties(dummyAppDescriptorWithPropsFileBuilder.getId(),
+                                                     FLOW_PROPERTY_NAME_VALUE_ON_REDEPLOY);
   }
 
-  private void stopAppAndVerifyDeploymentAndAppStatusProperties(String deploymentPropertyValue) throws IOException {
+  private void stopAppAndVerifyDeploymentAndAppStatusProperties(String artifactName, String deploymentPropertyValue)
+      throws IOException {
     Application app = findApp(dummyAppDescriptorWithPropsFileBuilder.getId(), 1);
     app.stop();
 
@@ -392,7 +394,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
     Properties updatedDeploymentProperties = resolveDeploymentProperties(dummyAppDescriptorWithPropsFileBuilder.getId(), empty());
     assertThat(updatedDeploymentProperties.get(FLOW_PROPERTY_NAME), is(deploymentPropertyValue));
-    assertThat(artifactStatusDeploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
+    assertThat(updatedDeploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
   @Issue("MULE-16688")
