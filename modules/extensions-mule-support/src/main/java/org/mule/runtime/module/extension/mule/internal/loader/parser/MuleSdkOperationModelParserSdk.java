@@ -267,7 +267,8 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   }
 
   private ComponentAst getBody() {
-    // TODO: What happens if the operation AST doesn't have a body? Is this code reachable in that case?
+    // If the operation AST doesn't have a body, it will fail at validations phase, and then this code wouldn't be reachable
+    // in that case. Therefore, checking if the optional isPresent isn't needed here.
     return getSingleChild(operationAst, "body").get();
   }
 
