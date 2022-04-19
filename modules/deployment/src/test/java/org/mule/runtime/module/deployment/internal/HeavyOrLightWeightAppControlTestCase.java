@@ -7,6 +7,9 @@
 
 package org.mule.runtime.module.deployment.internal;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Test;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
@@ -37,7 +40,11 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleBaseFolder;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.setMavenConfig;
+import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DEPLOYMENT_TYPE;
+import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DeploymentTypeStory.HEAVYWEIGHT;
+import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DeploymentTypeStory.LIGHTWEIGHT;
 
+@Feature(DEPLOYMENT_TYPE)
 public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDeploymentTestCase {
 
   private static final String APP_XML_FILE = "simple.xml";
@@ -52,6 +59,7 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
   }
 
   @Test
+  @Story(LIGHTWEIGHT)
   public void lightweightAppDeploymentDownloadsDependenciesFromRemoteRepo() throws Exception {
     final File muleRepository = Paths.get(getMuleBaseFolder().getAbsolutePath(), "repository").toFile();
 
@@ -89,6 +97,7 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
   }
 
   @Test
+  @Story(LIGHTWEIGHT)
   public void lightweightAppDeploymentFailsIfNoRemoteRepoConfigured() throws Exception {
     final ArtifactPluginFileBuilder mulePlugin = new ArtifactPluginFileBuilder("mule-sockets-connector")
         .withGroupId(MULE_CONNECTORS_GROUP_ID)
@@ -114,6 +123,8 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
   }
 
   @Test
+  @Story(HEAVYWEIGHT)
+  @Description("Test case for MULE-12298 and MULE-12317")
   public void heavyweightAppDeploymentDoesntDownloadDependenciesFromRemoteRepo() throws Exception {
     final ArtifactPluginFileBuilder mulePlugin = new ArtifactPluginFileBuilder("mule-http-connector")
         .withGroupId(MULE_CONNECTORS_GROUP_ID)
