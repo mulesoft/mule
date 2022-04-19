@@ -21,7 +21,7 @@ public interface SpanDuration {
   long getStartEpochMillis();
 
   /**
-   * @return OL if the duration is still open or the timestamp where the duration ended, represented by the amount of milliseconds
+   * @return 0 (zero) if the duration is still open or the timestamp where the duration ended, represented by the amount of milliseconds
    *         since the epoch.
    */
   long getEndEpochMillis();
