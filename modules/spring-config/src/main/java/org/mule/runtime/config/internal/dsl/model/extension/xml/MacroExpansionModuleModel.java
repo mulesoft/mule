@@ -18,6 +18,8 @@ import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.SUBFLOW_ELEMENT_IDENTIFIER;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -261,12 +263,13 @@ public class MacroExpansionModuleModel {
 
   private boolean existOperationThatUsesImplicitConfiguration() {
     return applicationModel.getRootComponentModel().getInnerComponents().stream()
-        .filter(componentModel -> componentModel.getIdentifier().getName().equals("flow"))
+        .filter(componentModel -> componentModel.getIdentifier().getName().equals(FLOW_ELEMENT_IDENTIFIER)
+            || componentModel.getIdentifier().getName().equals(SUBFLOW_ELEMENT_IDENTIFIER))
         .flatMap(componentModel -> componentModel.getInnerComponents().stream())
         .filter(componentModel -> componentModel.getIdentifier().getNamespace()
             .equals(extensionModel.getXmlDslModel().getPrefix()))
         .filter(componentModel -> ((ComponentAst) componentModel).getModel(OperationModel.class).isPresent())
-        .anyMatch(componentModel -> !componentModel.getRawParameters().containsKey("config-ref"));
+        .anyMatch(componentModel -> !componentModel.getRawParameters().containsKey(MODULE_OPERATION_CONFIG_REF));
   }
 
   private Optional<ConfigurationModel> getConfigurationModel() {
