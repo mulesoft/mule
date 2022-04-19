@@ -7,9 +7,12 @@
 
 package org.mule.runtime.module.deployment.internal;
 
+import com.github.valfirst.slf4jtest.LoggingEvent;
+import com.github.valfirst.slf4jtest.TestLogger;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
@@ -24,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.iterateFiles;
 import static org.apache.commons.io.filefilter.HiddenFileFilter.VISIBLE;
@@ -53,6 +57,7 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
   private static final String MULE_CONNECTORS_GROUP_ID = "org.mule.connectors";
   private static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
   private static final String MULESOFT_PUBLIC_REPOSITORY = "https://repository.mulesoft.org/nexus/content/repositories/public/";
+  private static final TestLogger logger = getTestLogger(DefaultArchiveDeployer.class);
 
   public HeavyOrLightWeightAppControlTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
@@ -115,9 +120,13 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
     final String applicationName = artifactFileBuilder.getDeployedPath();
     final File applicationRepository = Paths.get(getAppFolder(applicationName).toString(), "repository").toFile();
     final File muleRepository = Paths.get(getMuleBaseFolder().getAbsolutePath(), "repository").toFile();
+    final List<String> causeMessages = getCauseMessages(logger.getAllLoggingEvents());
+    final String exceptionError =
+        "org.eclipse.aether.transfer.ArtifactNotFoundException: Could not find artifact org.mule.connectors:mule-sockets-connector";
 
     assertDeploymentFailure(applicationDeploymentListener, artifactFileBuilder.getId());
     assertApplicationAnchorFileDoesNotExists(applicationName);
+    assertThat(causeMessages, hasItem(allOf(startsWith(exceptionError))));
     assertThat(applicationRepository.exists(), is(false));
     assertThat(muleRepository.exists(), is(false));
   }
@@ -153,7 +162,8 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
     assertThat(muleRepository.exists(), is(false));
   }
 
-  private Collection<File> getRepositoryContents(File repository) {
+  @NotNull
+  private Collection<File> getRepositoryContents(@NotNull File repository) {
     if (repository.exists() && repository.isDirectory()) {
       List<File> repoFiles = new LinkedList<>();
 
@@ -169,5 +179,18 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
     } else {
       throw new NoSuchElementException("No internal repository found");
     }
+  }
+
+  @NotNull
+  private List<String> getCauseMessages(@NotNull List<LoggingEvent> loggingEvents) {
+    List<String> causeMessages = new LinkedList<>();
+    Throwable throwable = loggingEvents.get(1).getThrowable().get();
+
+    while (throwable != null) {
+      causeMessages.add(throwable.toString());
+      throwable = throwable.getCause();
+    }
+
+    return causeMessages;
   }
 }
