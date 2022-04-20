@@ -44,6 +44,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 @SmallTest
+// TODO W-10928152: remove this test case when migrating to use the new extension model loading API.
 public class MuleExtensionModelLoaderManagerTestCase extends AbstractMuleTestCase {
 
   private static final String ID = "ID";

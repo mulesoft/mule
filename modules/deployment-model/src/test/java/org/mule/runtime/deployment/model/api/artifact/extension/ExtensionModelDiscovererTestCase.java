@@ -36,6 +36,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 
 @Feature(XML_SDK)
+// TODO W-10928152: remove this test case when migrating to use the new extension model loading API.
 public class ExtensionModelDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test

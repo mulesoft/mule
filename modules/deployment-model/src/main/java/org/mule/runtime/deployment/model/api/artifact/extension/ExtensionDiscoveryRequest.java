@@ -24,7 +24,7 @@ import java.util.Set;
  * {@link ExtensionModelDiscoverer#discoverPluginsExtensionModels(ExtensionDiscoveryRequest)}.
  * 
  * @since 4.5
- * @deprecated Use {@link org.mule.runtime.module.artifact.activation.api.extension.ExtensionDiscoveryRequest} instead.
+ * @deprecated Use {@link org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionDiscoveryRequest} instead.
  */
 @Deprecated
 public interface ExtensionDiscoveryRequest {

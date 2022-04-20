@@ -47,9 +47,11 @@ import org.slf4j.Logger;
  * Discover the {@link ExtensionModel} based on the {@link ExtensionModelLoader} type.
  *
  * @since 4.0
- * @deprecated Since 4.5, use {@link org.mule.runtime.module.artifact.activation.api.extension.ExtensionModelDiscoverer} instead.
+ * @deprecated Since 4.5, use {@link org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer}
+ *             instead.
  */
 @Deprecated
+// TODO W-10928152: remove this class when migrating to use the new extension model loading API.
 public class ExtensionModelDiscoverer {
 
   private static final Logger LOGGER = getLogger(ExtensionModelDiscoverer.class);

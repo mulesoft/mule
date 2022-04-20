@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider;
 
+// TODO W-10928152: remove this class when migrating to use the new extension model loading API.
 public class TestRuntimeExtensionModelProvider implements RuntimeExtensionModelProvider {
 
   @Override

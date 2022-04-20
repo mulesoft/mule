@@ -4,44 +4,50 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.artifact.activation.internal.extension;
+package org.mule.runtime.module.artifact.activation.internal.extension.discovery;
 
-import com.google.common.collect.ImmutableSet;
+import static java.lang.Thread.currentThread;
+import static java.util.Collections.unmodifiableSet;
+import static java.util.stream.Collectors.toSet;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
-import org.mule.runtime.module.artifact.activation.api.extension.ExtensionDiscoveryRequest;
-import org.mule.runtime.module.artifact.activation.api.extension.ExtensionModelDiscoverer;
-import org.mule.runtime.module.artifact.activation.api.extension.ExtensionModelGenerator;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionDiscoveryRequest;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer;
 import org.mule.runtime.module.artifact.activation.internal.PluginsDependenciesProcessor;
+
+import com.google.common.collect.ImmutableSet;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static java.lang.Thread.currentThread;
-import static java.util.stream.Collectors.toSet;
-
+/**
+ * Default implementation of {@link ExtensionModelDiscoverer}.
+ *
+ * @since 4.5
+ */
 public class DefaultExtensionModelDiscoverer implements ExtensionModelDiscoverer {
 
-  private final ExtensionModelGenerator extensionModelLoader;
+  private final ExtensionModelGenerator extensionModelGenerator;
 
-  public DefaultExtensionModelDiscoverer(ExtensionModelGenerator extensionModelLoader) {
-    this.extensionModelLoader = extensionModelLoader;
+  public DefaultExtensionModelDiscoverer(ExtensionModelGenerator extensionModelGenerator) {
+    this.extensionModelGenerator = extensionModelGenerator;
   }
 
   @Override
   public Set<ExtensionModel> discoverRuntimeExtensionModels() {
-    return new SpiServiceRegistry()
+    return unmodifiableSet(new SpiServiceRegistry()
         .lookupProviders(RuntimeExtensionModelProvider.class, currentThread().getContextClassLoader())
         .stream()
         .map(RuntimeExtensionModelProvider::createExtensionModel)
-        .collect(toSet());
+        .collect(toSet()));
   }
 
   @Override
   public Set<ExtensionModel> discoverPluginsExtensionModels(ExtensionDiscoveryRequest discoveryRequest) {
-    return new HashSet<>(PluginsDependenciesProcessor
+    return unmodifiableSet(new HashSet<>(PluginsDependenciesProcessor
         .process(discoveryRequest.getArtifactPlugins(), discoveryRequest.isParallelDiscovery(), (extensions, artifactPlugin) -> {
           Set<ExtensionModel> dependencies = new HashSet<>();
 
@@ -54,10 +60,10 @@ public class DefaultExtensionModelDiscoverer implements ExtensionModelDiscoverer
                 .build();
           }
 
-          ExtensionModel extension = extensionModelLoader.obtainExtensionModel(discoveryRequest, artifactPlugin, dependencies);
+          ExtensionModel extension = extensionModelGenerator.obtainExtensionModel(discoveryRequest, artifactPlugin, dependencies);
           if (extension != null) {
             extensions.add(extension);
           }
-        }));
+        })));
   }
 }

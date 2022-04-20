@@ -4,14 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.artifact.activation.internal.extension;
+package org.mule.runtime.module.artifact.activation.internal.extension.discovery;
 
-import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider;
+import static org.mule.test.allure.AllureConstants.ExtensionModelDiscoveryFeature.EXTENSION_MODEL_DISCOVERY;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider;
+
+import io.qameta.allure.Feature;
+
+@Feature(EXTENSION_MODEL_DISCOVERY)
 public class TestRuntimeExtensionModelProvider implements RuntimeExtensionModelProvider {
 
   @Override

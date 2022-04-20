@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 @Deprecated
+// TODO W-10928152: remove this class when migrating to use the new extension model loading API.
 public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryRequest {
 
   private final ExtensionModelLoaderRepository loaderRepository;

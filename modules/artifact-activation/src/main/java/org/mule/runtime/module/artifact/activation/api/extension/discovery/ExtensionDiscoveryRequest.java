@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.artifact.activation.api.extension;
+package org.mule.runtime.module.artifact.activation.api.extension.discovery;
+
+import static java.util.Collections.emptySet;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
-import org.mule.runtime.module.artifact.activation.internal.extension.DefaultExtensionDiscoveryRequest;
+import org.mule.runtime.module.artifact.activation.internal.extension.discovery.DefaultExtensionDiscoveryRequest;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
 import java.util.List;
 import java.util.Set;
-
-import static java.util.Collections.emptySet;
 
 /**
  * Container of the parameters that can be given to
@@ -54,8 +54,8 @@ public interface ExtensionDiscoveryRequest {
   boolean isParallelDiscovery();
 
   /**
-   * @return {@code true} if any {@link DeclarationEnricher} that adds descriptions to a {@link ExtensionDeclaration} must be
-   *         executed, {@code false} it if must be skipped.
+   * @return {@code true} if any {@link DeclarationEnricher} that adds descriptions to an {@link ExtensionDeclaration} must be
+   *         executed, {@code false} if it must be skipped.
    */
   boolean isEnrichDescriptions();
 

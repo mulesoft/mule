@@ -45,6 +45,7 @@ import org.slf4j.Logger;
  * @deprecated Since 4.5, use {@link #MuleExtensionModelLoaderManager(ArtifactClassLoader)} instead.
  */
 @Deprecated
+// TODO W-10928152: remove this class when migrating to use the new extension model loading API.
 public class MuleExtensionModelLoaderManager implements ExtensionModelLoaderManager {
 
   private static final Logger LOGGER = getLogger(MuleExtensionModelLoaderManager.class);

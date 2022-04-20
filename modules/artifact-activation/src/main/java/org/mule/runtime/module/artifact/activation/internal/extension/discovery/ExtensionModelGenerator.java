@@ -4,9 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.artifact.activation.api.extension;
+package org.mule.runtime.module.artifact.activation.internal.extension.discovery;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionDiscoveryRequest;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
 import java.util.Set;

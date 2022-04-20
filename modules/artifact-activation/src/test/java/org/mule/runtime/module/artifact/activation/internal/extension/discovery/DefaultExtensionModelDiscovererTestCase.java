@@ -4,33 +4,37 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.artifact.activation.internal.extension;
+package org.mule.runtime.module.artifact.activation.internal.extension.discovery;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import org.junit.Test;
+import static org.mule.runtime.api.meta.Category.COMMUNITY;
+import static org.mule.test.allure.AllureConstants.ExtensionModelDiscoveryFeature.EXTENSION_MODEL_DISCOVERY;
+
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.of;
+
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.module.artifact.activation.api.extension.ExtensionModelLoaderRepository;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.plugin.LoaderDescriber;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import org.junit.Test;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static java.util.Collections.*;
-import static java.util.Optional.of;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.meta.Category.COMMUNITY;
-import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
-
-@Feature(XML_SDK)
+@Feature(EXTENSION_MODEL_DISCOVERY)
 public class DefaultExtensionModelDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test

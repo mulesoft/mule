@@ -232,6 +232,16 @@ public interface AllureConstants {
     }
   }
 
+  interface ExtensionModelDiscoveryFeature {
+
+    String EXTENSION_MODEL_DISCOVERY = "Extension Model Discovery";
+
+    interface ExtensionModelDiscoveryStory {
+
+      String EXTENSION_MODEL_LOADER_REPOSITORY = "Extension model loader repository";
+    }
+  }
+
   interface ExtensionsClientFeature {
 
     String EXTENSIONS_CLIENT = "Extensions Client";
