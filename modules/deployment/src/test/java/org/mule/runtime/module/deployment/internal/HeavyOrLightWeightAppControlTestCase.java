@@ -57,6 +57,8 @@ import org.junit.runners.Parameterized;
 public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDeploymentTestCase {
 
   private static final int ERROR_LEVEL = 1;
+  private static final String EXCEPTION_ERROR_MESSAGE =
+      "org.eclipse.aether.transfer.ArtifactNotFoundException: Could not find artifact org.mule.connectors:mule-sockets-connector";
   private static final String APP_XML_FILE = "simple.xml";
   private static final String HEAVYWEIGHT_APP = "heavyweight";
   private static final String LIGHTWEIGHT_APP = "lightweight";
@@ -132,12 +134,10 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
     final File applicationRepository = Paths.get(getAppFolder(applicationName).toString(), "repository").toFile();
     final File muleRepository = Paths.get(getMuleBaseFolder().getAbsolutePath(), "repository").toFile();
     final List<String> logCauseMessages = getLogCauseMessages(logger.getAllLoggingEvents());
-    final String exceptionError =
-        "org.eclipse.aether.transfer.ArtifactNotFoundException: Could not find artifact org.mule.connectors:mule-sockets-connector";
 
     assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
     assertApplicationAnchorFileDoesNotExists(applicationName);
-    assertThat(logCauseMessages, hasItem(startsWith(exceptionError)));
+    assertThat(logCauseMessages, hasItem(startsWith(EXCEPTION_ERROR_MESSAGE)));
     assertThat(applicationRepository.exists(), is(false));
     assertThat(muleRepository.exists(), is(false));
   }
