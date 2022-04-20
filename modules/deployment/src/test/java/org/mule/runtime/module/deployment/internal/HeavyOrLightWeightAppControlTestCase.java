@@ -7,13 +7,30 @@
 
 package org.mule.runtime.module.deployment.internal;
 
-import com.github.valfirst.slf4jtest.LoggingEvent;
-import com.github.valfirst.slf4jtest.TestLogger;
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
+import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
+import static org.mule.maven.client.api.model.RemoteRepository.newRemoteRepositoryBuilder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleBaseFolder;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.setMavenConfig;
+import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DEPLOYMENT_TYPE;
+import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DeploymentTypeStory.HEAVYWEIGHT;
+import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DeploymentTypeStory.LIGHTWEIGHT;
+
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+
+import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
+import static org.apache.commons.io.FileUtils.iterateFiles;
+import static org.apache.commons.io.filefilter.HiddenFileFilter.VISIBLE;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
+import static org.junit.Assert.assertThat;
+
 import org.mule.maven.client.api.model.MavenConfiguration.MavenConfigurationBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
@@ -27,27 +44,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.io.FileUtils.iterateFiles;
-import static org.apache.commons.io.filefilter.HiddenFileFilter.VISIBLE;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertThat;
-import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
-import static org.mule.maven.client.api.model.RemoteRepository.newRemoteRepositoryBuilder;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleBaseFolder;
-import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.setMavenConfig;
-import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DEPLOYMENT_TYPE;
-import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DeploymentTypeStory.HEAVYWEIGHT;
-import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DeploymentTypeStory.LIGHTWEIGHT;
+import com.github.valfirst.slf4jtest.LoggingEvent;
+import com.github.valfirst.slf4jtest.TestLogger;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 @Feature(DEPLOYMENT_TYPE)
 public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDeploymentTestCase {
