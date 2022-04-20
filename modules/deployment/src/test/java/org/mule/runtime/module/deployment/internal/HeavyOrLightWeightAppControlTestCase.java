@@ -46,8 +46,9 @@ import java.util.NoSuchElementException;
 
 import com.github.valfirst.slf4jtest.LoggingEvent;
 import com.github.valfirst.slf4jtest.TestLogger;
-import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issues;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -143,7 +144,7 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
 
   @Test
   @Story(HEAVYWEIGHT)
-  @Description("Test case for MULE-12298 and MULE-12317")
+  @Issues({@Issue("MULE-12298"), @Issue("MULE-12317")})
   public void heavyweightAppDeploymentDoesntDownloadDependenciesFromRemoteRepo() throws Exception {
     final ArtifactPluginFileBuilder mulePlugin = new ArtifactPluginFileBuilder("mule-http-connector")
         .withGroupId(MULE_CONNECTORS_GROUP_ID)
