@@ -134,7 +134,7 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
 
     assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
     assertApplicationAnchorFileDoesNotExists(applicationName);
-    assertThat(logCauseMessages, hasItem(allOf(startsWith(exceptionError))));
+    assertThat(logCauseMessages, hasItem(startsWith(exceptionError)));
     assertThat(applicationRepository.exists(), is(false));
     assertThat(muleRepository.exists(), is(false));
   }
