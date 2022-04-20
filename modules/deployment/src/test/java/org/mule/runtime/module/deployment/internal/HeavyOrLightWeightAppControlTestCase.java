@@ -14,6 +14,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
+import org.junit.runners.Parameterized;
 import org.mule.maven.client.api.model.MavenConfiguration.MavenConfigurationBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.iterateFiles;
 import static org.apache.commons.io.filefilter.HiddenFileFilter.VISIBLE;
@@ -58,6 +60,11 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
   private static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
   private static final String MULESOFT_PUBLIC_REPOSITORY = "https://repository.mulesoft.org/nexus/content/repositories/public/";
   private static final TestLogger logger = getTestLogger(DefaultArchiveDeployer.class);
+
+  @Parameterized.Parameters(name = "Parallel: {0}")
+  public static List<Boolean> params() {
+    return asList(false);
+  }
 
   public HeavyOrLightWeightAppControlTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
