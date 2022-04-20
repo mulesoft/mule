@@ -14,7 +14,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
-import org.mule.maven.client.api.model.MavenConfiguration;
+import org.mule.maven.client.api.model.MavenConfiguration.MavenConfigurationBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 
@@ -68,7 +68,7 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
   public void lightweightAppDeploymentDownloadsDependenciesFromRemoteRepo() throws Exception {
     final File muleRepository = Paths.get(getMuleBaseFolder().getAbsolutePath(), "repository").toFile();
 
-    final MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder = newMavenConfigurationBuilder();
+    final MavenConfigurationBuilder mavenConfigurationBuilder = newMavenConfigurationBuilder();
     mavenConfigurationBuilder.remoteRepository(newRemoteRepositoryBuilder()
         .id("mulesoft-public")
         .url(new URL(MULESOFT_PUBLIC_REPOSITORY))
@@ -81,20 +81,20 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
         .withVersion("1.2.0")
         .withClassifier(MULE_PLUGIN_CLASSIFIER);
 
-    final ApplicationFileBuilder artifactFileBuilder = appFileBuilder(LIGHTWEIGHT_APP)
+    final ApplicationFileBuilder applicationFileBuilder = appFileBuilder(LIGHTWEIGHT_APP)
         .definedBy(APP_XML_FILE)
         .dependingOn(mulePlugin)
         .usingLightWeightPackage();
 
-    addPackedAppFromBuilder(artifactFileBuilder);
+    addPackedAppFromBuilder(applicationFileBuilder);
     startDeployment();
 
-    final String applicationName = artifactFileBuilder.getDeployedPath();
+    final String applicationName = applicationFileBuilder.getDeployedPath();
     final File applicationRepository = Paths.get(getAppFolder(applicationName).toString(), "repository").toFile();
     final Collection<File> muleRepositoryContents = getRepositoryContents(muleRepository);
     final List<String> muleRepositoryContentNames = muleRepositoryContents.stream().map(File::getName).collect(toList());
 
-    assertDeploymentSuccess(applicationDeploymentListener, artifactFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
     assertApplicationAnchorFileExists(applicationName);
     assertThat(applicationRepository.exists(), is(false));
     assertThat(muleRepositoryContentNames, hasItem(allOf(startsWith("mule-sockets-connector"), endsWith("-mule-plugin.jar"))));
@@ -109,24 +109,24 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
         .withVersion("1.2.0")
         .withClassifier(MULE_PLUGIN_CLASSIFIER);
 
-    final ApplicationFileBuilder artifactFileBuilder = appFileBuilder(LIGHTWEIGHT_APP)
+    final ApplicationFileBuilder applicationFileBuilder = appFileBuilder(LIGHTWEIGHT_APP)
         .definedBy(APP_XML_FILE)
         .dependingOn(mulePlugin)
         .usingLightWeightPackage();
 
-    addPackedAppFromBuilder(artifactFileBuilder);
+    addPackedAppFromBuilder(applicationFileBuilder);
     startDeployment();
 
-    final String applicationName = artifactFileBuilder.getDeployedPath();
+    final String applicationName = applicationFileBuilder.getDeployedPath();
     final File applicationRepository = Paths.get(getAppFolder(applicationName).toString(), "repository").toFile();
     final File muleRepository = Paths.get(getMuleBaseFolder().getAbsolutePath(), "repository").toFile();
-    final List<String> causeMessages = getCauseMessages(logger.getAllLoggingEvents());
+    final List<String> logCauseMessages = getLogCauseMessages(logger.getAllLoggingEvents());
     final String exceptionError =
         "org.eclipse.aether.transfer.ArtifactNotFoundException: Could not find artifact org.mule.connectors:mule-sockets-connector";
 
-    assertDeploymentFailure(applicationDeploymentListener, artifactFileBuilder.getId());
+    assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
     assertApplicationAnchorFileDoesNotExists(applicationName);
-    assertThat(causeMessages, hasItem(allOf(startsWith(exceptionError))));
+    assertThat(logCauseMessages, hasItem(allOf(startsWith(exceptionError))));
     assertThat(applicationRepository.exists(), is(false));
     assertThat(muleRepository.exists(), is(false));
   }
@@ -141,20 +141,20 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
         .withClassifier(MULE_PLUGIN_CLASSIFIER)
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo");
 
-    final ApplicationFileBuilder artifactFileBuilder = appFileBuilder(HEAVYWEIGHT_APP)
+    final ApplicationFileBuilder applicationFileBuilder = appFileBuilder(HEAVYWEIGHT_APP)
         .definedBy(APP_XML_FILE)
         .dependingOn(mulePlugin);
 
-    addPackedAppFromBuilder(artifactFileBuilder);
+    addPackedAppFromBuilder(applicationFileBuilder);
     startDeployment();
 
-    final String applicationName = artifactFileBuilder.getDeployedPath();
+    final String applicationName = applicationFileBuilder.getDeployedPath();
     final File applicationRepository = Paths.get(getAppFolder(applicationName).toString(), "repository").toFile();
     final File muleRepository = Paths.get(getMuleBaseFolder().getAbsolutePath(), "repository").toFile();
     final List<String> applicationRepositoryContentNames =
         getRepositoryContents(applicationRepository).stream().map(File::getName).collect(toList());
 
-    assertDeploymentSuccess(applicationDeploymentListener, artifactFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
     assertApplicationAnchorFileExists(applicationName);
     assertThat(applicationRepository.exists(), is(true));
     assertThat(applicationRepositoryContentNames,
@@ -165,32 +165,32 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
   @NotNull
   private Collection<File> getRepositoryContents(@NotNull File repository) {
     if (repository.exists() && repository.isDirectory()) {
-      List<File> repoFiles = new LinkedList<>();
+      List<File> repositoryFiles = new LinkedList<>();
 
       final Iterator<File> iterateFiles = iterateFiles(repository, VISIBLE, VISIBLE);
       while (iterateFiles.hasNext()) {
-        File current = iterateFiles.next();
-        if (current.isFile()) {
-          repoFiles.add(current);
+        File currentFile = iterateFiles.next();
+        if (currentFile.isFile()) {
+          repositoryFiles.add(currentFile);
         }
       }
 
-      return repoFiles;
+      return repositoryFiles;
     } else {
       throw new NoSuchElementException("No internal repository found");
     }
   }
 
   @NotNull
-  private List<String> getCauseMessages(@NotNull List<LoggingEvent> loggingEvents) {
-    List<String> causeMessages = new LinkedList<>();
-    Throwable throwable = loggingEvents.get(1).getThrowable().get();
+  private List<String> getLogCauseMessages(@NotNull List<LoggingEvent> loggingEvents) {
+    List<String> logCauseMessages = new LinkedList<>();
+    Throwable logCause = loggingEvents.get(1).getThrowable().get();
 
-    while (throwable != null) {
-      causeMessages.add(throwable.toString());
-      throwable = throwable.getCause();
+    while (logCause != null) {
+      logCauseMessages.add(logCause.toString());
+      logCause = logCause.getCause();
     }
 
-    return causeMessages;
+    return logCauseMessages;
   }
 }
