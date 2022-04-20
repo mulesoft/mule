@@ -20,13 +20,14 @@ import java.util.function.Supplier;
  * Provides access to the {@link ExtensionModelLoader} available in the container.
  *
  * @since 4.0, moved to api in 4.5
- * @deprecated Use {@link org.mule.runtime.module.artifact.activation.api.extension.ExtensionModelLoaderRepository} instead.
+ * @deprecated Use {@link org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository}
+ *             instead.
  */
 @Deprecated
 // TODO W-10928152: remove this interface when migrating to use the new extension model loading API.
 @FunctionalInterface
 public interface ExtensionModelLoaderRepository
-    extends org.mule.runtime.module.artifact.activation.api.extension.ExtensionModelLoaderRepository {
+    extends org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository {
 
   /**
    * @return a repository that manages the lifecycle of the {@link ExtensionModelLoader} available in the
