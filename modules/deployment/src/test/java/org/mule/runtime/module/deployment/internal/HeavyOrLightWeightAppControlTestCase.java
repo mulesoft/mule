@@ -12,7 +12,6 @@ import com.github.valfirst.slf4jtest.TestLogger;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 import org.mule.maven.client.api.model.MavenConfiguration.MavenConfigurationBuilder;
@@ -170,8 +169,7 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
     assertThat(muleRepository.exists(), is(false));
   }
 
-  @NotNull
-  private Collection<File> getRepositoryContents(@NotNull File repository) {
+  private Collection<File> getRepositoryContents(File repository) {
     if (repository.exists() && repository.isDirectory()) {
       List<File> repositoryFiles = new LinkedList<>();
 
@@ -189,8 +187,7 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
     }
   }
 
-  @NotNull
-  private List<String> getLogCauseMessages(@NotNull List<LoggingEvent> loggingEvents) {
+  private List<String> getLogCauseMessages(List<LoggingEvent> loggingEvents) {
     List<String> logCauseMessages = new LinkedList<>();
     Throwable logCause = loggingEvents.get(ERROR_LEVEL).getThrowable().get();
 
