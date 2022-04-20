@@ -53,6 +53,7 @@ import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.Deploym
 @Feature(DEPLOYMENT_TYPE)
 public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDeploymentTestCase {
 
+  private static final int ERROR_LEVEL = 1;
   private static final String APP_XML_FILE = "simple.xml";
   private static final String HEAVYWEIGHT_APP = "heavyweight";
   private static final String LIGHTWEIGHT_APP = "lightweight";
@@ -191,7 +192,7 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
   @NotNull
   private List<String> getLogCauseMessages(@NotNull List<LoggingEvent> loggingEvents) {
     List<String> logCauseMessages = new LinkedList<>();
-    Throwable logCause = loggingEvents.get(1).getThrowable().get();
+    Throwable logCause = loggingEvents.get(ERROR_LEVEL).getThrowable().get();
 
     while (logCause != null) {
       logCauseMessages.add(logCause.toString());
