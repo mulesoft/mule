@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -126,6 +128,7 @@ public class AggregationTestCase extends FunctionalTestCase
     
     static class WaitTillTimeoutProcessor extends AbstractFilteringMessageProcessor
     {
+        private static final Log logger = LogFactory.getLog(WaitTillTimeoutProcessor.class);
 
         @Override
         protected boolean accept(MuleEvent event)
