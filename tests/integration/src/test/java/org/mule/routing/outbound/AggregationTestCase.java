@@ -6,6 +6,7 @@
  */
 package org.mule.routing.outbound;
 
+import static org.apache.commons.logging.LogFactory.getLog;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -13,16 +14,6 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.junit.Test;
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.VoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -33,8 +24,12 @@ import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.store.ObjectStoreException;
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.exception.AbstractExceptionListener;
+import org.mule.MessageExchangePattern;
 import org.mule.processor.AbstractFilteringMessageProcessor;
+import org.mule.processor.AbstractInterceptingMessageProcessorBase;
 import org.mule.routing.AggregationException;
 import org.mule.routing.EventGroup;
 import org.mule.routing.SimpleCollectionAggregator;
@@ -43,12 +38,23 @@ import org.mule.routing.correlation.CorrelationTimeoutException;
 import org.mule.routing.correlation.EventCorrelatorCallback;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
+import org.mule.VoidMuleEvent;
+
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.junit.Test;
 
 /**
  * Test that aggregators preserve message order in synchronous scenarios (MULE-5998)
  */
 public class AggregationTestCase extends FunctionalTestCase
 {
+    private static final Log logger = getLog(AbstractInterceptingMessageProcessorBase.class);
+
     private static Latch timeoutLatch;
     
     @Override
