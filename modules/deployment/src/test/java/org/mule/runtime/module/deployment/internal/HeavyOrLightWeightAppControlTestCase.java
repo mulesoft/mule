@@ -36,6 +36,7 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileB
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -64,6 +65,8 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
   private static final String LIGHTWEIGHT_APP = "lightweight";
   private static final String MULE_CONNECTORS_GROUP_ID = "org.mule.connectors";
   private static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
+  private static final String MULE_PLUGIN_EXTENSION_NAME = "-mule-plugin.jar";
+  private static final String MULE_PLUGIN_NAME = "mule-sockets-connector";
   private static final String MULESOFT_PUBLIC_REPOSITORY = "https://repository.mulesoft.org/nexus/content/repositories/public/";
   private static final TestLogger logger = getTestLogger(DefaultArchiveDeployer.class);
 
@@ -80,24 +83,9 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
   @Story(LIGHTWEIGHT)
   public void lightweightAppDeploymentDownloadsDependenciesFromRemoteRepo() throws Exception {
     final File muleRepository = Paths.get(getMuleBaseFolder().getAbsolutePath(), "repository").toFile();
+    setMavenConfiguration(muleRepository);
 
-    final MavenConfigurationBuilder mavenConfigurationBuilder = newMavenConfigurationBuilder();
-    mavenConfigurationBuilder.remoteRepository(newRemoteRepositoryBuilder()
-        .id("mulesoft-public")
-        .url(new URL(MULESOFT_PUBLIC_REPOSITORY))
-        .build());
-    mavenConfigurationBuilder.localMavenRepositoryLocation(muleRepository);
-    setMavenConfig(mavenConfigurationBuilder.build());
-
-    final ArtifactPluginFileBuilder mulePlugin = new ArtifactPluginFileBuilder("mule-sockets-connector")
-        .withGroupId(MULE_CONNECTORS_GROUP_ID)
-        .withVersion("1.2.0")
-        .withClassifier(MULE_PLUGIN_CLASSIFIER);
-
-    final ApplicationFileBuilder applicationFileBuilder = appFileBuilder(LIGHTWEIGHT_APP)
-        .definedBy(APP_XML_FILE)
-        .dependingOn(mulePlugin)
-        .usingLightWeightPackage();
+    final ApplicationFileBuilder applicationFileBuilder = getApplicationFileBuilder(LIGHTWEIGHT_APP);
 
     addPackedAppFromBuilder(applicationFileBuilder);
     startDeployment();
@@ -110,22 +98,14 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
     assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
     assertApplicationAnchorFileExists(applicationName);
     assertThat(applicationRepository.exists(), is(false));
-    assertThat(muleRepositoryContentNames, hasItem(allOf(startsWith("mule-sockets-connector"), endsWith("-mule-plugin.jar"))));
+    assertThat(muleRepositoryContentNames, hasItem(allOf(startsWith(MULE_PLUGIN_NAME), endsWith(MULE_PLUGIN_EXTENSION_NAME))));
     assertThat(muleRepositoryContentNames, not(hasItem(allOf(startsWith("mule-core"), endsWith(".jar")))));
   }
 
   @Test
   @Story(LIGHTWEIGHT)
   public void lightweightAppDeploymentFailsIfNoRemoteRepoConfigured() throws Exception {
-    final ArtifactPluginFileBuilder mulePlugin = new ArtifactPluginFileBuilder("mule-sockets-connector")
-        .withGroupId(MULE_CONNECTORS_GROUP_ID)
-        .withVersion("1.2.0")
-        .withClassifier(MULE_PLUGIN_CLASSIFIER);
-
-    final ApplicationFileBuilder applicationFileBuilder = appFileBuilder(LIGHTWEIGHT_APP)
-        .definedBy(APP_XML_FILE)
-        .dependingOn(mulePlugin)
-        .usingLightWeightPackage();
+    final ApplicationFileBuilder applicationFileBuilder = getApplicationFileBuilder(LIGHTWEIGHT_APP);
 
     addPackedAppFromBuilder(applicationFileBuilder);
     startDeployment();
@@ -146,15 +126,7 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
   @Story(HEAVYWEIGHT)
   @Issues({@Issue("MULE-12298"), @Issue("MULE-12317")})
   public void heavyweightAppDeploymentDoesntDownloadDependenciesFromRemoteRepo() throws Exception {
-    final ArtifactPluginFileBuilder mulePlugin = new ArtifactPluginFileBuilder("mule-http-connector")
-        .withGroupId(MULE_CONNECTORS_GROUP_ID)
-        .withVersion("1.6.1")
-        .withClassifier(MULE_PLUGIN_CLASSIFIER)
-        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo");
-
-    final ApplicationFileBuilder applicationFileBuilder = appFileBuilder(HEAVYWEIGHT_APP)
-        .definedBy(APP_XML_FILE)
-        .dependingOn(mulePlugin);
+    final ApplicationFileBuilder applicationFileBuilder = getApplicationFileBuilder(HEAVYWEIGHT_APP);
 
     addPackedAppFromBuilder(applicationFileBuilder);
     startDeployment();
@@ -168,9 +140,38 @@ public class HeavyOrLightWeightAppControlTestCase extends AbstractApplicationDep
     assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
     assertApplicationAnchorFileExists(applicationName);
     assertThat(applicationRepository.exists(), is(true));
-    assertThat(applicationRepositoryContentNames,
-               hasItem(allOf(startsWith("mule-http-connector"), endsWith("-mule-plugin.jar"))));
+    assertThat(applicationRepositoryContentNames, hasItem(allOf(startsWith(MULE_PLUGIN_NAME), endsWith(MULE_PLUGIN_EXTENSION_NAME))));
     assertThat(muleRepository.exists(), is(false));
+  }
+
+  private ApplicationFileBuilder getApplicationFileBuilder(String applicationWeight) {
+    ApplicationFileBuilder applicationFileBuilder = appFileBuilder(applicationWeight)
+        .definedBy(APP_XML_FILE)
+        .dependingOn(getMulePlugin());
+
+    if (applicationWeight.equals(LIGHTWEIGHT_APP)) {
+      applicationFileBuilder.usingLightWeightPackage();
+    }
+
+    return applicationFileBuilder;
+  }
+
+  private ArtifactPluginFileBuilder getMulePlugin() {
+    return new ArtifactPluginFileBuilder(MULE_PLUGIN_NAME)
+        .withGroupId(MULE_CONNECTORS_GROUP_ID)
+        .withVersion("1.2.0")
+        .withClassifier(MULE_PLUGIN_CLASSIFIER)
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo");
+  }
+
+  private void setMavenConfiguration(File repository) throws MalformedURLException {
+    MavenConfigurationBuilder mavenConfigurationBuilder = newMavenConfigurationBuilder();
+    mavenConfigurationBuilder.remoteRepository(newRemoteRepositoryBuilder()
+        .id("mulesoft-public")
+        .url(new URL(MULESOFT_PUBLIC_REPOSITORY))
+        .build());
+    mavenConfigurationBuilder.localMavenRepositoryLocation(repository);
+    setMavenConfig(mavenConfigurationBuilder.build());
   }
 
   private Collection<File> getRepositoryContents(File repository) {
