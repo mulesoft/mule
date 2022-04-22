@@ -145,7 +145,7 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
   }
 
   @Override
-  public boolean isForceNoExplicit() {
+  public boolean isForceNoImplicit() {
     return configElement.isAnnotatedWith(NoImplicit.class) ||
         configElement.isAnnotatedWith(org.mule.sdk.api.annotation.NoImplicit.class);
   }
