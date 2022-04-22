@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
@@ -45,6 +46,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -54,9 +57,12 @@ import java.util.stream.Stream;
  */
 class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser implements OperationModelParser {
 
+  private static final String CHARACTERISTICS_NOT_COMPUTED_MSG = "Characteristics have not been computed yet.";
+
   private final ComponentAst operation;
   private final TypeLoader typeLoader;
-  private Boolean isBlocking;
+
+  private final Characteristic<Boolean> isBlocking = new AnyMatchCharacteristic(OperationModel::isBlocking);
 
   private String name;
 
@@ -141,8 +147,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public boolean isBlocking() {
-    checkState(isBlocking != null, "Characteristics have not been computed yet.");
-    return isBlocking;
+    return isBlocking.getValue();
   }
 
   @Override
@@ -306,11 +311,80 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
         });
   }
 
-  private void computeIsBlocking(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
-    isBlocking = getOperationModelsRecursiveStream(operationModelParsersByName).anyMatch(OperationModel::isBlocking);
+  public void computeCharacteristics(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
+    computeCharacteristics(singletonList(isBlocking), operationModelParsersByName);
   }
 
-  public void computeCharacteristics(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
-    computeIsBlocking(operationModelParsersByName);
+  private void computeCharacteristics(List<Characteristic<?>> characteristics,
+                                      Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
+    getOperationModelsRecursiveStream(operationModelParsersByName).anyMatch(operationModel -> {
+      for (Characteristic<?> characteristic : characteristics) {
+        characteristic.computeFrom(operationModel);
+      }
+
+      return areAllCharacteristicsWithDefinitiveValue(characteristics);
+    });
+
+    for (Characteristic<?> characteristic : characteristics) {
+      if (!characteristic.hasValue()) {
+        characteristic.setWithDefault();
+      }
+    }
+  }
+
+  private boolean areAllCharacteristicsWithDefinitiveValue(List<Characteristic<?>> characteristics) {
+    return characteristics.stream().allMatch(Characteristic::hasDefinitiveValue);
+  }
+
+  private static class Characteristic<T> {
+
+    private final BiFunction<OperationModel, T, T> mapper;
+    private final T defaultValue;
+    private final T stopValue;
+
+    private T value;
+
+    private Characteristic(BiFunction<OperationModel, T, T> mapper, T defaultValue, T stopValue) {
+      this.mapper = mapper;
+      this.defaultValue = defaultValue;
+      this.stopValue = stopValue;
+    }
+
+    public void computeFrom(OperationModel operationModel) {
+      value = mapper.apply(operationModel, value);
+    }
+
+    public void setWithDefault() {
+      value = defaultValue;
+    }
+
+    public boolean hasDefinitiveValue() {
+      return stopValue.equals(value);
+    }
+
+    public boolean hasValue() {
+      return value != null;
+    }
+
+    public T getValue() {
+      checkState(hasValue(), CHARACTERISTICS_NOT_COMPUTED_MSG);
+      return value;
+    }
+  }
+
+  private static class BooleanCharacteristic extends Characteristic<Boolean> {
+
+    private BooleanCharacteristic(Predicate<OperationModel> predicate, Boolean defaultValue, Boolean stopValue) {
+      super(((operationModel,
+              curValue) -> (curValue != null && curValue == stopValue) ? curValue : predicate.test(operationModel)),
+            defaultValue, stopValue);
+    }
+  }
+
+  private static class AnyMatchCharacteristic extends BooleanCharacteristic {
+
+    private AnyMatchCharacteristic(Predicate<OperationModel> predicate) {
+      super(predicate, false, true);
+    }
   }
 }
