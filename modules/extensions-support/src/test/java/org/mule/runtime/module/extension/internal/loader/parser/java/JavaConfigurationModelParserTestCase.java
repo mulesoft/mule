@@ -62,14 +62,14 @@ public class JavaConfigurationModelParserTestCase {
   public void isForceNoImplicitOnConfigurationUsingTheSdkApi() {
     JavaConfigurationModelParser javaConfigurationModelParser = getParser(SimpleSdkExtension.class);
 
-    assertThat(javaConfigurationModelParser.isForceNoExplicit(), is(true));
+    assertThat(javaConfigurationModelParser.isForceNoImplicit(), is(true));
   }
 
   @Test
   public void isForceNoImplicitOnConfigurationUsingTheLegacyApi() {
     JavaConfigurationModelParser javaConfigurationModelParser = getParser(SimpleLegacyExtension.class);
 
-    assertThat(javaConfigurationModelParser.isForceNoExplicit(), is(true));
+    assertThat(javaConfigurationModelParser.isForceNoImplicit(), is(true));
   }
 
   private JavaConfigurationModelParser getParser(Class<?> extension) {

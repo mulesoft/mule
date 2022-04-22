@@ -41,7 +41,7 @@ public interface ConfigurationModelParser extends StereotypeModelParser, Additio
   /**
    * @return whether the configuration should be force to never support implicit definitions
    */
-  boolean isForceNoExplicit();
+  boolean isForceNoImplicit();
 
   /**
    * @return a list with an {@link ExternalLibraryModel} per each external library defined at the configuration level.

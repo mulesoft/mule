@@ -36,7 +36,7 @@ final class ConfigModelLoaderDelegate extends AbstractComponentModelLoaderDelega
           .describedAs(resolveConfigDescription(configParser, configName))
           .withModelProperty(configParser.getConfigurationFactoryModelProperty());
 
-      if (configParser.isForceNoExplicit()) {
+      if (configParser.isForceNoImplicit()) {
         configurationDeclarer.withModelProperty(new NoImplicitModelProperty());
       }
 
