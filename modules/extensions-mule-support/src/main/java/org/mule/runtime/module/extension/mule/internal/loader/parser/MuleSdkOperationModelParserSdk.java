@@ -7,9 +7,9 @@
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
-import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
@@ -63,6 +63,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   private final TypeLoader typeLoader;
 
   private final Characteristic<Boolean> isBlocking = new AnyMatchCharacteristic(OperationModel::isBlocking);
+  private final Characteristic<Boolean> isConnected = new AnyMatchCharacteristic(OperationModel::requiresConnection);
 
   private String name;
 
@@ -167,8 +168,8 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public boolean isConnected() {
-    // TODO: MULE-20077
-    return false;
+    // TODO: W-11038145 add tests
+    return isConnected.getValue();
   }
 
   @Override
@@ -312,7 +313,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   }
 
   public void computeCharacteristics(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
-    computeCharacteristics(singletonList(isBlocking), operationModelParsersByName);
+    computeCharacteristics(asList(isBlocking, isConnected), operationModelParsersByName);
   }
 
   private void computeCharacteristics(List<Characteristic<?>> characteristics,
