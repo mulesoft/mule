@@ -35,7 +35,7 @@ public interface ExtensionDiscoveryRequest {
   /**
    * @return {@link ArtifactPluginDescriptor}s for artifact plugins deployed inside the artifact. Non-null.
    */
-  List<ArtifactPluginDescriptor> getArtifactPlugins();
+  List<ArtifactPluginDescriptor> getArtifactPluginDescriptors();
 
   /**
    * @return {@link Set} of {@link ExtensionModel} to also take into account when parsing extensions

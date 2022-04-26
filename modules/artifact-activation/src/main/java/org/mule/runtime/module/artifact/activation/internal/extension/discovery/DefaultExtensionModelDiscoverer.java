@@ -48,22 +48,24 @@ public class DefaultExtensionModelDiscoverer implements ExtensionModelDiscoverer
   @Override
   public Set<ExtensionModel> discoverPluginsExtensionModels(ExtensionDiscoveryRequest discoveryRequest) {
     return unmodifiableSet(new HashSet<>(PluginsDependenciesProcessor
-        .process(discoveryRequest.getArtifactPlugins(), discoveryRequest.isParallelDiscovery(), (extensions, artifactPlugin) -> {
-          Set<ExtensionModel> dependencies = new HashSet<>();
+        .process(discoveryRequest.getArtifactPluginDescriptors(), discoveryRequest.isParallelDiscovery(),
+                 (extensions, artifactPlugin) -> {
+                   Set<ExtensionModel> dependencies = new HashSet<>();
 
-          dependencies.addAll(extensions);
-          dependencies.addAll(discoveryRequest.getParentArtifactExtensions());
-          if (!dependencies.contains(MuleExtensionModelProvider.getExtensionModel())) {
-            dependencies = ImmutableSet.<ExtensionModel>builder()
-                .addAll(extensions)
-                .addAll(discoverRuntimeExtensionModels())
-                .build();
-          }
+                   dependencies.addAll(extensions);
+                   dependencies.addAll(discoveryRequest.getParentArtifactExtensions());
+                   if (!dependencies.contains(MuleExtensionModelProvider.getExtensionModel())) {
+                     dependencies = ImmutableSet.<ExtensionModel>builder()
+                         .addAll(extensions)
+                         .addAll(discoverRuntimeExtensionModels())
+                         .build();
+                   }
 
-          ExtensionModel extension = extensionModelGenerator.obtainExtensionModel(discoveryRequest, artifactPlugin, dependencies);
-          if (extension != null) {
-            extensions.add(extension);
-          }
-        })));
+                   ExtensionModel extension =
+                       extensionModelGenerator.obtainExtensionModel(discoveryRequest, artifactPlugin, dependencies);
+                   if (extension != null) {
+                     extensions.add(extension);
+                   }
+                 })));
   }
 }

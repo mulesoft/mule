@@ -38,7 +38,7 @@ public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryReque
   }
 
   @Override
-  public List<ArtifactPluginDescriptor> getArtifactPlugins() {
+  public List<ArtifactPluginDescriptor> getArtifactPluginDescriptors() {
     return artifactPlugins;
   }
 

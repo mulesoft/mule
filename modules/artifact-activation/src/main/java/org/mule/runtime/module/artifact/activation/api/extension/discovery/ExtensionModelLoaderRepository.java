@@ -20,7 +20,6 @@ import java.util.function.Supplier;
  *
  * @since 4.0, moved to api in 4.5
  */
-@FunctionalInterface
 public interface ExtensionModelLoaderRepository {
 
   /**
