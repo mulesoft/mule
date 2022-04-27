@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser;
 
+import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
@@ -164,4 +165,6 @@ public interface OperationModelParser extends SemanticTermsParser, AdditionalPro
    * @return a list with an {@link ErrorModelParser} per each error that the operation can raise.
    */
   List<ErrorModelParser> getErrorModelParsers();
+
+  ComponentVisibility getComponentVisibility();
 }

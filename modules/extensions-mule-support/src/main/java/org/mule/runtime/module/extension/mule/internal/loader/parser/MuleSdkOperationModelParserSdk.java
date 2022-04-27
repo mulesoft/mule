@@ -17,6 +17,7 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.metadata.api.TypeLoader;
+import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
@@ -125,6 +126,11 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
         .map(parameters -> Collections
             .<ParameterGroupModelParser>singletonList(new MuleSdkParameterGroupModelParser(parameters, typeLoader)))
         .orElse(emptyList());
+  }
+
+  @Override
+  public ComponentVisibility getComponentVisibility() {
+    return buchi.magic();
   }
 
   @Override
