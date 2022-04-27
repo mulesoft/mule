@@ -34,7 +34,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
@@ -48,7 +47,11 @@ import org.slf4j.Logger;
  * Discover the {@link ExtensionModel} based on the {@link ExtensionModelLoader} type.
  *
  * @since 4.0
+ * @deprecated Since 4.5, use {@link org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer}
+ *             instead.
  */
+@Deprecated
+// TODO W-10928152: remove this class when migrating to use the new extension model loading API.
 public class ExtensionModelDiscoverer {
 
   private static final Logger LOGGER = getLogger(ExtensionModelDiscoverer.class);
@@ -61,7 +64,7 @@ public class ExtensionModelDiscoverer {
    *                         deployed inside the artifact. Non null.
    * @return {@link Set} of {@link Pair} carrying the {@link ArtifactPluginDescriptor} and it's corresponding
    *         {@link ExtensionModel}.
-   * 
+   *
    * @deprecated from 4.5 use {@link #discoverPluginsExtensionModels(ExtensionDiscoveryRequest)} instead.
    */
   @Deprecated
@@ -82,7 +85,7 @@ public class ExtensionModelDiscoverer {
    * @param parentArtifactExtensions {@link Set} of {@link ExtensionModel} to also take into account when parsing extensions
    * @return {@link Set} of {@link Pair} carrying the {@link ArtifactPluginDescriptor} and it's corresponding
    *         {@link ExtensionModel}.
-   * 
+   *
    * @deprecated form 4.5 use {@link #discoverPluginsExtensionModels(ExtensionDiscoveryRequest)} instead.
    */
   @Deprecated
@@ -103,6 +106,7 @@ public class ExtensionModelDiscoverer {
    * @return {@link Set} of {@link Pair} carrying the {@link ArtifactPluginDescriptor} and it's corresponding
    *         {@link ExtensionModel}.
    */
+  @Deprecated
   public Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> discoverPluginsExtensionModels(ExtensionDiscoveryRequest discoveryRequest) {
     final Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> descriptorsWithExtensions = synchronizedSet(new HashSet<>());
 
@@ -163,10 +167,9 @@ public class ExtensionModelDiscoverer {
                                                               final Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> descriptorsWithExtensions,
                                                               Pair<ArtifactPluginDescriptor, ArtifactClassLoader> artifactPlugin) {
     final ArtifactPluginDescriptor artifactPluginDescriptor = artifactPlugin.getFirst();
-    Optional<LoaderDescriber> loaderDescriber = artifactPluginDescriptor.getExtensionModelDescriptorProperty();
     ClassLoader artifactClassloader = artifactPlugin.getSecond().getClassLoader();
     String artifactName = artifactPluginDescriptor.getName();
-    ExtensionModel extension = loaderDescriber
+    ExtensionModel extension = artifactPluginDescriptor.getExtensionModelDescriptorProperty()
         .map(describer -> discoverExtensionThroughJsonDescriber(discoveryRequest.getLoaderRepository(), describer,
                                                                 extensions, artifactClassloader,
                                                                 artifactName,

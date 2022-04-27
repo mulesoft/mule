@@ -4,16 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.deployment.model.api.artifact.extension;
+package org.mule.runtime.module.artifact.activation.api.extension.discovery;
 
 import static java.util.Collections.emptySet;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
-import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.deployment.model.internal.artifact.extension.DefaultExtensionDiscoveryRequest;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.activation.internal.extension.discovery.DefaultExtensionDiscoveryRequest;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
 import java.util.List;
@@ -24,9 +22,7 @@ import java.util.Set;
  * {@link ExtensionModelDiscoverer#discoverPluginsExtensionModels(ExtensionDiscoveryRequest)}.
  * 
  * @since 4.5
- * @deprecated Use {@link org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionDiscoveryRequest} instead.
  */
-@Deprecated
 public interface ExtensionDiscoveryRequest {
 
   /**
@@ -37,15 +33,9 @@ public interface ExtensionDiscoveryRequest {
   }
 
   /**
-   * @return {@link ExtensionModelLoaderRepository} with the available extension loaders.
+   * @return {@link ArtifactPluginDescriptor}s for artifact plugins deployed inside the artifact. Non-null.
    */
-  ExtensionModelLoaderRepository getLoaderRepository();
-
-  /**
-   * @return {@link Pair} of {@link ArtifactPluginDescriptor} and {@link ArtifactClassLoader} for artifact plugins deployed inside
-   *         the artifact. Non null.
-   */
-  List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> getArtifactPlugins();
+  List<ArtifactPluginDescriptor> getArtifactPluginDescriptors();
 
   /**
    * @return {@link Set} of {@link ExtensionModel} to also take into account when parsing extensions
@@ -64,25 +54,19 @@ public interface ExtensionDiscoveryRequest {
   boolean isParallelDiscovery();
 
   /**
-   * @return {@code true} if any {@link DeclarationEnricher} that adds descriptions to a {@link ExtensionDeclaration} must be
-   *         executed, {@code false} it if must be skipped.
+   * @return {@code true} if any {@link DeclarationEnricher} that adds descriptions to an {@link ExtensionDeclaration} must be
+   *         executed, {@code false} if it must be skipped.
    */
   boolean isEnrichDescriptions();
 
-  public final class ExtensionDiscoveryRequestBuilder {
+  final class ExtensionDiscoveryRequestBuilder {
 
-    private ExtensionModelLoaderRepository loaderRepository;
-    private List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> artifactPlugins;
+    private List<ArtifactPluginDescriptor> artifactPlugins;
     private Set<ExtensionModel> parentArtifactExtensions = emptySet();
     private boolean parallelDiscovery = false;
     private boolean enrichDescriptions = true;
 
-    public ExtensionDiscoveryRequestBuilder setLoaderRepository(ExtensionModelLoaderRepository loaderRepository) {
-      this.loaderRepository = loaderRepository;
-      return this;
-    }
-
-    public ExtensionDiscoveryRequestBuilder setArtifactPlugins(List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> artifactPlugins) {
+    public ExtensionDiscoveryRequestBuilder setArtifactPlugins(List<ArtifactPluginDescriptor> artifactPlugins) {
       this.artifactPlugins = artifactPlugins;
       return this;
     }
@@ -103,7 +87,7 @@ public interface ExtensionDiscoveryRequest {
     }
 
     public ExtensionDiscoveryRequest build() {
-      return new DefaultExtensionDiscoveryRequest(loaderRepository, artifactPlugins, parentArtifactExtensions,
+      return new DefaultExtensionDiscoveryRequest(artifactPlugins, parentArtifactExtensions,
                                                   parallelDiscovery, enrichDescriptions);
     }
   }

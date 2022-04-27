@@ -5,7 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.deployment.impl.internal.plugin;
+package org.mule.runtime.module.artifact.activation.internal.extension.discovery;
+
+import static org.mule.test.allure.AllureConstants.ExtensionModelDiscoveryFeature.EXTENSION_MODEL_DISCOVERY;
+import static org.mule.test.allure.AllureConstants.ExtensionModelDiscoveryFeature.ExtensionModelDiscoveryStory.EXTENSION_MODEL_LOADER_REPOSITORY;
 
 import static java.nio.file.Files.newBufferedWriter;
 import static java.util.Collections.singleton;
@@ -17,7 +20,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.deployment.model.internal.artifact.extension.MuleExtensionModelLoaderManager;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
@@ -25,6 +27,16 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.plugin.LoaderDescriber;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -34,23 +46,13 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Set;
 
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-
+@Feature(EXTENSION_MODEL_DISCOVERY)
+@Story(EXTENSION_MODEL_LOADER_REPOSITORY)
 @SmallTest
-// TODO W-10928152: remove this test case when migrating to use the new extension model loading API.
-public class MuleExtensionModelLoaderManagerTestCase extends AbstractMuleTestCase {
+@RunWith(MockitoJUnitRunner.class)
+public class DefaultExtensionModelLoaderRepositoryTestCase extends AbstractMuleTestCase {
 
   private static final String ID = "ID";
-
-  @Rule
-  public MockitoRule mockitorule = MockitoJUnit.rule();
 
   private final LoaderDescriber loaderDescriber = new LoaderDescriber(ID);
   @Mock
@@ -68,10 +70,11 @@ public class MuleExtensionModelLoaderManagerTestCase extends AbstractMuleTestCas
     URLClassLoader emptyClassLoader = new URLClassLoader(new URL[0], getLauncherClassLoader(this.getClass().getClassLoader()));
     when(containerClassLoader.getClassLoader()).thenReturn(emptyClassLoader);
 
-    MuleExtensionModelLoaderManager manager = new MuleExtensionModelLoaderManager(containerClassLoader);
-    manager.start();
+    DefaultExtensionModelLoaderRepository loaderRepository =
+        new DefaultExtensionModelLoaderRepository(containerClassLoader.getClassLoader());
+    loaderRepository.start();
 
-    Optional<ExtensionModelLoader> loader = manager.getExtensionModelLoader(loaderDescriber);
+    Optional<ExtensionModelLoader> loader = loaderRepository.getExtensionModelLoader(loaderDescriber);
     assertThat(loader.isPresent(), is(false));
   }
 
@@ -87,10 +90,11 @@ public class MuleExtensionModelLoaderManagerTestCase extends AbstractMuleTestCas
     when(containerClassLoader.getClassLoader())
         .thenReturn(new URLClassLoader(new URL[] {temporaryFolder.getRoot().toURI().toURL()}, this.getClass().getClassLoader()));
 
-    MuleExtensionModelLoaderManager manager = new MuleExtensionModelLoaderManager(containerClassLoader);
-    manager.start();
+    DefaultExtensionModelLoaderRepository loaderRepository =
+        new DefaultExtensionModelLoaderRepository(containerClassLoader.getClassLoader());
+    loaderRepository.start();
 
-    Optional<ExtensionModelLoader> loader = manager.getExtensionModelLoader(loaderDescriber);
+    Optional<ExtensionModelLoader> loader = loaderRepository.getExtensionModelLoader(loaderDescriber);
     assertThat(loader.isPresent(), is(true));
     assertThat(loader.get(), instanceOf(TestExtensionModelLoader.class));
   }

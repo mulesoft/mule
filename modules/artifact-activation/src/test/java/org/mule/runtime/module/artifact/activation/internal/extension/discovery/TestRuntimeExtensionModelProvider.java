@@ -4,7 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.deployment.model.api.artifact.extension;
+package org.mule.runtime.module.artifact.activation.internal.extension.discovery;
+
+import static org.mule.test.allure.AllureConstants.ExtensionModelDiscoveryFeature.EXTENSION_MODEL_DISCOVERY;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -12,7 +14,9 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider;
 
-// TODO W-10928152: remove this class when migrating to use the new extension model loading API.
+import io.qameta.allure.Feature;
+
+@Feature(EXTENSION_MODEL_DISCOVERY)
 public class TestRuntimeExtensionModelProvider implements RuntimeExtensionModelProvider {
 
   @Override

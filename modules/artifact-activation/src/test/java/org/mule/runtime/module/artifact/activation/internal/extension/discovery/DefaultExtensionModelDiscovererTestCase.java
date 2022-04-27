@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.deployment.model.api.artifact.extension;
+package org.mule.runtime.module.artifact.activation.internal.extension.discovery;
 
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
-import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
+import static org.mule.test.allure.AllureConstants.ExtensionModelDiscoveryFeature.EXTENSION_MODEL_DISCOVERY;
 
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
@@ -18,34 +18,36 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.deployment.model.internal.artifact.extension.DefaultExtensionDiscoveryRequest;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.plugin.LoaderDescriber;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.junit.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
+import org.junit.Test;
 
-@Feature(XML_SDK)
-// TODO W-10928152: remove this test case when migrating to use the new extension model loading API.
-public class ExtensionModelDiscovererTestCase extends AbstractMuleTestCase {
+import java.util.concurrent.atomic.AtomicBoolean;
+
+@Feature(EXTENSION_MODEL_DISCOVERY)
+public class DefaultExtensionModelDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test
   @Issue("MULE-19858")
   @Description("Check that not only 'mule' extension is loaded for xml sdk extension model generation, but all runtime ext models are (for instance: ee)")
   public void allRuntimeExtModelsDiscoveredForExtensionLoading() {
-    ArtifactPluginDescriptor descriptor = new ArtifactPluginDescriptor("myPlugin");
+    String pluginName = "myPlugin";
+    ArtifactPluginDescriptor descriptor = new ArtifactPluginDescriptor(pluginName);
     LoaderDescriber loaderDescriber = new LoaderDescriber("test");
     descriptor.setExtensionModelDescriptorProperty(loaderDescriber);
+    descriptor.setBundleDescriptor(new BundleDescriptor.Builder().setGroupId("myGroup").setArtifactId(
+                                                                                                      pluginName)
+        .setVersion("1.0").setClassifier("mule-plugin").build());
 
     AtomicBoolean extensionDeclared = new AtomicBoolean();
     ExtensionModelLoader extModelLoader = new ExtensionModelLoader() {
@@ -75,13 +77,12 @@ public class ExtensionModelDiscovererTestCase extends AbstractMuleTestCase {
     ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
     when(artifactClassLoader.getClassLoader()).thenReturn(this.getClass().getClassLoader());
 
-    new ExtensionModelDiscoverer()
-        .discoverPluginsExtensionModels(new DefaultExtensionDiscoveryRequest(loaderRepository,
-                                                                             singletonList(new Pair<>(descriptor,
-                                                                                                      artifactClassLoader)),
-                                                                             emptySet(),
-                                                                             false,
-                                                                             false));
+    new DefaultExtensionModelDiscoverer(new RepositoryLookupExtensionModelGenerator(artifactPluginDescriptor -> artifactClassLoader,
+                                                                                    loaderRepository))
+                                                                                        .discoverPluginsExtensionModels(new DefaultExtensionDiscoveryRequest(singletonList(descriptor),
+                                                                                                                                                             emptySet(),
+                                                                                                                                                             false,
+                                                                                                                                                             false));
 
     assertThat(extensionDeclared.get(), is(true));
   }
