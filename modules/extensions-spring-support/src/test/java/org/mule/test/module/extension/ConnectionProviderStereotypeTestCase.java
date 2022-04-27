@@ -8,6 +8,7 @@ package org.mule.test.module.extension;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.api.message.Message;
 
 import org.junit.Test;
@@ -23,5 +24,17 @@ public class ConnectionProviderStereotypeTestCase extends AbstractExtensionFunct
   public void storeInCustomStore() throws Exception {
     Message message = flowRunner("customStore").run().getMessage();
     assertThat(message.getPayload().getValue(), equalTo("Extend all the things!"));
+  }
+
+  @Test
+  public void storeInSDKCustomStore() throws Exception {
+    Message message = flowRunner("customSDKStore").run().getMessage();
+    assertThat(message.getPayload().getValue(), equalTo("test value"));
+  }
+
+  @Test
+  public void storeInSDKCustomStoreWithNonSdkConnectionProvider() throws Exception {
+    Message message = flowRunner("anotherCustomSDKStore").run().getMessage();
+    assertThat(message.getPayload().getValue(), equalTo("test value"));
   }
 }

@@ -6,7 +6,9 @@
  */
 package org.mule.test.customos.internal.operation;
 
+import static org.mule.test.customos.internal.MyOSConnector.STORAGE;
 import static org.mule.test.customos.internal.MyOSConnector.VALUES;
+
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 
@@ -17,4 +19,7 @@ public class MyOSOperations {
     return VALUES.get(key).getValue();
   }
 
+  public String retrieveFromSdkOS(String key) {
+    return STORAGE.get(key).getValue();
+  }
 }

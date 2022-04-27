@@ -23,6 +23,8 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.internal.registry.InjectionTargetDecorator;
+import org.mule.runtime.module.extension.internal.store.ObjectStoreManagerAdapter;
+import org.mule.sdk.api.store.ObjectStoreManager;
 
 import javax.inject.Inject;
 
@@ -50,6 +52,10 @@ public class SdkConnectionProviderAdapter<C> implements ConnectionProvider<C>, L
   @Inject
   private MuleContext muleContext;
 
+  private SdkConnectionProviderAdapter(org.mule.sdk.api.connectivity.ConnectionProvider<C> delegate) {
+    this.delegate = delegate;
+  }
+
   /**
    * Returns the given {@code connectionProvider} as a {@link ConnectionProvider}, creating an adapter around it if needed.
    * <p>
@@ -64,11 +70,13 @@ public class SdkConnectionProviderAdapter<C> implements ConnectionProvider<C>, L
   public static <C> ConnectionProvider<C> from(Object connectionProvider) {
     if (connectionProvider != null) {
       if (connectionProvider instanceof ConnectionProvider) {
-        return (ConnectionProvider<C>) connectionProvider;
+        return new SdkObjectStoreManagerConnectionProviderWrapper<>((ConnectionProvider<C>) connectionProvider);
       } else if (connectionProvider instanceof org.mule.sdk.api.connectivity.CachedConnectionProvider) {
-        return new SdkCachedConnectionProviderAdapter<>((org.mule.sdk.api.connectivity.CachedConnectionProvider<C>) connectionProvider);
+        return new SdkCachedConnectionProviderAdapter<>(
+                                                        (org.mule.sdk.api.connectivity.CachedConnectionProvider<C>) connectionProvider);
       } else if (connectionProvider instanceof org.mule.sdk.api.connectivity.PoolingConnectionProvider) {
-        return new SdkPoolingConnectionProviderAdapter<>((org.mule.sdk.api.connectivity.PoolingConnectionProvider<C>) connectionProvider);
+        return new SdkPoolingConnectionProviderAdapter<>(
+                                                         (org.mule.sdk.api.connectivity.PoolingConnectionProvider<C>) connectionProvider);
       } else if (connectionProvider instanceof org.mule.sdk.api.connectivity.ConnectionProvider) {
         return new SdkConnectionProviderAdapter<>((org.mule.sdk.api.connectivity.ConnectionProvider<C>) connectionProvider);
       } else {
@@ -79,23 +87,33 @@ public class SdkConnectionProviderAdapter<C> implements ConnectionProvider<C>, L
     }
   }
 
-  private SdkConnectionProviderAdapter(org.mule.sdk.api.connectivity.ConnectionProvider<C> delegate) {
-    this.delegate = delegate;
-  }
-
   @Override
   public C connect() throws ConnectionException {
-    return delegate.connect();
+    return wrapConnectionIfNeeded(delegate.connect());
   }
 
   @Override
   public void disconnect(C connection) {
-    delegate.disconnect(connection);
+    delegate.disconnect(unwrapConnectionIfNeeded(connection));
   }
 
   @Override
   public ConnectionValidationResult validate(C connection) {
-    return new SdkConnectionValidationResultAdapter(delegate.validate(connection));
+    return new SdkConnectionValidationResultAdapter(delegate.validate(unwrapConnectionIfNeeded(connection)));
+  }
+
+  protected C wrapConnectionIfNeeded(C connection) {
+    if (connection instanceof ObjectStoreManager) {
+      return (C) ObjectStoreManagerAdapter.from(connection);
+    }
+    return connection;
+  }
+
+  protected C unwrapConnectionIfNeeded(C connection) {
+    if (connection instanceof ObjectStoreManagerAdapter) {
+      return (C) ((ObjectStoreManagerAdapter) connection).getDelegate();
+    }
+    return connection;
   }
 
   @Override
@@ -156,11 +174,51 @@ public class SdkConnectionProviderAdapter<C> implements ConnectionProvider<C>, L
     }
   }
 
+
   private static class SdkCachedConnectionProviderAdapter<C> extends SdkConnectionProviderAdapter<C>
       implements CachedConnectionProvider<C> {
 
     private SdkCachedConnectionProviderAdapter(org.mule.sdk.api.connectivity.CachedConnectionProvider<C> delegate) {
       super(delegate);
+    }
+  }
+
+
+  private static class SdkObjectStoreManagerConnectionProviderWrapper<C> implements ConnectionProvider<C> {
+
+    private final ConnectionProvider<C> delegate;
+
+    private SdkObjectStoreManagerConnectionProviderWrapper(ConnectionProvider<C> delegate) {
+      this.delegate = delegate;
+    }
+
+    @Override
+    public C connect() throws ConnectionException {
+      return wrapConnectionIfNeeded(delegate.connect());
+    }
+
+    @Override
+    public void disconnect(C connection) {
+      delegate.disconnect(unwrapConnectionIfNeeded(connection));
+    }
+
+    @Override
+    public ConnectionValidationResult validate(C connection) {
+      return delegate.validate(unwrapConnectionIfNeeded(connection));
+    }
+
+    protected C wrapConnectionIfNeeded(C connection) {
+      if (connection instanceof ObjectStoreManager) {
+        return (C) ObjectStoreManagerAdapter.from(connection);
+      }
+      return connection;
+    }
+
+    protected C unwrapConnectionIfNeeded(C connection) {
+      if (connection instanceof ObjectStoreManagerAdapter) {
+        return (C) ((ObjectStoreManagerAdapter) connection).getDelegate();
+      }
+      return connection;
     }
   }
 }

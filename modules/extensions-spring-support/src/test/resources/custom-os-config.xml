@@ -8,16 +8,41 @@
             http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
 
     <os:config name="ObjectStore_Config">
-        <custom-os:connection />
+        <custom-os:connection/>
     </os:config>
 
-    <os:object-store name="customOS" config-ref="ObjectStore_Config" />
+    <os:object-store name="customOS" config-ref="ObjectStore_Config"/>
+
+    <os:config name="CustomSdkObjectStore_Config">
+        <custom-os:custom-sdk-os-connection/>
+    </os:config>
+
+    <os:object-store name="customSDKOS" config-ref="CustomSdkObjectStore_Config"/>
+
+    <os:config name="AnotherCustomSdkObjectStore_Config">
+        <custom-os:another-custom-sdk-os-connection/>
+    </os:config>
+
+    <os:object-store name="anotherCustomSDKOS" config-ref="AnotherCustomSdkObjectStore_Config"/>
 
     <flow name="customStore">
         <os:store key="key" objectStore="customOS">
             <os:value>Extend all the things!</os:value>
         </os:store>
-        <custom-os:retrieve key="key" />
+        <custom-os:retrieve key="key"/>
     </flow>
 
+    <flow name="customSDKStore">
+        <os:store key="key" objectStore="customSDKOS">
+            <os:value>test value</os:value>
+        </os:store>
+        <custom-os:retrieve-from-sdk-os key="key"/>
+    </flow>
+
+    <flow name="anotherCustomSDKStore">
+        <os:store key="key" objectStore="anotherCustomSDKOS">
+            <os:value>test value</os:value>
+        </os:store>
+        <custom-os:retrieve-from-sdk-os key="key"/>
+    </flow>
 </mule>
