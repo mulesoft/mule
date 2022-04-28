@@ -46,7 +46,7 @@ public class TrackingArtifactClassLoaderResolverDecorator implements ArtifactCla
   @Override
   public MuleDeployableArtifactClassLoader createDomainClassLoader(DomainDescriptor descriptor) {
     MuleDeployableArtifactClassLoader artifactClassLoader = delegate.createDomainClassLoader(descriptor);
-    track(artifactClassLoader);
+    trackDeployableArtifactClassLoader(artifactClassLoader);
     return artifactClassLoader;
   }
 
@@ -55,7 +55,7 @@ public class TrackingArtifactClassLoaderResolverDecorator implements ArtifactCla
                                                                    PluginClassLoaderResolver pluginClassLoaderResolver) {
     MuleDeployableArtifactClassLoader artifactClassLoader =
         delegate.createDomainClassLoader(descriptor, pluginClassLoaderResolver);
-    track(artifactClassLoader);
+    trackDeployableArtifactClassLoader(artifactClassLoader);
     return artifactClassLoader;
   }
 
@@ -63,7 +63,7 @@ public class TrackingArtifactClassLoaderResolverDecorator implements ArtifactCla
   public MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
                                                                         Supplier<ArtifactClassLoader> domainClassLoader) {
     MuleDeployableArtifactClassLoader artifactClassLoader = delegate.createApplicationClassLoader(descriptor, domainClassLoader);
-    track(artifactClassLoader);
+    trackDeployableArtifactClassLoader(artifactClassLoader);
     return artifactClassLoader;
   }
 
@@ -73,7 +73,7 @@ public class TrackingArtifactClassLoaderResolverDecorator implements ArtifactCla
                                                                         PluginClassLoaderResolver pluginClassLoaderResolver) {
     MuleDeployableArtifactClassLoader artifactClassLoader =
         delegate.createApplicationClassLoader(descriptor, domainClassLoader, pluginClassLoaderResolver);
-    track(artifactClassLoader);
+    trackDeployableArtifactClassLoader(artifactClassLoader);
     return artifactClassLoader;
   }
 
@@ -96,6 +96,11 @@ public class TrackingArtifactClassLoaderResolverDecorator implements ArtifactCla
         .createMulePluginClassLoader(ownerArtifactClassLoader, descriptor, pluginDescriptorResolver, pluginClassLoaderResolver);
     track(mulePluginClassLoader);
     return mulePluginClassLoader;
+  }
+
+  private void trackDeployableArtifactClassLoader(MuleDeployableArtifactClassLoader artifactClassLoader) {
+    artifactClassLoader.getArtifactPluginClassLoaders().forEach(this::track);
+    track(artifactClassLoader);
   }
 
   private void track(ArtifactClassLoader artifactClassLoader) {
