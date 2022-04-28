@@ -15,6 +15,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
 
+import io.qameta.allure.Issue;
 import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Issue("W-11069995")
 @Feature(CLASSLOADING_ISOLATION)
 @Story(CLASSLOADER_GENERATION)
 public class TrackingArtifactClassLoaderResolverDecoratorTestCase extends AbstractMuleTestCase {
@@ -50,7 +52,8 @@ public class TrackingArtifactClassLoaderResolverDecoratorTestCase extends Abstra
     decorator = new TrackingArtifactClassLoaderResolverDecorator(artifactClassLoaderManager, artifactClassLoaderResolver);
     Function<String, MuleDeployableArtifactClassLoader> classLoaderFactory =
         (artifactName) -> new MuleDeployableArtifactClassLoader(artifactName, new ArtifactDescriptor(artifactName), new URL[0],
-                                                                mock(RegionClassLoader.class), mock(ClassLoaderLookupPolicy.class));
+                                                                mock(RegionClassLoader.class),
+                                                                mock(ClassLoaderLookupPolicy.class));
     Function<String, MuleDeployableArtifactClassLoader> classLoaderWithPluginsFactory = (artifactName) -> {
       MuleDeployableArtifactClassLoader classLoader = spy(classLoaderFactory.apply(artifactName));
       List<ArtifactClassLoader> pluginClassLoaders = new ArrayList<>();
