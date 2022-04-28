@@ -201,7 +201,7 @@
                             </xsd:sequence>
                         </xsd:complexType>
                     </xsd:element>
-                    <xsd:element name="deprecate" minOccurs="0">
+                    <xsd:element name="deprecated" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
                                 Defines a operation's deprecation.
@@ -215,7 +215,7 @@
                                     </xsd:documentation>
                                 </xsd:annotation>
                             </xsd:attribute>
-                            <xsd:attribute name="deprecatedSince" use="required" type="mule:nonBlankString">
+                            <xsd:attribute name="since" use="required" type="mule:nonBlankString">
                                 <xsd:annotation>
                                     <xsd:documentation>
                                         The version of the extension in which the annotated member was deprecated.

@@ -211,10 +211,10 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public Optional<DeprecationModel> getDeprecationModel() {
-    return getSingleChild(operation, "deprecate")
-        .map(deprecateAst -> new ImmutableDeprecationModel(getParameter(deprecateAst, "message"),
-                                                           getParameter(deprecateAst, "deprecatedSince"),
-                                                           getParameter(deprecateAst, "toRemoveIn")));
+    return getSingleChild(operation, "deprecated")
+        .map(deprecationAst -> new ImmutableDeprecationModel(getParameter(deprecationAst, "message"),
+                                                             getParameter(deprecationAst, "since"),
+                                                             getParameter(deprecationAst, "toRemoveIn")));
   }
 
   @Override

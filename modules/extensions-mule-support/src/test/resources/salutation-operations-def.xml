@@ -219,9 +219,9 @@
     </operation:def>
 
     <operation:def name="helloGuys">
-        <operation:deprecate deprecatedSince="1.1.0"
-                             message="It may be sexist to say guys, be more inclusive and use helloWorld instead"
-                             toRemoveIn="2.0.0" />
+        <operation:deprecated since="1.1.0"
+                              message="It may be sexist to say guys, be more inclusive and use helloWorld instead"
+                              toRemoveIn="2.0.0" />
         <operation:output>
             <operation:payload-type type="string"/>
         </operation:output>
