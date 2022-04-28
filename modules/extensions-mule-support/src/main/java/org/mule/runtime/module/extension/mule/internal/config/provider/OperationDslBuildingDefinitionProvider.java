@@ -49,7 +49,8 @@ public class OperationDslBuildingDefinitionProvider implements ComponentBuilding
                       .withConstructorParameterDefinition(fromReferenceObject(ExtensionManager.class).build())
                       .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
                       .withSetterParameterDefinition("body", fromChildConfiguration(OperationBody.class).build())
-                      .withSetterParameterDefinition("deprecate", fromChildConfiguration(ImmutableDeprecationModel.class).build())
+                      .withSetterParameterDefinition("deprecated",
+                                                     fromChildConfiguration(ImmutableDeprecationModel.class).build())
                       .build(),
                   baseDefinition.withIdentifier("body")
                       .withTypeDefinition(fromType(OperationBody.class))
