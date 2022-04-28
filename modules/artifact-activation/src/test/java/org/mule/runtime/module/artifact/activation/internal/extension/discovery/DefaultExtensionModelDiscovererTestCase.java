@@ -80,16 +80,17 @@ public class DefaultExtensionModelDiscovererTestCase extends AbstractMuleTestCas
     ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
     when(artifactClassLoader.getClassLoader()).thenReturn(this.getClass().getClassLoader());
 
-    Set<ExtensionModel>
-      extensionModels = new DefaultExtensionModelDiscoverer(new RepositoryLookupExtensionModelGenerator(artifactPluginDescriptor -> artifactClassLoader,
-                                                                                                       loaderRepository))
-                                                                                        .discoverPluginsExtensionModels(new DefaultExtensionDiscoveryRequest(singletonList(descriptor),
-                                                                                                                                                             emptySet(),
-                                                                                                                                                             false,
-                                                                                                                                                             false));
+    Set<ExtensionModel> extensionModels =
+        new DefaultExtensionModelDiscoverer(new RepositoryLookupExtensionModelGenerator(artifactPluginDescriptor -> artifactClassLoader,
+                                                                                        loaderRepository))
+                                                                                            .discoverPluginsExtensionModels(new DefaultExtensionDiscoveryRequest(singletonList(descriptor),
+                                                                                                                                                                 emptySet(),
+                                                                                                                                                                 false,
+                                                                                                                                                                 false));
     assertThat(extensionDeclared.get(), is(true));
     assertThat(extensionModels.size(), is(1));
-    assertThat((extensionModels.stream().collect(toList())).get(0).getArtifactCoordinates().get(), is(descriptor.getBundleDescriptor()));
+    assertThat((extensionModels.stream().collect(toList())).get(0).getArtifactCoordinates().get(),
+               is(descriptor.getBundleDescriptor()));
   }
 
 }

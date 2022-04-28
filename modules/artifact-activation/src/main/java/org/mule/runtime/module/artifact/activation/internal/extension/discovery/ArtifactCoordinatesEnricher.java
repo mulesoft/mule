@@ -24,7 +24,8 @@ public class ArtifactCoordinatesEnricher implements DeclarationEnricher {
     this.artifactPluginDescriptor = artifactPluginDescriptor;
   }
 
-  @Override public void enrich(ExtensionLoadingContext extensionLoadingContext) {
+  @Override
+  public void enrich(ExtensionLoadingContext extensionLoadingContext) {
     extensionLoadingContext.getExtensionDeclarer().withArtifactCoordinates(artifactPluginDescriptor);
   }
 }
