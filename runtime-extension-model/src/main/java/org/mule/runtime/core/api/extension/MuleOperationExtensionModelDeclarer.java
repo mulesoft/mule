@@ -19,6 +19,7 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MUL
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.sdk.api.meta.ExpressionSupport.SUPPORTED;
+import static org.mule.sdk.api.stereotype.MuleStereotypes.DEPRECATE_STEREOTYPE;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OPERATION_DEF_STEREOTYPE;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OUTPUT_ATTRIBUTES_STEREOTYPE;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OUTPUT_PAYLOAD_STEREOTYPE;
@@ -127,6 +128,7 @@ class MuleOperationExtensionModelDeclarer {
 
     addParametersDeclaration(def);
     declareOutputConstruct(def);
+    declareDeprecationConstruct(def);
 
     def.withChain("body")
         .describedAs("The operations that makes for the operation's implementation")
@@ -155,6 +157,30 @@ class MuleOperationExtensionModelDeclarer {
         .withMaxOccurs(1);
 
     declareOutputTypeParameters(attributesType, "attributes");
+  }
+
+  private void declareDeprecationConstruct(ConstructDeclarer def) {
+    NestedComponentDeclarer deprecationConstruct = def.withComponent("deprecate")
+        .describedAs("Defines a operation's deprecation.")
+        .withStereotype(DEPRECATE_STEREOTYPE)
+        .withMinOccurs(0)
+        .withMaxOccurs(1);
+
+    ParameterGroupDeclarer defaultParameterGroupDeclarer = deprecationConstruct.onDefaultParameterGroup();
+    defaultParameterGroupDeclarer.withRequiredParameter("message")
+        .describedAs("Describes why something was deprecated, what can be used as substitute, or both")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    defaultParameterGroupDeclarer.withRequiredParameter("deprecatedSince")
+        .describedAs("The version of the extension in which the annotated member was deprecated")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
+
+    defaultParameterGroupDeclarer.withRequiredParameter("toRemoveIn")
+        .describedAs("The version of the extension in which the annotated member will be removed or was removed")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED);
   }
 
   private void declareOutputTypeParameters(NestedComponentDeclarer component, String outputRole) {

@@ -9,7 +9,9 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -44,7 +46,8 @@ abstract class BaseMuleSdkExtensionModelParser {
    * @return an {@link Optional} for the parameter's value
    */
   protected <T> Optional<T> getOptionalParameter(ComponentAst ast, String paramName) {
-    return ofNullable(getParameter(ast, paramName));
+    return ofNullable(ast.getParameter(DEFAULT_GROUP_NAME, paramName)).map(ComponentParameterAst::<T>getValue)
+        .map(Either::getRight);
   }
 
   /**
