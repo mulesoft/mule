@@ -133,9 +133,9 @@ public class ParallelForEachTestCase extends AbstractMuleContextTestCase {
     assertThat(routingPairs.get(0).getEvent().getMessage().getAttributes(),
                equalTo(((List<Message>) event.getMessage().getPayload().getValue()).get(0).getAttributes()));
     assertThat(routingPairs.get(1).getEvent().getMessage().getPayload(),
-        equalTo(((List<Message>) event.getMessage().getPayload().getValue()).get(1).getPayload()));
+               equalTo(((List<Message>) event.getMessage().getPayload().getValue()).get(1).getPayload()));
     assertThat(routingPairs.get(1).getEvent().getMessage().getAttributes(),
-        equalTo(((List<Message>) event.getMessage().getPayload().getValue()).get(1).getAttributes()));
+               equalTo(((List<Message>) event.getMessage().getPayload().getValue()).get(1).getAttributes()));
   }
 
   @Test
