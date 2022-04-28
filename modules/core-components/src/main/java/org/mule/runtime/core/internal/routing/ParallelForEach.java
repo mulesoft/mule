@@ -127,7 +127,7 @@ public class ParallelForEach extends AbstractForkJoinRouter {
   }
 
   private Message createMessage(TypedValue<?> partTypedValue, CoreEvent event) {
-    if (partTypedValue.getValue() instanceof Message) {
+    if (featureFlaggingService.isEnabled(PARALLEL_FOREACH_FLATTEN_MESSAGE) && partTypedValue.getValue() instanceof Message) {
       Message message = (Message) partTypedValue.getValue();
       return Message.builder(message).payload(manageTypedValuePayload(partTypedValue, event)).build();
     } else {
