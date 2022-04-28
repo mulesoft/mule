@@ -77,7 +77,7 @@ public class RepositoryLookupExtensionModelGenerator implements ExtensionModelGe
    * @param artifactName                   the name of the artifact being loaded.
    * @param additionalAttributes           custom parameters for the
    *                                       {@link org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest}.
-   * @param artifactPluginDescriptor
+   * @param artifactPluginDescriptor       {@link ArtifactPluginDescriptor} of the extension
    * @throws IllegalArgumentException there is no {@link ExtensionModelLoader} for the ID in the {@link MulePluginModel}.
    */
   private ExtensionModel discoverExtensionThroughJsonDescriber(ExtensionModelLoaderRepository extensionModelLoaderRepository,
