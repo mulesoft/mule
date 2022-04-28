@@ -23,6 +23,7 @@ import static reactor.core.publisher.Flux.fromIterable;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.Typed;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -80,9 +81,7 @@ public class ParallelForEach extends AbstractForkJoinRouter {
   protected Publisher<ForkJoinStrategy.RoutingPair> getRoutingPairs(CoreEvent event) {
     return fromIterable(() -> splittingStrategy.split(event))
         .map(partTypedValue -> CoreEvent.builder(event)
-            .message(Message.builder()
-                .payload(manageTypedValuePayload(partTypedValue, event))
-                .build())
+            .message(createMessage(partTypedValue, event))
             .build())
         .map(partEvent -> of(partEvent, nestedChain));
   }
@@ -126,5 +125,16 @@ public class ParallelForEach extends AbstractForkJoinRouter {
    */
   public void setCollectionExpression(String collectionExpression) {
     this.collectionExpression = collectionExpression;
+  }
+
+  private Message createMessage(TypedValue<?> partTypedValue, CoreEvent event) {
+    if (partTypedValue.getValue() instanceof Message) {
+      Message message = (Message) partTypedValue.getValue();
+      return Message.builder(message).payload(manageTypedValuePayload(partTypedValue, event)).build();
+    } else {
+      return Message.builder()
+          .payload(manageTypedValuePayload(partTypedValue, event))
+          .build();
+    }
   }
 }

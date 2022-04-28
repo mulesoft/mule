@@ -24,7 +24,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
+import static org.mule.runtime.api.metadata.DataType.JSON_STRING;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_LIST;
+import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
@@ -110,6 +112,30 @@ public class ParallelForEachTestCase extends AbstractMuleContextTestCase {
                equalTo(((List<Message>) event.getMessage().getPayload().getValue()).get(0)));
     assertThat(routingPairs.get(1).getEvent().getMessage().getPayload().getValue(),
                equalTo(((List<Message>) event.getMessage().getPayload().getValue()).get(1)));
+  }
+
+  @Test
+  @Issue("W-10848628")
+  @Description("RoutingPairs should not delete the message's attributes.")
+  public void routingPairsShouldKeepAttributes() throws Exception {
+    CoreEvent event = createMessageListEvent();
+
+    MessageProcessorChain nested = mock(MessageProcessorChain.class);
+    muleContext.getInjector().inject(router);
+    router.setMessageProcessors(singletonList(nested));
+    router.setAnnotations(getAppleFlowComponentLocationAnnotations());
+    router.initialise();
+
+    List<RoutingPair> routingPairs = from(router.getRoutingPairs(event)).collectList().block();
+    assertThat(routingPairs, hasSize(2));
+    assertThat(routingPairs.get(0).getEvent().getMessage().getPayload(),
+               equalTo(((List<Message>) event.getMessage().getPayload().getValue()).get(0).getPayload()));
+    assertThat(routingPairs.get(0).getEvent().getMessage().getAttributes(),
+               equalTo(((List<Message>) event.getMessage().getPayload().getValue()).get(0).getAttributes()));
+    assertThat(routingPairs.get(1).getEvent().getMessage().getPayload(),
+        equalTo(((List<Message>) event.getMessage().getPayload().getValue()).get(1).getPayload()));
+    assertThat(routingPairs.get(1).getEvent().getMessage().getAttributes(),
+        equalTo(((List<Message>) event.getMessage().getPayload().getValue()).get(1).getAttributes()));
   }
 
   @Test
@@ -275,6 +301,23 @@ public class ParallelForEachTestCase extends AbstractMuleContextTestCase {
     List<String> arrayList = new ArrayList<>();
     arrayList.add("bar");
     arrayList.add("zip");
+    return getEventBuilder().message(Message.of(arrayList)).build();
+  }
+
+  private CoreEvent createMessageListEvent() throws MuleException {
+    List<Message> arrayList = new ArrayList<>();
+    Message message = Message.builder()
+        .payload(TypedValue.of("test"))
+        .attributes(new TypedValue<>("{attribute: 1}", JSON_STRING))
+        .mediaType(TEXT)
+        .build();
+    Message message2 = Message.builder()
+        .payload(TypedValue.of("test2"))
+        .attributes(new TypedValue<>("{attribute: 2}", JSON_STRING))
+        .mediaType(TEXT)
+        .build();
+    arrayList.add(message);
+    arrayList.add(message2);
     return getEventBuilder().message(Message.of(arrayList)).build();
   }
 
