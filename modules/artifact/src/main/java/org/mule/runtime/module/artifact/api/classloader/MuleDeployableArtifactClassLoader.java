@@ -57,9 +57,9 @@ public class MuleDeployableArtifactClassLoader extends MuleArtifactClassLoader {
   }
 
   /**
-   * Provides a {@link List} with the plugin name as key and its classloader as value.
+   * Provides a {@link List} with the plugin class loaders.
    *
-   * @return {@link List} of plugin class loaders
+   * @return {@link List} of plugin class loaders.
    */
   public List<ArtifactClassLoader> getArtifactPluginClassLoaders() {
     return ((RegionClassLoader) getParent()).getArtifactPluginClassLoaders()
