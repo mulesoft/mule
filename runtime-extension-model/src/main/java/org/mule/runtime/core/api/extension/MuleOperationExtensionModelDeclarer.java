@@ -123,6 +123,15 @@ class MuleOperationExtensionModelDeclarer {
             .summary("The operation's name in the GUI")
             .build());
 
+    parameters.withOptionalParameter("visibility")
+        .ofType(STRING_TYPE)
+        .describedAs("The operation visibility to third partys")
+        .withDisplayModel(DisplayModel.builder()
+            .displayName("Visibility")
+            .summary("The operation visibility to third partys")
+            .build());
+
+
     addParametersDeclaration(def);
     declareOutputConstruct(def);
 

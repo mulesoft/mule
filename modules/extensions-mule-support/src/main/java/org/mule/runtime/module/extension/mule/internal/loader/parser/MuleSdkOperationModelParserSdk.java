@@ -131,7 +131,8 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public ComponentVisibility getComponentVisibility() {
-    return this.<String>getOptionalParameter(operation, "description").map(ComponentVisibility::valueOf).orElse(PUBLIC);
+    return this.<String>getOptionalParameter(operation, "visibility")
+        .map(visibility -> ComponentVisibility.valueOf(visibility.toUpperCase())).orElse(PUBLIC);
   }
 
   @Override

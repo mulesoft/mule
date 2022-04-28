@@ -222,13 +222,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="public" type="xsd:boolean" default="false">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Whether the operation is public and should be usable by third party components
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="displayName" type="mule:nonBlankString">
                     <xsd:annotation>
                         <xsd:documentation>
