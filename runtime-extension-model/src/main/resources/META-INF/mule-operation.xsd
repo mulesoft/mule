@@ -243,6 +243,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="visibility" type="visibilityType" default="public">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The operation's accessing visibility
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -280,6 +287,18 @@
             <xsd:enumeration value="SUPPORTED"/>
             <xsd:enumeration value="NOT_SUPPORTED"/>
             <xsd:enumeration value="REQUIRED"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="visibilityType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Whether the operation is public and should be usable by third party components
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="public"/>
+            <xsd:enumeration value="private"/>
         </xsd:restriction>
     </xsd:simpleType>
 
