@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
@@ -312,7 +313,7 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     source = new ImmutableSourceModel(SOURCE_NAME, "", false, false, asList(componentParameterGroup, actingParametersGroup),
                                       emptyList(),
                                       null, null, empty(), empty(), empty(), false, false, false, null, null, emptySet(),
-                                      emptySet(), emptySet(), null);
+                                      PUBLIC, emptySet(), emptySet(), null);
 
     configuration = new ImmutableConfigurationModel(CONFIGURATION_NAME, "", asList(configParameterGroup, actingParametersGroup),
                                                     asList(operation, otherOperation), asList(connectionProvider), asList(source),
@@ -354,7 +355,7 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
     return new ImmutableOperationModel(operationName, "",
                                        paramGroups,
                                        emptyList(), null, null, true, ExecutionType.BLOCKING, false, false, false, null,
-                                       emptySet(), PROCESSOR, emptySet(), emptySet());
+                                       emptySet(), PROCESSOR, PUBLIC, emptySet(), emptySet());
   }
 
   protected ExtensionModel createExtensionMock() {

@@ -12,6 +12,7 @@ import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
+import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
@@ -130,7 +131,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public ComponentVisibility getComponentVisibility() {
-    return buchi.magic();
+    return this.<String>getOptionalParameter(operation, "description").map(ComponentVisibility::valueOf).orElse(PUBLIC);
   }
 
   @Override
