@@ -6,17 +6,15 @@
  */
 package org.mule.runtime.artifact.activation.internal;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_GENERATION;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.Test;
 import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
@@ -27,12 +25,16 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 @Feature(CLASSLOADING_ISOLATION)
 @Story(CLASSLOADER_GENERATION)
@@ -46,10 +48,9 @@ public class TrackingArtifactClassLoaderResolverDecoratorTestCase extends Abstra
     artifactClassLoaderManager = mock(ArtifactClassLoaderManager.class);
     ArtifactClassLoaderResolver artifactClassLoaderResolver = mock(ArtifactClassLoaderResolver.class);
     decorator = new TrackingArtifactClassLoaderResolverDecorator(artifactClassLoaderManager, artifactClassLoaderResolver);
-    ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
     Function<String, MuleDeployableArtifactClassLoader> classLoaderFactory =
         (artifactName) -> new MuleDeployableArtifactClassLoader(artifactName, new ArtifactDescriptor(artifactName), new URL[0],
-                                                                mock(RegionClassLoader.class), lookupPolicy);
+                                                                mock(RegionClassLoader.class), mock(ClassLoaderLookupPolicy.class));
     Function<String, MuleDeployableArtifactClassLoader> classLoaderWithPluginsFactory = (artifactName) -> {
       MuleDeployableArtifactClassLoader classLoader = spy(classLoaderFactory.apply(artifactName));
       List<ArtifactClassLoader> pluginClassLoaders = new ArrayList<>();
@@ -67,7 +68,6 @@ public class TrackingArtifactClassLoaderResolverDecoratorTestCase extends Abstra
     MuleDeployableArtifactClassLoader pluginClassLoader1 = classLoaderWithPluginsFactory.apply("Plugin Class loader 1");
     MuleDeployableArtifactClassLoader pluginClassLoader2 = classLoaderWithPluginsFactory.apply("Plugin Class loader 2");
 
-    when(lookupPolicy.getClassLookupStrategy(any())).thenReturn(PARENT_FIRST);
     when(artifactClassLoaderResolver.createDomainClassLoader(any())).thenReturn(domainClassLoader1);
     when(artifactClassLoaderResolver.createDomainClassLoader(any(), any())).thenReturn(domainClassLoader2);
     when(artifactClassLoaderResolver.createApplicationClassLoader(any(), any())).thenReturn(applicationClassLoader1);
