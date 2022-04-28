@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.distributions</groupId>
         <artifactId>mule-distributions</artifactId>
-        <version>3.9.5-20220421</version>
+        <version>3.9.5-20220428</version>
     </parent>
     <artifactId>mule</artifactId>
     <packaging>pom</packaging>
