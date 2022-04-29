@@ -4311,6 +4311,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "BILL",
         "namespace": "SEMANTIC-TERMS",
@@ -4648,6 +4649,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "REDIRECT",
         "namespace": "SEMANTIC-TERMS",
@@ -4954,6 +4956,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SEND",
         "namespace": "SEMANTIC-TERMS",
@@ -9365,6 +9368,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SEMANTIC_TERMS_SOURCE",
         "namespace": "SEMANTIC-TERMS",

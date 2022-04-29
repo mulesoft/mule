@@ -1331,6 +1331,7 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "FAIL_CONNECTION",
             "namespace": "PETSTORE",
@@ -1871,6 +1872,7 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "FAIL_OPERATION_WITH_EXCEPTION",
             "namespace": "PETSTORE",
@@ -2411,6 +2413,7 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "FAIL_OPERATION_WITH_THROWABLE",
             "namespace": "PETSTORE",
@@ -2941,6 +2944,7 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "FAILS_TO_READ_STREAM",
             "namespace": "PETSTORE",
@@ -3490,6 +3494,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_CAGE",
             "namespace": "PETSTORE",
@@ -3822,6 +3827,7 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_CLIENT",
             "namespace": "PETSTORE",
@@ -4345,6 +4351,7 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_CLIENT_ON_LATCH",
             "namespace": "PETSTORE",
@@ -4959,6 +4966,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_CONFIG",
             "namespace": "PETSTORE",
@@ -5308,6 +5316,7 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_CONNECTION_AGE",
             "namespace": "PETSTORE",
@@ -5852,6 +5861,7 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_PETS",
             "namespace": "PETSTORE",
@@ -6504,6 +6514,7 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_PETS_WITH_INTERMITENT_CONNECTION_PROBLEM_AND_CLOSING_STREAM",
             "namespace": "PETSTORE",
@@ -7156,6 +7167,7 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_PETS_WITH_INTERMITENT_CONNECTION_PROBLEM_AND_CLOSING_STREAM_IN_PARAMETER_GROUP",
             "namespace": "PETSTORE",
@@ -7913,6 +7925,7 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_PETS_WITH_INTERMITENT_CONNECTION_PROBLEM_AND_CLOSING_STREAM_IN_PARAMETER_GROUP_SHOWN_IN_DSL",
             "namespace": "PETSTORE",
@@ -8670,6 +8683,7 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_PETS_WITH_INTERMITENT_CONNECTION_PROBLEM_AND_CLOSING_TYPED_VALUE_STREAM",
             "namespace": "PETSTORE",
@@ -9322,6 +9336,7 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_PETS_WITH_PARAMETER_GROUP",
             "namespace": "PETSTORE",
@@ -10079,6 +10094,7 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_PETS_WITH_PARAMETER_GROUP_SHOW_DSL",
             "namespace": "PETSTORE",
@@ -10836,6 +10852,7 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_PETS_WITH_TYPED_INPUT_STREAM_PARAMETER",
             "namespace": "PETSTORE",
@@ -11489,6 +11506,7 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_STREAMED_SIGNATURE_WITH_ERROR",
             "namespace": "PETSTORE",
@@ -18054,6 +18072,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "CONNECTED_PET_ADOPTION_SOURCE",
             "namespace": "PETSTORE",
@@ -18667,6 +18686,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "PET-FAILING-SOURCE",
             "namespace": "PETSTORE",
@@ -19316,6 +19336,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SOURCE",
             "namespace": "PETSTORE",
@@ -19903,6 +19924,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "DESCRIBE_SERIALIZED_ANIMAL",
         "namespace": "PETSTORE",
@@ -20231,6 +20253,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "ECHO_WITH_SIGNATURE",
         "namespace": "PETSTORE",
@@ -20541,6 +20564,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "FAIL",
         "namespace": "PETSTORE",
@@ -20872,6 +20896,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "FEATURE_FLAGGED_ECHO_FEATURE_CONTEXT",
         "namespace": "PETSTORE",
@@ -21182,6 +21207,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "FEATURE_FLAGGED_ECHO_MULE_CONTEXT",
         "namespace": "PETSTORE",
@@ -21486,6 +21512,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GET_AQUARIUM",
         "namespace": "PETSTORE",
@@ -21790,6 +21817,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GET_BREEDER",
         "namespace": "PETSTORE",
@@ -22131,6 +22159,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GET_CASHIER",
         "namespace": "PETSTORE",
@@ -22601,6 +22630,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GET_DEFAULT_ENCODING",
         "namespace": "PETSTORE",
@@ -22949,6 +22979,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GET_FISH_FROM_RIVER_STREAM",
         "namespace": "PETSTORE",
@@ -23359,6 +23390,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GET_FORBIDDEN_PETS",
         "namespace": "PETSTORE",
@@ -23804,6 +23836,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GET_MULE_VERSION",
         "namespace": "PETSTORE",
@@ -24085,6 +24118,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GET_PET_CORRELATION",
         "namespace": "PETSTORE",
@@ -24355,6 +24389,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GET_PET_STORE_DEAL",
         "namespace": "PETSTORE",
@@ -24681,6 +24716,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GET_SDK_PET_CORRELATION",
         "namespace": "PETSTORE",
@@ -24973,6 +25009,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GET_STREAMED_SIGNATURE",
         "namespace": "PETSTORE",
@@ -25481,6 +25518,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "IS_SPLITTER_EXCEPTION_HANDLED",
         "namespace": "PETSTORE",
@@ -25741,6 +25779,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "MAKE_PHONE_CALL",
         "namespace": "PETSTORE",
@@ -25968,6 +26007,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "RESET_CONNECTION_THREADS",
         "namespace": "PETSTORE",
@@ -26167,6 +26207,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "parameterGroupModels": [],
           "name": "validators",
           "description": "",
@@ -26176,6 +26217,7 @@
       ],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SCOPE_WITH_MULE_STEREOTYPE",
         "namespace": "PETSTORE",
@@ -26436,6 +26478,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SET_SECURE_CAGE",
         "namespace": "PETSTORE",
@@ -26761,6 +26804,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SPELL_BUILT_IN",
         "namespace": "PETSTORE",
@@ -27108,6 +27152,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SPELL_CLASS",
         "namespace": "PETSTORE",
@@ -27458,6 +27503,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SPELL_OBJECT",
         "namespace": "PETSTORE",
@@ -33600,6 +33646,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "NUMBER_PET_ADOPTION_SOURCE",
         "namespace": "PETSTORE",
@@ -33986,6 +34033,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "PARTIAL_PET_ADOPTION_SOURCE",
         "namespace": "PETSTORE",
@@ -34371,6 +34419,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "PET_ADOPTION_LIMITING_SOURCE",
         "namespace": "PETSTORE",
@@ -34808,6 +34857,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "PET_ADOPTION_SCHEDULER_IN_PARAM_SOURCE",
         "namespace": "PETSTORE",
@@ -35117,6 +35167,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "PET_ADOPTION_SOURCE",
         "namespace": "PETSTORE",
@@ -35498,6 +35549,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SENTIENT_SOURCE",
         "namespace": "PETSTORE",
@@ -35795,6 +35847,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WATERMARKING_PET_ADOPTION_SOURCE",
         "namespace": "PETSTORE",
@@ -36307,6 +36360,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "PET-FILTER-SOURCE",
         "namespace": "PETSTORE",
@@ -36646,6 +36700,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "PET-SOURCE",
         "namespace": "PETSTORE",
@@ -37068,6 +37123,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "PET-SOURCE-LIST",
         "namespace": "PETSTORE",
@@ -37469,6 +37525,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "PET-SOURCE-STREAM",
         "namespace": "PETSTORE",
@@ -38075,6 +38132,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "PET-SOURCE-WITH-SDK-API",
         "namespace": "PETSTORE",

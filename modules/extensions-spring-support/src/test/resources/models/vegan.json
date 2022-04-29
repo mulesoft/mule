@@ -618,6 +618,7 @@
             "VEGAN:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "EAT_APPLE",
             "namespace": "VEGAN",
@@ -1258,6 +1259,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_FRUIT_SAMPLE",
             "namespace": "VEGAN",
@@ -1639,6 +1641,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_NOT_OVERRIDEN_PARAMETER",
             "namespace": "VEGAN",
@@ -2026,6 +2029,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_PRODUCERS",
             "namespace": "VEGAN",
@@ -2464,6 +2468,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_TIME_TO_PEEL",
             "namespace": "VEGAN",
@@ -2870,6 +2875,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_TIME_TO_PEEL_ENUM",
             "namespace": "VEGAN",
@@ -3274,6 +3280,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_TIME_TO_PEEL_LONG",
             "namespace": "VEGAN",
@@ -3661,6 +3668,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SPREAD_THE_WORD",
             "namespace": "VEGAN",
@@ -4341,6 +4349,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "PAUL_MC_CARTNEY_SOURCE",
             "namespace": "VEGAN",
@@ -4726,6 +4735,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HARVEST-APPLES",
             "namespace": "VEGAN",
@@ -5798,6 +5808,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SDK_GET_LUNCH",
             "namespace": "VEGAN",
@@ -6140,6 +6151,7 @@
             "VEGAN:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "EAT_BANANA",
             "namespace": "VEGAN",
@@ -6660,6 +6672,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "EAT_PEALED",
             "namespace": "VEGAN",
@@ -7018,6 +7031,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_CONFIG",
             "namespace": "VEGAN",
@@ -7347,6 +7361,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_FRUIT_SAMPLE",
             "namespace": "VEGAN",
@@ -7722,6 +7737,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_LUNCH",
             "namespace": "VEGAN",
@@ -8067,6 +8083,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_NOT_OVERRIDEN_PARAMETER",
             "namespace": "VEGAN",
@@ -8454,6 +8471,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_PRODUCERS",
             "namespace": "VEGAN",
@@ -8892,6 +8910,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_TIME_TO_PEEL",
             "namespace": "VEGAN",
@@ -9298,6 +9317,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_TIME_TO_PEEL_ENUM",
             "namespace": "VEGAN",
@@ -9702,6 +9722,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_TIME_TO_PEEL_LONG",
             "namespace": "VEGAN",
@@ -10089,6 +10110,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SPREAD_THE_WORD",
             "namespace": "VEGAN",
@@ -10820,6 +10842,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "PAUL_MC_CARTNEY_SOURCE",
             "namespace": "VEGAN",
@@ -11346,6 +11369,7 @@
             "VEGAN:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GRAPE_OPERATION",
             "namespace": "VEGAN",
@@ -12235,6 +12259,7 @@
             "VEGAN:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "EAT_KIWI",
             "namespace": "VEGAN",
@@ -13325,6 +13350,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HARVEST-PEACHES",
             "namespace": "VEGAN",
@@ -13850,6 +13876,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "ADD_VEGAN_PRODUCTS_DESCRIPTIONS",
         "namespace": "VEGAN",
@@ -14222,6 +14249,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "APPLY_POLICY",
         "namespace": "VEGAN",
@@ -14594,6 +14622,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "CONSUMING_GROUPED_FOOD",
         "namespace": "VEGAN",
@@ -15080,6 +15109,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "CONVINCE_ANIMAL_KILLER",
         "namespace": "VEGAN",
@@ -15432,6 +15462,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "EAT_WATERMELON",
         "namespace": "VEGAN",
@@ -15757,6 +15788,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GET_ALL_APPLES",
         "namespace": "VEGAN",
@@ -16117,6 +16149,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GET_HEALTHY_FOOD",
         "namespace": "VEGAN",
@@ -16487,6 +16520,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GET_PRODUCTION",
         "namespace": "VEGAN",
@@ -16885,6 +16919,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "LONG_DIGEST",
         "namespace": "VEGAN",
@@ -17228,6 +17263,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "REGISTER_VEGAN_PRODUCTS",
         "namespace": "VEGAN",
@@ -17640,6 +17676,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "TRY_EAT",
         "namespace": "VEGAN",
@@ -18182,6 +18219,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "TRY_TO_EAT_THIS_LIST_OF_MAPS",
         "namespace": "VEGAN",

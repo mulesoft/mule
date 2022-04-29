@@ -1107,6 +1107,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "CONFIG_RETRIEVER",
             "namespace": "SUBTYPES",
@@ -1449,6 +1450,7 @@
             "SUBTYPES:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "CONNECTION_RETRIEVER",
             "namespace": "SUBTYPES",
@@ -2393,6 +2395,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "DOOR_RETRIEVER",
         "namespace": "SUBTYPES",
@@ -2718,6 +2721,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "KILL",
         "namespace": "SUBTYPES",
@@ -3032,6 +3036,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "NO_GLOBAL_POJO",
         "namespace": "SUBTYPES",
@@ -3352,6 +3357,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "POJOS_WITH_COMMON_NAME_INNER_FIELD",
         "namespace": "SUBTYPES",
@@ -3737,6 +3743,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "PROCESS_DOOR",
         "namespace": "SUBTYPES",
@@ -4111,6 +4118,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SHAPE_RETRIEVER",
         "namespace": "SUBTYPES",
@@ -4465,6 +4473,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SUBTYPED_AND_CONCRETE_PARAMETERS",
         "namespace": "SUBTYPES",
@@ -5356,6 +5365,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SUBTYPES_SOURCE",
         "namespace": "SUBTYPES",

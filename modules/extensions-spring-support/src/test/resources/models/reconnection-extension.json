@@ -341,6 +341,7 @@
             "RECONNECTION:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_RETRY_POLICY_TEMPLATE",
             "namespace": "RECONNECTION",
@@ -896,6 +897,7 @@
             "RECONNECTION:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "PAGED_OPERATION",
             "namespace": "RECONNECTION",
@@ -1732,6 +1734,7 @@
             "RECONNECTION:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "STICKY_PAGED_OPERATION",
             "namespace": "RECONNECTION",
@@ -2792,6 +2795,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "FALLIBLE_RECONNECTABLE_SOURCE",
             "namespace": "RECONNECTION",
@@ -3283,6 +3287,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "NON_RECONNECTABLE_SOURCE",
             "namespace": "RECONNECTION",
@@ -3774,6 +3779,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "RECONECTION_SOURCE",
             "namespace": "RECONNECTION",
@@ -4603,6 +4609,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "FAILING-CONNECTION-SOURCE",
             "namespace": "RECONNECTION",
@@ -5632,6 +5639,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SYNC-SOURCE",
             "namespace": "RECONNECTION",
@@ -6176,6 +6184,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SWITCH_CONNECTION",
         "namespace": "RECONNECTION",
