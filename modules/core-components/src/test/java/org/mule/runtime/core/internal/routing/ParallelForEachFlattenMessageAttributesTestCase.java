@@ -46,7 +46,7 @@ import org.junit.Test;
 public class ParallelForEachFlattenMessageAttributesTestCase extends AbstractMuleContextTestCase {
 
   @Rule
-  public SystemProperty systemProperty = new SystemProperty(PARALLEL_FOREACH_FLATTEN_MESSAGE_PROPERTY, "false");
+  public SystemProperty systemProperty = new SystemProperty(PARALLEL_FOREACH_FLATTEN_MESSAGE_PROPERTY, "true");
   private final ParallelForEach router = new ParallelForEach();
 
   @Override
