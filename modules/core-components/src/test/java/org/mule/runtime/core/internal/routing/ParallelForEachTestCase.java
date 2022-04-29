@@ -74,7 +74,7 @@ import io.qameta.allure.Story;
 
 @Feature(SCOPE)
 @Story(PARALLEL_FOR_EACH)
-public class  ParallelForEachTestCase extends AbstractMuleContextTestCase {
+public class ParallelForEachTestCase extends AbstractMuleContextTestCase {
 
   @Rule
   public ExpectedException expectedException = none();
