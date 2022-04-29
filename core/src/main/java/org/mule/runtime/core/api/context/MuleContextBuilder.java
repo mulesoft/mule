@@ -10,7 +10,7 @@ import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.artifact.ArtifactCoordinates;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;

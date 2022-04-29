@@ -18,7 +18,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactType;
 import org.mule.runtime.config.api.ArtifactContextFactory;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.artifact.ArtifactCoordinates;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;

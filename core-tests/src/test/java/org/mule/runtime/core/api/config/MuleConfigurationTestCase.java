@@ -25,7 +25,7 @@ import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLO
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.artifact.ArtifactCoordinates;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.internal.config.builders.MinimalConfigurationBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;

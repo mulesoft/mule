@@ -28,7 +28,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ArtifactType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.artifact.ArtifactCoordinates;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.type.catalog.ApplicationTypeLoader;
 import org.mule.runtime.dsl.api.ConfigResource;

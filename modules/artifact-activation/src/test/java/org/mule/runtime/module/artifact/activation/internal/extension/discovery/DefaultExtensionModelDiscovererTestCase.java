@@ -12,12 +12,14 @@ import static org.mule.test.allure.AllureConstants.ExtensionModelDiscoveryFeatur
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
@@ -32,6 +34,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import org.junit.Test;
 
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Feature(EXTENSION_MODEL_DISCOVERY)
@@ -77,14 +80,17 @@ public class DefaultExtensionModelDiscovererTestCase extends AbstractMuleTestCas
     ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
     when(artifactClassLoader.getClassLoader()).thenReturn(this.getClass().getClassLoader());
 
-    new DefaultExtensionModelDiscoverer(new RepositoryLookupExtensionModelGenerator(artifactPluginDescriptor -> artifactClassLoader,
-                                                                                    loaderRepository))
-                                                                                        .discoverPluginsExtensionModels(new DefaultExtensionDiscoveryRequest(singletonList(descriptor),
-                                                                                                                                                             emptySet(),
-                                                                                                                                                             false,
-                                                                                                                                                             false));
-
+    Set<ExtensionModel> extensionModels =
+        new DefaultExtensionModelDiscoverer(new RepositoryLookupExtensionModelGenerator(artifactPluginDescriptor -> artifactClassLoader,
+                                                                                        loaderRepository))
+                                                                                            .discoverPluginsExtensionModels(new DefaultExtensionDiscoveryRequest(singletonList(descriptor),
+                                                                                                                                                                 emptySet(),
+                                                                                                                                                                 false,
+                                                                                                                                                                 false));
     assertThat(extensionDeclared.get(), is(true));
+    assertThat(extensionModels.size(), is(1));
+    assertThat((extensionModels.stream().collect(toList())).get(0).getArtifactCoordinates().get(),
+               is(descriptor.getBundleDescriptor()));
   }
 
 }

@@ -35,7 +35,7 @@ import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.artifact.ArtifactCoordinates;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;

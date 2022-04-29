@@ -57,7 +57,8 @@ public class RepositoryLookupExtensionModelGenerator implements ExtensionModelGe
                                                                 discoveryRequest.isEnrichDescriptions()
                                                                     ? emptyMap()
                                                                     : singletonMap("EXTENSION_LOADER_DISABLE_DESCRIPTIONS_ENRICHMENT",
-                                                                                   true)))
+                                                                                   true),
+                                                                artifactPluginDescriptor))
         .orElse(null);
   }
 
@@ -73,6 +74,7 @@ public class RepositoryLookupExtensionModelGenerator implements ExtensionModelGe
    * @param artifactName                   the name of the artifact being loaded.
    * @param additionalAttributes           custom parameters for the
    *                                       {@link org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest}.
+   * @param artifactPluginDescriptor       {@link ArtifactPluginDescriptor} of the extension
    * @throws IllegalArgumentException there is no {@link ExtensionModelLoader} for the ID in the {@link MulePluginModel}.
    */
   private ExtensionModel discoverExtensionThroughJsonDescriber(ExtensionModelLoaderRepository extensionModelLoaderRepository,
@@ -80,7 +82,8 @@ public class RepositoryLookupExtensionModelGenerator implements ExtensionModelGe
                                                                Set<ExtensionModel> dependencies,
                                                                Supplier<ClassLoader> artifactClassloader,
                                                                String artifactName,
-                                                               Map<String, Object> additionalAttributes) {
+                                                               Map<String, Object> additionalAttributes,
+                                                               ArtifactPluginDescriptor artifactPluginDescriptor) {
     ExtensionModelLoader loader = extensionModelLoaderRepository.getExtensionModelLoader(loaderDescriber)
         .orElseThrow(() -> new IllegalArgumentException(format("The identifier '%s' does not match with the describers available "
             + "to generate an ExtensionModel (working with the plugin '%s')", loaderDescriber.getId(), artifactName)));
@@ -89,7 +92,7 @@ public class RepositoryLookupExtensionModelGenerator implements ExtensionModelGe
 
     return loader.loadExtensionModel(builder(artifactClassloader.get(), getDefault(dependencies))
         .addParameters(attributes)
+        .setArtifactCoordinates(artifactPluginDescriptor.getBundleDescriptor())
         .build());
   }
-
 }

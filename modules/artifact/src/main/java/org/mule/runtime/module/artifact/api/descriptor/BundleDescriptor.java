@@ -15,7 +15,7 @@ import static java.util.Optional.ofNullable;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import org.mule.runtime.core.api.artifact.ArtifactCoordinates;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 
 import java.util.Map;
 import java.util.Optional;

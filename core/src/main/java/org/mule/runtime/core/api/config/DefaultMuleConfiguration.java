@@ -34,7 +34,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.artifact.ArtifactCoordinates;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.component.InternalComponent;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
