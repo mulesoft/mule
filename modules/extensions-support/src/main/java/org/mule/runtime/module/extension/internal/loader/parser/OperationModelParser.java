@@ -28,7 +28,7 @@ import java.util.Optional;
  * @since 4.5.0
  */
 public interface OperationModelParser extends SemanticTermsParser, AdditionalPropertiesModelParser, StereotypeModelParser,
-    NotificationEmitterParser {
+    NotificationEmitterParser, ComponentVisibilityParser {
 
   /**
    * @return the operation's name
@@ -166,8 +166,4 @@ public interface OperationModelParser extends SemanticTermsParser, AdditionalPro
    */
   List<ErrorModelParser> getErrorModelParsers();
 
-  /**
-   * @return the operation's {@link ComponentVisibility}.
-   */
-  ComponentVisibility getComponentVisibility();
 }
