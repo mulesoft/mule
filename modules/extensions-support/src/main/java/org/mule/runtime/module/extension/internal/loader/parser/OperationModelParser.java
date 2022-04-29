@@ -166,5 +166,8 @@ public interface OperationModelParser extends SemanticTermsParser, AdditionalPro
    */
   List<ErrorModelParser> getErrorModelParsers();
 
+  /**
+   * @return the operation's {@link ComponentVisibility}.
+   */
   ComponentVisibility getComponentVisibility();
 }

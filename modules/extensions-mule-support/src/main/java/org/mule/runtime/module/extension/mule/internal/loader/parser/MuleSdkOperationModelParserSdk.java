@@ -59,6 +59,14 @@ import java.util.stream.Stream;
  */
 class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser implements OperationModelParser {
 
+  private static final String BODY_CHILD = "body";
+  private static final String DESCRIPTION_PARAMETER = "description";
+  private static final String DISPLAY_PARAMETER = "displayName";
+  private static final String NAME_PARAMETER = "name";
+  private static final String SUMMARY_PARAMETER = "summary";
+  private static final String TYPE_PARAMETER = "type";
+  private static final String VISIBILITY_PARAMETER = "visibility";
+
   private final ComponentAst operation;
   private final TypeLoader typeLoader;
   private Boolean isBlocking;
@@ -73,11 +81,11 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   }
 
   private void parseStructure() {
-    name = getParameter(operation, "name");
+    name = getParameter(operation, NAME_PARAMETER);
   }
 
   private OutputModelParser asOutputModelParser(ComponentAst outputTypeElement) {
-    String type = getParameter(outputTypeElement, "type");
+    String type = getParameter(outputTypeElement, TYPE_PARAMETER);
 
     return typeLoader.load(type)
         .map(mt -> new DefaultOutputModelParser(mt, false))
@@ -95,7 +103,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public String getDescription() {
-    return this.<String>getOptionalParameter(operation, "description").orElse("");
+    return this.<String>getOptionalParameter(operation, DESCRIPTION_PARAMETER).orElse("");
   }
 
   @Override
@@ -131,7 +139,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public ComponentVisibility getComponentVisibility() {
-    return this.<String>getOptionalParameter(operation, "visibility")
+    return this.<String>getOptionalParameter(operation, VISIBILITY_PARAMETER)
         .map(visibility -> ComponentVisibility.valueOf(visibility.toUpperCase())).orElse(PUBLIC);
   }
 
@@ -224,8 +232,8 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public Optional<DisplayModel> getDisplayModel() {
-    String summary = this.<String>getOptionalParameter(operation, "summary").orElse(null);
-    String displayName = this.<String>getOptionalParameter(operation, "displayName").orElse(null);
+    String summary = this.<String>getOptionalParameter(operation, SUMMARY_PARAMETER).orElse(null);
+    String displayName = this.<String>getOptionalParameter(operation, DISPLAY_PARAMETER).orElse(null);
 
     if (!isBlank(displayName) || !isBlank(summary)) {
       return of(DisplayModel.builder()
@@ -275,7 +283,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   }
 
   private ComponentAst getBody() {
-    return getSingleChild(operation, "body").get();
+    return getSingleChild(operation, BODY_CHILD).get();
   }
 
   private Stream<OperationModel> getOperationModelsRecursiveStream() {

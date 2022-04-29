@@ -149,6 +149,9 @@ public interface SourceModelParser extends SemanticTermsParser, StereotypeModelP
    */
   SourceClusterSupportModelProperty getSourceClusterSupportModelProperty();
 
+  /**
+   * @return this source's {@link ComponentVisibility}.
+   */
   ComponentVisibility getVisibility();
 
   /**
