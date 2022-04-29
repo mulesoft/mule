@@ -92,7 +92,7 @@ public class RepositoryLookupExtensionModelGenerator implements ExtensionModelGe
 
     return loader.loadExtensionModel(builder(artifactClassloader.get(), getDefault(dependencies))
         .addParameters(attributes)
-        .addArtifactCoordinates(artifactPluginDescriptor.getBundleDescriptor())
+        .setArtifactCoordinates(artifactPluginDescriptor.getBundleDescriptor())
         .build());
   }
 }
