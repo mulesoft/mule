@@ -13,11 +13,8 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 
-import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.extension.api.loader.DeclarationEnricher;
-import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionDiscoveryRequest;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
@@ -94,7 +91,8 @@ public class RepositoryLookupExtensionModelGenerator implements ExtensionModelGe
     attributes.putAll(additionalAttributes);
 
     return loader.loadExtensionModel(builder(artifactClassloader.get(), getDefault(dependencies))
-        .addParameters(attributes).addEnricher(new ArtifactCoordinatesEnricher(artifactPluginDescriptor.getBundleDescriptor()))
+        .addParameters(attributes)
+        .addArtifactCoordinates(artifactPluginDescriptor.getBundleDescriptor())
         .build());
   }
 }
