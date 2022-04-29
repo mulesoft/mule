@@ -19,8 +19,13 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 
+import org.mule.metadata.api.annotation.EnumAnnotation;
+import org.mule.metadata.api.annotation.TypeAnnotation;
+import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.impl.DefaultStringType;
 import org.mule.metadata.java.api.JavaTypeLoader;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -34,6 +39,7 @@ import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
+import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefinedStaticTypeAnnotation;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.FieldsValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
@@ -63,6 +69,7 @@ public class JavaValueProviderModelValidatorTestCase {
   private final MetadataType STRING_TYPE = loader.load(String.class);
   private final MetadataType NUMBER_TYPE = loader.load(Integer.class);
   private final MetadataType OBJECT_TYPE = loader.load(InputStream.class);
+  private final MetadataType STRING_TYPE_WITH_ANNOTATIONS = new DefaultStringType(MetadataFormat.JAVA, createAnnotations());
   private JavaValueProviderModelValidator valueProviderModelValidator;
 
   private ProblemsReporter problemsReporter;
@@ -282,6 +289,18 @@ public class JavaValueProviderModelValidatorTestCase {
     assertNoErrors();
   }
 
+  @Test
+  public void valueProviderParameterTypeShouldBeCheckAgainstJavaType() {
+    mockParameter(operationParameter, operationParameterBuilder, "valueProviderId", "streamParameter",
+                  STRING_TYPE_WITH_ANNOTATIONS);
+    operationParameterBuilder.withInjectableParameter("streamParameter", OBJECT_TYPE, true);
+    when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
+        .thenReturn(Optional.of(operationParameterBuilder.build()));
+
+    validate();
+    assertNoErrors();
+  }
+
   private void assertProblems(String errorMessage) {
     List<Problem> errors = problemsReporter.getErrors();
     assertThat(errors, hasSize(1));
@@ -302,11 +321,16 @@ public class JavaValueProviderModelValidatorTestCase {
   }
 
   private void mockParameter(ParameterModel parameter, ValueProviderFactoryModelPropertyBuilder builder, String valueProviderId) {
+    mockParameter(parameter, builder, valueProviderId, "someName", STRING_TYPE);
+  }
+
+  private void mockParameter(ParameterModel parameter, ValueProviderFactoryModelPropertyBuilder builder, String valueProviderId,
+                             String paramName, MetadataType type) {
     when(parameter.getModelProperty(ValueProviderFactoryModelProperty.class)).thenReturn(Optional.of(builder.build()));
     when(parameter.getModelProperty(ImplementingParameterModelProperty.class)).thenReturn(empty());
     when(parameter.getModelProperty(DeclaringMemberModelProperty.class)).thenReturn(empty());
-    when(parameter.getName()).thenReturn("someName");
-    when(parameter.getType()).thenReturn(STRING_TYPE);
+    when(parameter.getName()).thenReturn(paramName);
+    when(parameter.getType()).thenReturn(type);
     when(parameter.getValueProviderModel())
         .thenReturn(of(new ValueProviderModel(emptyList(), false, false, true, 1, "name", valueProviderId)));
   }
@@ -364,5 +388,13 @@ public class JavaValueProviderModelValidatorTestCase {
     public Set<Value> resolve() throws ValueResolvingException {
       return null;
     }
+  }
+
+  private Map<Class<? extends TypeAnnotation>, TypeAnnotation> createAnnotations() {
+    Map<Class<? extends TypeAnnotation>, TypeAnnotation> annotations = new HashMap<>();
+    annotations.put(ClassInformationAnnotation.class, new ClassInformationAnnotation(InputStream.class));
+    annotations.put(CustomDefinedStaticTypeAnnotation.class, new CustomDefinedStaticTypeAnnotation());
+    annotations.put(EnumAnnotation.class, new EnumAnnotation<>(new String[] {"value1", "value2"}));
+    return annotations;
   }
 }

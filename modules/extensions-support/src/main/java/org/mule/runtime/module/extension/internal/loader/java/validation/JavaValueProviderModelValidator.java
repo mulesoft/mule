@@ -15,8 +15,11 @@ import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getParameterNameFromExtractionExpression;
 
+import org.mule.metadata.api.annotation.EnumAnnotation;
+import org.mule.metadata.api.annotation.TypeAnnotation;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.StringType;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -32,6 +35,7 @@ import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.util.NameUtils;
+import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefinedStaticTypeAnnotation;
 import org.mule.runtime.module.extension.internal.loader.java.property.FieldsValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
@@ -41,6 +45,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+
+import org.apache.commons.lang3.ClassUtils;
 
 /**
  * {@link ExtensionModelValidator} for the correct usage of {@link ValueProviderModel} and
@@ -161,9 +168,24 @@ public final class JavaValueProviderModelValidator implements ExtensionModelVali
       } else {
         if (parameterInfo.getExtractionExpression().equals(parameterInfo.getParameterName())) {
           MetadataType metadataType = allParameters.get(parameterInfo.getParameterName());
-          Class<?> expectedType = getType(metadataType)
-              .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
-                                                                  parameterInfo.getParameterName())));
+          Set<TypeAnnotation> annotations = metadataType.getAnnotations();
+          Class<?> expectedType;
+          if (annotations.stream().anyMatch(ann -> ann instanceof EnumAnnotation)
+              && annotations.stream().anyMatch(ann -> ann instanceof CustomDefinedStaticTypeAnnotation)) {
+            TypeAnnotation classInformation = annotations.stream().filter(ann -> ann instanceof ClassInformationAnnotation)
+                .findFirst().orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
+                                                                                parameterInfo.getParameterName())));
+            String className = ((ClassInformationAnnotation) classInformation).getClassname();
+            try {
+              expectedType = ClassUtils.getClass(Thread.currentThread().getContextClassLoader(), className, true);
+            } catch (ClassNotFoundException e) {
+              throw new IllegalArgumentException("Could not load class [" + className + "]", e);
+            }
+          } else {
+            expectedType = getType(metadataType)
+                .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
+                                                                    parameterInfo.getParameterName())));
+          }
           Class<?> gotType = getType(parameterInfo.getType())
               .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
                                                                   parameterInfo.getParameterName())));
