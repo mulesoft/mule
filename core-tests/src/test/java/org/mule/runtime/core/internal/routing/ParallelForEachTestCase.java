@@ -277,5 +277,4 @@ public class ParallelForEachTestCase extends AbstractMuleContextTestCase {
     arrayList.add("zip");
     return getEventBuilder().message(Message.of(arrayList)).build();
   }
-
 }
