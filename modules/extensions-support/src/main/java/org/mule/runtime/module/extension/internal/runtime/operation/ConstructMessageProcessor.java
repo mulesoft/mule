@@ -18,6 +18,7 @@ import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationProviderResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
@@ -31,7 +32,7 @@ public class ConstructMessageProcessor extends ComponentMessageProcessor<Constru
 
   public ConstructMessageProcessor(ExtensionModel extensionModel,
                                    ConstructModel constructModel,
-                                   ConfigurationProvider configurationProvider,
+                                   ConfigurationProviderResolverWrapper configurationProviderResolver,
                                    String target,
                                    String targetValue,
                                    ResolverSet resolverSet,
@@ -42,7 +43,7 @@ public class ConstructMessageProcessor extends ComponentMessageProcessor<Constru
                                    PolicyManager policyManager,
                                    ReflectionCache reflectionCache,
                                    long terminationTimeout) {
-    super(extensionModel, constructModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
+    super(extensionModel, constructModel, configurationProviderResolver, target, targetValue, resolverSet, cursorProviderFactory,
           retryPolicyTemplate, nestedChain,
           extensionManager, policyManager, reflectionCache, null, terminationTimeout);
   }

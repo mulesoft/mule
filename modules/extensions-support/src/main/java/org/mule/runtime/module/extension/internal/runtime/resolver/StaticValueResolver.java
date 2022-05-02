@@ -13,7 +13,7 @@ import org.mule.runtime.api.exception.MuleException;
  *
  * @since 3.7.0
  */
-public class StaticValueResolver<T> implements ValueResolver<T> {
+public class StaticValueResolver<T> implements EventAgnosticValueResolver<T> {
 
   private final T value;
 
@@ -25,7 +25,7 @@ public class StaticValueResolver<T> implements ValueResolver<T> {
    * {@inheritDoc}
    */
   @Override
-  public T resolve(ValueResolvingContext context) throws MuleException {
+  public T resolve() throws MuleException {
     return value;
   }
 

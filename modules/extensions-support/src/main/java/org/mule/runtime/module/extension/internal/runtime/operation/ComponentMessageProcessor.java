@@ -133,6 +133,7 @@ import org.mule.runtime.module.extension.internal.runtime.operation.adapter.SdkO
 import org.mule.runtime.module.extension.internal.runtime.operation.retry.ComponentRetryPolicyTemplateResolver;
 import org.mule.runtime.module.extension.internal.runtime.operation.retry.RetryPolicyTemplateResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigOverrideValueResolverWrapper;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationProviderResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.RouteBuilderValueResolver;
@@ -264,7 +265,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   public ComponentMessageProcessor(ExtensionModel extensionModel,
                                    T componentModel,
-                                   ConfigurationProvider configurationProvider,
+                                   ConfigurationProviderResolverWrapper configurationProviderResolver,
                                    String target,
                                    String targetValue,
                                    ResolverSet resolverSet,
@@ -276,7 +277,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                    ReflectionCache reflectionCache,
                                    ResultTransformer resultTransformer,
                                    long terminationTimeout) {
-    super(extensionModel, componentModel, configurationProvider, cursorProviderFactory, extensionManager);
+    super(extensionModel, componentModel, configurationProviderResolver, cursorProviderFactory, extensionManager);
     this.extensionModel = extensionModel;
     this.resolverSet = resolverSet;
     this.target = target;

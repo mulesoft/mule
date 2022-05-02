@@ -94,6 +94,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ResultTransformer;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationProviderResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
@@ -569,7 +570,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
                                          MessageProcessorChain nestedChain, ExtensionManager extensionManager,
                                          PolicyManager policyManager, ReflectionCache reflectionCache,
                                          ResultTransformer resultTransformer, long terminationTimeout) {
-      super(extensionModel, operationModel, configurationProvider, target, targetValue, errorMappings, resolverSet,
+      super(extensionModel, operationModel, new ConfigurationProviderResolverWrapper(configurationProvider), target, targetValue,
+            errorMappings, resolverSet,
             cursorProviderFactory, retryPolicyTemplate, nestedChain, extensionManager, policyManager, reflectionCache,
             resultTransformer, terminationTimeout);
     }

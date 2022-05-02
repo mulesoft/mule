@@ -37,6 +37,7 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.metadata.EntityMetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ResultTransformer;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationProviderResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
@@ -63,7 +64,7 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
 
   public OperationMessageProcessor(ExtensionModel extensionModel,
                                    OperationModel operationModel,
-                                   ConfigurationProvider configurationProvider,
+                                   ConfigurationProviderResolverWrapper configurationProviderResolver,
                                    String target,
                                    String targetValue,
                                    List<EnrichedErrorMapping> errorMappings,
@@ -74,14 +75,14 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager,
                                    ReflectionCache reflectionCache) {
-    this(extensionModel, operationModel, configurationProvider, target, targetValue, errorMappings, resolverSet,
+    this(extensionModel, operationModel, configurationProviderResolver, target, targetValue, errorMappings, resolverSet,
          cursorProviderFactory, retryPolicyTemplate, nestedChain,
          extensionManager, policyManager, reflectionCache, null, -1);
   }
 
   public OperationMessageProcessor(ExtensionModel extensionModel,
                                    OperationModel operationModel,
-                                   ConfigurationProvider configurationProvider,
+                                   ConfigurationProviderResolverWrapper configurationProviderResolver,
                                    String target,
                                    String targetValue,
                                    List<EnrichedErrorMapping> errorMappings,
@@ -94,7 +95,7 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
                                    ReflectionCache reflectionCache,
                                    ResultTransformer resultTransformer,
                                    long terminationTimeout) {
-    super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet,
+    super(extensionModel, operationModel, configurationProviderResolver, target, targetValue, resolverSet,
           cursorProviderFactory, retryPolicyTemplate, nestedChain,
           extensionManager, policyManager, reflectionCache, resultTransformer, terminationTimeout);
     this.entityMetadataMediator = new EntityMetadataMediator(operationModel);
