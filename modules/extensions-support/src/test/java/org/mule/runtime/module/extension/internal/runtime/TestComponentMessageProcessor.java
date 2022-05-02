@@ -29,7 +29,9 @@ public abstract class TestComponentMessageProcessor extends ComponentMessageProc
                                        ExtensionManager extensionManager, PolicyManager policyManager,
                                        ReflectionCache reflectionCache, ResultTransformer resultTransformer,
                                        long terminationTimeout) {
-    super(extensionModel, componentModel, new ConfigurationProviderResolverWrapper(configurationProvider), target, targetValue,
+    super(extensionModel, componentModel,
+          configurationProvider != null ? new ConfigurationProviderResolverWrapper(configurationProvider) : null, target,
+          targetValue,
           resolverSet, cursorProviderFactory,
           retryPolicyTemplate, nestedChain, extensionManager, policyManager, reflectionCache, resultTransformer,
           terminationTimeout);

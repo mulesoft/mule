@@ -189,7 +189,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                                ConfigurationProvider configurationProvider,
                                CursorProviderFactory cursorProviderFactory,
                                ExtensionManager extensionManager) {
-    this(extensionModel, componentModel, new ConfigurationProviderResolverWrapper(configurationProvider), cursorProviderFactory,
+    this(extensionModel, componentModel,
+         configurationProvider != null ? new ConfigurationProviderResolverWrapper(configurationProvider) : null,
+         cursorProviderFactory,
          extensionManager);
   }
 
@@ -737,7 +739,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   private boolean doesConfigurationDependOnEvent() {
-    return configurationProviderResolver.get().dependsOnEvent();
+    return isConfigurationSpecified() && configurationProviderResolver.get().dependsOnEvent();
   }
 
   private boolean computeRequiresConfig() {
