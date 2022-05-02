@@ -80,9 +80,7 @@ public class ParallelForEach extends AbstractForkJoinRouter {
   protected Publisher<ForkJoinStrategy.RoutingPair> getRoutingPairs(CoreEvent event) {
     return fromIterable(() -> splittingStrategy.split(event))
         .map(partTypedValue -> CoreEvent.builder(event)
-            .message(Message.builder()
-                .payload(manageTypedValuePayload(partTypedValue, event))
-                .build())
+            .message(createMessage(partTypedValue, event))
             .build())
         .map(partEvent -> of(partEvent, nestedChain));
   }
@@ -126,5 +124,16 @@ public class ParallelForEach extends AbstractForkJoinRouter {
    */
   public void setCollectionExpression(String collectionExpression) {
     this.collectionExpression = collectionExpression;
+  }
+
+  private Message createMessage(TypedValue<?> partTypedValue, CoreEvent event) {
+    if (featureFlaggingService.isEnabled(PARALLEL_FOREACH_FLATTEN_MESSAGE) && partTypedValue.getValue() instanceof Message) {
+      Message message = (Message) partTypedValue.getValue();
+      return Message.builder(message).payload(manageTypedValuePayload(partTypedValue, event)).build();
+    } else {
+      return Message.builder()
+          .payload(manageTypedValuePayload(partTypedValue, event))
+          .build();
+    }
   }
 }
