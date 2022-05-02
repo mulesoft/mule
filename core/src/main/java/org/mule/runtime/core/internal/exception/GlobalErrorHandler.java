@@ -13,9 +13,14 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.reactivestreams.Publisher;
 
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class GlobalErrorHandler extends ErrorHandler {
 
   private boolean disposed;
+  private final Map<String, List<String>> locationMap = new ConcurrentHashMap<>();
 
   @Override
   public Publisher<CoreEvent> apply(Exception exception) {
@@ -31,7 +36,7 @@ public class GlobalErrorHandler extends ErrorHandler {
   private void setFromGlobalErrorHandler() {
     this.getExceptionListeners().stream()
         .filter(exceptionListener -> exceptionListener instanceof TemplateOnErrorHandler)
-        .forEach(exceptionListener -> ((TemplateOnErrorHandler) exceptionListener).setFromGlobalErrorHandler(true));
+        .forEach(exceptionListener -> ((TemplateOnErrorHandler) exceptionListener).setGlobalErrorHandlerMap(this.locationMap));
   }
 
   @Override
@@ -49,5 +54,9 @@ public class GlobalErrorHandler extends ErrorHandler {
     } catch (MuleException e) {
       logger.error("Could not stop global error handler.", e);
     }
+  }
+
+  public Map<String, List<String>> getLocationMap() {
+    return locationMap;
   }
 }

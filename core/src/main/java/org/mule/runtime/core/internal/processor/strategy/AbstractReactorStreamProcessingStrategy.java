@@ -77,6 +77,9 @@ public abstract class AbstractReactorStreamProcessingStrategy extends AbstractSt
 
   @Override
   public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
+    if (processorEnricher == null) {
+      processorEnricher = getProcessingStrategyEnricher();
+    }
     return processorEnricher.enrich(processor);
   }
 
@@ -136,7 +139,9 @@ public abstract class AbstractReactorStreamProcessingStrategy extends AbstractSt
 
   @Override
   public void start() throws MuleException {
-    processorEnricher = getProcessingStrategyEnricher();
+    if (processorEnricher == null) {
+      processorEnricher = getProcessingStrategyEnricher();
+    }
   }
 
   protected ProcessingTypeBasedReactiveProcessorEnricher getProcessingStrategyEnricher() {

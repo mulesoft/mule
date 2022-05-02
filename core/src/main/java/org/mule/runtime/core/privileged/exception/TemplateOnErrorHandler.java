@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.exception;
 
+import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -39,6 +40,7 @@ import static reactor.core.publisher.Flux.from;
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -70,6 +72,7 @@ import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -97,7 +100,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   private static final Pattern ERROR_HANDLER_LOCATION_PATTERN = compile("[^/]*/[^/]*/[^/]*");
 
-  private boolean fromGlobalErrorHandler = false;
+  private Map<String, List<String>> globalErrorHandlerMap = null;
 
   @Inject
   private ExpressionManager expressionManager;
@@ -285,14 +288,10 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   @Override
   protected void doInitialise() throws InitialisationException {
     super.doInitialise();
-    Optional<ProcessingStrategy> processingStrategy;
-    if (fromGlobalErrorHandler) {
-      processingStrategy = getProcessingStrategyFromGlobalErrorHandler(locator);
-    } else {
-      processingStrategy = getProcessingStrategy(locator, this);
-    }
+    Optional<ProcessingStrategy> processingStrategy = getProcessingStrategy(locator, this);
     configuredMessageProcessors =
-        buildNewChainWithListOfProcessors(processingStrategy, getMessageProcessors(), NullExceptionHandler.getInstance());
+        buildNewChainWithListOfProcessors(processingStrategy, getMessageProcessors(), NullExceptionHandler.getInstance(),
+                                          this.getLocation() != null ? this.getLocation().getRootContainerName() : null);
 
     fluxFactory = new OnErrorHandlerFluxObjectFactory(processingStrategy);
 
@@ -513,9 +512,11 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       return defaultErrorHandlerOwnsTransaction(transaction);
     }
 
-    if (fromGlobalErrorHandler) {
-      String location = ((MessagingException) exception).getFailingComponent().getRootContainerLocation().getGlobalName();
-      return transaction.getComponentLocation().get().getRootContainerName().equals(location);
+    if (globalErrorHandlerMap != null) {
+      ComponentLocation location = ((MessagingException) exception).getFailingComponent().getLocation();
+      String containerLocation = globalErrorHandlerMap.getOrDefault(location.getRootContainerName(), emptyList()).stream()
+          .filter(location.getLocation()::startsWith).findFirst().orElse("");
+      return transaction.getComponentLocation().get().getLocation().equals(containerLocation);
     } else {
       // We are in a simple scenario where the error handler's location ends with "/error-handler/1".
       // We cannot use the RootContainerLocation, since in case of nested TryScopes (the outer one creating the tx)
@@ -554,7 +555,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
     return errorTypeRepository;
   }
 
-  public void setFromGlobalErrorHandler(boolean fromGlobalErrorHandler) {
-    this.fromGlobalErrorHandler = fromGlobalErrorHandler;
+  public void setGlobalErrorHandlerMap(Map<String, List<String>> globalErrorHandlerMap) {
+    this.globalErrorHandlerMap = globalErrorHandlerMap;
   }
 }

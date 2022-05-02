@@ -29,6 +29,7 @@ import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUt
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactType;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.getDefaultProcessingStrategyFactory;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.resolveException;
@@ -141,7 +142,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private final String name;
   private final List<Processor> processors;
   private final FlowExceptionHandler messagingExceptionHandler;
-  private final ProcessingStrategy processingStrategy;
+  private ProcessingStrategy processingStrategy;
   private final List<ReactiveInterceptorAdapter> additionalInterceptors = new LinkedList<>();
 
   private boolean canProcessMessage = true;
@@ -176,7 +177,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                                 Optional<ProcessingStrategy> processingStrategyOptional,
                                 List<Processor> processors, FlowExceptionHandler messagingExceptionHandler) {
     this.name = name;
-    this.processingStrategy = processingStrategyOptional.orElse(null);
+    this.processingStrategy =
+        processingStrategyOptional.orElse(null);
     this.processors = processors;
     this.messagingExceptionHandler = messagingExceptionHandler;
   }
@@ -365,10 +367,11 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
     // Apply processing strategy. This is done here to ensure notifications and interceptors do not execute on async processor
     // threads which may be limited to avoid deadlocks.
-    if (processingStrategy != null) {
-      interceptors.add((processor, next) -> processingStrategy
-          .onProcessor(new InterceptedReactiveProcessor(processor, next)));
+    if (processingStrategy == null) {
+      processingStrategy = getDefaultProcessingStrategyFactory(muleContext).create(muleContext, this.name);
     }
+    interceptors.add((processor, next) -> processingStrategy
+        .onProcessor(new InterceptedReactiveProcessor(processor, next)));
 
     // Apply processor interceptors around processor and other core logic
     interceptors.addAll(additionalInterceptors);

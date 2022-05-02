@@ -11,7 +11,10 @@ import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
+import java.util.LinkedList;
 import java.util.List;
+
+import static org.mule.runtime.api.component.location.Location.ERROR_HANDLER;
 
 /**
  * An {@link org.mule.runtime.dsl.api.component.ObjectFactory} which produces {@link ErrorHandler} instances.
@@ -27,6 +30,10 @@ public class ErrorHandlerFactoryBean extends AbstractComponentFactory<ErrorHandl
   @Override
   public ErrorHandler doGetObject() throws Exception {
     if (delegate != null) {
+      String location = this.getLocation().getLocation();
+      String containerLocation = location.substring(0, location.length() - ERROR_HANDLER.length() - 1);
+      delegate.getLocationMap().putIfAbsent(this.getRootContainerLocation().getGlobalName(), new LinkedList<>());
+      delegate.getLocationMap().get(this.getRootContainerLocation().getGlobalName()).add(containerLocation);
       return delegate;
     }
 
