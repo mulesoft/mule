@@ -40,7 +40,7 @@ public class OnRuntimeProcessingStrategy implements ProcessingStrategy {
   public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
     return publisher -> Flux.from(publisher)
         .flatMap(e -> {
-          String location = e.getContext().getOriginatingLocation().getRootContainerName();
+          String location = e.getFlowCallStack().getElements().get(0).getFlowName();
           return Mono.just(e).transform(getProcessingStrategy(location).map(ps -> ps.onProcessor(processor))
               .orElse(getProcessor(processor, location)));
         });
