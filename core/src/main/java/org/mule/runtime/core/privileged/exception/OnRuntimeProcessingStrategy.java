@@ -9,6 +9,7 @@ package org.mule.runtime.core.privileged.exception;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -40,7 +41,11 @@ public class OnRuntimeProcessingStrategy implements ProcessingStrategy {
   public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
     return publisher -> Flux.from(publisher)
         .flatMap(e -> {
-          String location = e.getFlowCallStack().peek().getFlowName();
+          FlowStackElement element = e.getFlowCallStack().peek();
+          if (element == null) {
+            return Mono.just(e).transform(processor);
+          }
+          String location = element.getFlowName();
           return Mono.just(e).transform(getProcessingStrategy(location).map(ps -> ps.onProcessor(processor))
               .orElse(getProcessor(processor, location)));
         });
