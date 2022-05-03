@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 package org.mule.runtime.module.artifact.activation.api.classloader;
 
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -13,22 +19,22 @@ import java.util.Map;
 /**
  * Provides methods to create the descriptors of different kind of artifacts (applications, plugins, domains) from the
  * {@link DeployableProjectModel}.
- * 
+ *
  * @since 4.5
  */
 public interface ArtifactDescriptorFactory {
 
-  public ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
-                                                           Map<String, String> deploymentProperties,
-                                                           PluginModelResolver pluginModelResolver,
-                                                           PluginDescriptorResolver pluginDescriptorResolver);
+  ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
+                                                    Map<String, String> deploymentProperties,
+                                                    PluginModelResolver pluginModelResolver,
+                                                    PluginDescriptorResolver pluginDescriptorResolver);
 
-  public DomainDescriptor createDomainDescriptor(DeployableProjectModel model,
-                                                 Map<String, String> deploymentProperties,
-                                                 PluginModelResolver pluginModelResolver,
-                                                 PluginDescriptorResolver pluginDescriptorResolver);
+  DomainDescriptor createDomainDescriptor(DeployableProjectModel model,
+                                          Map<String, String> deploymentProperties,
+                                          PluginModelResolver pluginModelResolver,
+                                          PluginDescriptorResolver pluginDescriptorResolver);
 
-  public ArtifactPluginDescriptor createPluginDescriptor(MulePluginModel pluginModel,
-                                                         DeployableArtifactDescriptor ownerDescriptor);
+  ArtifactPluginDescriptor createPluginDescriptor(MulePluginModel pluginModel,
+                                                  DeployableArtifactDescriptor ownerDescriptor);
 
 }
