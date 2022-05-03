@@ -39,11 +39,11 @@ public class OnRuntimeProcessingStrategy implements ProcessingStrategy {
   @Override
   public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
     return publisher -> Flux.from(publisher)
-            .flatMap(e -> {
-              String location = e.getContext().getOriginatingLocation().getRootContainerName();
-              return Mono.just(e).transform(getProcessingStrategy(location).map(ps -> ps.onProcessor(processor))
-                      .orElse(getProcessor(processor, location)));
-            });
+        .flatMap(e -> {
+          String location = e.getContext().getOriginatingLocation().getRootContainerName();
+          return Mono.just(e).transform(getProcessingStrategy(location).map(ps -> ps.onProcessor(processor))
+              .orElse(getProcessor(processor, location)));
+        });
   }
 
   private ReactiveProcessor getProcessor(ReactiveProcessor processor, String location) {
@@ -55,7 +55,7 @@ public class OnRuntimeProcessingStrategy implements ProcessingStrategy {
 
   public Optional<ProcessingStrategy> getProcessingStrategy(String location) {
     return MessageProcessors.getProcessingStrategy(locator, Location.builder()
-            .globalName(location)
-            .build());
+        .globalName(location)
+        .build());
   }
 }
