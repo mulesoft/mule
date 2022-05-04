@@ -11,6 +11,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.util.Preconditions.checkState;
@@ -20,6 +21,7 @@ import org.mule.metadata.api.TypeLoader;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
+import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
@@ -49,6 +51,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
@@ -103,9 +106,9 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   }
 
   @Override
-  public List<String> getEmittedNotifications() {
-    // TODO: MULE-20075
-    return emptyList();
+  public List<NotificationModel> getEmittedNotifications(Function<String, Optional<NotificationModel>> notificationMapper) {
+    // The mapper isn't needed at this implementation since we already have the operation models.
+    return getOperationModelsRecursiveStream().flatMap(om -> om.getNotificationModels().stream()).collect(toList());
   }
 
   @Override

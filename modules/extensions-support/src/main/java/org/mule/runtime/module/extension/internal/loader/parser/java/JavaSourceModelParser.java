@@ -33,6 +33,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
+import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.annotation.source.BackPressure;
 import org.mule.runtime.extension.api.annotation.source.ClusterSupport;
@@ -70,6 +71,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelParser implements SourceModelParser {
 
@@ -190,8 +192,10 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
   }
 
   @Override
-  public List<String> getEmittedNotifications() {
-    return NotificationModelParserUtils.getEmittedNotifications(sourceElement, getComponentTypeName(), getName());
+  public List<NotificationModel> getEmittedNotifications(Function<String, Optional<NotificationModel>> notificationMapper) {
+    List<String> identifiers =
+        NotificationModelParserUtils.getEmittedNotifications(sourceElement, getComponentTypeName(), getName());
+    return identifiers.stream().map(notificationMapper).filter(Optional::isPresent).map(Optional::get).collect(toList());
   }
 
   @Override
