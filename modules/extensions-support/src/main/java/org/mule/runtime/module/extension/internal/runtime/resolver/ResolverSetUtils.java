@@ -14,10 +14,14 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
+import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -136,8 +140,40 @@ public class ResolverSetUtils {
       return new StaticValueResolver(value);
     }
 
+    Optional<StackedTypesModelProperty> stackedTypesModelProperty =
+        parameterModel.getModelProperty(StackedTypesModelProperty.class);
+
+    if (stackedTypesModelProperty.isPresent()) {
+      Type parameterType = extensionParameterDescriptorModelProperty.get().getExtensionParameter().getType();
+      return stackedTypesModelProperty.get().getValueResolverFactory()
+          .getWrapperValueResolver(getParameterValueResolver(getNonSpecialType(parameterType), value, reflectionCache,
+                                                             muleContext));
+    }
+
     Type parameterType = extensionParameterDescriptorModelProperty.get().getExtensionParameter().getType();
     return getParameterValueResolver(parameterType, value, reflectionCache, muleContext);
+  }
+
+  private static Type getNonSpecialType(Type parameterType) {
+    Class expectedType = parameterType.getDeclaringClass().orElse(null);
+    // TODO : SDK-API TYPES
+    if (TypedValue.class.isAssignableFrom(expectedType)) {
+      List<Type> parameterTypeGenerics = parameterType.getSuperTypeGenerics(TypedValue.class);
+      if (parameterTypeGenerics.size() == 1) {
+        return parameterTypeGenerics.get(0);
+      }
+    } else if (ParameterResolver.class.isAssignableFrom(expectedType)) {
+      List<Type> parameterTypeGenerics = parameterType.getSuperTypeGenerics(ParameterResolver.class);
+      if (parameterTypeGenerics.size() == 1) {
+        return parameterTypeGenerics.get(0);
+      }
+    } else if (Literal.class.isAssignableFrom(expectedType)) {
+      List<Type> parameterTypeGenerics = parameterType.getSuperTypeGenerics(Literal.class);
+      if (parameterTypeGenerics.size() == 1) {
+        return parameterTypeGenerics.get(0);
+      }
+    }
+    return parameterType;
   }
 
   // TODO W-10992158: Already existing value resolving processing must be reviewed to avoid code duplication.

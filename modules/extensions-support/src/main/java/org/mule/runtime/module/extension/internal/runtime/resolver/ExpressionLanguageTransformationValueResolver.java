@@ -13,13 +13,14 @@ import static org.mule.runtime.api.metadata.TypedValue.unwrap;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 
 /**
- * Value resolver that relies on a expression language transformation to convert the delegate resolver into the expected type.
+ * Value resolver that relies on an expression language transformation to convert the delegate resolver into the expected type.
  * 
  * @since 4.5
  */
@@ -45,12 +46,17 @@ public class ExpressionLanguageTransformationValueResolver implements ValueResol
     if (isInstance(expectedType, unwrap(resolvedValue))) {
       return resolvedValue;
     } else {
-      return expressionLanguage
-          .evaluate(PAYLOAD_EXPRESSION, fromType(expectedType),
-                    BindingContext.builder()
-                        .addBinding(PAYLOAD_IDENTIFIER, of(resolvedValue))
-                        .build())
-          .getValue();
+      try {
+        return expressionLanguage
+            .evaluate(PAYLOAD_EXPRESSION, fromType(expectedType),
+                      BindingContext.builder()
+                          .addBinding(PAYLOAD_IDENTIFIER, of(resolvedValue))
+                          .build())
+            .getValue();
+      } catch (Exception exception) {
+        // LOG
+        return resolvedValue;
+      }
     }
   }
 

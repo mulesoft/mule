@@ -8,6 +8,7 @@ package org.mule.test.oauth;
 
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
 
 public class ConnectionProfile {
 
@@ -19,11 +20,17 @@ public class ConnectionProfile {
   @Optional
   private Integer profileLevel;
 
+  @Parameter
+  @Optional
+  private Literal<String> profileDescription;
+
   public ConnectionProfile() {}
 
-  public ConnectionProfile(ConnectionProperties profileConnectionProperties, Integer profileLevel) {
+  public ConnectionProfile(ConnectionProperties profileConnectionProperties, Integer profileLevel,
+                           Literal<String> profileDescription) {
     this.profileConnectionProperties = profileConnectionProperties;
     this.profileLevel = profileLevel;
+    this.profileDescription = profileDescription;
   }
 
   public ConnectionProperties getProfileConnectionProperties() {
@@ -32,6 +39,10 @@ public class ConnectionProfile {
 
   public Integer getProfileLevel() {
     return profileLevel;
+  }
+
+  public Literal<String> getProfileDescription() {
+    return profileDescription;
   }
 
   @Override
@@ -46,13 +57,16 @@ public class ConnectionProfile {
     if (profileConnectionProperties != null ? !profileConnectionProperties.equals(that.profileConnectionProperties)
         : that.profileConnectionProperties != null)
       return false;
-    return profileLevel != null ? profileLevel.equals(that.profileLevel) : that.profileLevel == null;
+    if (profileLevel != null ? !profileLevel.equals(that.profileLevel) : that.profileLevel != null)
+      return false;
+    return profileDescription != null ? profileDescription.equals(that.profileDescription) : that.profileDescription == null;
   }
 
   @Override
   public int hashCode() {
     int result = profileConnectionProperties != null ? profileConnectionProperties.hashCode() : 0;
     result = 31 * result + (profileLevel != null ? profileLevel.hashCode() : 0);
+    result = 31 * result + (profileDescription != null ? profileDescription.hashCode() : 0);
     return result;
   }
 }

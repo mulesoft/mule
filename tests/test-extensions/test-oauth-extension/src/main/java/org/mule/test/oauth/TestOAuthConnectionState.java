@@ -6,6 +6,7 @@
  */
 package org.mule.test.oauth;
 
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthCallbackValue;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthParameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -14,6 +15,8 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
+import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.sdk.api.annotation.semantics.security.TenantIdentifier;
 
 import java.util.List;
@@ -85,6 +88,18 @@ public class TestOAuthConnectionState {
   @Optional
   private Integer securityLevel;
 
+  @Parameter
+  @Optional
+  private TypedValue<Integer> typedSecurityLevel;
+
+  @Parameter
+  @Optional
+  private Literal<String> literalSecurityDescription;
+
+  @Parameter
+  @Optional
+  private ParameterResolver<String> resolverConnectionDisplayName;
+
   private AuthorizationCodeState state;
 
   public Double getApiVersion() {
@@ -149,5 +164,17 @@ public class TestOAuthConnectionState {
 
   public Map<String, ConnectionProperties> getSomeMapOfConnectionProperties() {
     return someMapOfConnectionProperties;
+  }
+
+  public TypedValue<Integer> getTypedSecurityLevel() {
+    return typedSecurityLevel;
+  }
+
+  public Literal<String> getLiteralSecurityDescription() {
+    return literalSecurityDescription;
+  }
+
+  public ParameterResolver<String> getResolverConnectionDisplayName() {
+    return resolverConnectionDisplayName;
   }
 }
