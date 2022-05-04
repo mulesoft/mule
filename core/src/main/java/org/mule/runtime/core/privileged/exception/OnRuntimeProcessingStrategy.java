@@ -23,6 +23,12 @@ import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
+import static java.util.Optional.empty;
+
+/**
+ * A {@link ProcessingStrategy} used for {@link org.mule.runtime.core.internal.exception.GlobalErrorHandler}. The resolution of
+ * the processing strategy is done in runtime depending on the flow location where the error that is being handled was thrown.
+ */
 public class OnRuntimeProcessingStrategy implements ProcessingStrategy {
 
   private static final Logger logger = LoggerFactory.getLogger(OnRuntimeProcessingStrategy.class);
@@ -42,30 +48,33 @@ public class OnRuntimeProcessingStrategy implements ProcessingStrategy {
   public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
     return publisher -> Flux.from(publisher)
         .flatMap(e -> {
-          String location = getFlowName(e);
-          return Mono.just(e).transform(getProcessingStrategy(location).map(ps -> ps.onProcessor(processor))
-              .orElse(getProcessor(processor, location)));
+          Optional<ProcessingStrategy> processingStrategy = getProcessingStrategy(getFlowName(e));
+          return Mono.just(e).transform(processingStrategy.map(ps -> ps.onProcessor(processor))
+              .orElse(processor));
         });
   }
 
   private String getFlowName(CoreEvent e) {
     FlowStackElement element = e.getFlowCallStack().peek();
     if (element == null) {
-      return "null";
+      if (logger.isDebugEnabled()) {
+        logger.debug("Parent flow couldn't be resolved.");
+      }
+      return null;
     }
     return element.getFlowName();
   }
 
-  private ReactiveProcessor getProcessor(ReactiveProcessor processor, String location) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Processing strategy not found for location {}", location);
-    }
-    return processor;
-  }
-
   public Optional<ProcessingStrategy> getProcessingStrategy(String location) {
-    return MessageProcessors.getProcessingStrategy(locator, Location.builder()
+    if (location == null) {
+      return empty();
+    }
+    Optional<ProcessingStrategy> processingStrategy = MessageProcessors.getProcessingStrategy(locator, Location.builder()
         .globalName(location)
         .build());
+    if (!processingStrategy.isPresent() && logger.isDebugEnabled()) {
+      logger.debug("Processing strategy not found for location {}", location);
+    }
+    return processingStrategy;
   }
 }
