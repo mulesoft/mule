@@ -10,6 +10,7 @@ import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -41,14 +42,18 @@ public class OnRuntimeProcessingStrategy implements ProcessingStrategy {
   public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
     return publisher -> Flux.from(publisher)
         .flatMap(e -> {
-          FlowStackElement element = e.getFlowCallStack().peek();
-          if (element == null) {
-            return Mono.just(e).transform(processor);
-          }
-          String location = element.getFlowName();
+          String location = getFlowName(e);
           return Mono.just(e).transform(getProcessingStrategy(location).map(ps -> ps.onProcessor(processor))
               .orElse(getProcessor(processor, location)));
         });
+  }
+
+  private String getFlowName(CoreEvent e) {
+    FlowStackElement element = e.getFlowCallStack().peek();
+    if (element == null) {
+      return "null";
+    }
+    return element.getFlowName();
   }
 
   private ReactiveProcessor getProcessor(ReactiveProcessor processor, String location) {
