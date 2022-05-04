@@ -48,13 +48,13 @@ public class OnRuntimeProcessingStrategy implements ProcessingStrategy {
   public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
     return publisher -> Flux.from(publisher)
         .flatMap(e -> {
-          Optional<ProcessingStrategy> processingStrategy = getProcessingStrategy(getFlowName(e));
+          Optional<ProcessingStrategy> processingStrategy = getProcessingStrategy(getParentFlowNameForErrorHandler(e));
           return Mono.just(e).transform(processingStrategy.map(ps -> ps.onProcessor(processor))
               .orElse(processor));
         });
   }
 
-  private String getFlowName(CoreEvent e) {
+  private String getParentFlowNameForErrorHandler(CoreEvent e) {
     FlowStackElement element = e.getFlowCallStack().peek();
     if (element == null) {
       if (logger.isDebugEnabled()) {
