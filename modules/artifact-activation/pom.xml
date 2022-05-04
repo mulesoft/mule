@@ -51,12 +51,6 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mule.tools.maven</groupId>
-            <artifactId>mule-packager</artifactId>
-            <version>3.5.5-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
 
     <build>
