@@ -57,7 +57,7 @@ public class SdkObjectStoreAdapter<T extends Serializable> implements org.mule.s
     try {
       return delegate.contains(key);
     } catch (ObjectStoreException e) {
-      throw SdkObjectStoreUtils.from(e);
+      throw SdkObjectStoreUtils.convertToSdkObjectStoreException(e);
     }
   }
 
@@ -66,7 +66,7 @@ public class SdkObjectStoreAdapter<T extends Serializable> implements org.mule.s
     try {
       delegate.store(key, value);
     } catch (ObjectStoreException e) {
-      throw SdkObjectStoreUtils.from(e);
+      throw SdkObjectStoreUtils.convertToSdkObjectStoreException(e);
     }
   }
 
@@ -75,7 +75,7 @@ public class SdkObjectStoreAdapter<T extends Serializable> implements org.mule.s
     try {
       return (T) delegate.retrieve(key);
     } catch (ObjectStoreException e) {
-      throw SdkObjectStoreUtils.from(e);
+      throw SdkObjectStoreUtils.convertToSdkObjectStoreException(e);
     }
   }
 
@@ -84,7 +84,7 @@ public class SdkObjectStoreAdapter<T extends Serializable> implements org.mule.s
     try {
       return (T) delegate.remove(key);
     } catch (ObjectStoreException e) {
-      throw SdkObjectStoreUtils.from(e);
+      throw SdkObjectStoreUtils.convertToSdkObjectStoreException(e);
     }
   }
 
@@ -98,7 +98,7 @@ public class SdkObjectStoreAdapter<T extends Serializable> implements org.mule.s
     try {
       delegate.clear();
     } catch (ObjectStoreException e) {
-      throw SdkObjectStoreUtils.from(e);
+      throw SdkObjectStoreUtils.convertToSdkObjectStoreException(e);
     }
   }
 
@@ -107,7 +107,7 @@ public class SdkObjectStoreAdapter<T extends Serializable> implements org.mule.s
     try {
       delegate.open();
     } catch (ObjectStoreException e) {
-      throw SdkObjectStoreUtils.from(e);
+      throw SdkObjectStoreUtils.convertToSdkObjectStoreException(e);
     }
   }
 
@@ -116,7 +116,7 @@ public class SdkObjectStoreAdapter<T extends Serializable> implements org.mule.s
     try {
       delegate.close();
     } catch (ObjectStoreException e) {
-      throw SdkObjectStoreUtils.from(e);
+      throw SdkObjectStoreUtils.convertToSdkObjectStoreException(e);
     }
   }
 
@@ -125,7 +125,7 @@ public class SdkObjectStoreAdapter<T extends Serializable> implements org.mule.s
     try {
       return delegate.allKeys();
     } catch (ObjectStoreException e) {
-      throw SdkObjectStoreUtils.from(e);
+      throw SdkObjectStoreUtils.convertToSdkObjectStoreException(e);
     }
   }
 
@@ -134,7 +134,7 @@ public class SdkObjectStoreAdapter<T extends Serializable> implements org.mule.s
     try {
       return delegate.retrieveAll();
     } catch (ObjectStoreException e) {
-      throw SdkObjectStoreUtils.from(e);
+      throw SdkObjectStoreUtils.convertToSdkObjectStoreException(e);
     }
   }
 }

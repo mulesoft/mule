@@ -40,7 +40,8 @@ public class SdkObjectStoreManagerAdapter implements org.mule.sdk.api.store.Obje
                                                                              ObjectStoreSettings objectStoreSettings) {
     return (T) SdkObjectStoreAdapter.from(
                                           delegate.createObjectStore(name,
-                                                                     SdkObjectStoreUtils.from(objectStoreSettings)));
+                                                                     SdkObjectStoreUtils
+                                                                         .convertToMuleObjectStoreSettings(objectStoreSettings)));
   }
 
   @Override
@@ -49,7 +50,8 @@ public class SdkObjectStoreManagerAdapter implements org.mule.sdk.api.store.Obje
     return (T) SdkObjectStoreAdapter.from(
                                           delegate
                                               .getOrCreateObjectStore(name,
-                                                                      SdkObjectStoreUtils.from(objectStoreSettings)));
+                                                                      SdkObjectStoreUtils
+                                                                          .convertToMuleObjectStoreSettings(objectStoreSettings)));
   }
 
   @Override
@@ -57,7 +59,7 @@ public class SdkObjectStoreManagerAdapter implements org.mule.sdk.api.store.Obje
     try {
       delegate.disposeStore(name);
     } catch (ObjectStoreException e) {
-      throw SdkObjectStoreUtils.from(e);
+      throw SdkObjectStoreUtils.convertToSdkObjectStoreException(e);
     }
   }
 }

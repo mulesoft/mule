@@ -28,7 +28,7 @@ public class SdkObjectStoreUtils {
    * @param muleObjectStoreException the Mule api OS exception to be converted
    * @return the converted SDK api OS exception
    */
-  public static org.mule.sdk.api.store.ObjectStoreException from(ObjectStoreException muleObjectStoreException) {
+  public static org.mule.sdk.api.store.ObjectStoreException convertToSdkObjectStoreException(ObjectStoreException muleObjectStoreException) {
     checkArgument(muleObjectStoreException != null, "Cannot convert null value");
     return convertException((ObjectStoreException) muleObjectStoreException);
   }
@@ -40,7 +40,7 @@ public class SdkObjectStoreUtils {
    * @param sdkObjectStoreSettings the SDK api OS settings to be converted
    * @return the converted Mule api OS settings
    */
-  public static ObjectStoreSettings from(org.mule.sdk.api.store.ObjectStoreSettings sdkObjectStoreSettings) {
+  public static ObjectStoreSettings convertToMuleObjectStoreSettings(org.mule.sdk.api.store.ObjectStoreSettings sdkObjectStoreSettings) {
     checkArgument(sdkObjectStoreSettings != null, "Cannot convert null value");
     return convertSettings(sdkObjectStoreSettings);
   }
@@ -52,7 +52,7 @@ public class SdkObjectStoreUtils {
    * @param muleObjectStoreSettings the Mule api OS settings to be converted
    * @return the converted SDK api OS settings
    */
-  public static org.mule.sdk.api.store.ObjectStoreSettings from(ObjectStoreSettings muleObjectStoreSettings) {
+  public static org.mule.sdk.api.store.ObjectStoreSettings convertToSdkObjectStoreSettings(ObjectStoreSettings muleObjectStoreSettings) {
     checkArgument(muleObjectStoreSettings != null, "Cannot convert null value");
     return convertSettings(muleObjectStoreSettings);
   }
