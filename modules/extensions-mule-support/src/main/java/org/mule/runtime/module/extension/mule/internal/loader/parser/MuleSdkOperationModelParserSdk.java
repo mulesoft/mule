@@ -23,13 +23,13 @@ import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
+import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
-import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
@@ -50,6 +50,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -74,6 +75,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   private final TypeLoader typeLoader;
 
   private final Characteristic<Boolean> isBlocking = new AnyMatchCharacteristic(OperationModel::isBlocking);
+  private final Characteristic<List<NotificationModel>> notificationModels = new AggregatedNotificationsCharacteristic();
 
   private String name;
 
@@ -116,9 +118,9 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   }
 
   @Override
-  public List<String> getEmittedNotifications() {
-    // TODO: MULE-20075
-    return emptyList();
+  public List<NotificationModel> getEmittedNotifications(Function<String, Optional<NotificationModel>> notificationMapper) {
+    // The mapper isn't needed at this implementation since we already have the operation models.
+    return notificationModels.getValue();
   }
 
   @Override
@@ -399,6 +401,18 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
     private AnyMatchCharacteristic(Predicate<OperationModel> predicate) {
       super(predicate, false, true);
+    }
+  }
+
+  private static class AggregatedNotificationsCharacteristic extends Characteristic<List<NotificationModel>> {
+
+    private AggregatedNotificationsCharacteristic() {
+      super(AggregatedNotificationsCharacteristic::aggregator, emptyList(), null);
+    }
+
+    private static List<NotificationModel> aggregator(OperationModel operationModel, List<NotificationModel> notificationModels) {
+      notificationModels.addAll(operationModel.getNotificationModels());
+      return notificationModels;
     }
   }
 }

@@ -6,13 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser;
 
+import org.mule.runtime.api.meta.model.notification.NotificationModel;
+
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * @since 4.5.0
  */
 public interface NotificationEmitterParser {
 
-  List<String> getEmittedNotifications();
+  List<NotificationModel> getEmittedNotifications(Function<String, Optional<NotificationModel>> notificationMapper);
 
 }

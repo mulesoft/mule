@@ -240,4 +240,14 @@
             <set-payload value="Some deprecated value" />
         </operation:body>
     </operation:def>
+
+    <operation:def name="emit">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <test-components:fire-notification integer="52" />
+            <set-payload value="Notification fired" />
+        </operation:body>
+    </operation:def>
 </mule>
