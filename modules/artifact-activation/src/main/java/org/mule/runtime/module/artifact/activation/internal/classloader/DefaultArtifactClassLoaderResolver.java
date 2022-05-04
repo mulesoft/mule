@@ -8,17 +8,18 @@ package org.mule.runtime.module.artifact.activation.internal.classloader;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver.pluginDescriptorResolver;
 import static org.mule.runtime.module.artifact.api.classloader.ChildOnlyLookupStrategy.CHILD_ONLY;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toSet;
-import static java.lang.String.format;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -444,17 +445,12 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
   private MuleArtifactClassLoader resolvePluginClassLoader(ArtifactClassLoader ownerClassLoader,
                                                            ArtifactPluginDescriptor descriptor) {
+    Set<ArtifactPluginDescriptor> artifactPluginDescriptors = ((DeployableArtifactDescriptor) ownerClassLoader
+        .getArtifactDescriptor())
+            .getPlugins();
     return createMulePluginClassLoader((MuleDeployableArtifactClassLoader) ownerClassLoader,
                                        descriptor,
-                                       bundleDescriptor -> ((DeployableArtifactDescriptor) ownerClassLoader
-                                           .getArtifactDescriptor())
-                                               .getPlugins()
-                                               .stream()
-                                               .filter(apd -> apd.getBundleDescriptor().getArtifactId()
-                                                   .equals(bundleDescriptor.getArtifactId())
-                                                   && apd.getBundleDescriptor().getGroupId()
-                                                       .equals(bundleDescriptor.getGroupId()))
-                                               .findAny());
+                                       pluginDescriptorResolver());
   }
 
 }
