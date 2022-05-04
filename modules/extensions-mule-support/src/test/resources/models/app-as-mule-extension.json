@@ -927,6 +927,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "visibility": "PUBLIC",
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
