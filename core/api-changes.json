@@ -3,6 +3,15 @@
     "revapi": {
       "ignore": [
         {
+        "code": "java.method.defaultMethodAddedToInterface",
+        "new": "method org.mule.runtime.core.api.context.notification.FlowStackElement org.mule.runtime.core.api.context.notification.FlowCallStack::peek()",
+        "package": "org.mule.runtime.core.api.context.notification",
+        "classSimpleName": "FlowCallStack",
+        "methodName": "peek",
+        "elementKind": "method",
+        "justification": "Improvement in global error handlers"
+        },
+        {
           "code": "java.class.added",
           "new": "class org.mule.runtime.core.privileged.exception.OnRuntimeProcessingStrategy",
           "package": "org.mule.runtime.core.privileged.exception",
