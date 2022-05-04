@@ -116,7 +116,7 @@ class MuleOperationExtensionModelDeclarer {
 
     parameters.withOptionalParameter("visibility")
         .ofType(BASE_TYPE_BUILDER.stringType()
-            .enumOf("public", "private")
+            .enumOf("PUBLIC", "PRIVATE")
             .build())
         .describedAs("The operation visibility to third parties")
         .withDisplayModel(DisplayModel.builder()
