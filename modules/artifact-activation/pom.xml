@@ -16,9 +16,16 @@
 
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+        <muleMavenClientApi>1.7.0-SNAPSHOT</muleMavenClientApi>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-maven-client-api</artifactId>
+            <version>${muleMavenClientApi}</version>
+            <optional>true</optional>
+        </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-artifact</artifactId>
