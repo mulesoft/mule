@@ -984,11 +984,11 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "visibility": "PUBLIC",
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
-      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HELLO_AND_INTRODUCE",
         "namespace": "THIS",
