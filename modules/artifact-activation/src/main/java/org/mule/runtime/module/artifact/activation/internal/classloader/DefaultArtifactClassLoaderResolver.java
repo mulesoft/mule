@@ -60,6 +60,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -329,7 +330,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
     final String pluginArtifactId = getArtifactPluginId(regionClassLoader.getArtifactId(), descriptor.getName());
 
     ClassLoaderLookupPolicy pluginLookupPolicy = createPluginLookupPolicy(descriptor,
-                                                                          regionClassLoader,
+                                                                          ownerArtifactClassLoader,
                                                                           pluginDescriptorResolver,
                                                                           pluginClassLoaderResolver);
 
@@ -340,14 +341,17 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
   }
 
   protected ClassLoaderLookupPolicy createPluginLookupPolicy(ArtifactPluginDescriptor descriptor,
-                                                             RegionClassLoader regionClassLoader,
+                                                             MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
                                                              PluginDescriptorResolver pluginDescriptorResolver,
                                                              PluginClassLoaderResolver pluginClassLoaderResolver) {
+    RegionClassLoader regionClassLoader = (RegionClassLoader) ownerArtifactClassLoader.getParent();
     ClassLoaderLookupPolicy baseLookupPolicy = regionClassLoader.getClassLoaderLookupPolicy()
         .extend(regionClassLoader.filterForClassLoader(regionClassLoader.getOwnerClassLoader())
             .getExportedClassPackages()
             .stream(), PARENT_FIRST);
 
+    Set<ArtifactPluginDescriptor> pluginsDescriptors = ownerArtifactClassLoader.getArtifactPluginClassLoaders().stream()
+        .map(p -> (ArtifactPluginDescriptor) (p.getArtifactDescriptor())).collect(toSet());
     Map<String, LookupStrategy> pluginsLookupPolicies = new HashMap<>();
 
     descriptor.getClassLoaderModel().getDependencies()
@@ -355,7 +359,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
         .filter(dependency -> dependency.getDescriptor().getClassifier()
             .map(MULE_PLUGIN_CLASSIFIER::equals)
             .orElse(false))
-        .map(dependency -> pluginDescriptorResolver.resolve(dependency.getDescriptor()))
+        .map(dependency -> pluginDescriptorResolver.resolve(pluginsDescriptors, dependency.getDescriptor()))
         .filter(Optional::isPresent)
         .map(Optional::get)
         .forEach(dependencyPluginDescriptor -> {
@@ -445,9 +449,6 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
   private MuleArtifactClassLoader resolvePluginClassLoader(ArtifactClassLoader ownerClassLoader,
                                                            ArtifactPluginDescriptor descriptor) {
-    Set<ArtifactPluginDescriptor> artifactPluginDescriptors = ((DeployableArtifactDescriptor) ownerClassLoader
-        .getArtifactDescriptor())
-            .getPlugins();
     return createMulePluginClassLoader((MuleDeployableArtifactClassLoader) ownerClassLoader,
                                        descriptor,
                                        pluginDescriptorResolver());

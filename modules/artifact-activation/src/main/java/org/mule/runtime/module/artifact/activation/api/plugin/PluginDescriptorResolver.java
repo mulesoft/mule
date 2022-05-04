@@ -38,6 +38,7 @@ public interface PluginDescriptorResolver {
    * The function must return {@link Optional#empty()} if the plugin represented by the {@link BundleDescriptor} is not a
    * dependency of the artifact for {@code ownerArtifactClassLoader}.
    *
+   * @param artifactPluginDescriptors plugin descriptors from which to retrieve the one matching the given {@code bundleDescriptor}.
    * @param bundleDescriptor the bundle descriptor of the plugin to get the artifact descriptor for.
    * @return optionally returns an {@link ArtifactPluginDescriptor} corresponding to the given {@link BundleDescriptor}.
    */
