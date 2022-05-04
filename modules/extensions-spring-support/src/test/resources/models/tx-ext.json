@@ -262,6 +262,7 @@
             "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "CONNECTION_EXCEPTION",
             "namespace": "TX",
@@ -796,6 +797,7 @@
             "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "FAILING_PAGED_TRANSACTIONAL_OPERATION",
             "namespace": "TX",
@@ -1595,6 +1597,7 @@
             "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_CONNECTION",
             "namespace": "TX",
@@ -2205,6 +2208,7 @@
             "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "INJECT_TRANSACTIONAL_ACTION",
             "namespace": "TX",
@@ -2821,6 +2825,7 @@
             "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "PAGED_TRANSACTIONAL_OPERATION",
             "namespace": "TX",
@@ -3597,6 +3602,7 @@
             "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SDK_INJECT_TRANSACTIONAL_ACTION",
             "namespace": "TX",
@@ -4213,6 +4219,7 @@
             "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "STICKY_FAILING_PAGED_TRANSACTIONAL_OPERATION",
             "namespace": "TX",
@@ -5012,6 +5019,7 @@
             "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "VERIFY_NO_TRANSACTION",
             "namespace": "TX",
@@ -5507,6 +5515,7 @@
             "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "VERIFY_SAME_CONNECTION",
             "namespace": "TX",
@@ -6037,6 +6046,7 @@
             "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "VERIFY_TRANSACTION_BEGUN",
             "namespace": "TX",
@@ -6532,6 +6542,7 @@
             "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "VERIFY_TRANSACTION_COMMITED",
             "namespace": "TX",
@@ -7027,6 +7038,7 @@
             "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "VERIFY_TRANSACTION_ROLLEDBACK",
             "namespace": "TX",
@@ -8373,6 +8385,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "TRANSACTIONAL_SOURCE",
             "namespace": "TX",
@@ -9024,6 +9037,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "TRANSACTIONAL_SOURCE_WITH_TX_PARAMETERS",
             "namespace": "TX",
@@ -9827,6 +9841,7 @@
             "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SDK_CONNECTION_EXCEPTION",
             "namespace": "TX",
@@ -10322,6 +10337,7 @@
             "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SDK_GET_CONNECTION",
             "namespace": "TX",
@@ -10909,6 +10925,7 @@
             "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SDK_VERIFY_NO_TRANSACTION",
             "namespace": "TX",
@@ -11404,6 +11421,7 @@
             "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SDK_VERIFY_SAME_CONNECTION",
             "namespace": "TX",
@@ -11934,6 +11952,7 @@
             "TX:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SDK_VERIFY_TRANSACTION_BEGUN",
             "namespace": "TX",
@@ -12981,6 +13000,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SDK_TRANSACTIONAL_SOURCE",
             "namespace": "TX",
@@ -13601,6 +13621,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "FAIL",
         "namespace": "TX",
@@ -13779,6 +13800,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SDK_FAIL",
         "namespace": "TX",

@@ -19,6 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
@@ -390,7 +391,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
     SourceModel sourceModel = new ImmutableSourceModel(SOURCE_NAME, "", false, false, asList(group), emptyList(), null, null,
                                                        of(sourceCallbackModel), empty(), empty(), false, false, false,
-                                                       null, SOURCE, emptySet(), emptySet(), emptySet(), null);
+                                                       null, SOURCE, emptySet(), PUBLIC, emptySet(), emptySet(), null);
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
     validate();
   }

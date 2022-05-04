@@ -24,6 +24,7 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
+import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
@@ -292,7 +293,7 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
 
     source =
         new ImmutableSourceModel(SOURCE_NAME, "", false, false, asList(parameterGroupModel), emptyList(), null, null, empty(),
-                                 empty(), empty(), false, false, false, null, SOURCE, emptySet(),
+                                 empty(), empty(), false, false, false, null, SOURCE, emptySet(), PUBLIC,
                                  singleton(createTypeResolversInformationModelProperty("category", "outputResolverName",
                                                                                        "attributesResolverName",
                                                                                        parameterResolversNames,
@@ -377,7 +378,7 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
     return new ImmutableOperationModel(operationName, "",
                                        paramGroups,
                                        emptyList(), null, null, true, ExecutionType.BLOCKING, false, false, false, null,
-                                       emptySet(), PROCESSOR, modelProperties, emptySet());
+                                       emptySet(), PROCESSOR, PUBLIC, modelProperties, emptySet());
   }
 
   @After

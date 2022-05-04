@@ -290,6 +290,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -961,6 +962,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
@@ -1314,6 +1316,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -1920,6 +1923,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -2475,6 +2479,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -3036,6 +3041,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -3642,6 +3648,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -4330,6 +4337,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": true,
           "notifications": [],
@@ -5148,6 +5156,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -5709,6 +5718,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -6188,6 +6198,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -6743,6 +6754,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
@@ -7057,6 +7069,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -16248,6 +16261,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -16745,6 +16759,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -17481,6 +17496,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -18158,6 +18174,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -18764,6 +18781,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -19319,6 +19337,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -19880,6 +19899,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -20486,6 +20506,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -21174,6 +21195,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": true,
           "notifications": [],
@@ -21992,6 +22014,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -22553,6 +22576,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -23032,6 +23056,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -23587,6 +23612,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
@@ -23901,6 +23927,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -25976,6 +26003,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -26653,6 +26681,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -27259,6 +27288,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -27814,6 +27844,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -28375,6 +28406,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -28981,6 +29013,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -29669,6 +29702,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": true,
           "notifications": [],
@@ -30487,6 +30521,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -31048,6 +31083,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -31527,6 +31563,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -32082,6 +32119,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
@@ -32396,6 +32434,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -35869,6 +35908,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -36546,6 +36586,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -37152,6 +37193,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -37707,6 +37749,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -38268,6 +38311,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -38874,6 +38918,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -39562,6 +39607,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": true,
           "notifications": [],
@@ -40380,6 +40426,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -40941,6 +40988,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -41420,6 +41468,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -41975,6 +42024,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
@@ -42289,6 +42339,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -44788,6 +44839,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -45465,6 +45517,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -46071,6 +46124,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -46626,6 +46680,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -47187,6 +47242,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -47793,6 +47849,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -48481,6 +48538,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": true,
           "notifications": [],
@@ -49299,6 +49357,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -49860,6 +49919,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -50339,6 +50399,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -50894,6 +50955,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
@@ -51208,6 +51270,7 @@
             "modelProperties": {}
           },
           "transactional": false,
+          "visibility": "PUBLIC",
           "requiresConnection": true,
           "supportsStreaming": false,
           "notifications": [],
@@ -53321,6 +53384,7 @@
         "modelProperties": {}
       },
       "transactional": false,
+      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": true,
       "notifications": [],

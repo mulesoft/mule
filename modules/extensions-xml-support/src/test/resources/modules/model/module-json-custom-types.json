@@ -41,6 +41,7 @@
         "modelProperties": {}
       },
       "transactional": false,
+      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
@@ -376,6 +377,7 @@
         "modelProperties": {}
       },
       "transactional": false,
+      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
@@ -739,6 +741,7 @@
         "modelProperties": {}
       },
       "transactional": false,
+      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
@@ -1028,6 +1031,7 @@
         "modelProperties": {}
       },
       "transactional": false,
+      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
@@ -1289,6 +1293,7 @@
         "modelProperties": {}
       },
       "transactional": false,
+      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
@@ -1624,6 +1629,7 @@
         "modelProperties": {}
       },
       "transactional": false,
+      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
@@ -1960,6 +1966,7 @@
         "modelProperties": {}
       },
       "transactional": false,
+      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
@@ -2312,6 +2319,7 @@
         "modelProperties": {}
       },
       "transactional": false,
+      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
@@ -2657,6 +2665,7 @@
         "modelProperties": {}
       },
       "transactional": false,
+      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
@@ -3047,6 +3056,7 @@
         "modelProperties": {}
       },
       "transactional": false,
+      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
@@ -3382,6 +3392,7 @@
         "modelProperties": {}
       },
       "transactional": false,
+      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],

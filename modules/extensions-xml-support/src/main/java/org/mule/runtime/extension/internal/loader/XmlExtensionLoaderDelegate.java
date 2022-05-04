@@ -612,6 +612,7 @@ public final class XmlExtensionLoaderDelegate {
                                          opModel.getDisplayModel().orElse(null),
                                          opModel.getErrorModels(),
                                          opModel.getStereotype(),
+                                         opModel.getVisibility(),
                                          enrichedModelProperties,
                                          opModel.getNotificationModels(),
                                          opModel.getDeprecationModel().orElse(null));

@@ -320,6 +320,7 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                        constructModel.getDisplayModel().orElse(null),
                                                        constructModel.getErrorModels(),
                                                        constructModel.getStereotype(),
+                                                       constructModel.getVisibility(),
                                                        constructModel.getModelProperties(),
                                                        constructModel.getDeprecationModel().orElse(null)));
       }
@@ -344,6 +345,7 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                        operationModel.getDisplayModel().orElse(null),
                                                        operationModel.getErrorModels(),
                                                        operationModel.getStereotype(),
+                                                       operationModel.getVisibility(),
                                                        operationModel.getModelProperties(),
                                                        operationModel.getNotificationModels(),
                                                        operationModel.getDeprecationModel().orElse(null)));
@@ -378,7 +380,9 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                     sourceModel.supportsStreaming(),
                                                     sourceModel.getDisplayModel().orElse(null),
                                                     sourceModel.getStereotype(),
-                                                    sourceModel.getErrorModels(), sourceModel.getModelProperties(),
+                                                    sourceModel.getErrorModels(),
+                                                    sourceModel.getVisibility(),
+                                                    sourceModel.getModelProperties(),
                                                     sourceModel.getNotificationModels(),
                                                     sourceModel.getDeprecationModel().orElse(null)));
       }

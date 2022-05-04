@@ -2057,6 +2057,7 @@
             "HEISENBERG:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -2573,6 +2574,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -2841,6 +2843,7 @@
             "HEISENBERG:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -3609,6 +3612,7 @@
             "HEISENBERG:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -4389,6 +4393,7 @@
             "HEISENBERG:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -5152,6 +5157,7 @@
             "HEISENBERG:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -5936,6 +5942,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -6295,6 +6302,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -6713,6 +6721,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -7109,6 +7118,7 @@
             "HEISENBERG:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -7687,6 +7697,7 @@
             "HEISENBERG:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -8385,6 +8396,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -8761,6 +8773,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -9228,6 +9241,7 @@
             "HEISENBERG:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -10087,6 +10101,7 @@
             "HEISENBERG:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -10872,6 +10887,7 @@
             "HEISENBERG:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -11573,6 +11589,7 @@
             "HEISENBERG:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -12089,6 +12106,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -12491,6 +12509,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -12867,6 +12886,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -13258,6 +13278,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -13869,6 +13890,7 @@
             "HEISENBERG:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -14717,6 +14739,7 @@
             "HEISENBERG:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -15485,6 +15508,7 @@
             "HEISENBERG:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -16183,6 +16207,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -16781,6 +16806,7 @@
             "HEISENBERG:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
@@ -20256,6 +20282,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "ASYNC_SOURCE",
             "namespace": "HEISENBERG",
@@ -22622,6 +22649,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "LISTEN_PAYMENTS",
             "namespace": "HEISENBERG",
@@ -24470,6 +24498,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "LISTEN_PAYMENTS_ALL_OPTIONAL",
             "namespace": "HEISENBERG",
@@ -26582,6 +26611,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "RECONNECTABLE_LISTEN_PAYMENTS",
             "namespace": "HEISENBERG",
@@ -28985,6 +29015,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SDK_RECONNECTABLE_LISTEN_PAYMENTS",
             "namespace": "HEISENBERG",
@@ -31388,6 +31419,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "LISTEN-PAYMENTS-CLUSTER",
             "namespace": "HEISENBERG",
@@ -32453,6 +32485,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -33142,6 +33175,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "parameterGroupModels": [],
           "name": "processors",
           "description": "",
@@ -33151,6 +33185,7 @@
       ],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "ALWAYS_FAILS_WRAPPER",
         "namespace": "HEISENBERG",
@@ -33389,6 +33424,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -33791,6 +33827,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -33986,6 +34023,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -34348,6 +34386,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -34655,6 +34694,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -34911,6 +34951,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -35103,6 +35144,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -35413,6 +35455,7 @@
         "HEISENBERG:OAUTH2"
       ],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -35669,6 +35712,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -36074,6 +36118,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "DRUG_KILLING",
         "namespace": "HEISENBERG"
@@ -36407,6 +36452,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -36716,6 +36762,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -37022,6 +37069,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -37333,6 +37381,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "parameterGroupModels": [],
           "name": "processors",
           "description": "",
@@ -37342,6 +37391,7 @@
       ],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "EXCEPTION_ON_CALLBACKS",
         "namespace": "HEISENBERG",
@@ -37591,6 +37641,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "parameterGroupModels": [],
           "name": "chain",
           "description": "",
@@ -37600,6 +37651,7 @@
       ],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "EXECUTE_ANYTHING",
         "namespace": "HEISENBERG",
@@ -37849,6 +37901,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -38282,6 +38335,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -38588,6 +38642,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -39003,6 +39058,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -39345,6 +39401,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -39519,6 +39576,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -39727,6 +39785,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "parameterGroupModels": [],
           "name": "chain",
           "description": "",
@@ -39736,6 +39795,7 @@
       ],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GET_CHAIN",
         "namespace": "HEISENBERG",
@@ -40071,6 +40131,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GET_COUNTER",
         "namespace": "HEISENBERG",
@@ -40446,6 +40507,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -40821,6 +40883,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -41127,6 +41190,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -41502,6 +41566,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -41863,6 +41928,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -42541,6 +42607,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -42891,6 +42958,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "KILLING_OPERATION",
         "namespace": "HEISENBERG",
@@ -43241,6 +43309,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "KILLING_OPERATION",
         "namespace": "HEISENBERG",
@@ -43592,6 +43661,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "KILLING_OPERATION",
         "namespace": "HEISENBERG",
@@ -43932,6 +44002,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "KILLING_OPERATION",
         "namespace": "HEISENBERG",
@@ -44312,6 +44383,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "KILLING_OPERATION",
         "namespace": "HEISENBERG",
@@ -44698,6 +44770,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "KILLING_OPERATION",
         "namespace": "HEISENBERG",
@@ -45039,6 +45112,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "KILLING_OPERATION",
         "namespace": "HEISENBERG",
@@ -45437,6 +45511,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -45763,6 +45838,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -46126,6 +46202,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "LIFECYCLE_VALIDATOR",
         "namespace": "HEISENBERG",
@@ -46354,6 +46431,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -46690,6 +46768,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "parameterGroupModels": [],
           "name": "optionalProcessors",
           "description": "",
@@ -46699,6 +46778,7 @@
       ],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "NEVER_FAILS_WRAPPER",
         "namespace": "HEISENBERG",
@@ -47025,6 +47105,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -47396,6 +47477,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "parameterGroupModels": [],
           "name": "chain",
           "description": "",
@@ -47405,6 +47487,7 @@
       ],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "PAYLOAD_MODIFIER",
         "namespace": "HEISENBERG",
@@ -47911,6 +47994,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -48287,6 +48371,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -48608,6 +48693,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -48939,6 +49025,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -49291,6 +49378,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -49623,6 +49711,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -49940,6 +50029,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -50258,6 +50348,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "ROUTER_FIELD",
         "namespace": "HEISENBERG",
@@ -50681,6 +50772,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SCOPE_FIELD",
         "namespace": "HEISENBERG",
@@ -51095,6 +51187,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -51522,6 +51615,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -51845,6 +51939,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "parameterGroupModels": [],
           "name": "operations",
           "description": "",
@@ -51854,6 +51949,7 @@
       ],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -52110,6 +52206,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -52290,6 +52387,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -52596,6 +52694,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -52908,6 +53007,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -53220,6 +53320,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -53528,6 +53629,7 @@
         "HEISENBERG:VALIDATION"
       ],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "VALIDATOR",
         "namespace": "HEISENBERG",
@@ -53688,6 +53790,7 @@
           "minOccurs": 1,
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -53775,6 +53878,7 @@
               "nestedComponents": [],
               "errors": [],
               "semanticTerms": [],
+              "visibility": "PUBLIC",
               "parameterGroupModels": [],
               "name": "processors",
               "description": "",
@@ -53787,6 +53891,7 @@
       ],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "CONCURRENT_ROUTE_EXECUTOR",
         "namespace": "HEISENBERG",
@@ -53866,6 +53971,7 @@
           "minOccurs": 1,
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -53953,6 +54059,7 @@
               "nestedComponents": [],
               "errors": [],
               "semanticTerms": [],
+              "visibility": "PUBLIC",
               "parameterGroupModels": [],
               "name": "processors",
               "description": "",
@@ -53965,6 +54072,7 @@
       ],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SDK_VOID_ROUTER",
         "namespace": "HEISENBERG",
@@ -54044,6 +54152,7 @@
           "minOccurs": 1,
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -54131,6 +54240,7 @@
               "nestedComponents": [],
               "errors": [],
               "semanticTerms": [],
+              "visibility": "PUBLIC",
               "parameterGroupModels": [],
               "name": "processors",
               "description": "",
@@ -54143,6 +54253,7 @@
       ],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SIMPLE_ROUTER",
         "namespace": "HEISENBERG",
@@ -54226,6 +54337,7 @@
           "minOccurs": 0,
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "parameterGroupModels": [],
           "name": "beforeCallAssertions",
           "description": "",
@@ -54244,6 +54356,7 @@
               "nestedComponents": [],
               "errors": [],
               "semanticTerms": [],
+              "visibility": "PUBLIC",
               "parameterGroupModels": [],
               "name": "processors",
               "description": "",
@@ -54257,6 +54370,7 @@
           "minOccurs": 0,
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "parameterGroupModels": [],
           "name": "afterCallAssertions",
           "description": "",
@@ -54275,6 +54389,7 @@
               "nestedComponents": [],
               "errors": [],
               "semanticTerms": [],
+              "visibility": "PUBLIC",
               "parameterGroupModels": [],
               "name": "processors",
               "description": "",
@@ -54287,6 +54402,7 @@
       ],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SPY",
         "namespace": "HEISENBERG",
@@ -54443,6 +54559,7 @@
           "minOccurs": 1,
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -54538,6 +54655,7 @@
               "nestedComponents": [],
               "errors": [],
               "semanticTerms": [],
+              "visibility": "PUBLIC",
               "parameterGroupModels": [],
               "name": "processors",
               "description": "",
@@ -54551,6 +54669,7 @@
           "minOccurs": 0,
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -54610,6 +54729,7 @@
               "nestedComponents": [],
               "errors": [],
               "semanticTerms": [],
+              "visibility": "PUBLIC",
               "parameterGroupModels": [],
               "name": "processors",
               "description": "",
@@ -54622,6 +54742,7 @@
       ],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "STEREOTYPED_ROUTES",
         "namespace": "HEISENBERG",
@@ -54701,6 +54822,7 @@
           "minOccurs": 1,
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -54788,6 +54910,7 @@
               "nestedComponents": [],
               "errors": [],
               "semanticTerms": [],
+              "visibility": "PUBLIC",
               "parameterGroupModels": [],
               "name": "processors",
               "description": "",
@@ -54801,6 +54924,7 @@
           "minOccurs": 0,
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -54860,6 +54984,7 @@
               "nestedComponents": [],
               "errors": [],
               "semanticTerms": [],
+              "visibility": "PUBLIC",
               "parameterGroupModels": [],
               "name": "processors",
               "description": "",
@@ -54872,6 +54997,7 @@
       ],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "TWO_ROUTES_ROUTER",
         "namespace": "HEISENBERG",
@@ -54979,6 +55105,7 @@
           "minOccurs": 1,
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -55066,6 +55193,7 @@
               "nestedComponents": [],
               "errors": [],
               "semanticTerms": [],
+              "visibility": "PUBLIC",
               "parameterGroupModels": [],
               "name": "processors",
               "description": "",
@@ -55078,6 +55206,7 @@
       ],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "VOID_ROUTER",
         "namespace": "HEISENBERG",
@@ -56678,6 +56807,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "DEA-RADIO",
         "namespace": "HEISENBERG",
