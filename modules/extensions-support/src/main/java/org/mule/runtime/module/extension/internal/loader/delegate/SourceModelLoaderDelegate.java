@@ -76,7 +76,7 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
           .requiresConnection(parser.isConnected())
           .transactional(parser.isTransactional())
           .supportsStreaming(parser.supportsStreaming())
-          .withVisibility(parser.getVisibility());
+          .withVisibility(parser.getComponentVisibility());
 
       parser.getDeprecationModel().ifPresent(sourceDeclarer::withDeprecation);
       parser.getDisplayModel().ifPresent(d -> sourceDeclarer.getDeclaration().setDisplayModel(d));

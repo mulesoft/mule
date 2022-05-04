@@ -236,7 +236,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="visibility" type="visibilityType" default="public">
+                <xsd:attribute name="visibility" type="visibilityType" default="PUBLIC">
                     <xsd:annotation>
                         <xsd:documentation>
                             The operation's accessing visibility
@@ -290,8 +290,8 @@
             </xsd:documentation>
         </xsd:annotation>
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="public"/>
-            <xsd:enumeration value="private"/>
+            <xsd:enumeration value="PUBLIC"/>
+            <xsd:enumeration value="PRIVATE"/>
         </xsd:restriction>
     </xsd:simpleType>
 

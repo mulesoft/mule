@@ -301,7 +301,7 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
   }
 
   @Override
-  public ComponentVisibility getVisibility() {
+  public ComponentVisibility getComponentVisibility() {
     return PUBLIC;
   }
 

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser;
 
-import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
@@ -31,7 +30,7 @@ import java.util.Optional;
  * @since 4.5.0
  */
 public interface SourceModelParser extends SemanticTermsParser, StereotypeModelParser, AdditionalPropertiesModelParser,
-    NotificationEmitterParser {
+    NotificationEmitterParser, ComponentVisibilityParser {
 
   /**
    * @return the source's name
@@ -148,11 +147,6 @@ public interface SourceModelParser extends SemanticTermsParser, StereotypeModelP
    * @return the type of cluster support this source provides
    */
   SourceClusterSupportModelProperty getSourceClusterSupportModelProperty();
-
-  /**
-   * @return this source's {@link ComponentVisibility}.
-   */
-  ComponentVisibility getVisibility();
 
   /**
    * Parses the syntactic definition of a {@link SourceCallbackModel} so that the semantics reflected in it can be extracted in a

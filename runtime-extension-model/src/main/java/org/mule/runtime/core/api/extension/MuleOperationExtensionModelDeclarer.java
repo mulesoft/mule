@@ -96,15 +96,6 @@ class MuleOperationExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .withLayout(LayoutModel.builder().asText().build());
 
-    parameters.withOptionalParameter("public")
-        .ofType(BOOLEAN_TYPE)
-        .describedAs("Whether the operation is public and should be usable by third party components")
-        .defaultingTo(false)
-        .withDisplayModel(DisplayModel.builder()
-            .displayName("Public")
-            .summary("Whether the operation is public and should be usable by third party components")
-            .build());
-
     parameters.withOptionalParameter("summary")
         .ofType(STRING_TYPE)
         .describedAs("A brief description of the operation")
@@ -124,11 +115,13 @@ class MuleOperationExtensionModelDeclarer {
             .build());
 
     parameters.withOptionalParameter("visibility")
-        .ofType(STRING_TYPE)
-        .describedAs("The operation visibility to third partys")
+        .ofType(BASE_TYPE_BUILDER.stringType()
+            .enumOf("public", "private")
+            .build())
+        .describedAs("The operation visibility to third parties")
         .withDisplayModel(DisplayModel.builder()
             .displayName("Visibility")
-            .summary("The operation visibility to third partys")
+            .summary("The operation visibility to third parties")
             .build());
 
 
