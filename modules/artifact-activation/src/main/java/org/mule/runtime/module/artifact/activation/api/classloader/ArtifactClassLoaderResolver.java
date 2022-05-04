@@ -70,7 +70,8 @@ public interface ArtifactClassLoaderResolver {
    * 
    * @param descriptor                the descriptor of the domain to generate a classLoader for.
    * @param pluginClassLoaderResolver allows the user to provide a class loader for the given plugin, otherwise it will be
-   *                                  created.
+   *                                  created. Default implementation is
+   *                                  {@link PluginClassLoaderResolver#resolve(ArtifactClassLoader, ArtifactPluginDescriptor)}
    * @return a classLoader for a domain.
    */
   MuleDeployableArtifactClassLoader createDomainClassLoader(DomainDescriptor descriptor,
@@ -94,7 +95,8 @@ public interface ArtifactClassLoaderResolver {
    * @param descriptor                the descriptor of the application to generate a classLoader for.
    * @param domainClassLoader         the class loader of the domain the application belongs to.
    * @param pluginClassLoaderResolver allows the user to provide a class loader for the given plugin, otherwise it will be
-   *                                  created.
+   *                                  created. Default implementation is
+   *                                  {@link PluginClassLoaderResolver#resolve(ArtifactClassLoader, ArtifactPluginDescriptor)}
    * @return a classLoader for an application.
    */
   MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
