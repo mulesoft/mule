@@ -222,7 +222,7 @@
                                     </xsd:documentation>
                                 </xsd:annotation>
                             </xsd:attribute>
-                            <xsd:attribute name="toRemoveIn" use="required" type="mule:nonBlankString">
+                            <xsd:attribute name="toRemoveIn" type="mule:nonBlankString">
                                 <xsd:annotation>
                                     <xsd:documentation>
                                         The version of the extension in which the annotated member will be removed or was removed.

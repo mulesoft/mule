@@ -177,7 +177,7 @@ class MuleOperationExtensionModelDeclarer {
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED);
 
-    defaultParameterGroupDeclarer.withRequiredParameter("toRemoveIn")
+    defaultParameterGroupDeclarer.withOptionalParameter("toRemoveIn")
         .describedAs("The version of the extension in which the annotated member will be removed or was removed")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED);

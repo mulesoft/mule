@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
+import static java.util.Optional.empty;
 import static java.util.stream.Stream.of;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -55,6 +56,17 @@ public class MuleSdkOperationModelParserSdkTestCase {
     assertThat(deprecationModel.getDeprecatedSince(), is("1.1.0"));
     assertThat(deprecationModel.getMessage(), is("Some Message"));
     assertThat(deprecationModel.getToRemoveIn(), is(Optional.of("2.0.0")));
+  }
+
+  @Test
+  public void when_toRemoveInParameterIsNotConfigured_then_theDeprecationModelReturnsAnEmptyOptional() {
+    ComponentAst deprecatedAst = mockDeprecatedAst("1.1.0", "Some Message", null);
+    when(operationAst.directChildrenStreamByIdentifier(null, "deprecated")).thenAnswer(invocation -> of(deprecatedAst));
+
+    assertThat(operationModelParser.getDeprecationModel().isPresent(), is(true));
+
+    DeprecationModel deprecationModel = operationModelParser.getDeprecationModel().get();
+    assertThat(deprecationModel.getToRemoveIn(), is(empty()));
   }
 
   private ComponentAst mockDeprecatedAst(String since, String message, String toRemoveIn) {
