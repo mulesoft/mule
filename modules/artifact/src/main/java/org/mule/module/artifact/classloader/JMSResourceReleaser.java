@@ -52,8 +52,7 @@ public class JMSResourceReleaser implements ResourceReleaser {
       }
 
       for (Thread thread : threads) {
-        if (isActiveMQInactivityMonitorTimerThread(classLoader, thread)
-            || isActiveMQInactivityMonitorTimerThread_TestContext(classLoader, thread)) {
+        if (isActiveMQInactivityMonitorTimerThread(classLoader, thread)) {
           try {
             clearReferencesStopTimerThread(thread);
             thread.interrupt();
@@ -71,6 +70,10 @@ public class JMSResourceReleaser implements ResourceReleaser {
   }
 
   private boolean isActiveMQInactivityMonitorTimerThread(ClassLoader classLoader, Thread thread) {
+
+    if (isActiveMQInactivityMonitorTimerThread_TestContext(classLoader, thread)) {
+      return true;
+    }
     if (!(classLoader instanceof ArtifactClassLoader)) {
       return false;
     }
@@ -137,12 +140,6 @@ public class JMSResourceReleaser implements ResourceReleaser {
 
   private void clearReferencesStopTimerThread(Thread thread)
       throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-    // Need to get references to:
-    // - newTasksMayBeScheduled field (in java.util.TimerThread)
-    // - queue field
-    // - queue.clear()
-    // in IBM JDK, Apache Harmony:
-    // - cancel() method (in java.util.Timer$TimerImpl)
     try {
       Field newTasksMayBeScheduledField =
           thread.getClass().getDeclaredField("newTasksMayBeScheduled");
@@ -155,8 +152,6 @@ public class JMSResourceReleaser implements ResourceReleaser {
       synchronized (queue) {
         newTasksMayBeScheduledField.setBoolean(thread, false);
         clearMethod.invoke(queue);
-        // In case queue was already empty. Should only be one
-        // thread waiting but use notifyAll() to be safe.
         queue.notifyAll();
       }
     } catch (NoSuchFieldException noSuchFieldEx) {

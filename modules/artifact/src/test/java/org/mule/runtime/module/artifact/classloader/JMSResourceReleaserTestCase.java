@@ -50,20 +50,18 @@ import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPrevention
 @Story(METASPACE_LEAK_PREVENTION_ON_REDEPLOY)
 public class JMSResourceReleaserTestCase extends AbstractMuleTestCase {
 
-  private final static String DRIVER_GROUP_ID = "org.apache.activemq";
   private final static String DRIVER_ARTIFACT_ID = "activemq-all";
-  private final static String ACTIVEMQ_URL_CONFIG =
-      "failover:(tcp://192.168.1.111:61616)?jms.useAsyncSend=true&initialReconnectDelay=1000&maxReconnectAttempts=-1";
+  private static final String TEST_CLASSLOADER_ARTIFACT_ID = "test";
+  private final static String DRIVER_GROUP_ID = "org.apache.activemq";
   static final String DRIVER_CLASS_NAME = "org.apache.activemq.ActiveMQConnectionFactory";
   private static final String ACTIVEMQ_DRIVER_TIMER_THREAD_NAME = "ActiveMQ InactivityMonitor ReadCheckTimer";
-  private static final String TEST_CLASSLOADER_ARTIFACT_ID = "test";
-
+  private final static String ACTIVEMQ_URL_CONFIG =
+          "failover:(tcp://192.168.1.111:61616)?jms.useAsyncSend=true&initialReconnectDelay=1000&maxReconnectAttempts=-1";
 
   String driverVersion;
   private final ClassLoaderLookupPolicy testLookupPolicy;
   MuleArtifactClassLoader artifactClassLoader = null;
 
-  // Parameterized
   public JMSResourceReleaserTestCase(String driverVersion) {
     this.driverVersion = driverVersion;
     this.testLookupPolicy = new ClassLoaderLookupPolicy() {
