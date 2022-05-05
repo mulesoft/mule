@@ -20,6 +20,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
 import org.mule.module.artifact.classloader.IBMMQResourceReleaser;
+import org.mule.module.artifact.classloader.JMSResourceReleaser;
 import org.mule.module.artifact.classloader.ScalaClassValueReleaser;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -102,6 +103,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   private final ResourceReleaser classLoaderReferenceReleaser;
   private volatile boolean shouldReleaseJdbcReferences = false;
   private volatile boolean shouldReleaseIbmMQResources = false;
+  private volatile boolean shouldReleaseJMSReferences = false;
   private ResourceReleaser jdbcResourceReleaserInstance;
   private final ResourceReleaser scalaClassValueReleaserInstance;
   private final ArtifactDescriptor artifactDescriptor;
@@ -266,6 +268,10 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     if (!shouldReleaseIbmMQResources && name.startsWith("com.ibm.mq")) {
       shouldReleaseIbmMQResources = true;
     }
+
+    if (!shouldReleaseJMSReferences && name.startsWith("org.apache.activemq")) {
+      shouldReleaseJMSReferences = true;
+    }
     return clazz;
   }
 
@@ -315,6 +321,10 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
     if (shouldReleaseIbmMQResources) {
       new IBMMQResourceReleaser(this).release();
+    }
+
+    if (shouldReleaseJMSReferences) {
+      new JMSResourceReleaser(this).release();
     }
 
     super.dispose();
