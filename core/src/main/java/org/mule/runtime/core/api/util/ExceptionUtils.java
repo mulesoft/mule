@@ -294,7 +294,7 @@ public class ExceptionUtils {
     Throwable cause = exception;
     while (cause instanceof MessagingException) {
       cause = cause.getCause();
-    }
+    } // todo: commenting this while loop will bring the exceptions(flowStack, Element DSL etc.) back
     return cause != null ? cause : exception;
   }
 

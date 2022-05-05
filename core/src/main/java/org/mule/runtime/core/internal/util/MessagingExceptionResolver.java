@@ -104,7 +104,7 @@ public class MessagingExceptionResolver {
   }
 
   private CoreEvent resolveEvent(final MessagingException me, Throwable root, Component failingComponent, ErrorType errorType) {
-    return quickCopy(builder(getMessagingExceptionCause(root))
+    return quickCopy(builder(root)
         .failingComponent(failingComponent)
         .errorType(errorType)
         .build(), me.getEvent());
