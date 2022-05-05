@@ -76,6 +76,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * {@link OperationModelParser} for Java based syntax
@@ -424,14 +425,14 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   }
 
   @Override
-  public List<NotificationModel> getEmittedNotifications(Function<String, Optional<NotificationModel>> notificationMapper) {
+  public Stream<NotificationModel> getEmittedNotificationsStream(Function<String, Optional<NotificationModel>> notificationMapper) {
     List<String> notifications =
         NotificationModelParserUtils.getEmittedNotifications(operationElement, getComponentTypeName(), getName());
     if (notifications.isEmpty()) {
       notifications = NotificationModelParserUtils.getEmittedNotifications(operationContainer, getComponentTypeName(), getName());
     }
 
-    return notifications.stream().map(notificationMapper).filter(Optional::isPresent).map(Optional::get).collect(toList());
+    return notifications.stream().map(notificationMapper).filter(Optional::isPresent).map(Optional::get);
   }
 
   private void checkOperationIsNotAnExtension() {

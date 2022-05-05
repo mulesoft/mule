@@ -74,6 +74,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelParser implements SourceModelParser {
 
@@ -194,10 +195,10 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
   }
 
   @Override
-  public List<NotificationModel> getEmittedNotifications(Function<String, Optional<NotificationModel>> notificationMapper) {
+  public Stream<NotificationModel> getEmittedNotificationsStream(Function<String, Optional<NotificationModel>> notificationMapper) {
     List<String> identifiers =
         NotificationModelParserUtils.getEmittedNotifications(sourceElement, getComponentTypeName(), getName());
-    return identifiers.stream().map(notificationMapper).filter(Optional::isPresent).map(Optional::get).collect(toList());
+    return identifiers.stream().map(notificationMapper).filter(Optional::isPresent).map(Optional::get);
   }
 
   @Override

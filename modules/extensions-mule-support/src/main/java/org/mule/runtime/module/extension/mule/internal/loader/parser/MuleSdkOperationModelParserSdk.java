@@ -118,9 +118,9 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   }
 
   @Override
-  public List<NotificationModel> getEmittedNotifications(Function<String, Optional<NotificationModel>> notificationMapper) {
+  public Stream<NotificationModel> getEmittedNotificationsStream(Function<String, Optional<NotificationModel>> notificationMapper) {
     // The mapper isn't needed at this implementation since we already have the operation models.
-    return notificationModels.getValue();
+    return notificationModels.getValue().stream();
   }
 
   @Override

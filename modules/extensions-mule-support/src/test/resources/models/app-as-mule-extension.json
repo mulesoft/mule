@@ -986,8 +986,8 @@
       "supportsStreaming": false,
       "visibility": "PUBLIC",
       "notifications": [
-        "TEST-COMPONENTS:INTEGER_NOTIFICATION",
-        "TEST-COMPONENTS:STRING_NOTIFICATION"
+        "TEST-COMPONENTS:STRING_NOTIFICATION",
+        "TEST-COMPONENTS:INTEGER_NOTIFICATION"
       ],
       "nestedComponents": [],
       "errors": [],
