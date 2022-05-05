@@ -67,6 +67,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   private static final String SUMMARY_PARAMETER = "summary";
   private static final String TYPE_PARAMETER = "type";
   private static final String VISIBILITY_PARAMETER = "visibility";
+  private static final String DEPRECATED_CONSTRUCT_NAME = "deprecated";
 
   private final ComponentAst operation;
   private final TypeLoader typeLoader;
@@ -227,14 +228,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public Optional<DeprecationModel> getDeprecationModel() {
-    return getSingleChild(operation, "deprecated").map(this::buildDeprecationModel);
-  }
-
-  private DeprecationModel buildDeprecationModel(ComponentAst deprecationAst) {
-    String message = getParameter(deprecationAst, "message");
-    String since = getParameter(deprecationAst, "since");
-    String toRemoveIn = this.<String>getOptionalParameter(deprecationAst, "toRemoveIn").orElse(null);
-    return new ImmutableDeprecationModel(message, since, toRemoveIn);
+    return getSingleChild(operation, DEPRECATED_CONSTRUCT_NAME).map(this::buildDeprecationModel);
   }
 
   @Override
