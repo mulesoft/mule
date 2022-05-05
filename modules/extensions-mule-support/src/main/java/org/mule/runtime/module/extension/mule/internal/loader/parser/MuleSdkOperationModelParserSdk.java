@@ -28,6 +28,7 @@ import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
@@ -66,6 +67,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   private static final String SUMMARY_PARAMETER = "summary";
   private static final String TYPE_PARAMETER = "type";
   private static final String VISIBILITY_PARAMETER = "visibility";
+  private static final String DEPRECATED_CONSTRUCT_NAME = "deprecated";
 
   private final ComponentAst operation;
   private final TypeLoader typeLoader;
@@ -226,8 +228,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public Optional<DeprecationModel> getDeprecationModel() {
-    // TODO: MULE-20083
-    return empty();
+    return getSingleChild(operation, DEPRECATED_CONSTRUCT_NAME).map(this::buildDeprecationModel);
   }
 
   @Override

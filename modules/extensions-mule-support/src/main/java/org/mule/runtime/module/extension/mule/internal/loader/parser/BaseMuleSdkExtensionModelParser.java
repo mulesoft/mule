@@ -9,7 +9,9 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 
+import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -21,6 +23,10 @@ import java.util.stream.Stream;
  * @since 4.5.0
  */
 abstract class BaseMuleSdkExtensionModelParser {
+
+  private static final String MESSAGE_PARAMETER = "message";
+  private static final String SINCE_PARAMETER = "since";
+  private static final String TO_REMOVE_IN_PARAMETER = "toRemoveIn";
 
   /**
    * Returns the value of a parameter in the given {@code ast}. The parameter is assumed to either be required or have a default
@@ -44,7 +50,7 @@ abstract class BaseMuleSdkExtensionModelParser {
    * @return an {@link Optional} for the parameter's value
    */
   protected <T> Optional<T> getOptionalParameter(ComponentAst ast, String paramName) {
-    return ofNullable(getParameter(ast, paramName));
+    return ofNullable(ast.getParameter(DEFAULT_GROUP_NAME, paramName)).map(paramAst -> paramAst.<T>getValue().getRight());
   }
 
   /**
@@ -65,4 +71,16 @@ abstract class BaseMuleSdkExtensionModelParser {
     return getChildren(component, childName).findFirst();
   }
 
+  /**
+   * Builds a deprecation model by parsing the content of the {@code deprecated} parameter AST.
+   *
+   * @param deprecationAst The deprecation parameter AST.
+   * @return The corresponding {@link DeprecationModel}.
+   */
+  protected DeprecationModel buildDeprecationModel(ComponentAst deprecationAst) {
+    String message = getParameter(deprecationAst, MESSAGE_PARAMETER);
+    String since = getParameter(deprecationAst, SINCE_PARAMETER);
+    String toRemoveIn = this.<String>getOptionalParameter(deprecationAst, TO_REMOVE_IN_PARAMETER).orElse(null);
+    return new ImmutableDeprecationModel(message, since, toRemoveIn);
+  }
 }

@@ -218,4 +218,26 @@
         </operation:body>
     </operation:def>
 
+    <operation:def name="deprecatedOperation">
+        <operation:deprecated since="1.1.0"
+                              message="Some deprecation message" />
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <set-payload value="Some deprecated value" />
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="deprecatedOperationToBeRemoved">
+        <operation:deprecated since="1.1.0"
+                              message="Some deprecation message"
+                              toRemoveIn="2.0.0" />
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <set-payload value="Some deprecated value" />
+        </operation:body>
+    </operation:def>
 </mule>
