@@ -53,39 +53,23 @@ public class SdkObjectStoreAdapter<T extends Serializable> implements org.mule.s
   }
 
   @Override
-  public boolean contains(String key) throws org.mule.sdk.api.store.ObjectStoreException {
-    try {
-      return delegate.contains(key);
-    } catch (ObjectStoreException e) {
-      throw SdkObjectStoreUtils.convertToSdkObjectStoreException(e);
-    }
+  public boolean contains(String key) throws ObjectStoreException {
+    return delegate.contains(key);
   }
 
   @Override
-  public void store(String key, T value) throws org.mule.sdk.api.store.ObjectStoreException {
-    try {
-      delegate.store(key, value);
-    } catch (ObjectStoreException e) {
-      throw SdkObjectStoreUtils.convertToSdkObjectStoreException(e);
-    }
+  public void store(String key, T value) throws ObjectStoreException {
+    delegate.store(key, value);
   }
 
   @Override
-  public T retrieve(String key) throws org.mule.sdk.api.store.ObjectStoreException {
-    try {
-      return (T) delegate.retrieve(key);
-    } catch (ObjectStoreException e) {
-      throw SdkObjectStoreUtils.convertToSdkObjectStoreException(e);
-    }
+  public T retrieve(String key) throws ObjectStoreException {
+    return (T) delegate.retrieve(key);
   }
 
   @Override
-  public T remove(String key) throws org.mule.sdk.api.store.ObjectStoreException {
-    try {
-      return (T) delegate.remove(key);
-    } catch (ObjectStoreException e) {
-      throw SdkObjectStoreUtils.convertToSdkObjectStoreException(e);
-    }
+  public T remove(String key) throws ObjectStoreException {
+    return (T) delegate.remove(key);
   }
 
   @Override
@@ -94,47 +78,27 @@ public class SdkObjectStoreAdapter<T extends Serializable> implements org.mule.s
   }
 
   @Override
-  public void clear() throws org.mule.sdk.api.store.ObjectStoreException {
-    try {
-      delegate.clear();
-    } catch (ObjectStoreException e) {
-      throw SdkObjectStoreUtils.convertToSdkObjectStoreException(e);
-    }
+  public void clear() throws ObjectStoreException {
+    delegate.clear();
   }
 
   @Override
-  public void open() throws org.mule.sdk.api.store.ObjectStoreException {
-    try {
-      delegate.open();
-    } catch (ObjectStoreException e) {
-      throw SdkObjectStoreUtils.convertToSdkObjectStoreException(e);
-    }
+  public void open() throws ObjectStoreException {
+    delegate.open();
   }
 
   @Override
-  public void close() throws org.mule.sdk.api.store.ObjectStoreException {
-    try {
-      delegate.close();
-    } catch (ObjectStoreException e) {
-      throw SdkObjectStoreUtils.convertToSdkObjectStoreException(e);
-    }
+  public void close() throws ObjectStoreException {
+    delegate.close();
   }
 
   @Override
-  public List<String> allKeys() throws org.mule.sdk.api.store.ObjectStoreException {
-    try {
-      return delegate.allKeys();
-    } catch (ObjectStoreException e) {
-      throw SdkObjectStoreUtils.convertToSdkObjectStoreException(e);
-    }
+  public List<String> allKeys() throws ObjectStoreException {
+    return delegate.allKeys();
   }
 
   @Override
-  public Map retrieveAll() throws org.mule.sdk.api.store.ObjectStoreException {
-    try {
-      return delegate.retrieveAll();
-    } catch (ObjectStoreException e) {
-      throw SdkObjectStoreUtils.convertToSdkObjectStoreException(e);
-    }
+  public Map retrieveAll() throws ObjectStoreException {
+    return delegate.retrieveAll();
   }
 }

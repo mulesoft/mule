@@ -55,12 +55,8 @@ public class SdkObjectStoreManagerAdapter implements org.mule.sdk.api.store.Obje
   }
 
   @Override
-  public void disposeStore(String name) throws org.mule.sdk.api.store.ObjectStoreException {
-    try {
-      delegate.disposeStore(name);
-    } catch (ObjectStoreException e) {
-      throw SdkObjectStoreUtils.convertToSdkObjectStoreException(e);
-    }
+  public void disposeStore(String name) throws ObjectStoreException {
+    delegate.disposeStore(name);
   }
 }
 

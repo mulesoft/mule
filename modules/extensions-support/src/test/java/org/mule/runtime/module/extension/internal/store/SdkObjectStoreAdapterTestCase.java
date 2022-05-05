@@ -13,11 +13,11 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
-import org.mule.sdk.api.store.ObjectAlreadyExistsException;
-import org.mule.sdk.api.store.ObjectDoesNotExistException;
+import org.mule.runtime.api.store.ObjectAlreadyExistsException;
+import org.mule.runtime.api.store.ObjectDoesNotExistException;
+import org.mule.runtime.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
 import org.mule.sdk.api.store.ObjectStore;
-import org.mule.sdk.api.store.ObjectStoreException;
-import org.mule.sdk.api.store.ObjectStoreNotAvailableException;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -54,29 +54,29 @@ public class SdkObjectStoreAdapterTestCase {
   }
 
   @Test
-  public void muleObjectStoreExceptionIsConvertedToSdkObjectStoreException() throws Exception {
-    doThrow(org.mule.runtime.api.store.ObjectStoreException.class).when(muleObjectStore).clear();
+  public void muleObjectStoreExceptionIsThrown() throws Exception {
+    doThrow(ObjectStoreException.class).when(muleObjectStore).clear();
     expectedException.expect(ObjectStoreException.class);
     SdkObjectStoreAdapter.from(muleObjectStore).clear();
   }
 
   @Test
-  public void muleObjectAlreadyExistsExceptionIsConvertedToSdkObjectAlreadyExistsException() throws Exception {
-    doThrow(org.mule.runtime.api.store.ObjectAlreadyExistsException.class).when(muleObjectStore).store("key", "value");
+  public void muleObjectAlreadyExistsExceptionIsThrown() throws Exception {
+    doThrow(ObjectAlreadyExistsException.class).when(muleObjectStore).store("key", "value");
     expectedException.expect(ObjectAlreadyExistsException.class);
     SdkObjectStoreAdapter.from(muleObjectStore).store("key", "value");
   }
 
   @Test
-  public void muleObjectDoesNotExistExceptionIsConvertedToSdkObjectDoesNotExistException() throws Exception {
-    doThrow(org.mule.runtime.api.store.ObjectDoesNotExistException.class).when(muleObjectStore).remove("key");
+  public void muleObjectDoesNotExistExceptionIsThrown() throws Exception {
+    doThrow(ObjectDoesNotExistException.class).when(muleObjectStore).remove("key");
     expectedException.expect(ObjectDoesNotExistException.class);
     SdkObjectStoreAdapter.from(muleObjectStore).remove("key");
   }
 
   @Test
-  public void muleObjectStoreNotAvailableExceptionIsConvertedToSdkObjectStoreNotAvailableException() throws Exception {
-    doThrow(org.mule.runtime.api.store.ObjectStoreNotAvailableException.class).when(muleObjectStore).contains("key");
+  public void muleObjectStoreNotAvailableExceptionIsThrown() throws Exception {
+    doThrow(ObjectStoreNotAvailableException.class).when(muleObjectStore).contains("key");
     expectedException.expect(ObjectStoreNotAvailableException.class);
     SdkObjectStoreAdapter.from(muleObjectStore).contains("key");
   }

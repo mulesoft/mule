@@ -18,8 +18,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.sdk.api.store.ObjectStore;
-import org.mule.sdk.api.store.ObjectStoreException;
 import org.mule.sdk.api.store.ObjectStoreManager;
 import org.mule.sdk.api.store.ObjectStoreSettings;
 
@@ -121,8 +121,8 @@ public class SdkObjectStoreManagerAdapterTestCase {
   }
 
   @Test
-  public void onFailureMuleObjectStoreExceptionIsConvertedToSdkObjectStoreException() throws Exception {
-    doThrow(org.mule.runtime.api.store.ObjectStoreException.class).when(muleObjectStoreManager).disposeStore(eq(OS_NAME));
+  public void onFailureMuleObjectStoreExceptionIsThrown() throws Exception {
+    doThrow(ObjectStoreException.class).when(muleObjectStoreManager).disposeStore(eq(OS_NAME));
     expectedException.expect(ObjectStoreException.class);
     sdkObjectStoreManagerAdapter.disposeStore(OS_NAME);
   }

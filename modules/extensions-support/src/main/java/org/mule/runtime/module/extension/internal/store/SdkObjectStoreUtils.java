@@ -8,10 +8,6 @@ package org.mule.runtime.module.extension.internal.store;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import org.mule.runtime.api.store.ObjectAlreadyExistsException;
-import org.mule.runtime.api.store.ObjectDoesNotExistException;
-import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 
 /**
@@ -22,25 +18,14 @@ import org.mule.runtime.api.store.ObjectStoreSettings;
 public class SdkObjectStoreUtils {
 
   /**
-   * Converts the Mule object store exception {@code ObjectStoreException} into the corresponding SDK api OS exception
-   * {@link org.mule.sdk.api.store.ObjectStoreException}.
-   *
-   * @param muleObjectStoreException the Mule api OS exception to be converted
-   * @return the converted SDK api OS exception
-   */
-  public static org.mule.sdk.api.store.ObjectStoreException convertToSdkObjectStoreException(ObjectStoreException muleObjectStoreException) {
-    checkArgument(muleObjectStoreException != null, "Cannot convert null value");
-    return convertException((ObjectStoreException) muleObjectStoreException);
-  }
-
-  /**
    * Converts the SDK api OS settings {@link org.mule.sdk.api.store.ObjectStoreSettings} into the corresponding Mule api OS
    * settings {@code ObjectStoreSettings}
    *
    * @param sdkObjectStoreSettings the SDK api OS settings to be converted
    * @return the converted Mule api OS settings
    */
-  public static ObjectStoreSettings convertToMuleObjectStoreSettings(org.mule.sdk.api.store.ObjectStoreSettings sdkObjectStoreSettings) {
+  public static ObjectStoreSettings convertToMuleObjectStoreSettings(
+                                                                     org.mule.sdk.api.store.ObjectStoreSettings sdkObjectStoreSettings) {
     checkArgument(sdkObjectStoreSettings != null, "Cannot convert null value");
     return convertSettings(sdkObjectStoreSettings);
   }
@@ -52,7 +37,8 @@ public class SdkObjectStoreUtils {
    * @param muleObjectStoreSettings the Mule api OS settings to be converted
    * @return the converted SDK api OS settings
    */
-  public static org.mule.sdk.api.store.ObjectStoreSettings convertToSdkObjectStoreSettings(ObjectStoreSettings muleObjectStoreSettings) {
+  public static org.mule.sdk.api.store.ObjectStoreSettings convertToSdkObjectStoreSettings(
+                                                                                           ObjectStoreSettings muleObjectStoreSettings) {
     checkArgument(muleObjectStoreSettings != null, "Cannot convert null value");
     return convertSettings(muleObjectStoreSettings);
   }
@@ -73,17 +59,5 @@ public class SdkObjectStoreUtils {
         .entryTtl(objectStoreSettings.getEntryTTL().orElse(null))
         .expirationInterval(objectStoreSettings.getExpirationInterval())
         .build();
-  }
-
-  private static org.mule.sdk.api.store.ObjectStoreException convertException(ObjectStoreException exception) {
-    if (exception instanceof ObjectStoreNotAvailableException) {
-      return new org.mule.sdk.api.store.ObjectStoreNotAvailableException(exception);
-    } else if (exception instanceof ObjectAlreadyExistsException) {
-      return new org.mule.sdk.api.store.ObjectAlreadyExistsException(exception);
-    } else if (exception instanceof ObjectDoesNotExistException) {
-      return new org.mule.sdk.api.store.ObjectDoesNotExistException(exception);
-    } else {
-      return new org.mule.sdk.api.store.ObjectStoreException(exception);
-    }
   }
 }

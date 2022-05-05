@@ -51885,6 +51885,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
@@ -52149,6 +52150,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
