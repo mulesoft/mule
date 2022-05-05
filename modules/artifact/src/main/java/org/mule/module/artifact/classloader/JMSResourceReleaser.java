@@ -32,8 +32,8 @@ public class JMSResourceReleaser implements ResourceReleaser {
 
   private static final Logger logger = LoggerFactory.getLogger(JMSResourceReleaser.class);
 
-  public JMSResourceReleaser(ClassLoader driverClassLoader) {
-    this.classLoader = driverClassLoader;
+  public JMSResourceReleaser(ClassLoader classLoader) {
+    this.classLoader = classLoader;
   }
 
   @Override
