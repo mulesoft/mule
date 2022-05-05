@@ -28,12 +28,12 @@ public class JMSResourceReleaser implements ResourceReleaser {
   public static final String COMPOSITE_CLASS_LOADER_CLASS_NAME = "CompositeClassLoader";
   public static final String ACTIVEMQ_DRIVER_TIMER_THREAD_NAME = "ActiveMQ InactivityMonitor ReadCheckTimer";
 
-  private final ClassLoader driverClassLoader;
+  private final ClassLoader classLoader;
 
   private static final Logger logger = LoggerFactory.getLogger(JMSResourceReleaser.class);
 
   public JMSResourceReleaser(ClassLoader driverClassLoader) {
-    this.driverClassLoader = driverClassLoader;
+    this.classLoader = driverClassLoader;
   }
 
   @Override
@@ -52,8 +52,8 @@ public class JMSResourceReleaser implements ResourceReleaser {
       }
 
       for (Thread thread : threads) {
-        if (isActiveMQInactivityMonitorTimerThread(driverClassLoader, thread)
-            || isActiveMQInactivityMonitorTimerThread_TestContext(driverClassLoader, thread)) {
+        if (isActiveMQInactivityMonitorTimerThread(classLoader, thread)
+            || isActiveMQInactivityMonitorTimerThread_TestContext(classLoader, thread)) {
           try {
             clearReferencesStopTimerThread(thread);
             thread.interrupt();

@@ -103,7 +103,7 @@ public class JMSResourceReleaserTestCase extends AbstractMuleTestCase {
   @Parameterized.Parameters(name = "Testing Driver {0}")
   public static String[] data() throws NoSuchFieldException, IllegalAccessException {
     return new String[] {
-        "5.15.9"
+        "5.16.4"
     };
   }
 
