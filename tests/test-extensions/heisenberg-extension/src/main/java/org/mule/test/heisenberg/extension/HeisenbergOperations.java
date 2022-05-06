@@ -26,6 +26,8 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.store.ObjectStore;
+import org.mule.runtime.api.store.ObjectStoreManager;
+import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -60,7 +62,6 @@ import org.mule.sdk.api.annotation.error.Throws;
 import org.mule.sdk.api.annotation.param.display.Example;
 import org.mule.sdk.api.annotation.param.display.Summary;
 import org.mule.sdk.api.future.SecretSdkFutureFeature;
-import org.mule.sdk.api.meta.ExpressionSupport;
 import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HealthException;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
@@ -104,12 +105,9 @@ import com.google.common.collect.ImmutableMap;
 @Stereotype(EmpireStereotype.class)
 public class HeisenbergOperations implements Disposable {
 
-  public static SecretSdkFutureFeature secretSdkFutureFeature = null;
-
   public static final String CURE_CANCER_MESSAGE = "Can't help you, you are going to die";
   public static final String CALL_GUS_MESSAGE = "You are not allowed to speak with gus.";
   public static final String KILL_WITH_GROUP = "KillGroup";
-
   public static final String OPERATION_WITH_DISPLAY_NAME_PARAMETER = "resolverEcho";
   public static final String OPERATION_WITH_SUMMARY = "knockMany";
   public static final String OPERATION_WITH_EXAMPLE = "alias";
@@ -119,14 +117,16 @@ public class HeisenbergOperations implements Disposable {
   public static final String DOOR_PARAMETER = "doors";
   public static final String GREETING_PARAMETER = "greeting";
   public static final String OPERATION_PARAMETER_EXAMPLE = "Hello my friend!";
-
+  public static SecretSdkFutureFeature secretSdkFutureFeature = null;
   public static volatile boolean disposed = false;
   public static Integer streamRead = -1;
-
+  private final LazyValue<ExecutorService> executor = new LazyValue<>(() -> newSingleThreadExecutor());
   @Inject
   private ExtensionManager extensionManager;
-
-  private final LazyValue<ExecutorService> executor = new LazyValue<>(() -> newSingleThreadExecutor());
+  @Inject
+  private ObjectStoreManager muleRuntimeObjectStoreManager;
+  @Inject
+  private org.mule.sdk.api.store.ObjectStoreManager sdkObjectStoreManager;
 
   @MediaType(ANY)
   public String usingInterface(@Content MyInterface myInterface) {
@@ -206,7 +206,8 @@ public class HeisenbergOperations implements Disposable {
     };
   }
 
-  public PagingProvider<HeisenbergConnection, Result<CursorProvider, Object>> getPagedCursorProviderBlocklist(@Config HeisenbergExtension config,
+  public PagingProvider<HeisenbergConnection, Result<CursorProvider, Object>> getPagedCursorProviderBlocklist(
+                                                                                                              @Config HeisenbergExtension config,
                                                                                                               org.mule.sdk.api.runtime.streaming.StreamingHelper streamingHelper) {
 
     return new PagingProvider<HeisenbergConnection, Result<CursorProvider, Object>>() {
@@ -514,12 +515,14 @@ public class HeisenbergOperations implements Disposable {
   }
 
   @OutputResolver(output = HeisenbergOutputResolver.class)
-  public org.mule.sdk.api.runtime.parameter.ParameterResolver<Weapon> processWeapon(@Optional org.mule.sdk.api.runtime.parameter.ParameterResolver<Weapon> weapon) {
+  public org.mule.sdk.api.runtime.parameter.ParameterResolver<Weapon> processWeapon(
+                                                                                    @Optional org.mule.sdk.api.runtime.parameter.ParameterResolver<Weapon> weapon) {
     return weapon;
   }
 
   @OutputResolver(output = HeisenbergOutputResolver.class)
-  public org.mule.sdk.api.runtime.parameter.ParameterResolver<List<Weapon>> processWeaponList(@Optional org.mule.sdk.api.runtime.parameter.ParameterResolver<List<Weapon>> weapons) {
+  public org.mule.sdk.api.runtime.parameter.ParameterResolver<List<Weapon>> processWeaponList(
+                                                                                              @Optional org.mule.sdk.api.runtime.parameter.ParameterResolver<List<Weapon>> weapons) {
     return weapons;
   }
 
@@ -546,6 +549,19 @@ public class HeisenbergOperations implements Disposable {
 
   public void storeMoney(ObjectStore<Long> objectStore, Long money) throws Exception {
     objectStore.store("money", money);
+  }
+
+  public void storeMoneyUsingMuleObjectStoreManager(String objectStoreName, Long money) throws Exception {
+    ObjectStore os = muleRuntimeObjectStoreManager.getOrCreateObjectStore(objectStoreName, ObjectStoreSettings.builder().build());
+    os.store("mule-money", money);
+  }
+
+  public void storeMoneyUsingSDKObjectStoreManager(String objectStoreName, Long money) throws Exception {
+    org.mule.sdk.api.store.ObjectStore os = sdkObjectStoreManager.getOrCreateObjectStore(objectStoreName,
+                                                                                         org.mule.sdk.api.store.ObjectStoreSettings
+                                                                                             .builder()
+                                                                                             .build());
+    os.store("sdk-money", money);
   }
 
   @Ignore
@@ -658,8 +674,8 @@ public class HeisenbergOperations implements Disposable {
     }
     return new InputStream() {
 
-      private int bytesRead = 0;
       private final byte[] name = config.getPersonalInfo().getName().getBytes();
+      private int bytesRead = 0;
 
       @Override
       public int read() {
