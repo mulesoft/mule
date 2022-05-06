@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.internal.factories;
 
-import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;

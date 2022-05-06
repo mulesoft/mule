@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.exception;
 
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.event.CoreEvent;
