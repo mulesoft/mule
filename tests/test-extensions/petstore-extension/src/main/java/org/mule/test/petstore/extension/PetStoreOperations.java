@@ -41,6 +41,7 @@ import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.stereotype.AllowedStereotypes;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -335,6 +336,11 @@ public class PetStoreOperations {
 
   public MuleVersion getMuleVersion() {
     return muleVersion;
+  }
+
+  @MediaType(ANY)
+  public Object getObjectFromPojoInList(@NullSafe @Optional List<CustomObject> pojos) {
+    return pojos.get(0).getCustomParam();
   }
 
   public static class CorrelationInfoOutputResolver implements OutputTypeResolver<CorrelationInfo> {
