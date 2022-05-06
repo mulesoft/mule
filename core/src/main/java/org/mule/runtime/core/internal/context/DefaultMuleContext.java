@@ -1339,7 +1339,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureReuseGlobalErrorHandler() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(REUSE_GLOBAL_ERROR_HANDLER,
-            minMuleVersion("4.5.0"));
+                                                minMuleVersion("4.5.0"));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {
