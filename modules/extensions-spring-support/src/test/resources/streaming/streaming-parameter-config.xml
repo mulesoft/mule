@@ -18,14 +18,8 @@
         </petstore:pets>
     </petstore:config>
 
-
-    <flow name="streamingWithListOfPojos">
-        <petstore:get-object-from-pojo-in-list>
-            <petstore:pojos>
-                <petstore:pojo stringParam="Hello"
-                                        customParam="#[output application/json --- { 'testing' : 'testingValue' }]"/>
-            </petstore:pojos>
-        </petstore:get-object-from-pojo-in-list>
+    <flow name="streamingParameter">
+        <petstore:get-stream-to-string stream="#[payload]"/>
     </flow>
 
 </mule>
