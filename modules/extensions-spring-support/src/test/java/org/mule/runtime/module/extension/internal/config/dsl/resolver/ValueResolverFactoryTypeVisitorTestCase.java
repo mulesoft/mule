@@ -30,8 +30,8 @@ import org.junit.Test;
 public class ValueResolverFactoryTypeVisitorTestCase {
 
   private static final LocalDate LOCAL_DATE = LocalDate.parse("2021-04-28");
-  private static final LocalDateTime LOCAL_DATE_TIME   = LocalDateTime.parse("2021-04-28T14:30:35");
-  private static final ZonedDateTime ZONED_DATE_TIME   = ZonedDateTime.parse("2021-04-27T15:30:00Z");
+  private static final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.parse("2021-04-28T14:30:35");
+  private static final ZonedDateTime ZONED_DATE_TIME = ZonedDateTime.parse("2021-04-27T15:30:00Z");
 
   private DslSyntaxResolver dslSyntaxResolver;
   private ValueResolvingContext valueResolvingContext;
