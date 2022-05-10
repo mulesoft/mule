@@ -19,7 +19,11 @@ import java.util.List;
 
 import static java.lang.Thread.activeCount;
 import static java.lang.Thread.enumerate;
+import static org.slf4j.LoggerFactory.getLogger;
 
+/**
+ * Class created to solve classloading leaks
+ */
 public class JMSResourceReleaser implements ResourceReleaser {
 
   private static final String TEST_CLASSLOADER_ARTIFACT_ID = "test";
@@ -30,7 +34,7 @@ public class JMSResourceReleaser implements ResourceReleaser {
 
   private final ClassLoader classLoader;
 
-  private static final Logger logger = LoggerFactory.getLogger(JMSResourceReleaser.class);
+  private static final Logger logger = getLogger(JMSResourceReleaser.class);
 
   public JMSResourceReleaser(ClassLoader classLoader) {
     this.classLoader = classLoader;
@@ -41,6 +45,10 @@ public class JMSResourceReleaser implements ResourceReleaser {
     disposeJMSActiveMQThreads();
   }
 
+  /**
+   * Method for delete threads from active mq that still alive.
+   * The reason if because they have a reference to other classloader and cant be removed with the GC.
+   */
   private void disposeJMSActiveMQThreads() {
     try {
       Thread[] threads = new Thread[activeCount()];
@@ -69,6 +77,11 @@ public class JMSResourceReleaser implements ResourceReleaser {
     }
   }
 
+  /**
+   * Method that returns if the actual thread is the thread that we want to delete
+   * this name have to be -ActiveMQ InactivityMonitor ReadCheckTimer-
+   * And make other assertions to know is the thread belong to the current classloader.
+   */
   private boolean isActiveMQInactivityMonitorTimerThread(ClassLoader classLoader, Thread thread) {
 
     if (isActiveMQInactivityMonitorTimerThread_TestContext(classLoader, thread)) {
@@ -96,7 +109,9 @@ public class JMSResourceReleaser implements ResourceReleaser {
         && thread.getContextClassLoader().getClass().getSimpleName().equals(CLASSLOADER_CLASS_TEST_CONTEXT)
         && thread.getName().equals(ACTIVEMQ_DRIVER_TIMER_THREAD_NAME);
   }
-
+  /**
+   * To ensure that tha thread belong to the current domain
+   */
   private boolean isThreadLoadedByDisposedDomain(String undeployedArtifactId, ClassLoader threadContextClassLoader) {
     try {
       Class threadContextClassLoaderClass = threadContextClassLoader.getClass();
@@ -122,7 +137,9 @@ public class JMSResourceReleaser implements ResourceReleaser {
     }
     return false;
   }
-
+  /**
+   * To ensure that tha thread belong to the classloader that we are trying to dispose.
+   */
   private boolean isThreadLoadedByDisposedApplication(String undeployedArtifactId, ClassLoader threadContextClassLoader) {
     try {
       if (!(threadContextClassLoader instanceof MuleArtifactClassLoader)) {
@@ -138,6 +155,10 @@ public class JMSResourceReleaser implements ResourceReleaser {
     return false;
   }
 
+  /**
+   *
+   * Removing references to allow to delete the timer thread.
+   */
   private void clearReferencesStopTimerThread(Thread thread)
       throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
     try {

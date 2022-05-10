@@ -11,12 +11,17 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
+/**
+ * Created to be a Thread that start the connection to active mq in the test class {@link JMSResourceReleaserTestCase}
+ */
 public class JMSReleaserThreadUtil implements Runnable {
 
   private final Method startActiveMq;
   private final Object connection;
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(JMSReleaserThreadUtil.class);
+  private static final Logger LOGGER = getLogger(JMSReleaserThreadUtil.class);
 
   JMSReleaserThreadUtil(Method method, Object connection) {
     this.startActiveMq = method;
