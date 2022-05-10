@@ -138,7 +138,10 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
       DateTime dateTime = getParsedDateTime((String) value);
 
       if (type.equals(LocalDate.class)) {
-        constructedValue = LocalDate.of(dateTime.getYear(), dateTime.getMonthOfYear(), dateTime.getDayOfMonth());
+        //WARNING: fix/W-11125519 This change must implement through a feature flag
+        Instant instant = ofEpochMilli(dateTime.getMillis());
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        constructedValue = LocalDate.of(localDateTime.getYear(), localDateTime.getMonth(), localDateTime.getDayOfMonth());
       } else if (type.equals(Date.class)) {
         constructedValue = dateTime.toDate();
       } else if (type.equals(LocalDateTime.class)) {

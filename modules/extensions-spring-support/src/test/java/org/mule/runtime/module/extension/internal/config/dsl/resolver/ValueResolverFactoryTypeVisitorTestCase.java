@@ -33,6 +33,10 @@ public class ValueResolverFactoryTypeVisitorTestCase {
   private static final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.parse("2021-04-28T14:30:35");
   private static final ZonedDateTime ZONED_DATE_TIME = ZonedDateTime.parse("2021-04-27T15:30:00Z");
 
+  private static final String SAME_INSTANT_IN_CALIFORNIA = "2021-04-27T19:30:35-07:00";
+  private static final String SAME_INSTANT_IN_LONDON     = "2021-04-28T03:30:35+01:00";
+
+
   private DslSyntaxResolver dslSyntaxResolver;
   private ValueResolvingContext valueResolvingContext;
 
@@ -53,12 +57,39 @@ public class ValueResolverFactoryTypeVisitorTestCase {
   }
 
   @Test
+  public void localDateValueFromDateTimeIsResolved() throws MuleException {
+    Class theClass = LocalDate.class;
+    ValueResolverFactoryTypeVisitor visitor = createValueResolverFactoryTypeVisitor(SAME_INSTANT_IN_CALIFORNIA, theClass);
+    visitor.visitDateTime(createDateTimeType(theClass));
+    LocalDate localDate = getVisitedValue(visitor);
+
+    ValueResolverFactoryTypeVisitor visitor2 = createValueResolverFactoryTypeVisitor(SAME_INSTANT_IN_LONDON, theClass);
+    visitor2.visitDateTime(createDateTimeType(theClass));
+    LocalDate localDate2 = getVisitedValue(visitor2);
+    boolean isEqual = localDate2.isEqual(localDate);
+    assertThat(isEqual, is(true));
+  }
+
+  @Test
   public void dateValueIsResolved() throws Exception {
     Class theClass = Date.class;
     ValueResolverFactoryTypeVisitor visitor = createValueResolverFactoryTypeVisitor("2021-04-28", theClass);
     visitor.visitDateTime(createDateTimeType(theClass));
     Date date = getVisitedValue(visitor);
     boolean isEqual = new SimpleDateFormat("yyyy-MM-dd").parse("2021-04-28").equals(date);
+    assertThat(isEqual, is(true));
+  }
+
+  @Test
+  public void dateValueFromDateTimeIsResolved() throws Exception {
+    Class theClass = Date.class;
+    ValueResolverFactoryTypeVisitor visitor = createValueResolverFactoryTypeVisitor(SAME_INSTANT_IN_CALIFORNIA, theClass);
+    visitor.visitDateTime(createDateTimeType(theClass));
+    Date date = getVisitedValue(visitor);
+    ValueResolverFactoryTypeVisitor visitor2 = createValueResolverFactoryTypeVisitor(SAME_INSTANT_IN_LONDON, theClass);
+    visitor2.visitDateTime(createDateTimeType(theClass));
+    Date date2 = getVisitedValue(visitor2);
+    boolean isEqual = date2.equals(date);
     assertThat(isEqual, is(true));
   }
 
@@ -73,14 +104,14 @@ public class ValueResolverFactoryTypeVisitorTestCase {
   }
 
   @Test
-  public void dateTimeValueIsResolvedFromDateTimeValue() throws MuleException {
+  public void localDateTimeValueIsResolvedFromDateTimeValue() throws MuleException {
     Class theClass = LocalDateTime.class;
 
-    ValueResolverFactoryTypeVisitor visitor = createValueResolverFactoryTypeVisitor("2021-04-28T00:30:35-02:00", theClass);
+    ValueResolverFactoryTypeVisitor visitor = createValueResolverFactoryTypeVisitor(SAME_INSTANT_IN_CALIFORNIA, theClass);
     visitor.visitDateTime(createDateTimeType(theClass));
     LocalDateTime localDateTime = getVisitedValue(visitor);
 
-    ValueResolverFactoryTypeVisitor visitor2 = createValueResolverFactoryTypeVisitor("2021-04-27T23:30:35-03:00", theClass);
+    ValueResolverFactoryTypeVisitor visitor2 = createValueResolverFactoryTypeVisitor(SAME_INSTANT_IN_LONDON, theClass);
     visitor2.visitDateTime(createDateTimeType(theClass));
     LocalDateTime localDateTime2 = getVisitedValue(visitor2);
 
@@ -95,6 +126,21 @@ public class ValueResolverFactoryTypeVisitorTestCase {
     visitor.visitDateTime(createDateTimeType(theClass));
     ZonedDateTime zonedDateTime = getVisitedValue(visitor);
     boolean isEqual = ZONED_DATE_TIME.isEqual(zonedDateTime);
+    assertThat(isEqual, is(true));
+  }
+
+  @Test
+  public void zonedDateTimeValueFromDateTimeIsResolved() throws MuleException {
+    Class theClass = ZonedDateTime.class;
+    ValueResolverFactoryTypeVisitor visitor = createValueResolverFactoryTypeVisitor(SAME_INSTANT_IN_CALIFORNIA, theClass);
+    visitor.visitDateTime(createDateTimeType(theClass));
+    ZonedDateTime zonedDateTime = getVisitedValue(visitor);
+
+    ValueResolverFactoryTypeVisitor visitor2 = createValueResolverFactoryTypeVisitor(SAME_INSTANT_IN_LONDON, theClass);
+    visitor2.visitDateTime(createDateTimeType(theClass));
+    ZonedDateTime zonedDateTime2 = getVisitedValue(visitor2);
+
+    boolean isEqual = zonedDateTime2.isEqual(zonedDateTime);
     assertThat(isEqual, is(true));
   }
 
