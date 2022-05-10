@@ -30,8 +30,8 @@ import org.junit.Test;
 public class ValueResolverFactoryTypeVisitorTestCase {
 
   private static final LocalDate LOCAL_DATE = LocalDate.parse("2021-04-28");
-  private static final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.parse("2021-04-28T14:30:35");
-  private static final ZonedDateTime ZONED_DATE_TIME = ZonedDateTime.parse("2021-04-27T15:30:00Z");
+  private static final LocalDateTime LOCAL_DATE_TIME   = LocalDateTime.parse("2021-04-28T14:30:35");
+  private static final ZonedDateTime ZONED_DATE_TIME   = ZonedDateTime.parse("2021-04-27T15:30:00Z");
 
   private DslSyntaxResolver dslSyntaxResolver;
   private ValueResolvingContext valueResolvingContext;
@@ -69,6 +69,22 @@ public class ValueResolverFactoryTypeVisitorTestCase {
     visitor.visitDateTime(createDateTimeType(theClass));
     LocalDateTime localDateTime = getVisitedValue(visitor);
     boolean isEqual = LOCAL_DATE_TIME.isEqual(localDateTime);
+    assertThat(isEqual, is(true));
+  }
+
+  @Test
+  public void dateTimeValueIsResolvedFromDateTimeValue() throws MuleException {
+    Class theClass = LocalDateTime.class;
+
+    ValueResolverFactoryTypeVisitor visitor = createValueResolverFactoryTypeVisitor("2021-04-28T00:30:35-02:00", theClass);
+    visitor.visitDateTime(createDateTimeType(theClass));
+    LocalDateTime localDateTime = getVisitedValue(visitor);
+
+    ValueResolverFactoryTypeVisitor visitor2 = createValueResolverFactoryTypeVisitor("2021-04-27T23:30:35-03:00", theClass);
+    visitor2.visitDateTime(createDateTimeType(theClass));
+    LocalDateTime localDateTime2 = getVisitedValue(visitor2);
+
+    boolean isEqual = localDateTime2.isEqual(localDateTime);
     assertThat(isEqual, is(true));
   }
 
