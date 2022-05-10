@@ -143,6 +143,7 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
         constructedValue = dateTime.toDate();
       } else if (type.equals(LocalDateTime.class)) {
         Instant instant = ofEpochMilli(dateTime.getMillis());
+        //WARNING: fix/W-11125519 This change must implement through a feature flag
         constructedValue = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
       } else if (type.equals(Calendar.class)) {
         Calendar calendar = Calendar.getInstance();
