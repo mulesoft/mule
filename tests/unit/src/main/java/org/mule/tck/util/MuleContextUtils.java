@@ -287,7 +287,8 @@ public class MuleContextUtils {
    */
   public static MuleContextWithRegistry mockContextWithServices() {
     CoreProfilingService profilingService = mock(CoreProfilingService.class);
-    when(profilingService.getProfilingDataProducer(any(ProfilingEventType.class))).thenReturn(mock(ProfilingDataProducer.class));
+    lenient().when(profilingService.getProfilingDataProducer(any(ProfilingEventType.class)))
+        .thenReturn(mock(ProfilingDataProducer.class));
     return mockContextWithServicesWithProfilingService(profilingService);
   }
 
