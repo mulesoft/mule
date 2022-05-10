@@ -13,7 +13,6 @@ import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEFAULT_SCHEDULER_FIXED_FREQUENCY;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.api.util.MuleSystemProperties.REVERT_SIGLETON_ERROR_HANDLER_PROPERTY;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.createNewInstance;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getMuleMessageTransformerBaseBuilder;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getTransformerBaseBuilder;
@@ -54,8 +53,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENT
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
-
-import static java.lang.Boolean.getBoolean;
 
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.notification.AbstractServerNotification;
@@ -263,18 +260,15 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(onErrorBaseBuilder.withIdentifier(ON_ERROR_PROPAGATE)
         .withTypeDefinition(fromType(OnErrorPropagateHandler.class))
         .asPrototype().build());
-
-    Builder errorHandlerBuilder = baseDefinition.withIdentifier(ERROR_HANDLER)
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier(ERROR_HANDLER)
         .withTypeDefinition(fromType(ErrorHandler.class))
         .withObjectFactoryType(ErrorHandlerFactoryBean.class)
         .withSetterParameterDefinition("delegate", fromSimpleReferenceParameter("ref").build())
         .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build())
         .withSetterParameterDefinition("exceptionListeners",
-                                       fromChildCollectionConfiguration(FlowExceptionHandler.class).build());
-    if (getBoolean(REVERT_SIGLETON_ERROR_HANDLER_PROPERTY)) {
-      errorHandlerBuilder.asPrototype();
-    }
-    componentBuildingDefinitions.add(errorHandlerBuilder.build());
+                                       fromChildCollectionConfiguration(FlowExceptionHandler.class).build())
+        .asPrototype()
+        .build());
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(SET_PAYLOAD).withTypeDefinition(fromType(SetPayloadMessageProcessor.class))
             .withSetterParameterDefinition("value", fromSimpleParameter("value").build())
