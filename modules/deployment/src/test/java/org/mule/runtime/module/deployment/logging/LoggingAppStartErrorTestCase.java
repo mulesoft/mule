@@ -8,7 +8,9 @@ package org.mule.runtime.module.deployment.logging;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DEPLOYMENT_FAILED;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 
@@ -34,6 +36,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
+import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
@@ -55,7 +58,6 @@ import java.util.List;
 import java.util.Optional;
 
 import com.github.valfirst.slf4jtest.TestLogger;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -99,12 +101,12 @@ public class LoggingAppStartErrorTestCase extends AbstractApplicationDeploymentT
     when(applicationDescriptorMock.getClassLoaderModel())
         .thenReturn(new ClassLoaderModel.ClassLoaderModelBuilder().containing(new URL("file:/target/classes")).build());
     application = new DefaultMuleApplication(applicationDescriptorMock, parentArtifactClassLoader, emptyList(),
-                                             null, mock(ServiceRepository.class),
-                                             mock(ExtensionModelLoaderRepository.class),
-                                             appLocation, null, null,
-                                             getRuntimeLockFactory(),
-                                             mock(MemoryManagementService.class),
-                                             mock(ArtifactConfigurationProcessor.class));
+        null, mock(ServiceRepository.class),
+        mock(ExtensionModelLoaderRepository.class),
+        appLocation, null, null,
+        getRuntimeLockFactory(),
+        mock(MemoryManagementService.class),
+        mock(ArtifactConfigurationProcessor.class));
 
     Method setArtifactContext = application.getClass().getDeclaredMethod("setArtifactContext", ArtifactContext.class);
     setArtifactContext.setAccessible(true);
@@ -123,11 +125,11 @@ public class LoggingAppStartErrorTestCase extends AbstractApplicationDeploymentT
     try {
       application.start();
       fail("Was expecting start to fail");
-    } catch (Exception e) {
-      assertStatus(ApplicationStatus.DEPLOYMENT_FAILED);
-      Assert.assertThat(loggerDefaultMuleApplication.getAllLoggingEvents().size(), is(1));
-      Assert.assertThat(loggerDefaultMuleApplication.getAllLoggingEvents().get(0).getMessage(),
-                        containsString(expectedLogMessage));
+    } catch (DeploymentStartException e) {
+      assertStatus(DEPLOYMENT_FAILED);
+      assertThat(loggerDefaultMuleApplication.getAllLoggingEvents().size(), is(1));
+      assertThat(loggerDefaultMuleApplication.getAllLoggingEvents().get(0).getMessage(),
+          containsString(expectedLogMessage));
     }
   }
 
@@ -137,14 +139,14 @@ public class LoggingAppStartErrorTestCase extends AbstractApplicationDeploymentT
 
       @Override
       protected boolean test() throws Exception {
-        Assert.assertThat(application.getStatus(), is(status));
+        assertThat(application.getStatus(), is(status));
         return true;
       }
 
       @Override
       public String describeFailure() {
-        return String.format("Application remained at status %s instead of moving to %s", application.getStatus().name(),
-                             status.name());
+        return format("Application remained at status %s instead of moving to %s", application.getStatus().name(),
+            status.name());
       }
     });
 
@@ -161,14 +163,14 @@ public class LoggingAppStartErrorTestCase extends AbstractApplicationDeploymentT
     assertDeploymentFailure(applicationDeploymentListener, dummyErrorAppOnStartDescriptorFileBuilder.getId());
 
     assertThat(loggerDefaultArtifactDeployer.getAllLoggingEvents().size(), is(1));
-    Assert.assertThat(loggerDefaultArtifactDeployer.getAllLoggingEvents().get(0).getMessage(),
-                      containsString(expectedLogMessageDefaultArtifactDeployer));
+    assertThat(loggerDefaultArtifactDeployer.getAllLoggingEvents().get(0).getMessage(),
+        containsString(expectedLogMessageDefaultArtifactDeployer));
 
     assertThat(loggerDefaultMuleApplication.getAllLoggingEvents().size(), is(1));
-    Assert.assertThat(loggerDefaultMuleApplication.getAllLoggingEvents().get(0).getMessage(),
-                      containsString(expectedLogMessageDefaultMuleApplication));
+    assertThat(loggerDefaultMuleApplication.getAllLoggingEvents().get(0).getMessage(),
+        containsString(expectedLogMessageDefaultMuleApplication));
     assertThat(((MuleArtifactClassLoader) loggerDefaultMuleApplication.getAllLoggingEvents().get(0).getThreadContextClassLoader())
-        .getArtifactId(),
-               containsString("dummy-error-app-start"));
+            .getArtifactId(),
+        containsString("dummy-error-app-start"));
   }
 }
