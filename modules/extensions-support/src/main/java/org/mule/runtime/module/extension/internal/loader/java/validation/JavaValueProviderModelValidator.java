@@ -168,24 +168,9 @@ public final class JavaValueProviderModelValidator implements ExtensionModelVali
       } else {
         if (parameterInfo.getExtractionExpression().equals(parameterInfo.getParameterName())) {
           MetadataType metadataType = allParameters.get(parameterInfo.getParameterName());
-          Set<TypeAnnotation> annotations = metadataType.getAnnotations();
-          Class<?> expectedType;
-          if (annotations.stream().anyMatch(ann -> ann instanceof EnumAnnotation)
-              && annotations.stream().anyMatch(ann -> ann instanceof CustomDefinedStaticTypeAnnotation)) {
-            TypeAnnotation classInformation = annotations.stream().filter(ann -> ann instanceof ClassInformationAnnotation)
-                .findFirst().orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
-                                                                                parameterInfo.getParameterName())));
-            String className = ((ClassInformationAnnotation) classInformation).getClassname();
-            try {
-              expectedType = ClassUtils.getClass(Thread.currentThread().getContextClassLoader(), className, true);
-            } catch (ClassNotFoundException e) {
-              throw new IllegalArgumentException("Could not load class [" + className + "]", e);
-            }
-          } else {
-            expectedType = getType(metadataType)
-                .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
-                                                                    parameterInfo.getParameterName())));
-          }
+          Class<?> expectedType = getType(metadataType)
+              .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
+                                                                  parameterInfo.getParameterName())));
           Class<?> gotType = getType(parameterInfo.getType())
               .orElseThrow(() -> new IllegalStateException(format("Unable to get Class for parameter: %s",
                                                                   parameterInfo.getParameterName())));
