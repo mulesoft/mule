@@ -319,7 +319,8 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
           status = FILTERED_BY_WATERMARK;
         } else if (currentPollItems < maxItemsPerPoll) {
           currentPollItems++;
-          notificationDispatcher.dispatch(new PollingSourceNotification(new PollingSourceNotificationInfo(this.pollId), ITEM_DISPATCHED, componentLocation.getLocation()));
+          notificationDispatcher.dispatch(new PollingSourceNotification(new PollingSourceNotificationInfo(this.pollId),
+                                                                        ITEM_DISPATCHED, componentLocation.getLocation()));
           sourceCallback.handle(pollItem.getResult(), callbackContext);
           saveWatermarkValue(watermarkStatus, pollItem);
         } else {
@@ -330,8 +331,9 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
 
       String itemId = getItemId(pollItem);
       if (status != ACCEPTED || currentPollItemLimitApplied) {
-        LOGGER.debug(REJECTED_ITEM_MESSAGE, itemId, status);        // TODO: match notification action to status.
-        notificationDispatcher.dispatch(new PollingSourceNotification(new PollingSourceNotificationInfo(this.pollId), ITEM_REJECTED_WATERMARK, componentLocation.getLocation()));
+        LOGGER.debug(REJECTED_ITEM_MESSAGE, itemId, status); // TODO: match notification action to status.
+        notificationDispatcher.dispatch(new PollingSourceNotification(new PollingSourceNotificationInfo(this.pollId),
+                                                                      ITEM_REJECTED_WATERMARK, componentLocation.getLocation()));
         rejectItem(pollItem.getResult(), callbackContext);
       } else {
         LOGGER.debug(ACCEPTED_ITEM_MESSAGE, itemId);
