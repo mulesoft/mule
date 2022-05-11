@@ -28,7 +28,7 @@ import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInternalProfilingDataConsumer;
 import org.mule.runtime.core.internal.profiling.notification.ProfilingNotification;
-import org.mule.runtime.core.privileged.profiling.CoreProfilingService;
+import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 
 import javax.inject.Inject;
@@ -41,7 +41,7 @@ import java.util.Set;
  * @since 4.4
  */
 public abstract class AbstractProfilingService
-    implements ReactorAwareProfilingService, CoreProfilingService, Initialisable, Startable, Stoppable {
+    implements ReactorAwareProfilingService, PrivilegedProfilingService, Initialisable, Startable, Stoppable {
 
   @Inject
   protected ServerNotificationManager notificationManager;

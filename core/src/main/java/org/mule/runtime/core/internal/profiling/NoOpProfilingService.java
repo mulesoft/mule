@@ -13,7 +13,7 @@ import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 
-import org.mule.runtime.core.privileged.profiling.CoreProfilingService;
+import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -25,7 +25,7 @@ import java.util.function.Function;
  *
  * @since 4.5.0
  */
-public class NoOpProfilingService implements ReactorAwareProfilingService, CoreProfilingService {
+public class NoOpProfilingService implements ReactorAwareProfilingService, PrivilegedProfilingService {
 
   @SuppressWarnings("rawtypes")
   private final ProfilingDataProducer<?, ?> profilingDataProducer = new ProfilingDataProducer() {

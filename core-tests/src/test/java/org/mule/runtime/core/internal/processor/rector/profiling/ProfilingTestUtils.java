@@ -53,13 +53,12 @@ public class ProfilingTestUtils {
    * @param reactorAwareProfilingService the core profiling service to mock
    * @see ReactorAwareProfilingService
    */
-  public static void mockProcessingStrategyProfilingChainWithoutTriggeringEvent(
-                                                                                ReactorAwareProfilingService reactorAwareProfilingService) {
-    when(reactorAwareProfilingService.setCurrentExecutionContext(any(Flux.class), any()))
-        .thenAnswer(i -> i.getArgument(0));
+  public static void mockProcessingStrategyProfilingChainWithoutTriggeringEvent(ReactorAwareProfilingService reactorAwareProfilingService) {
+    when(reactorAwareProfilingService.enrichWithProfilingEventFlux(any(), any(), any()))
+        .thenAnswer(i -> ((Flux<CoreEvent>) i.getArgument(0)));
 
-    when(reactorAwareProfilingService.setCurrentExecutionContext(any(Mono.class), any()))
-        .thenAnswer(i -> i.getArgument(0));
+    when(reactorAwareProfilingService.enrichWithProfilingEventMono(any(), any(), any()))
+        .thenAnswer(i -> ((Mono<CoreEvent>) i.getArgument(0)));
   }
 
   /**

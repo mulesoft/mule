@@ -24,7 +24,7 @@ import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.privileged.profiling.CoreProfilingService;
+import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 
 import java.util.function.Function;
 
@@ -38,7 +38,7 @@ import reactor.core.publisher.Mono;
  * @see DefaultProfilingService
  * @see NoOpProfilingService
  */
-public class ProfilingServiceWrapper implements ReactorAwareProfilingService, CoreProfilingService, Lifecycle {
+public class ProfilingServiceWrapper implements ReactorAwareProfilingService, PrivilegedProfilingService, Lifecycle {
 
   @Inject
   MuleContext muleContext;
@@ -71,8 +71,8 @@ public class ProfilingServiceWrapper implements ReactorAwareProfilingService, Co
   public <T extends ProfilingEventContext> void registerProfilingDataConsumer(ProfilingDataConsumer<T> profilingDataConsumer) {
     // This is a privileged operation that has only to be invoked by a certain test connectors
     // The API for this will not be generally available.
-    if (profilingService instanceof CoreProfilingService) {
-      ((CoreProfilingService) getProfilingService()).registerProfilingDataConsumer(profilingDataConsumer);
+    if (profilingService instanceof PrivilegedProfilingService) {
+      ((PrivilegedProfilingService) getProfilingService()).registerProfilingDataConsumer(profilingDataConsumer);
     }
   }
 
