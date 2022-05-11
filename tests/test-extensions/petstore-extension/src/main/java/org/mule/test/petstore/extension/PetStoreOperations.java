@@ -317,6 +317,11 @@ public class PetStoreOperations {
     return clazz;
   }
 
+  @MediaType(ANY)
+  public String getStreamToString(InputStream stream) {
+    return stream.toString();
+  }
+
   public static class CorrelationInfoOutputResolver implements OutputTypeResolver<CorrelationInfo> {
 
     @Override
