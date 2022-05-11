@@ -14,6 +14,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
 import static org.mule.runtime.extension.internal.semantic.SemanticTermsHelper.getAllTermsFromAnnotations;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getCompletionCallbackParameters;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConfigParameter;
@@ -29,6 +30,7 @@ import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelL
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 
 import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
@@ -461,6 +463,11 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   @Override
   public Optional<DisplayModel> getDisplayModel() {
     return JavaExtensionModelParserUtils.getDisplayModel(operationElement, "operation", operationElement.getName());
+  }
+
+  @Override
+  public ComponentVisibility getComponentVisibility() {
+    return PUBLIC;
   }
 
   @Override

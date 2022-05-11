@@ -101,6 +101,7 @@ public class FakeMuleServer {
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder()
         .artifactConfigurationProcessor(serializedAstWithFallbackArtifactConfigurationProcessor())
         .build();
+    muleArtifactResourcesRegistry.inject(muleArtifactResourcesRegistry.getContainerProfilingService());
     containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();
     serviceManager = muleArtifactResourcesRegistry.getServiceManager();
     extensionModelLoaderManager = muleArtifactResourcesRegistry.getExtensionModelLoaderManager();

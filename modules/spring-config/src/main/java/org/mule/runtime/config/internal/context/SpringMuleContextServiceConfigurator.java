@@ -52,6 +52,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLI
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_FACTORY_LOCATOR;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMATION_SERVICE;
+import static org.mule.runtime.core.api.config.MuleProperties.SDK_OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
@@ -118,6 +119,7 @@ import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataService;
+import org.mule.runtime.module.extension.internal.store.SdkObjectStoreManagerAdapter;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -189,6 +191,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(OBJECT_LOCAL_STORE_PERSISTENT,
            getBeanDefinition(DefaultObjectStoreFactoryBean.class, "createDefaultPersistentObjectStore"))
       .put(OBJECT_STORE_MANAGER, getPrimaryBeanDefinition(MuleObjectStoreManager.class))
+      .put(SDK_OBJECT_STORE_MANAGER, getPrimaryBeanDefinition(SdkObjectStoreManagerAdapter.class))
       .put(OBJECT_QUEUE_MANAGER, getBeanDefinition(TransactionalQueueManager.class))
       .put(OBJECT_SECURITY_MANAGER, getBeanDefinition(DefaultMuleSecurityManager.class))
       .put(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER, getBeanDefinition(MuleMessageProcessingManager.class))

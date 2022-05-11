@@ -8,6 +8,7 @@ package org.mule.runtime.core.privileged.exception;
 
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.REUSE_GLOBAL_ERROR_HANDLER;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
@@ -41,6 +42,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -107,6 +109,9 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   @Inject
   private ConfigurationProperties configurationProperties;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   protected Optional<Location> flowLocation = empty();
   private MessageProcessorChain configuredMessageProcessors;
@@ -286,8 +291,10 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   protected void doInitialise() throws InitialisationException {
     super.doInitialise();
     Optional<ProcessingStrategy> processingStrategy;
-    if (fromGlobalErrorHandler) {
+    if (fromGlobalErrorHandler && featureFlaggingService.isEnabled(REUSE_GLOBAL_ERROR_HANDLER)) {
       processingStrategy = getProcessingStrategyFromGlobalErrorHandler(locator);
+    } else if (flowLocation.isPresent()) {
+      processingStrategy = getProcessingStrategy(locator, flowLocation.get());
     } else {
       processingStrategy = getProcessingStrategy(locator, this);
     }
@@ -503,6 +510,11 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
    */
   public abstract TemplateOnErrorHandler duplicateFor(Location location);
 
+  private boolean isTransactionInGlobalErrorHandler(TransactionAdapter transaction) {
+    String transactionContainerName = transaction.getComponentLocation().get().getRootContainerName();
+    return flowLocation.isPresent() && transactionContainerName.equals(flowLocation.get().getGlobalName());
+  }
+
   protected boolean isOwnedTransaction(Exception exception) {
     TransactionAdapter transaction = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
     if (transaction == null || !transaction.getComponentLocation().isPresent()) {
@@ -513,20 +525,26 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       return defaultErrorHandlerOwnsTransaction(transaction);
     }
 
-    if (fromGlobalErrorHandler) {
-      String location = ((MessagingException) exception).getFailingComponent().getRootContainerLocation().getGlobalName();
-      return transaction.getComponentLocation().get().getRootContainerName().equals(location);
-    } else {
-      // We are in a simple scenario where the error handler's location ends with "/error-handler/1".
-      // We cannot use the RootContainerLocation, since in case of nested TryScopes (the outer one creating the tx)
-      // the RootContainerLocation will be the same for both, and we don't want the inner TryScope's OnErrorPropagate
-      // to rollback the tx.
-      if (!isLocalErrorHandlerLocation) {
-        return sameRootContainerLocation(transaction);
+    if (featureFlaggingService.isEnabled(REUSE_GLOBAL_ERROR_HANDLER)) {
+      if (fromGlobalErrorHandler) {
+        String location = ((MessagingException) exception).getFailingComponent().getRootContainerLocation().getGlobalName();
+        return transaction.getComponentLocation().get().getRootContainerName().equals(location);
       }
-      String transactionLocation = transaction.getComponentLocation().get().getLocation();
-      return (sameRootContainerLocation(transaction) && errorHandlerLocation.equals(transactionLocation));
+    } else {
+      if (flowLocation.isPresent()) {
+        return isTransactionInGlobalErrorHandler(transaction);
+      }
     }
+
+    // We are in a simple scenario where the error handler's location ends with "/error-handler/1".
+    // We cannot use the RootContainerLocation, since in case of nested TryScopes (the outer one creating the tx)
+    // the RootContainerLocation will be the same for both, and we don't want the inner TryScope's OnErrorPropagate
+    // to rollback the tx.
+    if (!isLocalErrorHandlerLocation) {
+      return sameRootContainerLocation(transaction);
+    }
+    String transactionLocation = transaction.getComponentLocation().get().getLocation();
+    return (sameRootContainerLocation(transaction) && errorHandlerLocation.equals(transactionLocation));
   }
 
   private boolean sameRootContainerLocation(TransactionAdapter transaction) {

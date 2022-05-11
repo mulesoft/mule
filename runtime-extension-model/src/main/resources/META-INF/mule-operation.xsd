@@ -201,6 +201,36 @@
                             </xsd:sequence>
                         </xsd:complexType>
                     </xsd:element>
+                    <xsd:element name="deprecated" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Defines a operation's deprecation.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:complexType>
+                            <xsd:attribute name="message" use="required" type="mule:nonBlankString">
+                                <xsd:annotation>
+                                    <xsd:documentation>
+                                        Describes why something was deprecated, what can be used as substitute, or both.
+                                    </xsd:documentation>
+                                </xsd:annotation>
+                            </xsd:attribute>
+                            <xsd:attribute name="since" use="required" type="mule:nonBlankString">
+                                <xsd:annotation>
+                                    <xsd:documentation>
+                                        The version of the extension in which the annotated member was deprecated.
+                                    </xsd:documentation>
+                                </xsd:annotation>
+                            </xsd:attribute>
+                            <xsd:attribute name="toRemoveIn" type="mule:nonBlankString">
+                                <xsd:annotation>
+                                    <xsd:documentation>
+                                        The version of the extension in which the annotated member will be removed or was removed.
+                                    </xsd:documentation>
+                                </xsd:annotation>
+                            </xsd:attribute>
+                        </xsd:complexType>
+                    </xsd:element>
                     <xsd:element name="output" type="resultType"/>
                     <xsd:element name="body">
                         <xsd:annotation>
@@ -222,13 +252,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="public" type="xsd:boolean" default="false">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Whether the operation is public and should be usable by third party components
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="displayName" type="mule:nonBlankString">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -240,6 +263,13 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             A very brief overview about the operation.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="visibility" type="visibilityType" default="PUBLIC">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The operation's accessing visibility
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -280,6 +310,18 @@
             <xsd:enumeration value="SUPPORTED"/>
             <xsd:enumeration value="NOT_SUPPORTED"/>
             <xsd:enumeration value="REQUIRED"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="visibilityType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Whether the operation is public and should be usable by third party components
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="PUBLIC"/>
+            <xsd:enumeration value="PRIVATE"/>
         </xsd:restriction>
     </xsd:simpleType>
 

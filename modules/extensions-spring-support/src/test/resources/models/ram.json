@@ -470,6 +470,7 @@
             "RAM:BAD_RESPONSE"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "INVOKE",
             "namespace": "RAM",

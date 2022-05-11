@@ -299,6 +299,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "ANOTHER_METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -967,6 +968,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "CAPTURE_CALLBACK_PAYLOADS",
             "namespace": "TEST-OAUTH",
@@ -1323,6 +1325,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "ENTITIES_METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -1929,6 +1932,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -2484,6 +2488,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_FLACKY_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -3045,6 +3050,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_STREAM_CONTENT_WITH_FLACKY_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -3651,6 +3657,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -4339,6 +4346,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "PAGED_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -5163,6 +5171,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SAMPLE_DATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -5718,6 +5727,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "TOKEN_EXPIRED",
             "namespace": "TEST-OAUTH",
@@ -6197,6 +6207,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "TOKEN_EXPIRED_ASYNC",
             "namespace": "TEST-OAUTH",
@@ -6749,6 +6760,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "UNAUTHORIZE",
             "namespace": "TEST-OAUTH",
@@ -7066,6 +7078,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "VALUES_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -16169,6 +16182,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "LISTENER",
             "namespace": "TEST-OAUTH",
@@ -16666,6 +16680,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "POLLER",
             "namespace": "TEST-OAUTH",
@@ -17405,6 +17420,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "ANOTHER_METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -18082,6 +18098,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "ENTITIES_METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -18688,6 +18705,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -19243,6 +19261,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_FLACKY_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -19804,6 +19823,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_STREAM_CONTENT_WITH_FLACKY_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -20410,6 +20430,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -21098,6 +21119,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "PAGED_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -21922,6 +21944,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SAMPLE_DATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -22477,6 +22500,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "TOKEN_EXPIRED",
             "namespace": "TEST-OAUTH",
@@ -22956,6 +22980,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "TOKEN_EXPIRED_ASYNC",
             "namespace": "TEST-OAUTH",
@@ -23508,6 +23533,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "UNAUTHORIZE",
             "namespace": "TEST-OAUTH",
@@ -23825,6 +23851,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "VALUES_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -25815,6 +25842,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "ANOTHER_METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -26492,6 +26520,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "ENTITIES_METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -27098,6 +27127,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -27653,6 +27683,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_FLACKY_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -28214,6 +28245,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_STREAM_CONTENT_WITH_FLACKY_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -28820,6 +28852,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -29508,6 +29541,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "PAGED_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -30332,6 +30366,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SAMPLE_DATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -30887,6 +30922,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "TOKEN_EXPIRED",
             "namespace": "TEST-OAUTH",
@@ -31366,6 +31402,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "TOKEN_EXPIRED_ASYNC",
             "namespace": "TEST-OAUTH",
@@ -31918,6 +31955,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "UNAUTHORIZE",
             "namespace": "TEST-OAUTH",
@@ -32235,6 +32273,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "VALUES_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -35623,6 +35662,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "ANOTHER_METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -36300,6 +36340,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "ENTITIES_METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -36906,6 +36947,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -37461,6 +37503,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_FLACKY_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -38022,6 +38065,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_STREAM_CONTENT_WITH_FLACKY_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -38628,6 +38672,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -39316,6 +39361,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "PAGED_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -40140,6 +40186,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SAMPLE_DATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -40695,6 +40742,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "TOKEN_EXPIRED",
             "namespace": "TEST-OAUTH",
@@ -41174,6 +41222,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "TOKEN_EXPIRED_ASYNC",
             "namespace": "TEST-OAUTH",
@@ -41726,6 +41775,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "UNAUTHORIZE",
             "namespace": "TEST-OAUTH",
@@ -42043,6 +42093,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "VALUES_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -44457,6 +44508,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "ANOTHER_METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -45134,6 +45186,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "ENTITIES_METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -45740,6 +45793,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -46295,6 +46349,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_FLACKY_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -46856,6 +46911,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_STREAM_CONTENT_WITH_FLACKY_CONNECTION",
             "namespace": "TEST-OAUTH",
@@ -47462,6 +47518,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "METADATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -48150,6 +48207,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "PAGED_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -48974,6 +49032,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SAMPLE_DATA_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -49529,6 +49588,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "TOKEN_EXPIRED",
             "namespace": "TEST-OAUTH",
@@ -50008,6 +50068,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "TOKEN_EXPIRED_ASYNC",
             "namespace": "TEST-OAUTH",
@@ -50560,6 +50621,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "UNAUTHORIZE",
             "namespace": "TEST-OAUTH",
@@ -50877,6 +50939,7 @@
             "TEST-OAUTH:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "VALUES_OPERATION",
             "namespace": "TEST-OAUTH",
@@ -52902,6 +52965,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GET_STREAM",
         "namespace": "TEST-OAUTH",

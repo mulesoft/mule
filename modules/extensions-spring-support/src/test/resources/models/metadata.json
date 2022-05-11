@@ -382,6 +382,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "BOOLEAN_METADATA_KEY",
             "namespace": "METADATA",
@@ -1043,6 +1044,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "CONTENT_AND_OUTPUT_CACHE_RESOLVER",
             "namespace": "METADATA",
@@ -1765,6 +1767,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "CONTENT_AND_OUTPUT_METADATA_WITH_KEY_ID",
             "namespace": "METADATA",
@@ -2492,6 +2495,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "CONTENT_AND_OUTPUT_METADATA_WITHOUT_KEY_ID",
             "namespace": "METADATA",
@@ -3172,6 +3176,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "CONTENT_METADATA_WITH_KEY_ID",
             "namespace": "METADATA",
@@ -3899,6 +3904,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "CONTENT_METADATA_WITHOUT_KEY_ID",
             "namespace": "METADATA",
@@ -4555,6 +4561,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "CONTENT_METADATA_WITHOUT_KEYS_WITH_KEY_ID",
             "namespace": "METADATA",
@@ -5122,6 +5129,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "CONTENT_ONLY_CACHE_RESOLVER",
             "namespace": "METADATA",
@@ -5820,6 +5828,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "CONTENT_ONLY_IGNORES_OUTPUT",
             "namespace": "METADATA",
@@ -6391,6 +6400,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "ENUM_METADATA_KEY",
             "namespace": "METADATA",
@@ -7091,6 +7101,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "FAIL_WITH_RESOLVING_EXCEPTION",
             "namespace": "METADATA",
@@ -7818,6 +7829,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "FAIL_WITH_RUNTIME_EXCEPTION",
             "namespace": "METADATA",
@@ -8613,6 +8625,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "JSON_ATTRIBUTES_PAGING_PROVIDER_WITH_RESULT",
             "namespace": "METADATA",
@@ -9332,6 +9345,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "JSON_OUTPUT_PAGING_PROVIDER",
             "namespace": "METADATA",
@@ -10089,6 +10103,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "METADATA_KEY_OPTIONAL",
             "namespace": "METADATA",
@@ -10808,6 +10823,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "METADATA_KEY_WITH_DEFAULT_VALUE",
             "namespace": "METADATA",
@@ -11528,6 +11544,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER",
             "namespace": "METADATA",
@@ -12200,6 +12217,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "OUTPUT_AND_MULTIPLE_INPUT_WITH_KEY_ID",
             "namespace": "METADATA",
@@ -12978,6 +12996,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "OUTPUT_METADATA_WITH_KEY_ID",
             "namespace": "METADATA",
@@ -13697,6 +13716,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "OUTPUT_METADATA_WITHOUT_KEY_ID",
             "namespace": "METADATA",
@@ -14369,6 +14389,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "OUTPUT_METADATA_WITHOUT_KEYS_WITH_KEY_ID",
             "namespace": "METADATA",
@@ -15036,6 +15057,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "OUTPUT_ONLY_WITHOUT_CONTENT_PARAM",
             "namespace": "METADATA",
@@ -15706,6 +15728,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "PAGED_OPERATION_METADATA",
             "namespace": "METADATA",
@@ -16512,6 +16535,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "PAGED_OPERATION_RESULT",
             "namespace": "METADATA",
@@ -17360,6 +17384,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "PAGED_OPERATION_RESULT_WITH_ATTRIBUTES_RESOLVER",
             "namespace": "METADATA",
@@ -18116,6 +18141,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "PARTIAL_MULTI_LEVEL_KEY_RESOLVER",
             "namespace": "METADATA",
@@ -18832,6 +18858,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "PARTIAL_MULTI_LEVEL_KEY_SHOW_IN_DSL_RESOLVER",
             "namespace": "METADATA",
@@ -19572,6 +19599,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SHOULD_INHERIT_OPERATION_PARENT_RESOLVERS",
             "namespace": "METADATA",
@@ -20267,6 +20295,7 @@
             "METADATA:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SIMPLE_MULTI_LEVEL_KEY_RESOLVER",
             "namespace": "METADATA",
@@ -21352,6 +21381,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "METADATA_SOURCE",
             "namespace": "METADATA",
@@ -22310,6 +22340,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "METADATA_SOURCE_WITH_CALLBACK_PARAMETERS",
             "namespace": "METADATA",
@@ -22873,6 +22904,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "CONTENT_PARAMETER_SHOULD_NOT_GENERATE_LIST_CHILD_ELEMENT",
         "namespace": "METADATA",
@@ -23129,6 +23161,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "CONTENT_PARAMETER_SHOULD_NOT_GENERATE_MAP_CHILD_ELEMENT",
         "namespace": "METADATA",
@@ -23404,6 +23437,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "CONTENT_PARAMETER_SHOULD_NOT_GENERATE_POJO_CHILD_ELEMENT",
         "namespace": "METADATA",
@@ -23648,6 +23682,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "CUSTOM_ATTRIBUTES_OUTPUT",
         "namespace": "METADATA",
@@ -23908,6 +23943,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "CUSTOM_INPUT_AND_OUTPUT",
         "namespace": "METADATA",
@@ -24280,6 +24316,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "CUSTOM_INTERSECTION_TYPE_INPUT",
         "namespace": "METADATA",
@@ -24628,6 +24665,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "CUSTOM_INTERSECTION_TYPE_OUTPUT",
         "namespace": "METADATA",
@@ -24933,6 +24971,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "CUSTOM_TYPE_INPUT",
         "namespace": "METADATA",
@@ -25237,6 +25276,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "CUSTOM_TYPE_LIST_OUTPUT",
         "namespace": "METADATA",
@@ -25497,6 +25537,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "CUSTOM_TYPE_OUTPUT",
         "namespace": "METADATA",
@@ -25840,6 +25881,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "CUSTOM_TYPE_OUTPUT_WITH_STATIC_ATTRIBUTES",
         "namespace": "METADATA",
@@ -26416,6 +26458,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "DO_QUERY",
         "namespace": "METADATA",
@@ -26800,6 +26843,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "DYNAMIC_LIST_OF_MESSAGES",
         "namespace": "METADATA",
@@ -27235,6 +27279,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "DYNAMIC_LIST_OF_OBJECTS",
         "namespace": "METADATA",
@@ -27612,6 +27657,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "INPUT_HAS_EXCLUSIVE_OPTIONAL_PARAMETER_GROUP",
         "namespace": "METADATA",
@@ -27953,6 +27999,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "INPUT_HAS_POJO_WITH_EXCLUSIVE_OPTIONAL_PARAMETER_GROUP",
         "namespace": "METADATA",
@@ -28294,6 +28341,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "JSON_ARRAY_ATTRIBUTES",
         "namespace": "METADATA",
@@ -28600,6 +28648,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "JSON_ARRAY_ATTRIBUTES_LIST",
         "namespace": "METADATA",
@@ -28886,6 +28935,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "JSON_ARRAY_OUTPUT_LIST",
         "namespace": "METADATA",
@@ -29212,6 +29262,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "JSON_ATTRIBUTES",
         "namespace": "METADATA",
@@ -29509,6 +29560,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "JSON_ATTRIBUTES_LIST",
         "namespace": "METADATA",
@@ -29806,6 +29858,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "JSON_INPUT_LIST",
         "namespace": "METADATA",
@@ -30213,6 +30266,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "JSON_INPUT_MAP",
         "namespace": "METADATA",
@@ -30517,6 +30571,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "JSON_INPUT_STREAM",
         "namespace": "METADATA",
@@ -30821,6 +30876,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "JSON_OUTPUT",
         "namespace": "METADATA",
@@ -31377,6 +31433,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "JSON_OUTPUT_ARRAY",
         "namespace": "METADATA",
@@ -31933,6 +31990,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "JSON_OUTPUT_LIST",
         "namespace": "METADATA",
@@ -32300,6 +32358,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "LIST_OF_MESSAGES",
         "namespace": "METADATA",
@@ -32615,6 +32674,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "MESSAGE_ATTRIBUTES_ANY_TYPE_METADATA",
         "namespace": "METADATA",
@@ -32987,6 +33047,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "MESSAGE_ATTRIBUTES_PERSON_TYPE_METADATA",
         "namespace": "METADATA",
@@ -33354,6 +33415,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "OBJECT_LIST_AS_INPUT",
         "namespace": "METADATA",
@@ -33757,6 +33819,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "OUTPUT_ATTRIBUTES_WITH_DECLARED_SUBTYPES_METADATA",
         "namespace": "METADATA",
@@ -34036,6 +34099,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "OUTPUT_ATTRIBUTES_WITH_DYNAMIC_METADATA",
         "namespace": "METADATA",
@@ -34389,6 +34453,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "RECEIVE_JSON_INPUT_STREAM",
         "namespace": "METADATA",
@@ -34911,6 +34976,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "RESOLVER_CONTENT_WITH_CONTEXT_CLASS_LOADER",
         "namespace": "METADATA",
@@ -35235,6 +35301,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "RESOLVER_OUTPUT_WITH_CONTEXT_CLASS_LOADER",
         "namespace": "METADATA",
@@ -35636,6 +35703,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "RETURN_QUERY",
         "namespace": "METADATA",
@@ -35965,6 +36033,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "TYPE_WITH_DECLARED_SUBTYPES_METADATA",
         "namespace": "METADATA",
@@ -36344,6 +36413,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "XML_ATTRIBUTES",
         "namespace": "METADATA",
@@ -36604,6 +36674,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "XML_INPUT",
         "namespace": "METADATA",
@@ -36938,6 +37009,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "XML_OUTPUT",
         "namespace": "METADATA",
@@ -37494,6 +37566,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "XML_OUTPUT_LIST",
         "namespace": "METADATA",
@@ -37874,6 +37947,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "XML_OUTPUT_LIST_WITH_EMPTY_SCHEMA",
         "namespace": "METADATA",
@@ -38217,6 +38291,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "XML_OUTPUT_SCHEMA_WITH_IMPORT",
         "namespace": "METADATA",
@@ -39127,6 +39202,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "METADATA_SOURCE_WITH_MULTILEVEL",
         "namespace": "METADATA",
@@ -39556,6 +39632,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "METADATA_SOURCE_WITH_PARTIAL_MULTI_LEVEL_SHOW_IN_DSL",
         "namespace": "METADATA",
@@ -39985,6 +40062,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "METADATA_SOURCE_WITH_PARTIAL_MULTILEVEL",
         "namespace": "METADATA",
@@ -40464,6 +40542,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "CUSTOM-STATIC-METADATA",
         "namespace": "METADATA",
@@ -40778,6 +40857,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "XML-STATIC-METADATA",
         "namespace": "METADATA",
@@ -41291,6 +41371,7 @@
       "format": "xml",
       "type": "Object",
       "annotations": {
+        "typeId": "#root:shiporder",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -41304,8 +41385,7 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        },
-        "typeId": "#root:shiporder"
+        }
       },
       "fields": [
         {
@@ -41478,6 +41558,7 @@
       "format": "java",
       "type": "Object",
       "annotations": {
+        "typeId": "custom-java",
         "classInformation": {
           "classname": "java.lang.Object",
           "hasDefaultConstructor": true,
@@ -41489,8 +41570,7 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        },
-        "typeId": "custom-java"
+        }
       },
       "fields": []
     },
@@ -41498,6 +41578,8 @@
       "format": "json",
       "type": "Object",
       "annotations": {
+        "typeId": "http://example.com/example.json",
+        "label": "Person",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -41511,9 +41593,7 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        },
-        "label": "Person",
-        "typeId": "http://example.com/example.json"
+        }
       },
       "open": {
         "type": "Any"
@@ -41565,6 +41645,7 @@
       "format": "json",
       "type": "Object",
       "annotations": {
+        "typeId": "json-object",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -41578,8 +41659,7 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        },
-        "typeId": "json-object"
+        }
       },
       "fields": [
         {

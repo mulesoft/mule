@@ -398,6 +398,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_CONFIG",
             "namespace": "NON-IMPLICIT",
@@ -730,6 +731,7 @@
             "NON-IMPLICIT:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_CONNECTION",
             "namespace": "NON-IMPLICIT",

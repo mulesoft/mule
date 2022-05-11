@@ -2008,6 +2008,7 @@
             "VALUES:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "WITH_JSON_BODY_PARAMETER_WITH_FIELD",
             "namespace": "VALUES",
@@ -2524,6 +2525,7 @@
             "VALUES:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "WITH_JSON_BODY_PARAMETER_WITH_MULTI_LEVEL_FIELD",
             "namespace": "VALUES",
@@ -3561,6 +3563,7 @@
             "VALUES:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SINGLE_VALUES_ENABLED_PARAMETER_WITH_CONFIGURATION",
             "namespace": "VALUES",
@@ -4045,6 +4048,7 @@
             "VALUES:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SINGLE_VALUES_ENABLED_PARAMETER_WITH_CONNECTION",
             "namespace": "VALUES",
@@ -7422,6 +7426,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SOURCE_WITH_CONFIGURATION",
             "namespace": "VALUES",
@@ -7771,6 +7776,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SOURCE_WITH_CONNECTION",
             "namespace": "VALUES",
@@ -10023,6 +10029,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "ACTING_PARAMETER_WITH_RESERVED_NAME",
         "namespace": "VALUES",
@@ -10290,6 +10297,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "ATTRIBUTE_AS_ACTING_FOR_TAG_CONTENT_VALUE",
         "namespace": "VALUES",
@@ -10571,6 +10579,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "CONTENT_TYPED_VALUES_INSIDE_SHOW_IN_DSL_GROUP",
         "namespace": "VALUES",
@@ -10978,6 +10987,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "MULTI_LEVEL_VALUE",
         "namespace": "VALUES",
@@ -11324,6 +11334,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "PARAMETER_WITH_MULTILEVEL_FIELD_VALUE",
         "namespace": "VALUES",
@@ -11608,6 +11619,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "PARAMETER_WITH_MULTIPLE_MULTILEVEL_FIELD_VALUE_USING_SAME_PROVIDER",
         "namespace": "VALUES",
@@ -11925,6 +11937,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "PARAMETER_WITH_TWO_FIELD_WITH_SAME_VALUES",
         "namespace": "VALUES",
@@ -12187,6 +12200,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "RESOLVER_GETS_MULE_CONTEXT_INJECTION",
         "namespace": "VALUES",
@@ -12419,6 +12433,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SINGLE_VALUES_ENABLED_PARAMETER",
         "namespace": "VALUES",
@@ -12655,6 +12670,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SINGLE_VALUES_ENABLED_PARAMETER_INSIDE_PARAMETER_GROUP",
         "namespace": "VALUES",
@@ -12920,6 +12936,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SINGLE_VALUES_ENABLED_PARAMETER_REQUIRES_VALUES_OF_PARAMETER_GROUP",
         "namespace": "VALUES",
@@ -13249,6 +13266,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SINGLE_VALUES_ENABLED_PARAMETER_WITH_MORE_THAN_ONE_FIELD_VALUES",
         "namespace": "VALUES",
@@ -13511,6 +13529,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SINGLE_VALUES_ENABLED_PARAMETER_WITH_ONE_FIELD_VALUES",
         "namespace": "VALUES",
@@ -13762,6 +13781,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SINGLE_VALUES_ENABLED_PARAMETER_WITH_REQUIRED_PARAMETERS",
         "namespace": "VALUES",
@@ -14171,6 +14191,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SINGLE_VALUES_WITH_REQUIRED_PARAMETER_WITH_ALIAS",
         "namespace": "VALUES",
@@ -14438,6 +14459,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "TAG_CONTENT_AS_ACTING_FOR_ATTRIBUTE_VALUE",
         "namespace": "VALUES",
@@ -14695,6 +14717,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "TEXT_AS_ACTING_FOR_ATTRIBUTE_VALUE",
         "namespace": "VALUES",
@@ -14952,6 +14975,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "VALUES_INSIDE_SHOW_IN_DSL_GROUP",
         "namespace": "VALUES",
@@ -15281,6 +15305,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_BOUND_ACTING_PARAMETER",
         "namespace": "VALUES",
@@ -15552,6 +15577,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_BOUND_ACTING_PARAMETER_ARRAY",
         "namespace": "VALUES",
@@ -15839,6 +15865,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_BOUND_ACTING_PARAMETER_ENUM",
         "namespace": "VALUES",
@@ -16126,6 +16153,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_BOUND_ACTING_PARAMETER_FIELD",
         "namespace": "VALUES",
@@ -16413,6 +16441,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_BOUND_ACTING_PARAMETER_FIELD_WITH_DOT",
         "namespace": "VALUES",
@@ -16700,6 +16729,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_BOUND_ACTING_PARAMETER_FROM_CONTENT_FIELD",
         "namespace": "VALUES",
@@ -16988,6 +17018,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_BOUND_ACTING_PARAMETER_FROM_XML_CONTENT_FIELD",
         "namespace": "VALUES",
@@ -17276,6 +17307,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_BOUND_ACTING_PARAMETER_TO_XML_TAG_ATTRIBUTE",
         "namespace": "VALUES",
@@ -17563,6 +17595,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_BOUND_ACTING_PARAMETER_TO_XML_TAG_CONTENT",
         "namespace": "VALUES",
@@ -17850,6 +17883,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_BOUND_ACTING_PARAMETER_WITH_ALIAS",
         "namespace": "VALUES",
@@ -18121,6 +18155,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_BOUND_OPTIONAL_ACTING_PARAMETER",
         "namespace": "VALUES",
@@ -18392,6 +18427,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_BOUND_OPTIONAL_ACTING_PARAMETER_FIELD",
         "namespace": "VALUES",
@@ -18679,6 +18715,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_COMPLEX_ACTING_PARAMETER",
         "namespace": "VALUES",
@@ -18946,6 +18983,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_ERROR_VALUE_PROVIDER",
         "namespace": "VALUES",
@@ -19217,6 +19255,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_FOUR_BOUND_ACTING_PARAMETERS",
         "namespace": "VALUES",
@@ -19519,6 +19558,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_MAP_BOUND_ACTING_PARAMETER",
         "namespace": "VALUES",
@@ -19806,6 +19846,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_OPTIONAL_PARAMETER",
         "namespace": "VALUES",
@@ -20073,6 +20114,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_OPTIONAL_PARAMETER_AS_REQUIRED",
         "namespace": "VALUES",
@@ -20340,6 +20382,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_OPTIONAL_PARAMETER_WITH_DEFAULT",
         "namespace": "VALUES",
@@ -20608,6 +20651,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_POJO_BOUND_ACTING_PARAMETER",
         "namespace": "VALUES",
@@ -20895,6 +20939,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_POJO_FIELD_BOUND_ACTING_PARAMETER_FIELD",
         "namespace": "VALUES",
@@ -21166,6 +21211,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_REQUIRED_AND_OPTIONAL_PARAMETERS",
         "namespace": "VALUES",
@@ -21467,6 +21513,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_REQUIRED_AND_OPTIONAL_WITH_DEFAULT_PARAMETERS",
         "namespace": "VALUES",
@@ -21769,6 +21816,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_REQUIRED_PARAMETER",
         "namespace": "VALUES",
@@ -22036,6 +22084,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_REQUIRED_PARAMETER_AND_OPTIONAL_PARAMETER_AS_REQUIRED",
         "namespace": "VALUES",
@@ -22337,6 +22386,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_TWO_ACTING_PARAMETERS",
         "namespace": "VALUES",
@@ -22658,6 +22708,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_TWO_BOUND_ACTING_PARAMETERS",
         "namespace": "VALUES",
@@ -22979,6 +23030,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WITH_VP_OPTIONAL_PARAMETER_WITH_DEFAULT_VALUE",
         "namespace": "VALUES",
@@ -23258,6 +23310,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SIMPLE_SOURCE",
         "namespace": "VALUES",
@@ -23553,6 +23606,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SIMPLE_SOURCE_WITH_PARAMETER_WITH_FIELD_VALUES",
         "namespace": "VALUES",
@@ -23846,6 +23900,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SOURCE_MUST_NOT_START",
         "namespace": "VALUES",
@@ -24141,6 +24196,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SOURCE_WITH_MULTI_LEVEL_FIELD_VALUES",
         "namespace": "VALUES",
@@ -24467,6 +24523,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SOURCE_WITH_MULTI_LEVEL_VALUE",
         "namespace": "VALUES",
@@ -24887,6 +24944,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SOURCE_WITH_REQUIRED_PARAMETER_INSIDE_SHOW_IN_DSL_GROUP",
         "namespace": "VALUES",
@@ -25271,6 +25329,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SOURCE_WITH_REQUIRED_PARAMETER_WITH_ALIAS",
         "namespace": "VALUES",
@@ -25612,6 +25671,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SOURCE_WITH_TWO_BOUND_ACTING_PARAMETERS",
         "namespace": "VALUES",
@@ -25976,6 +26036,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SOURCE_WITH_VALUES_WITH_REQUIRED_PARAMETER_INSIDE_PARAM_GROUP",
         "namespace": "VALUES",
@@ -26315,6 +26376,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SOURCE_WITH_VALUES_WITH_REQUIRED_PARAMETERS",
         "namespace": "VALUES",

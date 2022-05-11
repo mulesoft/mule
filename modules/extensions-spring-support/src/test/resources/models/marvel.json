@@ -331,6 +331,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "CRASH_CAR",
             "namespace": "MARVEL",
@@ -603,6 +604,7 @@
             "MARVEL:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "GET_RELICS",
             "namespace": "MARVEL",
@@ -1324,6 +1326,7 @@
             "MARVEL:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "OBJECT_TO_STREAM",
             "namespace": "MARVEL",
@@ -2103,6 +2106,7 @@
             "MARVEL:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "READ_STREAM",
             "namespace": "MARVEL",
@@ -2694,6 +2698,7 @@
             "MARVEL:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SAY_MAGIC_WORDS",
             "namespace": "MARVEL",
@@ -3528,6 +3533,7 @@
             "MARVEL:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SEEK_STREAM",
             "namespace": "MARVEL",
@@ -4163,6 +4169,7 @@
             "MARVEL:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "TO_STREAM",
             "namespace": "MARVEL",
@@ -4914,6 +4921,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "REFERABLE_OPERATION",
             "namespace": "MARVEL",
@@ -6086,6 +6094,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "BYTES-CASTER",
             "namespace": "MARVEL",
@@ -7047,6 +7056,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "COMPUTE_FLIGHT_PLAN",
             "namespace": "MARVEL",
@@ -7303,6 +7313,7 @@
             "MARVEL:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "FIRE_MISSILE",
             "namespace": "MARVEL",
@@ -7861,6 +7872,7 @@
             "MARVEL:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "FIRE_MISSILE_EPIC_SHOT",
             "namespace": "MARVEL",
@@ -8419,6 +8431,7 @@
             "MARVEL:RETRY_EXHAUSTED"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "FIRE_MISSILE_MISHAP",
             "namespace": "MARVEL",
@@ -9735,6 +9748,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "ADAMANTIUM_INJECTORS",
         "namespace": "MARVEL",
@@ -10172,6 +10186,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "FIND_INSTRUCTIONS",
         "namespace": "MARVEL",
@@ -10522,6 +10537,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GAMBIT_CHARGE_ITEMS",
         "namespace": "MARVEL",
@@ -10762,6 +10778,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GAMBIT_RELUCTANT_CHARGE",
         "namespace": "MARVEL",
@@ -11000,6 +11017,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GAMBIT_RELUCTANT_CHARGE_ITEMS",
         "namespace": "MARVEL",
@@ -11260,6 +11278,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "READ_OBJECT_STREAM",
         "namespace": "MARVEL",
@@ -11672,6 +11691,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "parameterGroupModels": [],
           "name": "operations",
           "description": "",
@@ -11681,6 +11701,7 @@
       ],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SCOPEVERSE",
         "namespace": "MARVEL",
@@ -12073,6 +12094,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WOLVERINE_BLOCKLIST",
         "namespace": "MARVEL",
@@ -12382,6 +12404,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WOLVERINE_CHILL_OUT",
         "namespace": "MARVEL",
@@ -12724,6 +12747,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WOLVERINE_CHILL_OUT_QUICK",
         "namespace": "MARVEL",
@@ -13066,6 +13090,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WOLVERINE_SHRED",
         "namespace": "MARVEL",
@@ -13346,6 +13371,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "WOUNDS_PASSTHROUGH",
         "namespace": "MARVEL",
@@ -13743,6 +13769,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "CEREBRO_DETECT_NEW_MUTANTS",
         "namespace": "MARVEL",
@@ -14113,6 +14140,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "MAGNETO_BROTHERHOOD",
         "namespace": "MARVEL",
@@ -14522,6 +14550,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "MAGNETO_MUTANT_SUMMON",
         "namespace": "MARVEL",

@@ -474,6 +474,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "TYPED_VALUE_ON_CONFIG",
             "namespace": "TYPED-VALUE",
@@ -809,6 +810,7 @@
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "TYPED_VALUE_OPERATION_STRING_PARAMETER",
             "namespace": "TYPED-VALUE",
@@ -1225,6 +1227,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "MIXED_TYPED_VALUES",
         "namespace": "TYPED-VALUE",
@@ -1859,6 +1862,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "TYPED_VALUE_FOR_INPUT_STREAM",
         "namespace": "TYPED-VALUE",
@@ -2400,6 +2404,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "TYPED_VALUE_FOR_OBJECT",
         "namespace": "TYPED-VALUE",
@@ -2734,6 +2739,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "TYPED_VALUE_FOR_STRING_INSIDE_POJO",
         "namespace": "TYPED-VALUE",
@@ -3064,6 +3070,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "TYPED_VALUE_OPERATION_DOOR_LIST_PARAMETER",
         "namespace": "TYPED-VALUE",
@@ -3410,6 +3417,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "TYPED_VALUE_OPERATION_DOOR_MAP_PARAMETER",
         "namespace": "TYPED-VALUE",
@@ -3735,6 +3743,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "TYPED_VALUE_OPERATION_DOOR_PARAMETER",
         "namespace": "TYPED-VALUE",
@@ -4039,6 +4048,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "TYPED_VALUE_OPERATION_POJO_WITH_NULLSAFE_AND_CONTENT",
         "namespace": "TYPED-VALUE",
@@ -4440,6 +4450,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "TYPED_VALUE_OPERATION_STRING_LIST_PARAMETER",
         "namespace": "TYPED-VALUE",
@@ -4841,6 +4852,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "TYPED_VALUE_OPERATION_STRING_MAP_LIST_PARAMETER",
         "namespace": "TYPED-VALUE",
@@ -5208,6 +5220,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "TYPED_VALUE_OPERATION_STRING_MAP_PARAMETER",
         "namespace": "TYPED-VALUE",
@@ -5539,6 +5552,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "TYPED_VALUE_OPERATION_WITH_STRING_CONTENT",
         "namespace": "TYPED-VALUE",
@@ -5924,6 +5938,7 @@
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SOURCE",
         "namespace": "TYPED-VALUE",

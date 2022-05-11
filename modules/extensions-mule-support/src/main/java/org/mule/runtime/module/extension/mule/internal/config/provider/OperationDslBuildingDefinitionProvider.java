@@ -16,6 +16,7 @@ import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.module.extension.internal.runtime.operation.construct.Operation;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
@@ -48,6 +49,8 @@ public class OperationDslBuildingDefinitionProvider implements ComponentBuilding
                       .withConstructorParameterDefinition(fromReferenceObject(ExtensionManager.class).build())
                       .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
                       .withSetterParameterDefinition("body", fromChildConfiguration(OperationBody.class).build())
+                      .withSetterParameterDefinition("deprecated",
+                                                     fromChildConfiguration(ImmutableDeprecationModel.class).build())
                       .build(),
                   baseDefinition.withIdentifier("body")
                       .withTypeDefinition(fromType(OperationBody.class))

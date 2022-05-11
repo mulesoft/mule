@@ -97,4 +97,8 @@ public class UnclosableCursorStream extends CursorStream {
      */
   }
 
+  @Override
+  public String toString() {
+    return delegate.toString();
+  }
 }

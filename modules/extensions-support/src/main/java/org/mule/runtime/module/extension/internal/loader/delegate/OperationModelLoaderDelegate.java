@@ -84,7 +84,8 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
           .supportsStreaming(parser.supportsStreaming())
           .transactional(parser.isTransactional())
           .requiresConnection(parser.isConnected())
-          .blocking(parser.isBlocking());
+          .blocking(parser.isBlocking())
+          .withVisibility(parser.getComponentVisibility());
 
       parser.getExecutorModelProperty().ifPresent(operation::withModelProperty);
       parser.getOutputType().applyOn(operation.withOutput());

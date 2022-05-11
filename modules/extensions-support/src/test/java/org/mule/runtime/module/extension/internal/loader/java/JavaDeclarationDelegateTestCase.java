@@ -543,7 +543,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception {
-    assertThat(extensionDeclaration.getOperations(), hasSize(63));
+    assertThat(extensionDeclaration.getOperations(), hasSize(65));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
     assertThat(withOperationsDeclaration.getOperations().size(), is(26));
