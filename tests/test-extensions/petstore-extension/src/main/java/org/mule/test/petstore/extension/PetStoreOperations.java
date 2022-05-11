@@ -331,6 +331,11 @@ public class PetStoreOperations {
     return muleVersion;
   }
 
+  @MediaType(ANY)
+  public String getStreamToString(InputStream stream) {
+    return stream.toString();
+  }
+
   public static class CorrelationInfoOutputResolver implements OutputTypeResolver<CorrelationInfo> {
 
     @Override
