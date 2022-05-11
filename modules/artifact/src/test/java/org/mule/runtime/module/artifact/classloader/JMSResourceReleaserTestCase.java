@@ -6,12 +6,21 @@
  */
 package org.mule.runtime.module.artifact.classloader;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+
+
+import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
+import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
+import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
+import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
+import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
+import static java.lang.Thread.enumerate;
+import static java.lang.Thread.activeCount;
+import static java.lang.Thread.currentThread;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.assertTrue;
+import static org.apache.commons.io.FileUtils.toFile;
+import static org.junit.Assert.assertFalse;
+
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.model.BundleDependency;
@@ -22,7 +31,6 @@ import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -33,17 +41,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
-
-import static java.lang.Thread.*;
-import static org.apache.commons.io.FileUtils.toFile;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
-import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
-import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
-import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
-import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 @Feature(LEAK_PREVENTION)
 @RunWith(Parameterized.class)

@@ -6,12 +6,10 @@
  */
 package org.mule.runtime.module.artifact.classloader;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.lang.reflect.Method;
-
-import static org.slf4j.LoggerFactory.getLogger;
+import org.slf4j.Logger;
 
 /**
  * Created to be a Thread that start the connection to active mq in the test class {@link JMSResourceReleaserTestCase}

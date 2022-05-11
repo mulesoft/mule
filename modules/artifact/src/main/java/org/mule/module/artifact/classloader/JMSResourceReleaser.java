@@ -6,20 +6,18 @@
  */
 package org.mule.module.artifact.classloader;
 
+import static java.lang.Thread.activeCount;
+import static java.lang.Thread.enumerate;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
-
-import static java.lang.Thread.activeCount;
-import static java.lang.Thread.enumerate;
-import static org.slf4j.LoggerFactory.getLogger;
+import org.slf4j.Logger;
 
 /**
  * Class created to solve classloading leaks
@@ -36,6 +34,11 @@ public class JMSResourceReleaser implements ResourceReleaser {
 
   private static final Logger logger = getLogger(JMSResourceReleaser.class);
 
+  /**
+   * Creates a new Instance of JMSResourceReleaser
+   *
+   * @param classLoader ClassLoader which loaded the ActiveMQ Driver.
+   */
   public JMSResourceReleaser(ClassLoader classLoader) {
     this.classLoader = classLoader;
   }
@@ -156,7 +159,6 @@ public class JMSResourceReleaser implements ResourceReleaser {
   }
 
   /**
-   *
    * Removing references to allow to delete the timer thread.
    */
   private void clearReferencesStopTimerThread(Thread thread)
