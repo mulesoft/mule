@@ -94,6 +94,8 @@ public class MacroExpansionModuleModel {
 
   public static final String DEFAULT_GLOBAL_ELEMENTS = "_defaultGlobalElements";
 
+  public static final String IMPLICIT_CONFIG_NAME = "xml-sdk-implicit-config";
+
   /**
    * Used when the <module/> contains global elements without <property/>ies to be expanded, thus the macro expansion will take
    * care of the default global elements macro expanding them ONCE, and replacing the {@link #MODULE_OPERATION_CONFIG_REF} in the
@@ -223,7 +225,7 @@ public class MacroExpansionModuleModel {
               .namespaceUri(extensionModel.getXmlDslModel().getNamespace())
               .namespace(extensionModel.getXmlDslModel().getPrefix())
               .name(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).build())
-          .addParameter("name", MODULE_CONFIG_GLOBAL_ELEMENT_NAME, false)
+          .addParameter("name", IMPLICIT_CONFIG_NAME, false)
           .build();
       configModel.setComponentLocation(fromSingleComponent(MODULE_CONFIG_GLOBAL_ELEMENT_NAME));
       configModel.setConfigurationModel(extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).get());
@@ -344,15 +346,15 @@ public class MacroExpansionModuleModel {
 
     operationRefModel.getMetadata().getSourceCode().ifPresent(processorChainBuilder::setSourceCode);
 
-    final Optional<String> implicitConfigRef =
+    final Optional<String> configRef =
         !configRefName.isPresent() && extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).isPresent()
-            ? of(MODULE_CONFIG_GLOBAL_ELEMENT_NAME) : configRefName;
+            ? of(IMPLICIT_CONFIG_NAME) : configRefName;
 
     bodyProcessors.stream()
         .map(bodyProcessor -> lookForTNSOperation((ComponentAst) bodyProcessor)
             .map(tnsOperation -> createModuleOperationChain(bodyProcessor, tnsOperation, moduleGlobalElementsNames,
-                                                            implicitConfigRef, containerName))
-            .orElseGet(() -> copyOperationComponentModel(bodyProcessor, implicitConfigRef, moduleGlobalElementsNames,
+                                                            configRef, containerName))
+            .orElseGet(() -> copyOperationComponentModel(bodyProcessor, configRef, moduleGlobalElementsNames,
                                                          getLiteralParameters(propertiesMap, parametersMap),
                                                          containerName)))
         .forEach(processorChainBuilder::addChildComponentModel);
