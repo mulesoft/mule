@@ -43,6 +43,9 @@ import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.Injector;
@@ -266,6 +269,7 @@ public class MuleContextUtils {
       injectableObjects.put(ConfigurationProperties.class, configProps);
       injectableObjects.put(FeatureFlaggingService.class, featureFlaggingService);
       injectableObjects.put(CoreProfilingService.class, coreProfilingService);
+      injectableObjects.put(ProfilingService.class, coreProfilingService);
 
       // Ensure injection of consistent mock objects
       when(muleContext.getInjector()).thenReturn(new MocksInjector(injectableObjects));
@@ -282,7 +286,10 @@ public class MuleContextUtils {
    * @return the created {@code muleContext}.
    */
   public static MuleContextWithRegistry mockContextWithServices() {
-    return mockContextWithServicesWithProfilingService(mock(CoreProfilingService.class));
+    CoreProfilingService profilingService = mock(CoreProfilingService.class);
+    lenient().when(profilingService.getProfilingDataProducer(any(ProfilingEventType.class)))
+        .thenReturn(mock(ProfilingDataProducer.class));
+    return mockContextWithServicesWithProfilingService(profilingService);
   }
 
   /**

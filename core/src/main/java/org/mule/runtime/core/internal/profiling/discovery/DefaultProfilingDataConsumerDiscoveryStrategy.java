@@ -13,6 +13,7 @@ import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentProcessingStrategyDataConsumer;
 import org.mule.runtime.core.internal.profiling.consumer.LoggerComponentThreadingDataConsumer;
+import org.mule.runtime.core.internal.profiling.consumer.TransactionLoggerDataConsumer;
 
 import java.util.Set;
 
@@ -26,7 +27,8 @@ public class DefaultProfilingDataConsumerDiscoveryStrategy implements ProfilingD
   @Override
   public Set<ProfilingDataConsumer<?>> discover() {
     return of(new LoggerComponentProcessingStrategyDataConsumer(),
-              new LoggerComponentThreadingDataConsumer());
+              new LoggerComponentThreadingDataConsumer(),
+              new TransactionLoggerDataConsumer());
   }
 
 }

@@ -281,6 +281,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
         .setCompletionHandlerFactory(completionHandlerFactory)
         .setExceptionCallback(exceptionCallback)
         .setCursorStreamProviderFactory(cursorStreamProviderFactory)
+        .setMuleContext(muleContext)
         .build();
 
     when(sourceCallbackFactory.createSourceCallback(any())).thenReturn(sourceCallback);
