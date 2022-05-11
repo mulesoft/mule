@@ -33,7 +33,7 @@ public class DefaultObjectParsingDelegate implements ObjectParsingDelegate {
   /**
    * Parses the given {@code objectType} as a {@link ValueResolver}
    *
-   * @param name the element name
+   * @param name       the element name
    * @param objectType a {@link ObjectType}
    * @param elementDsl the {@link DslElementSyntax} of the parsed element
    * @return a {@link AttributeDefinition.Builder}

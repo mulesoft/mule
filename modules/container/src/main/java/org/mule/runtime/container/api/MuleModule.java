@@ -7,8 +7,10 @@
 
 package org.mule.runtime.container.api;
 
-import static java.util.Collections.unmodifiableSet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableSet;
 
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
@@ -31,12 +33,14 @@ public class MuleModule {
   /**
    * Creates a new module
    *
-   * @param name module name. Not empty.
-   * @param exportedPackages java packages exported by this module. Not null.
-   * @param exportedPaths java resources exported by this module. Not null;
+   * @param name                       module name. Not empty.
+   * @param exportedPackages           java packages exported by this module. Not null.
+   * @param exportedPaths              java resources exported by this module. Not null;
    * @param privilegedExportedPackages java packages exported by this module to privileged artifacts only. Not null.
-   * @param privilegedArtifacts artifacts with privileged access to the API. Each artifact is defined using the artifact's Maven groupId:artifactId. Non null.
-   * @param exportedServices contains the definition of service implementations that must be accessible to artifacts via SPI. Non null.
+   * @param privilegedArtifacts        artifacts with privileged access to the API. Each artifact is defined using the artifact's
+   *                                   Maven groupId:artifactId. Non null.
+   * @param exportedServices           contains the definition of service implementations that must be accessible to artifacts via
+   *                                   SPI. Non null.
    */
   public MuleModule(String name, Set<String> exportedPackages, Set<String> exportedPaths, Set<String> privilegedExportedPackages,
                     Set<String> privilegedArtifacts, List<ExportedService> exportedServices) {
@@ -81,7 +85,7 @@ public class MuleModule {
   }
 
   public List<ExportedService> getExportedServices() {
-    return exportedServices;
+    return exportedServices != null ? exportedServices : emptyList();
   }
 
   @Override

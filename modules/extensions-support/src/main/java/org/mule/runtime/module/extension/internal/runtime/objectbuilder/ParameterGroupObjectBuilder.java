@@ -6,35 +6,26 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
-import static java.util.function.UnaryOperator.identity;
-import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
-import static org.mule.runtime.core.internal.util.message.MessageUtils.decorateInput;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursorAsUnclosable;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.typedValueAsUnclosable;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
-import org.mule.runtime.core.internal.util.message.MessageUtils;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext;
-import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -69,17 +60,9 @@ public class ParameterGroupObjectBuilder<T> {
   public T build(EventedExecutionContext executionContext) throws MuleException {
     try (ValueResolvingContext context = ValueResolvingContext.builder(executionContext.getEvent())
         .withExpressionManager(expressionManager)
-        .withConfig(executionContext.getConfiguration()).build()) {
-      return doBuild(executionContext::hasParameter, executionContext::getParameter, context,
-                     resolveCursorComponentDecoratorFactory(executionContext));
-    }
-  }
-
-  private CursorComponentDecoratorFactory resolveCursorComponentDecoratorFactory(EventedExecutionContext executionContext) {
-    if (executionContext instanceof ExecutionContextAdapter) {
-      return ((ExecutionContextAdapter) executionContext).getComponentDecoratorFactory();
-    } else {
-      return null;
+        .withConfig(executionContext.getConfiguration())
+        .build()) {
+      return doBuild(executionContext::hasParameter, executionContext::getParameter, context);
     }
   }
 
@@ -90,7 +73,7 @@ public class ParameterGroupObjectBuilder<T> {
     try {
       initializerEvent = getInitialiserEvent();
       context = ValueResolvingContext.builder(initializerEvent).build();
-      return doBuild(resultMap::containsKey, resultMap::get, context, NO_OP_INSTANCE);
+      return doBuild(resultMap::containsKey, resultMap::get, context);
     } finally {
       if (initializerEvent != null) {
         ((BaseEventContext) initializerEvent.getContext()).success();
@@ -101,23 +84,16 @@ public class ParameterGroupObjectBuilder<T> {
     }
   }
 
-  private T doBuild(Predicate<String> hasParameter, Function<String, Object> parameters, ValueResolvingContext context,
-                    CursorComponentDecoratorFactory componentDecoratorFactory)
+  private T doBuild(Predicate<String> hasParameter, Function<String, Object> parameters, ValueResolvingContext context)
       throws MuleException {
     T object = createInstance(prototypeClass);
 
     for (FieldElement field : groupDescriptorFields) {
       String name = field.getName();
       if (hasParameter.test(name)) {
-        final boolean isContent = field.isAnnotatedWith(Content.class)
-            || field.isAnnotatedWith(org.mule.sdk.api.annotation.param.Content.class);
-        Object resolvedValue = resolveValue(new StaticValueResolver<>(parameters
-            .apply(name)), context);
-        Object value = context == null || context.resolveCursors()
-            ? resolveCursor(resolvedValue,
-                            isContent ? v -> decorateInput(v, context.getEvent().getCorrelationId(), componentDecoratorFactory)
-                                : identity())
-            : resolvedValue;
+        Object resolvedValue = resolveValue(new StaticValueResolver<>(parameters.apply(name)), context);
+        Object value = context == null || context.resolveCursors() ? resolveCursorAsUnclosable(resolvedValue)
+            : typedValueAsUnclosable(resolvedValue);
         field.set(object, value);
       }
     }

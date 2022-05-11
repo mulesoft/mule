@@ -7,16 +7,21 @@
 
 package org.mule.runtime.module.artifact.api.serializer;
 
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
+import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+import static org.mule.test.allure.AllureConstants.SerializationFeature.SERIALIZATION;
+import static org.mule.test.allure.AllureConstants.SerializationFeature.SerializationStory.MESSAGE_SERIALIZATION;
+
 import static java.util.Optional.empty;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
-import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.serialization.SerializationException;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -29,16 +34,23 @@ import org.mule.runtime.module.artifact.api.serializer.protocol.CustomJavaSerial
 import org.mule.tck.core.internal.serialization.AbstractSerializerProtocolContractTestCase;
 import org.mule.tck.util.CompilerUtils;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Optional;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(SERIALIZATION)
+@Story(MESSAGE_SERIALIZATION)
 public class CustomJavaSerializationProtocolTestCase extends AbstractSerializerProtocolContractTestCase {
 
   public static final String INSTANCE_NAME = "serializedInstance";
@@ -50,6 +62,16 @@ public class CustomJavaSerializationProtocolTestCase extends AbstractSerializerP
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   private ClassLoaderRepository classLoaderRepository;
+
+  @Before
+  public void setUp() {
+    currentMuleContext.set(muleContext);
+  }
+
+  @After
+  public void teardown() {
+    currentMuleContext.set(null);
+  }
 
   @Override
   protected void doSetUp() throws Exception {

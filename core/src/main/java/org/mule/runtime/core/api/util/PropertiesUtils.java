@@ -8,11 +8,13 @@ package org.mule.runtime.core.api.util;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.util.OrderedProperties;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -20,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -96,7 +97,7 @@ public final class PropertiesUtils {
   /**
    * Read in the properties from a properties file. The file may be on the file system or the classpath.
    *
-   * @param fileName - The name of the properties file
+   * @param fileName     - The name of the properties file
    * @param callingClass - The Class which is calling this method. This is used to determine the classpath.
    * @return a java.util.Properties object containing the properties.
    */
@@ -176,8 +177,8 @@ public final class PropertiesUtils {
   public static Map removeNamespaces(Map properties) {
     HashMap props = new HashMap(properties.size());
     Map.Entry entry;
-    for (Iterator iter = properties.entrySet().iterator(); iter.hasNext();) {
-      entry = (Map.Entry) iter.next();
+    for (Object element : properties.entrySet()) {
+      entry = (Map.Entry) element;
       props.put(removeNamespacePrefix((String) entry.getKey()), entry.getValue());
 
     }
@@ -188,8 +189,8 @@ public final class PropertiesUtils {
    * Will create a map of properties where the names have a prefix Allows the callee to supply the target map so a comparator can
    * be set
    *
-   * @param props the source set of properties
-   * @param prefix the prefix to filter on
+   * @param props    the source set of properties
+   * @param prefix   the prefix to filter on
    * @param newProps return map containing the filtered list of properties or an empty map if no properties matched the prefix
    */
   public static void getPropertiesWithPrefix(Map props, String prefix, Map newProps) {
@@ -197,8 +198,8 @@ public final class PropertiesUtils {
       return;
     }
 
-    for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
-      Map.Entry entry = (Map.Entry) iterator.next();
+    for (Object element : props.entrySet()) {
+      Map.Entry entry = (Map.Entry) element;
       Object key = entry.getKey();
       if (key.toString().startsWith(prefix)) {
         newProps.put(key, entry.getValue());
@@ -278,7 +279,7 @@ public final class PropertiesUtils {
    * Discovers properties files available on the given classloader.
    *
    * @param classLoader classloader used to find properties resources. Not null.
-   * @param resource resource to find. Not empty
+   * @param resource    resource to find. Not empty
    * @return a non null list of Properties
    * @throws IOException when a property file cannot be processed
    */
@@ -296,7 +297,7 @@ public final class PropertiesUtils {
       }
       Properties properties = new OrderedProperties();
 
-      try (InputStream resourceStream = propertiesResource.openStream()) {
+      try (InputStream resourceStream = new BufferedInputStream(propertiesResource.openStream())) {
         properties.load(resourceStream);
       }
 

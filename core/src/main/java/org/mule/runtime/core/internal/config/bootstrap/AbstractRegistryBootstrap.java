@@ -13,25 +13,20 @@ import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getCause;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.ALL;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.createFromString;
 
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapService;
+import org.mule.runtime.core.api.config.builders.RegistryBootstrap;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.PropertiesUtils;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -41,69 +36,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.Predicate;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Base class for an object will load objects defined in a file called <code>registry-bootstrap.properties</code> into the local
- * registry. This allows modules and transports to make certain objects available by default. The most common use case is for a
- * module or transport to load stateless transformers into the registry. For this file to be located it must be present in the
- * modules META-INF directory under
- *
- * <pre>
- * META-INF/org/mule/config/
- * </pre>
- * <p/>
- * The format of this file is a simple key / value pair. i.e.
- *
- * <pre>
- * myobject = org.foo.MyObject
- * </pre>
- *
- * Will register an instance of MyObject with a key of 'myobject'. If you don't care about the object name and want to ensure that
- * the ojbect gets a unique name you can use -
- *
- * <pre>
- * object.1=org.foo.MyObject
- * object.2=org.bar.MyObject
- * </pre>
- *
- * or
- *
- * <pre>
- * myFoo=org.foo.MyObject
- * myBar=org.bar.MyObject
- * </pre>
- *
- * It's also possible to define if the entry must be applied to a domain, an application, or both by using the parameter
- * applyToArtifactType.
- *
- * <pre>
- * myFoo=org.foo.MyObject will be applied to any mule application since the parameter applyToArtifactType default value is app
- * myFoo=org.foo.MyObject;applyToArtifactType=app will be applied to any mule application
- * myFoo=org.foo.MyObject;applyToArtifactType=domain will be applied to any mule domain
- * myFoo=org.foo.MyObject;applyToArtifactType=app/domain will be applied to any mule application and any mule domain
- * </pre>
- *
- * Loading transformers has a slightly different notation since you can define the 'returnClass' with optional mime type, and
- * 'name'of the transformer as parameters i.e.
- *
- * <pre>
- * transformer.1=org.mule.compatibility.core.transport.jms.transformers.JMSMessageToObject,returnClass=byte[]
- * transformer.2=org.mule.compatibility.core.transport.jms.transformers.JMSMessageToObject,returnClass=java.lang.String:text/xml, name=JMSMessageToString
- * transformer.3=org.mule.compatibility.core.transport.jms.transformers.JMSMessageToObject,returnClass=java.util.Hashtable)
- * </pre>
- *
- * Note that the key used for transformers must be 'transformer.x' where 'x' is a sequential number. The transformer name will be
- * automatically generated as JMSMessageToXXX where XXX is the return class name i.e. JMSMessageToString unless a 'name' parameter
- * is specified. If no 'returnClass' is specified the default in the transformer will be used.
- * <p/>
- * Note that all objects defined have to have a default constructor. They can implement injection interfaces such as
- * {@link org.mule.runtime.core.api.context.MuleContextAware} and lifecycle interfaces such as {@link Initialisable}.
+ * Base class for {@link RegistryBootstrap} implementations
  *
  * @since 3.7.0
  */
-public abstract class AbstractRegistryBootstrap implements Initialisable {
+public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
 
   private static final String TRANSACTION_RESOURCE_SUFFIX = ".transaction.resource";
+  // TODO W-10736276 Remove this
   private static final String OPTIONAL_ATTRIBUTE = "optional";
   private static final String RETURN_CLASS_PROPERTY = "returnClass";
   private static final String MIME_TYPE_PROPERTY = "mimeType";
@@ -112,25 +58,33 @@ public abstract class AbstractRegistryBootstrap implements Initialisable {
   public static final String OBJECT_KEY = ".object.";
   public static final String SINGLE_TX = ".singletx.";
 
+  /**
+   * Indicates if a propertyKey is a property that declares a transformer
+   */
+  public static final Predicate<String> TRANSFORMER_PREDICATE =
+      propertyKey -> propertyKey.contains(TRANSFORMER_KEY);
+  /**
+   * Indicates if a propertyKey is a property that declares a bindingProvider to use in the expressions language
+   */
+  public static final Predicate<String> BINDING_PROVIDER_PREDICATE =
+      propertyKey -> propertyKey.endsWith(".binding.provider") || propertyKey.endsWith("FunctionsProvider");
+
   protected ArtifactType artifactType = APP;
   protected final transient Logger logger = LoggerFactory.getLogger(getClass());
   protected MuleContext muleContext;
+  private final Predicate<String> propertyKeyfilter;
 
   /**
    * @param artifactType type of artifact. Bootstrap entries may be associated to an specific type of artifact. If it's not
-   *        associated to the related artifact it will be ignored.
-   * @param muleContext the {@code MuleContext} of the artifact.
+   *                     associated to the related artifact it will be ignored.
+   * @param muleContext  the {@code MuleContext} of the artifact.
    */
-  public AbstractRegistryBootstrap(ArtifactType artifactType, MuleContext muleContext) {
+  public AbstractRegistryBootstrap(ArtifactType artifactType, MuleContext muleContext, Predicate<String> propertyKeyfilter) {
     this.artifactType = artifactType;
     this.muleContext = muleContext;
+    this.propertyKeyfilter = propertyKeyfilter;
   }
 
-  /**
-   * TODO Optimize me! MULE-9343
-   *
-   * {@inheritDoc}
-   */
   @Override
   public void initialise() throws InitialisationException {
     List<BootstrapService> bootstrapServices;
@@ -143,6 +97,7 @@ public abstract class AbstractRegistryBootstrap implements Initialisable {
     // Merge and process properties
     int objectCounter = 1;
     List<TransformerBootstrapProperty> transformers = new LinkedList<>();
+    List<ObjectBootstrapProperty> bindingProviders = new LinkedList<>();
     List<ObjectBootstrapProperty> namedObjects = new LinkedList<>();
     List<ObjectBootstrapProperty> unnamedObjects = new LinkedList<>();
     List<TransactionFactoryBootstrapProperty> singleTransactionFactories = new LinkedList<>();
@@ -154,16 +109,22 @@ public abstract class AbstractRegistryBootstrap implements Initialisable {
         final String propertyKey = (String) entry.getKey();
         final String propertyValue = (String) entry.getValue();
 
+        if (!propertyKeyfilter.test(propertyKey)) {
+          continue;
+        }
+
         if (propertyKey.contains(OBJECT_KEY)) {
           String newKey = propertyKey.substring(0, propertyKey.lastIndexOf(".")) + objectCounter++;
           unnamedObjects.add(createObjectBootstrapProperty(bootstrapService, newKey, propertyValue));
-        } else if (propertyKey.contains(TRANSFORMER_KEY)) {
+        } else if (TRANSFORMER_PREDICATE.test(propertyKey)) {
           transformers.add(createTransformerBootstrapProperty(bootstrapService, propertyValue));
         } else if (propertyKey.contains(SINGLE_TX)) {
           if (!propertyKey.contains(TRANSACTION_RESOURCE_SUFFIX)) {
             singleTransactionFactories.add(createTransactionFactoryBootstrapProperty(bootstrapService, bootstrapProperties,
                                                                                      propertyKey, propertyValue));
           }
+        } else if (BINDING_PROVIDER_PREDICATE.test(propertyKey)) {
+          bindingProviders.add(createObjectBootstrapProperty(bootstrapService, propertyKey, propertyValue));
         } else {
           namedObjects.add(createObjectBootstrapProperty(bootstrapService, propertyKey, propertyValue));
         }
@@ -172,8 +133,8 @@ public abstract class AbstractRegistryBootstrap implements Initialisable {
 
     try {
       registerUnnamedObjects(unnamedObjects);
-      registerTransformers();
       registerTransformers(transformers);
+      registerObjects(bindingProviders);
       registerObjects(namedObjects);
       registerTransactionFactories(singleTransactionFactories, muleContext);
     } catch (Exception e1) {
@@ -340,8 +301,6 @@ public abstract class AbstractRegistryBootstrap implements Initialisable {
   protected abstract void doRegisterTransformer(TransformerBootstrapProperty bootstrapProperty, Class<?> returnClass,
                                                 Class<? extends Transformer> transformerClass)
       throws Exception;
-
-  protected abstract void registerTransformers() throws MuleException;
 
   protected abstract void doRegisterObject(ObjectBootstrapProperty bootstrapProperty) throws Exception;
 

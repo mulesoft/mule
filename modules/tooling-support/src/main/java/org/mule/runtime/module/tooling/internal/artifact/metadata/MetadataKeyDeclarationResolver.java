@@ -42,9 +42,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 
 /**
- * Resolver that creates a {@link MetadataKey} from a {@link ComponentElementDeclaration}.
- * Exposes a {@link MetadataKeyResult} that enables checking if the key is complete or not.
- * Complete meaning that all required parts of the key have a value assigned.
+ * Resolver that creates a {@link MetadataKey} from a {@link ComponentElementDeclaration}. Exposes a {@link MetadataKeyResult}
+ * that enables checking if the key is complete or not. Complete meaning that all required parts of the key have a value assigned.
  *
  * @since 4.4
  */
@@ -135,10 +134,10 @@ public class MetadataKeyDeclarationResolver {
     if (!missingPartsInfo.isEmpty()) {
       MetadataKeyInfo firstKeyPartInfo = missingPartsInfo.get(0);
       if (missingPartsInfo.size() == 1 && firstKeyPartInfo.level == 1 && firstKeyPartInfo.totalLevels == 1) {
-        //Single level key
+        // Single level key
         partialMessage = format("Missing MetadataKey: %s", firstKeyPartInfo.parameterModel.getName());
       } else {
-        //Multi Level key
+        // Multi Level key
         partialMessage = format("The given MetadataKey does not provide all the required levels. Missing levels: %s",
                                 missingPartsInfo.stream().map(ki -> ki.parameterModel.getName()).collect(toList()));
       }
@@ -193,6 +192,10 @@ public class MetadataKeyDeclarationResolver {
           if (!parameterModel.getExpressionSupport().equals(NOT_SUPPORTED) && isExpression(value)) {
             throw new ExpressionNotSupportedException(format("Error resolving value for parameter: '%s' from declaration, it cannot be an EXPRESSION value",
                                                              parameterName));
+          }
+          if (parametersMap.containsKey(parameterName)) {
+            throw new MuleRuntimeException(createStaticMessage("Parameter '%s' for MetadataKey is duplicated in declaration, can't decide which one to use",
+                                                               parameterName));
           }
           parametersMap.put(parameterName, value);
         }

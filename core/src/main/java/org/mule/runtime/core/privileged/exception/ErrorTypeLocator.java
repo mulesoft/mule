@@ -11,6 +11,7 @@ import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -38,6 +39,7 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
  *
  * @since 4.0
  */
+@NoExtend
 public class ErrorTypeLocator {
 
   private final ExceptionMapper defaultExceptionMapper;
@@ -46,9 +48,9 @@ public class ErrorTypeLocator {
 
   private final LoadingCache<Pair<ComponentIdentifier, Class<? extends Throwable>>, ErrorType> componentErrorTypeCache;
 
-  private ErrorTypeLocator(ExceptionMapper defaultExceptionMapper,
-                           Map<ComponentIdentifier, ExceptionMapper> componentExceptionMappers,
-                           ErrorType defaultError) {
+  protected ErrorTypeLocator(ExceptionMapper defaultExceptionMapper,
+                             Map<ComponentIdentifier, ExceptionMapper> componentExceptionMappers,
+                             ErrorType defaultError) {
     this.defaultExceptionMapper = defaultExceptionMapper;
     this.componentExceptionMappers = componentExceptionMappers;
     this.defaultError = defaultError;
@@ -92,7 +94,7 @@ public class ErrorTypeLocator {
    * If no mapping is available then the {@link #lookupErrorType(Throwable)} rules applies.
    *
    * @param componentIdentifier the identifier of the component that throw the exception.
-   * @param exception the exception thrown by the component.
+   * @param exception           the exception thrown by the component.
    * @return the error type related to the exception based on the component mappings. If there's no mapping then the error type
    *         related to UNKNOWN will be returned.
    */
@@ -107,7 +109,7 @@ public class ErrorTypeLocator {
    * If no mapping is available then the {@link #lookupErrorType(Throwable)} rules applies.
    *
    * @param componentIdentifier the identifier of the component that throw the exception.
-   * @param exception the exception thrown by the component.
+   * @param exception           the exception thrown by the component.
    * @return the error type related to the exception based on the component mappings. If there's no mapping then the error type
    *         related to UNKNOWN will be returned.
    */
@@ -131,7 +133,7 @@ public class ErrorTypeLocator {
    * Adds an {@link ExceptionMapper} for a particular component identified by a {@link ComponentIdentifier}.
    *
    * @param componentIdentifier identifier of a component.
-   * @param exceptionMapper exception mapper for the component.
+   * @param exceptionMapper     exception mapper for the component.
    */
   public void addComponentExceptionMapper(ComponentIdentifier componentIdentifier, ExceptionMapper exceptionMapper) {
     this.componentExceptionMappers.put(componentIdentifier, exceptionMapper);
@@ -180,7 +182,7 @@ public class ErrorTypeLocator {
      * Adds an {@link ExceptionMapper} for a particular component identified by the componentIdentifier.
      *
      * @param componentIdentifier identifier of a component.
-     * @param exceptionMapper exception mapper for the component.
+     * @param exceptionMapper     exception mapper for the component.
      * @return {@code this} builder.
      */
     public Builder addComponentExceptionMapper(ComponentIdentifier componentIdentifier, ExceptionMapper exceptionMapper) {

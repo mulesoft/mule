@@ -25,8 +25,7 @@ public class GroupLayoutTestCase extends AbstractJavaExtensionDeclarationTestCas
 
   @Before
   public void setUp() {
-    setLoader(loaderFor(VeganExtension.class));
-    extensionDeclaration = declareExtension().getDeclaration();
+    extensionDeclaration = declarerFor(VeganExtension.class).getDeclaration();
   }
 
   @Test

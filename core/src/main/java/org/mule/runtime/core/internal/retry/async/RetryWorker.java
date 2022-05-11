@@ -57,7 +57,6 @@ public class RetryWorker implements Runnable {
     } catch (Exception e) {
       this.exception = e;
       logger.error("Error retrying work", e);
-
     }
   }
 

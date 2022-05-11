@@ -44,7 +44,7 @@ public class TestPolicyManager implements DeploymentListener {
   /**
    * Creates a new manager
    *
-   * @param deploymentService service that deploys applications in the container. Non null.
+   * @param deploymentService               service that deploys applications in the container. Non null.
    * @param policyTemplateDescriptorFactory creates descriptors for the policy templates. Non null
    */
   public TestPolicyManager(DeploymentService deploymentService, PolicyTemplateDescriptorFactory policyTemplateDescriptorFactory) {
@@ -76,8 +76,8 @@ public class TestPolicyManager implements DeploymentListener {
   /**
    * Adds a parameterized policy
    *
-   * @param appName application where the policy must be applied. Non empty.
-   * @param policyTemplateName template that must be used to instantiate the parametrized policy. Non empty.
+   * @param appName               application where the policy must be applied. Non empty.
+   * @param policyTemplateName    template that must be used to instantiate the parametrized policy. Non empty.
    * @param policyParametrization parametrization to instantiate the policy. Non null.
    */
   public void addPolicy(String appName, String policyTemplateName, PolicyParametrization policyParametrization)
@@ -100,9 +100,9 @@ public class TestPolicyManager implements DeploymentListener {
   /**
    * Adds a parameterized policy
    *
-   * @param appName application where the policy must be applied. Non empty.
+   * @param appName                  application where the policy must be applied. Non empty.
    * @param policyTemplateDescriptor template that must be used to instantiate the parametrized policy. Non empty.
-   * @param policyParametrization parametrization to instantiate the policy. Non null.
+   * @param policyParametrization    parametrization to instantiate the policy. Non null.
    */
   public void addPolicy(String appName, PolicyTemplateDescriptor policyTemplateDescriptor,
                         PolicyParametrization policyParametrization)
@@ -120,7 +120,7 @@ public class TestPolicyManager implements DeploymentListener {
   /**
    * Removes a parameterized policy
    *
-   * @param appName application where the policy is applied. Non empty.
+   * @param appName  application where the policy is applied. Non empty.
    * @param policyId identifies the policy parametrization. Non empty.
    * @return true if the poclicy was removed, false if the policy is not applied in the application.
    * @throws IllegalArgumentException if the application does not exists or there is an invalid parameter value.
@@ -139,8 +139,8 @@ public class TestPolicyManager implements DeploymentListener {
 
   /**
    * Retrieves the source policies that match the given {@link PolicyPointcutParameters}
-   * 
-   * @param appName application from which to look for the policies. Non empty.
+   *
+   * @param appName                  application from which to look for the policies. Non empty.
    * @param policyPointcutParameters parameters to match against existing policies
    * @return List of source {@link Policy}s that matched the parameters
    */
@@ -151,8 +151,8 @@ public class TestPolicyManager implements DeploymentListener {
   /**
    * Retrieves the operation policies that match the given {@link PolicyPointcutParameters}Retrieves the source policies that
    * match the given {@link PolicyPointcutParameters}
-   * 
-   * @param appName application from which to look for the policies. Non empty.
+   *
+   * @param appName                  application from which to look for the policies. Non empty.
    * @param policyPointcutParameters parameters to match against existing policies
    * @return List of operation {@link Policy}s that matched the parameters
    */
@@ -166,7 +166,7 @@ public class TestPolicyManager implements DeploymentListener {
       throw new IllegalArgumentException("Cannot find application named: " + appName);
     }
 
-    return application.getRegistry().lookupByType(PolicyProvider.class)
+    return application.getArtifactContext().getRegistry().lookupByType(PolicyProvider.class)
         .orElseThrow(() -> new IllegalArgumentException("Cannot find a Polict Provider in application named: " + appName));
   }
 

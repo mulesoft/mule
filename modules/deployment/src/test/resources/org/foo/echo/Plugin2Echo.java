@@ -7,16 +7,14 @@
 
 package org.foo.echo;
 
-import org.mule.functional.api.component.EventCallback;
-import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.module.deployment.api.EventCallback;
 
 import org.bar.BarUtils;
 
-public class Plugin2Echo extends AbstractComponent implements EventCallback{
+public class Plugin2Echo implements EventCallback {
 
-  public void eventReceived(CoreEvent event, Object component, MuleContext muleContext) throws Exception {
+  @Override
+  public void eventReceived(String payload) throws Exception {
     new BarUtils().doStuff();
   }
 }

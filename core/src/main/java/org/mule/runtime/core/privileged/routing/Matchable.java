@@ -17,7 +17,7 @@ public interface Matchable {
   /**
    * Determines if the event should be processed
    *
-   * @param event the current event to evaluate
+   * @param event   the current event to evaluate
    * @param builder an event builder in case the filter needs to make changes to the event.
    * @return true if the event should be processed by this router
    * @throws MuleException if the event cannot be evaluated

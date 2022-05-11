@@ -2,7 +2,6 @@
 
 <xs:schema xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mulesoft.org/schema/mule/module-properties-types" attributeFormDefault="unqualified" elementFormDefault="qualified">
   <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
-  <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"></xs:import>
   <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
   <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="config">
     <xs:complexType>
@@ -12,7 +11,7 @@
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
           </xs:sequence>
           <xs:attribute type="mule:expressionDecimal" use="required" name="integerParam"></xs:attribute>
-          <xs:attribute type="mule:expressionBoolean" use="required" name="booleanParam"></xs:attribute>
+          <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="booleanParam"></xs:attribute>
           <xs:attribute type="mule:expressionDateTime" use="required" name="dateParam"></xs:attribute>
           <xs:attribute type="mule:expressionDateTime" use="required" name="datetimeParam"></xs:attribute>
           <xs:attribute type="mule:expressionString" use="required" name="stringParam"></xs:attribute>

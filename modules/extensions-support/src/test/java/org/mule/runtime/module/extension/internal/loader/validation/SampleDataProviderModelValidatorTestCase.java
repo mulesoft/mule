@@ -46,6 +46,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SampleDataProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SampleDataProviderFactoryModelProperty.SampleDataProviderFactoryModelPropertyBuilder;
+import org.mule.runtime.module.extension.internal.loader.java.validation.JavaSampleDataModelValidator;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.sdk.api.annotation.param.Config;
 import org.mule.sdk.api.annotation.param.Connection;
@@ -57,9 +58,11 @@ import org.mule.tck.size.SmallTest;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.reflect.TypeUtils;
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
@@ -78,7 +81,7 @@ public class SampleDataProviderModelValidatorTestCase {
   private final MetadataType NUMBER_TYPE = loader.load(Integer.class);
   private final ReflectionCache reflectionCache = new ReflectionCache();
 
-  private SampleDataModelValidator validator;
+  private JavaSampleDataModelValidator validator;
   private ProblemsReporter problemsReporter;
 
   @Mock(lenient = true)
@@ -109,7 +112,7 @@ public class SampleDataProviderModelValidatorTestCase {
   @Before
   public void setUp() {
     OUTPUT_RESULT = mock(Result.class);
-    validator = new SampleDataModelValidator();
+    validator = new JavaSampleDataModelValidator();
     problemsReporter = new ProblemsReporter(extensionModel);
 
     providerBuilder = builder(ConnectedSampleDataProvider.class);
@@ -179,7 +182,7 @@ public class SampleDataProviderModelValidatorTestCase {
     mockOperationProvider();
 
     validate();
-    assertProblems("The SampleDataProvider [ConnectedSampleDataProvider] declares a parameter 'someParam' which doesn't exist in the operation 'superOperation'");
+    assertProblems("The SampleDataProvider [ConnectedSampleDataProvider] declares to use a parameter 'someParam' which doesn't exist in the operation 'superOperation'");
   }
 
   @Test
@@ -244,28 +247,28 @@ public class SampleDataProviderModelValidatorTestCase {
   public void operationWithWrongPayloadTypeSampleDataProvider() {
     assertWrongGenerics(operationModel,
                         MapSampleDataProvider.class,
-                        "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapSampleDataProvider] is used at component 'superOperation' which outputs a Result<java.lang.String,java.lang.String>, but the provider generic signature is '<java.util.Map<java.lang.String,java.lang.String>,java.lang.String>'");
+                        "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapSampleDataProvider] is used at component 'superOperation' which outputs a Result<java.lang.String, java.lang.String>, but the provider generic signature is '<java.util.Map<java.lang.String, java.lang.String>, java.lang.String>'");
   }
 
   @Test
   public void operationWithWrongAttributesTypeSampleDataProvider() {
     assertWrongGenerics(operationModel,
                         MapAttributesSampleDataProvider.class,
-                        "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapAttributesSampleDataProvider] is used at component 'superOperation' which outputs a Result<java.lang.String,java.lang.String>, but the provider generic signature is '<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>'");
+                        "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapAttributesSampleDataProvider] is used at component 'superOperation' which outputs a Result<java.lang.String, java.lang.String>, but the provider generic signature is '<java.lang.String, java.util.Map<java.lang.String, java.lang.String>>'");
   }
 
   @Test
   public void sourceWithWrongPayloadTypeSampleDataProvider() {
     assertWrongGenerics(sourceModel,
                         MapSampleDataProvider.class,
-                        "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapSampleDataProvider] is used at component 'listener' which outputs a Result<java.lang.String,java.lang.String>, but the provider generic signature is '<java.util.Map<java.lang.String,java.lang.String>,java.lang.String>'");
+                        "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapSampleDataProvider] is used at component 'listener' which outputs a Result<java.lang.String, java.lang.String>, but the provider generic signature is '<java.util.Map<java.lang.String, java.lang.String>, java.lang.String>'");
   }
 
   @Test
   public void sourceWithWrongAttributesTypeSampleDataProvider() {
     assertWrongGenerics(sourceModel,
                         MapAttributesSampleDataProvider.class,
-                        "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapAttributesSampleDataProvider] is used at component 'listener' which outputs a Result<java.lang.String,java.lang.String>, but the provider generic signature is '<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>'");
+                        "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapAttributesSampleDataProvider] is used at component 'listener' which outputs a Result<java.lang.String, java.lang.String>, but the provider generic signature is '<java.lang.String, java.util.Map<java.lang.String, java.lang.String>>'");
   }
 
   @Test
@@ -288,6 +291,15 @@ public class SampleDataProviderModelValidatorTestCase {
 
     validate();
     assertNoErrors();
+  }
+
+  @Test
+  public void operationWithBoxedVoidReturnType() {
+    mockComponent(operationModel, builder(VoidReturnTypeSampleDataProvider.class),
+                  VoidAttributesSampleDataProvider.class.getSimpleName());
+
+    validate();
+    assertErrorMessages(equalTo("SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$VoidReturnTypeSampleDataProvider] cannot have a Void return type"));
   }
 
   @Test
@@ -346,6 +358,104 @@ public class SampleDataProviderModelValidatorTestCase {
 
     validate();
     assertErrorMessages(equalTo("SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$PagingSampleDataProviderWithWrongAttributesType] is used on component 'superOperation' which is paged. The SampleDataProvider is thus expected to provide attributes of type 'java.lang.String' but it returns attributes of type 'void' instead"));
+  }
+
+  @Test
+  public void operationSamePayloadTypeUsingGenericsSampleDataProvider() {
+    mockComponent(operationModel, builder(SampleDataProviderWithGenerics.class),
+                  SampleDataProviderWithGenerics.class.getSimpleName());
+    ParameterizedType outputType = TypeUtils.parameterize(Map.class, String.class, Object.class);
+    when(operationModel.getOutput().getType()).thenReturn(typeLoader.load(outputType));
+    when(operationModel.getOutputAttributes().getType()).thenReturn(typeLoader.load(String.class));
+
+    validate();
+    assertNoErrors();
+  }
+
+  @Test
+  public void operationSamePayloadTypeUsingNestedGenericsSampleDataProvider() {
+    mockComponent(operationModel, builder(SampleDataProviderWithNestedGenerics.class),
+                  SampleDataProviderWithNestedGenerics.class.getSimpleName());
+    ParameterizedType listType = TypeUtils.parameterize(List.class, String.class);
+    ParameterizedType outputType = TypeUtils.parameterize(Map.class, String.class, listType);
+    when(operationModel.getOutput().getType()).thenReturn(typeLoader.load(outputType));
+    when(operationModel.getOutputAttributes().getType()).thenReturn(typeLoader.load(String.class));
+
+    validate();
+    assertNoErrors();
+  }
+
+  @Test
+  public void operationSamePayloadTypeUsingWrongGenericsSampleDataProvider() {
+    mockComponent(operationModel, builder(SampleDataProviderWithGenerics.class),
+                  SampleDataProviderWithGenerics.class.getSimpleName());
+    ParameterizedType outputType = TypeUtils.parameterize(Map.class, Integer.class, Object.class);
+    when(operationModel.getOutput().getType()).thenReturn(typeLoader.load(outputType));
+    when(operationModel.getOutputAttributes().getType()).thenReturn(typeLoader.load(String.class));
+
+    validate();
+    assertErrorMessages(equalTo("SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$SampleDataProviderWithGenerics] is used at component 'superOperation' which outputs a Result<java.util.Map<java.lang.Integer, java.lang.Object>, java.lang.String>, but the provider generic signature is '<java.util.Map<java.lang.String, java.lang.Object>, java.lang.String>'"));
+  }
+
+  @Test
+  public void operationSamePayloadTypeUsingWrongNestedGenericsSampleDataProvider() {
+    mockComponent(operationModel, builder(SampleDataProviderWithNestedGenerics.class),
+                  SampleDataProviderWithNestedGenerics.class.getSimpleName());
+    ParameterizedType listType = TypeUtils.parameterize(List.class, Object.class);
+    ParameterizedType outputType = TypeUtils.parameterize(Map.class, String.class, listType);
+    when(operationModel.getOutput().getType()).thenReturn(typeLoader.load(outputType));
+    when(operationModel.getOutputAttributes().getType()).thenReturn(typeLoader.load(String.class));
+
+    validate();
+    assertNoErrors();
+  }
+
+  @Test
+  public void boundParameterExists() {
+    providerBuilder.withInjectableParameter("actingParameter", STRING_TYPE, true, "someName");
+    when(operationModel.getModelProperty(SampleDataProviderFactoryModelProperty.class))
+        .thenReturn(of(providerBuilder.build()));
+
+    mockOperationProvider();
+
+    validate();
+    assertNoErrors();
+  }
+
+  @Test
+  public void boundParameterShouldExist() {
+    providerBuilder.withInjectableParameter("actingParameter", STRING_TYPE, true, "anotherName");
+    when(operationModel.getModelProperty(SampleDataProviderFactoryModelProperty.class))
+        .thenReturn(of(providerBuilder.build()));
+
+    mockOperationProvider();
+
+    validate();
+    assertProblems("The SampleDataProvider [ConnectedSampleDataProvider] declares to use a parameter 'anotherName' which doesn't exist in the operation 'superOperation'");
+  }
+
+  @Test
+  public void boundParameterFromExtractionExpressionExists() {
+    providerBuilder.withInjectableParameter("actingParameter", STRING_TYPE, true, "someName.someTag.@attribute");
+    when(operationModel.getModelProperty(SampleDataProviderFactoryModelProperty.class))
+        .thenReturn(of(providerBuilder.build()));
+
+    mockOperationProvider();
+
+    validate();
+    assertNoErrors();
+  }
+
+  @Test
+  public void boundParameterFromExtractionExpressionShouldExist() {
+    providerBuilder.withInjectableParameter("actingParameter", STRING_TYPE, true, "anotherName.nested.fields");
+    when(operationModel.getModelProperty(SampleDataProviderFactoryModelProperty.class))
+        .thenReturn(of(providerBuilder.build()));
+
+    mockOperationProvider();
+
+    validate();
+    assertProblems("The SampleDataProvider [ConnectedSampleDataProvider] declares to use a parameter 'anotherName' which doesn't exist in the operation 'superOperation'");
   }
 
   private void assertWrongGenerics(ConnectableComponentModel model,
@@ -487,6 +597,19 @@ public class SampleDataProviderModelValidatorTestCase {
     }
   }
 
+  public static class VoidReturnTypeSampleDataProvider implements SampleDataProvider<Void, Void> {
+
+    @Override
+    public String getId() {
+      return getClass().getSimpleName();
+    }
+
+    @Override
+    public Result<Void, Void> getSample() throws SampleDataException {
+      return null;
+    }
+  }
+
   public static class PagedInputStreamSampleDataProvider implements SampleDataProvider<List<InputStream>, String> {
 
     @Override
@@ -535,6 +658,32 @@ public class SampleDataProviderModelValidatorTestCase {
 
     @Override
     public Result<List<InputStream>, Void> getSample() throws SampleDataException {
+      return null;
+    }
+  }
+
+  public static class SampleDataProviderWithGenerics implements SampleDataProvider<Map<String, Object>, String> {
+
+    @Override
+    public String getId() {
+      return getClass().getSimpleName();
+    }
+
+    @Override
+    public Result<Map<String, Object>, String> getSample() throws SampleDataException {
+      return null;
+    }
+  }
+
+  public static class SampleDataProviderWithNestedGenerics implements SampleDataProvider<Map<String, List<String>>, String> {
+
+    @Override
+    public String getId() {
+      return getClass().getSimpleName();
+    }
+
+    @Override
+    public Result<Map<String, List<String>>, String> getSample() throws SampleDataException {
       return null;
     }
   }

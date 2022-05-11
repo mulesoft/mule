@@ -6,10 +6,10 @@
  */
 package org.mule.test.values.extension.resolver;
 
-import org.mule.runtime.extension.api.values.ValueBuilder;
-import org.mule.runtime.api.value.Value;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.values.ValueProvider;
+import org.mule.sdk.api.values.Value;
+import org.mule.sdk.api.values.ValueBuilder;
+import org.mule.sdk.api.values.ValueProvider;
 
 import java.util.Set;
 
@@ -21,5 +21,10 @@ public class WithRequiredParameterFromGroupValueProvider implements ValueProvide
   @Override
   public Set<Value> resolve() {
     return ValueBuilder.getValuesFor("anyParameter:" + anyParameter);
+  }
+
+  @Override
+  public String getId() {
+    return "WithRequiredParameterFromGroupValueProvider-id";
   }
 }

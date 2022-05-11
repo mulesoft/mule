@@ -6,14 +6,24 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static org.mule.maven.client.api.model.BundleScope.COMPILE;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
+import static org.mule.runtime.core.api.util.FileUtils.copyFile;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
+
+import static com.google.common.collect.Lists.newArrayList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
@@ -32,12 +42,6 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.maven.client.api.model.BundleScope.COMPILE;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
-import static org.mule.runtime.core.api.util.FileUtils.copyFile;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.model.BundleDescriptor;
@@ -69,10 +73,12 @@ import java.util.function.Supplier;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import io.qameta.allure.Description;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import io.qameta.allure.Description;
 
 public class DeployableMavenClassLoaderModelLoaderTestCase {
 
@@ -120,7 +126,7 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
     assertThat(classLoaderModel.getLocalResources(), hasItem("META-INF/maven/com/mycompany/test/pom.xml"));
 
     Optional<BundleDependency> mulePluginBundleDependency = classLoaderModel.getDependencies().stream().filter(
-                                                                                                               bundleDependency -> "mule-plugin"
+                                                                                                               bundleDependency -> MULE_PLUGIN_CLASSIFIER
                                                                                                                    .equals(bundleDependency
                                                                                                                        .getDescriptor()
                                                                                                                        .getClassifier()
@@ -210,7 +216,7 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
                                                               false);
 
     Optional<BundleDependency> mulePluginBundleDependency = classLoaderModel.getDependencies().stream().filter(
-                                                                                                               bundleDependency -> "mule-plugin"
+                                                                                                               bundleDependency -> MULE_PLUGIN_CLASSIFIER
                                                                                                                    .equals(bundleDependency
                                                                                                                        .getDescriptor()
                                                                                                                        .getClassifier()
@@ -364,7 +370,7 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
 
     ClassLoaderModel classLoaderModel = buildClassLoaderModel(app);
     assertThat(classLoaderModel.getUrls().length, equalTo(5));
-    for (int i = 1; i < classLoaderModel.getUrls().length; i++) { //The first one does not count because it's the main artifact.
+    for (int i = 1; i < classLoaderModel.getUrls().length; i++) { // The first one does not count because it's the main artifact.
       org.mule.maven.client.api.model.BundleDependency dependency = resolvedDependencies.get(i - 1);
       URL url = getDummyUriFor(dependency.getDescriptor().getGroupId(),
                                dependency.getDescriptor().getArtifactId(),
@@ -463,7 +469,7 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
                                                  Map<String, Object> attributes)
       throws InvalidDescriptorLoaderException {
     DeployableMavenClassLoaderModelLoader deployableMavenClassLoaderModelLoader =
-        new DeployableMavenClassLoaderModelLoader(mockMavenClient, supplier);
+        new DeployableMavenClassLoaderModelLoader(of(mockMavenClient), supplier);
 
     Map<String, Object> mergedAttributes =
         ImmutableMap.<String, Object>builder()
@@ -483,7 +489,7 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
   public ClassLoaderModel buildPluginClassLoaderModel(File pluginLocation, Map<String, Object> attributes)
       throws InvalidDescriptorLoaderException {
     PluginMavenClassLoaderModelLoader pluginMavenClassLoaderModelLoader =
-        new PluginMavenClassLoaderModelLoader(mockMavenClient);
+        new PluginMavenClassLoaderModelLoader(of(mockMavenClient));
 
     return pluginMavenClassLoaderModelLoader.load(pluginLocation, attributes, PLUGIN);
 

@@ -4,22 +4,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.module.deployment.impl.internal.plugin;
+
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
+import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toSet;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
-import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginLocalDependenciesBlacklist.isBlacklisted;
 
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.deployment.model.internal.plugin.DuplicateExportedPackageException;
-import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
-import org.mule.runtime.deployment.model.internal.plugin.PluginResolutionError;
+import org.mule.runtime.deployment.model.api.plugin.resolver.DuplicateExportedPackageException;
+import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
+import org.mule.runtime.deployment.model.api.plugin.resolver.PluginResolutionError;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
@@ -38,10 +38,10 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Resolves plugin dependencies considering the plugin name only.
@@ -60,16 +60,16 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
    * plugin).
    *
    * @param artifactDescriptorFactory factory to create {@link ArtifactPluginDescriptor} when there's a missing dependency to
-   *        resolve
+   *                                  resolve
    */
   public BundlePluginDependenciesResolver(ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory) {
     this.artifactDescriptorFactory = artifactDescriptorFactory;
   }
 
   @Override
-  public List<ArtifactPluginDescriptor> resolve(
-                                                Set<ArtifactPluginDescriptor> providedPluginDescriptors,
-                                                List<ArtifactPluginDescriptor> descriptors, boolean isDomain) {
+  public List<ArtifactPluginDescriptor> resolve(Set<ArtifactPluginDescriptor> providedPluginDescriptors,
+                                                List<ArtifactPluginDescriptor> descriptors, boolean isDomain)
+      throws PluginResolutionError {
 
     List<ArtifactPluginDescriptor> resolvedPlugins = resolvePluginsDependencies(descriptors);
 
@@ -190,7 +190,8 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
    * Goes over the elements in the {@code pluginDescriptors} collection looking if it hasn't been resolved yet.
    *
    * @param pluginDescriptors plugins to validate.
-   * @param visited plugins that are already resolved (by either the container or application initially, or by the resolver).
+   * @param visited           plugins that are already resolved (by either the container or application initially, or by the
+   *                          resolver).
    * @return the plugins that were obtained initially plus all the ones that were found.
    */
   private List<ArtifactPluginDescriptor> getArtifactsWithDependencies(List<ArtifactPluginDescriptor> pluginDescriptors,
@@ -223,7 +224,7 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
                                      pluginDescriptor.getBundleDescriptor(), dependency.getDescriptor(),
                                      artifactPluginDescriptorResolved.getBundleDescriptor()));
                     ClassLoaderModel originalClassLoaderModel = pluginDescriptor.getClassLoaderModel();
-                    boolean includeLocals = !isBlacklisted(pluginDescriptor.getBundleDescriptor());
+                    boolean includeLocals = !isDenylisted(pluginDescriptor.getBundleDescriptor());
                     pluginDescriptor
                         .setClassLoaderModel(createBuilderWithoutDependency(originalClassLoaderModel, dependency, includeLocals)
                             .dependingOn(ImmutableSet.of(
@@ -284,7 +285,7 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
     ClassLoaderModel originalClassLoaderModel = pluginDescriptor.getClassLoaderModel();
     final Set<String> exportedClassPackages = new HashSet<>(originalClassLoaderModel.getExportedPackages());
     exportedClassPackages.removeAll(packagesExportedByDependencies);
-    boolean includeLocals = !isBlacklisted(pluginDescriptor.getBundleDescriptor());
+    boolean includeLocals = !isDenylisted(pluginDescriptor.getBundleDescriptor());
     pluginDescriptor.setClassLoaderModel(createBuilderWithoutExportedPackages(originalClassLoaderModel, includeLocals)
         .exportingPackages(exportedClassPackages).build());
   }

@@ -6,31 +6,32 @@
  */
 package org.mule.runtime.deployment.model.internal.tooling;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.tooling.ToolingRegionClassLoader.newToolingRegionClassLoader;
+
+import static java.lang.String.format;
+import static java.util.Collections.emptySet;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
+import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
+import org.mule.runtime.deployment.model.api.plugin.resolver.PluginResolutionError;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
-import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
-import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
-import org.mule.runtime.deployment.model.internal.plugin.PluginResolutionError;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
-import com.google.common.collect.ImmutableList;
-
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Given an {@link ArtifactPluginDescriptor} as a starting point, it will generate a {@link ArtifactClassLoader} capable of
@@ -48,7 +49,7 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
 
   private static final String TOOLING_EXTENSION_MODEL = "tooling-extension-model";
   private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
-  private ArtifactPluginDescriptor artifactPluginDescriptor;
+  private final ArtifactPluginDescriptor artifactPluginDescriptor;
   private final PluginDependenciesResolver pluginDependenciesResolver;
 
   private ArtifactClassLoader parentClassLoader;
@@ -57,9 +58,9 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
    * {@inheritDoc}
    *
    * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes
-   * @param artifactPluginDescriptor desired plugin to generate an {@link ArtifactClassLoader} for.
+   * @param artifactPluginDescriptor   desired plugin to generate an {@link ArtifactClassLoader} for.
    * @param pluginDependenciesResolver resolver for the plugins on which the {@code artifactPluginDescriptor} declares it depends.
-   * @param pluginClassLoadersFactory creates the class loaders for the plugins included in the policy's region. Non null
+   * @param pluginClassLoadersFactory  creates the class loaders for the plugins included in the policy's region. Non null
    * @see #build()
    */
   public ToolingPluginClassLoaderBuilder(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
@@ -74,13 +75,13 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
 
   @Override
   protected ArtifactClassLoader createArtifactClassLoader(String artifactId, RegionClassLoader regionClassLoader) {
-    return artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor, artifactPluginClassLoaders);
+    return artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor);
   }
 
   /**
    * @param parentClassLoader parent class loader for the artifact class loader that should have all the {@link URL}s needed from
-   *        tooling side when loading the {@link ExtensionModel}. Among those, there will be mule-api, extensions-api,
-   *        extensions-support and so on.
+   *                          tooling side when loading the {@link ExtensionModel}. Among those, there will be mule-api,
+   *                          extensions-api, extensions-support and so on.
    * @return the builder
    */
   public ToolingPluginClassLoaderBuilder setParentClassLoader(ArtifactClassLoader parentClassLoader) {
@@ -99,7 +100,7 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
   }
 
   @Override
-  public ToolingArtifactClassLoader build() throws IOException {
+  public ToolingArtifactClassLoader build() {
     setArtifactDescriptor(new ArtifactDescriptor(TOOLING_EXTENSION_MODEL));
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
         pluginDependenciesResolver
@@ -125,9 +126,9 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
   }
 
   /**
-   * @param artifactPluginDescriptor to look for within the collection of {@link ArtifactClassLoader}s
+   * @param artifactPluginDescriptor   to look for within the collection of {@link ArtifactClassLoader}s
    * @param artifactPluginClassLoaders plugins class loaders to look for, at least one of them must contain the
-   *        {@code pluginDescriptor}.
+   *                                   {@code pluginDescriptor}.
    * @return the {@link ArtifactClassLoader} that was generated for the {@code artifactPluginDescriptor}
    * @throws PluginResolutionError if the plugin wasn't found in the collection of {@code artifactPluginClassLoaders}
    */

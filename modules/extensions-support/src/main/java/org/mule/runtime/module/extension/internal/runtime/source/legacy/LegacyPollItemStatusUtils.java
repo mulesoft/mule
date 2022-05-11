@@ -16,10 +16,11 @@ import org.mule.runtime.extension.api.runtime.source.PollContext;
 public class LegacyPollItemStatusUtils {
 
   /**
-   * Gives the correspondent {@link PollContext.PollItemStatus} to the give {@link org.mule.sdk.api.runtime.source.PollContext.PollItemStatus}
+   * Gives the correspondent {@link PollContext.PollItemStatus} to the give
+   * {@link org.mule.sdk.api.runtime.source.PollContext.PollItemStatus}
    *
-   * @param pollItemStatus  a {@link org.mule.sdk.api.runtime.source.PollContext.PollItemStatus}
-   * @return                the correspondent {@link PollContext.PollItemStatus}
+   * @param pollItemStatus a {@link org.mule.sdk.api.runtime.source.PollContext.PollItemStatus}
+   * @return the correspondent {@link PollContext.PollItemStatus}
    */
   public static PollContext.PollItemStatus from(org.mule.sdk.api.runtime.source.PollContext.PollItemStatus pollItemStatus) {
     switch (pollItemStatus) {

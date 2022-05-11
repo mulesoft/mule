@@ -38,8 +38,8 @@ import javax.inject.Named;
 import org.slf4j.Logger;
 
 /**
- * Contains base logic for extensions which require OAuth authentication. It tracks and handles the obtained
- * tokens and provides base functionality.
+ * Contains base logic for extensions which require OAuth authentication. It tracks and handles the obtained tokens and provides
+ * base functionality.
  * <p>
  * One concrete implementation of this class must exist per each supported grant type.
  *

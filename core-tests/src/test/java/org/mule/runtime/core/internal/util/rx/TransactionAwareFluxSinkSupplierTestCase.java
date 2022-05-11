@@ -7,25 +7,38 @@
 package org.mule.runtime.core.internal.util.rx;
 
 
+import static java.util.concurrent.Executors.newFixedThreadPool;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.IsIterableContaining.hasItem;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static java.util.Collections.synchronizedSet;
+import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.TX_SCOPES_KEY;
+import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.popTxFromSubscriberContext;
+import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.pushTxToSubscriberContext;
+import static reactor.util.context.Context.empty;
 
-import org.junit.Before;
-import org.junit.Test;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+
+import io.qameta.allure.Issue;
+import org.junit.Before;
+import org.junit.Test;
 import reactor.core.publisher.FluxSink;
+import reactor.util.context.Context;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 public class TransactionAwareFluxSinkSupplierTestCase {
 
@@ -63,6 +76,26 @@ public class TransactionAwareFluxSinkSupplierTestCase {
     }
   }
 
+  @Issue("MULE-19937")
+  @Test
+  public void returnsNewSinkWhenInTxByContext() {
+    Context ctx = pushTxToSubscriberContext("location").apply(empty());
+    FluxSink supplied = txSupplier.get(ctx);
+    // Assert is another sink
+    assertThat(supplied, is(not(sameInstance(mockSink))));
+    // Assert that supplied for same thread supplies same sink
+    assertThat(txSupplier.get(ctx), is(sameInstance(supplied)));
+  }
+
+  @Issue("MULE-19937")
+  @Test
+  public void txIsHandledCorrectlyInContext() {
+    Context ctx = pushTxToSubscriberContext("location").apply(empty());
+    assertThat(ctx.<Deque<String>>get(TX_SCOPES_KEY), hasItem("location"));
+    ctx = popTxFromSubscriberContext().apply(ctx);
+    assertThat(ctx.<Deque<String>>get(TX_SCOPES_KEY), not(hasItem("location")));
+  }
+
   @Test
   public void newSinkPerThread() throws Exception {
     List<Thread> threads = new ArrayList<>();
@@ -75,7 +108,7 @@ public class TransactionAwareFluxSinkSupplierTestCase {
             TransactionCoordination.getInstance().bindTransaction(tx);
             FluxSink sink = txSupplier.get();
             // Assert that supplied for same thread supplies same sink
-            assertThat(txSupplier.get(), is(sink));
+            assertThat(txSupplier.get(), is(sameInstance(sink)));
             sinks.add(sink);
           } finally {
             TransactionCoordination.getInstance().unbindTransaction(tx);
@@ -93,6 +126,30 @@ public class TransactionAwareFluxSinkSupplierTestCase {
     for (Thread t : threads) {
       t.join();
     }
+
+    // Every thread created has a different sink
+    assertThat(sinks, hasSize(THREAD_TEST));
+  }
+
+  @Issue("MULE-19937")
+  @Test
+  public void newSinkPerThreadWithContext() throws Exception {
+    Set<FluxSink> sinks = synchronizedSet(new HashSet<>());
+    Context ctx = pushTxToSubscriberContext("location").apply(empty());
+
+    ExecutorService executorService = newFixedThreadPool(THREAD_TEST);
+    try {
+      for (int i = 0; i < THREAD_TEST; i++) {
+        executorService.submit(() -> {
+          FluxSink sink = txSupplier.get(ctx);
+          sinks.add(sink);
+        });
+      }
+    } finally {
+      executorService.shutdown();
+    }
+
+    executorService.awaitTermination(5, SECONDS);
 
     // Every thread created has a different sink
     assertThat(sinks, hasSize(THREAD_TEST));

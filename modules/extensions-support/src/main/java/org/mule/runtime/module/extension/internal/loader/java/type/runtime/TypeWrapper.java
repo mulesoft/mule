@@ -59,14 +59,15 @@ public class TypeWrapper implements Type {
   private LazyValue<Boolean> instantiable;
 
   public TypeWrapper(Class<?> aClass, ClassTypeLoader typeLoader) {
-    this.aClass = aClass;
+    this.aClass = aClass != null ? aClass : Object.class;
     instantiable = new LazyValue<>(() -> IntrospectionUtils.isInstantiable(aClass, new ReflectionCache()));
     this.type = aClass;
     this.typeLoader = typeLoader;
   }
 
   public TypeWrapper(ResolvableType resolvableType, ClassTypeLoader typeLoader) {
-    this.aClass = resolvableType.resolve();
+    Class<?> resolvedTypeClass = resolvableType.resolve();
+    this.aClass = resolvedTypeClass != null ? resolvedTypeClass : Object.class;
     instantiable = new LazyValue<>(() -> IntrospectionUtils.isInstantiable(aClass, new ReflectionCache()));
     this.type = resolvableType.getType();
     this.generics = new ArrayList<>();
@@ -142,8 +143,8 @@ public class TypeWrapper implements Type {
   }
 
   /**
-  * {@inheritDoc}
-  */
+   * {@inheritDoc}
+   */
   @Override
   public List<FieldElement> getAnnotatedFields(Class<? extends Annotation>... annotations) {
     return getFields().stream().filter(field -> of(annotations).anyMatch(field::isAnnotatedWith)).collect(toList());
@@ -160,7 +161,7 @@ public class TypeWrapper implements Type {
 
   @Override
   public boolean isAssignableFrom(Class<?> clazz) {
-    return aClass != null && aClass.isAssignableFrom(clazz);
+    return aClass.isAssignableFrom(clazz);
   }
 
   @Override
@@ -174,7 +175,7 @@ public class TypeWrapper implements Type {
 
   @Override
   public boolean isAssignableTo(Class<?> clazz) {
-    return aClass != null && clazz.isAssignableFrom(aClass);
+    return clazz.isAssignableFrom(aClass);
   }
 
   @Override
@@ -204,6 +205,16 @@ public class TypeWrapper implements Type {
   @Override
   public String getTypeName() {
     return aClass.getTypeName();
+  }
+
+  @Override
+  public Optional<Type> getSuperType() {
+    Class<?> superClass = aClass.getSuperclass();
+    if (superClass == null || Object.class.equals(superClass)) {
+      return empty();
+    }
+
+    return Optional.of(new TypeWrapper(superClass, typeLoader));
   }
 
   @Override

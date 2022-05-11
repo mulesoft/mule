@@ -20,8 +20,8 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 /**
- * {@link TypeKeysResolver} implementation which resolves automatically {@link MetadataKey}s for {@link Enum} based
- * MetadataKey Id parameters.
+ * {@link TypeKeysResolver} implementation which resolves automatically {@link MetadataKey}s for {@link Enum} based MetadataKey Id
+ * parameters.
  *
  * @since 4.0
  * @see TypeKeysResolver
@@ -32,7 +32,7 @@ public final class EnumKeyResolver implements TypeKeysResolver {
   private final String categoryName;
 
   /**
-   * @param anEnum An {@link Enum} represented by a {@link EnumAnnotation} of a {@link MetadataType}
+   * @param anEnum       An {@link Enum} represented by a {@link EnumAnnotation} of a {@link MetadataType}
    * @param categoryName Category name of the current {@link TypeKeysResolver}
    */
   EnumKeyResolver(EnumAnnotation anEnum, String categoryName) {

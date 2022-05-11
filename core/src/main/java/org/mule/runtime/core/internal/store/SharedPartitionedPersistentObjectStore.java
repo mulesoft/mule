@@ -20,9 +20,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 
 /**
- * Extends {@link PartitionedPersistentObjectStore} in order to allow using a shared path where OS data will be persisted.
- * This means also that if this is used by different MuleContext they will share the OS data. It should not be used
- * in the context of deployable artifacts, only Tooling uses this implementation.
+ * Extends {@link PartitionedPersistentObjectStore} in order to allow using a shared path where OS data will be persisted. This
+ * means also that if this is used by different MuleContext they will share the OS data. It should not be used in the context of
+ * deployable artifacts, only Tooling uses this implementation.
  *
  * @param <T> the serializable entity to be persisted by OS
  *
@@ -33,22 +33,24 @@ public class SharedPartitionedPersistentObjectStore<T extends Serializable> exte
   public static final String SHARED_PERSISTENT_OBJECT_STORE_KEY = "_defaultSharedPersistentObjectStore";
 
   /**
-   * Uses an static field to control access from different instances of this partitioned persistent object store
-   * between different deploymennts, registries.
+   * Uses an static field to control access from different instances of this partitioned persistent object store between different
+   * deploymennts, registries.
    */
   private static Map<String, PersistentObjectStorePartition> partitionsByName =
       new ConcurrentHashMap<String, PersistentObjectStorePartition>() {
 
         @Override
         public PersistentObjectStorePartition put(String key, PersistentObjectStorePartition value) {
-          // Creates an instance of the information to avoid referencing to the muleContext as the same persistentObjectStorePartition
+          // Creates an instance of the information to avoid referencing to the muleContext as the same
+          // persistentObjectStorePartition
           // is used by different muleContexts
           return super.put(key, new PersistentObjectStorePartitionData(value.getPartitionName(), value.getPartitionDirectory()));
         }
 
         @Override
         public PersistentObjectStorePartition putIfAbsent(String key, PersistentObjectStorePartition value) {
-          // Creates an instance of the information to avoid referencing to the muleContext as the same persistentObjectStorePartition
+          // Creates an instance of the information to avoid referencing to the muleContext as the same
+          // persistentObjectStorePartition
           // is used by different muleContexts
           return super.putIfAbsent(key, new PersistentObjectStorePartitionData(value.getPartitionName(),
                                                                                value.getPartitionDirectory()));
@@ -62,7 +64,8 @@ public class SharedPartitionedPersistentObjectStore<T extends Serializable> exte
    * Creates a shared partitioned persistent object store.
    *
    * @param workingDirectory {@link File} where to store this OS data. Not null.
-   * @param lockFactory {@link LockFactory} an external lock factory to synchronize the access to this partitioned persistent object store.
+   * @param lockFactory      {@link LockFactory} an external lock factory to synchronize the access to this partitioned persistent
+   *                         object store.
    */
   public SharedPartitionedPersistentObjectStore(File workingDirectory, LockFactory lockFactory) {
     super(partitionsByName);
@@ -74,7 +77,8 @@ public class SharedPartitionedPersistentObjectStore<T extends Serializable> exte
   @Override
   protected PersistentObjectStorePartition<T> getPartitionObjectStore(String partitionName) throws ObjectStoreException {
     PersistentObjectStorePartition<T> partitionObjectStore = super.getPartitionObjectStore(partitionName);
-    // Create a new PersistentObjectStorePartition that references to the current muleContext to deserialize an entry that was added
+    // Create a new PersistentObjectStorePartition that references to the current muleContext to deserialize an entry that was
+    // added
     // by another muleContext (serialization)
     return new PersistentObjectStorePartition<>(muleContext, partitionName, partitionObjectStore.getPartitionDirectory());
   }
@@ -93,6 +97,11 @@ public class SharedPartitionedPersistentObjectStore<T extends Serializable> exte
   public void open(String partitionName) throws ObjectStoreException {
     lock.lock();
     try {
+      // As partitions are stored in an static field in order to be shared between deployments/muleContext, when a partition
+      // is opened we would need to validate if what we have in memory is still valid and partition still exists in FS.
+      if (partitionsByName.containsKey(partitionName) && !partitionsByName.get(partitionName).getPartitionDirectory().exists()) {
+        partitionsByName.remove(partitionName);
+      }
       super.open(partitionName);
     } finally {
       lock.unlock();

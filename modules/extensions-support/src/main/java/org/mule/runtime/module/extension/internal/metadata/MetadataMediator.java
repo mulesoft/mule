@@ -15,11 +15,15 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADA
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
+
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ComponentModelVisitor;
 import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
+import org.mule.runtime.api.meta.model.nested.NestedChainModel;
+import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
+import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -57,12 +61,12 @@ import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Resolves a Component's Metadata by coordinating the several moving parts that are affected by the Metadata fetching process, so
@@ -112,12 +116,11 @@ public final class MetadataMediator<T extends ComponentModel> {
    * representing them as a list of {@link MetadataKey}.
    * <p>
    * If no {@link MetadataKeyId} is present in the component's input parameters, then a {@link NullMetadataKey} is returned.
-   * Otherwise, the {@link TypeKeysResolver#getKeys} associated with the current Component will be invoked to obtain
-   * the keys
+   * Otherwise, the {@link TypeKeysResolver#getKeys} associated with the current Component will be invoked to obtain the keys
    *
    * @param context current {@link MetadataContext} that will be used by the {@link TypeKeysResolver}
    * @return Successful {@link MetadataResult} if the keys are obtained without errors Failure {@link MetadataResult} when no
-   * Dynamic keys are a available or the retrieval fails for any reason
+   *         Dynamic keys are a available or the retrieval fails for any reason
    */
   public MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataContext context, ReflectionCache reflectionCache) {
     return keysDelegate.getMetadataKeys(context, reflectionCache);
@@ -146,13 +149,12 @@ public final class MetadataMediator<T extends ComponentModel> {
   }
 
   /**
-   * Resolves the {@link ComponentMetadataDescriptor} for the associated {@code context} using the specified
-   * {@code key}
+   * Resolves the {@link ComponentMetadataDescriptor} for the associated {@code context} using the specified {@code key}
    *
    * @param context current {@link MetadataContext} that will be used by the metadata resolvers.
    * @param key     {@link MetadataKey} of the type which's structure has to be resolved, used both for input and output types
    * @return Successful {@link MetadataResult} if the MetadataTypes are resolved without errors Failure {@link MetadataResult}
-   * when the Metadata retrieval of any element fails for any reason
+   *         when the Metadata retrieval of any element fails for any reason
    */
   public MetadataResult<ComponentMetadataDescriptor<T>> getMetadata(MetadataContext context, MetadataKey key) {
     try {
@@ -253,8 +255,8 @@ public final class MetadataMediator<T extends ComponentModel> {
    * Resolves the {@link ComponentMetadataDescriptor} for the associated {@code context} using static and dynamic resolving of the
    * Component parameters, attributes and output.
    *
-   * @param context current {@link MetadataContext} that will be used by the {@link InputTypeResolver} and
-   *        {@link OutputTypeResolver}
+   * @param context  current {@link MetadataContext} that will be used by the {@link InputTypeResolver} and
+   *                 {@link OutputTypeResolver}
    * @param keyValue {@link Object} resolved {@link MetadataKey} object
    * @return Successful {@link MetadataResult} if the MetadataTypes are resolved without errors Failure {@link MetadataResult}
    *         when the Metadata retrieval of any element fails for any reason
@@ -294,7 +296,7 @@ public final class MetadataMediator<T extends ComponentModel> {
   /**
    * Returns a {@link ComponentModel} with its types resolved.
    *
-   * @param inputMetadataDescriptor {@link InputMetadataDescriptor} describes the input parameters of the component
+   * @param inputMetadataDescriptor  {@link InputMetadataDescriptor} describes the input parameters of the component
    * @param outputMetadataDescriptor {@link OutputMetadataDescriptor} describes the component output
    * @return model with its types resolved by the metadata resolution process
    */
@@ -318,6 +320,7 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                        constructModel.getDisplayModel().orElse(null),
                                                        constructModel.getErrorModels(),
                                                        constructModel.getStereotype(),
+                                                       constructModel.getVisibility(),
                                                        constructModel.getModelProperties(),
                                                        constructModel.getDeprecationModel().orElse(null)));
       }
@@ -342,6 +345,7 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                        operationModel.getDisplayModel().orElse(null),
                                                        operationModel.getErrorModels(),
                                                        operationModel.getStereotype(),
+                                                       operationModel.getVisibility(),
                                                        operationModel.getModelProperties(),
                                                        operationModel.getNotificationModels(),
                                                        operationModel.getDeprecationModel().orElse(null)));
@@ -376,9 +380,26 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                     sourceModel.supportsStreaming(),
                                                     sourceModel.getDisplayModel().orElse(null),
                                                     sourceModel.getStereotype(),
-                                                    sourceModel.getErrorModels(), sourceModel.getModelProperties(),
+                                                    sourceModel.getErrorModels(),
+                                                    sourceModel.getVisibility(),
+                                                    sourceModel.getModelProperties(),
                                                     sourceModel.getNotificationModels(),
                                                     sourceModel.getDeprecationModel().orElse(null)));
+      }
+
+      @Override
+      public void visit(NestedComponentModel model) {
+        // no-op
+      }
+
+      @Override
+      public void visit(NestedChainModel model) {
+        // no-op
+      }
+
+      @Override
+      public void visit(NestedRouteModel model) {
+        // no-op
       }
     });
 

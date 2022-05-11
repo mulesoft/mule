@@ -7,27 +7,28 @@
 
 package org.mule.functional.junit4;
 
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
+import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
+
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
-import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
 
 import org.mule.functional.services.NullPolicyProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.service.Service;
+import org.mule.runtime.config.internal.ComponentBuildingDefinitionRegistryFactoryAware;
 import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegistryFactory;
-import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
+import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;
@@ -54,6 +55,7 @@ import java.util.Optional;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
+import org.junit.runners.BlockJUnit4ClassRunner;
 
 /**
  * Base class for running {@link FunctionalTestCase} with class loader isolation using {@link ArtifactClassLoaderRunner}, a JUnit
@@ -67,17 +69,16 @@ import org.junit.runner.RunWith;
  * The classification for {@link ClassLoader}s would be based on dependencies scope, provided will go to the container, compile to
  * plugin and test to the application. For more information about the classification process see {@link ClassPathClassifier}.
  * <p/>
- * For plugins it will scan the plugin set of {@link java.net.URL}s to search for classes annotated with
- * {@link org.mule.runtime.extension.api.annotation.Extension}, if a class is annotated it will generate the metadata for the
- * extension in runtime and it will also register it to the {@link org.mule.runtime.core.api.extension.ExtensionManager}. Non
- * extension plugins will set its filter based on {@code mule-module.properties} file.
+ * For plugins it will scan the plugin set of {@link java.net.URL}s to search for classes annotated with {@link Extension} or
+ * {@link org.mule.sdk.api.annotation.Extension}, if a class is annotated it will generate the metadata for the extension in
+ * runtime an it will also register it to the {@link ExtensionManager}. Non extension plugins will set its filter based on
+ * {@code mule-module.properties} file.
  * <p/>
- * By default this test runs internally with a {@link org.junit.runners.BlockJUnit4ClassRunner} runner. On those cases where the
- * test has to be run with another runner the {@link RunnerDelegateTo} should be used to define it.
+ * By default this test runs internally with a {@link BlockJUnit4ClassRunner} runner. On those cases where the test has to be run
+ * with another runner the {@link RunnerDelegateTo} should be used to define it.
  * <p/>
  * {@link PluginClassLoadersAware} will define that this class also needs to get access to plugin {@link ArtifactClassLoader} in
- * order to load extension classes (they are not exposed to the application) for registering them to the
- * {@link org.mule.runtime.core.api.extension.ExtensionManager}.
+ * order to load extension classes (they are not exposed to the application) for registering them to the {@link ExtensionManager}.
  * <p/>
  * Due to the cost of reading the classpath, scanning the dependencies and classes to generate the {@link ClassLoader} is high,
  * this runner will hold an static reference to the {@link ClassLoader} created for the first test and will use the same during
@@ -111,8 +112,8 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   private static IsolatedClassLoaderExtensionsManagerConfigurationBuilder extensionsManagerConfigurationBuilder;
   /**
    * This is the {@link IsolatedClassLoaderExtensionsManagerConfigurationBuilder} used when there is a need to reload the
-   * extension models for a specific test class. When {@link #mustRegenerateExtensionModels()} returns true, the extension
-   * models will be reloaded and this configuration builder will be used.
+   * extension models for a specific test class. When {@link #mustRegenerateExtensionModels()} returns true, the extension models
+   * will be reloaded and this configuration builder will be used.
    */
   private static IsolatedClassLoaderExtensionsManagerConfigurationBuilder reloadableExtensionsManagerConfigurationBuilder;
 
@@ -177,6 +178,14 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     createServiceManager();
   }
 
+  /**
+   * @return The discovered {@link Service services} {@link ArtifactClassLoader classloaders}
+   * @since 4.5.0
+   */
+  public static List<ArtifactClassLoader> getServiceClassLoaders() {
+    return serviceClassLoaders;
+  }
+
   @ContainerClassLoaderAware
   private static final void setContainerClassLoader(ClassLoader containerClassLoader) {
     if (containerClassLoader == null) {
@@ -203,11 +212,18 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     ArtifactFunctionalTestCase.applicationClassLoader = applicationClassLoader;
   }
 
+  /**
+   * @return The application {@link ArtifactClassLoader}
+   * @since 4.5.0
+   */
+  public static ClassLoader getApplicationClassLoader() {
+    return applicationClassLoader;
+  }
+
   @Override
   protected ConfigurationBuilder getBuilder() throws Exception {
     ConfigurationBuilder builder = super.getBuilder();
-    assertThat(builder.getClass().getName(), is("org.mule.runtime.config.internal.SpringXmlConfigurationBuilder"));
-    configureSpringXmlConfigurationBuilder(builder);
+    configureSpringConfigurationBuilder(builder);
     return builder;
   }
 
@@ -215,7 +231,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
    * Returns an instance of a given service if available
    *
    * @param serviceClass class of service to look for. Non null.
-   * @param <T> service class
+   * @param <T>          service class
    * @return an instance of the provided service type if it was declared as a dependency on the test, null otherwise.
    */
   protected <T extends Service> T getService(Class<T> serviceClass) {
@@ -225,14 +241,15 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     return service.isPresent() ? (T) service.get() : null;
   }
 
-  protected void configureSpringXmlConfigurationBuilder(ConfigurationBuilder builder) {
+  protected void configureSpringConfigurationBuilder(ConfigurationBuilder builder) {
     builder.addServiceConfigurator(serviceConfigurator);
-    if (builder instanceof SpringXmlConfigurationBuilder) {
-      if (mustRegenerateComponentBuildingDefinitionRegistryFactory() || mustRegenerateExtensionModels()) {
-        ((SpringXmlConfigurationBuilder) builder)
+    if (builder instanceof ComponentBuildingDefinitionRegistryFactoryAware) {
+      if (mustRegenerateComponentBuildingDefinitionRegistryFactory()
+          || mustRegenerateExtensionModels()) {
+        ((ComponentBuildingDefinitionRegistryFactoryAware) builder)
             .setComponentBuildingDefinitionRegistryFactory(new DefaultComponentBuildingDefinitionRegistryFactory());
       } else {
-        ((SpringXmlConfigurationBuilder) builder)
+        ((ComponentBuildingDefinitionRegistryFactoryAware) builder)
             .setComponentBuildingDefinitionRegistryFactory(componentBuildingDefinitionRegistryFactory);
       }
     }
@@ -250,8 +267,8 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   }
 
   /**
-   * Adds a {@link ConfigurationBuilder} that sets the {@link org.mule.runtime.core.api.extension.ExtensionManager} into the
-   * {@link #muleContext}. This {@link ConfigurationBuilder} is set as the first element of the {@code builders} {@link List}
+   * Adds a {@link ConfigurationBuilder} that sets the {@link ExtensionManager} into the {@link #muleContext}. This
+   * {@link ConfigurationBuilder} is set as the first element of the {@code builders} {@link List}
    *
    * @param builders the list of {@link ConfigurationBuilder}s that will be used to initialise the {@link #muleContext}
    */
@@ -286,17 +303,6 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
                                                                         new NullPolicyProvider());
       }
     });
-  }
-
-  /**
-   * Subclasses can override this method so that extension models used are regenerated before running its tests. For example,
-   * some part of a extension model might only be created if a certain system property is in place, so the test classes that
-   * test that feature will have to generate the extension model when the property is already set.
-   *
-   * @return whether the tests on this class need for extensions model to be generated again.
-   */
-  protected boolean mustRegenerateExtensionModels() {
-    return false;
   }
 
   /**

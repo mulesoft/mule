@@ -29,20 +29,14 @@ import javax.inject.Inject;
 public class ExpressionTypedValueValueResolver<T> extends ExpressionValueResolver<TypedValue<T>> implements Initialisable {
 
   private final Class<T> expectedClass;
-  private final boolean content;
   private TypeSafeTransformer typeSafeTransformer;
 
   @Inject
   private TransformationService transformationService;
 
   public ExpressionTypedValueValueResolver(String expression, Class<T> expectedClass) {
-    this(expression, expectedClass, false);
-  }
-
-  public ExpressionTypedValueValueResolver(String expression, Class<T> expectedClass, boolean content) {
     super(expression, DataType.fromType(expectedClass));
     this.expectedClass = expectedClass;
-    this.content = content;
   }
 
   @Override
@@ -68,10 +62,5 @@ public class ExpressionTypedValueValueResolver<T> extends ExpressionValueResolve
   public void initialise() throws InitialisationException {
     super.initialise();
     this.typeSafeTransformer = new TypeSafeTransformer(transformationService);
-  }
-
-  @Override
-  public boolean isContent() {
-    return content;
   }
 }

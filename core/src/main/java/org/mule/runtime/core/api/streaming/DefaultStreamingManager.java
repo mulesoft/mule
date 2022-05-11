@@ -6,16 +6,19 @@
  */
 package org.mule.runtime.core.api.streaming;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.String.format;
-import static java.lang.System.getProperty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STREAMING_STATISTICS;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.core.privileged.util.EventUtils.getRoot;
+
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.String.format;
+import static java.lang.System.getProperty;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoExtend;
@@ -23,7 +26,6 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.util.Pair;
@@ -74,9 +76,6 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   private MuleContext muleContext;
 
   @Inject
-  private SchedulerService schedulerService;
-
-  @Inject
   private StreamingGhostBuster ghostBuster;
 
   /**
@@ -99,8 +98,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   }
 
   private ByteBufferManager createByteBufferManager() throws InitialisationException {
-    CompositeClassLoader classLoader =
-        new CompositeClassLoader(getClass().getClassLoader(), muleContext.getExecutionClassLoader());
+    CompositeClassLoader classLoader = from(getClass().getClassLoader(), muleContext.getExecutionClassLoader());
     ByteBufferManagerFactory factory;
     try {
       factory = (ByteBufferManagerFactory) instantiateClass(BUFFER_MANAGER_FACTORY_CLASS, new Object[] {}, classLoader);

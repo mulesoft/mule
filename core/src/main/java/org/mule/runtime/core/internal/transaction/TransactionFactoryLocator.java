@@ -22,8 +22,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * Locator which given a {@link TransactionType} will locates through SPI a {@link TransactionFactory} able to handle
- * that kind of of transaction.
+ * Locator which given a {@link TransactionType} will locates through SPI a {@link TransactionFactory} able to handle that kind of
+ * of transaction.
  *
  * @since 4.0
  */
@@ -34,8 +34,8 @@ public final class TransactionFactoryLocator implements Disposable {
   private boolean initialized = false;
 
   /**
-   * Given a {@link TransactionType} will look through SPI a {@link TransactionFactory} able to handle that kind of
-   * of transaction.
+   * Given a {@link TransactionType} will look through SPI a {@link TransactionFactory} able to handle that kind of of
+   * transaction.
    *
    * @param type The {@link TransactionType} that the {@link TransactionFactory} should handle.
    * @return An {@link Optional} {@link TransactionFactory}

@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:callback="http://www.mulesoft.org/schema/mule/callback"
       xsi:schemaLocation="
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-            http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+            http://www.mulesoft.org/schema/mule/callback http://www.mulesoft.org/schema/mule/callback/current/mule-callback.xsd">
 
     <flow name="main">
-        <test:processor>
-            <test:callback class="org.foo.Plugin1Echo"/>
-        </test:processor>
-        <test:processor>
-            <test:callback class="org.foo.echo.Plugin2Echo"/>
-        </test:processor>
+        <callback:callback class="org.foo.Plugin1Echo"/>
+        <callback:callback class="org.foo.echo.Plugin2Echo"/>
     </flow>
 </mule>

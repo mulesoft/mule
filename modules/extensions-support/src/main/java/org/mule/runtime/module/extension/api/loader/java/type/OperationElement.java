@@ -9,13 +9,13 @@ package org.mule.runtime.module.extension.api.loader.java.type;
 import org.mule.api.annotation.NoImplement;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.util.List;
 
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isNonBlocking;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.isNonBlocking;
 
 /**
  * {@link MethodElement} specification for Operations
@@ -29,7 +29,7 @@ public interface OperationElement extends MethodElement<OperationContainerElemen
     Type returnType;
     if (isNonBlocking(this)) {
       returnType = getParameters().stream()
-          .filter(p -> p.getType().isAssignableTo(CompletionCallback.class))
+          .filter(JavaExtensionModelParserUtils::isCompletionCallbackParameter)
           .findAny()
           .get()
           .getType();
@@ -44,4 +44,21 @@ public interface OperationElement extends MethodElement<OperationContainerElemen
     return IntrospectionUtils.getReturnType(returnType);
   }
 
+  default MetadataType getOperationAttributesMetadataType() {
+    Type returnType;
+    if (isNonBlocking(this)) {
+      returnType = getParameters().stream()
+          .filter(JavaExtensionModelParserUtils::isCompletionCallbackParameter)
+          .findAny()
+          .get()
+          .getType();
+      List<TypeGeneric> generics = returnType.getGenerics();
+      if (generics.isEmpty()) {
+        return BaseTypeBuilder.create(JAVA).anyType().build();
+      }
+      return generics.get(1).getConcreteType().asMetadataType();
+    } else {
+      return getAttributesMetadataType();
+    }
+  }
 }

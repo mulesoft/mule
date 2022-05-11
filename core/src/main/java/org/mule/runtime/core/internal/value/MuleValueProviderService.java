@@ -31,11 +31,11 @@ import java.util.Set;
 import javax.inject.Inject;
 
 /**
- * Default implementation of the {@link ValueProviderService}, which provides the capability to resolve {@link Value values}
- * for any capable element in the application, using it's {@link Location}.
+ * Default implementation of the {@link ValueProviderService}, which provides the capability to resolve {@link Value values} for
+ * any capable element in the application, using it's {@link Location}.
  * <p>
- * Requires the injection of the {@link MuleContext}, to be able to lookup the component inside the Mule App flows using
- * the given {@link Location}
+ * Requires the injection of the {@link MuleContext}, to be able to lookup the component inside the Mule App flows using the given
+ * {@link Location}
  *
  * @since 4.0
  */
@@ -49,15 +49,21 @@ public class MuleValueProviderService implements ValueProviderService {
    */
   @Override
   public ValueResult getValues(Location location, String providerName) {
-    return getValueResult(() -> this.findValueProvider(location, providerName).resolve());
+    return getValueResult(() -> this.findValueProvider(location, providerName, null).resolve());
+  }
+
+  @Override
+  public ValueResult getFieldValues(Location location, String parameterName, String targetSelector) {
+    return getValueResult(() -> this.findValueProvider(location, parameterName, targetSelector).resolve());
   }
 
   /**
-   * Executes the {@link Value} resolving logic and wraps the result into a {@link ValueResult}. In case that
-   * the resolving finished
+   * Executes the {@link Value} resolving logic and wraps the result into a {@link ValueResult}. In case that the resolving
+   * finished
    *
    * @param valueSupplier supplier which encapsulates the {@link Value} resolution logic.
-   * @return A {@link ValueResult} indicating providing the {@link Set} of {@link Value values} or the produced {@link ResolvingFailure failure}.
+   * @return A {@link ValueResult} indicating providing the {@link Set} of {@link Value values} or the produced
+   *         {@link ResolvingFailure failure}.
    */
   private ValueResult getValueResult(ValueResultSupplier valueSupplier) {
     ValueResult result;
@@ -80,7 +86,8 @@ public class MuleValueProviderService implements ValueProviderService {
     Set<Value> get() throws Exception;
   }
 
-  private ValueProvider findValueProvider(Location location, String providerName) throws ValueResolvingException {
+  private ValueProvider findValueProvider(Location location, String parameterName, String targetSelector)
+      throws ValueResolvingException {
     boolean isConnection = isConnection(location);
 
     Location realLocation = isConnection
@@ -90,14 +97,26 @@ public class MuleValueProviderService implements ValueProviderService {
     Object component = findComponent(realLocation);
 
     if (component instanceof ComponentValueProvider) {
-      return () -> ((ComponentValueProvider) component).getValues(providerName);
+      if (targetSelector != null) {
+        return () -> ((ComponentValueProvider) component).getValues(parameterName, targetSelector);
+      } else {
+        return () -> ((ComponentValueProvider) component).getValues(parameterName);
+      }
     }
 
     if (component instanceof ConfigurationParameterValueProvider) {
       if (isConnection) {
-        return () -> ((ConfigurationParameterValueProvider) component).getConnectionValues(providerName);
+        if (targetSelector != null) {
+          return () -> ((ConfigurationParameterValueProvider) component).getConnectionValues(parameterName, targetSelector);
+        } else {
+          return () -> ((ConfigurationParameterValueProvider) component).getConnectionValues(parameterName);
+        }
       } else {
-        return () -> ((ConfigurationParameterValueProvider) component).getConfigValues(providerName);
+        if (targetSelector != null) {
+          return () -> ((ConfigurationParameterValueProvider) component).getConfigValues(parameterName, targetSelector);
+        } else {
+          return () -> ((ConfigurationParameterValueProvider) component).getConfigValues(parameterName);
+        }
       }
     }
 

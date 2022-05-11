@@ -10,6 +10,8 @@ import static com.google.common.collect.ImmutableMap.copyOf;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.function.Function.identity;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.COMPUTE_CONNECTION_ERRORS_IN_STATS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -17,17 +19,16 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
-import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMap;
-import org.reactivestreams.Publisher;
+import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.NULL_THROWABLE_CONSUMER;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.cluster.ClusterService;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -47,14 +48,14 @@ import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.lifecycle.PrimaryNodeLifecycleNotificationListener;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
+import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.retry.RetryCallback;
-import org.mule.runtime.core.api.retry.RetryContext;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -65,7 +66,6 @@ import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
 import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
-import org.mule.runtime.core.internal.management.stats.CursorDecoratorFactory;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
@@ -75,7 +75,6 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.config.ConfiguredComponent;
-import org.mule.runtime.extension.api.runtime.connectivity.Reconnectable;
 import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
@@ -92,13 +91,16 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Mono;
 
 /**
@@ -131,7 +133,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private ClusterService clusterService;
 
   @Inject
-  private CursorDecoratorFactory cursorDecoratorFactory;
+  private FeatureFlaggingService featureFlaggingService;
 
   private final SourceModel sourceModel;
   private final SourceAdapterFactory sourceAdapterFactory;
@@ -205,20 +207,55 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
   }
 
-  private void startSource(boolean restarting, RestartContext restartContext)
-      throws MuleException {
+  private void startSource(boolean restarting, RestartContext restartContext) throws MuleException {
+    Runnable onSuccess;
+    Consumer<Throwable> onFailure;
+    SystemExceptionHandler systemExceptionHandler = muleContext.getExceptionListener();
+    if (retryPolicyTemplate.isAsync()) {
+      onSuccess = this::onReconnectionSuccessful;
+      onFailure = (t) -> {
+        RetryPolicyExhaustedException exception = t instanceof RetryPolicyExhaustedException ? (RetryPolicyExhaustedException) t
+            : new RetryPolicyExhaustedException(t, ExtensionMessageSource.this);
+        systemExceptionHandler.handleException(exception);
+        onReconnectionFailed(exception);
+      };
+    } else {
+      onSuccess = () -> {
+      };
+      onFailure = (t) -> {
+      };
+    }
+    Supplier<CompletableFuture<Void>> futureSupplier = () -> {
+      CompletableFuture<Void> future = new CompletableFuture<>();
+      retryScheduler.execute(() -> doWork(restarting, restartContext, future));
+      return future;
+    };
+    CompletableFuture<Void> future = retryPolicyTemplate
+        .applyPolicy(futureSupplier, t -> true, t -> computeStats(), NULL_THROWABLE_CONSUMER, identity(), retryScheduler)
+        .whenComplete((v, e) -> {
+          if (e != null) {
+            onFailure.accept(e);
+          } else {
+            onSuccess.run();
+          }
+        });
     try {
-      if (restarting && retryPolicyTemplate.isAsync()) {
-        retryPolicyTemplate.execute(new StartSourceCallback(restarting, restartContext), IMMEDIATE_SCHEDULER);
-      } else {
-        retryPolicyTemplate.execute(new StartSourceCallback(restarting, restartContext), retryScheduler);
+      if (!retryPolicyTemplate.isAsync()) {
+        future.get();
+        this.onReconnectionSuccessful();
       }
-    } catch (Throwable e) {
-      if (e instanceof MuleException) {
-        throw (MuleException) e;
-      } else {
-        throw new MuleRuntimeException(e);
-      }
+    } catch (ExecutionException exception) {
+      RetryPolicyExhaustedException retryPolicyExhaustedException =
+          new RetryPolicyExhaustedException(exception.getCause(), ExtensionMessageSource.this);
+      systemExceptionHandler.handleException(retryPolicyExhaustedException);
+      throw retryPolicyExhaustedException;
+    } catch (InterruptedException e) {
+      MuleRuntimeException muleRuntimeException =
+          new MuleRuntimeException(createStaticMessage(format("Found exception starting source '%s' on flow '%s'",
+                                                              sourceModel.getName(), getLocation().getRootContainerName())),
+                                   e);
+      systemExceptionHandler.handleException(muleRuntimeException);
+      throw muleRuntimeException;
     }
   }
 
@@ -306,7 +343,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       return;
     }
 
-    muleContext.getExceptionListener().handleException(exception);
+    muleContext.getExceptionListener().handleException(exception, getLocation());
 
     refreshTokenIfNecessary(getConfigurationInstance()
         .flatMap(configurationInstance -> configurationInstance.getConnectionProvider()).orElse(null), exception);
@@ -317,27 +354,23 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
     Optional<Publisher<Void>> action = sourceAdapter.getReconnectionAction(exception);
     if (!action.isPresent()) {
-      exception.getConnection().ifPresent(sourceConnectionManager::invalidate);
+      invalidateConnection(exception);
+      retryScheduler.execute(() -> {
+        try {
+          restart();
+        } catch (MuleException e) {
+          this.onReconnectionFailed(e);
+        }
+      });
+    } else {
+      retryScheduler.execute(() -> {
+        Mono<Void> reconnectionAction = action.map(p -> from(retryPolicyTemplate.applyPolicy(p, retryScheduler))).get();
+        reconnectionAction
+            .doOnSuccess(v -> onReconnectionSuccessful())
+            .doOnError(this::onReconnectionFailed)
+            .subscribe();
+      });
     }
-
-    retryScheduler.execute(() -> {
-      Mono<Void> reconnectionAction = action
-          .map(p -> from(retryPolicyTemplate.applyPolicy(p, retryScheduler)))
-          .orElseGet(() -> create(sink -> {
-            try {
-              restart();
-              sink.success();
-            } catch (Exception e) {
-              sink.error(e);
-            }
-          }));
-
-      reconnectionAction
-          .doAfterTerminate(() -> reconnecting.set(false))
-          .doOnSuccess(v -> onReconnectionSuccessful())
-          .doOnError(this::onReconnectionFailed)
-          .subscribe();
-    });
   }
 
   private void onReconnectionSuccessful() {
@@ -345,6 +378,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       LOGGER.warn("Message source '{}' on flow '{}' successfully reconnected",
                   sourceModel.getName(), getLocation().getRootContainerName());
     }
+    reconnecting.set(false);
   }
 
   private void onReconnectionFailed(Throwable exception) {
@@ -352,6 +386,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                         sourceModel.getName(), getLocation().getRootContainerName(), exception.getMessage()),
                  exception);
     shutdown();
+    reconnecting.set(false);
   }
 
   private void restart() throws MuleException {
@@ -375,6 +410,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void reallyDoStart() throws MuleException {
+    LOGGER.debug("Message source '{}' on flow '{}' is starting", sourceModel.getName(),
+                 getLocation().getRootContainerName());
     lifecycle(() -> lifecycleManager.fireStartPhase((phase, o) -> {
       startIfNeeded(retryPolicyTemplate);
 
@@ -391,6 +428,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Override
   public void doStop() throws MuleException {
+    LOGGER.debug("Message source '{}' on flow '{}' is stopping", sourceModel.getName(),
+                 getLocation().getRootContainerName());
     safeLifecycle(() -> lifecycleManager.fireStopPhase((phase, o) -> {
       synchronized (started) {
         started.set(false);
@@ -495,8 +534,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private MessageProcessContext createProcessingContext() {
-    // doing this here instead of inlining in the method below that uses it avoids doing the map lookup per event received.
-    final CursorComponentDecoratorFactory componentDecoratorFactory = cursorDecoratorFactory.componentDecoratorFactory(this);
 
     return new MessageProcessContext() {
 
@@ -528,65 +565,56 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       }
 
       @Override
-      public CursorComponentDecoratorFactory getComponentDecoratorFactory() {
-        return componentDecoratorFactory;
-      }
-
-      @Override
       public FlowConstruct getFlowConstruct() {
         return flowConstruct.get();
       }
     };
   }
 
-  private class StartSourceCallback implements RetryCallback {
-
-    boolean restarting;
-    RestartContext restartContext;
-
-    StartSourceCallback(boolean restarting, RestartContext restartContext) {
-      this.restarting = restarting;
-      this.restartContext = restartContext;
-    }
-
-    @Override
-    public void doWork(RetryContext context) throws Exception {
-      try {
-        createSource(restarting);
-        initialiseIfNeeded(sourceAdapter);
-        if (restarting) {
-          sourceAdapter.finishRestart(restartContext);
-        }
-        sourceAdapter.start();
-      } catch (Exception e) {
-        try {
-          stopSource();
-        } catch (Exception eStop) {
-          e.addSuppressed(eStop);
-        }
-        try {
-          disposeSource();
-        } catch (Exception eDispose) {
-          e.addSuppressed(eDispose);
-        }
-        Throwable throwable = exceptionEnricherManager.process(e);
-        Optional<ConnectionException> connectionException = extractConnectionException(throwable);
-        if (connectionException.isPresent()) {
-          throwable = connectionException.get();
-        }
-        throw throwable instanceof Exception ? ((Exception) throwable) : new MuleRuntimeException(throwable);
+  private void doWork(boolean restarting, RestartContext restartContext, CompletableFuture<Void> future) {
+    try {
+      createSource(restarting);
+      initialiseIfNeeded(sourceAdapter);
+      if (restarting) {
+        sourceAdapter.finishRestart(restartContext);
       }
+      sourceAdapter.start();
+      future.complete(null);
+    } catch (Exception e) {
+      try {
+        // On connection exception, if the failed connection is present, it must be invalidated before stopping the source. This
+        // warranties that a possible call to connectionProvider.disconnect made on the onStop method of the source, does not
+        // affect the connection's invalidation
+        extractConnectionException(e).ifPresent(connectionException -> invalidateConnection(connectionException));
+        stopSource();
+      } catch (Exception eStop) {
+        e.addSuppressed(eStop);
+      }
+      try {
+        disposeSource();
+      } catch (Exception eDispose) {
+        e.addSuppressed(eDispose);
+      }
+      Throwable throwable = exceptionEnricherManager.process(e);
+      Optional<ConnectionException> connectionException = extractConnectionException(throwable);
+      if (connectionException.isPresent()) {
+        throwable = connectionException.get();
+      }
+      throwable = throwable instanceof Exception ? ((Exception) throwable) : new MuleRuntimeException(throwable);
+      future.completeExceptionally(throwable);
     }
+  }
 
-    @Override
-    public String getWorkDescription() {
-      return "Message Source Reconnection";
-    }
+  private void computeStats() {
+    AllStatistics statistics = muleContext.getStatistics();
 
-    @Override
-    public Object getWorkOwner() {
-      return ExtensionMessageSource.this;
+    if (statistics != null && statistics.isEnabled() && computeConnectionErrorsInStats()) {
+      statistics.getApplicationStatistics().incConnectionErrors();
     }
+  }
+
+  private boolean computeConnectionErrorsInStats() {
+    return featureFlaggingService.isEnabled(COMPUTE_CONNECTION_ERRORS_IN_STATS);
   }
 
   @Override
@@ -621,9 +649,27 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     flowConstruct = new LazyValue<>(() -> (FlowConstruct) componentLocator.find(getRootContainerLocation()).orElse(null));
     messageProcessContext = createProcessingContext();
     if (shouldRunOnThisNode()) {
+      if (LOGGER.isDebugEnabled()) {
+        boolean isPrimaryPollingInstance = clusterService.isPrimaryPollingInstance();
+        if (primaryNodeOnly) {
+          LOGGER
+              .debug("Message source '{}' on flow '{}' running on the primary node is initializing. Note that this Message source must run on the primary node only.",
+                     sourceModel.getName(), getLocation().getRootContainerName());
+        } else {
+          LOGGER
+              .debug("Message source '{}' on flow '{}' is initializing. This {} the primary node of the cluster.",
+                     sourceModel.getName(), getLocation().getRootContainerName(), isPrimaryPollingInstance ? "is" : "is not");
+        }
+      }
+
       reallyDoInitialise();
     } else {
+      LOGGER
+          .debug("Message source '{}' on flow '{}' cannot initialize. This Message source can only run on the primary node of the cluster",
+                 sourceModel.getName(), getLocation().getRootContainerName());
       new PrimaryNodeLifecycleNotificationListener(() -> {
+        LOGGER.debug("Message source '{}' on flow '{}' is initializing because the node became cluster's primary.",
+                     sourceModel.getName(), getLocation().getRootContainerName());
         reallyDoInitialise();
         reallyDoStart();
       }, notificationListenerRegistry).register();
@@ -721,5 +767,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
    */
   boolean isReconnecting() {
     return reconnecting.get();
+  }
+
+  private void invalidateConnection(ConnectionException exception) {
+    exception.getConnection().ifPresent(sourceConnectionManager::invalidate);
   }
 }

@@ -11,7 +11,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 import static org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextProperties.COMPLETION_CALLBACK_CONTEXT_PARAM;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -40,8 +39,7 @@ public class AbstractCompletableMethodOperationExecutorTestCase extends Abstract
         new AbstractCompletableMethodOperationExecutor<ComponentModel>(mock(ComponentModel.class),
                                                                        this.getClass()
                                                                            .getDeclaredMethod("nonBlockingThrowsException"),
-                                                                       null,
-                                                                       NO_OP_INSTANCE) {
+                                                                       null) {
 
           @Override
           protected void doExecute(ExecutionContext<ComponentModel> executionContext, ExecutorCallback callback) {

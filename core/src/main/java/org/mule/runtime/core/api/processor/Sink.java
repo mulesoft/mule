@@ -14,8 +14,8 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import java.util.function.Consumer;
 
 /**
- * Used to dispatch {@link CoreEvent}'s asynchronously for processing. The result of asynchronous processing can be obtained
- * by subscribing to the {@link CoreEvent}'s {@link BaseEventContext}.
+ * Used to dispatch {@link CoreEvent}'s asynchronously for processing. The result of asynchronous processing can be obtained by
+ * subscribing to the {@link CoreEvent}'s {@link BaseEventContext}.
  * <p/>
  * All Sinks must support concurrent calls from multiple publishers and it is then up to each implementation to determine how to
  * handle this, i.e.
@@ -31,8 +31,8 @@ import java.util.function.Consumer;
 public interface Sink extends Consumer<CoreEvent> {
 
   /**
-   * Submit the given {@link CoreEvent} for processing without a timeout. If the {@link CoreEvent} cannot be processed
-   * immediately due to back-pressure then this method will block until in can be processed.
+   * Submit the given {@link CoreEvent} for processing without a timeout. If the {@link CoreEvent} cannot be processed immediately
+   * due to back-pressure then this method will block until in can be processed.
    *
    * @param event the {@link CoreEvent} to dispatch for processing
    */

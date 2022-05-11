@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.startsWith;
 
 import org.mule.runtime.api.component.AbstractComponent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class SummaryLogChecker extends AbstractLogChecker {
 
   private static final Pattern SUMMARY_REGEX_PATTERN = compile("([^:]*):(.*)");
 
-  private List<SummaryInfo> expectedInfo;
+  private List<SummaryInfo> expectedInfo = new ArrayList<>();
   private boolean exclusiveContent;
 
   @Override
@@ -111,7 +112,7 @@ public class SummaryLogChecker extends AbstractLogChecker {
   }
 
   public void setExpectedInfo(List<SummaryInfo> expectedInfo) {
-    this.expectedInfo = expectedInfo;
+    this.expectedInfo.addAll(expectedInfo);
   }
 
   public static class SummaryInfo extends AbstractComponent {

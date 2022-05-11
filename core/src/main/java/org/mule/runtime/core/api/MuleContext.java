@@ -35,6 +35,7 @@ import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.management.stats.ProcessingTimeWatcher;
 import org.mule.runtime.core.api.security.SecurityManager;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.api.util.queue.QueueManager;
@@ -109,7 +110,7 @@ public interface MuleContext extends Lifecycle {
    * service invocations
    *
    * @param securityManager the security manager used by this Mule instance to authenticate and authorise incoming and outgoing
-   *        event traffic and service invocations
+   *                        event traffic and service invocations
    */
   void setSecurityManager(SecurityManager securityManager) throws InitialisationException;
 
@@ -135,9 +136,16 @@ public interface MuleContext extends Lifecycle {
 
   /**
    * Gets the queue manager used by mule for queuing events. This is used for service queues.
+   * 
+   * @deprecated Used only internally by Mule Runtime
    */
+  @Deprecated
   QueueManager getQueueManager();
 
+  /*
+   * @deprecated Used only internally by Mule Runtime
+   */
+  @Deprecated
   ObjectStoreManager getObjectStoreManager();
 
   ExtensionManager getExtensionManager();
@@ -343,6 +351,15 @@ public interface MuleContext extends Lifecycle {
    *         artifact.
    */
   ErrorTypeRepository getErrorTypeRepository();
+
+  /**
+   * @return the streamingManager used in this artifact.
+   * 
+   * @since 4.5
+   */
+  default StreamingManager getStreamingManager() {
+    return null;
+  }
 
   /**
    * Sets application wide instance of {@link BootstrapServiceDiscoverer}

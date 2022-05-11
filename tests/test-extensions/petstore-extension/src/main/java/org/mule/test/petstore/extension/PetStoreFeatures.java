@@ -14,7 +14,9 @@ import static java.util.Optional.ofNullable;
 
 public enum PetStoreFeatures implements Feature {
 
-  LEGACY_FEATURE("Feature legacy, just for testing", "MULE-123", "4.4.0", "mule.pet.store.legacy-behavior");
+  LEGACY_FEATURE_ONE("Feature legacy, just for testing", "MULE-123", "4.4.0", "mule.pet.store.legacy-behavior"),
+
+  LEGACY_FEATURE_TWO("Feature legacy, just for testing", "MULE-123", "4.4.0", "mule.pet.store.legacy-behavior");
 
   private final String issue;
   private final String since;
@@ -44,6 +46,11 @@ public enum PetStoreFeatures implements Feature {
 
   @Override
   public String getSince() {
+    return getEnabledByDefaultSince();
+  }
+
+  @Override
+  public String getEnabledByDefaultSince() {
     return since;
   }
 

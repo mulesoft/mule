@@ -27,6 +27,7 @@ import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
+import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 
 /**
  * Builder for domain MuleContext instance.
@@ -45,6 +46,10 @@ public class DomainMuleContextBuilder extends DefaultMuleContextBuilder {
     DefaultMuleConfiguration defaultMuleConfiguration = new DefaultMuleConfiguration(true);
     defaultMuleConfiguration.setDomainId(domainId);
     defaultMuleConfiguration.setId(domainId);
+    if (executionClassLoader instanceof MuleArtifactClassLoader) {
+      defaultMuleConfiguration
+          .setMinMuleVersion(((MuleArtifactClassLoader) executionClassLoader).getArtifactDescriptor().getMinMuleVersion());
+    }
     return defaultMuleConfiguration;
   }
 

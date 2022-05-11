@@ -38,6 +38,7 @@ import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.scheduler.SchedulerView;
@@ -47,7 +48,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
@@ -56,8 +56,8 @@ import org.mule.runtime.core.api.context.notification.MuleContextNotificationLis
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuilder;
-import org.mule.runtime.core.internal.el.ExpressionExecutor;
+import org.mule.runtime.core.internal.config.builders.MinimalConfigurationBuilder;
+import org.mule.runtime.core.internal.config.builders.ServiceCustomizationsConfigurationBuilder;
 import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.tck.SensingNullMessageProcessor;
@@ -79,13 +79,12 @@ import java.util.function.Supplier;
 
 import javax.xml.namespace.QName;
 
+import com.google.common.collect.ImmutableMap;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
-
-import com.google.common.collect.ImmutableMap;
 
 /**
  * Extends {@link AbstractMuleTestCase} providing access to a {@link MuleContext} instance and tools for manage it.
@@ -97,9 +96,9 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   private static Field LIFECYCLE_EXCEPTION_COMPONENT_FIELD;
 
   /**
-   * This is stored in order to clean the field in case a {@link LifecycleException} is thrown by the {@link MuleContext}s creation.
-   * Since the component keeps a reference to the {@link MuleContext}, and JUnit stores all thrown exceptions, if there are multiple failures
-   * with this cause in a row, it will cause an OOM Exception.
+   * This is stored in order to clean the field in case a {@link LifecycleException} is thrown by the {@link MuleContext}s
+   * creation. Since the component keeps a reference to the {@link MuleContext}, and JUnit stores all thrown exceptions, if there
+   * are multiple failures with this cause in a row, it will cause an OOM Exception.
    */
   static {
     try {
@@ -204,7 +203,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
       doSetUp();
     } catch (LifecycleException e) {
-      //Set to null in order to clean references to the muleContext and avoid OOM errors.
+      // Set to null in order to clean references to the muleContext and avoid OOM errors.
       if (LIFECYCLE_EXCEPTION_COMPONENT_FIELD != null) {
         LIFECYCLE_EXCEPTION_COMPONENT_FIELD.set(e, null);
       }
@@ -278,12 +277,12 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
         MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
         List<ConfigurationBuilder> builders = new ArrayList<>();
-        builders.add(new SimpleConfigurationBuilder(getStartUpRegistryObjects()));
+        builders.add(new ServiceCustomizationsConfigurationBuilder(getStartUpRegistryObjects()));
         addBuilders(builders);
         builders.add(new MockExtensionManagerConfigurationBuilder());
         builders.add(getBuilder());
         MuleContextBuilder contextBuilder = MuleContextBuilder.builder(APP);
-        DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
+        DefaultMuleConfiguration muleConfiguration = createMuleConfiguration();
         String workingDirectory = this.workingDirectory.getRoot().getAbsolutePath();
         LOGGER.info("Using working directory for test: " + workingDirectory);
         muleConfiguration.setWorkingDirectory(workingDirectory);
@@ -292,6 +291,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         contextBuilder.setExecutionClassLoader(executionClassLoader);
         contextBuilder.setObjectSerializer(getObjectSerializer());
         contextBuilder.setDeploymentProperties(getDeploymentProperties());
+        contextBuilder.setArtifactCoordinates(getTestArtifactCoordinates());
         configureMuleContext(contextBuilder);
         context = muleContextFactory.createMuleContext(builders, contextBuilder);
         recordSchedulersOnInit(context);
@@ -305,6 +305,15 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
       }
     }
     return context;
+  }
+
+  protected DefaultMuleConfiguration createMuleConfiguration() {
+    if (getMavenProjectVersionProperty() == null) {
+      return new DefaultMuleConfiguration();
+    }
+    DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
+    muleConfiguration.setMinMuleVersion(new MuleVersion(getMavenProjectVersionProperty()));
+    return muleConfiguration;
   }
 
   /**
@@ -357,7 +366,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   protected void configureMuleContext(MuleContextBuilder contextBuilder) {}
 
   protected ConfigurationBuilder getBuilder() throws Exception {
-    return new DefaultsConfigurationBuilder();
+    return new MinimalConfigurationBuilder();
   }
 
   protected String getConfigurationResources() {
@@ -396,6 +405,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   @AfterClass
   public static void disposeContext() throws MuleException {
     try {
+      clearTestFlows();
       if (muleContext != null && !(muleContext.isDisposed() || muleContext.isDisposing())) {
         disposeOnlyMuleContext();
 
@@ -538,7 +548,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    * Uses {@link org.mule.runtime.api.transformation.TransformationService} to get representation of a message for a given
    * {@link DataType}
    *
-   * @param message message to get payload from
+   * @param message  message to get payload from
    * @param dataType dataType to be transformed to
    * @return representation of the message payload of the required dataType
    * @throws Exception if there is an unexpected error obtaining the payload representation
@@ -552,7 +562,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    * {@link Class}
    *
    * @param message message to get payload from
-   * @param clazz type of the payload to be transformed to
+   * @param clazz   type of the payload to be transformed to
    * @return representation of the message payload of the required class
    * @throws Exception if there is an unexpected error obtaining the payload representation
    */

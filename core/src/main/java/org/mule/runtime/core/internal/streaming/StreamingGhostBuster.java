@@ -34,17 +34,17 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import org.slf4j.Logger;
 
 /**
- * Tracks instances of {@link ManagedCursorProvider} through the {@link #track(ManagedCursorProvider)} method.
- * This class uses a {@link ReferenceQueue} so that when each of those instances are garbage collected, we can make sure
- * that {@link ManagedCursorProvider#releaseResources()} is invoked.
+ * Tracks instances of {@link ManagedCursorProvider} through the {@link #track(ManagedCursorProvider)} method. This class uses a
+ * {@link ReferenceQueue} so that when each of those instances are garbage collected, we can make sure that
+ * {@link ManagedCursorProvider#releaseResources()} is invoked.
  * <p>
  * This is useful in cases of long running flows in which cursor providers are open and dereferenced long before the flow ends
  * (e.g: an &lt;until-successful&gt; which reads a file many times or a &lt;foreach&gt; that executes many queries which result
  * are never used outside of the scope).
  * <p>
- * Notice that this <b>DOES NOT</b> replace the cleanup and tracking job that is performed in {@link CursorManager}. That
- * still remains the main cleanup mechanism as we cannot rely on garbage collection for releasing streaming resources. This is
- * only a mitigation for cases like described above.
+ * Notice that this <b>DOES NOT</b> replace the cleanup and tracking job that is performed in {@link CursorManager}. That still
+ * remains the main cleanup mechanism as we cannot rely on garbage collection for releasing streaming resources. This is only a
+ * mitigation for cases like described above.
  *
  * @since 4.2.0
  */
@@ -141,10 +141,10 @@ public class StreamingGhostBuster implements Lifecycle {
    * Important implementation details:
    *
    * 1. An original design included a PhantomReference as part of this class state. It was then changed to its current state in
-   * which the PhantomReference is not used and the ReferenceQueue is applied to the WeakReference directly. This results in
-   * a big performance improvement.
-   * 2. Because WeakReference#get is not guaranteed to actually return the instance, we need a way to cleanup the resources
-   * without actually depending on the ManagedCursorProvider instance. That is when the CursorProviderJanitor comes very handy.
+   * which the PhantomReference is not used and the ReferenceQueue is applied to the WeakReference directly. This results in a big
+   * performance improvement. 2. Because WeakReference#get is not guaranteed to actually return the instance, we need a way to
+   * cleanup the resources without actually depending on the ManagedCursorProvider instance. That is when the
+   * CursorProviderJanitor comes very handy.
    */
   private class StreamingWeakReference extends WeakReference<ManagedCursorProvider> {
 

@@ -52,7 +52,7 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
@@ -73,7 +73,7 @@ import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
+import org.mule.runtime.extension.api.runtime.exception.SdkExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
@@ -95,11 +95,11 @@ import org.mockito.Mock;
 
 public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMuleContextTestCase {
 
+  protected static final String LOGGER_FIELD_NAME = "LOGGER";
   protected static final String CONFIG_NAME = "myConfig";
   protected static final String ERROR_MESSAGE = "ERROR";
   protected static final String SOURCE_NAME = "source";
   protected static final String METADATA_KEY = "metadataKey";
-  protected final SimpleRetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate(0, 2);
   protected final JavaTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
   protected CursorStreamProviderFactory cursorStreamProviderFactory;
 
@@ -158,7 +158,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
   protected ExceptionCallback exceptionCallback;
 
   @Mock
-  protected ExceptionHandlerFactory enricherFactory;
+  protected SdkExceptionHandlerFactory enricherFactory;
 
   @Mock
   protected ConfigurationProvider configurationProvider;
@@ -181,12 +181,13 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
   @Mock
   protected MetadataResolverFactory metadataResolverFactory;
 
+  protected RetryPolicyTemplate retryPolicyTemplate;
   protected boolean primaryNodeOnly = false;
   protected SourceAdapter sourceAdapter;
   protected SourceCallback sourceCallback;
   protected ExtensionMessageSource messageSource;
   protected StreamingManager streamingManager = spy(new DefaultStreamingManager());
-  private NotificationDispatcher notificationDispatcher;
+  protected NotificationDispatcher notificationDispatcher;
 
   @Before
   public void before() throws Exception {
@@ -220,8 +221,6 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
     mockExceptionEnricher(extensionModel, null);
     mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
 
-    retryPolicyTemplate
-        .setNotificationFirer(notificationDispatcher);
     initialiseIfNeeded(retryPolicyTemplate, muleContext);
 
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_EXTENSION_MANAGER, extensionManager);
@@ -281,6 +280,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
         .setCompletionHandlerFactory(completionHandlerFactory)
         .setExceptionCallback(exceptionCallback)
         .setCursorStreamProviderFactory(cursorStreamProviderFactory)
+        .setMuleContext(muleContext)
         .build();
 
     when(sourceCallbackFactory.createSourceCallback(any())).thenReturn(sourceCallback);
@@ -313,7 +313,6 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
   }
 
   protected ExtensionMessageSource getNewExtensionMessageSourceInstance() throws MuleException {
-
     ExtensionMessageSource messageSource =
         new ExtensionMessageSource(extensionModel, sourceModel, sourceAdapterFactory, configurationProvider, primaryNodeOnly,
                                    retryPolicyTemplate, cursorStreamProviderFactory, FAIL, extensionManager,

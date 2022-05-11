@@ -11,8 +11,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mule.runtime.container.internal.JreModuleDiscoverer.JRE_MODULE_NAME;
+
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -22,12 +24,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import io.qameta.allure.Issue;
+
 public class JreModuleDiscovererTestCase extends AbstractMuleTestCase {
 
   @Rule
   public ExpectedException expected = ExpectedException.none();
 
-  private JreModuleDiscoverer moduleDiscoverer = new JreModuleDiscoverer();;
+  private final JreModuleDiscoverer moduleDiscoverer = new JreModuleDiscoverer();;
 
   @Test
   public void discoversJreModule() throws Exception {
@@ -39,5 +43,14 @@ public class JreModuleDiscovererTestCase extends AbstractMuleTestCase {
     assertThat(muleModule.getExportedPaths(), is(not(empty())));
     assertThat(muleModule.getExportedPackages(), is(not(empty())));
     assertThat(muleModule.getExportedServices(), is(not(empty())));
+  }
+
+  @Test
+  @Issue("MULE-19398")
+  public void discoveryResultCached() throws Exception {
+    final List<MuleModule> discovered = moduleDiscoverer.discover();
+    final List<MuleModule> discoveredFromCache = moduleDiscoverer.discover();
+
+    assertThat(discoveredFromCache, sameInstance(discovered));
   }
 }

@@ -63,10 +63,10 @@ public class DefaultFlowBuilder implements Builder {
   /**
    * Creates a new builder
    *
-   * @param name name of the flow to be created. Non empty.
-   * @param muleContext context where the flow will be associated with. Non null.
+   * @param name                         name of the flow to be created. Non empty.
+   * @param muleContext                  context where the flow will be associated with. Non null.
    * @param componentInitialStateManager component state manager used by the flow to determine what components must be started or
-   *        not. Not null.
+   *                                     not. Not null.
    */
   public DefaultFlowBuilder(String name, MuleContext muleContext, ComponentInitialStateManager componentInitialStateManager) {
     checkArgument(isNotEmpty(name), "name cannot be empty");

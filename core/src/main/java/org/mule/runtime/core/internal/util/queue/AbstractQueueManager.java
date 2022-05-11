@@ -158,7 +158,7 @@ public abstract class AbstractQueueManager
   /**
    * Creates a QueueStore
    *
-   * @param name queue name
+   * @param name   queue name
    * @param config configuration for the queue
    * @return a new QueueStore for the given queue name
    */

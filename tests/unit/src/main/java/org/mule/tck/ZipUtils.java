@@ -53,7 +53,7 @@ public class ZipUtils {
    * Compress a set of resource files into a ZIP file
    *
    * @param targetFile file that will contain the zipped files
-   * @param resources resources to compress
+   * @param resources  resources to compress
    * @throws UncheckedIOException in case of any error processing the files
    */
   public static void compress(File targetFile, ZipResource[] resources) {

@@ -290,7 +290,43 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
    * {@inheritDoc}
    */
   @Override
+  public Set<Value> getConfigValues(String parameterName, String targetSelector) throws ValueResolvingException {
+    return valuesWithClassLoader(() -> new ValueProviderMediator<>(getConfigurationModel(), () -> muleContext,
+                                                                   () -> reflectionCache)
+                                                                       .getValues(parameterName, targetSelector,
+                                                                                  new ResolverSetBasedParameterResolver(resolverSet,
+                                                                                                                        getConfigurationModel(),
+                                                                                                                        reflectionCache,
+                                                                                                                        expressionManager)),
+                                 getExtensionModel());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Set<Value> getConnectionValues(String parameterName) throws ValueResolvingException {
+    return valuesWithClassLoader(() -> {
+      ConnectionProviderModel connectionProviderModel = getConnectionProviderModel()
+          .orElseThrow(() -> new ValueResolvingException("Internal Error. Unable to resolve values because the service is unable to get the connection model",
+                                                         UNKNOWN));
+      ResolverSet resolverSet = ((Optional<ResolverSet>) connectionProviderResolver.getResolverSet())
+          .orElseThrow(() -> new ValueResolvingException("Internal Error. Unable to resolve values because of the service is unable to retrieve connection parameters",
+                                                         UNKNOWN));
+
+      return new ValueProviderMediator<>(connectionProviderModel,
+                                         () -> muleContext,
+                                         () -> reflectionCache)
+                                             .getValues(parameterName,
+                                                        new ResolverSetBasedParameterResolver(resolverSet,
+                                                                                              connectionProviderModel,
+                                                                                              reflectionCache,
+                                                                                              expressionManager));
+    }, getExtensionModel());
+  }
+
+  @Override
+  public Set<Value> getConnectionValues(String parameterName, String targetSelector) throws ValueResolvingException {
     return valuesWithClassLoader(() -> {
       ConnectionProviderModel connectionProviderModel = getConnectionProviderModel()
           .orElseThrow(() -> new ValueResolvingException(
@@ -304,7 +340,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
       return new ValueProviderMediator<>(connectionProviderModel,
                                          () -> muleContext,
                                          () -> reflectionCache)
-                                             .getValues(parameterName,
+                                             .getValues(parameterName, targetSelector,
                                                         new ResolverSetBasedParameterResolver(resolverSet,
                                                                                               connectionProviderModel,
                                                                                               reflectionCache,
@@ -319,8 +355,8 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   }
 
   /**
-   * Used to preserve exception throwing behaviour in {@link #getConfiguration} as the method {@link #createConfiguration} can no longer throw
-   * checked exception as it is used inside {@link Map#computeIfAbsent}.
+   * Used to preserve exception throwing behaviour in {@link #getConfiguration} as the method {@link #createConfiguration} can no
+   * longer throw checked exception as it is used inside {@link Map#computeIfAbsent}.
    */
   private static class WrappingRuntimeException extends RuntimeException {
 

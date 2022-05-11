@@ -106,10 +106,11 @@ public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDe
     assertType(source.getOutputAttributes().getType(), Serializable.class, ObjectType.class);
     List<ParameterModel> parameters = source.getAllParameterModels();
 
-    assertThat(parameters, hasSize(3));
+    assertThat(parameters, hasSize(4));
     assertConfigRefParam(parameters.get(0));
     assertStreamingStrategyParameter(parameters.get(1));
-    ParameterModel port = parameters.get(2);
+    assertRedeliveryPolicyParameter(parameters.get(2));
+    ParameterModel port = parameters.get(3);
     assertThat(port.getName(), is(PORT));
     assertThat(port.isRequired(), is(false));
     assertType(port.getType(), Integer.class, NumberType.class);

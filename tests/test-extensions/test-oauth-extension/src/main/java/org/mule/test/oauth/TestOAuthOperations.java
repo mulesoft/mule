@@ -7,9 +7,11 @@
 package org.mule.test.oauth;
 
 import static java.util.Arrays.asList;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
@@ -25,11 +27,14 @@ import org.mule.runtime.extension.api.dsql.QueryTranslator;
 import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.sdk.api.annotation.data.sample.SampleData;
 import org.mule.test.oauth.metadata.OAuthMetadataResolver;
 import org.mule.test.oauth.metadata.RefreshedOAuthMetadataResolver;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.List;
 
 public class TestOAuthOperations {
@@ -48,6 +53,21 @@ public class TestOAuthOperations {
       } else {
         throw new AccessTokenExpiredException();
       }
+    }
+  }
+
+  @MediaType(TEXT_PLAIN)
+  public void tokenExpiredAsync(@Connection TestOAuthConnection connection,
+                                CompletionCallback<String, String> completionCallback) {
+    final OAuthState state = connection.getState().getState();
+    if (state != null && !state.getAccessToken().endsWith("refreshed")) {
+      if (state instanceof AuthorizationCodeState) {
+        completionCallback.error(new AccessTokenExpiredException(((AuthorizationCodeState) state).getResourceOwnerId()));
+      } else {
+        completionCallback.error(new AccessTokenExpiredException());
+      }
+    } else {
+      completionCallback.success(Result.<String, String>builder().output("Success!").attributes("Success!").build());
     }
   }
 
@@ -100,6 +120,21 @@ public class TestOAuthOperations {
     return connection;
   }
 
+  @MediaType(ANY)
+  public InputStream getStream(String content) {
+    return new ByteArrayInputStream(content.getBytes());
+  }
+
+  @MediaType(ANY)
+  public String getStreamContentWithFlackyConnection(@Connection TestOAuthConnection connection, InputStream content) {
+    String result = IOUtils.toString(content);
+    if (executedCounter++ % 2 == 0) {
+      throw new AccessTokenExpiredException();
+    }
+
+    return result;
+  }
+
   @OutputResolver(output = RefreshedOAuthMetadataResolver.class)
   @MediaType(TEXT_PLAIN)
   public String metadataOperation(@MetadataKeyId(RefreshedOAuthMetadataResolver.class) String metadataKey,
@@ -112,7 +147,7 @@ public class TestOAuthOperations {
   @MediaType(TEXT_PLAIN)
   public Result<String, String> anotherMetadataOperation(@MetadataKeyId(RefreshedOAuthMetadataResolver.class) String metadataKey,
                                                          @TypeResolver(RefreshedOAuthMetadataResolver.class) Object inputParameter,
-                                                         @Connection TestOAuthConnection connection) {
+                                                         @org.mule.sdk.api.annotation.param.Connection TestOAuthConnection connection) {
     return Result.<String, String>builder().output("Operation Result").attributes("Operation Attributes").build();
   }
 

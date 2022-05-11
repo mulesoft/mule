@@ -34,7 +34,7 @@ public abstract class PeriodicScheduler extends AbstractComponent implements Sch
    * Template method to delegate the scheduling of the job.
    *
    * @param executor the corresponding {@link org.mule.runtime.api.scheduler.Scheduler} instance.
-   * @param job The {@link Runnable} job that has to be executed.
+   * @param job      The {@link Runnable} job that has to be executed.
    * @return the newly scheduled job.
    */
   protected abstract ScheduledFuture<?> doSchedule(org.mule.runtime.api.scheduler.Scheduler executor, Runnable job);

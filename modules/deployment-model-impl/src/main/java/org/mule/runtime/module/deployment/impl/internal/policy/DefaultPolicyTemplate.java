@@ -34,10 +34,10 @@ public class DefaultPolicyTemplate implements PolicyTemplate {
   /**
    * Creates a new policy template artifact
    *
-   * @param artifactId artifact unique ID. Non empty.
-   * @param descriptor describes the policy to create. Non null.
-   * @param policyClassLoader classloader to use on this policy. Non null.
-   * @param artifactPlugins artifact plugins deployed only inside the policy. Non null.
+   * @param artifactId         artifact unique ID. Non empty.
+   * @param descriptor         describes the policy to create. Non null.
+   * @param policyClassLoader  classloader to use on this policy. Non null.
+   * @param artifactPlugins    artifact plugins deployed only inside the policy. Non null.
    * @param ownArtifactPlugins artifact plugins the policy depends on. Non null.
    */
   public DefaultPolicyTemplate(String artifactId, PolicyTemplateDescriptor descriptor, ArtifactClassLoader policyClassLoader,

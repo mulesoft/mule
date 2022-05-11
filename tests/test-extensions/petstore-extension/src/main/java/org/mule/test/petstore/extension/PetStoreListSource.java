@@ -23,7 +23,7 @@ import java.util.List;
 @MediaType(value = TEXT_PLAIN, strict = false)
 public class PetStoreListSource extends Source<List<Result<String, Object>>, Object> {
 
-  @ParameterGroup(name = "Breeder")
+  @org.mule.sdk.api.annotation.param.ParameterGroup(name = "Breeder")
   private ExclusivePetBreeder breeder;
 
   @Override

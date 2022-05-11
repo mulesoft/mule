@@ -31,7 +31,7 @@ public interface Converter extends Transformer {
    * If 2 or more discoverable transformers are equal, this value can be used to select the correct one
    *
    * @param weighting the priority weighting for this transformer. This is a value between {@link #MIN_PRIORITY_WEIGHTING} and
-   *        {@link #MAX_PRIORITY_WEIGHTING}.
+   *                  {@link #MAX_PRIORITY_WEIGHTING}.
    */
   void setPriorityWeighting(int weighting);
 

@@ -9,6 +9,7 @@ package org.mule.runtime.config.api.dsl.model.metadata;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.app.declaration.internal.utils.Preconditions.checkArgument;
 import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.getSourceElementName;
 import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.resolveConfigName;
@@ -16,11 +17,13 @@ import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.
 import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.sourceElementNameFromSimpleValue;
 import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.aValueProviderCacheId;
 import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.fromElementWithName;
+
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
@@ -29,18 +32,18 @@ import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
-
-import com.google.common.base.Objects;
+import org.mule.runtime.module.extension.internal.value.ValueProviderUtils;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 public class DslElementBasedValueProviderCacheIdGenerator implements ValueProviderCacheIdGenerator<DslElementModel<?>> {
 
-  private ComponentLocator<DslElementModel<?>> locator;
+  private final ComponentLocator<DslElementModel<?>> locator;
 
   private static final String VALUE_PROVIDER = "ValueProvider";
 
@@ -51,12 +54,13 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
   /**
    * {@inheritDoc}
    * <p/>
-   * The returned {@link ValueProviderCacheId} will contain all acting parameters required by the {@link org.mule.runtime.extension.api.values.ValueProvider} as parts.
-   * In case the {@link DslElementModel} corresponds to a Source or Operation, if the {@link org.mule.runtime.extension.api.values.ValueProvider} requires a connection or
-   * a configuration, their id will be added as part.
-   * The resolution of a config or connection id as part is different from the one done when their are the one's holding the resolving parameter.
-   * In the case they are parts needed by another {@link org.mule.runtime.extension.api.values.ValueProvider}, acting parameters will not exist. Therefore, only
-   * parameters required for metadata are used as input to calculate the {@link ValueProviderCacheId}.
+   * The returned {@link ValueProviderCacheId} will contain all acting parameters required by the
+   * {@link org.mule.runtime.extension.api.values.ValueProvider} as parts. In case the {@link DslElementModel} corresponds to a
+   * Source or Operation, if the {@link org.mule.runtime.extension.api.values.ValueProvider} requires a connection or a
+   * configuration, their id will be added as part. The resolution of a config or connection id as part is different from the one
+   * done when their are the one's holding the resolving parameter. In the case they are parts needed by another
+   * {@link org.mule.runtime.extension.api.values.ValueProvider}, acting parameters will not exist. Therefore, only parameters
+   * required for metadata are used as input to calculate the {@link ValueProviderCacheId}.
    */
   @Override
   public Optional<ValueProviderCacheId> getIdForResolvedValues(DslElementModel<?> containerComponent, String parameterName) {
@@ -66,12 +70,34 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
             .flatMap(infoMap -> resolveId(containerComponent, valueProviderModel, infoMap)));
   }
 
+  /**
+   * {@inheritDoc}
+   * <p/>
+   * The returned {@link ValueProviderCacheId} will contain all acting parameters required by the
+   * {@link org.mule.runtime.extension.api.values.ValueProvider} as parts. In case the {@link DslElementModel} corresponds to a
+   * Source or Operation, if the {@link org.mule.runtime.extension.api.values.ValueProvider} requires a connection or a
+   * configuration, their id will be added as part. The resolution of a config or connection id as part is different from the one
+   * done when their are the one's holding the resolving parameter. In the case they are parts needed by another
+   * {@link org.mule.runtime.extension.api.values.ValueProvider}, acting parameters will not exist. Therefore, only parameters
+   * required for metadata are used as input to calculate the {@link ValueProviderCacheId}.
+   */
+  @Override
+  public Optional<ValueProviderCacheId> getIdForResolvedValues(DslElementModel<?> containerComponent,
+                                                               String parameterName,
+                                                               String targetPath) {
+    return ifContainsParameter(containerComponent, parameterName)
+        .flatMap(pm -> pm.getFieldValueProviderModels().stream().filter(fm -> Objects.equals(fm.getTargetSelector(), targetPath))
+            .findAny())
+        .flatMap(fieldModel -> resolveParametersInformation(containerComponent)
+            .flatMap(infoMap -> resolveId(containerComponent, fieldModel, infoMap)));
+  }
+
   private Optional<ParameterModel> ifContainsParameter(DslElementModel<?> containerComponent, String parameterName) {
     if (containerComponent.getModel() instanceof ParameterizedModel) {
       return ((ParameterizedModel) containerComponent.getModel())
           .getAllParameterModels()
           .stream()
-          .filter(p -> Objects.equal(parameterName, p.getName()))
+          .filter(p -> Objects.equals(parameterName, p.getName()))
           .findAny();
     }
     return empty();
@@ -190,18 +216,17 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
 
   private List<ValueProviderCacheId> resolveActingParameterIds(ValueProviderModel valueProviderModel,
                                                                Map<String, ParameterModelInformation> parameterModelsInformation) {
-    List<ValueProviderCacheId> parts = new LinkedList<>();
 
-    valueProviderModel.getActingParameters().forEach(
-                                                     ap -> {
-                                                       if (parameterModelsInformation.containsKey(ap)) {
-                                                         resolveParameterId(parameterModelsInformation.get(ap)
-                                                             .getParameterDslElementModel()).ifPresent(parts::add);
-                                                       }
-                                                     });
-
-    return parts;
-
+    return valueProviderModel
+        .getParameters()
+        .stream()
+        .map(ActingParameterModel::getExtractionExpression)
+        .map(ValueProviderUtils::getParameterNameFromExtractionExpression)
+        .filter(parameterModelsInformation::containsKey)
+        .map(parameterModelsInformation::get)
+        .map(ParameterModelInformation::getParameterDslElementModel)
+        .map(dsl -> resolveParameterId(dsl).orElse(null))
+        .collect(toList());
   }
 
   private Optional<String> resolveDslTag(DslElementModel<?> elementModel) {
@@ -216,7 +241,7 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
                                          l -> resolveIdRecursively(l).orElse(null),
                                          r -> aValueProviderCacheId(fromElementWithName(sourceElementNameFromSimpleValue(parameterModel))
                                              .withHashValueFrom(v)))))
-        .orElse(resolveIdRecursively(parameterModel));
+        .orElseGet(() -> resolveIdRecursively(parameterModel));
   }
 
   private Optional<ValueProviderCacheId> resolveIdRecursively(DslElementModel<?> element) {
@@ -231,10 +256,10 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
     }
   }
 
-  private class ParameterModelInformation {
+  private static class ParameterModelInformation {
 
-    private ParameterModel parameterModel;
-    private DslElementModel<?> parameterDslElementModel;
+    private final ParameterModel parameterModel;
+    private final DslElementModel<?> parameterDslElementModel;
 
     private ParameterModelInformation(DslElementModel<?> dslElementModel) {
       checkArgument(dslElementModel.getModel() instanceof ParameterModel, "A ParameterModel is expected");

@@ -44,10 +44,10 @@ public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTes
   /**
    * Run a JMH benchmark and assert that the primary result is less than or equal to an expected value.
    *
-   * @param clazz the JMS benchmark class.
-   * @param testName the name of the test method.
+   * @param clazz          the JMS benchmark class.
+   * @param testName       the name of the test method.
    * @param expectedResult the expected minimum minimum result value.
-   * @param timeUnit the time unit of the expected result value.
+   * @param timeUnit       the time unit of the expected result value.
    */
   protected void runAndAssertBenchmark(Class clazz, String testName, final double expectedResult, TimeUnit timeUnit) {
     runAndAssertBenchmark(clazz, testName, 1, expectedResult, timeUnit);
@@ -56,10 +56,10 @@ public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTes
   /**
    * Run a JMH benchmark and assert that the primary result is less than or equal to an expected value.
    *
-   * @param clazz the JMS benchmark class.
-   * @param testName the name of the test method.
-   * @param expectedResult the expected minimum minimum result value.
-   * @param timeUnit the time unit of the expected result value.
+   * @param clazz              the JMS benchmark class.
+   * @param testName           the name of the test method.
+   * @param expectedResult     the expected minimum minimum result value.
+   * @param timeUnit           the time unit of the expected result value.
    * @param expectedAllocation the expected maximum allocation in bytes per benchmark iteration.
    */
   protected void runAndAssertBenchmark(Class clazz, String testName, final double expectedResult, TimeUnit timeUnit,
@@ -70,11 +70,11 @@ public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTes
   /**
    * Run a JMH benchmark and assert that the primary result is less than or equal to an expected value.
    *
-   * @param clazz the JMS benchmark class.
-   * @param testName the name of the test method.
-   * @param threads the number of threads to run benchmark with.
+   * @param clazz          the JMS benchmark class.
+   * @param testName       the name of the test method.
+   * @param threads        the number of threads to run benchmark with.
    * @param expectedResult the expected minimum minimum result value.
-   * @param timeUnit the time unit of the expected result value.
+   * @param timeUnit       the time unit of the expected result value.
    */
   protected void runAndAssertBenchmark(Class clazz, String testName, int threads, final double expectedResult,
                                        TimeUnit timeUnit) {
@@ -85,12 +85,12 @@ public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTes
   /**
    * Run a JMH benchmark and assert that the primary result is less than or equal to an expected value.
    *
-   * @param clazz the JMS benchmark class.
-   * @param testName the name of the test method.
-   * @param threads the number of threads to run benchmark with.
-   * @param params parameters along with array of parameters values to be applied to the benchmark.
-   * @param expectedResult the expected minimum minimum result value.
-   * @param timeUnit the time unit of the expected result value.
+   * @param clazz              the JMS benchmark class.
+   * @param testName           the name of the test method.
+   * @param threads            the number of threads to run benchmark with.
+   * @param params             parameters along with array of parameters values to be applied to the benchmark.
+   * @param expectedResult     the expected minimum minimum result value.
+   * @param timeUnit           the time unit of the expected result value.
    * @param expectedAllocation the expected maximum allocation in bytes per benchmark iteration.
    */
   protected void runAndAssertBenchmark(Class clazz, String testName, int threads, Map<String, String[]> params,
@@ -107,11 +107,11 @@ public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTes
   /**
    * Run a JMH benchmark and assert that the primary result is less than or equal to an expected value.
    *
-   * @param clazz the JMS benchmark class.
-   * @param testName the name of the test method.
-   * @param threads the number of threads to run benchmark with.
-   * @param params parameters along with array of parameters values to be applied to the benchmark.
-   * @param timeUnit the time unit of the expected result value.
+   * @param clazz      the JMS benchmark class.
+   * @param testName   the name of the test method.
+   * @param threads    the number of threads to run benchmark with.
+   * @param params     parameters along with array of parameters values to be applied to the benchmark.
+   * @param timeUnit   the time unit of the expected result value.
    * @param assertions assertion consumer.
    */
   protected void runAndAssertBenchmark(Class clazz, String testName, int threads, Map<String, String[]> params, TimeUnit timeUnit,

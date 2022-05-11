@@ -29,19 +29,21 @@ import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAResource;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
-@RunWith(MockitoJUnitRunner.class)
 @SmallTest
 public class XaTransactionTestCase extends AbstractMuleTestCase {
 
-  private MuleContext mockMuleContext = mockContextWithServices();
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
+
+  private final MuleContext mockMuleContext = mockContextWithServices();
   private NotificationDispatcher notificationDispatcher;
-  private static final int DEFAULT_TIMEOUT = 20;
 
   @Mock
   private TransactionManager mockTransactionManager;

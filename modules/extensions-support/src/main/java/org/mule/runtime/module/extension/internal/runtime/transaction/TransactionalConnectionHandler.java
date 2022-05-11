@@ -17,7 +17,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.connection.ConnectionHandlerAdapter;
-import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
+import org.mule.sdk.api.connectivity.TransactionalConnection;
 
 import org.slf4j.Logger;
 

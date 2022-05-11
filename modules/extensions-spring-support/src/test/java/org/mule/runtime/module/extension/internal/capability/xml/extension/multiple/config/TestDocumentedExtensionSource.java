@@ -48,7 +48,8 @@ public class TestDocumentedExtensionSource extends Source<String, String> {
    * @param responseGroup Callback Doc of responseGroup
    */
   @OnSuccess
-  public void onSuccess(@ParameterGroup(name = "Response group", showInDsl = true) TestDocumentedParameterGroup responseGroup) {
+  public void onSuccess(@org.mule.sdk.api.annotation.param.ParameterGroup(name = "Response group",
+      showInDsl = true) TestDocumentedParameterGroup responseGroup) {
 
   }
 

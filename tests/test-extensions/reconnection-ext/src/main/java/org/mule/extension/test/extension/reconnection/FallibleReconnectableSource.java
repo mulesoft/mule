@@ -25,8 +25,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 
 /**
- * This class represents a {@link Source} that can fail starting repeatedly and after all reconnect successfully.
- * Also keeps in track if multiple instances were starting at the same time.
+ * This class represents a {@link Source} that can fail starting repeatedly and after all reconnect successfully. Also keeps in
+ * track if multiple instances were starting at the same time.
  */
 public class FallibleReconnectableSource extends Source<Void, Void> {
 

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
+
+	<heisenberg:config name="heisenberg" money="1000000"
+		finalHealth="CANCER">
+		<heisenberg:enemies />
+		<heisenberg:monthly-incomes />
+		<heisenberg:known-addresses />
+	</heisenberg:config>
+
+	<flow name="sourceCallbackError" initialState="stopped">
+		<heisenberg:listen-payments-all-optional config-ref="heisenberg">
+			<heisenberg:success-info age="27">
+				<heisenberg:known-addresses>
+					<heisenberg:known-address value="success address" />
+				</heisenberg:known-addresses>
+			</heisenberg:success-info>
+
+			<heisenberg:methylamine importer="Madrigal" />
+
+			<!-- no error info, must use the defaults -->
+		</heisenberg:listen-payments-all-optional>
+
+		<raise-error type="TEST:EXPECTED" />
+	</flow>
+
+</mule>

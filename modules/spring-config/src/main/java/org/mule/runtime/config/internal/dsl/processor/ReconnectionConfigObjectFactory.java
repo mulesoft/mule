@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.config.internal.dsl.processor;
 
-import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
+import org.mule.runtime.dsl.api.component.ComponentFactory;
 
 /**
- * {@link ObjectFactory} which yields instances of {@link ReconnectionConfig}
+ * {@link ComponentFactory} which yields instances of {@link ReconnectionConfig}
  *
  * @since 4.0
  */

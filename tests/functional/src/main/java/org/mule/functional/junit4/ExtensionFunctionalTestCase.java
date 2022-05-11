@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
-import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.test.runner.infrastructure.ExtensionsTestInfrastructureDiscoverer;
 
@@ -71,7 +71,7 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase {
    * @param builders the list of {@link ConfigurationBuilder}s that will be used to initialise the {@link #muleContext}
    */
   @Override
-  //TODO - MULE-11119: Make final again once we can add the HTTP service injection as the scehduler's is
+  // TODO - MULE-11119: Make final again once we can add the HTTP service injection as the scehduler's is
   protected void addBuilders(List<ConfigurationBuilder> builders) {
     super.addBuilders(builders);
     builders.add(0, new AbstractConfigurationBuilder() {

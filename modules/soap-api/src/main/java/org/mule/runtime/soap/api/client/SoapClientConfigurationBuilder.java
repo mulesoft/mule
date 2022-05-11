@@ -47,8 +47,8 @@ public class SoapClientConfigurationBuilder {
   SoapClientConfigurationBuilder() {}
 
   /**
-   * Sets the location of the WSDL that describes the SOAP web service. This can be an URL to an
-   * external resource (e.g http://somewsdl.com/hit?wsdl), just a reference to a local file or an application resource name.
+   * Sets the location of the WSDL that describes the SOAP web service. This can be an URL to an external resource (e.g
+   * http://somewsdl.com/hit?wsdl), just a reference to a local file or an application resource name.
    *
    * @return this builder.
    */

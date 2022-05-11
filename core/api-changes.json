@@ -1,7 +1,201 @@
 {
+  "4.5.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.removed",
+          "old": "method java.util.Map<java.lang.String, java.lang.Object> org.mule.runtime.core.api.util.SystemUtils::getCommandLineOptions(java.lang.String[], java.lang.String[][]) throws org.mule.runtime.api.exception.MuleException",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "SystemUtils",
+          "methodName": "getCommandLineOptions",
+          "elementKind": "method",
+          "justification": "MULE-1947: Moved this method to mule-module-launcher"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.core.api.util.SystemUtils",
+          "new": "class org.mule.runtime.core.api.util.SystemUtils",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "annotation": "@org.mule.api.annotation.NoInstantiate",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "SystemUtils",
+          "elementKind": "class",
+          "justification": "MULE-1947: It had a private constructor previously, couldn be instantiated anyway."
+        },
+        {
+          "code": "java.class.noLongerInheritsFromClass",
+          "old": "class org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
+          "new": "class org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
+          "superClass": "org.mule.runtime.core.privileged.exception.AbstractExceptionListener",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "elementKind": "class",
+          "justification": "MULE-19595: Used only by OnErrorCheckLogHandler, already adapted."
+        },
+        {
+          "code": "java.class.nonFinalClassInheritsFromNewClass",
+          "old": "class org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
+          "new": "class org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
+          "superClass": "org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "elementKind": "class",
+          "justification": "MULE-19595: Used only by OnErrorCheckLogHandler, already adapted."
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.el.context.EventVariablesMapContext",
+          "package": "org.mule.runtime.core.privileged.el.context",
+          "classSimpleName": "EventVariablesMapContext",
+          "elementKind": "class",
+          "justification": "Moved to core-mvel, same package"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.el.context.SessionVariableMapContext",
+          "package": "org.mule.runtime.core.privileged.el.context",
+          "classSimpleName": "SessionVariableMapContext",
+          "elementKind": "class",
+          "justification": "Moved to core-mvel, same package"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.lang.reflect.Field org.mule.runtime.core.api.util.ClassUtils::getField(java.lang.Class<?>, java.lang.String, boolean) throws java.lang.NoSuchFieldException",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "ClassUtils",
+          "methodName": "getField",
+          "elementKind": "method",
+          "justification": "Added convenience methods por reflection use cases"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method <T> T org.mule.runtime.core.api.util.ClassUtils::getStaticFieldValue(java.lang.Class<?>, java.lang.String, boolean) throws java.lang.NoSuchFieldException, java.lang.IllegalAccessException",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "ClassUtils",
+          "methodName": "getStaticFieldValue",
+          "elementKind": "method",
+          "justification": "Added convenience methods por reflection use cases"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.api.util.ClassUtils::setStaticFieldValue(java.lang.Class<?>, java.lang.String, java.lang.Object, boolean) throws java.lang.NoSuchFieldException, java.lang.IllegalAccessException",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "ClassUtils",
+          "methodName": "setStaticFieldValue",
+          "elementKind": "method",
+          "justification": "Added convenience methods por reflection use cases"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "field org.mule.runtime.core.api.config.MuleProperties.OBJECT_PAYLOAD_STATISTICS_DECORATOR_FACTORY",
+          "new": "field org.mule.runtime.core.api.config.MuleProperties.OBJECT_PAYLOAD_STATISTICS_DECORATOR_FACTORY",
+          "annotationType": "org.mule.api.annotation.Experimental",
+          "annotation": "@org.mule.api.annotation.Experimental",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "MuleProperties",
+          "fieldName": "OBJECT_PAYLOAD_STATISTICS_DECORATOR_FACTORY",
+          "elementKind": "field",
+          "justification": "Should have been annotated as experimental to start with. It is deprecated now and will be removed soon."
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "method org.mule.runtime.core.api.management.stats.PayloadStatistics org.mule.runtime.core.api.management.stats.AllStatistics::computePayloadStatisticsIfAbsent(org.mule.runtime.api.component.Component)",
+          "new": "method org.mule.runtime.core.api.management.stats.PayloadStatistics org.mule.runtime.core.api.management.stats.AllStatistics::computePayloadStatisticsIfAbsent(org.mule.runtime.api.component.Component)",
+          "annotationType": "org.mule.api.annotation.Experimental",
+          "annotation": "@org.mule.api.annotation.Experimental",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "AllStatistics",
+          "methodName": "computePayloadStatisticsIfAbsent",
+          "elementKind": "method",
+          "justification": "Should have been annotated as experimental to start with. It is deprecated now and will be removed soon."
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "method void org.mule.runtime.core.api.management.stats.AllStatistics::enablePayloadStatistics(boolean)",
+          "new": "method void org.mule.runtime.core.api.management.stats.AllStatistics::enablePayloadStatistics(boolean)",
+          "annotationType": "org.mule.api.annotation.Experimental",
+          "annotation": "@org.mule.api.annotation.Experimental",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "AllStatistics",
+          "methodName": "enablePayloadStatistics",
+          "elementKind": "method",
+          "justification": "Should have been annotated as experimental to start with. It is deprecated now and will be removed soon."
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "method java.util.Collection<org.mule.runtime.core.api.management.stats.PayloadStatistics> org.mule.runtime.core.api.management.stats.AllStatistics::getPayloadStatistics()",
+          "new": "method java.util.Collection<org.mule.runtime.core.api.management.stats.PayloadStatistics> org.mule.runtime.core.api.management.stats.AllStatistics::getPayloadStatistics()",
+          "annotationType": "org.mule.api.annotation.Experimental",
+          "annotation": "@org.mule.api.annotation.Experimental",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "AllStatistics",
+          "methodName": "getPayloadStatistics",
+          "elementKind": "method",
+          "justification": "Should have been annotated as experimental to start with. It is deprecated now and will be removed soon."
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "method org.mule.runtime.core.api.management.stats.PayloadStatistics org.mule.runtime.core.api.management.stats.AllStatistics::getPayloadStatistics(java.lang.String)",
+          "new": "method org.mule.runtime.core.api.management.stats.PayloadStatistics org.mule.runtime.core.api.management.stats.AllStatistics::getPayloadStatistics(java.lang.String)",
+          "annotationType": "org.mule.api.annotation.Experimental",
+          "annotation": "@org.mule.api.annotation.Experimental",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "AllStatistics",
+          "methodName": "getPayloadStatistics",
+          "elementKind": "method",
+          "justification": "Should have been annotated as experimental to start with. It is deprecated now and will be removed soon."
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "method boolean org.mule.runtime.core.api.management.stats.AllStatistics::isPayloadStatisticsEnabled()",
+          "new": "method boolean org.mule.runtime.core.api.management.stats.AllStatistics::isPayloadStatisticsEnabled()",
+          "annotationType": "org.mule.api.annotation.Experimental",
+          "annotation": "@org.mule.api.annotation.Experimental",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "AllStatistics",
+          "methodName": "isPayloadStatisticsEnabled",
+          "elementKind": "method",
+          "justification": "Should have been annotated as experimental to start with. It is deprecated now and will be removed soon."
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory",
+          "new": "interface org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory",
+          "annotationType": "org.mule.api.annotation.Experimental",
+          "annotation": "@org.mule.api.annotation.Experimental",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "CursorComponentDecoratorFactory",
+          "elementKind": "interface",
+          "justification": "Should have been annotated as experimental to start with. It is deprecated now and will be removed soon."
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.core.api.management.stats.PayloadStatistics",
+          "new": "class org.mule.runtime.core.api.management.stats.PayloadStatistics",
+          "annotationType": "org.mule.api.annotation.Experimental",
+          "annotation": "@org.mule.api.annotation.Experimental",
+          "package": "org.mule.runtime.core.api.management.stats",
+          "classSimpleName": "PayloadStatistics",
+          "elementKind": "class",
+          "justification": "Should have been annotated as experimental to start with. It is deprecated now and will be removed soon."
+        }
+      ]
+    }
+  },
   "4.4.0": {
     "revapi": {
       "ignore": [
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.core.privileged.exception.ErrorTypeLocator",
+          "new": "class org.mule.runtime.core.privileged.exception.ErrorTypeLocator",
+          "annotationType": "org.mule.api.annotation.NoExtend",
+          "annotation": "@org.mule.api.annotation.NoExtend",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "ErrorTypeLocator",
+          "elementKind": "class",
+          "justification": "MULE-18993: Had to make constructor protected"
+        },
         {
           "code": "java.method.visibilityReduced",
           "old": "method void org.mule.runtime.core.privileged.exception.EventProcessingException::storeErrorTypeInfo(java.lang.Throwable)",

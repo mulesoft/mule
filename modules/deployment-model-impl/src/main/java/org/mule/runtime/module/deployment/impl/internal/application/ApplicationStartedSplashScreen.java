@@ -9,10 +9,12 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
+
 import static org.apache.commons.io.FileUtils.toFile;
+
 import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactStartedSplashScreen;
 
 import java.net.URL;
@@ -46,7 +48,7 @@ public class ApplicationStartedSplashScreen extends ArtifactStartedSplashScreen<
   }
 
   protected void listLibraries(ApplicationDescriptor descriptor) {
-    // Excludes the application URL 
+    // Excludes the application URL
     URL[] urls = descriptor.getClassLoaderModel().getUrls();
     urls = Arrays.copyOfRange(urls, 1, urls.length);
 

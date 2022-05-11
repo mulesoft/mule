@@ -8,6 +8,7 @@
 package org.foo;
 
 public class EchoTest {
+
   public EchoTest() {
   }
 

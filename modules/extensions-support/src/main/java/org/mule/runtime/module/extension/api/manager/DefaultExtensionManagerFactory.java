@@ -16,8 +16,8 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 
 /**
- * Default implementation of {@link ExtensionManagerFactory} which creates instances of
- * {@link DefaultExtensionManager} and sets them into the owning {@link MuleContext}
+ * Default implementation of {@link ExtensionManagerFactory} which creates instances of {@link DefaultExtensionManager} and sets
+ * them into the owning {@link MuleContext}
  *
  * @since 4.0
  */

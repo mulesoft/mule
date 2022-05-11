@@ -23,7 +23,9 @@ import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.OUTPUT;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.TRANSFORMATION;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.ANY_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
@@ -42,6 +44,8 @@ import org.mule.metadata.api.annotation.DefaultValueAnnotation;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.BooleanType;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.VoidType;
@@ -52,6 +56,7 @@ import org.mule.metadata.api.model.impl.DefaultObjectType;
 import org.mule.metadata.api.model.impl.DefaultStringType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
@@ -61,17 +66,22 @@ import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.Test;
+
+import io.qameta.allure.Issue;
 
 public class CoreExtensionModelTestCase {
 
@@ -128,21 +138,21 @@ public class CoreExtensionModelTestCase {
     assertThat(cronSchedulerType.getFields(), hasSize(2));
     assertThat(cronSchedulerType.getFieldByName("expression").get().isRequired(), is(true));
     assertThat(cronSchedulerType.getFieldByName("expression").get().getValue(), instanceOf(DefaultStringType.class));
-    assertThat(cronSchedulerType.getFieldByName("timeZone").get().isRequired(), is(true));
+    assertThat(cronSchedulerType.getFieldByName("timeZone").get().isRequired(), is(false));
     assertThat(cronSchedulerType.getFieldByName("timeZone").get().getValue(), instanceOf(DefaultStringType.class));
 
     assertThat(coreExtensionModel.getExternalLibraryModels(), empty());
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
     assertThat(coreExtensionModel.getOperationModels(), hasSize(8));
-    assertThat(coreExtensionModel.getConstructModels(), hasSize(20));
+    assertThat(coreExtensionModel.getConstructModels(), hasSize(22));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
 
     assertThat(coreExtensionModel.getErrorModels(),
                hasItem(newError(TRANSFORMATION).withParent(errorMuleAny).build()));
 
-    assertThat(coreExtensionModel.getTypes(), hasSize(5));
+    assertThat(coreExtensionModel.getTypes(), hasSize(6));
   }
 
   @Test
@@ -219,14 +229,11 @@ public class CoreExtensionModelTestCase {
   @Test
   public void scheduler() {
     final SourceModel schedulerModel = coreExtensionModel.getSourceModel("scheduler").get();
-    assertThat(schedulerModel.getStereotype(), is(SOURCE));
+    assertSteretorype(schedulerModel.getStereotype(), "SCHEDULER", SOURCE);
 
+    assertOutputTypes(schedulerModel, ANY_TYPE, ANY_TYPE);
     assertThat(schedulerModel.getErrorModels(), empty());
     assertThat(schedulerModel.hasResponse(), is(false));
-    assertThat(schedulerModel.getOutput().getType(), instanceOf(DefaultObjectType.class));
-    assertThat(schedulerModel.getOutput().hasDynamicType(), is(false));
-    assertThat(schedulerModel.getOutputAttributes().getType(), instanceOf(DefaultObjectType.class));
-    assertThat(schedulerModel.getOutputAttributes().hasDynamicType(), is(false));
 
     final List<ParameterModel> paramModels = schedulerModel.getAllParameterModels();
     assertThat(paramModels, hasSize(2));
@@ -234,10 +241,20 @@ public class CoreExtensionModelTestCase {
     assertSchedulingDisallowConcurrentExecution(paramModels.get(1));
   }
 
+  private void assertSteretorype(StereotypeModel stereotypeModel, String type, StereotypeModel parent) {
+    assertThat(stereotypeModel.getType(), equalTo(type));
+    assertThat(stereotypeModel.getNamespace(), equalTo("MULE"));
+    if (parent != null) {
+      assertThat(stereotypeModel.getParent().get(), is(parent));
+    } else {
+      assertThat(stereotypeModel.getParent().isPresent(), is(false));
+    }
+  }
+
   @Test
   public void logger() {
     final OperationModel loggerModel = coreExtensionModel.getOperationModel("logger").get();
-    assertThat(loggerModel.getStereotype(), is(PROCESSOR));
+    assertSteretorype(loggerModel.getStereotype(), "LOGGER", PROCESSOR);
 
     assertThat(loggerModel.getErrorModels(), empty());
     assertThat(loggerModel.getExecutionType(), is(CPU_LITE));
@@ -270,7 +287,7 @@ public class CoreExtensionModelTestCase {
     assertThat(object.allowsTopLevelDeclaration(), is(true));
 
     final List<ParameterModel> paramModels = object.getAllParameterModels();
-    assertThat(paramModels, hasSize(3));
+    assertThat(paramModels, hasSize(4));
 
     ParameterModel name = paramModels.get(0);
     assertThat(name.getName(), is("name"));
@@ -296,12 +313,20 @@ public class CoreExtensionModelTestCase {
     ExclusiveParametersModel exclusiveParameterModel = exclusiveParametersModels.get(0);
     assertThat(exclusiveParameterModel.getExclusiveParameterNames(), contains("ref", "class"));
     assertThat(exclusiveParameterModel.isOneRequired(), is(true));
+
+    ParameterModel properties = paramModels.get(3);
+    assertThat(properties.getName(), is("property"));
+    assertThat(properties.isRequired(), is(false));
+    assertThat(properties.getType(), instanceOf(DefaultObjectType.class));
+    assertThat(properties.getType().getAnnotations(), hasSize(1));
+    assertThat(properties.getType().getAnnotation(ClassInformationAnnotation.class).get().getClassname(),
+               is(Map.class.getName()));
   }
 
   @Test
   public void raiseError() {
     final OperationModel raiseErrorModel = coreExtensionModel.getOperationModel("raiseError").get();
-    assertThat(raiseErrorModel.getStereotype(), is(PROCESSOR));
+    assertSteretorype(raiseErrorModel.getStereotype(), "RAISE_ERROR", PROCESSOR);
 
     assertThat(raiseErrorModel.getErrorModels(), empty());
     assertThat(raiseErrorModel.getExecutionType(), is(CPU_LITE));
@@ -364,7 +389,7 @@ public class CoreExtensionModelTestCase {
   @Test
   public void flowRef() {
     final OperationModel flowRefModel = coreExtensionModel.getOperationModel("flowRef").get();
-    assertThat(flowRefModel.getStereotype(), is(PROCESSOR));
+    assertSteretorype(flowRefModel.getStereotype(), "FLOW_REF", PROCESSOR);
 
     assertAssociatedProcessorsChangeOutput(flowRefModel);
 
@@ -382,7 +407,7 @@ public class CoreExtensionModelTestCase {
   @Test
   public void idempotentMessageValidator() {
     final OperationModel filterModel = coreExtensionModel.getOperationModel("idempotentMessageValidator").get();
-    assertThat(filterModel.getStereotype(), is(PROCESSOR));
+    assertSteretorype(filterModel.getStereotype(), "IDEMPOTENT_MESSAGE_VALIDATOR", PROCESSOR);
 
     assertOutputSameAsInput(filterModel);
 
@@ -409,6 +434,11 @@ public class CoreExtensionModelTestCase {
     assertThat(filterModel.getAllParameterModels().get(3).isRequired(), is(false));
     assertThat(filterModel.getAllParameterModels().get(3).getAllowedStereotypes().size(), is(1));
     assertThat(filterModel.getAllParameterModels().get(3).getAllowedStereotypes().get(0), is(OBJECT_STORE));
+  }
+
+  private void assertOutputTypes(HasOutputModel model, MetadataType payload, MetadataType attributes) {
+    assertThat(model.getOutput().getType(), equalTo(payload));
+    assertThat(model.getOutputAttributes().getType(), equalTo(attributes));
   }
 
   @Test
@@ -441,8 +471,7 @@ public class CoreExtensionModelTestCase {
   public void scatterGather() {
     final ConstructModel scatterGatherModel = coreExtensionModel.getConstructModel("scatterGather").get();
 
-
-    assertThat(scatterGatherModel.getAllParameterModels(), hasSize(4));
+    assertThat(scatterGatherModel.getAllParameterModels(), hasSize(5));
 
     assertThat(scatterGatherModel.getAllParameterModels().get(0).getName(), is("timeout"));
     assertThat(scatterGatherModel.getAllParameterModels().get(0).getExpressionSupport(), is(NOT_SUPPORTED));
@@ -454,15 +483,20 @@ public class CoreExtensionModelTestCase {
     assertThat(scatterGatherModel.getAllParameterModels().get(1).getType(), instanceOf(DefaultNumberType.class));
     assertThat(scatterGatherModel.getAllParameterModels().get(1).isRequired(), is(false));
 
-    assertThat(scatterGatherModel.getAllParameterModels().get(2).getName(), is(TARGET_PARAMETER_NAME));
+    assertThat(scatterGatherModel.getAllParameterModels().get(2).getName(), is("collectList"));
     assertThat(scatterGatherModel.getAllParameterModels().get(2).getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(scatterGatherModel.getAllParameterModels().get(2).getType(), instanceOf(DefaultStringType.class));
+    assertThat(scatterGatherModel.getAllParameterModels().get(2).getType(), instanceOf(DefaultObjectType.class));
     assertThat(scatterGatherModel.getAllParameterModels().get(2).isRequired(), is(false));
 
-    assertThat(scatterGatherModel.getAllParameterModels().get(3).getName(), is(TARGET_VALUE_PARAMETER_NAME));
-    assertThat(scatterGatherModel.getAllParameterModels().get(3).getExpressionSupport(), is(REQUIRED));
-    assertThat(scatterGatherModel.getAllParameterModels().get(3).getType(), instanceOf(StringType.class));
+    assertThat(scatterGatherModel.getAllParameterModels().get(3).getName(), is(TARGET_PARAMETER_NAME));
+    assertThat(scatterGatherModel.getAllParameterModels().get(3).getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(scatterGatherModel.getAllParameterModels().get(3).getType(), instanceOf(DefaultStringType.class));
     assertThat(scatterGatherModel.getAllParameterModels().get(3).isRequired(), is(false));
+
+    assertThat(scatterGatherModel.getAllParameterModels().get(4).getName(), is(TARGET_VALUE_PARAMETER_NAME));
+    assertThat(scatterGatherModel.getAllParameterModels().get(4).getExpressionSupport(), is(REQUIRED));
+    assertThat(scatterGatherModel.getAllParameterModels().get(4).getType(), instanceOf(StringType.class));
+    assertThat(scatterGatherModel.getAllParameterModels().get(4).isRequired(), is(false));
 
     assertThat(scatterGatherModel.getNestedComponents(), hasSize(1));
 
@@ -471,6 +505,18 @@ public class CoreExtensionModelTestCase {
     assertThat(routeModel.getMinOccurs(), is(2));
     assertThat(routeModel.getMaxOccurs(), is(Optional.empty()));
     assertThat(routeModel.getAllParameterModels(), empty());
+  }
+
+  @Test
+  @Issue("MULE-19653")
+  public void scatterGatherOutputParams() {
+    final ConstructModel scatterGatherModel = coreExtensionModel.getConstructModel("scatterGather").get();
+
+    ParameterGroupModel outputGroup =
+        scatterGatherModel.getParameterGroupModels().stream().filter(pg -> pg.getName().equals(OUTPUT)).findAny().get();
+
+    assertThat(outputGroup.getParameter(TARGET_PARAMETER_NAME).isPresent(), is(true));
+    assertThat(outputGroup.getParameter(TARGET_VALUE_PARAMETER_NAME).isPresent(), is(true));
   }
 
   @Test
@@ -521,6 +567,18 @@ public class CoreExtensionModelTestCase {
   }
 
   @Test
+  @Issue("MULE-19653")
+  public void parallelForeachOutputParams() {
+    final ConstructModel parallelForeach = coreExtensionModel.getConstructModel("parallelForeach").get();
+
+    ParameterGroupModel outputGroup =
+        parallelForeach.getParameterGroupModels().stream().filter(pg -> pg.getName().equals(OUTPUT)).findAny().get();
+
+    assertThat(outputGroup.getParameter(TARGET_PARAMETER_NAME).isPresent(), is(true));
+    assertThat(outputGroup.getParameter(TARGET_VALUE_PARAMETER_NAME).isPresent(), is(true));
+  }
+
+  @Test
   public void async() {
     final ConstructModel asyncModel = coreExtensionModel.getConstructModel("async").get();
 
@@ -562,9 +620,9 @@ public class CoreExtensionModelTestCase {
 
   @Test
   public void untilSuccessful() {
-    final ConstructModel tryModel = coreExtensionModel.getConstructModel("untilSuccessful").get();
+    final ConstructModel untilSuccessful = coreExtensionModel.getConstructModel("untilSuccessful").get();
 
-    List<ParameterModel> allParameterModels = tryModel.getAllParameterModels();
+    List<ParameterModel> allParameterModels = untilSuccessful.getAllParameterModels();
     assertThat(allParameterModels, hasSize(2));
 
     ParameterModel action = allParameterModels.get(0);
@@ -584,9 +642,9 @@ public class CoreExtensionModelTestCase {
 
   @Test
   public void firstSuccessful() {
-    final ConstructModel tryModel = coreExtensionModel.getConstructModel("firstSuccessful").get();
+    final ConstructModel firstSuccessful = coreExtensionModel.getConstructModel("firstSuccessful").get();
 
-    List<ParameterModel> allParameterModels = tryModel.getAllParameterModels();
+    List<ParameterModel> allParameterModels = firstSuccessful.getAllParameterModels();
     assertThat(allParameterModels, hasSize(0));
   }
 
@@ -863,6 +921,7 @@ public class CoreExtensionModelTestCase {
   private void assertSchedulingStrategy(ParameterModel paramModel) {
     assertThat(paramModel.getName(), is("schedulingStrategy"));
     assertThat(paramModel.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(paramModel.getDslConfiguration().allowsReferences(), is(false));
     assertThat(paramModel.getType(), instanceOf(DefaultObjectType.class));
     assertThat(paramModel.isRequired(), is(true));
     assertThat(paramModel.getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
@@ -875,6 +934,6 @@ public class CoreExtensionModelTestCase {
     assertThat(paramModel.getType(), instanceOf(DefaultBooleanType.class));
     assertThat(paramModel.isRequired(), is(false));
     assertThat(paramModel.getDefaultValue(), is(false));
-    assertThat(paramModel.getType().getAnnotation(TypeIdAnnotation.class).get().getValue(), is(Boolean.class.getName()));
+    assertThat(paramModel.getType(), is(instanceOf(BooleanType.class)));
   }
 }

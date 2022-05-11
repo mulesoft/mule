@@ -20,7 +20,7 @@ public interface PolicyTemplateFactory {
    * Creates a new policy template artifact
    *
    * @param application class loader where the policy template's class loader will be included. Non null.
-   * @param descriptor describes how to build a policy template artifact. Non null
+   * @param descriptor  describes how to build a policy template artifact. Non null
    * @return a {@link PolicyTemplate} artifact from the provided descriptor as a member of the region.
    * @throws PolicyTemplateCreationException when the artifact cannot be created
    */

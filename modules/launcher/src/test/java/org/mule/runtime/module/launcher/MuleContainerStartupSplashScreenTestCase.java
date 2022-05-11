@@ -10,15 +10,18 @@ import static org.hamcrest.Matchers.not;
 import static org.mule.runtime.container.api.MuleFoldersUtil.ARTIFACT_PATCHES_FOLDER;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.tck.junit4.matcher.StringContainsIgnoringLineBreaks.containsStringIgnoringLineBreaks;
+import static org.mule.test.allure.AllureConstants.ArtifactPatchingFeature.ARTIFACT_PATCHING;
 
 import org.mule.runtime.module.deployment.impl.internal.AbstractSplashScreenTestCase;
 
 import java.io.File;
 
+import io.qameta.allure.Feature;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
+@Feature(ARTIFACT_PATCHING)
 public class MuleContainerStartupSplashScreenTestCase extends AbstractSplashScreenTestCase<MuleContainerStartupSplashScreen> {
 
   private static final String FIRST_PATCH = "SE-4242-3.8.0.jar";
@@ -58,7 +61,7 @@ public class MuleContainerStartupSplashScreenTestCase extends AbstractSplashScre
 
   @Before
   public void setUp() {
-    splashScreen = new MuleContainerStartupSplashScreen();
+    splashScreen = new MuleContainerStartupSplashScreen(false);
   }
 
   @Override

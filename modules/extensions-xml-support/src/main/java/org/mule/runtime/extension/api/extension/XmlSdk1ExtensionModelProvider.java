@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.extension.api.extension;
 
+import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
+
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.LazyValue;
@@ -24,8 +26,8 @@ public class XmlSdk1ExtensionModelProvider {
 
   private static final LazyValue<ExtensionModel> EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
       .create(new DefaultExtensionLoadingContext(new XmlSdk1ExtensionModelDeclarer().createExtensionModel(),
-                                                 MuleExtensionModelProvider.class.getClassLoader(),
-                                                 new NullDslResolvingContext())));
+                                                 builder(MuleExtensionModelProvider.class.getClassLoader(),
+                                                         new NullDslResolvingContext()).build())));
 
   /**
    * @return the {@link ExtensionModel} definition for Mule's EE Runtime

@@ -10,6 +10,7 @@ package org.mule.runtime.module.artifact.api.classloader;
 import org.mule.api.annotation.NoImplement;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * Defines which resources in a class loader should be looked up using parent-first, child-first or child only strategies.
@@ -50,14 +51,44 @@ public interface ClassLoaderLookupPolicy {
   ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies);
 
   /**
+   * Creates a new instance extending the original policy configuration.
+   * <p>
+   * This is equivalent of calling {@link #extend(Stream, LookupStrategy, boolean)} with {@code overwrite=false}.
+   *
+   * @param packages       specific packages to set the lookupStrategy to. Non null.
+   * @param lookupStrategy lookup strategies to use with the provided packages. Non null.
+   * @return a new policy containing the lookup strategies from the original policy and the lookup strategies passed on the
+   *         parameter.
+   * 
+   * @since 4.5
+   */
+  ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy);
+
+  /**
    * Creates a new instance extending the original policy configuration
    *
    * @param lookupStrategies lookup strategies to use with specific packages. Non null.
-   * @param overwrite if a lookupStrategy for a package provided in {@code lookupStrategies} already exists on this policy, it
-   *        will be overridden or not depending on this value.
+   * @param overwrite        if a lookupStrategy for a package provided in {@code lookupStrategies} already exists on this policy,
+   *                         it will be overridden or not depending on this value.
    * @return a new policy containing the lookup strategies from the original policy and the lookup strategies passed on the
    *         parameter.
    */
   ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies, boolean overwrite);
+
+  /**
+   * Creates a new instance extending the original policy configuration.
+   * <p>
+   * This is equivalent of calling {@link #extend(Stream, LookupStrategy, boolean)} with {@code overwrite=false}.
+   *
+   * @param packages       specific packages to set the lookupStrategy to. Non null.
+   * @param lookupStrategy lookup strategies to use with the provided packages. Non null.
+   * @param overwrite      if a lookupStrategy for a package provided in {@code lookupStrategies} already exists on this policy,
+   *                       it will be overridden or not depending on this value.
+   * @return a new policy containing the lookup strategies from the original policy and the lookup strategies passed on the
+   *         parameter.
+   * 
+   * @since 4.5
+   */
+  ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy, boolean overwrite);
 
 }

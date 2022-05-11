@@ -16,17 +16,20 @@ import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.util.BeanUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Creates object instances based on the class and sets any properties. This factory is also responsible for applying any object
  * processors on the object before the lifecycle callbacks are called.
+ * 
+ * @deprecated this will be removed in next major version
  */
+@Deprecated
 public abstract class AbstractObjectFactory extends AbstractComponent implements ObjectFactory {
 
   protected String objectClassName;
@@ -96,7 +99,7 @@ public abstract class AbstractObjectFactory extends AbstractComponent implements
    * properties for the resulting object
    *
    * @param muleContext the current {@link org.mule.runtime.core.api.MuleContext} instance. This can be used for performing
-   *        registry lookups applying processors to newly created objects or even firing custom notifications
+   *                    registry lookups applying processors to newly created objects or even firing custom notifications
    * @throws Exception Can throw any type of exception while creating a new object
    */
   @Override

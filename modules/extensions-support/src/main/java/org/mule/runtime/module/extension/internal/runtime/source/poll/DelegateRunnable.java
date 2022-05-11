@@ -15,9 +15,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 
 /**
- * {@link Runnable} that delegates its execution. The delegate can be switch at any time.
- * This is particulary useful when you want to schedule a task to be repeated, and you want to change the task for the next
- * executions without rescheduling.
+ * {@link Runnable} that delegates its execution. The delegate can be switch at any time. This is particulary useful when you want
+ * to schedule a task to be repeated, and you want to change the task for the next executions without rescheduling.
  *
  * @since 4.2.3 4.3.1 4.4.0
  */

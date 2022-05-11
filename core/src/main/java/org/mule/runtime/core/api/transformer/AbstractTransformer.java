@@ -181,9 +181,9 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
   /**
    * Determines whether that data type passed in is supported by this transformer
    *
-   * @param dataType the type to check against
+   * @param dataType   the type to check against
    * @param exactMatch if set to true, this method will look for an exact match to the data type, if false it will look for a
-   *        compatible data type.
+   *                   compatible data type.
    * @return true if the source type is supported by this transformer, false otherwise
    */
   public boolean isSourceDataTypeSupported(DataType dataType, boolean exactMatch) {

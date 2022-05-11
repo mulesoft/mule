@@ -22,9 +22,9 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Custom service that extends the list of {@link XmlNamespaceInfoProvider}s discovered
- * using a {@link ServiceRegistry} with a {@link XmlNamespaceInfoProvider} providing information
- * of the namespaces for the {@link ExtensionModel extensions} in the current context.
+ * Custom service that extends the list of {@link XmlNamespaceInfoProvider}s discovered using a {@link ServiceRegistry} with a
+ * {@link XmlNamespaceInfoProvider} providing information of the namespaces for the {@link ExtensionModel extensions} in the
+ * current context.
  *
  * @since 4.0
  */

@@ -6,15 +6,18 @@
  */
 package org.mule.runtime.core.privileged.object;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.object.AbstractObjectFactory;
 
 import java.util.Map;
 
 /**
  * Creates an instance of the object once and then always returns the same instance.
+ * 
+ * @deprecated this will be removed in next major version
  */
+@Deprecated
 public final class SingletonObjectFactory extends AbstractObjectFactory {
 
   private Object instance;

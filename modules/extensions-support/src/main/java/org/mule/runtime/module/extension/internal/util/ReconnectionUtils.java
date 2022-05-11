@@ -7,12 +7,14 @@
 package org.mule.runtime.module.extension.internal.util;
 
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+import static org.mule.runtime.core.api.util.ExceptionUtils.extractCauseOfType;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.COMPONENT_CONFIG_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.IS_TRANSACTIONAL;
 
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -34,7 +36,7 @@ public class ReconnectionUtils {
   };
 
   /**
-   * @param t the {@link Throwable} thrown during the execution of the operation
+   * @param t       the {@link Throwable} thrown during the execution of the operation
    * @param context the {@link ExecutionContextAdapter} that contains the context information about the operation's execution
    * @return whether or not the operation should be retried
    *
@@ -47,7 +49,10 @@ public class ReconnectionUtils {
       return false;
     }
 
-    if (isPartOfActiveTransaction(context.getConfiguration().get())) {
+    // Transactions are bound to a connection, so the tx cannot continue on a newly established connection.
+    // Because of this, operations within transactions cannot be retried.
+    if (isPartOfActiveTransaction(context.getConfiguration().get())
+        || extractCauseOfType(t, TransactionException.class).isPresent()) {
       return false;
     }
 
@@ -55,17 +60,17 @@ public class ReconnectionUtils {
   }
 
   /**
-   * To fix reconnection for paged operations that fail after the first page, the connection exception is intercepted at
-   * the {@link PagingProviderProducer} and enriched with additional information. This method reads that information and
-   * determines if the operation should be retried.
+   * To fix reconnection for paged operations that fail after the first page, the connection exception is intercepted at the
+   * {@link PagingProviderProducer} and enriched with additional information. This method reads that information and determines if
+   * the operation should be retried.
    *
-   * This method first checks if the operation was involved in a transaction. If so, it returns false.
-   * Then it checks that the context trying to retry this operation has the same config as the operation itself. This is
-   * to prevent other components from retrying the operation. If the config names do no match, it returns false.
-   * Otherwise or if the connection exception was not enriched, this method returns true.
+   * This method first checks if the operation was involved in a transaction. If so, it returns false. Then it checks that the
+   * context trying to retry this operation has the same config as the operation itself. This is to prevent other components from
+   * retrying the operation. If the config names do no match, it returns false. Otherwise or if the connection exception was not
+   * enriched, this method returns true.
    *
    * @param connectionException the {@link ConnectionException} thrown during the execution of the operation
-   * @param contextConfigName the config name for the context that is attempting to retry the operation
+   * @param contextConfigName   the config name for the context that is attempting to retry the operation
    * @return whether or not the operation should be retried
    */
   private static boolean isConnectionExceptionFromCurrentComponent(ConnectionException connectionException,

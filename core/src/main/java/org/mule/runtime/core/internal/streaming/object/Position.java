@@ -7,12 +7,10 @@
 package org.mule.runtime.core.internal.streaming.object;
 
 /**
- * Represents the position of an item inside a {@link ObjectStreamBuffer}. Because
- * the buffer stores its contents in buckets, this position will refer to bucket and
- * item indexes.
+ * Represents the position of an item inside a {@link ObjectStreamBuffer}. Because the buffer stores its contents in buckets, this
+ * position will refer to bucket and item indexes.
  * <p>
- * This object is immutable. All methods which generate new state will return
- * a new instance.
+ * This object is immutable. All methods which generate new state will return a new instance.
  *
  * @see Bucket
  * @since 4.0
@@ -24,8 +22,9 @@ public class Position implements Comparable<Position> {
 
   /**
    * Create a new instance
+   * 
    * @param bucketIndex the index of the bucket which contains the item
-   * @param itemIndex the item index between its bucket
+   * @param itemIndex   the item index between its bucket
    */
   public Position(int bucketIndex, int itemIndex) {
     this.bucketIndex = bucketIndex;

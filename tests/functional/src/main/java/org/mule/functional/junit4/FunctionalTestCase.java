@@ -6,20 +6,24 @@
  */
 package org.mule.functional.junit4;
 
-import static java.util.Collections.emptyMap;
-import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.retry.ReconnectionConfig.DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.createDefaultExtensionManager;
+
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singleton;
+
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
-import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -34,6 +38,7 @@ import org.mule.tck.processor.FlowAssert;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -89,30 +94,45 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   protected ConfigurationBuilder getBuilder() throws Exception {
     ArtifactDeclaration artifactDeclaration = getArtifactDeclaration();
     if (artifactDeclaration != null) {
-      return createConfigurationBuilder(artifactDeclaration);
+      return new ArtifactAstXmlParserConfigurationBuilder(artifactProperties(),
+                                                          enableLazyInit(),
+                                                          artifactDeclaration);
     }
 
     String configResources = getConfigResources();
     if (configResources != null) {
-      return createConfigurationBuilder(configResources, emptyMap(), APP, enableLazyInit(), disableXmlValidations());
+      return new ArtifactAstXmlParserConfigurationBuilder(artifactProperties(),
+                                                          disableXmlValidations(), enableLazyInit(),
+                                                          mustRegenerateExtensionModels(),
+                                                          new String[] {configResources});
     }
     configResources = getConfigFile();
     if (configResources != null) {
       if (configResources.contains(",")) {
         throw new RuntimeException("Do not use this method when the config is composed of several files. Use getConfigFiles method instead.");
       }
-      return createConfigurationBuilder(configResources, artifactProperties(), APP, enableLazyInit(), disableXmlValidations());
+      return new ArtifactAstXmlParserConfigurationBuilder(artifactProperties(),
+                                                          disableXmlValidations(), enableLazyInit(),
+                                                          mustRegenerateExtensionModels(),
+                                                          new String[] {configResources});
     }
-    return createConfigurationBuilder(getConfigFiles(), artifactProperties(), APP, enableLazyInit(), disableXmlValidations());
+    return new ArtifactAstXmlParserConfigurationBuilder(artifactProperties(),
+                                                        disableXmlValidations(), enableLazyInit(),
+                                                        mustRegenerateExtensionModels(),
+                                                        getConfigFiles());
   }
 
   public static ConfigurationBuilder extensionManagerWithMuleExtModelBuilder() {
+    return extensionManagerWithMuleExtModelBuilder(singleton(getExtensionModel()));
+  }
+
+  public static ConfigurationBuilder extensionManagerWithMuleExtModelBuilder(Set<ExtensionModel> extensionModels) {
     return new AbstractConfigurationBuilder() {
 
       @Override
       protected void doConfigure(MuleContext muleContext) throws Exception {
         ExtensionManager extensionManager = createExtensionManager(muleContext);
-        extensionManager.registerExtension(getExtensionModel());
+        extensionModels.forEach(extensionManager::registerExtension);
       }
 
     };
@@ -157,9 +177,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   @Override
   protected ClassLoader getExecutionClassLoader() {
     if (!isDisposeContextPerClass() || executionClassLoader == null) {
-      executionClassLoader =
-          new ContainerClassLoaderFactory(new FunctionalTestModuleRepository())
-              .createContainerClassLoader(getClass().getClassLoader());
+      executionClassLoader = createContainerClassLoader(new FunctionalTestModuleRepository(), getClass().getClassLoader());
     }
 
     return executionClassLoader.getClassLoader();
@@ -224,11 +242,20 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   }
 
   /**
-   * @return a boolean indicating if the Mule App should start in lazy mode. This means that the Mule App components
-   * will be initialized on demand.
+   * @return a boolean indicating if the Mule App should start in lazy mode. This means that the Mule App components will be
+   *         initialized on demand.
    */
   public boolean enableLazyInit() {
     return false;
+  }
+
+  @Override
+  protected DefaultMuleConfiguration createMuleConfiguration() {
+    if (enableLazyInit()) {
+      return new ReconfigurableMuleConfiguration();
+    } else {
+      return super.createMuleConfiguration();
+    }
   }
 
   /**
@@ -236,5 +263,26 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
    */
   public boolean disableXmlValidations() {
     return false;
+  }
+
+  /**
+   * Subclasses can override this method so that extension models used are regenerated before running its tests. For example, some
+   * part of a extension model might only be created if a certain system property is in place, so the test classes that test that
+   * feature will have to generate the extension model when the property is already set.
+   *
+   * @return whether the tests on this class need for extensions model to be generated again.
+   */
+  protected boolean mustRegenerateExtensionModels() {
+    return false;
+  }
+
+  @Override
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    builders.add(extensionManagerWithMuleExtModelBuilder(getExtensionModels()));
+    super.addBuilders(builders);
+  }
+
+  protected Set<ExtensionModel> getExtensionModels() {
+    return singleton(getExtensionModel());
   }
 }

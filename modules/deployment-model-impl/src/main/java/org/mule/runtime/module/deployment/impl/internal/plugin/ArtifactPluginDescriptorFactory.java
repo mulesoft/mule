@@ -7,27 +7,28 @@
 
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.core.internal.util.JarUtils.loadFileContentFrom;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
+
+import static java.lang.String.format;
+
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.LoaderDescriber;
+import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepositoryFactory;
 import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
+import org.mule.runtime.module.artifact.api.plugin.LoaderDescriber;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,15 +46,17 @@ public class ArtifactPluginDescriptorFactory
    * Creates a default factory
    */
   public ArtifactPluginDescriptorFactory() {
-    this(new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry()),
+    this(new DescriptorLoaderRepositoryFactory().createDescriptorLoaderRepository(),
          ArtifactDescriptorValidatorBuilder.builder());
   }
 
   /**
    * Creates a custom factory
    * 
-   * @param descriptorLoaderRepository contains all the {@link ClassLoaderModelLoader} registered on the container. Non null
-   * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} builder to define the validator to be used. Non null.
+   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderModelLoader} registered on the container. Non
+   *                                           null
+   * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} builder to define the validator to be
+   *                                           used. Non null.
    */
   public ArtifactPluginDescriptorFactory(DescriptorLoaderRepository descriptorLoaderRepository,
                                          ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
@@ -137,6 +140,7 @@ public class ArtifactPluginDescriptorFactory
   @Override
   protected ArtifactPluginDescriptor createArtifactDescriptor(File artifactLocation, String name,
                                                               Optional<Properties> deploymentProperties) {
+    // Keep compatibility with usages of the factory that expect the descriptor from previous version.
     return new ArtifactPluginDescriptor(name, deploymentProperties);
   }
 

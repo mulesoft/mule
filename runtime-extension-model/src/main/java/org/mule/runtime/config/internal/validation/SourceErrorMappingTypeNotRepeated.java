@@ -13,27 +13,23 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
-import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
+import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 
-import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.extension.api.error.ErrorMapping;
-import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
 
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  * Error Mappings source types are not repeated.
  */
-public class SourceErrorMappingTypeNotRepeated implements Validation {
+public class SourceErrorMappingTypeNotRepeated extends AbstractErrorMappingValidation {
 
   @Override
   public String getName() {
@@ -51,34 +47,25 @@ public class SourceErrorMappingTypeNotRepeated implements Validation {
   }
 
   @Override
-  public Predicate<List<ComponentAst>> applicable() {
-    return currentElemement(component -> component.getModel(OperationModel.class)
-        .map(opModel -> !opModel.getModelProperty(NoErrorMappingModelProperty.class).isPresent()
-            && component.getParameter(ERROR_MAPPINGS_PARAMETER_NAME) != null)
-        .orElse(false));
-  }
+  protected Optional<ValidationResultItem> validateErrorMapping(ComponentAst component,
+                                                                final ComponentParameterAst errorMappingsParam,
+                                                                List<ErrorMapping> mappings) {
+    final List<String> repeatedSources = mappings.stream()
+        .map(ErrorMapping::getSource)
+        .collect(groupingBy(Function.identity(), counting()))
+        .entrySet()
+        .stream()
+        .filter(element -> element.getValue() > 1)
+        .map(Entry::getKey)
+        .collect(toList());
 
-  @Override
-  public Optional<String> validate(ComponentAst component, ArtifactAst artifact) {
-    return component.getParameter(ERROR_MAPPINGS_PARAMETER_NAME).<List<ErrorMapping>>getValue()
-        .reduce(l -> empty(),
-                mappings -> {
-                  final List<String> repeatedSources = mappings.stream()
-                      .map(ErrorMapping::getSource)
-                      .collect(groupingBy(Function.identity(), counting()))
-                      .entrySet()
-                      .stream()
-                      .filter(element -> element.getValue() > 1)
-                      .map(Entry::getKey)
-                      .collect(toList());
-
-                  if (!repeatedSources.isEmpty()) {
-                    return of(format("Repeated source types are not allowed. Offending types are '%s'.",
-                                     on("', '").join(repeatedSources)));
-                  } else {
-                    return empty();
-                  }
-                });
+    if (!repeatedSources.isEmpty()) {
+      return of(create(component, errorMappingsParam, this,
+                       format("Repeated source types are not allowed. Offending types are '%s'.",
+                              on("', '").join(repeatedSources))));
+    } else {
+      return empty();
+    }
   }
 
 }

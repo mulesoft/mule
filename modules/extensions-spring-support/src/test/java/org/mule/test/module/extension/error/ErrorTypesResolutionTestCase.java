@@ -18,10 +18,10 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.util.TestConnectivityUtils;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
+import java.util.Map;
+
 import org.junit.Rule;
 import org.junit.Test;
-
-import java.util.Map;
 
 public class ErrorTypesResolutionTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -69,4 +69,11 @@ public class ErrorTypesResolutionTestCase extends AbstractExtensionFunctionalTes
     Map<String, Object> info = ((MuleException) epe).getInfo();
     assertThat(info.get("Element").toString(), containsString("withUnderlyingConnectorError/processors/0"));
   }
+
+  @Test
+  public void failsWithConnectivityError() throws Exception {
+    expectedError.expectErrorType("PETSTORE", "CONNECTIVITY");
+    flowRunner("withConnectivityError").run();
+  }
+
 }

@@ -34,8 +34,9 @@ import io.qameta.allure.Story;
 @Story(DIRECT)
 public class DirectProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
-  public DirectProcessingStrategyTestCase(Mode mode) {
-    super(mode);
+  public DirectProcessingStrategyTestCase(Mode mode, boolean profiling) {
+    // The blocking processing strategy does not implement profiling yet
+    super(mode, false);
   }
 
   @Override

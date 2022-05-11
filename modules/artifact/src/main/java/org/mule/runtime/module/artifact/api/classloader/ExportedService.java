@@ -29,7 +29,7 @@ public final class ExportedService {
    * Create a new service
    *
    * @param serviceInterface fully qualified name of the interface that defines the service to be located using SPI. Non empty.
-   * @param resource resource to be returned when {code serviceInterface} is searched via SPI. Non null.
+   * @param resource         resource to be returned when {code serviceInterface} is searched via SPI. Non null.
    */
   public ExportedService(String serviceInterface, URL resource) {
     checkArgument(!isEmpty(serviceInterface), "serviceInterface cannot be empty");

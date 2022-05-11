@@ -10,8 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * Default implementation of {@link MethodInvoker} which simply invokes the method using the supplied
- * target and arguments.
+ * Default implementation of {@link MethodInvoker} which simply invokes the method using the supplied target and arguments.
  *
  * @since 4.2
  */

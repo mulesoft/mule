@@ -1,0 +1,8 @@
+{
+  "definitions": {
+    "schema": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

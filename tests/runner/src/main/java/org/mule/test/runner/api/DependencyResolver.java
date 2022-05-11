@@ -67,7 +67,7 @@ public class DependencyResolver {
    * Creates an instance of the resolver.
    *
    * @param mavenConfiguration {@link MavenConfiguration} that defines the configuration to be used by Aether.
-   * @param workspaceReader {@link WorkspaceReader} used to resolve {@link Dependency dependencies} within the workspace.
+   * @param workspaceReader    {@link WorkspaceReader} used to resolve {@link Dependency dependencies} within the workspace.
    */
   public DependencyResolver(MavenConfiguration mavenConfiguration, Optional<WorkspaceReader> workspaceReader) {
     checkNotNull(mavenConfiguration, "mavenConfiguration cannot be null");
@@ -111,7 +111,7 @@ public class DependencyResolver {
   /**
    * Gets information about an artifact like its direct dependencies and potential relocations.
    *
-   * @param artifact the {@link Artifact} requested, must not be {@code null}
+   * @param artifact           the {@link Artifact} requested, must not be {@code null}
    * @param remoteRepositories to be used for resolving the artifact in addition to the ones already defined in context.
    * @return {@link ArtifactDescriptorResult} descriptor result, never {@code null}
    * @throws {@link ArtifactDescriptorException} if the artifact descriptor could not be read
@@ -143,7 +143,7 @@ public class DependencyResolver {
   /**
    * Resolves the path for an artifact.
    *
-   * @param artifact the {@link Artifact} requested, must not be {@code null}
+   * @param artifact           the {@link Artifact} requested, must not be {@code null}
    * @param remoteRepositories remote repositories to be used in addition to the one in context
    * @return The resolution result, never {@code null}.
    * @throws {@link ArtifactResolutionException} if the artifact could not be resolved.
@@ -172,7 +172,7 @@ public class DependencyResolver {
   /**
    * Resolves direct dependencies for an {@link Artifact}.
    *
-   * @param artifact {@link Artifact} to collect its direct dependencies
+   * @param artifact           {@link Artifact} to collect its direct dependencies
    * @param remoteRepositories remote repositories to be used in addition to the one in context
    * @return a {@link List} of {@link Dependency} for each direct dependency resolved
    * @throws {@link ArtifactDescriptorException} if the artifact descriptor could not be read
@@ -190,15 +190,15 @@ public class DependencyResolver {
    * If both a root dependency and direct dependencies are given, the direct dependencies will be merged with the direct
    * dependencies from the root dependency's artifact descriptor, giving higher priority to the dependencies from the root.
    *
-   * @param root {@link Dependency} node from to collect its dependencies, may be {@code null}
-   * @param directDependencies {@link List} of direct {@link Dependency} to collect its transitive dependencies, may be
-   *        {@code null}
+   * @param root                {@link Dependency} node from to collect its dependencies, may be {@code null}
+   * @param directDependencies  {@link List} of direct {@link Dependency} to collect its transitive dependencies, may be
+   *                            {@code null}
    * @param managedDependencies {@link List} of managed {@link Dependency}s to be used for resolving the depedency graph, may be
-   *        {@code null}
-   * @param dependencyFilter {@link DependencyFilter} to include/exclude dependency nodes during collection and resolve operation.
-   *        May be {@code null} to no filter
-   * @param remoteRepositories {@link RemoteRepository} to be used when resolving dependencies in addition to the ones already
-   *        defined in the context.
+   *                            {@code null}
+   * @param dependencyFilter    {@link DependencyFilter} to include/exclude dependency nodes during collection and resolve
+   *                            operation. May be {@code null} to no filter
+   * @param remoteRepositories  {@link RemoteRepository} to be used when resolving dependencies in addition to the ones already
+   *                            defined in the context.
    * @return a {@link List} of {@link File}s for each dependency resolved
    * @throws {@link DependencyCollectionException} if the dependency tree could not be built
    * @thwows {@link DependencyResolutionException} if the dependency tree could not be built or any dependency artifact could not
@@ -300,7 +300,7 @@ public class DependencyResolver {
    * Logs the paths for each dependency not found
    *
    * @param node root {@link DependencyNode}, can be a "null" root (imaginary root)
-   * @param e {@link DependencyResolutionException} the error to collect paths.
+   * @param e    {@link DependencyResolutionException} the error to collect paths.
    */
   private void logUnresolvedArtifacts(DependencyNode node, DependencyResolutionException e) {
     List<ArtifactResult> artifactResults = e.getResult().getArtifactResults().stream()

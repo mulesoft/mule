@@ -6,13 +6,16 @@
  */
 package org.mule.runtime.core.privileged.transformer;
 
-import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectNotRegistered;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformUnexpectedType;
 
+import static java.lang.String.format;
+
+import static org.apache.commons.lang3.StringUtils.capitalize;
+
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
@@ -22,6 +25,7 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -75,7 +79,7 @@ public class TransformerUtils {
   /**
    * Builds a list of Transformers.
    *
-   * @param names - a list of transformers separated by commands
+   * @param names       - a list of transformers separated by commands
    * @param muleContext the current muleContext. This is used to look up transformers in the registry
    * @return a list (possibly empty) of transformers or
    * @throws MuleException if any of the transformers cannot be found
@@ -86,7 +90,7 @@ public class TransformerUtils {
       StringTokenizer st = new StringTokenizer(names, COMMA);
       while (st.hasMoreTokens()) {
         String key = st.nextToken().trim();
-        Transformer transformer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(key);
+        Transformer transformer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(key);
 
         if (transformer == null) {
           throw new DefaultMuleException(objectNotRegistered("Transformer", key));
@@ -103,7 +107,7 @@ public class TransformerUtils {
    * Checks whether a given value is a valid output for a transformer.
    *
    * @param transformer the transformer used to validate
-   * @param value the output value
+   * @param value       the output value
    * @throws TransformerException if the output value is of a unexpected type.
    */
   public static void checkTransformerReturnClass(Transformer transformer, Object value) throws TransformerException {
@@ -131,12 +135,23 @@ public class TransformerUtils {
     }
   }
 
+  /**
+   * @deprecated since 4.5, transformations are done internally by the Runtime, no need to call them explicitly.
+   */
+  @Deprecated
   public static <T> Object transformToAny(T input, MuleContext muleContext, DataType... supportedTypes) {
     final DataType sourceType = DataType.fromType(input.getClass());
     Object transformedData = null;
 
+    TransformersRegistry transformersRegistry;
+    try {
+      transformersRegistry =
+          ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(TransformersRegistry.class);
+    } catch (RegistrationException e) {
+      throw new MuleRuntimeException(e);
+    }
     for (DataType supportedType : supportedTypes) {
-      transformedData = attemptTransformation(sourceType, input, supportedType, muleContext);
+      transformedData = attemptTransformation(sourceType, input, supportedType, transformersRegistry);
       if (transformedData != null) {
         break;
       }
@@ -146,10 +161,10 @@ public class TransformerUtils {
   }
 
   private static <S, R> R attemptTransformation(DataType sourceDataType, S source, DataType resultDataType,
-                                                MuleContext muleContext) {
+                                                TransformersRegistry transformersRegistry) {
     Transformer transformer;
     try {
-      transformer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(sourceDataType, resultDataType);
+      transformer = transformersRegistry.lookupTransformer(sourceDataType, resultDataType);
     } catch (TransformerException e) {
       LOGGER.debug("Could not find a transformer from type {} to {}", sourceDataType.getType().getName(),
                    resultDataType.getType().getName());

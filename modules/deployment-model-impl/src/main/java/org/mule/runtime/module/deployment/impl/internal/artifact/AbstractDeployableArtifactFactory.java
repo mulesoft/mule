@@ -9,8 +9,10 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.validateArtifactLicense;
 
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.File;
@@ -23,25 +25,35 @@ import java.util.Properties;
  * <p/>
  * Handles license validation for the artifact plugins.
  * 
+ * @param <D> the type of the {@link DeployableArtifactDescriptor}
  * @param <T> the type of the {@link DeployableArtifact}
  * @since 4.
  */
-public abstract class AbstractDeployableArtifactFactory<T extends DeployableArtifact> implements ArtifactFactory<T> {
+public abstract class AbstractDeployableArtifactFactory<D extends DeployableArtifactDescriptor, T extends DeployableArtifact<D>>
+    implements ArtifactFactory<D, T> {
 
   private final LicenseValidator licenseValidator;
   private final LockFactory runtimeLockFactory;
+  private final MemoryManagementService memoryManagementService;
+  private final ArtifactConfigurationProcessor artifactConfigurationProcessor;
 
   /**
    * Creates a new {@link AbstractDeployableArtifactFactory}
    * 
-   * @param licenseValidator the license validator to use for plugins.
-   * @param runtimeComponentBuildingDefinitionProvider provider for the runtime {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
-   * @param runtimeLockFactory {@link LockFactory} for Runtime, a unique and shared lock factory to be used between different artifacts.
+   * @param licenseValidator               the license validator to use for plugins.
+   * @param runtimeLockFactory             {@link LockFactory} for Runtime, a unique and shared lock factory to be used between
+   *                                       different artifacts.
+   * @param memoryManagementService        the memory management service.
+   * @param artifactConfigurationProcessor the processor to use for building the application model.
    */
   public AbstractDeployableArtifactFactory(LicenseValidator licenseValidator,
-                                           LockFactory runtimeLockFactory) {
+                                           LockFactory runtimeLockFactory,
+                                           MemoryManagementService memoryManagementService,
+                                           ArtifactConfigurationProcessor artifactConfigurationProcessor) {
     this.licenseValidator = licenseValidator;
     this.runtimeLockFactory = runtimeLockFactory;
+    this.memoryManagementService = memoryManagementService;
+    this.artifactConfigurationProcessor = artifactConfigurationProcessor;
   }
 
   @Override
@@ -55,7 +67,7 @@ public abstract class AbstractDeployableArtifactFactory<T extends DeployableArti
    * Creates an instance of {@link DeployableArtifact}
    * 
    * @param artifactDir the artifact deployment directory.
-   * @param properties deployment properties
+   * @param properties  deployment properties
    * @return the created artifact.
    * @throws IOException if there was a problem reading the content of the artifact.
    */
@@ -64,7 +76,7 @@ public abstract class AbstractDeployableArtifactFactory<T extends DeployableArti
   /**
    * Creates the artifact descriptor of the artifact.
    *
-   * @param artifactLocation the artifact location
+   * @param artifactLocation     the artifact location
    * @param deploymentProperties the artifact deployment properties
    * @return the artifact descriptor
    */
@@ -76,6 +88,20 @@ public abstract class AbstractDeployableArtifactFactory<T extends DeployableArti
    */
   public LockFactory getRuntimeLockFactory() {
     return runtimeLockFactory;
+  }
+
+  /**
+   * @return the memory management service.
+   */
+  public MemoryManagementService getMemoryManagementService() {
+    return memoryManagementService;
+  }
+
+  /**
+   * @return the processor to use for building the application model.
+   */
+  public ArtifactConfigurationProcessor getArtifactConfigurationProcessor() {
+    return artifactConfigurationProcessor;
   }
 
 }

@@ -1,14 +1,14 @@
 {
   "name": "RAM",
   "description": "",
-  "version": "4.0.0-SNAPSHOT",
+  "version": "4.5.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "ram",
     "namespace": "http://www.mulesoft.org/schema/mule/ram",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/ram/current/mule-ram.xsd",
-    "schemaVersion": "4.0.0-SNAPSHOT",
+    "schemaVersion": "4.5.0-SNAPSHOT",
     "xsdFileName": "mule-ram.xsd"
   },
   "resources": [],
@@ -81,6 +81,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": true,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -95,6 +96,7 @@
                 "order": 2
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -117,6 +119,7 @@
                     "genericTypes": [],
                     "isMap": false
                   },
+                  "infrastructureType": {},
                   "description": {
                     "value": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit."
                   },
@@ -197,6 +200,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -212,6 +216,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
@@ -456,14 +461,16 @@
             "MULE:ANY",
             "RAM:CANNOT_DISPATCH",
             "RAM:INVALID_WSDL",
+            "RAM:TIMEOUT",
+            "MULE:CONNECTIVITY",
             "MULE:RETRY_EXHAUSTED",
             "RAM:BAD_REQUEST",
-            "RAM:TIMEOUT",
             "RAM:CONNECTIVITY",
             "RAM:SOAP_FAULT",
-            "RAM:BAD_RESPONSE",
-            "MULE:CONNECTIVITY"
+            "RAM:BAD_RESPONSE"
           ],
+          "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "INVOKE",
             "namespace": "RAM",
@@ -504,6 +511,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -527,6 +535,7 @@
                       }
                     }
                   ],
+                  "semanticTerms": [],
                   "name": "config-ref",
                   "description": "The name of the configuration to be used to execute this component",
                   "modelProperties": {}
@@ -555,6 +564,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -569,6 +579,7 @@
                     "order": 1
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "service",
                   "description": "",
                   "modelProperties": {
@@ -587,6 +598,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -601,6 +613,7 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "operation",
                   "description": "",
                   "modelProperties": {
@@ -650,6 +663,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "defaultValue": "#[payload]",
                   "role": "PRIMARY_CONTENT",
@@ -665,6 +679,7 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "body",
                   "displayModel": {
                     "summary": "The XML body to include in the SOAP message, with all the required parameters."
@@ -697,6 +712,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "CONTENT",
                   "dslConfiguration": {
@@ -711,6 +727,7 @@
                     "order": 4
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "headers",
                   "displayModel": {
                     "displayName": "Headers",
@@ -750,6 +767,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "CONTENT",
                   "dslConfiguration": {
@@ -764,6 +782,7 @@
                     "order": 5
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "attachments",
                   "displayModel": {
                     "summary": "The attachments to include in the SOAP request."
@@ -814,6 +833,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -829,6 +849,7 @@
                     "tabName": "Transport"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "transportHeaders",
                   "displayModel": {
                     "displayName": "Headers",
@@ -861,6 +882,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -876,6 +898,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -892,6 +915,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "REQUIRED",
                   "defaultValue": "#[payload]",
                   "role": "BEHAVIOUR",
@@ -908,6 +932,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -935,6 +960,7 @@
                     "format": "java",
                     "type": "Array",
                     "annotations": {
+                      "infrastructureType": {},
                       "description": {
                         "value": "Determines that an error thrown by this operation should be mapped to another"
                       },
@@ -946,7 +972,8 @@
                     "item": {
                       "type": "Object",
                       "annotations": {
-                        "typeId": "errorMapping"
+                        "typeId": "errorMapping",
+                        "infrastructureType": {}
                       },
                       "fields": [
                         {
@@ -1009,10 +1036,11 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
-                    "allowsInlineDefinition": false,
+                    "allowsInlineDefinition": true,
                     "allowsReferences": false,
                     "allowTopLevelDefinition": false
                   },
@@ -1024,13 +1052,14 @@
                     "tabName": "Error Mapping"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "errorMappings",
                   "description": "Set of error mappings",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "error-mapping",
+                        "localPart": "error-mappings",
                         "prefix": "mule"
                       }
                     },
@@ -1062,13 +1091,15 @@
                     "format": "java",
                     "type": "Union",
                     "annotations": {
-                      "typeId": "ReconnectionStrategy"
+                      "typeId": "ReconnectionStrategy",
+                      "infrastructureType": {}
                     },
                     "of": [
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "reconnect"
+                          "typeId": "reconnect",
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -1140,7 +1171,8 @@
                       {
                         "type": "Object",
                         "annotations": {
-                          "typeId": "reconnect-forever"
+                          "typeId": "reconnect-forever",
+                          "infrastructureType": {}
                         },
                         "fields": [
                           {
@@ -1198,6 +1230,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -1213,6 +1246,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1335,6 +1369,7 @@
           "connectionManagementType": "POOLING",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "semanticTerms": [],
           "stereotype": {
             "type": "RICK-AND-MORTY-CONNECTION",
             "namespace": "RAM",
@@ -1355,6 +1390,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -1369,6 +1405,9 @@
                     "order": 2
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "core.urlTemplate"
+                  ],
                   "name": "wsdlUrl",
                   "description": "",
                   "modelProperties": {}
@@ -1382,6 +1421,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -1396,6 +1436,9 @@
                     "order": 3
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "apiContract.endPoint"
+                  ],
                   "name": "service",
                   "description": "",
                   "modelProperties": {}
@@ -1409,6 +1452,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -1423,6 +1467,9 @@
                     "order": 4
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [
+                    "connectivity.port"
+                  ],
                   "name": "port",
                   "description": "",
                   "modelProperties": {}
@@ -1472,6 +1519,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -1487,6 +1535,7 @@
                     "tabName": "Transport"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "transport",
                   "displayModel": {
                     "displayName": "Transport Configuration"
@@ -1514,7 +1563,8 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "Reconnection"
+                      "typeId": "Reconnection",
+                      "infrastructureType": {}
                     },
                     "fields": [
                       {
@@ -1540,13 +1590,15 @@
                         "model": {
                           "type": "Union",
                           "annotations": {
-                            "typeId": "ReconnectionStrategy"
+                            "typeId": "ReconnectionStrategy",
+                            "infrastructureType": {}
                           },
                           "of": [
                             {
                               "type": "Object",
                               "annotations": {
-                                "typeId": "reconnect"
+                                "typeId": "reconnect",
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -1618,7 +1670,8 @@
                             {
                               "type": "Object",
                               "annotations": {
-                                "typeId": "reconnect-forever"
+                                "typeId": "reconnect-forever",
+                                "infrastructureType": {}
                               },
                               "fields": [
                                 {
@@ -1684,6 +1737,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -1699,6 +1753,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -1723,6 +1778,7 @@
                       "description": {
                         "value": "A pooling profile is used to configure the pooling behaviour of Mule components. Each component can have its own pooling profile."
                       },
+                      "infrastructureType": {},
                       "typeAlias": {
                         "value": "pooling-profile"
                       }
@@ -1897,6 +1953,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
+                  "fieldValueProviderModels": [],
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -1912,6 +1969,7 @@
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
+                  "semanticTerms": [],
                   "name": "poolingProfile",
                   "description": "Characteristics of the connection pool",
                   "modelProperties": {

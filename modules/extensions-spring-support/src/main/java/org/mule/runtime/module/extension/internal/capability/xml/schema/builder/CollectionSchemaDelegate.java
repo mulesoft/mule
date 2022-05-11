@@ -9,10 +9,10 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MAX_ONE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.UNBOUNDED;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MAX_ONE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.UNBOUNDED;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -101,8 +101,8 @@ class CollectionSchemaDelegate {
       }
 
       /**
-       * For a Collection with any other type as generic.
-       * The generated {@link ComplexType} declares a sequence of child elements with an inline declaration of the type
+       * For a Collection with any other type as generic. The generated {@link ComplexType} declares a sequence of child elements
+       * with an inline declaration of the type
        *
        * @param metadataType the item's type
        */

@@ -16,13 +16,13 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_SEND;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_GENERATE;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_SEND;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_SEND;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_GENERATE;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_SEND;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
 import static org.mule.runtime.core.internal.message.ErrorBuilder.builder;
 import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
@@ -53,13 +53,13 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.CorrelationIdGenerator;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.NotificationHelper;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -77,7 +77,6 @@ import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 import org.mule.runtime.core.internal.processor.interceptor.CompletableInterceptorSourceFailureCallbackAdapter;
 import org.mule.runtime.core.internal.processor.interceptor.CompletableInterceptorSourceSuccessCallbackAdapter;
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultCollection;
-import org.mule.runtime.core.internal.util.message.SdkResultAdapter;
 import org.mule.runtime.core.internal.util.message.TransformingLegacyResultAdapterCollection;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.context.FlowProcessMediatorContext;
@@ -139,6 +138,7 @@ public class FlowProcessMediator implements Initialisable {
   private ErrorType flowBackPressureErrorType;
   private NotificationHelper notificationHelper;
   private final List<SourceInterceptor> sourceInterceptors = new LinkedList<>();
+  private Optional<CorrelationIdGenerator> correlationIdGenerator;
 
   public FlowProcessMediator(PolicyManager policyManager, PhaseResultNotifier phaseResultNotifier) {
     this.policyManager = policyManager;
@@ -164,6 +164,8 @@ public class FlowProcessMediator implements Initialisable {
 
     flowBackPressureErrorType = errorTypeRepository.getErrorType(FLOW_BACK_PRESSURE)
         .orElseThrow(createInitialisationExceptionFor(FLOW_BACK_PRESSURE));
+
+    correlationIdGenerator = muleContext.getConfiguration().getDefaultCorrelationIdGenerator();
 
     if (processorInterceptorManager != null) {
       processorInterceptorManager.getSourceInterceptorFactories().stream().forEach(interceptorFactory -> {
@@ -201,10 +203,8 @@ public class FlowProcessMediator implements Initialisable {
           new FlowProcessor(publisher -> applyWithChildContext(from(publisher), template::routeEventAsync, empty()),
                             flowConstruct);
 
-      final CursorComponentDecoratorFactory componentDecoratorFactory = messageProcessContext.getComponentDecoratorFactory();
-      final CoreEvent event = createEvent(template, componentDecoratorFactory, messageSource,
+      final CoreEvent event = createEvent(template, messageSource,
                                           responseCompletion, flowConstruct);
-      componentDecoratorFactory.incrementInvocationCount(event.getCorrelationId());
 
       policyManager.addSourcePointcutParametersIntoEvent(messageSource, event.getMessage().getAttributes(),
                                                          (InternalEvent) event);
@@ -300,7 +300,7 @@ public class FlowProcessMediator implements Initialisable {
    * logic.
    *
    * @param template the processing template being used
-   * @param event the event that caused the backpressure signal to be fired
+   * @param event    the event that caused the backpressure signal to be fired
    * @return an exception mapper that notifies the {@link FlowConstruct} response listener of the backpressure signal
    */
   protected Either<SourcePolicyFailureResult, SourcePolicySuccessResult> mapBackPressureExceptionToPolicyFailureResult(
@@ -515,13 +515,26 @@ public class FlowProcessMediator implements Initialisable {
         .fireNotification(notificationFunction.apply(event, flowConstruct.getSource())));
   }
 
-  private CoreEvent createEvent(FlowProcessTemplate template,
-                                CursorComponentDecoratorFactory componentDecoratorFactory, MessageSource source,
+  private String evaluateCorrelationIdExpressionGenerator() {
+    if (correlationIdGenerator.isPresent()) {
+      return correlationIdGenerator.get().generateCorrelationId();
+    } else {
+      return null;
+    }
+  }
+
+  private String resolveSourceCorrelationId(SourceResultAdapter adapter) {
+    // If there is not a correlation ID coming from the Source, use the one generated by the default generator,
+    // if there's any.
+    return adapter.getCorrelationId().orElseGet(() -> evaluateCorrelationIdExpressionGenerator());
+  }
+
+  private CoreEvent createEvent(FlowProcessTemplate template, MessageSource source,
                                 CompletableFuture<Void> responseCompletion, FlowConstruct flowConstruct) {
 
     SourceResultAdapter adapter = template.getSourceMessage();
     Builder eventBuilder =
-        createEventBuilder(source.getLocation(), responseCompletion, flowConstruct, adapter.getCorrelationId().orElse(null));
+        createEventBuilder(source.getLocation(), responseCompletion, flowConstruct, resolveSourceCorrelationId(adapter));
 
     return eventBuilder.message(eventCtx -> {
       final Result<?, ?> result = adapter.getResult();
@@ -531,8 +544,7 @@ public class FlowProcessMediator implements Initialisable {
       if (resultValue instanceof Collection && adapter.isCollection()) {
         Collection<Result> resultCollection = new TransformingLegacyResultAdapterCollection((Collection) resultValue);
         eventMessage = toMessage(Result.<Collection<Message>, TypedValue<?>>builder()
-            .output(messageCollection(new MediaTypeDecoratedResultCollection(componentDecoratorFactory
-                .decorateOutputCollection(resultCollection, adapter.getCorrelationId().orElse("")),
+            .output(messageCollection(new MediaTypeDecoratedResultCollection(resultCollection,
                                                                              adapter.getPayloadMediaTypeResolver()),
                                       adapter.getCursorProviderFactory(),
                                       ((BaseEventContext) eventCtx).getRootContext(),
@@ -540,9 +552,8 @@ public class FlowProcessMediator implements Initialisable {
             .mediaType(result.getMediaType().orElse(ANY))
             .build());
       } else {
-        eventMessage = toMessage(result, adapter.getMediaType(), componentDecoratorFactory, adapter.getCursorProviderFactory(),
-                                 ((BaseEventContext) eventCtx).getRootContext(), source.getLocation(),
-                                 adapter.getCorrelationId().orElse(null));
+        eventMessage = toMessage(result, adapter.getMediaType(), adapter.getCursorProviderFactory(),
+                                 ((BaseEventContext) eventCtx).getRootContext(), source.getLocation());
       }
 
       return eventMessage;
@@ -557,10 +568,10 @@ public class FlowProcessMediator implements Initialisable {
   /**
    * This method will not throw any {@link Exception}.
    *
-   * @param ctx the {@link DefaultFlowProcessMediatorContext}
+   * @param ctx    the {@link DefaultFlowProcessMediatorContext}
    * @param result the outcome of trying to send the response of the source through the source. In the case of error, only
-   *        {@link MessagingException} or {@link SourceErrorException} are valid values on the {@code left} side of this
-   *        parameter.
+   *               {@link MessagingException} or {@link SourceErrorException} are valid values on the {@code left} side of this
+   *               parameter.
    */
   private void onTerminate(Pipeline flowConstruct, DefaultFlowProcessMediatorContext ctx, Either<Throwable, CoreEvent> result) {
     safely(result.mapLeft(throwable -> {

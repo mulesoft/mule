@@ -40,10 +40,10 @@ public class DefaultExtensionNotification implements ExtensionNotification {
    * Creates a new {@link DefaultExtensionNotification} validating that the {@code actionDefinition} type information matches the
    * actual data to use.
    *
-   * @param event the {@link Event} associated to the notification
-   * @param component the {@link Component} associated to the notification
+   * @param event            the {@link Event} associated to the notification
+   * @param component        the {@link Component} associated to the notification
    * @param actionDefinition the {@link NotificationActionDefinition} to use
-   * @param data the information to expose
+   * @param data             the information to expose
    * @throws IllegalArgumentException when the {@code actionDefinition} type doesn't match {@code data}
    */
   public DefaultExtensionNotification(Event event, Component component,
@@ -65,11 +65,11 @@ public class DefaultExtensionNotification implements ExtensionNotification {
    * Creates a new {@link DefaultExtensionNotification} validating that the {@code actionDefinition} type information matches the
    * actual data to use.
    *
-   * @param event the {@link Event} associated to the notification
-   * @param component the {@link Component} associated to the notification
+   * @param event            the {@link Event} associated to the notification
+   * @param component        the {@link Component} associated to the notification
    * @param actionDefinition the {@link NotificationActionDefinition} to use
-   * @param dataValue a supplier for the information to expose
-   * @param actualDataType the data type of the information to expose
+   * @param dataValue        a supplier for the information to expose
+   * @param actualDataType   the data type of the information to expose
    * @throws IllegalArgumentException when the {@code actionDefinition} type doesn't match {@code data}
    */
   public DefaultExtensionNotification(Event event, Component component,

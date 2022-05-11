@@ -41,7 +41,9 @@ import javax.xml.bind.annotation.XmlType;
 @XmlEnum(DerivationControl.class)
 public enum ReducedDerivationControl {
 
-  @XmlEnumValue("extension") EXTENSION(DerivationControl.EXTENSION), @XmlEnumValue("restriction") RESTRICTION(
+  @XmlEnumValue("extension")
+  EXTENSION(DerivationControl.EXTENSION), @XmlEnumValue("restriction")
+  RESTRICTION(
       DerivationControl.RESTRICTION);
 
   private final DerivationControl value;

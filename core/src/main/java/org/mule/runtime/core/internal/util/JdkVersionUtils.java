@@ -234,6 +234,7 @@ public class JdkVersionUtils {
   public static boolean isSupportedJdkVendor() {
     return SystemUtils.isSunJDK() ||
         SystemUtils.isAdoptOpenJDK() ||
+        SystemUtils.isAdoptiumTemurinJDK() ||
         SystemUtils.isOpenJDK() ||
         SystemUtils.isAmazonJDK() ||
         SystemUtils.isAzulJDK() ||

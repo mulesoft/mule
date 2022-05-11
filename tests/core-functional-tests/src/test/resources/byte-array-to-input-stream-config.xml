@@ -15,4 +15,8 @@
         <some:input-stream-consuming-operation />
         <flow-ref name="event-recorder"/>
     </flow>
+    <flow name="transformer">
+        <some:input-stream-consuming-operation />
+        <set-payload value="#[payload as String {encoding:'UTF-16'}]"/>
+    </flow>
 </mule>

@@ -6,14 +6,8 @@
  */
 package org.mule.runtime.core.api.retry.policy;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.COMPUTE_CONNECTION_ERRORS_IN_STATS;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.api.annotation.NoExtend;
-import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.api.notification.NotificationDispatcher;
-import org.mule.runtime.core.api.retry.RetryCallback;
-import org.mule.runtime.core.api.retry.RetryContext;
-import org.mule.runtime.core.api.retry.RetryNotifier;
-import org.mule.runtime.core.internal.retry.DefaultRetryContext;
 
 import java.io.InterruptedIOException;
 import java.util.Map;
@@ -21,6 +15,16 @@ import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
 
+import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.management.stats.AllStatistics;
+import org.mule.runtime.core.api.retry.RetryCallback;
+import org.mule.runtime.core.api.retry.RetryContext;
+import org.mule.runtime.core.api.retry.RetryNotifier;
+import org.mule.runtime.core.internal.retry.DefaultRetryContext;
 import org.slf4j.Logger;
 
 /**
@@ -36,6 +40,12 @@ public abstract class AbstractPolicyTemplate extends AbstractComponent implement
 
   @Inject
   private NotificationDispatcher notificationFirer;
+
+  @Inject
+  protected MuleContext muleContext;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   private static final Logger LOGGER = getLogger(AbstractPolicyTemplate.class);
 
@@ -56,6 +66,9 @@ public abstract class AbstractPolicyTemplate extends AbstractComponent implement
           break;
         } catch (Exception e) {
           cause = e;
+
+          computeStats();
+
           if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Error executing policy", cause);
           }
@@ -84,6 +97,18 @@ public abstract class AbstractPolicyTemplate extends AbstractComponent implement
         }
       }
     }
+  }
+
+  protected void computeStats() {
+    AllStatistics statistics = muleContext.getStatistics();
+
+    if (statistics != null && statistics.isEnabled() && computeConnectionErrorsInStats()) {
+      statistics.getApplicationStatistics().incConnectionErrors();
+    }
+  }
+
+  protected boolean computeConnectionErrorsInStats() {
+    return featureFlaggingService.isEnabled(COMPUTE_CONNECTION_ERRORS_IN_STATS);
   }
 
   @Override

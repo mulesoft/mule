@@ -20,6 +20,6 @@ import org.mule.test.data.sample.extension.provider.GroupTestSampleDataProvider;
 @MediaType(TEXT_PLAIN)
 public class ShowInDslParameterGroupListener extends TestSampleDataListener {
 
-  @ParameterGroup(name = "group", showInDsl = true)
+  @org.mule.sdk.api.annotation.param.ParameterGroup(name = "group", showInDsl = true)
   private SampleDataParameterGroup group;
 }

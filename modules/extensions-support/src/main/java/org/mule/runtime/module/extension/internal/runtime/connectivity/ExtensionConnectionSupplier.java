@@ -6,14 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
@@ -28,8 +32,8 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 /**
- * A bridge between the execution of a {@link ComponentModel} and the {@link ConnectionManager} which provides
- * the connections that it needs.
+ * A bridge between the execution of a {@link ComponentModel} and the {@link ConnectionManager} which provides the connections
+ * that it needs.
  * <p>
  * It handles connection provisioning and transaction support
  *
@@ -39,6 +43,8 @@ public class ExtensionConnectionSupplier {
 
   @Inject
   private ConnectionManager connectionManager;
+
+  private boolean lazyConnections;
 
   /**
    * Returns the connection to be used with the {@code operationContext}.
@@ -80,7 +86,7 @@ public class ExtensionConnectionSupplier {
     final ExtensionTransactionKey txKey = new ExtensionTransactionKey(configuration);
 
     TransactionBindingDelegate transactionBindingDelegate = new TransactionBindingDelegate(extensionModel, componentModel);
-    return transactionBindingDelegate.getBoundResource(transactionConfig, txKey,
+    return transactionBindingDelegate.getBoundResource(lazyConnections, txKey,
                                                        () -> getTransactionlessConnectionHandler(executionContext));
   }
 
@@ -104,5 +110,11 @@ public class ExtensionConnectionSupplier {
     }
 
     return connectionManager.getConnection(configuration.get().getValue());
+  }
+
+  @Inject
+  public void setMuleContext(MuleContext muleContext) {
+    this.lazyConnections =
+        parseBoolean(muleContext.getDeploymentProperties().getProperty(MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY, "false"));
   }
 }

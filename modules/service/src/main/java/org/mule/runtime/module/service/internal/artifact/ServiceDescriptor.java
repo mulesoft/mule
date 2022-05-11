@@ -8,8 +8,8 @@
 package org.mule.runtime.module.service.internal.artifact;
 
 import static java.util.Collections.emptyList;
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -56,7 +56,7 @@ public class ServiceDescriptor extends ArtifactDescriptor {
    * @param contractModels the {@link MuleServiceContractModel} that are fulfilled by the service artifact.
    */
   public void setContractModels(List<MuleServiceContractModel> contractModels) {
-    checkArgument(!isEmpty(contractModels), "contractModels cannot be empty");
+    checkArgument(!contractModels.isEmpty(), "contractModels cannot be empty");
     this.contractModels = contractModels;
   }
 }

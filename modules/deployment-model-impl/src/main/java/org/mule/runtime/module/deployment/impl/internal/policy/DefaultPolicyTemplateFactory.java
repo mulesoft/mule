@@ -7,32 +7,30 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptySet;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
 import static org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.validateArtifactLicense;
 
+import static java.lang.String.format;
+import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
-import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.api.Artifact;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -48,7 +46,7 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
    * Creates a new factory
    *
    * @param policyTemplateClassLoaderBuilderFactory creates class loader builders to create the class loaders for the created
-   *        policy templates. Non null.
+   *                                                policy templates. Non null.
    */
   public DefaultPolicyTemplateFactory(PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory,
                                       PluginDependenciesResolver pluginDependenciesResolver,
@@ -82,7 +80,7 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
           .addArtifactPluginDescriptors(resolvedPolicyPluginsDescriptors
               .toArray(new ArtifactPluginDescriptor[resolvedPolicyPluginsDescriptors.size()]))
           .setParentClassLoader(application.getRegionClassLoader()).setArtifactDescriptor(descriptor).build();
-    } catch (IOException e) {
+    } catch (Exception e) {
       throw new PolicyTemplateCreationException(createPolicyTemplateCreationErrorMessage(descriptor.getName()), e);
     }
 
@@ -102,24 +100,18 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
   private List<ArtifactPlugin> resolveOwnArtifactPlugins(List<ArtifactPlugin> artifactPlugins,
                                                          List<ArtifactPluginDescriptor> ownResolvedPluginDescriptors,
                                                          MuleDeployableArtifactClassLoader ownPolicyClassLoader) {
-    final Map<String, ArtifactPlugin> ownArtifactPlugins = new HashMap<>();
-
-    ownResolvedPluginDescriptors.stream()
-        .map(artifactPluginDescriptor -> new DefaultArtifactPlugin(getArtifactPluginId(ownPolicyClassLoader.getArtifactId(),
-                                                                                       artifactPluginDescriptor.getName()),
-                                                                   artifactPluginDescriptor, ownPolicyClassLoader
-                                                                       .getArtifactPluginClassLoaders().stream()
-                                                                       .filter(artifactClassLoader -> artifactClassLoader
-                                                                           .getArtifactId()
-                                                                           .endsWith(artifactPluginDescriptor.getName()))
-                                                                       .findFirst().get()))
-        .forEach(ap -> ownArtifactPlugins.put(ap.getArtifactId(), ap));
-
-    // Override some of the entries from the previous iteration
-    artifactPlugins
-        .forEach(ap -> ownArtifactPlugins.put(ap.getArtifactId(), ap));
-
-    return new ArrayList<>(ownArtifactPlugins.values());
+    return ownResolvedPluginDescriptors.stream()
+        .map(pluginDescriptor -> artifactPlugins.stream()
+            .filter(artifactPlugin -> artifactPlugin.getDescriptor().getName().equals(pluginDescriptor.getName())).findFirst()
+            .orElseGet(() -> new DefaultArtifactPlugin(getArtifactPluginId(ownPolicyClassLoader.getArtifactId(),
+                                                                           pluginDescriptor.getName()),
+                                                       pluginDescriptor, ownPolicyClassLoader
+                                                           .getArtifactPluginClassLoaders().stream()
+                                                           .filter(artifactClassLoader -> artifactClassLoader
+                                                               .getArtifactId()
+                                                               .endsWith(pluginDescriptor.getName()))
+                                                           .findFirst().get())))
+        .collect(toList());
   }
 
   private List<ArtifactPluginDescriptor> resolvePolicyPluginDescriptors(Application application,

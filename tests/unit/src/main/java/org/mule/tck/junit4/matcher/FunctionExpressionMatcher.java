@@ -9,7 +9,6 @@ package org.mule.tck.junit4.matcher;
 import java.util.function.Function;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
@@ -33,10 +32,9 @@ public final class FunctionExpressionMatcher<T, R> extends TypeSafeMatcher<T> {
    * Builds a matcher that lazily evaluates against the object returned by the given resolver {@link Function}.
    * 
    * @param resolver the function to use to get the object to run the matcher against.
-   * @param matcher the matcher to run against the resolved object.
+   * @param matcher  the matcher to run against the resolved object.
    * @return a matcher that lazily evaluates the object to match.
    */
-  @Factory
   public static final <T, R> FunctionExpressionMatcher<T, R> expressionMatches(Function<T, R> resolver,
                                                                                Matcher<? extends R> matcher) {
     return new FunctionExpressionMatcher<>(resolver, matcher);

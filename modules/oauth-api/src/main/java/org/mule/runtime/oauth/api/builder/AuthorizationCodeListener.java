@@ -8,6 +8,7 @@ package org.mule.runtime.oauth.api.builder;
 
 /**
  * Allows to get notified about certain events related to an OAuth dance with Authorization Code grant type
+ * 
  * @since 4.2.0
  * @deprecated since 4.2.2. Use {@link org.mule.runtime.oauth.api.listener.AuthorizationCodeListener} instead
  */

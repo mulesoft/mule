@@ -6,25 +6,36 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static java.lang.System.currentTimeMillis;
+import static java.lang.Thread.currentThread;
 import static java.util.function.Function.identity;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactType;
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
+import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.getNearestRegion;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isConnectedStreamingOperation;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.NULL_THROWABLE_CONSUMER;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.util.func.CheckedBiFunction;
-import org.mule.runtime.core.internal.util.CompositeClassLoader;
+import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadingProfilingEventContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
@@ -35,6 +46,7 @@ import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigur
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.exception.ModuleExceptionHandler;
 import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
+import org.slf4j.Logger;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -61,8 +73,11 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   private final ExecutionTemplate<?> defaultExecutionTemplate = callback -> callback.process();
   private final ModuleExceptionHandler moduleExceptionHandler;
   private final ResultTransformer resultTransformer;
-  private final ClassLoader extensionClassLoader;
+  private final ClassLoader executionClassLoader;
   private final ComponentModel operationModel;
+  private final ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> threadReleaseDataProducer;
+
+  private static final Logger LOGGER = getLogger(DefaultExecutionMediator.class);
 
   @FunctionalInterface
   public interface ResultTransformer extends CheckedBiFunction<ExecutionContextAdapter, Object, Object> {
@@ -72,45 +87,46 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   public DefaultExecutionMediator(ExtensionModel extensionModel,
                                   M operationModel,
                                   InterceptorChain interceptorChain,
-                                  ErrorTypeRepository typeRepository) {
-    this(extensionModel, operationModel, interceptorChain, typeRepository, null);
-  }
-
-  public DefaultExecutionMediator(ExtensionModel extensionModel,
-                                  M operationModel,
-                                  InterceptorChain interceptorChain,
                                   ErrorTypeRepository typeRepository,
-                                  ResultTransformer resultTransformer) {
+                                  ClassLoader executionClassLoader,
+                                  ResultTransformer resultTransformer,
+                                  ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> threadReleaseDataProducer) {
     this.interceptorChain = interceptorChain;
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel, typeRepository);
     this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
     this.resultTransformer = resultTransformer;
     this.operationModel = operationModel;
-    extensionClassLoader = getClassLoader(extensionModel);
+
+    // The effective execution ClassLoader will be a composition with the extension ClassLoader being used first and
+    // then the default execution ClassLoader which may depend on the execution context.
+    // This is important for cases where the extension does not belong to the region of the operation, see MULE-18159.
+    final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
+    executionClassLoader = getNearestRegion(executionClassLoader);
+    if (executionClassLoader != null && !executionClassLoader.equals(extensionClassLoader)) {
+      this.executionClassLoader = from(extensionClassLoader, executionClassLoader);
+    } else {
+      this.executionClassLoader = extensionClassLoader;
+    }
+
+    this.threadReleaseDataProducer = threadReleaseDataProducer;
   }
 
   /**
-   * Executes the operation per the specification in this classes' javadoc
+   * Executes the operation per the specification in these classes javadoc
    *
    * @param executor an {@link CompletableComponentExecutor}
    * @param context  the {@link ExecutionContextAdapter} for the {@code executor} to use
    * @return the operation's result
-   * @throws Exception if the operation or a {@link Interceptor#before(ExecutionContext)} invokation fails
+   * @throws Exception if the operation or a {@link Interceptor#before(ExecutionContext)} invocation fails
    */
   @Override
   public void execute(CompletableComponentExecutor<M> executor,
                       ExecutionContextAdapter<M> context,
                       ExecutorCallback callback) {
-
-    final MutableConfigurationStats stats = getMutableConfigurationStats(context);
-    if (stats != null) {
-      stats.addActiveComponent();
-      stats.addInflightOperation();
-    }
-
-    try {
-      getExecutionTemplate((ExecutionContextAdapter<ComponentModel>) context).execute(() -> {
-        executeWithInterceptors(executor, context, stats, callback);
+    try (DeferredExecutorCallback deferredCallback =
+        new DeferredExecutorCallback(getDelegateExecutorCallback(getStats(context), callback, context))) {
+      withExecutionTemplate((ExecutionContextAdapter<ComponentModel>) context, () -> {
+        executeWithInterceptors(executor, context, deferredCallback);
         return null;
       });
     } catch (Exception e) {
@@ -120,6 +136,56 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     }
   }
 
+  private MutableConfigurationStats getStats(ExecutionContextAdapter<M> context) {
+    final MutableConfigurationStats stats = getMutableConfigurationStats(context);
+    if (stats != null) {
+      stats.addActiveComponent();
+      stats.addInflightOperation();
+    }
+
+    return stats;
+  }
+
+  private ExecutorCallback getDelegateExecutorCallback(final MutableConfigurationStats stats,
+                                                       ExecutorCallback callback,
+                                                       ExecutionContextAdapter<M> context) {
+    return new ExecutorCallback() {
+
+      @Override
+      public void complete(Object value) {
+        if (stats != null) {
+          if (!isConnectedStreamingOperation(operationModel)) {
+            stats.discountActiveComponent();
+          }
+          stats.discountInflightOperation();
+        }
+        try {
+          interceptorChain.onSuccess(context, value);
+          callback.complete(value);
+        } catch (Throwable t) {
+          try {
+            t = handleError(t, context);
+          } finally {
+            callback.error(t);
+          }
+        }
+      }
+
+      @Override
+      public void error(Throwable t) {
+        try {
+          t = handleError(t, context);
+        } finally {
+          if (stats != null) {
+            stats.discountInflightOperation();
+            stats.discountActiveComponent();
+          }
+          callback.error(t);
+        }
+      }
+    };
+  }
+
   private void executeWithRetry(ExecutionContextAdapter<M> context,
                                 RetryPolicyTemplate retryPolicy,
                                 Consumer<ExecutorCallback> executeCommand,
@@ -127,7 +193,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
 
     retryPolicy.applyPolicy(() -> {
       CompletableFuture<Object> future = new CompletableFuture<>();
-      executeCommand.accept(new FutureExecutionCallbackDecorator(future));
+      executeCommand.accept(new FutureExecutionCallbackAdapter(future));
       return future;
     },
                             e -> shouldRetry(e, context),
@@ -146,52 +212,12 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
 
   private void executeWithInterceptors(CompletableComponentExecutor<M> executor,
                                        ExecutionContextAdapter<M> context,
-                                       MutableConfigurationStats stats,
                                        ExecutorCallback executorCallback) {
-
-    ExecutorCallback callbackDelegate = new ExecutorCallback() {
-
-      @Override
-      public void complete(Object value) {
-        // after() method cannot be invoked in the finally. Needs to be explicitly called before completing the callback.
-        // Race conditions appear otherwise, specially in connection pooling scenarios.
-        if (stats != null) {
-          if (!isConnectedStreamingOperation(operationModel)) {
-            stats.discountActiveComponent();
-          }
-          stats.discountInflightOperation();
-        }
-        try {
-          interceptorChain.onSuccess(context, value);
-          executorCallback.complete(value);
-        } catch (Throwable t) {
-          try {
-            t = handleError(t, context);
-          } finally {
-            executorCallback.error(t);
-          }
-        }
-      }
-
-      @Override
-      public void error(Throwable t) {
-        try {
-          t = handleError(t, context);
-        } finally {
-          if (stats != null) {
-            stats.discountInflightOperation();
-            stats.discountActiveComponent();
-          }
-          executorCallback.error(t);
-        }
-      }
-    };
-
     RetryPolicyTemplate retryPolicy = context.getRetryPolicyTemplate().orElse(null);
     if (retryPolicy != null && retryPolicy.isEnabled()) {
-      executeWithRetry(context, retryPolicy, callback -> executeCommand(executor, context, callback), callbackDelegate);
+      executeWithRetry(context, retryPolicy, callback -> executeCommand(executor, context, callback), executorCallback);
     } else {
-      executeCommand(executor, context, callbackDelegate);
+      executeCommand(executor, context, executorCallback);
     }
   }
 
@@ -203,62 +229,92 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       if (resultTransformer != null) {
         callback = new TransformingExecutionCallbackDecorator(callback, context, resultTransformer);
       }
-      final Thread currentThread = Thread.currentThread();
+      final Thread currentThread = currentThread();
       final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-      final CompositeClassLoader compositeClassLoader = new CompositeClassLoader(extensionClassLoader, currentClassLoader);
-      setContextClassLoader(currentThread, currentClassLoader, compositeClassLoader);
+      setContextClassLoader(currentThread, currentClassLoader, executionClassLoader);
       try {
         executor.execute(context, callback);
       } finally {
-        setContextClassLoader(currentThread, compositeClassLoader, currentClassLoader);
+        profileThreadRelease(context);
+        setContextClassLoader(currentThread, executionClassLoader, currentClassLoader);
       }
     }
   }
 
-  private Throwable handleError(Throwable e, ExecutionContextAdapter context) {
-    e = exceptionEnricherManager.process(e);
-    e = moduleExceptionHandler.processException(e);
-    e = interceptorChain.onError(context, e);
-
-    return e;
+  private void profileThreadRelease(ExecutionContextAdapter<M> context) {
+    String threadName = currentThread().getName();
+    String artifactId = getArtifactId(context.getMuleContext());
+    String artifactType = getArtifactType(context.getMuleContext());
+    threadReleaseDataProducer.triggerProfilingEvent(context
+        .getEvent(), event -> new DefaultComponentThreadingProfilingEventContext(event, context
+            .getComponent().getLocation(), threadName, artifactId, artifactType, currentTimeMillis()));
   }
 
-  Throwable applyBeforeInterceptors(ExecutionContextAdapter executionContext) {
-    return interceptorChain.before(executionContext, null);
+  private Throwable handleError(Throwable original, ExecutionContextAdapter context) {
+    try {
+      Throwable handled = exceptionEnricherManager.process(original);
+      handled = moduleExceptionHandler.processException(handled);
+      return interceptorChain.onError(context, handled);
+      // TODO: MULE-19723
+    } catch (Exception handlingException) {
+      // Errors will be logged and suppressed from the execution (a different error is already being handled)
+      LOGGER.error("An exception has been thrown during the operation error handling", handlingException);
+      return original;
+    }
+  }
+
+  Throwable applyBeforeInterceptors(ExecutionContextAdapter context) {
+    try {
+      return withExecutionTemplate(context, () -> {
+        RetryPolicyTemplate retryPolicy = (RetryPolicyTemplate) context.getRetryPolicyTemplate().orElse(null);
+        if (retryPolicy != null && retryPolicy.isEnabled()) {
+          CompletableFuture<Throwable> result = new CompletableFuture<>();
+
+          executeWithRetry(context, retryPolicy, callback -> {
+            final Throwable t = interceptorChain.before(context, callback);
+            if (t == null) {
+              result.complete(null);
+            }
+          },
+                           new ExecutorCallback() {
+
+                             @Override
+                             public void complete(Object value) {
+                               result.complete((Throwable) value);
+                             }
+
+                             @Override
+                             public void error(Throwable e) {
+                               result.completeExceptionally(e);
+                             }
+
+                           });
+
+          return result.get();
+        } else {
+          return interceptorChain.before(context, null);
+        }
+      });
+    } catch (Exception e) {
+      return e;
+    }
   }
 
   void applyAfterInterceptors(ExecutionContext executionContext) {
     interceptorChain.abort(executionContext);
   }
 
-  private <T> ExecutionTemplate<T> getExecutionTemplate(ExecutionContextAdapter<ComponentModel> context) {
+  private <T> T withExecutionTemplate(ExecutionContextAdapter<ComponentModel> context, ExecutionCallback<T> callback)
+      throws Exception {
     if (context.getTransactionConfig().isPresent()) {
       return ((ExecutionTemplate<T>) createTransactionalExecutionTemplate(context.getMuleContext(),
-                                                                          context.getTransactionConfig().get()));
+                                                                          context.getTransactionConfig().get()))
+                                                                              .execute(callback);
     } else {
-      return (ExecutionTemplate<T>) defaultExecutionTemplate;
+      return ((ExecutionTemplate<T>) defaultExecutionTemplate)
+          .execute(callback);
     }
   }
-
-  private static class FutureExecutionCallbackDecorator implements ExecutorCallback {
-
-    private final CompletableFuture<Object> future;
-
-    private FutureExecutionCallbackDecorator(CompletableFuture<Object> future) {
-      this.future = future;
-    }
-
-    @Override
-    public void complete(Object value) {
-      future.complete(value);
-    }
-
-    @Override
-    public void error(Throwable e) {
-      future.completeExceptionally(e);
-    }
-  }
-
 
   private static class TransformingExecutionCallbackDecorator<M extends ComponentModel> implements ExecutorCallback {
 

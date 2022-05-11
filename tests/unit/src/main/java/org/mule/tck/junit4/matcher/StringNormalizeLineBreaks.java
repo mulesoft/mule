@@ -7,7 +7,6 @@
 package org.mule.tck.junit4.matcher;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
@@ -36,7 +35,6 @@ public class StringNormalizeLineBreaks extends TypeSafeMatcher<String> {
     description.appendText("a string with normalized line breaks which ").appendDescriptionOf(innerMatcher);
   }
 
-  @Factory
   public static Matcher<String> normalizeLineBreaks(Matcher<String> innerMatcher) {
     return new StringNormalizeLineBreaks(innerMatcher);
   }

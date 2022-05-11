@@ -14,6 +14,7 @@ import static java.util.Optional.of;
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -40,8 +41,10 @@ public final class ArtifactContextConfiguration {
   private boolean disableXmlValidations;
   private List<ServiceConfigurator> serviceConfigurators = emptyList();
   private Optional<MuleContext> parentContext = empty();
+  private Optional<ArtifactContext> parentArtifactContext = empty();
   private ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
   private LockFactory runtimeLockFactory;
+  private MemoryManagementService memoryManagementService;
 
   private ArtifactContextConfiguration() {}
 
@@ -117,9 +120,18 @@ public final class ArtifactContextConfiguration {
 
   /**
    * @return the parent context of this artifact context.
+   * @deprecated Use {@link #getParentArtifactContext()}.
    */
+  @Deprecated
   public Optional<MuleContext> getParentContext() {
     return parentContext;
+  }
+
+  /**
+   * @return the {@link ArtifactContext} of the parent of this artifact context.
+   */
+  public Optional<ArtifactContext> getParentArtifactContext() {
+    return parentArtifactContext;
   }
 
   /**
@@ -134,12 +146,17 @@ public final class ArtifactContextConfiguration {
     return runtimeLockFactory;
   }
 
+  public MemoryManagementService getMemoryManagementService() {
+    return memoryManagementService;
+  }
+
   /**
    * Builder for {@code ArtifactContextConfiguration}.
    */
   public static class ArtifactContextConfigurationBuilder {
 
     private final ArtifactContextConfiguration artifactContextConfiguration = new ArtifactContextConfiguration();
+    private MemoryManagementService memoryManagementService;
 
 
     /**
@@ -180,7 +197,7 @@ public final class ArtifactContextConfiguration {
 
     /**
      * @param artifactType the type of the artifact. The artifact type restricts the functionality available in the artifact
-     *        context.
+     *                     context.
      * @return {@code this} builder
      */
     public ArtifactContextConfigurationBuilder setArtifactType(ArtifactType artifactType) {
@@ -213,7 +230,7 @@ public final class ArtifactContextConfiguration {
 
     /**
      * @param serviceConfigurators list of {@link ServiceConfigurator} that register or override services in the
-     *        {@link MuleContext}.
+     *                             {@link MuleContext}.
      * @return {@code this} builder
      */
     public ArtifactContextConfigurationBuilder setServiceConfigurators(List<ServiceConfigurator> serviceConfigurators) {
@@ -224,15 +241,26 @@ public final class ArtifactContextConfiguration {
     /**
      * @param parentContext the parent {@link MuleContext} of the {@link ArtifactContext} to be created.
      * @return {@code this} builder
+     * @deprecated Use {@link #setParentArtifactContext(ArtifactContext)} instead.
      */
+    @Deprecated
     public ArtifactContextConfigurationBuilder setParentContext(MuleContext parentContext) {
       artifactContextConfiguration.parentContext = of(parentContext);
       return this;
     }
 
     /**
+     * @param parentArtifactContext the parent {@link MuleContext} of the {@link ArtifactContext} to be created.
+     * @return {@code this} builder
+     */
+    public ArtifactContextConfigurationBuilder setParentArtifactContext(ArtifactContext parentArtifactContext) {
+      artifactContextConfiguration.parentArtifactContext = of(parentArtifactContext);
+      return this;
+    }
+
+    /**
      * @param runtimeComponentBuildingDefinitionProvider provider for the runtime
-     *        {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
+     *                                                   {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
      * @return {@code this} builder
      *
      * @deprecated no longer used since 4.4, providers are resolved internally
@@ -244,7 +272,8 @@ public final class ArtifactContextConfiguration {
     }
 
     /**
-     * @param runtimeLockFactory {@link LockFactory} for the runtime that can be shared along deployable artifacts to synchronize access on different deployable artifacts to the same resources.
+     * @param runtimeLockFactory {@link LockFactory} for the runtime that can be shared along deployable artifacts to synchronize
+     *                           access on different deployable artifacts to the same resources.
      * @return the builder
      */
     public ArtifactContextConfigurationBuilder setRuntimeLockFactory(LockFactory runtimeLockFactory) {
@@ -259,5 +288,9 @@ public final class ArtifactContextConfiguration {
       return artifactContextConfiguration;
     }
 
+    public ArtifactContextConfigurationBuilder setMemoryManagementService(MemoryManagementService memoryManagementService) {
+      artifactContextConfiguration.memoryManagementService = memoryManagementService;
+      return this;
+    }
   }
 }

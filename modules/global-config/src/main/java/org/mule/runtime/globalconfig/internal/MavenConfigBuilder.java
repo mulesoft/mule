@@ -9,6 +9,7 @@ package org.mule.runtime.globalconfig.internal;
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.valueOf;
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
@@ -25,6 +26,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -63,6 +65,11 @@ public class MavenConfigBuilder {
       boolean forcePolicyUpdateAlways = !forcePolicyUpdateNever
           && mavenConfig.hasPath("forcePolicyUpdateAlways") && mavenConfig.getBoolean("forcePolicyUpdateAlways");
 
+      List<String> activeProfiles =
+          mavenConfig.hasPath("activeProfiles") ? mavenConfig.getStringList("activeProfiles") : emptyList();
+      List<String> inactiveProfiles =
+          mavenConfig.hasPath("inactiveProfiles") ? mavenConfig.getStringList("inactiveProfiles") : emptyList();
+
       boolean offLineMode = mavenConfig.hasPath("offLineMode") && mavenConfig.getBoolean("offLineMode");
 
       File globalSettingsFile = findResource(globalSettingsLocation);
@@ -84,6 +91,8 @@ public class MavenConfigBuilder {
               .ignoreArtifactDescriptorRepositories(ignoreArtifactDescriptorRepositories)
               .forcePolicyUpdateNever(forcePolicyUpdateNever)
               .forcePolicyUpdateAlways(forcePolicyUpdateAlways)
+              .activeProfiles(activeProfiles)
+              .inactiveProfiles(inactiveProfiles)
               .offlineMode(offLineMode);
       if (globalSettingsFile != null) {
         mavenConfigurationBuilder.globalSettingsLocation(globalSettingsFile);

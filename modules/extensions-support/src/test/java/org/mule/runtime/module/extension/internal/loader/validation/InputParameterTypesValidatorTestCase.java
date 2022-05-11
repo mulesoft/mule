@@ -32,6 +32,7 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.validation.JavaInputParametersTypeModelValidator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -68,7 +69,7 @@ public class InputParameterTypesValidatorTestCase extends AbstractMuleTestCase {
   @Mock(lenient = true)
   private OutputModel outputModel;
 
-  private InputParametersTypeModelValidator validator = new InputParametersTypeModelValidator();
+  private JavaInputParametersTypeModelValidator validator = new JavaInputParametersTypeModelValidator();
 
   @Before
   public void before() {

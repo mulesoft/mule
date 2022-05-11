@@ -13,6 +13,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
+import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -25,8 +26,10 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
+import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 
+@Feature(XML_SDK)
 @RunnerDelegateTo(Parameterized.class)
 public class ModuleSimpleTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
@@ -212,6 +215,13 @@ public class ModuleSimpleTestCase extends AbstractCeXmlExtensionMuleArtifactFunc
   @Test
   public void testSetPayloadHardcodedFlowThruSubflowWithNestedElements() throws Exception {
     CoreEvent event = flowRunner("testSetPayloadHardcodedFlowThruSubflowWithNestedElements").run();
+    assertThat(event.getMessage().getPayload().getValue(), is("hardcoded value"));
+  }
+
+  @Test
+  @Issue("MULE-19010")
+  public void collidingOperationAndFlowName() throws Exception {
+    CoreEvent event = flowRunner("collidingOperationAndFlowName").run();
     assertThat(event.getMessage().getPayload().getValue(), is("hardcoded value"));
   }
 

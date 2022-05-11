@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.core.internal.util.journal.queue;
 
-import static org.apache.commons.collections.CollectionUtils.find;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.internal.util.queue.QueueProvider;
 import org.mule.runtime.core.internal.util.queue.RecoverableQueueStore;
 
-import com.google.common.collect.Multimap;
-
 import java.io.Serializable;
 import java.util.Collection;
+
+import com.google.common.collect.Multimap;
 
 import org.slf4j.Logger;
 
@@ -55,11 +55,8 @@ public class LocalTxQueueTransactionRecoverer {
     int txRecovered = 0;
     for (Integer txId : allEntries.keySet()) {
       Collection<LocalQueueTxJournalEntry> entries = allEntries.get(txId);
-      Object commitOrRollback = find(entries, object -> {
-        LocalQueueTxJournalEntry logEntry = (LocalQueueTxJournalEntry) object;
-        return logEntry.isCommit() || logEntry.isRollback();
-      });
-      if (commitOrRollback != null) {
+
+      if (entries.stream().anyMatch(logEntry -> logEntry.isCommit() || logEntry.isRollback())) {
         continue;
       }
       txRecovered++;

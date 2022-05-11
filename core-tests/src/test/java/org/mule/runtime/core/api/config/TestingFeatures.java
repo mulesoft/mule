@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.api.config;
 
+import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.api.config.Feature;
 
 import java.util.Optional;
-
-import static java.util.Optional.ofNullable;
 
 public enum TestingFeatures implements Feature {
 
@@ -20,17 +20,17 @@ public enum TestingFeatures implements Feature {
 
   private final String description;
   private final String issue;
-  private final String since;
+  private final String enabledByDefaultSince;
   private final String overridingSystemPropertyName;
 
-  TestingFeatures(String description, String issue, String since) {
-    this(description, issue, since, null);
+  TestingFeatures(String description, String issue, String enabledByDefaultSince) {
+    this(description, issue, enabledByDefaultSince, null);
   }
 
-  TestingFeatures(String description, String issue, String since, String overridingSystemPropertyName) {
+  TestingFeatures(String description, String issue, String enabledByDefaultSince, String overridingSystemPropertyName) {
     this.description = description;
     this.issue = issue;
-    this.since = since;
+    this.enabledByDefaultSince = enabledByDefaultSince;
     this.overridingSystemPropertyName = overridingSystemPropertyName;
   }
 
@@ -46,7 +46,12 @@ public enum TestingFeatures implements Feature {
 
   @Override
   public String getSince() {
-    return since;
+    return getEnabledByDefaultSince();
+  }
+
+  @Override
+  public String getEnabledByDefaultSince() {
+    return enabledByDefaultSince;
   }
 
   @Override

@@ -9,9 +9,11 @@ package org.mule.runtime.core.privileged.processor;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTER;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
-import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
@@ -55,7 +57,6 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Optional;
-import java.util.Stack;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -86,7 +87,7 @@ public class MessageProcessors {
    * construction but will not inject {@link MuleContext} or perform any lifecycle.
    *
    * @param processingStrategy the processing strategy to use for configuring the chain. It may be {@link Optional#empty()}.
-   * @param processors list of processors to construct chains from.
+   * @param processors         list of processors to construct chains from.
    * @return new {@link MessageProcessorChain} instance.
    */
   public static MessageProcessorChain newChain(Optional<ProcessingStrategy> processingStrategy, List<Processor> processors) {
@@ -118,7 +119,7 @@ public class MessageProcessors {
    * construction but will not inject {@link MuleContext} or perform any lifecycle.
    *
    * @param processingStrategy the processing strategy to use for configuring the chain. It may be {@link Optional#empty()}.
-   * @param processors list of processors to construct chains from.
+   * @param processors         list of processors to construct chains from.
    * @return new {@link MessageProcessorChain} instance.
    */
   public static MessageProcessorChain newChain(Optional<ProcessingStrategy> processingStrategy, Processor... processors) {
@@ -136,7 +137,7 @@ public class MessageProcessors {
    *
    * TODO MULE-13054 Remove blocking processor API
    *
-   * @param event event to process
+   * @param event     event to process
    * @param processor processor to adapt
    * @return result event
    * @throws MuleException if an error occurs
@@ -156,7 +157,7 @@ public class MessageProcessors {
    *
    * TODO MULE-13054 Remove blocking processor API
    *
-   * @param event event to process
+   * @param event     event to process
    * @param processor processor to adapt
    * @return result event
    * @throws MuleException if an error occurs
@@ -178,7 +179,7 @@ public class MessageProcessors {
    *
    * TODO MULE-13054 Remove blocking processor API
    *
-   * @param event event to process
+   * @param event     event to process
    * @param processor processor to adapt
    * @param alternate publisher to use if {@code processor} doesn't return data.
    * @return result event
@@ -211,7 +212,7 @@ public class MessageProcessors {
    * such that completion of the {@link EventContext} in the delegate {@link Processor} does not complete the original
    * {@link EventContext}.
    *
-   * @param event event to process
+   * @param event     event to process
    * @param processor processor to adapt
    * @return result event
    * @throws MuleException if an error occurs
@@ -236,7 +237,7 @@ public class MessageProcessors {
    * The {@link CoreEvent} returned by this method <b>will</b> be completed with the same {@link CoreEvent} instance and if an
    * error occurs during processing the {@link EventContext} will be completed with the error.
    *
-   * @param event event to process
+   * @param event     event to process
    * @param processor processor to use
    * @return future result
    */
@@ -262,8 +263,8 @@ public class MessageProcessors {
    * When using this method, the usage of {@link Mono#onErrorContinue(java.util.function.BiConsumer)} methods must be avoided,
    * since the returned publisher already configures its error handling.
    *
-   * @param event the event to process.
-   * @param processor the processor to process.
+   * @param event             the event to process.
+   * @param processor         the processor to process.
    * @param componentLocation
    * @return the future result of processing processor.
    */
@@ -282,8 +283,8 @@ public class MessageProcessors {
    * When using this method, the usage of {@link Mono#onErrorContinue(java.util.function.BiConsumer)} methods must be avoided,
    * since the returned publisher already configures its error handling.
    *
-   * @param event the event to process.
-   * @param processor the processor to process.
+   * @param event             the event to process.
+   * @param processor         the processor to process.
    * @param componentLocation
    * @return the future result of processing processor.
    */
@@ -299,7 +300,7 @@ public class MessageProcessors {
    * When using this method, the usage of {@link Mono#onErrorContinue(java.util.function.BiConsumer)} methods must be avoided,
    * since the returned publisher already configures its error handling.
    *
-   * @param event the parent event
+   * @param event             the parent event
    * @param componentLocation the location of the component creating the child context
    * @return a child {@link BaseEventContext}
    */
@@ -322,10 +323,10 @@ public class MessageProcessors {
    * When using this method, the usage of {@link Mono#onErrorContinue(java.util.function.BiConsumer)} methods must be avoided,
    * since the returned publisher already configures its error handling.
    *
-   * @param event the event to process.
-   * @param processor the processor to process.
+   * @param event             the event to process.
+   * @param processor         the processor to process.
    * @param componentLocation
-   * @param exceptionHandler used to handle {@link Exception}'s.
+   * @param exceptionHandler  used to handle {@link Exception}'s.
    * @return the future result of processing processor.
    *
    * @deprecated Since 4.3.0, use {@link #processWithChildContext(CoreEvent, ReactiveProcessor, Optional)} instead and rely on the
@@ -351,10 +352,10 @@ public class MessageProcessors {
    * When using this method, the usage of {@link Mono#onErrorContinue(java.util.function.BiConsumer)} methods must be avoided,
    * since the returned publisher already configures its error handling.
    *
-   * @param event the event to process.
-   * @param processor the processor to process.
+   * @param event             the event to process.
+   * @param processor         the processor to process.
    * @param componentLocation
-   * @param exceptionHandler used to handle {@link Exception}'s.
+   * @param exceptionHandler  used to handle {@link Exception}'s.
    * @return the future result of processing processor.
    *
    * @deprecated Since 4.3.0, use {@link #processWithChildContextDontComplete(CoreEvent, ReactiveProcessor, Optional)} instead and
@@ -372,8 +373,8 @@ public class MessageProcessors {
    * Process a {@link Processor} using a child {@link EventContext}. This is useful if it is necessary to perform processing in a
    * scope and handle an empty result or error locally rather than complete the response for the whole Flow.
    *
-   * @param event the event to process.
-   * @param processor the processor to process.
+   * @param event             the event to process.
+   * @param processor         the processor to process.
    * @param componentLocation
    * @return the result of processing processor.
    * @throws MuleException
@@ -393,10 +394,10 @@ public class MessageProcessors {
    * The {@link FlowExceptionHandler} configured on {@link MessageProcessorChain} or {@link FlowConstruct} will be used to handle
    * any errors that occur.
    *
-   * @param event the event to process.
-   * @param processor the processor to process.
+   * @param event             the event to process.
+   * @param processor         the processor to process.
    * @param componentLocation
-   * @param exceptionHandler used to handle {@link Exception}'s.
+   * @param exceptionHandler  used to handle {@link Exception}'s.
    * @return the result of processing processor.
    * @throws MuleException
    *
@@ -455,7 +456,7 @@ public class MessageProcessors {
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded())
         .switchIfEmpty(Mono.<Either<MessagingException, CoreEvent>>create(errorSwitchSinkSinkRef)
-            .map(propagateErrorResponseMapper())
+            .map(RxUtils.<MessagingException>propagateErrorResponseMapper())
             .toProcessor())
         .map(MessageProcessors::toParentContext)
         .subscriberContext(ctx -> ctx.put(WITHIN_PROCESS_WITH_CHILD_CONTEXT, true)
@@ -502,15 +503,16 @@ public class MessageProcessors {
                     .doOnNext(eventChildCtx -> childContextResponseHandler(eventChildCtx, errorSwitchSinkSinkRefAdapter,
                                                                            completeParentIfEmpty, propagateErrors))
                     .transform(processor)
-                    .doOnNext(completeSuccessIfNeeded())
-                    .map(event -> right(MessagingException.class, event))
                     // This Either here is used to propagate errors. If the error is sent directly through the merged with Flux,
                     // it will be cancelled, ignoring the onErrorContinue of the parent Flux.
-                    .doOnError(t -> errorSwitchSinkSinkRef.error(t))
-                    .doOnComplete(() -> errorSwitchSinkSinkRef.complete());
+                    .map(event -> right(MessagingException.class, event));
 
-                return subscribeFluxOnPublisherSubscription(errorSwitchSinkSinkRef.flux(), upstream)
-                    .map(propagateErrorResponseMapper().andThen(MessageProcessors::toParentContext));
+                return subscribeFluxOnPublisherSubscription(errorSwitchSinkSinkRef.flux(), upstream,
+                                                            completeSuccessEitherIfNeeded(),
+                                                            errorSwitchSinkSinkRef::error,
+                                                            errorSwitchSinkSinkRef::complete)
+                                                                .map(RxUtils.<MessagingException>propagateErrorResponseMapper()
+                                                                    .andThen(MessageProcessors::toParentContext));
               }
             }));
   }
@@ -568,12 +570,6 @@ public class MessageProcessors {
     });
   }
 
-  private static Function<? super Either<MessagingException, CoreEvent>, ? extends CoreEvent> propagateErrorResponseMapper() {
-    return result -> result.reduce(me -> {
-      throw propagateWrappingFatal(me);
-    }, response -> response);
-  }
-
   private static CoreEvent toParentContext(final CoreEvent event) {
     return quickCopy(getParentContext(event), event);
   }
@@ -586,8 +582,8 @@ public class MessageProcessors {
    * Process a {@link ReactiveProcessor} using a child {@link BaseEventContext}. This is useful if it is necessary to perform
    * processing in a scope and handle an empty result or error locally rather than complete the response for the whole Flow.
    *
-   * @param eventPub the publisher for the event(s) to process.
-   * @param processor the processor to process.
+   * @param eventPub          the publisher for the event(s) to process.
+   * @param processor         the processor to process.
    * @param componentLocation
    * @return the future result of processing processor.
    */
@@ -606,8 +602,8 @@ public class MessageProcessors {
    * somewhere else (for instance, on a {@code flow-ref} to a {@code flow}, the error bubbling is done by the flow itself, so the
    * child context needs not do that).
    *
-   * @param eventPub the publisher for the event(s) to process.
-   * @param processor the processor to process.
+   * @param eventPub          the publisher for the event(s) to process.
+   * @param processor         the processor to process.
    * @param componentLocation
    * @return the future result of processing processor.
    */
@@ -626,10 +622,10 @@ public class MessageProcessors {
    * The {@link FlowExceptionHandler} configured on {@link MessageProcessorChain} or {@link FlowConstruct} will be used to handle
    * any errors that occur.
    *
-   * @param eventPub the publisher for the event(s) to process.
-   * @param processor the processor to process.
+   * @param eventPub          the publisher for the event(s) to process.
+   * @param processor         the processor to process.
    * @param componentLocation
-   * @param exceptionHandler used to handle {@link Exception}'s.
+   * @param exceptionHandler  used to handle {@link Exception}'s.
    * @return the future result of processing processor.
    *
    * @deprecated Since 4.3.0, use {@link #applyWithChildContext(Publisher, ReactiveProcessor, Optional)} instead and rely on the
@@ -669,16 +665,56 @@ public class MessageProcessors {
     };
   }
 
+  private static Consumer<Either<MessagingException, CoreEvent>> completeSuccessEitherIfNeeded() {
+    return result -> result.applyRight(completeSuccessIfNeeded());
+  }
+
   /**
    * Helper method to get the {@link ProcessingStrategy} from a component.
    *
-   * @param locator the locator
-   * @param rootContainerLocation the component root container element
-   * @return the processing strategy of the root component if it was an instance of {@link FlowConstruct}, empty otherwise.
+   * @param locator   the locator
+   * @param component the component from which root the processing strategy will be obtained
+   * @return the processing strategy of the root of the component if it was an instance of {@link ProcessingStrategySupplier},
+   *         empty otherwise.
    */
   public static Optional<ProcessingStrategy> getProcessingStrategy(ConfigurationComponentLocator locator,
+                                                                   Component component) {
+    if (component.getLocation() == null) {
+      return empty();
+    }
+
+    // TODO MULE-19930 - remove this logic and try to propagate the processing strategy down from the root container
+    // instead of doing the lookup.
+    return component.getLocation().getParts().get(0).getPartIdentifier()
+        // This filter is consistent with the types that implement ProcessingStrategySupplier
+        .filter(id -> id.getType().equals(FLOW)
+            // a top level router is a policy...
+            || id.getType().equals(ROUTER)
+            // a top level scope should only be a subflow
+            || id.getType().equals(SCOPE))
+        .flatMap(id -> getProcessingStrategy(locator, component.getRootContainerLocation()));
+  }
+
+  /**
+   * Helper method to get the {@link ProcessingStrategy} from a component.
+   *
+   * @param locator               the locator
+   * @param rootContainerLocation the component root container element
+   * @return the processing strategy of the root component if it was an instance of {@link ProcessingStrategySupplier}, empty
+   *         otherwise.
+   *
+   * @deprecated Use {@link #getProcessingStrategy(ConfigurationComponentLocator, Component)} instead.
+   */
+  @Deprecated
+  public static Optional<ProcessingStrategy> getProcessingStrategy(ConfigurationComponentLocator locator,
                                                                    Location rootContainerLocation) {
-    return locator.find(rootContainerLocation)
+    final Optional<Component> found = locator.find(rootContainerLocation);
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("getProcessingStrategy - location: {} -> found: {}", rootContainerLocation,
+                   found.map(loc -> loc.getClass().getSimpleName() + ": " + loc.getLocation().getLocation()).orElse("(null)"));
+    }
+
+    return found
         .filter(loc -> loc instanceof ProcessingStrategySupplier)
         .map(loc -> ((ProcessingStrategySupplier) loc).getProcessingStrategy());
   }
@@ -723,7 +759,7 @@ public class MessageProcessors {
    * class-loaders.
    *
    * @param publisher the publisher to transform
-   * @param mapper the mapper to map publisher items with
+   * @param mapper    the mapper to map publisher items with
    * @return the transformed publisher
    * @since 4.2
    * @deprecated Since 4.3.0, use {@link RxUtils} instead
@@ -738,7 +774,7 @@ public class MessageProcessors {
    * {@link ReactiveProcessor} in other class-loaders.
    *
    * @param publisher the publisher to transform
-   * @param function the function to apply to each event.
+   * @param function  the function to apply to each event.
    * @param component the component that implements this functionality.
    * @return the transformed publisher
    * @since 4.1
@@ -753,7 +789,7 @@ public class MessageProcessors {
   /**
    * Creates a new {@link Publisher} that will emit the given {@code event}, publishing it on the given {@code executor}.
    *
-   * @param event the {@link CoreEvent} to emit
+   * @param event    the {@link CoreEvent} to emit
    * @param executor the thread pool where the event will be published.
    * @return the created publisher
    * @since 4.2

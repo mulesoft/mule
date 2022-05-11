@@ -43,8 +43,8 @@ import org.slf4j.Logger;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 
 /**
- * A {@link ValueResolver} wrapper which defaults to obtaining the value from the current {@link ConfigurationInstance}
- * if the given {@link ValueResolver delegate} results in a {@code null} value.
+ * A {@link ValueResolver} wrapper which defaults to obtaining the value from the current {@link ConfigurationInstance} if the
+ * given {@link ValueResolver delegate} results in a {@code null} value.
  *
  * @param <T> the generic type of the produced values.
  * @since 4.0
@@ -69,10 +69,11 @@ public final class ConfigOverrideValueResolverWrapper<T> implements ValueResolve
   /**
    * Creates a new instance
    *
-   * @param delegate the {@link ValueResolver delegate} used to obtain a value in the first place. Only if this {@code delegate}
-   *        returns a {@code null} value will the resolution using a {@link ConfigurationInstance config} will be attempted.
+   * @param delegate        the {@link ValueResolver delegate} used to obtain a value in the first place. Only if this
+   *                        {@code delegate} returns a {@code null} value will the resolution using a {@link ConfigurationInstance
+   *                        config} will be attempted.
    * @param reflectionCache the cache for expensive reflection lookups
-   * @param <T> the generic type of the produced values.
+   * @param <T>             the generic type of the produced values.
    * @return a new instance of {@link ConfigOverrideValueResolverWrapper}
    */
   public static <T> ValueResolver<T> of(ValueResolver<T> delegate, String parameterName, Class<?> parameterType,
@@ -87,10 +88,11 @@ public final class ConfigOverrideValueResolverWrapper<T> implements ValueResolve
   /**
    * Creates a new instance
    *
-   * @param delegate the {@link ValueResolver delegate} used to obtain a value in the first place. Only if this {@code delegate}
-   *        returns a {@code null} value will the resolution using a {@link ConfigurationInstance config} will be attempted.
+   * @param delegate        the {@link ValueResolver delegate} used to obtain a value in the first place. Only if this
+   *                        {@code delegate} returns a {@code null} value will the resolution using a {@link ConfigurationInstance
+   *                        config} will be attempted.
    * @param reflectionCache the cache for expensive reflection lookups
-   * @param <T> the generic type of the produced values.
+   * @param <T>             the generic type of the produced values.
    * @return a new instance of {@link ConfigOverrideValueResolverWrapper}
    */
   public static <T> ValueResolver<T> of(ValueResolver<T> delegate, String parameterName, MetadataType parameterType,
@@ -183,11 +185,6 @@ public final class ConfigOverrideValueResolverWrapper<T> implements ValueResolve
   }
 
   @Override
-  public boolean isContent() {
-    return false;
-  }
-
-  @Override
   public void initialise() throws InitialisationException {
     try {
       muleContext.getInjector().inject(delegate);
@@ -200,13 +197,12 @@ public final class ConfigOverrideValueResolverWrapper<T> implements ValueResolve
   }
 
   /**
-   * Retrieves the value of the parameter of name {@code parameterName} obtained from the {@code delegate} or
-   * from {@link ConfigurationInstance#getValue() config instance} if the {@code delegate} produces a
-   * {@code null} value.
+   * Retrieves the value of the parameter of name {@code parameterName} obtained from the {@code delegate} or from
+   * {@link ConfigurationInstance#getValue() config instance} if the {@code delegate} produces a {@code null} value.
    *
-   * @param instance        the {@link ConfigurationInstance config} from where the parameter value will be obtained
-   * @return the value of the parameter with name {@code parameterName} obtained from the {@code delegate} or
-   * from {@link ConfigurationInstance#getValue() config instance} if the {@code delegate} produces a {@code null} value.
+   * @param instance the {@link ConfigurationInstance config} from where the parameter value will be obtained
+   * @return the value of the parameter with name {@code parameterName} obtained from the {@code delegate} or from
+   *         {@link ConfigurationInstance#getValue() config instance} if the {@code delegate} produces a {@code null} value.
    */
   private T resolveConfigOverrideParameter(ConfigurationInstance instance) {
     try {

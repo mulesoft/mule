@@ -42,7 +42,7 @@ public class ResolverSetResult {
     /**
      * Adds a new result {@code value} for the given {@code key}
      *
-     * @param key a not {@code null} key for the value
+     * @param key   a not {@code null} key for the value
      * @param value the associated value. It can be {@code null}
      * @return this builder
      * @throws IllegalArgumentException is {@code parameter} is {@code null}

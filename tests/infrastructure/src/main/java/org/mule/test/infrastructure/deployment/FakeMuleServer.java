@@ -6,7 +6,17 @@
  */
 package org.mule.test.infrastructure.deployment;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
+import static org.mule.runtime.container.api.MuleFoldersUtil.APPS_FOLDER;
+import static org.mule.runtime.container.api.MuleFoldersUtil.DOMAINS_FOLDER;
+import static org.mule.runtime.container.api.MuleFoldersUtil.SERVICES_FOLDER;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
+import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
+import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
+
 import static java.lang.System.setProperty;
+
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.copyURLToFile;
@@ -20,24 +30,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
-import static org.mule.runtime.container.api.MuleFoldersUtil.APPS_FOLDER;
-import static org.mule.runtime.container.api.MuleFoldersUtil.DOMAINS_FOLDER;
-import static org.mule.runtime.container.api.MuleFoldersUtil.SERVICES_FOLDER;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
-import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
 import org.mule.runtime.module.repository.api.RepositoryService;
@@ -62,7 +65,7 @@ public class FakeMuleServer {
   protected static final int DEPLOYMENT_TIMEOUT = 20000;
   private final RepositoryService repositoryService;
 
-  private File muleHome;
+  private final File muleHome;
   private File appsDir;
   private File domainsDir;
   private File logsDir;
@@ -85,17 +88,20 @@ public class FakeMuleServer {
     }
   }
 
-  private DefaultMuleCoreExtensionManagerServer coreExtensionManager;
+  private final DefaultMuleCoreExtensionManagerServer coreExtensionManager;
   private final ArtifactClassLoader containerClassLoader;
-  private ServiceManager serviceManager;
-  private ExtensionModelLoaderManager extensionModelLoaderManager;
+  private final ServiceManager serviceManager;
+  private final ExtensionModelLoaderManager extensionModelLoaderManager;
 
   public FakeMuleServer(String muleHomePath) {
     this(muleHomePath, new LinkedList<>());
   }
 
   public FakeMuleServer(String muleHomePath, List<MuleCoreExtension> intialCoreExtensions) {
-    MuleArtifactResourcesRegistry muleArtifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder().build();
+    MuleArtifactResourcesRegistry muleArtifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder()
+        .artifactConfigurationProcessor(serializedAstWithFallbackArtifactConfigurationProcessor())
+        .build();
+    muleArtifactResourcesRegistry.inject(muleArtifactResourcesRegistry.getContainerProfilingService());
     containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();
     serviceManager = muleArtifactResourcesRegistry.getServiceManager();
     extensionModelLoaderManager = muleArtifactResourcesRegistry.getExtensionModelLoaderManager();
@@ -280,9 +286,9 @@ public class FakeMuleServer {
   /**
    * Deploys an application from a classpath resource
    *
-   * @param resource points to the resource to deploy. Non null.
+   * @param resource      points to the resource to deploy. Non null.
    * @param targetAppName application name used to deploy the resource. Null to maintain the original resource name
-   * @throws IOException if the resource cannot be accessed
+   * @throws IOException        if the resource cannot be accessed
    * @throws URISyntaxException
    */
   public void deploy(String resource, String targetAppName) throws IOException, URISyntaxException {
@@ -293,9 +299,9 @@ public class FakeMuleServer {
   /**
    * Deploys an application from an URL
    *
-   * @param resource points to the resource to deploy. Non null.
+   * @param resource      points to the resource to deploy. Non null.
    * @param targetAppName application name used to deploy the resource. Null to maintain the original resource name
-   * @throws IOException if the URL cannot be accessed
+   * @throws IOException        if the URL cannot be accessed
    * @throws URISyntaxException
    */
   public void deploy(URL resource, String targetAppName) throws IOException, URISyntaxException {
@@ -407,7 +413,7 @@ public class FakeMuleServer {
    * Deploys a Domain from a classpath folder
    *
    * @param domainFolder folder in which the domain is defined
-   * @param domainName name of the domain to use as domain artifact name
+   * @param domainName   name of the domain to use as domain artifact name
    * @throws URISyntaxException
    */
   public void deployDomainFromClasspathFolder(String domainFolder, String domainName) throws URISyntaxException {
@@ -434,7 +440,7 @@ public class FakeMuleServer {
    * Deploys an Application from a classpath folder
    *
    * @param appFolder folder in which the app is defined
-   * @param appName name of the domain to use as app artifact name
+   * @param appName   name of the domain to use as app artifact name
    * @throws URISyntaxException
    */
   public void deployAppFromClasspathFolder(String appFolder, String appName) throws URISyntaxException {

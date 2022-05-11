@@ -31,7 +31,7 @@ abstract class ConnectionManagementStrategy<C> implements Closeable {
    * Creates a new instance
    *
    * @param connectionProvider the {@link ConnectionProvider} which will be used to manage the connections
-   * @param muleContext the application's {@link MuleContext}
+   * @param muleContext        the application's {@link MuleContext}
    */
   ConnectionManagementStrategy(ConnectionProvider<C> connectionProvider, MuleContext muleContext) {
     this.connectionProvider = connectionProvider;

@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.internal.registry;
 
+import static org.apache.commons.lang3.ClassUtils.primitiveToWrapper;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
-
-import org.apache.commons.beanutils.MethodUtils;
 
 import java.util.List;
 
@@ -21,11 +21,11 @@ import java.util.List;
  */
 public class TransformerWeighting implements Comparable {
 
-  private Transformer transformer;
+  private final Transformer transformer;
   private int inputWeighting;
   private int outputWeighting;
-  private Class inputClass;
-  private Class outputClass;
+  private final Class inputClass;
+  private final Class outputClass;
 
   public TransformerWeighting(Class inputClass, Class outputClass, Transformer transformer) {
     this.inputClass = inputClass;
@@ -61,15 +61,15 @@ public class TransformerWeighting implements Comparable {
    * w + 1 If there is no match -1 is returned
    *
    * @param weighting an offset weighting, by default -1 should be used
-   * @param src the src class being matched
-   * @param dest the destination class to match to
+   * @param src       the src class being matched
+   * @param dest      the destination class to match to
    * @return a weighting where 0 would be an exact match, -1 would be no match and a positive integer that defines how close the
    *         match is
    */
   protected int getWeighting(int weighting, Class src, Class dest) {
     if (!dest.isAssignableFrom(src)) {
       if (src.isPrimitive()) {
-        return getWeighting(weighting, MethodUtils.getPrimitiveWrapper(src), dest);
+        return getWeighting(weighting, primitiveToWrapper(src), dest);
       }
 
       return -1;

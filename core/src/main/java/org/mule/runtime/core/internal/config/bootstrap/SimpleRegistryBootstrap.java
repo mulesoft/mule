@@ -7,43 +7,33 @@
 package org.mule.runtime.core.internal.config.bootstrap;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.config.builders.RegistryBootstrap;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
-import org.mule.runtime.core.internal.registry.SimpleRegistry;
-import org.mule.runtime.core.internal.registry.TransformerResolver;
-import org.mule.runtime.core.internal.util.StreamCloser;
-import org.mule.runtime.core.privileged.registry.ObjectProcessor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
-import java.util.Map;
-
 /**
- * An implementation of {@link AbstractRegistryBootstrap} to populate instances of {@link SimpleRegistry}
+ * Basic implementation of {@link RegistryBootstrap}
  *
- * @deprecated as of 3.7.0. Try to use {@see org.mule.runtime.core.config.spring.SpringRegistryBootstrap} instead.
+ * @since 4.5.0
  */
-@Deprecated
 public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap {
 
   /**
    * @param supportedArtifactType type of the artifact to support. This attributes defines which types of registry bootstrap
-   *        entries will be created depending on the entry applyToArtifactType parameter value.
-   * @param muleContext {@code MuleContext} in which the objects will be registered
+   *                              entries will be created depending on the entry applyToArtifactType parameter value.
+   * @param muleContext           {@code MuleContext} in which the objects will be registered
    */
   public SimpleRegistryBootstrap(ArtifactType supportedArtifactType, MuleContext muleContext) {
-    super(supportedArtifactType, muleContext);
+    super(supportedArtifactType, muleContext, k -> true);
   }
 
   @Override
@@ -68,31 +58,12 @@ public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap {
       // the transformer with the same name
       trans.setName("_" + trans.getName());
     }
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(trans);
-  }
-
-  @Override
-  protected void registerTransformers() throws MuleException {
-    MuleRegistryHelper registry = (MuleRegistryHelper) ((MuleContextWithRegistry) muleContext).getRegistry();
-    Map<String, Converter> converters = registry.lookupByType(Converter.class);
-    for (Converter converter : converters.values()) {
-      registry.notifyTransformerResolvers(converter, TransformerResolver.RegistryAction.ADDED);
-    }
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(trans.getName(), trans);
   }
 
   @Override
   protected void doRegisterObject(ObjectBootstrapProperty bootstrapProperty) throws Exception {
     Object value = bootstrapProperty.getService().instantiateClass(bootstrapProperty.getClassName());
-    Class<?> meta = Object.class;
-
-    if (value instanceof ObjectProcessor) {
-      meta = ObjectProcessor.class;
-    } else if (value instanceof StreamCloser) {
-      meta = StreamCloser.class;
-    } else if (value instanceof BootstrapObjectFactory) {
-      setMuleContextIfNeeded(value, muleContext);
-      value = ((BootstrapObjectFactory) value).create();
-    }
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(bootstrapProperty.getKey(), value, meta);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(bootstrapProperty.getKey(), value);
   }
 }

@@ -10,7 +10,7 @@ import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.extension.api.tx.Transactional;
-import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
+import org.mule.sdk.api.connectivity.TransactionalConnection;
 
 /**
  * Generic transactional resource for extension's {@link TransactionalConnection}s
@@ -27,9 +27,9 @@ public class ExtensionTransactionalResource<T extends TransactionalConnection> i
   /**
    * Creates a new instance
    *
-   * @param connection the connection
+   * @param connection        the connection
    * @param connectionHandler the {@link ConnectionHandler} for the {@code connection}
-   * @param transaction the bound {@link Transaction}
+   * @param transaction       the bound {@link Transaction}
    */
   public ExtensionTransactionalResource(T connection, ConnectionHandler<T> connectionHandler, Transaction transaction) {
     this.connection = connection;

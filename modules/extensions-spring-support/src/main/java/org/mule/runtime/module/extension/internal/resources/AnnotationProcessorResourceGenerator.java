@@ -36,7 +36,7 @@ public final class AnnotationProcessorResourceGenerator extends AbstractResource
    * Creates a new instance
    *
    * @param resourceFactories the {@link GeneratedResourceFactory} instances used to generated resources
-   * @param processingEnv the current {@link ProcessingEnvironment}
+   * @param processingEnv     the current {@link ProcessingEnvironment}
    */
   public AnnotationProcessorResourceGenerator(List<GeneratedResourceFactory> resourceFactories,
                                               ProcessingEnvironment processingEnv) {

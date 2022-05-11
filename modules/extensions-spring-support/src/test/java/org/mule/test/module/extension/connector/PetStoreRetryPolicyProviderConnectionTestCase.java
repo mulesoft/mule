@@ -17,15 +17,17 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.functional.api.flow.TransactionConfigEnum.ACTION_ALWAYS_BEGIN;
-import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.tck.SimpleUnitTestSupportSchedulerService.UNIT_TEST_THREAD_GROUP;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 import static org.mule.test.petstore.extension.PetStoreOperationsWithFailures.getConnectionThreads;
 import static org.mule.test.petstore.extension.PetStoreOperationsWithFailures.resetConnectionThreads;
+
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
@@ -84,6 +86,26 @@ public class PetStoreRetryPolicyProviderConnectionTestCase extends AbstractExten
     flowRunner("fail-connection-validation").runExpectingException(errorType("PETSTORE", CONNECTIVITY_ERROR_IDENTIFIER));
 
     assertThat(getConnectionThreads(), hasSize(3));
+    assertThat(getConnectionThreads().stream().map(t -> t.getThreadGroup()).collect(toSet()),
+               everyItem(sameInstance(UNIT_TEST_THREAD_GROUP)));
+  }
+
+  @Test
+  public void retryPolicyExhaustedDueToInvalidConnectionExecutingOperationUsingNonBlockingOverride() throws Exception {
+    flowRunner("fail-connection-validation-with-reconnect-override-non-blocking")
+        .runExpectingException(errorType("PETSTORE", CONNECTIVITY_ERROR_IDENTIFIER));
+
+    assertThat(getConnectionThreads(), hasSize(4));
+    assertThat(getConnectionThreads().stream().map(t -> t.getThreadGroup()).collect(toSet()),
+               everyItem(sameInstance(UNIT_TEST_THREAD_GROUP)));
+  }
+
+  @Test
+  public void retryPolicyExhaustedDueToInvalidConnectionExecutingOperationUsingBlockingOverride() throws Exception {
+    flowRunner("fail-connection-validation-with-reconnect-override-blocking")
+        .runExpectingException(errorType("PETSTORE", CONNECTIVITY_ERROR_IDENTIFIER));
+
+    assertThat(getConnectionThreads(), hasSize(4));
     assertThat(getConnectionThreads().stream().map(t -> t.getThreadGroup()).collect(toSet()),
                everyItem(sameInstance(UNIT_TEST_THREAD_GROUP)));
   }

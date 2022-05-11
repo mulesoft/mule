@@ -51,7 +51,7 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
   @Extension(name = "InvalidExtensionWithNestedCollection")
   public static class InvalidExtensionWithoutOptionals {
 
-    @ParameterGroup(name = "exclusion")
+    @org.mule.sdk.api.annotation.param.ParameterGroup(name = "exclusion")
     private ExclusionWithNestedCollection group;
   }
 
@@ -149,14 +149,15 @@ public class ExclusiveParameterModelValidatorTestCase extends AbstractMuleTestCa
 
   public static class ValidOperation {
 
-    public void validOperationWithExclusion(@ParameterGroup(name = "exclusion") ValidExclusion exclusiveParameter) {
+    public void validOperationWithExclusion(@org.mule.sdk.api.annotation.param.ParameterGroup(
+        name = "exclusion") ValidExclusion exclusiveParameter) {
 
     }
   }
 
   public static class InvalidOperation {
 
-    public void invalidOperationWithExclusion(@ParameterGroup(
+    public void invalidOperationWithExclusion(@org.mule.sdk.api.annotation.param.ParameterGroup(
         name = "exclusion") ExclusionWithoutOneOptionalParameters invalidExclusionParameter) {
 
     }

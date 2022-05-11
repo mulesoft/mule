@@ -46,7 +46,7 @@ public class TransformerException extends MuleException {
 
   /**
    * @param message the exception message
-   * @param cause the exception that cause this exception to be thrown
+   * @param cause   the exception that cause this exception to be thrown
    */
   public TransformerException(I18nMessage message, Transformer transformer, Throwable cause) {
     super(message, cause);
@@ -74,7 +74,7 @@ public class TransformerException extends MuleException {
 
   /**
    * @param message the exception message
-   * @param cause the exception that cause this exception to be thrown
+   * @param cause   the exception that cause this exception to be thrown
    */
   public TransformerException(I18nMessage message, Throwable cause) {
     super(message, cause);

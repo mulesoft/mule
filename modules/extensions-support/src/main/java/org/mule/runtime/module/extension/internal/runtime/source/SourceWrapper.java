@@ -14,8 +14,8 @@ import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 import java.util.Map;
 
 /**
- * An abstract wrapper for {@link Source} implementations that allows to intercept
- * all the invocations related to a generic {@link Source} lifecycle and event handlers.
+ * An abstract wrapper for {@link Source} implementations that allows to intercept all the invocations related to a generic
+ * {@link Source} lifecycle and event handlers.
  *
  * @param <T>
  * @param <A>

@@ -28,9 +28,8 @@ import javax.annotation.PreDestroy;
 
 /**
  * Objects are disposed of via the Registry since the Registry manages the creation/initialisation of the objects it must also
- * take care of disposing them. However, a user may want to initiate a dispose via the
- * {@link DefaultMuleContext} so the dispose Lifecycle phase for the
- * {@link DefaultMuleContext} needs to call dispose on the Registry.
+ * take care of disposing them. However, a user may want to initiate a dispose via the {@link DefaultMuleContext} so the dispose
+ * Lifecycle phase for the {@link DefaultMuleContext} needs to call dispose on the Registry.
  *
  * The MuleContextDisposePhase defines the lifecycle behaviour when the Mule context is disposed. The MuleContext is associated
  * with one or more registries that inherit the lifecycle of the MuleContext.

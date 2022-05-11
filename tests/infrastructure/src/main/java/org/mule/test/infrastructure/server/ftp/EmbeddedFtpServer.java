@@ -31,7 +31,7 @@ public class EmbeddedFtpServer {
    * Initialize the ftp server on a given port
    *
    * @param port The port to start the server on. Note, you need special permissions on *nux to open port 22, so we usually choose
-   *        a very high port number.
+   *             a very high port number.
    * @throws Exception
    */
   public EmbeddedFtpServer(int port) throws Exception {

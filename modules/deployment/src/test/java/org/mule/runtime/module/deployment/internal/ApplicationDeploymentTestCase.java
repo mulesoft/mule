@@ -7,12 +7,53 @@
 
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.runtime.api.deployment.meta.Product.MULE;
+import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
+import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
+import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
+import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.CREATED;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DEPLOYMENT_FAILED;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveArtifactStatusDeploymentProperties;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveFlowDeploymentProperties;
+import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.FlowStoppedDeploymentPersistenceListener.START_FLOW_ON_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
+import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
+import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+import static org.mule.test.allure.AllureConstants.ArtifactAst.ArtifactAstSerialization.AST_JSON_DESERIALIZER;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DeploymentFailureStory.DEPLOYMENT_FAILURE;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DeploymentSuccessfulStory.DEPLOYMENT_SUCCESS;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.UndeploymentFailureStory.UNDEPLOYMENT;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FlowStatePersistenceStory.FLOW_STATE_PERSISTENCE;
+import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.RedeploymentStory.APPLICATION_REDEPLOYMENT;
+import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
+
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
+
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -32,57 +73,35 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.api.deployment.meta.Product.MULE;
-import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
-import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
-import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
-import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
-import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.CREATED;
-import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
-import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
-import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
-import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
-import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.DEPLOYMENT_APPLICATION_PROPERTY;
-import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
-import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
-import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
-import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
-import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FlowStatePersistenceStory.FLOW_STATE_PERSISTENCE;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
-import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
-import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
-import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
+import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
+import org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
@@ -90,22 +109,29 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-import io.qameta.allure.Story;
+import javax.inject.Inject;
+
 import org.apache.commons.io.IOUtils;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+
 /**
  * Contains test for application deployment on the default domain
  */
+@Feature(APP_DEPLOYMENT)
 public class ApplicationDeploymentTestCase extends AbstractApplicationDeploymentTestCase {
 
   private static final String OVERWRITTEN_PROPERTY = "configFile";
   private static final String OVERWRITTEN_PROPERTY_SYSTEM_VALUE = "nonExistent.yaml";
   private static final String OVERWRITTEN_PROPERTY_DEPLOYMENT_VALUE = "someProps.yaml";
 
-  protected ApplicationFileBuilder dummyAppDescriptorWithPropsDependencyFileBuilder;
+  protected static ApplicationFileBuilder dummyAppDescriptorWithPropsDependencyFileBuilder;
 
   @Rule
   public SystemProperty systemProperty = new SystemProperty(OVERWRITTEN_PROPERTY, OVERWRITTEN_PROPERTY_SYSTEM_VALUE);
@@ -126,11 +152,18 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     waitAppFileBuilder = appFileBuilder("wait-app").definedBy("wait-app-config.xml");
     dummyAppDescriptorWithPropsFileBuilder = appFileBuilder("dummy-app-with-props")
         .definedBy("dummy-app-with-props-config.xml")
+        .dependingOn(callbackExtensionPlugin)
         .containingClass(echoTestClassFile,
                          "org/foo/EchoTest.class");
     dummyAppDescriptorWithPropsDependencyFileBuilder = appFileBuilder("dummy-app-with-props-dependencies")
         .withMinMuleVersion("4.3.0") // MULE-19038
         .definedBy("dummy-app-with-props-dependencies-config.xml");
+    dummyAppDescriptorWithStoppedFlowFileBuilder = appFileBuilder("dummy-app-with-stopped-flow-config")
+        .withMinMuleVersion("4.3.0") // MULE-19127
+        .definedBy("dummy-app-with-stopped-flow-config.xml")
+        .dependingOn(callbackExtensionPlugin)
+        .containingClass(echoTestClassFile,
+                         "org/foo/EchoTest.class");
 
     // Application plugin artifact builders
     echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
@@ -140,6 +173,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysAppZipOnStartup() throws Exception {
     addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
 
@@ -153,18 +187,69 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
 
     // Checks that the configuration's ID was properly configured
-    assertThat(app.getRegistry().<MuleConfiguration>lookupByName(OBJECT_MULE_CONFIGURATION).get().getId(),
+    assertThat(app.getArtifactContext().getRegistry().<MuleConfiguration>lookupByName(OBJECT_MULE_CONFIGURATION).get().getId(),
                equalTo(dummyAppDescriptorFileBuilder.getId()));
   }
 
   @Test
+  @Story(AST_JSON_DESERIALIZER)
+  public void deploysAppZipOnStartupUsingSerializedAst() throws Exception {
+    restartServer(new SerializedAstArtifactConfigurationProcessor());
+
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
+    assertApplicationAnchorFileExists(dummyAppDescriptorFileBuilder.getId());
+  }
+
+  @Test
+  public void deploysAppZipOnStartupUsingSerializedAstFallback() throws Exception {
+    addPackedAppFromBuilder(dummyAppWithBrokenAstDescriptorFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppWithBrokenAstDescriptorFileBuilder.getId());
+    assertAppsDir(NONE, new String[] {dummyAppWithBrokenAstDescriptorFileBuilder.getId()}, true);
+    assertApplicationAnchorFileExists(dummyAppWithBrokenAstDescriptorFileBuilder.getId());
+
+    // just assert no privileged entries were put in the registry
+    final Application app = findApp(dummyAppWithBrokenAstDescriptorFileBuilder.getId(), 1);
+
+    // Checks that the configuration's ID was properly configured
+    assertThat(app.getArtifactContext().getRegistry().<MuleConfiguration>lookupByName(OBJECT_MULE_CONFIGURATION).get().getId(),
+               equalTo(dummyAppWithBrokenAstDescriptorFileBuilder.getId()));
+  }
+
+  @Test
+  public void memoryManagementCanBeInjectedInApplication() throws Exception {
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
+    assertApplicationAnchorFileExists(dummyAppDescriptorFileBuilder.getId());
+
+    // just assert no privileged entries were put in the registry
+    final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
+
+    InjectedMemoryManagement injectedMemoryManagementService = new InjectedMemoryManagement();
+    app.getArtifactContext().getMuleContext().getInjector().inject(injectedMemoryManagementService);
+
+    assertThat(injectedMemoryManagementService.getMemoryManagementService(), is(notNullValue()));
+  }
+
+  @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void extensionManagerPresent() throws Exception {
     final Application app = deployApplication(emptyAppFileBuilder);
-    assertThat(app.getRegistry().<ExtensionManager>lookupByName(MuleProperties.OBJECT_EXTENSION_MANAGER).get(),
+    assertThat(app.getArtifactContext().getRegistry().<ExtensionManager>lookupByName(OBJECT_EXTENSION_MANAGER).get(),
                is(notNullValue()));
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void appHomePropertyIsPresent() throws Exception {
     final ApplicationFileBuilder globalPropertyAppFileBuilder =
         appFileBuilder("property-app").definedBy("app-properties-config.xml");
@@ -177,7 +262,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     final Application app = findApp(globalPropertyAppFileBuilder.getId(), 1);
 
     Optional<ConfigurationProperties> configurationProperties =
-        app.getRegistry().lookupByType(ConfigurationProperties.class);
+        app.getArtifactContext().getRegistry().lookupByType(ConfigurationProperties.class);
     assertThat(configurationProperties.isPresent(), is(true));
 
     File appHome = new File(configurationProperties.get().resolveStringProperty("appHome")
@@ -187,33 +272,39 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysExplodedAppAndVerifyAnchorFileIsCreatedAfterDeploymentEnds() throws Exception {
     Action deployExplodedWaitAppAction = () -> addExplodedAppFromBuilder(waitAppFileBuilder);
     deploysAppAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(deployExplodedWaitAppAction);
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysPackagedAppAndVerifyAnchorFileIsCreatedAfterDeploymentEnds() throws Exception {
     Action deployPackagedWaitAppAction = () -> addPackedAppFromBuilder(waitAppFileBuilder);
     deploysAppAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(deployPackagedWaitAppAction);
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysAppZipAfterStartup() throws Exception {
     deployAfterStartUp(dummyAppDescriptorFileBuilder);
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysAppZipWithExtensionUpperCaseAfterStartup() throws Exception {
     final ApplicationFileBuilder dummyAppDescriptorFileBuilderWithUpperCaseInExtension =
         appFileBuilder("dummy-app", true)
             .definedBy("dummy-app-config.xml").configuredWith("myCustomProp", "someValue")
+            .dependingOn(callbackExtensionPlugin)
             .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
 
     deployAfterStartUp(dummyAppDescriptorFileBuilderWithUpperCaseInExtension);
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysAppWithNonExistentConfigResourceOnDeclaration() throws Exception {
     ApplicationFileBuilder appBundleNonExistentConfigResource = appFileBuilder("non-existent-app-config-resource")
         .definedBy("empty-config.xml").deployedWith(PROPERTY_CONFIG_RESOURCES, "mule-non-existent-config.xml");
@@ -226,6 +317,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysBrokenAppZipOnStartup() throws Exception {
     addPackedAppFromBuilder(brokenAppFileBuilder);
 
@@ -241,6 +333,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deployAndRedeployAppWithDeploymentProperties() throws Exception {
     Properties deploymentProperties = new Properties();
     deploymentProperties.put(FLOW_PROPERTY_NAME, FLOW_PROPERTY_NAME_VALUE);
@@ -261,8 +354,52 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
                                             .equals(FLOW_PROPERTY_NAME_VALUE_ON_REDEPLOY));
   }
 
+  @Test
+  @Issue("W-10984029")
+  public void deployRedeployAndStopAppWithDeploymentProperties() throws Exception {
+    Properties deploymentProperties = new Properties();
+    deploymentProperties.put(FLOW_PROPERTY_NAME, FLOW_PROPERTY_NAME_VALUE);
+    startDeployment();
+    deployAndVerifyPropertyInRegistry(dummyAppDescriptorWithPropsFileBuilder.getArtifactFile().toURI(), deploymentProperties,
+                                      (registry) -> registry.lookupByName(FLOW_PROPERTY_NAME).get()
+                                          .equals(FLOW_PROPERTY_NAME_VALUE));
+
+    stopAppAndVerifyDeploymentAndAppStatusProperties(dummyAppDescriptorWithPropsFileBuilder.getId(), FLOW_PROPERTY_NAME_VALUE);
+
+    // Redeploys without deployment properties (remains the same, as it takes the deployment properties from the persisted file)
+    redeployAndVerifyPropertyInRegistry(dummyAppDescriptorWithPropsFileBuilder
+        .getId(), null, (registry) -> registry.lookupByName(FLOW_PROPERTY_NAME).get().equals(FLOW_PROPERTY_NAME_VALUE));
+
+    stopAppAndVerifyDeploymentAndAppStatusProperties(dummyAppDescriptorWithPropsFileBuilder.getId(), FLOW_PROPERTY_NAME_VALUE);
+
+    // Redeploy with new deployment properties
+    deploymentProperties.clear();
+    deploymentProperties.put(FLOW_PROPERTY_NAME, FLOW_PROPERTY_NAME_VALUE_ON_REDEPLOY);
+    redeployAndVerifyPropertyInRegistry(dummyAppDescriptorWithPropsFileBuilder.getId(), deploymentProperties,
+                                        (registry) -> registry.lookupByName(FLOW_PROPERTY_NAME).get()
+                                            .equals(FLOW_PROPERTY_NAME_VALUE_ON_REDEPLOY));
+
+    stopAppAndVerifyDeploymentAndAppStatusProperties(dummyAppDescriptorWithPropsFileBuilder.getId(),
+                                                     FLOW_PROPERTY_NAME_VALUE_ON_REDEPLOY);
+  }
+
+  private void stopAppAndVerifyDeploymentAndAppStatusProperties(String artifactName, String deploymentPropertyValue)
+      throws IOException {
+    Application app = findApp(dummyAppDescriptorWithPropsFileBuilder.getId(), 1);
+    app.stop();
+
+    Properties artifactStatusDeploymentProperties =
+        resolveArtifactStatusDeploymentProperties(dummyAppDescriptorWithPropsFileBuilder.getId(), empty());
+    assertThat(artifactStatusDeploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
+
+    Properties updatedDeploymentProperties = resolveDeploymentProperties(dummyAppDescriptorWithPropsFileBuilder.getId(), empty());
+    assertThat(updatedDeploymentProperties.get(FLOW_PROPERTY_NAME), is(deploymentPropertyValue));
+    assertThat(updatedDeploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
+  }
+
   @Issue("MULE-16688")
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deployAppWithDeploymentPropertiesInImportTag() throws Exception {
     Properties deploymentProperties = new Properties();
     deploymentProperties.put("environment", "dev");
@@ -277,6 +414,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
   @Issue("MULE-16688")
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deployAppWithOverwrittenDeploymentPropertiesInImportTag() throws Exception {
     Properties deploymentProperties = new Properties();
     deploymentProperties.put("oneProperty", "dev");
@@ -290,6 +428,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploymentPropertiesUsedInConfigurationProperties() throws Exception {
     Properties deploymentProperties = new Properties();
     deploymentProperties.put(OVERWRITTEN_PROPERTY, OVERWRITTEN_PROPERTY_DEPLOYMENT_VALUE);
@@ -302,25 +441,27 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
   @Issue("MULE-19040")
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void whenAppIsStoppedStateIsPersistedAsDeploymentProperty() throws Exception {
     final Application app = deployApplication(emptyAppFileBuilder);
     app.stop();
 
-    assertThat(app.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
-    Properties deploymentProperties = resolveDeploymentProperties(emptyAppFileBuilder.getId(), empty());
+    assertThat(app.getArtifactContext().getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
   }
 
   @Issue("MULE-19040")
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void whenAppIsStoppedByUndeploymentStateIsNotPersistedAsDeploymentProperty() throws Exception {
     final Application app = deployApplication(emptyAppFileBuilder);
 
-    assertThat(app.getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
+    assertThat(app.getArtifactContext().getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
     deploymentService.undeploy(app);
 
-    Properties deploymentProperties = resolveDeploymentProperties(emptyAppFileBuilder.getId(), empty());
+    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
     assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
@@ -329,6 +470,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
    * doesn't try to do it again, which is a behavior than can be seen in some file systems due to path handling issues
    */
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void doesNotRetriesBrokenAppWithFunkyName() throws Exception {
     addPackedAppFromBuilder(brokenAppWithFunkyNameAppFileBuilder);
 
@@ -354,6 +496,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysBrokenAppZipAfterStartup() throws Exception {
     startDeployment();
 
@@ -369,6 +512,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void redeploysAppZipDeployedOnStartup() throws Exception {
     startDeployment();
 
@@ -390,6 +534,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void removesPreviousAppFolderOnStart() throws Exception {
     addExplodedAppFromBuilder(emptyAppFileBuilder);
 
@@ -410,6 +555,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysExplodedAppOnStartup() throws Exception {
     addExplodedAppFromBuilder(emptyAppFileBuilder);
 
@@ -421,6 +567,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysPackagedAppOnStartupWhenExplodedAppIsAlsoPresent() throws Exception {
     addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder);
     addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
@@ -437,6 +584,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysExplodedAppAfterStartup() throws Exception {
     startDeployment();
 
@@ -448,6 +596,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysInvalidExplodedAppOnStartup() throws Exception {
     addExplodedAppFromBuilder(emptyAppFileBuilder, "app with spaces");
 
@@ -461,6 +610,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysInvalidExplodedAppAfterStartup() throws Exception {
     startDeployment();
 
@@ -474,6 +624,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysInvalidExplodedOnlyOnce() throws Exception {
     startDeployment();
 
@@ -491,6 +642,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysBrokenExplodedAppOnStartup() throws Exception {
     addExplodedAppFromBuilder(incompleteAppFileBuilder);
 
@@ -504,10 +656,11 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertAppsDir(NONE, new String[] {incompleteAppFileBuilder.getId()}, true);
     String appId = incompleteAppFileBuilder.getId();
     assertArtifactIsRegisteredAsZombie(appId, deploymentService.getZombieApplications());
-    assertThat(deploymentService.findApplication(appId).getRegistry(), nullValue());
+    assertThat(deploymentService.findApplication(appId).getArtifactContext(), nullValue());
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysBrokenExplodedAppAfterStartup() throws Exception {
     startDeployment();
 
@@ -520,11 +673,12 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     // Maintains app dir created
     assertAppsDir(NONE, new String[] {incompleteAppFileBuilder.getId()}, true);
     assertArtifactIsRegisteredAsZombie(incompleteAppFileBuilder.getId(), deploymentService.getZombieApplications());
-    assertThat(deploymentService.findApplication(incompleteAppFileBuilder.getId()).getRegistry(), nullValue());
+    assertThat(deploymentService.findApplication(incompleteAppFileBuilder.getId()).getArtifactContext(), nullValue());
   }
 
   @Test
-  public void removesZombieFilesAfterremovesZombieFilesAfterFailedAppIsDeleted() throws Exception {
+  @Story(DEPLOYMENT_FAILURE)
+  public void removesZombieFilesAfterRemovesZombieFilesAfterFailedAppIsDeleted() throws Exception {
     final String appName = "bad-config-app";
 
     final ApplicationFileBuilder badConfigAppFileBuilder = appFileBuilder(appName).definedBy("bad-app-config.xml");
@@ -538,7 +692,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertArtifactIsRegisteredAsZombie(badConfigAppFileBuilder.getId(), deploymentService.getZombieApplications());
 
     final Application app = findApp(badConfigAppFileBuilder.getId(), 1);
-    assertStatus(app, ApplicationStatus.DEPLOYMENT_FAILED);
+    assertStatus(app, DEPLOYMENT_FAILED);
     assertApplicationAnchorFileDoesNotExists(app.getArtifactName());
 
     reset(applicationDeploymentListener);
@@ -549,16 +703,19 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void brokenAppArchiveWithoutArgument() throws Exception {
     doBrokenAppArchiveTest();
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void brokenAppArchiveAsArgument() throws Exception {
     testWithSystemProperty(DEPLOYMENT_APPLICATION_PROPERTY, brokenAppFileBuilder.getId(), () -> doBrokenAppArchiveTest());
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysInvalidZipAppOnStartup() throws Exception {
     addPackedAppFromBuilder(emptyAppFileBuilder, "app with spaces.jar");
 
@@ -571,6 +728,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysInvalidZipAppAfterStartup() throws Exception {
     startDeployment();
 
@@ -584,6 +742,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deployAppNameWithZipSuffix() throws Exception {
     final ApplicationFileBuilder applicationFileBuilder = appFileBuilder("empty-app.jar", emptyAppFileBuilder);
     addPackedAppFromBuilder(applicationFileBuilder);
@@ -601,6 +760,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysPackedAppsInOrderWhenAppArgumentIsUsed() throws Exception {
     assumeThat(parallelDeployment, is(false));
 
@@ -635,6 +795,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysExplodedAppsInOrderWhenAppArgumentIsUsed() throws Exception {
     assumeThat(parallelDeployment, is(false));
 
@@ -667,6 +828,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysAppJustOnce() throws Exception {
     addPackedAppFromBuilder(emptyAppFileBuilder);
 
@@ -685,6 +847,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void tracksAppConfigUpdateTime() throws Exception {
     addExplodedAppFromBuilder(emptyAppFileBuilder);
 
@@ -701,6 +864,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void receivesMuleContextDeploymentNotifications() throws Exception {
     // NOTE: need an integration test like this because DefaultMuleApplication
     // class cannot be unit tested.
@@ -714,6 +878,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(UNDEPLOYMENT)
   public void undeploysStoppedApp() throws Exception {
     final Application app = deployApplication(emptyAppFileBuilder);
     app.stop();
@@ -722,9 +887,26 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     deploymentService.undeploy(app);
   }
 
+  @Test
+  public void whenAppIsUndeployedStoppedPersistenceIsDeleted() throws Exception {
+    final Application app = deployApplication(emptyAppFileBuilder);
+    app.stop();
+    assertStatus(app, STOPPED);
+
+    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
+
+    deploymentService.undeploy(app);
+
+    deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
+  }
+
   @Issue("MULE-19040")
   @Test
-  public void undeploysStoppedAppAndDoesNotStartItOnDeploy() throws Exception {
+  @Story(UNDEPLOYMENT)
+  public void runtimeWithStoppedAppRestartsAndDoesNotStartAppOnDeployBecauseOfStatusDeploymentProperties() throws Exception {
     final Application app = deployApplication(emptyAppFileBuilder);
     app.stop();
     assertStatus(app, STOPPED);
@@ -732,11 +914,15 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     restartServer();
 
     assertAppDeploymentAndStatus(emptyAppFileBuilder, CREATED);
+    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
   }
 
   @Issue("MULE-19040")
   @Test
-  public void undeploysStoppedAppDoesNotStartItOnDeployButCanBeStartedManually() throws Exception {
+  @Story(UNDEPLOYMENT)
+  public void runtimeWithStoppedAppRestartsAndDoesNotStartAppOnDeployButItCanBeStartedManually() throws Exception {
     final Application app = deployApplication(emptyAppFileBuilder);
     app.stop();
     assertStatus(app, STOPPED);
@@ -746,19 +932,44 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
     final Application app_2 = findApp(emptyAppFileBuilder.getId(), 1);
     assertStatus(app_2, CREATED);
+    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
+
     app_2.start();
     assertStatus(app_2, STARTED);
   }
 
   @Issue("MULE-19040")
   @Test
-  public void undeploysNotStoppedAppAndStartsItOnDeploy() throws Exception {
+  @Story(UNDEPLOYMENT)
+  public void runtimeWithStartedAppRestartsAndStartsAppOnDeploy() throws Exception {
     final Application app = deployApplication(emptyAppFileBuilder);
     assertStatus(app, STARTED);
 
     restartServer();
 
     assertAppDeploymentAndStatus(emptyAppFileBuilder, STARTED);
+    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
+  }
+
+  @Test
+  public void redeploysStoppedAppAndStartsItOnDeployBecauseStatusPersistenceGetsDeleted() throws Exception {
+    final Application app = deployApplication(emptyAppFileBuilder);
+    app.stop();
+    assertStatus(app, STOPPED);
+    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
+
+    reset(applicationDeploymentListener);
+
+    deploymentService.redeploy(emptyAppFileBuilder.getId());
+
+    assertAppDeploymentAndStatus(emptyAppFileBuilder, STARTED);
+    deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
+    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
   @Test
@@ -767,7 +978,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Story(FLOW_STATE_PERSISTENCE)
   public void undeploysAppWithStoppedFlowAndDoesNotStartItOnDeploy() throws Exception {
     final Application app = deployApplication(dummyAppDescriptorFileBuilder);
-    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+    for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       flow.stop();
     }
 
@@ -800,12 +1011,13 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Story(FLOW_STATE_PERSISTENCE)
   public void redeploysAppWithStoppedFlowAndDoesNotStartItOnDeploy() throws Exception {
     final Application app = deployApplication(dummyAppDescriptorFileBuilder);
-    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+    for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       flow.stop();
     }
 
     reset(applicationDeploymentListener);
     deploymentService.redeploy(dummyAppDescriptorFileBuilder.getId());
+    assertApplicationRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
 
     final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder, STARTED);
     assertIfFlowsHaveStarted(app_2, false);
@@ -817,7 +1029,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Story(FLOW_STATE_PERSISTENCE)
   public void redeploysAppWithStoppedFlowAndDoesNotStartItOnDeployButCanBeStartedManually() throws Exception {
     final Application app = deployApplication(dummyAppDescriptorFileBuilder);
-    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+    for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       flow.stop();
     }
 
@@ -825,7 +1037,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     deploymentService.redeploy(dummyAppDescriptorFileBuilder.getId());
 
     final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder, STARTED);
-    for (Flow flow : app_2.getRegistry().lookupAllByType(Flow.class)) {
+    for (Flow flow : app_2.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       assertThat(flow.getLifecycleState().isStarted(), is(false));
       flow.start();
       assertThat(flow.getLifecycleState().isStarted(), is(true));
@@ -836,9 +1048,24 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Issue("MULE-19127")
   @Feature(DEPLOYMENT_CONFIGURATION)
   @Story(FLOW_STATE_PERSISTENCE)
+  public void redeploysAppWithNotStoppedFlowAndStartsItOnDeploy() throws Exception {
+    deployApplication(dummyAppDescriptorFileBuilder);
+
+    reset(applicationDeploymentListener);
+    deploymentService.redeploy(dummyAppDescriptorFileBuilder.getId());
+    assertApplicationRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+
+    final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorFileBuilder, STARTED);
+    assertIfFlowsHaveStarted(app_2, true);
+  }
+
+  @Test
+  @Issue("MULE-19127")
+  @Feature(DEPLOYMENT_CONFIGURATION)
+  @Story(FLOW_STATE_PERSISTENCE)
   public void stopsAndStartsAppWithStoppedFlowAndDoesNotStartIt() throws Exception {
     final Application app = deployApplication(dummyAppDescriptorFileBuilder);
-    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+    for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       flow.stop();
     }
     app.stop();
@@ -850,6 +1077,40 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Issue("MULE-19127")
+  @Feature(DEPLOYMENT_CONFIGURATION)
+  @Story(FLOW_STATE_PERSISTENCE)
+  public void stopsAndStartsAppWithStartedFlowAndDoesNotStopIt() throws Exception {
+    final Application app = deployApplication(dummyAppDescriptorFileBuilder);
+    app.stop();
+    assertStatus(app, STOPPED);
+    app.start();
+    assertStatus(app, STARTED);
+
+    assertIfFlowsHaveStarted(app, true);
+  }
+
+  @Test
+  @Issue("MULE-19127")
+  public void stopsAndStartsAppWithStoppedFlowWithInitialStateStoppedAndStartsIt() throws Exception {
+    final Application app = deployApplication(dummyAppDescriptorWithStoppedFlowFileBuilder);
+    for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
+      flow.start();
+      flow.stop();
+    }
+    reset(applicationDeploymentListener);
+    deploymentService.redeploy(dummyAppDescriptorWithStoppedFlowFileBuilder.getId());
+
+    final Application app_2 = assertAppDeploymentAndStatus(dummyAppDescriptorWithStoppedFlowFileBuilder, STARTED);
+    for (Flow flow : app_2.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
+      assertThat(flow.getLifecycleState().isStarted(), is(false));
+      flow.start();
+      assertThat(flow.getLifecycleState().isStarted(), is(true));
+    }
+  }
+
+  @Test
+  @Story(UNDEPLOYMENT)
   public void undeploysApplicationRemovingAnchorFile() throws Exception {
     Application app = deployApplication(emptyAppFileBuilder);
 
@@ -860,6 +1121,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(UNDEPLOYMENT)
   public void undeploysAppCompletelyEvenOnStoppingException() throws Exception {
     addPackedAppFromBuilder(emptyAppFileBuilder);
 
@@ -867,8 +1129,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
                                      createDescriptorLoaderRepository());
     appFactory.setFailOnStopApplication(true);
 
@@ -887,11 +1148,11 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploymentFailureWhenDomainNotFound() throws Exception {
     final DefaultDomainManager emptyDomainManager = new DefaultDomainManager();
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     emptyDomainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
+        createTestApplicationFactory(emptyDomainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
                                      createDescriptorLoaderRepository());
     appFactory.setFailOnStopApplication(true);
     deploymentService.setAppFactory(appFactory);
@@ -907,11 +1168,11 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploymentSuccessWhenUsingDefaultDomain() throws Exception {
     final DefaultDomainManager domainManager = new DefaultDomainManager();
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
                                      createDescriptorLoaderRepository());
     appFactory.setFailOnStopApplication(true);
     deploymentService.setAppFactory(appFactory);
@@ -924,6 +1185,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(UNDEPLOYMENT)
   public void undeploysAppCompletelyEvenOnDisposingException() throws Exception {
     addPackedAppFromBuilder(emptyAppFileBuilder);
 
@@ -931,8 +1193,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
                                      createDescriptorLoaderRepository());
     appFactory.setFailOnDisposeApplication(true);
     deploymentService.setAppFactory(appFactory);
@@ -949,6 +1210,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysIncompleteZipAppOnStartup() throws Exception {
     addPackedAppFromBuilder(incompleteAppFileBuilder);
 
@@ -967,6 +1229,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void deploysIncompleteZipAppAfterStartup() throws Exception {
     startDeployment();
 
@@ -985,6 +1248,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void mantainsAppFolderOnExplodedAppDeploymentError() throws Exception {
     startDeployment();
 
@@ -1003,9 +1267,12 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysAppZipWithPlugin() throws Exception {
     final ApplicationFileBuilder echoPluginAppFileBuilder =
-        appFileBuilder("dummyWithEchoPlugin").definedBy("app-with-echo-plugin-config.xml").dependingOn(echoPlugin);
+        appFileBuilder("dummyWithEchoPlugin").definedBy("app-with-echo-plugin-config.xml")
+            .dependingOn(callbackExtensionPlugin)
+            .dependingOn(echoPlugin);
 
     addPackedAppFromBuilder(echoPluginAppFileBuilder);
 
@@ -1015,6 +1282,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysAppZipWithExtensionPlugin() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
                                                                                            helloExtensionV1Plugin);
@@ -1026,6 +1294,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void failsToDeploysAppZipWithInvalidPrivilegedExtensionPlugin() throws Exception {
     ArtifactPluginFileBuilder invalidPrivilegedPlugin =
         new ArtifactPluginFileBuilder("invalidPrivilegedPlugin")
@@ -1042,6 +1311,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Feature(XML_SDK)
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysWithExtensionXmlPlugin() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = appFileBuilder("appWithExtensionXmlPlugin")
         .definedBy("app-with-extension-xml-plugin-module-bye.xml").dependingOn(byeXmlExtensionPlugin);
@@ -1051,8 +1322,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
                                      createDescriptorLoaderRepository());
 
     deploymentService.setAppFactory(appFactory);
@@ -1062,6 +1332,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Feature(XML_SDK)
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysWithExtensionXmlPluginWithXmlDependencies() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = appFileBuilder("appWithExtensionXmlPluginWithXmlDependencies")
         .definedBy("app-with-extension-xml-plugin-module-using-bye.xml")
@@ -1072,8 +1344,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
                                      createDescriptorLoaderRepository());
 
     deploymentService.setAppFactory(appFactory);
@@ -1083,6 +1354,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Feature(XML_SDK)
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysWithExtensionXmlPluginWithDependencies() throws Exception {
     String moduleFileName = "module-using-java.xml";
     String extensionName = "using-java-extension";
@@ -1094,12 +1367,13 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
                                                                                                   moduleDestination);
     builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
         .addProperty(EXPORTED_PACKAGES, asList("org.foo")).setId(MULE_LOADER_ID).build());
-    builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER, MULE_LOADER_ID));
+    builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_PLUGIN_CLASSIFIER, MULE_LOADER_ID));
     builder.setRequiredProduct(MULE).setMinMuleVersion(MIN_MULE_VERSION);
 
     final ArtifactPluginFileBuilder byeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
         .describedBy(builder.build())
         .containingResource("module-using-javaSource.xml", moduleDestination)
+        .dependingOn(callbackExtensionPlugin)
         .dependingOn(new JarFileBuilder("echoTestJar", echoTestJarFile))
         .describedBy(builder.build());
 
@@ -1112,8 +1386,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
                                      createDescriptorLoaderRepository());
 
     deploymentService.setAppFactory(appFactory);
@@ -1123,6 +1396,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Feature(XML_SDK)
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysWithExtensionXmlPluginWithResourcesOnly() throws Exception {
     final String dwlResourceTestFile = "module-resources-dwlSource.dwl";
     final String prefixModuleName = "module-resources";
@@ -1138,7 +1413,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
         .setId(MULE_LOADER_ID)
         .addProperty(EXPORTED_RESOURCES, asList(dwExportedFile))
         .build());
-    builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER, MULE_LOADER_ID));
+    builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_PLUGIN_CLASSIFIER, MULE_LOADER_ID));
     builder.setRequiredProduct(MULE).setMinMuleVersion(MIN_MULE_VERSION);
 
     final ArtifactPluginFileBuilder resourcesXmlPluginFileBuilder = new ArtifactPluginFileBuilder(extensionName)
@@ -1154,8 +1429,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     domainManager.addDomain(createDefaultDomain());
 
     TestApplicationFactory appFactory =
-        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
+        createTestApplicationFactory(domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
                                      createDescriptorLoaderRepository());
 
     deploymentService.setAppFactory(appFactory);
@@ -1167,18 +1441,19 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     final ClassLoader appClassLoader = deploymentService.getApplications().get(0).getArtifactClassLoader().getClassLoader();
     final URL appDwlResource = appClassLoader.getResource(dwExportedFile);
     assertThat(appDwlResource, not(nullValue()));
-    final String expectedResource = IOUtils.toString(currentThread().getContextClassLoader().getResource(dwlResourceTestFile));
-    assertThat(IOUtils.toString(appDwlResource), is(expectedResource));
+    final String expectedResource =
+        IOUtils.toString(currentThread().getContextClassLoader().getResource(dwlResourceTestFile), UTF_8);
+    assertThat(IOUtils.toString(appDwlResource, UTF_8), is(expectedResource));
   }
 
-
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void failsToDeployWithExtensionThatHasNonExistingIdForExtensionModel() throws Exception {
     String extensionName = "extension-with-extension-model-id-non-existing";
     MulePluginModel.MulePluginModelBuilder builder =
         new MulePluginModel.MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION);
     builder.withExtensionModelDescriber().setId("a-non-existing-ID-describer").addProperty("aProperty", "aValue");
-    builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER,
+    builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_PLUGIN_CLASSIFIER,
                                                                     PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID));
     builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
 
@@ -1195,6 +1470,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysAppWithPluginBootstrapProperty() throws Exception {
     final ArtifactPluginFileBuilder pluginFileBuilder = new ArtifactPluginFileBuilder("bootstrapPlugin")
         .containingResource("plugin-bootstrap.properties", BOOTSTRAP_PROPERTIES)
@@ -1204,12 +1480,13 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     ApplicationFileBuilder applicationFileBuilder = appFileBuilder("app-with-plugin-bootstrap")
         .definedBy("app-with-plugin-bootstrap.xml").dependingOn(pluginFileBuilder);
     final Application application = deployApplication(applicationFileBuilder);
-    final Optional<Object> lookupObject = application.getRegistry().lookupByName("plugin.echotest");
+    final Optional<Object> lookupObject = application.getArtifactContext().getRegistry().lookupByName("plugin.echotest");
     assertThat(lookupObject.isPresent(), is(true));
     assertThat(lookupObject.get().getClass().getName(), equalTo("org.foo.EchoTest"));
   }
 
   @Test
+  @Story(DEPLOYMENT_FAILURE)
   public void failsToDeployApplicationOnMissingService() throws Exception {
     ArtifactPluginFileBuilder extensionPlugin = new ArtifactPluginFileBuilder("extensionPlugin")
         .dependingOn(new JarFileBuilder("bundleExtensionv1", helloExtensionV1JarFile))
@@ -1224,6 +1501,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void deploysMultipleAppsZipOnStartup() throws Exception {
     final int totalApps = 20;
 
@@ -1240,6 +1518,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void synchronizesAppDeployFromClient() throws Exception {
     final Action action = () -> deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
 
@@ -1249,6 +1528,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(UNDEPLOYMENT)
   public void synchronizesAppUndeployFromClient() throws Exception {
     final Action action = () -> deploymentService.undeploy(emptyAppFileBuilder.getId());
 
@@ -1258,6 +1538,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(APPLICATION_REDEPLOYMENT)
   public void synchronizesAppRedeployFromClient() throws Exception {
     final Action action = () -> {
       // Clears notification from first deployment
@@ -1278,6 +1559,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(DEPLOYMENT_SUCCESS)
   public void synchronizesDeploymentOnStart() throws Exception {
     addPackedAppFromBuilder(emptyAppFileBuilder);
 
@@ -1323,6 +1605,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(UNDEPLOYMENT)
   public void undeploysAppRemovesTemporaryData() throws Exception {
     addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
 
@@ -1347,30 +1630,35 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(APPLICATION_REDEPLOYMENT)
   public void explodedAppRedeploymentDoesNotDeleteTempFile() throws Exception {
     testTempFileOnRedeployment(() -> addExplodedAppFromBuilder(emptyAppFileBuilder),
                                () -> addExplodedAppFromBuilder(emptyAppFileBuilder));
   }
 
   @Test
+  @Story(APPLICATION_REDEPLOYMENT)
   public void packedAppRedeploymentDoesNotDeleteTempFile() throws Exception {
     testTempFileOnRedeployment(() -> addPackedAppFromBuilder(emptyAppFileBuilder),
                                () -> addPackedAppFromBuilder(emptyAppFileBuilder));
   }
 
   @Test
+  @Story(APPLICATION_REDEPLOYMENT)
   public void packedAppRedeploymentWithExplodedDoesNotDeleteTempFile() throws Exception {
     testTempFileOnRedeployment(() -> addPackedAppFromBuilder(emptyAppFileBuilder),
                                () -> addExplodedAppFromBuilder(emptyAppFileBuilder));
   }
 
   @Test
+  @Story(APPLICATION_REDEPLOYMENT)
   public void explodedAppRedeploymentWithPackedDoesNotDeleteTempFile() throws Exception {
     testTempFileOnRedeployment(() -> addExplodedAppFromBuilder(emptyAppFileBuilder),
                                () -> addPackedAppFromBuilder(emptyAppFileBuilder));
   }
 
   @Test
+  @Story(APPLICATION_REDEPLOYMENT)
   public void deployMethodRedeploysIfApplicationIsAlreadyDeployedPacked() throws Exception {
     DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     deploymentService.addDeploymentListener(mockDeploymentListener);
@@ -1397,6 +1685,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @Story(APPLICATION_REDEPLOYMENT)
   public void deployMethodRedeploysIfApplicationIsAlreadyDeployedExploded() throws Exception {
     DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     deploymentService.addDeploymentListener(mockDeploymentListener);
@@ -1407,17 +1696,49 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
     // Application was deployed
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
-    verify(mockDeploymentListener, times(1)).onDeploymentSuccess(
-                                                                 dummyAppDescriptorFileBuilder.getId());
-    verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(
-                                                                   dummyAppDescriptorFileBuilder.getId());
+    verify(mockDeploymentListener, times(1)).onDeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+    verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
 
     // Redeploy by using deploy method
     deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
 
     // Application was redeployed
-    verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(
-                                                                   dummyAppDescriptorFileBuilder.getId());
+    verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+  }
+
+  @Test
+  @Issue("MULE-19127")
+  @Feature(DEPLOYMENT_CONFIGURATION)
+  @Story(FLOW_STATE_PERSISTENCE)
+  public void whenDeploymentFailsDoNotPersistFlows() throws Exception {
+    addPackedAppFromBuilder(dummyFlowErrorAppDescriptorFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentFailure(applicationDeploymentListener, dummyFlowErrorAppDescriptorFileBuilder.getId());
+
+    Properties flowDeploymentProperties =
+        resolveFlowDeploymentProperties(dummyFlowErrorAppDescriptorFileBuilder.getId(), empty());
+    assertThat(flowDeploymentProperties, is(notNullValue()));
+    for (int i = 1; i < 4; i++) {
+      Object mustStartFlow = flowDeploymentProperties.get("test" + i + "_" + START_FLOW_ON_DEPLOYMENT_PROPERTY);
+      if (mustStartFlow != null) {
+        assertThat(mustStartFlow, is("true"));
+      }
+    }
+  }
+
+  public static class FailingProcessorTest implements Processor, Startable {
+
+    @Override
+    public void start() throws MuleException {
+      throw new RuntimeException("Failing processor error");
+    }
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      return event;
+    }
   }
 
   private void testTempFileOnRedeployment(CheckedRunnable deployApp, CheckedRunnable redeployApp) throws Exception {
@@ -1456,7 +1777,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   private File getAppMetaFolder(Application app) {
-    return new File((app.getRegistry().<MuleConfiguration>lookupByName(MuleProperties.OBJECT_MULE_CONFIGURATION).get()
+    return new File((app.getArtifactContext().getRegistry().<MuleConfiguration>lookupByName(OBJECT_MULE_CONFIGURATION).get()
         .getWorkingDirectory()));
   }
 
@@ -1506,6 +1827,10 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   private void restartServer() throws MuleException {
+    restartServer(serializedAstWithFallbackArtifactConfigurationProcessor());
+  }
+
+  private void restartServer(ArtifactConfigurationProcessor artifactConfigurationProcessor) throws MuleException {
     serviceManager.stop();
     extensionModelLoaderManager.stop();
     deploymentService.stop();
@@ -1513,7 +1838,10 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     reset(applicationDeploymentListener);
 
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry =
-        new MuleArtifactResourcesRegistry.Builder().moduleRepository(moduleRepository).build();
+        new MuleArtifactResourcesRegistry.Builder()
+            .moduleRepository(moduleRepository)
+            .artifactConfigurationProcessor(artifactConfigurationProcessor)
+            .build();
 
     serviceManager = muleArtifactResourcesRegistry.getServiceManager();
     serviceManager.start();
@@ -1545,8 +1873,21 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   private void assertIfFlowsHaveStarted(Application app, boolean started) {
-    for (Flow flow : app.getRegistry().lookupAllByType(Flow.class)) {
+    for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       assertThat(flow.getLifecycleState().isStarted(), is(started));
+    }
+  }
+
+  /**
+   * Class to test injection of memory management.
+   */
+  private static class InjectedMemoryManagement {
+
+    @Inject
+    private MemoryManagementService memoryManagementService;
+
+    public MemoryManagementService getMemoryManagementService() {
+      return memoryManagementService;
     }
   }
 }

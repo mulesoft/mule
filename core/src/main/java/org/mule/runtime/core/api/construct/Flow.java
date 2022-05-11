@@ -59,7 +59,7 @@ public interface Flow extends ExecutableComponent, Lifecycle, Pipeline, Processo
   /**
    * Creates a new flow builder
    *
-   * @param name name of the flow to be created. Non empty.
+   * @param name        name of the flow to be created. Non empty.
    * @param muleContext context where the flow will be registered. Non null.
    */
   static Builder builder(String name, MuleContext muleContext) {

@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.core.internal.util;
 
+import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleHome;
+
+import static java.nio.file.Files.createTempFile;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.apache.commons.io.IOUtils.toByteArray;
-import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleHome;
 
 import org.mule.runtime.core.api.util.FileUtils;
 
@@ -56,7 +59,7 @@ public final class JarUtils {
   /**
    * Loads the content of a file within a jar into a byte array.
    * 
-   * @param jarFile the jar file
+   * @param jarFile  the jar file
    * @param filePath the path to the file within the jar file
    * @return the content of the file as byte array or empty if the file does not exists within the jar file.
    * @throws IOException if there was a problem reading from the jar file.
@@ -64,8 +67,8 @@ public final class JarUtils {
   public static Optional<byte[]> loadFileContentFrom(File jarFile, String filePath) throws IOException {
     URL jsonDescriptorUrl = getUrlWithinJar(jarFile, filePath);
     /*
-     * A specific implementation of JarURLConnection is required to read jar content because not all implementations
-     * support ways to disable connection caching. Disabling connection caching is necessary to avoid file descriptor leaks.
+     * A specific implementation of JarURLConnection is required to read jar content because not all implementations support ways
+     * to disable connection caching. Disabling connection caching is necessary to avoid file descriptor leaks.
      */
     JarURLConnection jarConnection =
         new sun.net.www.protocol.jar.JarURLConnection(jsonDescriptorUrl, new sun.net.www.protocol.jar.Handler());
@@ -87,8 +90,8 @@ public final class JarUtils {
    */
   public static Optional<byte[]> loadFileContentFrom(URL jarFile) throws IOException {
     /*
-     * A specific implementation of JarURLConnection is required to read jar content because not all implementations
-     * support ways to disable connection caching. Disabling connection caching is necessary to avoid file descriptor leaks.
+     * A specific implementation of JarURLConnection is required to read jar content because not all implementations support ways
+     * to disable connection caching. Disabling connection caching is necessary to avoid file descriptor leaks.
      */
     JarURLConnection jarConnection =
         new sun.net.www.protocol.jar.JarURLConnection(jarFile, new sun.net.www.protocol.jar.Handler());
@@ -104,7 +107,7 @@ public final class JarUtils {
   /**
    * Creates an URL to a path within a jar file.
    *
-   * @param jarFile the jar file
+   * @param jarFile  the jar file
    * @param filePath the path within the jar file
    * @return an URL to the {@code filePath} within the {@code jarFile}
    * @throws MalformedURLException if the provided {@code filePath} is malformed
@@ -116,7 +119,7 @@ public final class JarUtils {
   /**
    * Gets all the URL of files within a directory
    * 
-   * @param file the jar file
+   * @param file      the jar file
    * @param directory the directory within the jar file
    * @return a collection of URLs to files within the directory {@code directory}. Empty collection if the directory does not
    *         exists or is empty.
@@ -147,13 +150,10 @@ public final class JarUtils {
         while (iter.hasMoreElements()) {
           ZipEntry zipEntry = (ZipEntry) iter.nextElement();
           InputStream entryStream = jarFileWrapper.getInputStream(zipEntry);
-          ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream();
-          try {
+          try (ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream()) {
             IOUtils.copy(entryStream, byteArrayStream);
             entries.put(zipEntry.getName(), byteArrayStream.toByteArray());
             logger.debug("Read jar entry " + zipEntry.getName() + " from " + jarFile.getAbsolutePath());
-          } finally {
-            byteArrayStream.close();
           }
         }
       } finally {
@@ -173,7 +173,7 @@ public final class JarUtils {
     if (entries != null) {
       LinkedHashMap combinedEntries = readJarFileEntries(jarFile);
       combinedEntries.putAll(entries);
-      File tmpJarFile = File.createTempFile(jarFile.getName(), null);
+      File tmpJarFile = createTempFile(jarFile.getName(), null).toFile();
       createJarFileEntries(tmpJarFile, combinedEntries);
       jarFile.delete();
       FileUtils.renameFile(tmpJarFile, jarFile);

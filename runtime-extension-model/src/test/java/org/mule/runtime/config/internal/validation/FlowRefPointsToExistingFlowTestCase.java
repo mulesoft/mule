@@ -6,16 +6,19 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static java.util.Optional.empty;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.FlowReferenceStory.FLOW_REFERENCE;
 import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
 import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 
+import static java.util.Optional.empty;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
 import java.util.Optional;
 
@@ -37,7 +40,7 @@ public class FlowRefPointsToExistingFlowTestCase extends AbstractCoreValidationT
 
   @Test
   public void flowRefToNonExistentFlow() {
-    final Optional<String> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
         "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
         "      xsi:schemaLocation=\"http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n"
         +
@@ -45,14 +48,15 @@ public class FlowRefPointsToExistingFlowTestCase extends AbstractCoreValidationT
         "    <flow name=\"flow\">\n" +
         "        <flow-ref name=\"sub-flow-name\" />\n" +
         "    </flow>\n" +
-        "</mule>");
+        "</mule>")
+            .stream().findFirst();
 
-    assertThat(msg.get(), containsString("'flow-ref' is pointing to 'sub-flow-name' which does not exist"));
+    assertThat(msg.get().getMessage(), containsString("'flow-ref' is pointing to 'sub-flow-name' which does not exist"));
   }
 
   @Test
   public void flowRefDynamic() {
-    final Optional<String> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
         "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
         "      xsi:schemaLocation=\"http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n"
         +
@@ -60,7 +64,8 @@ public class FlowRefPointsToExistingFlowTestCase extends AbstractCoreValidationT
         "    <flow name=\"flow\">\n" +
         "        <flow-ref name=\"#['sub-flow-name']\" />\n" +
         "    </flow>\n" +
-        "</mule>");
+        "</mule>")
+            .stream().findFirst();
 
     assertThat(msg, is(empty()));
   }

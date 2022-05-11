@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
-import static java.util.Optional.empty;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
-import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
+import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import static java.util.Optional.empty;
+
+import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepositoryFactory;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DeployableArtifactDescriptorFactoryTestCase;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
-import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 
 import java.io.File;
@@ -62,7 +64,9 @@ public class ApplicationDescriptorFactoryTestCase
 
   @Override
   protected ApplicationDescriptorFactory createDeployableDescriptorFactory() {
-    return new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
+    return new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(artifactDescriptorFactoryProvider()
+        .createArtifactPluginDescriptorFactory(new DescriptorLoaderRepositoryFactory().createDescriptorLoaderRepository(),
+                                               ArtifactDescriptorValidatorBuilder.builder())),
                                             createDescriptorLoaderRepository(), ArtifactDescriptorValidatorBuilder.builder());
   }
 }

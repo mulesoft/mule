@@ -17,8 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Allows to use {@link org.mule.runtime.core.api.exception.FlowExceptionHandler} as
- * {@link MessagingExceptionHandlerAcceptor}.
+ * Allows to use {@link org.mule.runtime.core.api.exception.FlowExceptionHandler} as {@link MessagingExceptionHandlerAcceptor}.
  */
 public class MessagingExceptionStrategyAcceptorDelegate extends AbstractMuleObjectOwner<FlowExceptionHandler>
     implements MessagingExceptionHandlerAcceptor {

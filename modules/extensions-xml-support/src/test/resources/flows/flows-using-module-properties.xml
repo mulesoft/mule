@@ -47,4 +47,13 @@
     <flow name="testSetPayloadHardcodedFileProperty">
         <module-properties:set-payload-hardcoded-file-property config-ref="instantiatedConfig"/>
     </flow>
+    
+    <flow name="testSetPayloadAddParamAndPropertyValueThruInternalOperationFlow">
+        <module-properties:set-payload-add-param-and-property-values-thru-internal-operation config-ref="instantiatedConfig" inputParam="a parameter value"/>
+    </flow>
+
+    <flow name="testSetPayloadPropertiesCallingNestedOperations">
+        <module-properties:call-private-nested-operations config-ref="instantiatedConfig"  inputParam="What are these?"/>
+    </flow>
+
 </mule>

@@ -24,7 +24,7 @@ public class MapFactoryBean extends AbstractComponent implements FactoryBean {
 
   /**
    * @param mapEntries the collection of entries to store in the map
-   * @param mapType the map type
+   * @param mapType    the map type
    */
   public MapFactoryBean(List<MapEntry> mapEntries, Class<? extends Map> mapType) {
     this.mapEntries = mapEntries;

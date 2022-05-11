@@ -1,1 +1,2 @@
 org.mule.runtime.core.api.extension.CoreRuntimeExtensionModelProvider
+org.mule.runtime.core.api.extension.OperationDslExtensionModelProvider

@@ -7,8 +7,8 @@
 package org.mule.test.heisenberg.extension.exception;
 
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.VALIDATION;
-import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
-import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
+import org.mule.sdk.api.annotation.error.ErrorTypeProvider;
+import org.mule.sdk.api.error.ErrorTypeDefinition;
 
 import java.util.Collections;
 import java.util.Set;

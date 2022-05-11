@@ -25,7 +25,8 @@ public interface ConfigurableInstanceFactory<T> {
   /**
    * Creates the object to be used at runtime.
    *
-   * @param parameters the set of configuration parameters according to the {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition} configuration.
+   * @param parameters the set of configuration parameters according to the
+   *                   {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition} configuration.
    * @return the object to be used at runtime.
    */
   T createInstance(Map<String, Object> parameters);

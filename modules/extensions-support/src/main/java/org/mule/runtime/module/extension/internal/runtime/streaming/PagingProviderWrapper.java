@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -77,7 +76,7 @@ final class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
     setContextClassLoader(currentThread, currentClassLoader, extensionClassLoader);
     try {
       List<T> page = delegate.getPage(connection);
-      if (isEmpty(page)) {
+      if (page == null || page.isEmpty()) {
         try {
           LOGGER.debug("Empty page was obtained. Closing delegate since this means that the data source has been consumed");
           close(connection);

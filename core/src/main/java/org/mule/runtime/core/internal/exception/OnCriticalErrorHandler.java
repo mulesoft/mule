@@ -6,22 +6,28 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static org.mule.runtime.core.internal.exception.DefaultErrorTypeRepository.CRITICAL_ERROR_TYPE;
+import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.CRITICAL_ERROR_TYPE;
+
 import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
-import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
+import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import javax.inject.Inject;
+
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Handler that only accepts CRITICAL errors, logging them before propagating them. This handler is added before any others in all
@@ -29,13 +35,23 @@ import org.reactivestreams.Publisher;
  *
  * @since 4.0
  */
-public class OnCriticalErrorHandler extends AbstractExceptionListener implements MessagingExceptionHandlerAcceptor {
+public class OnCriticalErrorHandler implements MessagingExceptionHandlerAcceptor {
+
+  private static final Logger logger = LoggerFactory.getLogger(OnCriticalErrorHandler.class);
 
   private final ErrorTypeMatcher criticalMatcher = new SingleErrorTypeMatcher(CRITICAL_ERROR_TYPE);
   private final ErrorTypeMatcher overloadMatcher;
 
+  @Inject
+  private NotificationDispatcher notificationFirer;
+
+  private final DefaultExceptionListener exceptionListener;
+
   public OnCriticalErrorHandler(ErrorTypeMatcher overloadMatcher) {
     this.overloadMatcher = overloadMatcher;
+    exceptionListener = new DefaultExceptionListener();
+    exceptionListener.setNotificationFirer(notificationFirer);
+    exceptionListener.setRepresentation(toString());
   }
 
   @Override
@@ -66,12 +82,12 @@ public class OnCriticalErrorHandler extends AbstractExceptionListener implements
       ErrorType errorType = ((MessagingException) exception).getEvent().getError().get().getErrorType();
       if (overloadMatcher.match(errorType)) {
         if (logger.isInfoEnabled()) {
-          logger.info(resolveExceptionAndMessageToLog(exception).toString());
+          logger.info(exceptionListener.resolveExceptionAndMessageToLog(exception).toString());
         }
         return;
       }
     }
-    resolveAndLogException(exception);
+    exceptionListener.resolveAndLogException(exception);
   }
 
   @Override
@@ -87,5 +103,9 @@ public class OnCriticalErrorHandler extends AbstractExceptionListener implements
   @Override
   public String toString() {
     return "OnCriticalErrorHandler";
+  }
+
+  public DefaultExceptionListener getExceptionListener() {
+    return exceptionListener;
   }
 }

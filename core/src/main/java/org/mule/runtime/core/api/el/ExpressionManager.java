@@ -22,6 +22,9 @@ import java.util.Iterator;
 /**
  * Provides universal access for evaluating expressions embedded in Mule configurations, such as XML, Java, scripting and
  * annotations.
+ * <p>
+ * Callers must ensure that the proper threadContexClassloader, being able to access any class or resource required by the
+ * expression, is used when calling any of the methods defined here or in the inherited interfaces.
  */
 @NoImplement
 public interface ExpressionManager extends MuleExpressionLanguage {
@@ -48,7 +51,7 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * will not mutated the {@code event} parameter.
    *
    * @param expression the expression to be executed
-   * @param event the current event being processed
+   * @param event      the current event being processed
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
@@ -62,8 +65,8 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * {@link InternalMessage} mutation performed within the expression will impact within the context of expression evaluation but
    * will not mutated the {@code event} parameter.
    *
-   * @param expression the expression to be executed
-   * @param event the current event being processed
+   * @param expression        the expression to be executed
+   * @param event             the current event being processed
    * @param componentLocation the location of the component where the event is being processed
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
@@ -80,8 +83,8 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * will not mutated the {@code event} parameter.
    *
    * @param expression the expression to be executed
-   * @param event the current event being processed
-   * @param context the bindings to be considered
+   * @param event      the current event being processed
+   * @param context    the bindings to be considered
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
@@ -97,10 +100,10 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * {@link InternalMessage} mutation performed within the expression will impact within the context of expression evaluation but
    * will not mutated the {@code event} parameter.
    *
-   * @param expression the expression to be executed
-   * @param event the current event being processed
+   * @param expression        the expression to be executed
+   * @param event             the current event being processed
    * @param componentLocation the location of the component where the event is being processed
-   * @param context the bindings to be considered
+   * @param context           the bindings to be considered
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
@@ -110,9 +113,9 @@ public interface ExpressionManager extends MuleExpressionLanguage {
   /**
    * Evaluates an expression according to the global {@link BindingContext} and the {@link DataType} of the expected result.
    *
-   * @param expression the EL expression
+   * @param expression         the EL expression
    * @param expectedOutputType the expected output type so that automatic conversion can be performed for the resulting value
-   *        type.
+   *                           type.
    * @return the result of the expression plus its type
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression or during transformation
    */
@@ -123,11 +126,11 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * Evaluates an expression according to a given {@link BindingContext}, the global one, the {@link DataType} of the expected
    * result and an {@link CoreEvent}.
    *
-   * @param expression the EL expression
+   * @param expression         the EL expression
    * @param expectedOutputType the expected output type so that automatic conversion can be performed for the resulting value
-   *        type.
-   * @param context an expression binding context to consider
-   * @param event the current event to consider
+   *                           type.
+   * @param context            an expression binding context to consider
+   * @param event              the current event to consider
    * @return the result of the expression plus its type
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression or during transformation
    */
@@ -138,13 +141,13 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * Evaluates an expression according to a given {@link BindingContext}, the global one, the {@link DataType} of the expected
    * result and an {@link CoreEvent}.
    *
-   * @param expression the EL expression
+   * @param expression         the EL expression
    * @param expectedOutputType the expected output type so that automatic conversion can be performed for the resulting value
-   *        type.
-   * @param context an expression binding context to consider
-   * @param event the current event to consider
-   * @param componentLocation the location of the component where the event is being processed
-   * @param failOnNull indicates if should fail if the evaluation result is {@code null}
+   *                           type.
+   * @param context            an expression binding context to consider
+   * @param event              the current event to consider
+   * @param componentLocation  the location of the component where the event is being processed
+   * @param failOnNull         indicates if should fail if the evaluation result is {@code null}
    * @return the result of the expression plus its type
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression or during transformation
    */
@@ -156,8 +159,8 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * Evaluates an expression considering a {@code boolean} as output. If the result cannot be clearly transformed or is
    * {@code null}, {@code false} will be returned.
    *
-   * @param expression a single expression to be evaluated and transformed
-   * @param event the {@link CoreEvent} to consider
+   * @param expression        a single expression to be evaluated and transformed
+   * @param event             the {@link CoreEvent} to consider
    * @param componentLocation the location of the component where the event is being processed
    * @return {@code true} if the expression evaluated to that or "true", false otherwise
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
@@ -168,10 +171,10 @@ public interface ExpressionManager extends MuleExpressionLanguage {
   /**
    * Evaluates an expression considering a {@code boolean} as output.
    *
-   * @param expression a single expression to be evaluated and transformed
-   * @param event the {@link CoreEvent} to consider
-   * @param componentLocation the location of the component where the event is being processed
-   * @param nullReturnsTrue whether or not a {@code null} outcome should be considered a {@code true}
+   * @param expression            a single expression to be evaluated and transformed
+   * @param event                 the {@link CoreEvent} to consider
+   * @param componentLocation     the location of the component where the event is being processed
+   * @param nullReturnsTrue       whether or not a {@code null} outcome should be considered a {@code true}
    * @param nonBooleanReturnsTrue whether or not a non boolean outcome should be considered a {@code true}
    * @return {@code true} if the expression evaluated to that, "true" or the above flags where considered, {@code false} otherwise
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
@@ -183,10 +186,10 @@ public interface ExpressionManager extends MuleExpressionLanguage {
   /**
    * Evaluates an expression considering a {@code boolean} as output.
    *
-   * @param expression a single expression to be evaluated and transformed
-   * @param bindingCtx the {@link BindingContext} to consider
-   * @param componentLocation the location of the component where the event is being processed
-   * @param nullReturnsTrue whether or not a {@code null} outcome should be considered a {@code true}
+   * @param expression            a single expression to be evaluated and transformed
+   * @param bindingCtx            the {@link BindingContext} to consider
+   * @param componentLocation     the location of the component where the event is being processed
+   * @param nullReturnsTrue       whether or not a {@code null} outcome should be considered a {@code true}
    * @param nonBooleanReturnsTrue whether or not a non boolean outcome should be considered a {@code true}
    * @return {@code true} if the expression evaluated to that, "true" or the above flags where considered, {@code false} otherwise
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
@@ -198,10 +201,10 @@ public interface ExpressionManager extends MuleExpressionLanguage {
   /**
    * Evaluates an expression according to a given {@link BindingContext}, an {@link CoreEvent} and a flowName.
    *
-   * @param expression the expression to be executed
-   * @param event the current event being processed
+   * @param expression        the expression to be executed
+   * @param event             the current event being processed
    * @param componentLocation the location of the component where the event is being processed
-   * @param bindingContext the bindings to consider
+   * @param bindingContext    the bindings to consider
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
@@ -213,8 +216,8 @@ public interface ExpressionManager extends MuleExpressionLanguage {
   /**
    * Evaluates an expression according to a given {@link BindingContext}, an {@link CoreEvent}.
    *
-   * @param expression the expression to be executed
-   * @param event the current event being processed
+   * @param expression     the expression to be executed
+   * @param event          the current event being processed
    * @param bindingContext the bindings to consider
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
@@ -226,10 +229,10 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * Parses a logging expression template by iterating through each expression and evaluating it. If a user needs to evaluate a
    * single expression they can use {@link #evaluate(String, CoreEvent, ComponentLocation, BindingContext)}.
    *
-   * @param template the string template featuring inner expressions to parse
-   * @param event the current event being processed
+   * @param template          the string template featuring inner expressions to parse
+   * @param event             the current event being processed
    * @param componentLocation the location of the component where the event is being processed
-   * @param bindingContext the bindings to consider
+   * @param bindingContext    the bindings to consider
    * @return the result of the evaluation
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
@@ -261,8 +264,8 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * @since 4.2
    *
    * @param componentLocation the location of the component where the event is being processed
-   * @param event the current event being processed
-   * @param context the current dynamic binding context to consider
+   * @param event             the current event being processed
+   * @param context           the current dynamic binding context to consider
    * @return a session associated to the provided {@code context}
    */
   ExpressionManagerSession openSession(ComponentLocation componentLocation, CoreEvent event, BindingContext context);

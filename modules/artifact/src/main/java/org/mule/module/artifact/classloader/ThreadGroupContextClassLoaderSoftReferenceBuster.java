@@ -181,7 +181,7 @@ public class ThreadGroupContextClassLoaderSoftReferenceBuster {
   /**
    * Get the interfaces for the specified class.
    *
-   * @param cls the class to look up, may be {@code null}
+   * @param cls             the class to look up, may be {@code null}
    * @param interfacesFound the {@code Set} of interfaces for the class
    */
   private static void getAllInterfaces(Class<?> cls, final HashSet<Class<?>> interfacesFound) {

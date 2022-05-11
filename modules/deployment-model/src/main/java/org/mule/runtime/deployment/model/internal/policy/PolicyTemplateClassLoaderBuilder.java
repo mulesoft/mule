@@ -7,17 +7,17 @@
 
 package org.mule.runtime.deployment.model.internal.policy;
 
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
+import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
-import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-
-import java.io.IOException;
 
 /**
  * Builds the class loader to use on a {@link org.mule.runtime.deployment.model.api.policy.PolicyTemplate}
@@ -31,8 +31,8 @@ public class PolicyTemplateClassLoaderBuilder extends AbstractArtifactClassLoade
    * Creates an {@link AbstractArtifactClassLoaderBuilder}.
    * 
    * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes. Must be not
-   *        null.
-   * @param pluginClassLoadersFactory creates the class loaders for the plugins included in the policy's region. Non null
+   *                                   null.
+   * @param pluginClassLoadersFactory  creates the class loaders for the plugins included in the policy's region. Non null
    */
   public PolicyTemplateClassLoaderBuilder(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
                                           RegionPluginClassLoadersFactory pluginClassLoadersFactory) {
@@ -43,7 +43,7 @@ public class PolicyTemplateClassLoaderBuilder extends AbstractArtifactClassLoade
 
   @Override
   protected ArtifactClassLoader createArtifactClassLoader(String artifactId, RegionClassLoader regionClassLoader) {
-    return artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor, artifactPluginClassLoaders);
+    return artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor);
   }
 
   @Override
@@ -52,7 +52,7 @@ public class PolicyTemplateClassLoaderBuilder extends AbstractArtifactClassLoade
   }
 
   @Override
-  public MuleDeployableArtifactClassLoader build() throws IOException {
+  public MuleDeployableArtifactClassLoader build() {
     return (MuleDeployableArtifactClassLoader) super.build();
   }
 

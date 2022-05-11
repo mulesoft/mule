@@ -15,6 +15,7 @@ import static org.mule.runtime.extension.api.runtime.source.BackPressureAction.D
 import static org.mule.runtime.extension.api.runtime.source.BackPressureAction.FAIL;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.test.allure.AllureConstants.ExecutionEngineFeature.ExecutionEngineStory.BACKPRESSURE;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -30,8 +31,10 @@ import java.util.List;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
+@Feature(SOURCES)
 @Story(BACKPRESSURE)
 public class BackPressureTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -50,10 +53,11 @@ public class BackPressureTestCase extends AbstractExtensionFunctionalTestCase {
 
   private HeisenbergExtension heisenberg;
   private List<BackPressureContext> backPressureContexts;
+  private List<org.mule.sdk.api.runtime.source.BackPressureContext> sdkBackPressureContexts;
 
   @Override
   protected String getConfigFile() {
-    return "heisenberg-backpressure-config.xml";
+    return "source/heisenberg-backpressure-config.xml";
   }
 
   @Override
@@ -61,12 +65,14 @@ public class BackPressureTestCase extends AbstractExtensionFunctionalTestCase {
     heisenberg = getConfigurationFromRegistry("heisenberg", testEvent(), muleContext);
     assertThat(heisenberg, is(notNullValue()));
     backPressureContexts = new LinkedList<>();
+    sdkBackPressureContexts = new LinkedList<>();
     EVENTS = new LinkedList<>();
   }
 
   @Override
   protected void doTearDown() throws Exception {
     backPressureContexts = null;
+    sdkBackPressureContexts = null;
     EVENTS = null;
   }
 
@@ -74,12 +80,12 @@ public class BackPressureTestCase extends AbstractExtensionFunctionalTestCase {
   public void backPressureWithFailStrategy() throws Exception {
     startFlow("defaultToFail");
     check(15000, 100, () -> {
-      backPressureContexts.addAll(heisenberg.getBackPressureContexts());
-      return !backPressureContexts.isEmpty();
+      sdkBackPressureContexts.addAll(heisenberg.getSdkBackPressureContexts());
+      return !sdkBackPressureContexts.isEmpty();
     });
 
-    BackPressureContext sample = backPressureContexts.get(0);
-    assertThat(sample.getAction(), is(FAIL));
+    org.mule.sdk.api.runtime.source.BackPressureContext sample = sdkBackPressureContexts.get(0);
+    assertThat(sample.getAction(), is(org.mule.sdk.api.runtime.source.BackPressureAction.FAIL));
     assertThat(sample.getEvent().getMessage().getPayload().getValue().toString(), containsString("If found by DEA contact"));
     assertThat(sample.getSourceCallbackContext(), is(notNullValue()));
   }
@@ -88,12 +94,12 @@ public class BackPressureTestCase extends AbstractExtensionFunctionalTestCase {
   public void backPressureWithDropStrategy() throws Exception {
     startFlow("configuredToDrop");
     check(15000, 100, () -> {
-      backPressureContexts.addAll(heisenberg.getBackPressureContexts());
-      return !backPressureContexts.isEmpty();
+      sdkBackPressureContexts.addAll(heisenberg.getSdkBackPressureContexts());
+      return !sdkBackPressureContexts.isEmpty();
     });
 
-    BackPressureContext sample = backPressureContexts.get(0);
-    assertThat(sample.getAction(), is(DROP));
+    org.mule.sdk.api.runtime.source.BackPressureContext sample = sdkBackPressureContexts.get(0);
+    assertThat(sample.getAction(), is(org.mule.sdk.api.runtime.source.BackPressureAction.DROP));
     assertThat(sample.getEvent().getMessage().getPayload().getValue().toString(), containsString("If found by DEA contact"));
     assertThat(sample.getSourceCallbackContext(), is(notNullValue()));
   }

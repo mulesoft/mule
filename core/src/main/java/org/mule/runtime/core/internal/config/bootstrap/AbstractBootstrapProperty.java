@@ -26,10 +26,10 @@ public class AbstractBootstrapProperty {
   /**
    * Creates a bootstrap property
    *
-   * @param service service that provides the property. Not null.
+   * @param service       service that provides the property. Not null.
    * @param artifactTypes defines what is the artifact this bootstrap object applies to
-   * @param optional indicates whether or not the bootstrapped transformer is optional. When a bootstrap object is optional, any
-   *        error creating it will be ignored.
+   * @param optional      indicates whether or not the bootstrapped transformer is optional. When a bootstrap object is optional,
+   *                      any error creating it will be ignored.
    */
   public AbstractBootstrapProperty(BootstrapService service, Set<ArtifactType> artifactTypes, Boolean optional) {
     checkArgument(service != null, "service cannot be null");
@@ -45,6 +45,7 @@ public class AbstractBootstrapProperty {
     return service;
   }
 
+  // TODO W-10736276 Remove this
   public Boolean getOptional() {
     return optional;
   }

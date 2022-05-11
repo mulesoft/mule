@@ -32,7 +32,8 @@ import org.mule.runtime.module.extension.soap.api.runtime.connection.transport.D
 import org.mule.runtime.soap.api.client.SoapClient;
 
 /**
- * Implementation of {@link ConnectionProviderObjectBuilder} which produces instances of {@link ForwardingSoapClientConnectionProvider}.
+ * Implementation of {@link ConnectionProviderObjectBuilder} which produces instances of
+ * {@link ForwardingSoapClientConnectionProvider}.
  *
  * @since 4.0
  */

@@ -7,16 +7,21 @@
 
 package org.mule.runtime.container.internal;
 
-import static java.lang.String.format;
-import static java.nio.file.Files.createTempFile;
-import static org.apache.commons.io.FileUtils.cleanDirectory;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getModulesTempFolder;
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.core.api.util.PropertiesUtils.discoverProperties;
+
+import static java.lang.String.format;
+import static java.nio.file.Files.createTempFile;
+import static java.util.Collections.emptyList;
+
+import static org.apache.commons.io.FileUtils.cleanDirectory;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 
 import java.io.File;
@@ -28,6 +33,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +43,8 @@ import org.slf4j.LoggerFactory;
  * Discovers {@link MuleModule} searching for {@link #MODULE_PROPERTIES} files resources available in a given classloader.
  */
 public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
+
+  private static final String TMP_FOLDER_SUFFIX = "tmp";
 
   private static Logger logger = LoggerFactory.getLogger(ClasspathModuleDiscoverer.class);
 
@@ -47,19 +56,40 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
   public static final String EXPORTED_SERVICES_PROPERTY = "artifact.export.services";
 
   private final ClassLoader classLoader;
-  private final File temporaryFolder;
+  private final Function<String, File> serviceInterfaceToServiceFile;
+  private final BiFunction<String, File, URL> fileToResource;
 
   public ClasspathModuleDiscoverer(ClassLoader classLoader) {
-    this.classLoader = classLoader;
-    this.temporaryFolder = createModulesTemporaryFolder();
+    this(classLoader, createModulesTemporaryFolder());
   }
 
   public ClasspathModuleDiscoverer(ClassLoader classLoader, File temporaryFolder) {
     this.classLoader = classLoader;
-    this.temporaryFolder = temporaryFolder;
+    this.serviceInterfaceToServiceFile =
+        serviceInterface -> wrappingInIllegalStateException(() -> createTempFile(temporaryFolder.toPath(), serviceInterface,
+                                                                                 TMP_FOLDER_SUFFIX).toFile(),
+                                                            serviceInterface);
+    this.fileToResource =
+        (serviceInterface, serviceFile) -> wrappingInIllegalStateException(() -> serviceFile.toURI().toURL(), serviceInterface);
   }
 
-  protected File createModulesTemporaryFolder() {
+  private <T> T wrappingInIllegalStateException(CheckedSupplier<T> supplier, String serviceInterface) {
+    try {
+      return supplier.get();
+    } catch (Exception e) {
+      throw new IllegalStateException(format("Error creating temporary service provider file for '%s'", serviceInterface), e);
+    }
+  }
+
+  public ClasspathModuleDiscoverer(ClassLoader classLoader,
+                                   Function<String, File> serviceInterfaceToServiceFile,
+                                   BiFunction<String, File, URL> fileToResource) {
+    this.classLoader = classLoader;
+    this.serviceInterfaceToServiceFile = serviceInterfaceToServiceFile;
+    this.fileToResource = fileToResource;
+  }
+
+  protected static File createModulesTemporaryFolder() {
     File modulesTempFolder = getModulesTempFolder();
     if (modulesTempFolder.exists()) {
       try {
@@ -120,30 +150,30 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
   }
 
   private List<ExportedService> getExportedServices(Properties moduleProperties, String exportedServicesProperty) {
-    final String privilegedExportedPackagesProperty = (String) moduleProperties.get(exportedServicesProperty);
+    final String exportedPackagesProperty = (String) moduleProperties.get(exportedServicesProperty);
     List<ExportedService> exportedServices;
-    if (!isEmpty(privilegedExportedPackagesProperty)) {
-      exportedServices = getServicesFromProperty(privilegedExportedPackagesProperty);
+    if (!isEmpty(exportedPackagesProperty)) {
+      exportedServices = getServicesFromProperty(exportedPackagesProperty);
     } else {
-      exportedServices = new ArrayList<>();
+      exportedServices = emptyList();
     }
     return exportedServices;
   }
 
-  private List<ExportedService> getServicesFromProperty(String privilegedExportedPackagesProperty) {
+  private List<ExportedService> getServicesFromProperty(String exportedPackagesProperty) {
     List<ExportedService> exportedServices = new ArrayList<>();
 
-    for (String exportedServiceDefinition : privilegedExportedPackagesProperty.split(",")) {
+    for (String exportedServiceDefinition : exportedPackagesProperty.split(",")) {
       String[] split = exportedServiceDefinition.split(":");
       String serviceInterface = split[0];
       String serviceImplementation = split[1];
       URL resource;
       try {
-        File serviceFile = createTempFile(temporaryFolder.toPath(), serviceInterface, "tmp").toFile();
+        File serviceFile = serviceInterfaceToServiceFile.apply(serviceInterface);
         serviceFile.deleteOnExit();
 
         stringToFile(serviceFile.getAbsolutePath(), serviceImplementation);
-        resource = serviceFile.toURI().toURL();
+        resource = fileToResource.apply(serviceInterface, serviceFile);
       } catch (IOException e) {
         throw new IllegalStateException(format("Error creating temporary service provider file for '%s'", serviceInterface), e);
       }

@@ -53,9 +53,9 @@ public class ContextPropagationChecker implements Processor {
 
   /**
    *
-   * @param event the event to test with
+   * @param event         the event to test with
    * @param routerOrScope the router or scope containing {@code checker} to validate.
-   * @param checker the processor that validates the context
+   * @param checker       the processor that validates the context
    */
   public static final void assertContextPropagation(CoreEvent event, Processor routerOrScope, ContextPropagationChecker checker) {
     final CoreEvent result = just(event)

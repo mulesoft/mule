@@ -26,7 +26,7 @@ public class SomeSource extends Source<String, Object> {
   @Parameter
   public static Literal<String> literalString;
 
-  @Config
+  @org.mule.sdk.api.annotation.param.Config
   public static ParameterResolverExtension extension;
 
   @Override

@@ -1,14 +1,14 @@
 {
   "name": "Test Functions",
   "description": "",
-  "version": "4.0.0-SNAPSHOT",
+  "version": "4.5.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "fn",
     "namespace": "http://www.mulesoft.org/schema/mule/fn",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/fn/current/mule-fn.xsd",
-    "schemaVersion": "4.0.0-SNAPSHOT",
+    "schemaVersion": "4.5.0-SNAPSHOT",
     "xsdFileName": "mule-fn.xsd"
   },
   "resources": [],
@@ -117,6 +117,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": true,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -131,6 +132,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "name",
               "description": "The identifier of this element used to reference it in other components",
               "modelProperties": {}
@@ -216,6 +218,8 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
+      "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "EVALUATE",
         "namespace": "FN",
@@ -258,6 +262,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "defaultValue": "#[payload]",
               "role": "PRIMARY_CONTENT",
@@ -273,6 +278,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "payload",
               "description": "",
               "modelProperties": {}
@@ -286,6 +292,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -301,6 +308,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {
@@ -318,6 +326,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -333,6 +342,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "outputEncoding",
               "description": "The encoding of the payload that this operation outputs.",
               "modelProperties": {
@@ -365,6 +375,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -380,6 +391,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -396,6 +408,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -412,6 +425,7 @@
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -439,6 +453,7 @@
                 "format": "java",
                 "type": "Array",
                 "annotations": {
+                  "infrastructureType": {},
                   "description": {
                     "value": "Determines that an error thrown by this operation should be mapped to another"
                   },
@@ -450,7 +465,8 @@
                 "item": {
                   "type": "Object",
                   "annotations": {
-                    "typeId": "errorMapping"
+                    "typeId": "errorMapping",
+                    "infrastructureType": {}
                   },
                   "fields": [
                     {
@@ -513,10 +529,11 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": false,
+                "allowsInlineDefinition": true,
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
@@ -528,13 +545,14 @@
                 "tabName": "Error Mapping"
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "errorMappings",
               "description": "Set of error mappings",
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                    "localPart": "error-mapping",
+                    "localPart": "error-mappings",
                     "prefix": "mule"
                   }
                 },
@@ -599,6 +617,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -612,6 +631,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "echo",
               "description": "",
               "modelProperties": {}
@@ -654,6 +674,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "defaultValue": "false",
               "role": "BEHAVIOUR",
@@ -668,6 +689,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "bool",
               "description": "",
               "modelProperties": {}
@@ -696,6 +718,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -709,6 +732,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "number",
               "description": "",
               "modelProperties": {}
@@ -736,6 +760,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -749,6 +774,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "doubles",
               "description": "",
               "modelProperties": {}
@@ -776,6 +802,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -789,6 +816,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "floats",
               "description": "",
               "modelProperties": {}
@@ -817,6 +845,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -830,6 +859,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "longs",
               "description": "",
               "modelProperties": {}
@@ -857,6 +887,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -870,6 +901,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "shorts",
               "description": "",
               "modelProperties": {}
@@ -945,6 +977,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -959,6 +992,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "payload",
               "description": "",
               "modelProperties": {}
@@ -972,6 +1006,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "defaultValue": "prefix_",
               "role": "BEHAVIOUR",
@@ -986,6 +1021,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "prefix",
               "description": "",
               "modelProperties": {}
@@ -1126,6 +1162,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1139,6 +1176,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "listToSplit",
               "description": "",
               "modelProperties": {}
@@ -1167,6 +1205,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1180,6 +1219,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "groupSize",
               "description": "",
               "modelProperties": {}
@@ -1234,58 +1274,13 @@
             {
               "type": {
                 "format": "java",
-                "type": "Object",
-                "annotations": {
-                  "typeId": "org.mule.test.function.extension.SimplePojo",
-                  "classInformation": {
-                    "classname": "org.mule.test.function.extension.SimplePojo",
-                    "hasDefaultConstructor": true,
-                    "isInterface": false,
-                    "isInstantiable": true,
-                    "isAbstract": false,
-                    "isFinal": false,
-                    "implementedInterfaces": [],
-                    "parent": "",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "typeAlias": {
-                    "value": "SimplePojo"
-                  }
-                },
-                "fields": [
-                  {
-                    "key": {
-                      "name": "user"
-                    },
-                    "model": {
-                      "type": "String"
-                    },
-                    "annotations": {
-                      "expressionSupport": {
-                        "value": "SUPPORTED"
-                      }
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "pass"
-                    },
-                    "model": {
-                      "type": "String"
-                    },
-                    "annotations": {
-                      "expressionSupport": {
-                        "value": "SUPPORTED"
-                      }
-                    }
-                  }
-                ]
+                "type": "@ref:org.mule.test.function.extension.SimplePojo"
               },
               "hasDynamicType": false,
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1299,6 +1294,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "pojo",
               "description": "",
               "modelProperties": {}
@@ -1370,6 +1366,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1383,6 +1380,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "stream",
               "description": "",
               "modelProperties": {}
@@ -1481,6 +1479,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1494,6 +1493,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "notObject",
               "description": "",
               "modelProperties": {}
@@ -1507,6 +1507,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1520,6 +1521,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "string",
               "description": "",
               "modelProperties": {}
@@ -1549,6 +1551,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1562,6 +1565,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "stream",
               "description": "",
               "modelProperties": {}
@@ -1575,6 +1579,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1588,6 +1593,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "door",
               "description": "",
               "modelProperties": {}
@@ -1650,6 +1656,7 @@
               "required": true,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1663,6 +1670,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "expression",
               "description": "",
               "modelProperties": {}
@@ -1692,6 +1700,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -1706,6 +1715,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "item",
               "description": "",
               "modelProperties": {}
@@ -1719,6 +1729,7 @@
               "required": false,
               "isConfigOverride": false,
               "isComponentId": false,
+              "fieldValueProviderModels": [],
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1732,6 +1743,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
+              "semanticTerms": [],
               "name": "returnType",
               "description": "",
               "modelProperties": {}
@@ -1781,5 +1793,56 @@
     }
   ],
   "modelProperties": {},
-  "types": []
+  "types": [
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.function.extension.SimplePojo",
+        "classInformation": {
+          "classname": "org.mule.test.function.extension.SimplePojo",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeAlias": {
+          "value": "SimplePojo"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "user"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "pass"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    }
+  ]
 }

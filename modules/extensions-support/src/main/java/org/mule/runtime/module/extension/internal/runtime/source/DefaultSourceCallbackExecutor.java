@@ -23,7 +23,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -35,6 +34,7 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.GeneratedMethodComponentExecutor;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 
 import java.lang.reflect.Method;
@@ -46,8 +46,8 @@ import java.util.stream.Stream;
 import com.google.common.collect.ImmutableList;
 
 /**
- * Implementation of {@link SourceCallbackExecutor} which uses a {@link GeneratedMethodComponentExecutor} to execute the
- * callback through a {@link Method}
+ * Implementation of {@link SourceCallbackExecutor} which uses a {@link GeneratedMethodComponentExecutor} to execute the callback
+ * through a {@link Method}
  *
  * @since 4.3.0
  */
@@ -57,7 +57,6 @@ class DefaultSourceCallbackExecutor implements SourceCallbackExecutor {
   private final Optional<ConfigurationInstance> configurationInstance;
   private final SourceModel sourceModel;
   private final CursorProviderFactory cursorProviderFactory;
-  private final CursorComponentDecoratorFactory componentDecoratorFactory;
   private final StreamingManager streamingManager;
   private final MuleContext muleContext;
   private final boolean async;
@@ -84,7 +83,6 @@ class DefaultSourceCallbackExecutor implements SourceCallbackExecutor {
                                        Object source,
                                        Method method,
                                        CursorProviderFactory cursorProviderFactory,
-                                       CursorComponentDecoratorFactory componentDecoratorFactory,
                                        StreamingManager streamingManager,
                                        Component component,
                                        MuleContext muleContext,
@@ -94,18 +92,17 @@ class DefaultSourceCallbackExecutor implements SourceCallbackExecutor {
     this.configurationInstance = configurationInstance;
     this.sourceModel = sourceModel;
     this.cursorProviderFactory = cursorProviderFactory;
-    this.componentDecoratorFactory = componentDecoratorFactory;
     this.streamingManager = streamingManager;
     this.component = component;
     this.muleContext = muleContext;
-    executor = new GeneratedMethodComponentExecutor<>(getAllGroups(sourceModel, method, sourceCallbackModel), method, source,
-                                                      componentDecoratorFactory);
+    executor =
+        new GeneratedMethodComponentExecutor<>(getAllGroups(sourceModel, method, sourceCallbackModel), method, source);
     try {
       initialiseIfNeeded(executor, true, muleContext);
     } catch (InitialisationException e) {
       throw new MuleRuntimeException(e);
     }
-    async = Stream.of(method.getParameterTypes()).anyMatch(p -> SourceCompletionCallback.class.equals(p));
+    async = Stream.of(method.getParameterTypes()).anyMatch(MuleExtensionUtils::isSourceCompletionCallbackType);
   }
 
   /**
@@ -142,7 +139,6 @@ class DefaultSourceCallbackExecutor implements SourceCallbackExecutor {
                                                                                           sourceModel,
                                                                                           event,
                                                                                           cursorProviderFactory,
-                                                                                          componentDecoratorFactory,
                                                                                           streamingManager,
                                                                                           component,
                                                                                           null,

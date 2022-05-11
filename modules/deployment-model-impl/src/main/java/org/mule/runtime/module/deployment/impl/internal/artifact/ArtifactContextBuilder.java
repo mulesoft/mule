@@ -6,11 +6,9 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
-import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
-import static org.mule.runtime.api.util.MuleSystemProperties.SHARE_ERROR_TYPE_REPOSITORY_PROPERTY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.config.MuleProperties.APP_HOME_DIRECTORY_PROPERTY;
@@ -24,22 +22,20 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createCompositeErrorTypeRepository;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.getMuleContext;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.isConfigLess;
-import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.withArtifactMuleContext;
 
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
-import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
@@ -53,8 +49,10 @@ import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
+import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
+import org.mule.runtime.module.artifact.activation.api.service.config.ContainerServiceConfigurator;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationMuleContextBuilder;
@@ -64,7 +62,6 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DomainMuleContext
 import org.mule.runtime.module.deployment.impl.internal.policy.ArtifactExtensionManagerFactory;
 import org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -100,6 +97,7 @@ public class ArtifactContextBuilder {
 
   private List<ArtifactPlugin> artifactPlugins = new ArrayList<>();
   private ArtifactType artifactType = APP;
+  private ArtifactConfigurationProcessor artifactConfigurationProcessor;
   private String[] configurationFiles = new String[0];
   private ArtifactDeclaration artifactDeclaration;
   private Map<String, String> artifactProperties = new HashMap<>();
@@ -122,6 +120,8 @@ public class ArtifactContextBuilder {
   private Optional<Properties> properties = empty();
   private String dataFolderName;
   private LockFactory runtimeLockFactory;
+  private MemoryManagementService memoryManagementService;
+  private ArtifactCoordinates artifactCoordinates;
 
   private ArtifactContextBuilder() {}
 
@@ -170,6 +170,19 @@ public class ArtifactContextBuilder {
    */
   public ArtifactContextBuilder setDataFolderName(String folderName) {
     this.dataFolderName = folderName;
+    return this;
+  }
+
+  /**
+   * Configures the {@link ArtifactConfigurationProcessor} to use.
+   * 
+   * @param artifactConfigurationProcessor the processor to use for building the application model.
+   * @return the builder
+   * 
+   * @since 4.5
+   */
+  public ArtifactContextBuilder setArtifactConfigurationProcessor(ArtifactConfigurationProcessor artifactConfigurationProcessor) {
+    this.artifactConfigurationProcessor = artifactConfigurationProcessor;
     return this;
   }
 
@@ -277,7 +290,7 @@ public class ArtifactContextBuilder {
    * {@code MuleContext} to be created. It may also be that the configuration files make use of this extensions.
    *
    * @param artifactPlugins collection of artifact extensions that define resources as part of the {@code MuleContext} to be
-   *        created.
+   *                        created.
    * @return the builder
    */
   public ArtifactContextBuilder setArtifactPlugins(List<ArtifactPlugin> artifactPlugins) {
@@ -319,10 +332,11 @@ public class ArtifactContextBuilder {
    * Allows to lazily create the artifact resources.
    *
    * @param enableLazyInit when true the artifact resources from the mule configuration won't be created at startup. The artifact
-   *        components from the configuration will be created on demand when requested. For instance, when using
-   *        {@link DefaultMuleApplication#getConnectivityTestingService()} and then invoking
-   *        {@link ConnectivityTestingService#testConnection(Location)} will cause the creation of the component requested to do
-   *        test connectivity, if it was not already created. when false, the application will be created completely at startup.
+   *                       components from the configuration will be created on demand when requested. For instance, when using
+   *                       {@link DefaultMuleApplication#getConnectivityTestingService()} and then invoking
+   *                       {@link ConnectivityTestingService#testConnection(Location)} will cause the creation of the component
+   *                       requested to do test connectivity, if it was not already created. when false, the application will be
+   *                       created completely at startup.
    * @return the builder
    */
   public ArtifactContextBuilder setEnableLazyInit(boolean enableLazyInit) {
@@ -367,11 +381,16 @@ public class ArtifactContextBuilder {
 
   /**
    * @param runtimeLockFactory {@link LockFactory} for the runtime that can be shared along deployable artifacts to synchronize
-   *        access on different deployable artifacts to the same resources.
+   *                           access on different deployable artifacts to the same resources.
    * @return the builder
    */
   public ArtifactContextBuilder setRuntimeLockFactory(LockFactory runtimeLockFactory) {
     this.runtimeLockFactory = runtimeLockFactory;
+    return this;
+  }
+
+  public ArtifactContextBuilder setArtifactCoordinates(ArtifactCoordinates artifactCoordinates) {
+    this.artifactCoordinates = artifactCoordinates;
     return this;
   }
 
@@ -390,7 +409,7 @@ public class ArtifactContextBuilder {
 
   /**
    * @return the {@code MuleContext} created with the provided configuration
-   * @throws ConfigurationException when there's a problem creating the {@code MuleContext}
+   * @throws ConfigurationException  when there's a problem creating the {@code MuleContext}
    * @throws InitialisationException when a certain configuration component failed during initialisation phase
    */
   public ArtifactContext build() throws InitialisationException, ConfigurationException {
@@ -420,15 +439,14 @@ public class ArtifactContextBuilder {
         builders.add(new ArtifactExtensionManagerConfigurationBuilder(artifactPlugins,
                                                                       extensionManagerFactory));
         builders.add(createConfigurationBuilderFromApplicationProperties());
-        // TODO MULE-14289 (elrodro83) pass this object to the builder instead of looking it up here
-        ArtifactConfigurationProcessor artifactConfigurationProcessor = ArtifactConfigurationProcessor.discover();
+
         AtomicReference<ArtifactContext> artifactContext = new AtomicReference<>();
         builders.add(new ConfigurationBuilder() {
 
           @Override
           public void configure(MuleContext muleContext) throws ConfigurationException {
             if (serviceRepository != null) {
-              serviceConfigurators.add(new ContainerServicesMuleContextConfigurator(serviceRepository));
+              serviceConfigurators.add(new ContainerServiceConfigurator(serviceRepository.getServices()));
             }
             if (classLoaderRepository != null) {
               serviceConfigurators.add(customizationService -> customizationService
@@ -448,9 +466,13 @@ public class ArtifactContextBuilder {
                     .setEnableLazyInitialization(enableLazyInit)
                     .setDisableXmlValidations(disableXmlValidations)
                     .setServiceConfigurators(serviceConfigurators)
-                    .setRuntimeLockFactory(runtimeLockFactory);
+                    .setRuntimeLockFactory(runtimeLockFactory)
+                    .setMemoryManagementService(memoryManagementService);
 
-            withArtifactMuleContext(parentArtifact, artifactContextConfigurationBuilder::setParentContext);
+            if (parentArtifact != null && parentArtifact.getArtifactContext() != null) {
+              artifactContextConfigurationBuilder.setParentArtifactContext(parentArtifact.getArtifactContext());
+            }
+
             artifactContext
                 .set(artifactConfigurationProcessor.createArtifactContext(artifactContextConfigurationBuilder.build()));
             ((DefaultMuleConfiguration) muleContext.getConfiguration()).setDataFolderName(dataFolderName);
@@ -476,12 +498,10 @@ public class ArtifactContextBuilder {
         ArtifactObjectSerializer objectSerializer = new ArtifactObjectSerializer(classLoaderRepository);
         muleContextBuilder.setObjectSerializer(objectSerializer);
         muleContextBuilder.setDeploymentProperties(properties);
+        muleContextBuilder.setArtifactCoordinates(artifactCoordinates);
 
         if (parentArtifact != null) {
           builders.add(new ConnectionManagerConfigurationBuilder(parentArtifact));
-
-          withArtifactMuleContext(parentArtifact, parentContext -> muleContextBuilder
-              .setErrorTypeRepository(createErrorTypeRepository(parentContext)));
         } else {
           builders.add(new ConnectionManagerConfigurationBuilder());
         }
@@ -503,27 +523,6 @@ public class ArtifactContextBuilder {
       }
       throw e;
     }
-  }
-
-  private ErrorTypeRepository createErrorTypeRepository(MuleContext parentContext) {
-    if (POLICY.equals(artifactType)) {
-      if (shareErrorTypeRepository()) {
-        // Because MULE-18196 breaks backwards, we need this feature flag to allow legacy behavior
-        return createCompositeErrorTypeRepository(parentContext.getErrorTypeRepository());
-      } else {
-        // Since there is already a workaround to allow polices to use http connector without declaring the dependency
-        // and relying on it provided by the app, this case has to be accounted for here when handling error codes as
-        // well.
-        return new FilteredCompositeErrorTypeRepository(createDefaultErrorTypeRepository(),
-                                                        parentContext.getErrorTypeRepository(),
-                                                        "HTTP");
-      }
-    }
-    return createCompositeErrorTypeRepository(parentContext.getErrorTypeRepository());
-  }
-
-  private boolean shareErrorTypeRepository() {
-    return getBoolean(SHARE_ERROR_TYPE_REPOSITORY_PROPERTY);
   }
 
   protected ConfigurationBuilder createConfigurationBuilderFromApplicationProperties() {
@@ -549,4 +548,8 @@ public class ArtifactContextBuilder {
     return this;
   }
 
+  public ArtifactContextBuilder setMemoryManagementService(MemoryManagementService memoryManagementService) {
+    this.memoryManagementService = memoryManagementService;
+    return this;
+  }
 }

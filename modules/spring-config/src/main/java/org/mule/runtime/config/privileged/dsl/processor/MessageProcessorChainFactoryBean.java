@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.newLazyProcessorChainBuilder;
+
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.MuleContext;
@@ -62,7 +63,7 @@ public class MessageProcessorChainFactoryBean extends AbstractComponentFactory<M
     }
     return newLazyProcessorChainBuilder((DefaultMessageProcessorChainBuilder) builder,
                                         muleContext,
-                                        () -> getProcessingStrategy(locator, getRootContainerLocation()).orElse(null));
+                                        () -> getProcessingStrategy(locator, this).orElse(null));
   }
 
   protected MessageProcessorChainBuilder getBuilderInstance() {

@@ -7,28 +7,32 @@
 package org.mule.functional.junit4;
 
 import static java.util.Collections.emptyMap;
-
+import static java.util.Collections.singleton;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
-
-import org.junit.After;
-import org.junit.Before;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
+
+import org.junit.After;
+import org.junit.Before;
 
 public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
 
@@ -68,7 +72,7 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
   }
 
   private final Map<String, MuleContext> muleContexts = new HashMap<>();
-  private Map<String, ArtifactInstanceInfrastructure> applsInfrastructures = new HashMap<>();
+  private final Map<String, ArtifactInstanceInfrastructure> applsInfrastructures = new HashMap<>();
   private final List<MuleContext> disposedContexts = new ArrayList<>();
   private MuleContext domainContext;
   private ArtifactInstanceInfrastructure domainInfrastructure;
@@ -110,23 +114,33 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
           builders.add(getBuilder());
         }
       }
+
+      @Override
+      protected Set<ExtensionModel> getExtensionModels() {
+        return DomainFunctionalTestCase.this.getExtensionModels();
+      }
     }
         .setContextId(this.getClass().getSimpleName())
         .setDomainConfig(getDomainConfigs());
 
-    domainContext = domainContextBuilder.build();
+    final ArtifactContext domainArtifactContext = domainContextBuilder.build();
+    domainContext = domainArtifactContext.getMuleContext();
     domainInfrastructure = new ArtifactInstanceInfrastructure();
     domainContext.getInjector().inject(domainInfrastructure);
     ApplicationConfig[] applicationConfigs = getConfigResources();
 
     for (ApplicationConfig applicationConfig : applicationConfigs) {
-      MuleContext muleContext = createAppMuleContext(applicationConfig.applicationResources);
+      MuleContext muleContext = createAppMuleContext(applicationConfig.applicationResources, domainArtifactContext);
       muleContexts.put(applicationConfig.applicationName, muleContext);
 
       ArtifactInstanceInfrastructure appInfrasturcture = new ArtifactInstanceInfrastructure();
       muleContext.getInjector().inject(appInfrasturcture);
       applsInfrastructures.put(applicationConfig.applicationName, appInfrasturcture);
     }
+  }
+
+  protected Set<ExtensionModel> getExtensionModels() {
+    return singleton(getExtensionModel());
   }
 
   protected Map<String, Object> getDomainStartUpRegistryObjects() {
@@ -148,11 +162,18 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
     domainInfrastructure = null;
   }
 
-  protected MuleContext createAppMuleContext(String... configResource) throws Exception {
-    return new ApplicationContextBuilder()
+  private MuleContext createAppMuleContext(String[] configResource, ArtifactContext domainArtifactContext) throws Exception {
+    return new ApplicationContextBuilder() {
+
+      @Override
+      protected Set<ExtensionModel> getExtensionModels() {
+        return DomainFunctionalTestCase.this.getExtensionModels();
+      }
+    }
         .setContextId(this.getClass().getSimpleName())
-        .setDomainContext(domainContext)
+        .setDomainArtifactContext(domainArtifactContext)
         .setApplicationResources(configResource)
+        .setArtifactCoordinates(getTestArtifactCoordinates())
         .build();
   }
 

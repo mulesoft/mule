@@ -52,7 +52,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
   /**
    * Creates a new builder
    *
-   * @param artifactId artifact identifier. Non empty.
+   * @param artifactId           artifact identifier. Non empty.
    * @param upperCaseInExtension whether the extension is in uppercase
    */
   public AbstractArtifactFileBuilder(String artifactId, boolean upperCaseInExtension) {
@@ -91,7 +91,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
   /**
    * Create a new builder from another instance and different ID.
    *
-   * @param id artifact identifier. Non empty.
+   * @param id     artifact identifier. Non empty.
    * @param source instance used as template to build the new one. Non null.
    */
   public AbstractArtifactFileBuilder(String id, T source) {
@@ -118,7 +118,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
    * Adds a class file to the artifact classes folder.
    *
    * @param classFile class file to include. Non null.
-   * @param alias path where the file must be added inside the app file
+   * @param alias     path where the file must be added inside the app file
    * @return the same builder instance
    */
   public T containingClass(File classFile, String alias) {

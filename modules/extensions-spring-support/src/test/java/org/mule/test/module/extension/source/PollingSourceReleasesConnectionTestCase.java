@@ -8,6 +8,8 @@ package org.mule.test.module.extension.source;
 
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories.POLLING;
 
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
@@ -15,11 +17,16 @@ import org.mule.test.petstore.extension.PooledPetStoreConnectionProvider;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(SOURCES)
+@Story(POLLING)
 public class PollingSourceReleasesConnectionTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "polling-source-releases-connection-config.xml";
+    return "source/polling-source-releases-connection-config.xml";
   }
 
   @Override

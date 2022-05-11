@@ -29,12 +29,13 @@ import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.api.RepositoryServiceAware;
 import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.runtime.module.tooling.api.ToolingServiceAware;
-
-import org.slf4j.Logger;
+import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.slf4j.Logger;
 
 public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionManagerServer {
 
@@ -50,6 +51,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   private ArtifactClassLoaderManager artifactClassLoaderManager;
   private ServiceRepository serviceRepository;
   private EventContextService eventContextService;
+  private TroubleshootingService troubleshootingService;
 
   private List<MuleCoreExtension> initializedCoreExtensions = new ArrayList<>();
   private List<MuleCoreExtension> startedCoreExtensions = new ArrayList<>();
@@ -186,6 +188,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   private Injector createContainerInjector() {
     return new ContainerInjectorBuilder()
         .withDeploymentService(deploymentService)
+        .withTroubleshootingService(troubleshootingService)
         .withRepositoryService(repositoryService)
         .withServiceRepository(serviceRepository)
         .withCoreExtensions(coreExtensions)
@@ -225,11 +228,16 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
     this.serviceRepository = serviceRepository;
   }
 
+  @Override
+  public void setTroubleshootingService(TroubleshootingService troubleshootingService) {
+    this.troubleshootingService = troubleshootingService;
+  }
+
   /**
    * Creates a {@link DeploymentListenerAdapter}.
    *
    * @param artifactDeploymentListener the artifactDeploymentListener to be adapted.
-   * @param type: the artifact type.
+   * @param type:                      the artifact type.
    * @return an DeploymentListener.
    */
   DeploymentListener createDeploymentListenerAdapter(ArtifactDeploymentListener artifactDeploymentListener, ArtifactType type) {

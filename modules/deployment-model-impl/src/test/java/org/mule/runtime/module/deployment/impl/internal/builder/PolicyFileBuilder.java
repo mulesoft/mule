@@ -50,7 +50,8 @@ public class PolicyFileBuilder extends DeployableFileBuilder<PolicyFileBuilder> 
    * Adds a model describer to the policy describer file.
    *
    * @param mulePolicyModel the describer to store under
-   *        {@link PolicyTemplateDescriptor#META_INF}/{@link PolicyTemplateDescriptor#MULE_ARTIFACT_JSON_DESCRIPTOR} file
+   *                        {@link PolicyTemplateDescriptor#META_INF}/{@link PolicyTemplateDescriptor#MULE_ARTIFACT_JSON_DESCRIPTOR}
+   *                        file
    * @return the same builder instance
    */
   public PolicyFileBuilder describedBy(MulePolicyModel mulePolicyModel) {

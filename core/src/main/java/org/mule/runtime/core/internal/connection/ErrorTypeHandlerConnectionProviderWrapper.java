@@ -27,8 +27,8 @@ import org.mule.runtime.extension.api.exception.ModuleException;
 import java.util.Optional;
 
 /**
- * {@link ConnectionProviderWrapper} implementation which handles the exceptions occurred when {@link #connect()} and the
- * failed {@link ConnectionValidationResult} from the {@link #validate(Object)}, this wrapper consumes these outputs and if a
+ * {@link ConnectionProviderWrapper} implementation which handles the exceptions occurred when {@link #connect()} and the failed
+ * {@link ConnectionValidationResult} from the {@link #validate(Object)}, this wrapper consumes these outputs and if a
  * {@link ErrorTypeDefinition} is provided transforms it and communicates the proper {@link ErrorType}
  *
  * @param <C>
@@ -115,20 +115,11 @@ public final class ErrorTypeHandlerConnectionProviderWrapper<C> extends Abstract
         : ofNullable(reconnectionConfig);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Optional<PoolingProfile> getPoolingProfile() {
-    ConnectionProvider<C> delegate = getDelegate();
-    return delegate instanceof ConnectionProviderWrapper
-        ? ((ConnectionProviderWrapper) delegate).getPoolingProfile()
-        : empty();
-  }
-
   private Optional<ErrorType> getErrorType(Throwable exception) {
     if (exception instanceof ModuleException) {
       return getErrorType(((ModuleException) exception).getType());
+    } else if (exception instanceof org.mule.sdk.api.exception.ModuleException) {
+      return getErrorType(((org.mule.sdk.api.exception.ModuleException) exception).getType());
     } else {
       return exception != null && exception.getCause() != null
           ? getErrorType(exception.getCause())
@@ -140,7 +131,15 @@ public final class ErrorTypeHandlerConnectionProviderWrapper<C> extends Abstract
     return errorTypeRepository.getErrorType(getIdentifier(errorType));
   }
 
+  private Optional<ErrorType> getErrorType(org.mule.sdk.api.error.ErrorTypeDefinition errorType) {
+    return errorTypeRepository.getErrorType(getIdentifier(errorType));
+  }
+
   private ComponentIdentifier getIdentifier(ErrorTypeDefinition errorType) {
+    return builder().name(errorType.getType()).namespace(prefix).build();
+  }
+
+  private ComponentIdentifier getIdentifier(org.mule.sdk.api.error.ErrorTypeDefinition errorType) {
     return builder().name(errorType.getType()).namespace(prefix).build();
   }
 }

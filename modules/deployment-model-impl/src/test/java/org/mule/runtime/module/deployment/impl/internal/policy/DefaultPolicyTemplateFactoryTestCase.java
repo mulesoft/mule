@@ -7,37 +7,48 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
-import static java.util.Collections.emptySet;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.anyVararg;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 import static org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyTemplateFactory.createPolicyTemplateCreationErrorMessage;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptySet;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyVararg;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
-import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderBuilder;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
-import org.mule.runtime.module.license.api.LicenseValidatorProvider;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import io.qameta.allure.Issue;
 
 @SmallTest
 public class DefaultPolicyTemplateFactoryTestCase extends AbstractMuleTestCase {
@@ -77,12 +88,41 @@ public class DefaultPolicyTemplateFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Issue("MULE-19387")
+  public void maintainsPluginDependenciesOrder() throws Exception {
+    RegionClassLoader regionClassLoader = createRegionClassLoader();
+    PolicyTemplateClassLoaderBuilder policyTemplateClassLoaderBuilder = createPolicyTemplateClassLoaderBuilder(regionClassLoader);
+    MuleDeployableArtifactClassLoader policyClassLoader = mock(MuleDeployableArtifactClassLoader.class);
+
+    List<String> pluginNames =
+        asList("plugin 1", "plugin 2", "plugin 3", "plugin 4", "plugin 5", "plugin 6", "plugin 7", "plugin 8", "plugin 9");
+    List<ArtifactPluginDescriptor> pluginDescriptors = new ArrayList<>(pluginNames.size());
+    List<ArtifactClassLoader> pluginArtifactClassLoaders = new ArrayList<>(pluginNames.size());
+    pluginNames.forEach(pluginName -> {
+      pluginDescriptors.add(new ArtifactPluginDescriptor(pluginName));
+      ArtifactClassLoader pluginArtifactClassLoader = mock(ArtifactClassLoader.class);
+      when(pluginArtifactClassLoader.getArtifactId()).thenReturn(pluginName);
+      pluginArtifactClassLoaders.add(pluginArtifactClassLoader);
+    });
+    when(pluginDependenciesResolver.resolve(anySet(), anyList(), anyBoolean())).thenReturn(pluginDescriptors);
+    when(policyClassLoader.getArtifactPluginClassLoaders()).thenReturn(pluginArtifactClassLoaders);
+
+    when(policyClassLoader.getArtifactId()).thenReturn(POLICY_ID);
+    when(policyTemplateClassLoaderBuilder.build()).thenReturn(policyClassLoader);
+    when(classLoaderBuilderFactory.createArtifactClassLoaderBuilder()).thenReturn(policyTemplateClassLoaderBuilder);
+
+    PolicyTemplate policyTemplate = policyTemplateFactory.createArtifact(createApplication(regionClassLoader), descriptor);
+
+    assertThat(policyTemplate.getOwnArtifactPlugins(), contains(policyTemplate.getArtifactPlugins().toArray()));
+  }
+
+  @Test
   public void managesArtifactContextCreationFailure() throws Exception {
     RegionClassLoader regionClassLoader = createRegionClassLoader();
     PolicyTemplateClassLoaderBuilder policyTemplateClassLoaderBuilder = createPolicyTemplateClassLoaderBuilder(regionClassLoader);
 
     final String errorMessage = "Error";
-    final IOException exceptionCause = new IOException(errorMessage);
+    final Exception exceptionCause = new RuntimeException(errorMessage);
     when(policyTemplateClassLoaderBuilder.build()).thenThrow(exceptionCause);
     when(classLoaderBuilderFactory.createArtifactClassLoaderBuilder()).thenReturn(policyTemplateClassLoaderBuilder);
 

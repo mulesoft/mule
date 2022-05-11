@@ -6,76 +6,77 @@
  */
 package org.mule.runtime.module.extension.internal.loader.utils;
 
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclarer;
-import org.mule.runtime.extension.api.annotation.Streaming;
-import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
-import org.mule.runtime.extension.api.runtime.route.Chain;
-import org.mule.runtime.extension.api.runtime.route.Route;
-import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
-import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
-import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
+import org.mule.runtime.api.meta.model.XmlDslModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.WithSemanticTermsDeclaration;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
+import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.parser.SemanticTermsParser;
+import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
+import org.mule.sdk.api.annotation.dsl.xml.Xml;
 
-import java.io.InputStream;
-import java.lang.reflect.Method;
+import java.util.Optional;
 
 /**
  * Utility class for {@link ModelLoaderDelegate model loaders}
  *
- * @since 1.0
+ * @since 4.0
  */
 public final class ModelLoaderUtils {
 
   private ModelLoaderUtils() {}
 
-  public static boolean isScope(MethodElement methodElement) {
-    return methodElement.getParameters().stream().anyMatch(ModelLoaderUtils::isProcessorChain);
-  }
-
-  public static boolean isRouter(MethodElement methodElement) {
-    return methodElement.getParameters().stream()
-        .anyMatch(ModelLoaderUtils::isRoute);
-  }
-
-  public static boolean isRoute(ExtensionParameter parameter) {
-    return parameter.getType().isAssignableTo(Route.class);
-  }
-
-  public static boolean isNonBlocking(MethodElement method) {
-    return method.getParameters().stream()
-        .anyMatch(p -> p.getType().isAssignableTo(CompletionCallback.class));
-  }
-
-  public static boolean isAutoPaging(MethodElement operationMethod) {
-    return operationMethod.getReturnType().isAssignableTo(PagingProvider.class);
-  }
-
-  public static boolean isProcessorChain(ExtensionParameter parameter) {
-    return parameter.getType().isAssignableTo(Chain.class);
-  }
-
-  public static void handleByteStreaming(Method method, ExecutableComponentDeclarer executableComponent,
-                                         MetadataType outputType) {
-    executableComponent.supportsStreaming(isInputStream(outputType) || method.getAnnotation(Streaming.class) != null);
-  }
-
-  public static void handleByteStreaming(MethodElement method, ExecutableComponentDeclarer executableComponent,
-                                         MetadataType outputType) {
-    executableComponent.supportsStreaming(isInputStream(outputType) || method.isAnnotatedWith(Streaming.class));
+  /**
+   * Adds all the semantic terms in the {@code parser} into the given {@code declaration}
+   *
+   * @param declaration a declaration
+   * @param parser      a parser
+   * @since 4.5.0
+   */
+  public static void addSemanticTerms(WithSemanticTermsDeclaration declaration, SemanticTermsParser parser) {
+    declaration.getSemanticTerms().addAll(parser.getSemanticTerms());
   }
 
   /**
-   * @param type a {@link MetadataType}
-   * @return whether the given {@code type} represents an {@link InputStream} or not
+   * Utility method to obtain a default {@link XmlDslModel} of a given {@link XmlDslConfiguration}
+   *
+   * @param extensionName                 the name of the extension
+   * @param version                       version of the extension
+   * @param xmlDslAnnotationConfiguration configuration of {@link org.mule.runtime.extension.api.annotation.dsl.xml.Xml} of
+   *                                      {@link Xml}
+   * @return the {@link XmlDslModel}
+   * @since 4.5.0
    */
-  public static boolean isInputStream(MetadataType type) {
-    return isAssignableFrom(type, InputStream.class);
+  public static XmlDslModel getXmlDslModel(String extensionName,
+                                           String version,
+                                           Optional<XmlDslConfiguration> xmlDslAnnotationConfiguration) {
+    Optional<String> prefix = empty();
+    Optional<String> namespace = empty();
+
+    if (xmlDslAnnotationConfiguration.isPresent()) {
+      prefix = of(xmlDslAnnotationConfiguration.get().getPrefix());
+      namespace = of(xmlDslAnnotationConfiguration.get().getNamespace());
+    }
+
+    return createXmlLanguageModel(prefix, namespace, extensionName, version);
   }
 
-  private static boolean isAssignableFrom(MetadataType metadataType, Class<?> type) {
-    return getType(metadataType).map(clazz -> type.isAssignableFrom(clazz)).orElse(false);
+  /**
+   * Utility method to obtain a default {@link XmlDslModel} of a given {@link XmlDslConfiguration}
+   *
+   * @param extensionElement              the extension element
+   * @param version                       version of the extension
+   * @param xmlDslAnnotationConfiguration configuration of {@link org.mule.runtime.extension.api.annotation.dsl.xml.Xml} of
+   *                                      {@link Xml}
+   * @return the {@link XmlDslModel}
+   * @since 4.5.0
+   */
+  public static XmlDslModel getXmlDslModel(ExtensionElement extensionElement,
+                                           String version,
+                                           Optional<XmlDslConfiguration> xmlDslAnnotationConfiguration) {
+    return getXmlDslModel(extensionElement.getName(), version, xmlDslAnnotationConfiguration);
   }
 }

@@ -10,6 +10,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.deployment.model.internal.artifact.CompositeClassLoaderArtifactFinder.findClassLoader;
 
 import org.junit.Test;
@@ -31,8 +32,7 @@ public class CompositeClassLoaderArtifactFinderTestCase {
   @Test
   public void appClassLoader() {
     ClassLoader appClassLoader = mockArtifactClassLoader(appDescriptor);
-    CompositeClassLoader compositeClassLoader =
-        new CompositeClassLoader(mockArtifactClassLoader(pluginDescriptor), appClassLoader);
+    CompositeClassLoader compositeClassLoader = from(mockArtifactClassLoader(pluginDescriptor), appClassLoader);
 
     assertThat(findClassLoader(compositeClassLoader), equalTo(appClassLoader));
   }
@@ -40,8 +40,7 @@ public class CompositeClassLoaderArtifactFinderTestCase {
   @Test
   public void domainClassLoader() {
     ClassLoader domainClassLoader = mockArtifactClassLoader(domainDescriptor);
-    CompositeClassLoader compositeClassLoader =
-        new CompositeClassLoader(mockArtifactClassLoader(pluginDescriptor), domainClassLoader);
+    CompositeClassLoader compositeClassLoader = from(mockArtifactClassLoader(pluginDescriptor), domainClassLoader);
 
     assertThat(findClassLoader(compositeClassLoader), equalTo(domainClassLoader));
   }
@@ -49,7 +48,7 @@ public class CompositeClassLoaderArtifactFinderTestCase {
   @Test
   public void firstDelegateIfNoArtifactClassLoaderFound() {
     ClassLoader pluginClassLoader = mockArtifactClassLoader(pluginDescriptor);
-    CompositeClassLoader compositeClassLoader = new CompositeClassLoader(pluginClassLoader);
+    CompositeClassLoader compositeClassLoader = from(pluginClassLoader);
 
     assertThat(findClassLoader(compositeClassLoader), equalTo(pluginClassLoader));
   }

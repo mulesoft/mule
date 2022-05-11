@@ -64,11 +64,11 @@ public class MavenUtils {
 
   /**
    * Returns the {@link Model} from a given artifact folder
-   * 
+   *
    * @param artifactFile file containing the artifact content.
    * @return the {@link Model} from the {@value ArtifactPluginDescriptor#MULE_PLUGIN_POM} file if available
    * @throws ArtifactDescriptorCreateException if the artifact jar does not contain a
-   *         {@value ArtifactPluginDescriptor#MULE_PLUGIN_POM} file or the file can' be loaded
+   *                                           {@value ArtifactPluginDescriptor#MULE_PLUGIN_POM} file or the file can' be loaded
    */
   public static Model getPomModelFromJar(File artifactFile) {
     String pomFilePath = MULE_ARTIFACT_PATH_INSIDE_JAR + "/" + MULE_PLUGIN_POM;
@@ -84,7 +84,7 @@ public class MavenUtils {
 
   /**
    * Finds the URL of the pom file within the artifact file.
-   * 
+   *
    * @param artifactFile the artifact file to search for the pom file.
    * @return the URL to the pom file.
    */
@@ -108,8 +108,8 @@ public class MavenUtils {
     try {
       possibleUrl = getUrlWithinJar(artifactFile, mavenMetadataFilePath);
       /*
-       * A specific implementation of JarURLConnection is required to read jar content because not all implementations
-       * support ways to disable connection caching. Disabling connection caching is necessary to avoid file descriptor leaks.
+       * A specific implementation of JarURLConnection is required to read jar content because not all implementations support
+       * ways to disable connection caching. Disabling connection caching is necessary to avoid file descriptor leaks.
        */
       JarURLConnection jarConnection =
           new sun.net.www.protocol.jar.JarURLConnection(possibleUrl, new sun.net.www.protocol.jar.Handler());
@@ -138,7 +138,7 @@ public class MavenUtils {
    * @param artifactFolder folder containing the exploded artifact file.
    * @return the {@link Model} from the {@value DeployableArtifactDescriptor#MULE_POM} file if available
    * @throws ArtifactDescriptorCreateException if the folder does not contain a {@value DeployableArtifactDescriptor#MULE_POM}
-   *         file or the file can' be loaded
+   *                                           file or the file can' be loaded
    */
   public static Model getPomModelFolder(File artifactFolder) {
     final File artifactPom = lookupPomFromMavenLocation(artifactFolder);
@@ -160,8 +160,9 @@ public class MavenUtils {
    *
    * @param artifactFolder folder containing the exploded artifact file.
    * @return the {@link Properties} from the {@value DeployableArtifactDescriptor#MULE_POM_PROPERTIES} file if available
-   * @throws ArtifactDescriptorCreateException if the folder does not contain a {@value DeployableArtifactDescriptor#MULE_POM_PROPERTIES}
-   *                                           file or the file can' be loaded
+   * @throws ArtifactDescriptorCreateException if the folder does not contain a
+   *                                           {@value DeployableArtifactDescriptor#MULE_POM_PROPERTIES} file or the file can' be
+   *                                           loaded
    */
   public static Properties getPomPropertiesFolder(File artifactFolder) {
     final File artifactPomProperties = lookupPomPropertiesMavenLocation(artifactFolder);
@@ -181,8 +182,9 @@ public class MavenUtils {
    *
    * @param artifactFile the artifact file to search for the pom file.
    * @return the {@link Properties} from the {@value DeployableArtifactDescriptor#MULE_POM_PROPERTIES} file if available
-   * @throws ArtifactDescriptorCreateException if the folder does not contain a {@value DeployableArtifactDescriptor#MULE_POM_PROPERTIES}
-   *                                           file or the file can' be loaded
+   * @throws ArtifactDescriptorCreateException if the folder does not contain a
+   *                                           {@value DeployableArtifactDescriptor#MULE_POM_PROPERTIES} file or the file can' be
+   *                                           loaded
    */
   public static Properties getPomPropertiesFromJar(File artifactFile) {
     String pomPropertiesFilePath = MULE_ARTIFACT_PATH_INSIDE_JAR + "/" + MULE_POM_PROPERTIES;
@@ -198,8 +200,8 @@ public class MavenUtils {
   }
 
   /**
-   * @param artifact a maven artifact that may be a directory following the mule deployable archive structure or a compressed
-   *        file.
+   * @param artifact a Maven artifact that may be a directory following the mule deployable archive structure or a compressed
+   *                 file.
    * @return the pom model for the artifact.
    */
   public static Model getPomModel(File artifact) {
@@ -211,9 +213,9 @@ public class MavenUtils {
 
   /**
    * Updates the pom file from an artifact.
-   * 
+   *
    * @param artifactFolder the artifact folder
-   * @param model the new pom model
+   * @param model          the new pom model
    */
   public static void updateArtifactPom(File artifactFolder, Model model) {
     final File mulePluginPom = lookupPomFromMavenLocation(artifactFolder);
@@ -229,7 +231,7 @@ public class MavenUtils {
    * Creates the pom file for a deployable artifact inside the artifact exploded folder
    *
    * @param artifactFolder the deployable artifact folder
-   * @param model the pom model
+   * @param model          the pom model
    */
   public static void createDeployablePomFile(File artifactFolder, Model model) {
     File pomFileLocation =
@@ -289,7 +291,7 @@ public class MavenUtils {
 
     // final File artifactPomFile = new File(artifactFolder, MULE_ARTIFACT_FOLDER + separator + MULE_POM);
     if (artifactPomFile == null || !artifactPomFile.exists()) {
-      throw new ArtifactDescriptorCreateException(format("The maven bundle loader requires the file pom.xml (error found while reading artifact '%s')",
+      throw new ArtifactDescriptorCreateException(format("The Maven bundle loader requires the file pom.xml (error found while reading artifact '%s')",
                                                          artifactFolder.getName()));
     }
     return artifactPomFile;
@@ -316,7 +318,7 @@ public class MavenUtils {
 
     // final File mulePropertiesPom = new File(artifactFolder, MULE_ARTIFACT_FOLDER + separator + MULE_PLUGIN_POM);
     if (mulePropertiesPom == null || !mulePropertiesPom.exists()) {
-      throw new ArtifactDescriptorCreateException(format("The maven bundle loader requires the file pom.properties (error found while reading artifact '%s')",
+      throw new ArtifactDescriptorCreateException(format("The Maven bundle loader requires the file pom.properties (error found while reading artifact '%s')",
                                                          artifactFolder.getName()));
     }
     return mulePropertiesPom;
@@ -324,8 +326,8 @@ public class MavenUtils {
 
   /**
    * Adds a shared library to the pom model. If the plugin does not exists yet in the model then it will create it.
-   * 
-   * @param model the pom model
+   *
+   * @param model      the pom model
    * @param dependency the descriptor of the dependency
    */
   public static void addSharedLibraryDependency(Model model, Dependency dependency) {

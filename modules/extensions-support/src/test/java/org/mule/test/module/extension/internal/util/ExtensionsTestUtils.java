@@ -47,6 +47,8 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
@@ -73,7 +75,7 @@ import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
+import org.mule.runtime.extension.api.runtime.exception.SdkExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigTypeModelProperty;
@@ -230,14 +232,12 @@ public final class ExtensionsTestUtils {
     });
   }
 
-  public static <C> C getConfigurationFromRegistry(String key, CoreEvent muleEvent, MuleContext muleContext)
-      throws Exception {
+  public static <C> C getConfigurationFromRegistry(String key, CoreEvent muleEvent, MuleContext muleContext) {
     return (C) getConfigurationInstanceFromRegistry(key, muleEvent, muleContext).getValue();
   }
 
   public static ConfigurationInstance getConfigurationInstanceFromRegistry(String key, CoreEvent muleEvent,
-                                                                           MuleContext muleContext)
-      throws Exception {
+                                                                           MuleContext muleContext) {
     ExtensionManager extensionManager = muleContext.getExtensionManager();
     return extensionManager.getConfiguration(key, muleEvent);
   }
@@ -267,7 +267,7 @@ public final class ExtensionsTestUtils {
         diffLines.append(difference.toString() + '\n');
       }
 
-      throw new IllegalArgumentException("Actual XML differs from expected: \n" + diffLines.toString());
+      throw new IllegalArgumentException("Actual XML differs from expected: \n" + diffLines);
     }
   }
 
@@ -328,7 +328,7 @@ public final class ExtensionsTestUtils {
     return group;
   }
 
-  public static void mockExceptionEnricher(EnrichableModel enrichableModel, ExceptionHandlerFactory exceptionHandlerFactory) {
+  public static void mockExceptionEnricher(EnrichableModel enrichableModel, SdkExceptionHandlerFactory exceptionHandlerFactory) {
     Optional<ExceptionHandlerModelProperty> property = exceptionHandlerFactory != null
         ? of(new ExceptionHandlerModelProperty(exceptionHandlerFactory))
         : empty();
@@ -385,4 +385,14 @@ public final class ExtensionsTestUtils {
     when(model.getModelProperty(ImplementingTypeModelProperty.class))
         .thenReturn(java.util.Optional.of(new ImplementingTypeModelProperty(type)));
   }
+
+  public static ConnectionProviderDeclaration findConnectionProvider(ConfigurationDeclaration configurationDeclaration,
+                                                                     final String connectionProviderName) {
+    return configurationDeclaration.getConnectionProviders()
+        .stream()
+        .filter(connectionProvider -> connectionProvider.getName().equals(connectionProviderName))
+        .findAny()
+        .orElse(null);
+  }
+
 }

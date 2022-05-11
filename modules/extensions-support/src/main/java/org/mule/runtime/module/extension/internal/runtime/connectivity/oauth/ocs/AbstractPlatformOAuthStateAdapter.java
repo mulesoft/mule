@@ -17,8 +17,8 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
- * Base class for an adapter that bridges implementations of {@link OAuthState} with {@link ResourceOwnerOAuthContext}
- * instances obtained through a {@link PlatformManagedOAuthDancer}
+ * Base class for an adapter that bridges implementations of {@link OAuthState} with {@link ResourceOwnerOAuthContext} instances
+ * obtained through a {@link PlatformManagedOAuthDancer}
  *
  * @since 4.3.0
  */

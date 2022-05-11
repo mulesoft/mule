@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.config;
 
+import static java.util.regex.Pattern.compile;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -16,6 +18,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +37,7 @@ public class MuleManifest {
 
   public static String getProductVersion() {
     final String version = getManifestProperty("Implementation-Version");
-    return version == null ? "4.4.0" : version;
+    return version == null ? "4.5.0" : version;
   }
 
   public static String getVendorName() {
@@ -116,11 +119,14 @@ public class MuleManifest {
 
   static class UrlPrivilegedAction implements PrivilegedAction<URL> {
 
+    private static final Pattern EMBEDDED_JAR_PATTERN = compile("mule[^-]*-[^-]*-embedded");
+    private static final String MANIFEST_PATH = "META-INF/MANIFEST.MF";
+
     @Override
     public URL run() {
       URL result = null;
       try {
-        Enumeration<URL> e = MuleConfiguration.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
+        Enumeration<URL> e = MuleConfiguration.class.getClassLoader().getResources(MANIFEST_PATH);
         result = getManifestJarURL(e);
         if (result == null) {
           // if we haven't found a valid manifest yet, maybe we're running tests
@@ -133,18 +139,24 @@ public class MuleManifest {
     }
 
     URL getManifestJarURL(Enumeration<URL> e) {
-      SortedMap<String, URL> candidates = new TreeMap<String, URL>();
+      SortedMap<String, URL> candidates = new TreeMap<>();
       while (e.hasMoreElements()) {
         URL url = e.nextElement();
-        if ((url.toExternalForm().indexOf("mule-core") > -1 && url.toExternalForm().indexOf("tests.jar") < 0)
-            || url.toExternalForm().matches(".*mule.*-.*-embedded.*\\.jar.*")) {
+        if ((url.toExternalForm().contains("mule-core")
+            && !url.toExternalForm().contains("tests.jar")
+            && !url.toExternalForm().contains("mule-core-mvel")
+            && !url.toExternalForm().contains("mule-core-components"))
+            || url.toExternalForm().contains("mule-runtime-extension-model")
+            || url.toExternalForm().contains("mule-runtime-ee-extension-model")
+            || (EMBEDDED_JAR_PATTERN.matcher(url.toExternalForm()).find() && url.toExternalForm().endsWith(".jar"))) {
           candidates.put(url.toExternalForm(), url);
         }
       }
       if (!candidates.isEmpty()) {
         // if mule-core and mule-core-ee jars are present, then mule-core-ee gets precedence
         for (String candidateKey : candidates.keySet()) {
-          if (candidateKey.contains("mule-core-ee")) {
+          if (candidateKey.contains("mule-core-ee")
+              || candidateKey.contains("mule-runtime-ee-extension-model")) {
             return candidates.get(candidateKey);
           }
         }
@@ -155,11 +167,12 @@ public class MuleManifest {
 
     URL getManifestTestJarURL() throws IOException {
       String testManifestPath = "core-tests/target/test-classes";
-      Enumeration<URL> e = MuleConfiguration.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
+      Enumeration<URL> e = MuleConfiguration.class.getClassLoader().getResources(MANIFEST_PATH);
       while (e.hasMoreElements()) {
         URL url = e.nextElement();
-        if ((url.toExternalForm().indexOf(testManifestPath) > -1 && url.toExternalForm().indexOf("tests.jar") < 0)
-            || url.toExternalForm().matches(".*mule.*-.*-embedded.*\\.jar.*")) {
+        if ((url.toExternalForm().contains(testManifestPath)
+            && !url.toExternalForm().contains("tests.jar"))
+            || (EMBEDDED_JAR_PATTERN.matcher(url.toExternalForm()).find() && url.toExternalForm().endsWith(".jar"))) {
           return url;
         }
       }

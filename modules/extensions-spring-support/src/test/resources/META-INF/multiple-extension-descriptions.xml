@@ -182,6 +182,12 @@
                 <parameter name="source1">
                     <description><![CDATA[Source parameter 1]]></description>
                 </parameter>
+                <parameter name="primaryNodeOnly">
+                    <description><![CDATA[Whether this source should only be executed on the primary node when runnning in Cluster]]></description>
+                </parameter>
+                <parameter name="redeliveryPolicy">
+                    <description><![CDATA[Defines a policy for processing the redelivery of the same message]]></description>
+                </parameter>
                 <parameter name="value1">
                     <description><![CDATA[Group parameter 1]]></description>
                 </parameter>

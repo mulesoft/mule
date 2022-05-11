@@ -7,9 +7,12 @@
 
 package org.mule.test.resource.extension;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.ResourceLocator;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
@@ -37,6 +40,7 @@ public class ResourceOps {
    * @param resource the resource to load
    * @return the String representation of the resource or Bundle-Description if it was a MANIFEST
    */
+  @MediaType(TEXT_PLAIN)
   public String access(String resource) {
     Optional<InputStream> resourceStream = resourceLocator.load(resource, this);
     // We'll interpret MANIFEST files but also allow simple output to test other scenarios
@@ -56,12 +60,13 @@ public class ResourceOps {
   }
 
   /**
-   * This operation depends on the fake HTTP service to provide resource access through it and validate how the service classloader
-   * behaves. It should only be used when the fake HTTP service is available.
+   * This operation depends on the fake HTTP service to provide resource access through it and validate how the service
+   * classloader behaves. It should only be used when the fake HTTP service is available.
    *
    * @param resource the MANIFEST resource to load
    * @return the Bundle-Description of the MANIFEST or an empty String if not found
    */
+  @MediaType(TEXT_PLAIN)
   public String serviceAccess(String resource) {
     try {
       HttpRequestBuilder requestBuilder = HttpRequest.builder().uri("pepito.com");

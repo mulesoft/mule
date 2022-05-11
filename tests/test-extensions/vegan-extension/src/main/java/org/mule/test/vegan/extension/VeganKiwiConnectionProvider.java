@@ -11,9 +11,10 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.tck.testmodels.fruit.Kiwi;
+import org.mule.sdk.api.connectivity.NoConnectivityTest;
 
 @Alias("kiwi")
-public class VeganKiwiConnectionProvider implements ConnectionProvider<Kiwi> {
+public class VeganKiwiConnectionProvider implements ConnectionProvider<Kiwi>, NoConnectivityTest {
 
   @Override
   public Kiwi connect() throws ConnectionException {

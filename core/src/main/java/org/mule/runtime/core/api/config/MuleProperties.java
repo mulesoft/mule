@@ -13,7 +13,7 @@ import static java.lang.System.getProperty;
 import org.mule.api.annotation.Experimental;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.util.MuleSystemProperties;
-import org.mule.runtime.core.internal.management.stats.CursorDecoratorFactory;
+import org.mule.runtime.core.internal.connection.DefaultConnectivityTesterFactory;
 
 /**
  * <code>MuleProperties</code> is a set of constants pertaining to Mule properties.
@@ -47,6 +47,7 @@ public class MuleProperties {
   public static final String MULE_ORIGINATING_ENDPOINT_PROPERTY = PROPERTY_PREFIX + "ORIGINATING_ENDPOINT";
   public static final String MULE_ERROR_CODE_PROPERTY = PROPERTY_PREFIX + "ERROR_CODE";
   public static final String MULE_REPLY_TO_PROPERTY = PROPERTY_PREFIX + "REPLYTO";
+
   /**
    * Prevents processing of the ReplyTo property by the Service. This is useful if you're component routed the message somewhere
    * else which processed the ReplyTo.
@@ -135,6 +136,7 @@ public class MuleProperties {
   public static final String OBJECT_LOCAL_STORE_IN_MEMORY = "_localInMemoryObjectStore";
   public static final String OBJECT_LOCAL_STORE_PERSISTENT = "_localPersistentObjectStore";
   public static final String OBJECT_STORE_MANAGER = "_muleObjectStoreManager";
+  public static final String SDK_OBJECT_STORE_MANAGER = "_sdkObjectStoreManager";
   public static final String LOCAL_OBJECT_STORE_MANAGER = "_muleLocalObjectStoreManager";
   public static final String OBJECT_MULE_APPLICATION_PROPERTIES = "_muleProperties";
   public static final String OBJECT_MULE_OUTBOUND_ENDPOINT_EXECUTOR_FACTORY = "_muleOutboundEndpointExecutorFactory";
@@ -144,18 +146,33 @@ public class MuleProperties {
   public static final String OBJECT_MULE_CONFIGURATION = "_muleConfiguration";
   public static final String OBJECT_MULE_NAMESPACE_MANAGER = "_muleNamespaceManager";
   public static final String OBJECT_CONVERTER_RESOLVER = "_converterResolver";
+  public static final String OBJECT_TRANSFORMERS_REGISTRY = "_muleTransfromersRegistry";
   public static final String OBJECT_EXPRESSION_LANGUAGE = "_muleExpressionLanguage";
+  public static final String OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER = "_muleDwExpressionLanguageAdapter";
   public static final String OBJECT_EXPRESSION_MANAGER = "_muleExpressionManager";
   public static final String OBJECT_LOCK_FACTORY = "_muleLockFactory";
   public static final String LOCAL_OBJECT_LOCK_FACTORY = "_muleLocalLockFactory";
   public static final String OBJECT_LOCK_PROVIDER = "_muleLockProvider";
   public static final String OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER = "_muleMessageProcessingManager";
   public static final String OBJECT_PROCESSING_TIME_WATCHER = "_muleProcessingTimeWatcher";
+  public static final String MULE_MEMORY_MANAGEMENT_SERVICE = "_muleMemoryManagementService";
+  public static final String MULE_CONTAINER_FEATURE_MANAGEMENT_SERVICE = "_muleContainerFeatureManagementService";
+
+  /**
+   * Registry key for {@link DefaultConnectivityTesterFactory}
+   *
+   * @since 4.4
+   */
+  public static final String OBJECT_CONNECTIVITY_TESTER_FACTORY = "_muleConnectivityTesterFactory";
+
   /**
    * Registry key for {@link CursorDecoratorFactory}
    *
    * @since 4.4, 4.3.1
+   * @deprecated since 4.4.1, 4.5.0. Payload statistics is no longer supported.
    */
+  @Experimental
+  @Deprecated
   public static final String OBJECT_PAYLOAD_STATISTICS_DECORATOR_FACTORY = "_mulePayloadStatisticsCursorDecoratorFactory";
   public static final String OBJECT_POLLING_CONTROLLER = "_mulePollingController";
   public static final String OBJECT_CLUSTER_CONFIGURATION = "_muleClusterConfiguration";
@@ -163,19 +180,21 @@ public class MuleProperties {
 
   /**
    * @deprecated since 4.2.1. This key doesn't exist anymore. Use {@link #OBJECT_EXTENSION_AUTH_CODE_HANDLER} or
-   * {@link #OBJECT_EXTENSION_CLIENT_CREDENTIALS_HANDLER} instead
+   *             {@link #OBJECT_EXTENSION_CLIENT_CREDENTIALS_HANDLER} instead
    */
   @Deprecated
   public static final String OBJECT_EXTENSION_OAUTH_MANAGER = "extensions.oauth.manager";
 
   /**
    * Registry key for the {@code AuthorizationCodeOAuthHandler}
+   *
    * @since 4.2.1
    */
   public static final String OBJECT_EXTENSION_AUTH_CODE_HANDLER = "extensions.authCode.handler";
 
   /**
    * Registry key for the {@code ClientCredentialsOAuthHandler}
+   *
    * @since 4.2.1
    */
   public static final String OBJECT_EXTENSION_CLIENT_CREDENTIALS_HANDLER = "extensions.clientCredentials.handler";
@@ -183,8 +202,8 @@ public class MuleProperties {
   /**
    * Registry key for the {@code PlatformManagedOAuthHandler}
    * <p>
-   * Platform Managed OAuth is an experimental feature. It will only be enabled on selected environments and scenarios.
-   * Backwards compatibility is not guaranteed.
+   * Platform Managed OAuth is an experimental feature. It will only be enabled on selected environments and scenarios. Backwards
+   * compatibility is not guaranteed.
    *
    * @since 4.3.0
    */
@@ -203,6 +222,7 @@ public class MuleProperties {
   public static final String OBJECT_STREAMING_GHOST_BUSTER = "_muleStreamingGhostBuster";
   public static final String OBJECT_REGISTRY = "_muleRegistry";
   public static final String OBJECT_TRANSFORMATION_SERVICE = "_muleTransformationService";
+  public static final String OBJECT_TRANSFORMER_RESOLVER = "_muleTransfromerResolver";
   public static final String OBJECT_COMPONENT_INITIAL_STATE_MANAGER = ComponentInitialStateManager.SERVICE_ID;
   public static final String DEFAULT_TLS_CONTEXT_FACTORY_REGISTRY_KEY = "_muleDefaultTlsContextFactory";
   public static final String OBJECT_SCHEDULER_POOLS_CONFIG = "_muleSchedulerPoolsConfig";
@@ -214,7 +234,8 @@ public class MuleProperties {
   public static final String OBJECT_STATISTICS = "_muleStatistics";
   public static final String OBJECT_RESOURCE_LOCATOR = "_muleResourceLocator";
   public static final String COMPATIBILITY_PLUGIN_INSTALLED = "_compatibilityPluginInstalled";
-
+  public static final String MULE_PROFILING_SERVICE_KEY = "_muleProfilingService";
+  public static final String SERVER_NOTIFICATION_MANAGER = "_serverNotificationManager";
 
   // Not currently used as these need to be instance variables of the MuleContext.
   public static final String OBJECT_NOTIFICATION_MANAGER = "_muleNotificationManager";
@@ -231,6 +252,7 @@ public class MuleProperties {
 
   /**
    * The prefix for any Mule-specific properties set in the system properties
+   *
    * @deprecated since 4.2. Use {@link MuleSystemProperties#SYSTEM_PROPERTY_PREFIX} instead
    */
   @Deprecated
@@ -268,6 +290,7 @@ public class MuleProperties {
 
   /**
    * System property key for the default size of a streaming buffer bucket
+   *
    * @since 4.1.4
    * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_STREAMING_BUCKET_SIZE} instead
    */

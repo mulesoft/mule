@@ -7,12 +7,15 @@
 
 package org.mule.runtime.config.internal.dsl.model;
 
-import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
+import static org.mule.runtime.api.util.MuleSystemProperties.REVERT_SIGLETON_ERROR_HANDLER_PROPERTY;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.PARALLEL_FOREACH_ELEMENT;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.SCATTER_GATHER_ELEMENT;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.createNewInstance;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getMuleMessageTransformerBaseBuilder;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getTransformerBaseBuilder;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
+import static org.mule.runtime.core.api.context.notification.AnySelector.ANY_SELECTOR;
 import static org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair.ANY_SELECTOR_STRING;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
@@ -49,19 +52,20 @@ import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEME
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
 
+import static org.apache.commons.lang3.ArrayUtils.addAll;
+
+import static java.lang.Boolean.getBoolean;
+
 import org.mule.runtime.api.config.PoolingProfile;
-import org.mule.runtime.api.notification.AbstractServerNotification;
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.DataUnit;
 import org.mule.runtime.config.api.dsl.ConfigurableInstanceFactory;
 import org.mule.runtime.config.api.dsl.ConfigurableObjectFactory;
-import org.mule.runtime.config.internal.CustomEncryptionStrategyDelegate;
-import org.mule.runtime.config.internal.CustomSecurityProviderDelegate;
-import org.mule.runtime.config.internal.MuleConfigurationConfigurator;
-import org.mule.runtime.config.internal.NotificationConfig;
-import org.mule.runtime.config.internal.ServerNotificationManagerConfigurator;
-import org.mule.runtime.config.internal.dsl.processor.CustomSecurityFilterObjectFactory;
+import org.mule.runtime.config.internal.bean.CustomEncryptionStrategyDelegate;
+import org.mule.runtime.config.internal.bean.CustomSecurityProviderDelegate;
+import org.mule.runtime.config.internal.bean.NotificationConfig;
+import org.mule.runtime.config.internal.bean.ServerNotificationManagerConfigurator;
 import org.mule.runtime.config.internal.dsl.processor.EnvironmentPropertyObjectFactory;
 import org.mule.runtime.config.internal.dsl.processor.ReconnectionConfigObjectFactory;
 import org.mule.runtime.config.internal.dsl.processor.RetryPolicyTemplateObjectFactory;
@@ -73,6 +77,7 @@ import org.mule.runtime.config.internal.factories.EnrichedErrorMappingsFactoryBe
 import org.mule.runtime.config.internal.factories.ErrorHandlerFactoryBean;
 import org.mule.runtime.config.internal.factories.ExpirationPolicyObjectFactory;
 import org.mule.runtime.config.internal.factories.FlowRefFactoryBean;
+import org.mule.runtime.config.internal.factories.MuleConfigurationConfigurator;
 import org.mule.runtime.config.internal.factories.OnErrorFactoryBean;
 import org.mule.runtime.config.internal.factories.ProcessorExpressionRouteFactoryBean;
 import org.mule.runtime.config.internal.factories.ProcessorRouteFactoryBean;
@@ -91,6 +96,7 @@ import org.mule.runtime.core.api.config.DynamicConfigExpiration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
+import org.mule.runtime.core.api.context.notification.ResourceIdentifierSelector;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.RaiseErrorProcessor;
@@ -140,7 +146,6 @@ import org.mule.runtime.core.internal.routing.UntilSuccessful;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
 import org.mule.runtime.core.internal.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.internal.security.SecretKeyEncryptionStrategy;
-import org.mule.runtime.core.internal.security.UsernamePasswordAuthenticationFilter;
 import org.mule.runtime.core.internal.security.filter.MuleEncryptionEndpointSecurityFilter;
 import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
@@ -186,8 +191,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String FLOW = "flow";
   private static final String FLOW_REF = "flow-ref";
   private static final String EXCEPTION_LISTENER_ATTRIBUTE = "exceptionListener";
-  private static final String SCATTER_GATHER = "scatter-gather";
-  private static final String PARALLEL_FOREACH = "parallel-foreach";
   private static final String FORK_JOIN_STRATEGY = "forkJoinStrategyFactory";
   private static final String COLLECT_LIST = "collect-list";
   private static final String ASYNC = "async";
@@ -239,15 +242,18 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(onErrorBaseBuilder.withIdentifier(ON_ERROR_PROPAGATE)
         .withTypeDefinition(fromType(OnErrorPropagateHandler.class))
         .asPrototype().build());
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier(ERROR_HANDLER)
+
+    Builder errorHandlerBuilder = baseDefinition.withIdentifier(ERROR_HANDLER)
         .withTypeDefinition(fromType(ErrorHandler.class))
         .withObjectFactoryType(ErrorHandlerFactoryBean.class)
         .withSetterParameterDefinition("delegate", fromSimpleReferenceParameter("ref").build())
         .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build())
         .withSetterParameterDefinition("exceptionListeners",
-                                       fromChildCollectionConfiguration(FlowExceptionHandler.class).build())
-        .asPrototype()
-        .build());
+                                       fromChildCollectionConfiguration(FlowExceptionHandler.class).build());
+    if (getBoolean(REVERT_SIGLETON_ERROR_HANDLER_PROPERTY)) {
+      errorHandlerBuilder.asPrototype();
+    }
+    componentBuildingDefinitions.add(errorHandlerBuilder.build());
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(SET_PAYLOAD).withTypeDefinition(fromType(SetPayloadMessageProcessor.class))
             .withSetterParameterDefinition("value", fromSimpleParameter("value").build())
@@ -326,7 +332,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(COLLECT_LIST)
         .withTypeDefinition(fromType(CollectListForkJoinStrategyFactory.class))
         .build());
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier(SCATTER_GATHER)
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier(SCATTER_GATHER_ELEMENT)
         .withTypeDefinition(fromType(ScatterGatherRouter.class))
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
         .withSetterParameterDefinition("maxConcurrency", fromSimpleParameter("maxConcurrency").build())
@@ -337,7 +343,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition(ROUTES, fromChildCollectionConfiguration(MessageProcessorChain.class).build())
         .withSetterParameterDefinition(FORK_JOIN_STRATEGY, fromChildConfiguration(ForkJoinStrategyFactory.class).build())
         .asScope().build());
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier(PARALLEL_FOREACH)
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier(PARALLEL_FOREACH_ELEMENT)
         .withTypeDefinition(fromType(ParallelForEach.class))
         .withSetterParameterDefinition("collectionExpression", fromSimpleParameter("collection").build())
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
@@ -438,7 +444,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("timeZone", fromSimpleParameter("timeZone").build()).build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("configuration")
-        .withTypeDefinition(fromType(MuleConfiguration.class)).withObjectFactoryType(MuleConfigurationConfigurator.class)
+        .withTypeDefinition(fromType(MuleConfiguration.class))
+        .withObjectFactoryType(MuleConfigurationConfigurator.class)
         .withSetterParameterDefinition("defaultErrorHandlerName",
                                        fromSimpleParameter("defaultErrorHandler-ref").build())
         .withSetterParameterDefinition("defaultResponseTimeout", fromSimpleParameter("defaultResponseTimeout").build())
@@ -454,6 +461,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("extensions", fromChildCollectionConfiguration(Object.class).build())
         .withSetterParameterDefinition(INHERIT_ITERABLE_REPEATABILITY,
                                        fromSimpleParameter(INHERIT_ITERABLE_REPEATABILITY).build())
+        .withSetterParameterDefinition("correlationIdGeneratorExpression",
+                                       fromSimpleParameter("correlationIdGeneratorExpression").build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("dynamic-config-expiration")
@@ -516,20 +525,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withConstructorParameterDefinition(fromSimpleParameter("subscription", getNotificationSubscriptionConverter())
             .withDefaultValue(ANY_SELECTOR_STRING)
             .build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("username-password-filter")
-        .withTypeDefinition(fromType(UsernamePasswordAuthenticationFilter.class))
-        .withSetterParameterDefinition("username", fromSimpleParameter("username").build())
-        .withSetterParameterDefinition("password", fromSimpleParameter("password").build())
-        .withIgnoredConfigurationParameter(NAME)
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("custom-security-filter")
-        .withTypeDefinition(fromType(Processor.class))
-        .withObjectFactoryType(CustomSecurityFilterObjectFactory.class)
-        .withConstructorParameterDefinition(fromSimpleReferenceParameter("ref").build())
-        .withIgnoredConfigurationParameter(NAME)
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("encryption-security-filter")
@@ -600,32 +595,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                                                        .build())
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("expression-language")
-        .withTypeDefinition(fromType(MVELExpressionLanguage.class))
-        .withObjectFactoryType(MVELExpressionLanguageObjectFactory.class)
-        .withSetterParameterDefinition("autoResolveVariables", fromSimpleParameter("autoResolveVariables").build())
-        .withSetterParameterDefinition("globalFunctions", fromChildConfiguration(MVELGlobalFunctionsConfig.class).build())
-        .withSetterParameterDefinition("imports", fromChildCollectionConfiguration(ImportEntry.class).build())
-        .withSetterParameterDefinition("aliases", fromChildCollectionConfiguration(AliasEntry.class).build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("import")
-        .withTypeDefinition(fromType(ImportEntry.class))
-        .withSetterParameterDefinition("key", fromSimpleParameter("name").build())
-        .withSetterParameterDefinition("value", fromSimpleParameter("class", stringToClassConverter()).build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("alias")
-        .withTypeDefinition(fromType(AliasEntry.class))
-        .withSetterParameterDefinition("key", fromSimpleParameter("name").build())
-        .withSetterParameterDefinition("value", fromSimpleParameter("expression").build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("global-functions")
-        .withTypeDefinition(fromType(MVELGlobalFunctionsConfig.class))
-        .withSetterParameterDefinition("file", fromSimpleParameter("file").build())
-        .withSetterParameterDefinition("inlineScript", fromTextContent().build())
-        .build());
+    componentBuildingDefinitions.addAll(getMvelBuildingDefinitions());
 
     componentBuildingDefinitions.addAll(getTransformersBuildingDefinitions());
 
@@ -648,10 +618,9 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private TypeConverter<String, Predicate<? extends Notification>> getNotificationSubscriptionConverter() {
     return subscription -> {
       if (ANY_SELECTOR_STRING.equals(subscription)) {
-        return (Predicate<? extends Notification>) (n -> true);
+        return ANY_SELECTOR;
       }
-      return (notification -> subscription != null ? subscription
-          .equals(((AbstractServerNotification) notification).getResourceIdentifier()) : true);
+      return new ResourceIdentifierSelector(subscription);
     };
   }
 
@@ -675,6 +644,40 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
     return definitions;
   }
+
+  private List<ComponentBuildingDefinition> getMvelBuildingDefinitions() {
+    List<ComponentBuildingDefinition> mvelComponentBuildingDefinitions = new ArrayList<>();
+
+    mvelComponentBuildingDefinitions.add(baseDefinition.withIdentifier("expression-language")
+        .withTypeDefinition(fromType(MVELExpressionLanguage.class))
+        .withObjectFactoryType(MVELExpressionLanguageObjectFactory.class)
+        .withSetterParameterDefinition("autoResolveVariables", fromSimpleParameter("autoResolveVariables").build())
+        .withSetterParameterDefinition("globalFunctions", fromChildConfiguration(MVELGlobalFunctionsConfig.class).build())
+        .withSetterParameterDefinition("imports", fromChildCollectionConfiguration(ImportEntry.class).build())
+        .withSetterParameterDefinition("aliases", fromChildCollectionConfiguration(AliasEntry.class).build())
+        .build());
+
+    mvelComponentBuildingDefinitions.add(baseDefinition.withIdentifier("import")
+        .withTypeDefinition(fromType(ImportEntry.class))
+        .withSetterParameterDefinition("key", fromSimpleParameter("name").build())
+        .withSetterParameterDefinition("value", fromSimpleParameter("class", stringToClassConverter()).build())
+        .build());
+
+    mvelComponentBuildingDefinitions.add(baseDefinition.withIdentifier("alias")
+        .withTypeDefinition(fromType(AliasEntry.class))
+        .withSetterParameterDefinition("key", fromSimpleParameter("name").build())
+        .withSetterParameterDefinition("value", fromSimpleParameter("expression").build())
+        .build());
+
+    mvelComponentBuildingDefinitions.add(baseDefinition.withIdentifier("global-functions")
+        .withTypeDefinition(fromType(MVELGlobalFunctionsConfig.class))
+        .withSetterParameterDefinition("file", fromSimpleParameter("file").build())
+        .withSetterParameterDefinition("inlineScript", fromTextContent().build())
+        .build());
+
+    return mvelComponentBuildingDefinitions;
+  }
+
 
   @SuppressWarnings("unchecked")
   private List<ComponentBuildingDefinition> getTransformersBuildingDefinitions() {

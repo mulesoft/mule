@@ -10,10 +10,11 @@ package org.mule.runtime.module.deployment.impl.internal.maven;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFolder;
@@ -22,6 +23,8 @@ import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomPropertiesFromJar;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 
+import static java.util.Collections.singletonMap;
+
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
@@ -29,6 +32,7 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
 import org.mule.runtime.module.deployment.impl.internal.plugin.PluginExtendedBundleDescriptorAttributes;
+import org.mule.tools.api.classloader.AppClassLoaderModelJsonSerializer;
 
 import java.io.File;
 import java.util.Map;
@@ -54,19 +58,24 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
    * {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER} folder) to retrieve the plugin artifact locator.
    *
    * @param artifactFile {@link File} with the content of the artifact to work with. Non null
-   * @param attributes collection of attributes describing the loader. Non null.
+   * @param attributes   collection of attributes describing the loader. Non null.
    * @param artifactType the type of the artifact of the descriptor to be loaded.
    * @return a locator of the coordinates of the current plugin
    * @throws ArtifactDescriptorCreateException if the plugin is missing the {@link ArtifactPluginDescriptor#MULE_PLUGIN_POM} or
-   *         there's an issue while reading that file
+   *                                           there's an issue while reading that file
    */
   @Override
   public BundleDescriptor load(File artifactFile, Map<String, Object> attributes, ArtifactType artifactType)
       throws InvalidDescriptorLoaderException {
-    if (isHeavyPackage(artifactFile)) {
-      File classLoaderModelDescriptor = getClassLoaderModelDescriptor(artifactFile);
-
-      org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel = deserialize(classLoaderModelDescriptor);
+    File classLoaderModelDescriptor = getClassLoaderModelDescriptor(artifactFile);
+    // if is heavyweight
+    if (classLoaderModelDescriptor.exists()) {
+      org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel;
+      if (APP.equals(artifactType) || DOMAIN.equals(artifactType) || POLICY.equals(artifactType)) {
+        packagerClassLoaderModel = AppClassLoaderModelJsonSerializer.deserialize(classLoaderModelDescriptor);
+      } else {
+        packagerClassLoaderModel = deserialize(classLoaderModelDescriptor);
+      }
 
       return new BundleDescriptor.Builder()
           .setArtifactId(packagerClassLoaderModel.getArtifactCoordinates().getArtifactId())
@@ -75,6 +84,8 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
           .setBaseVersion(packagerClassLoaderModel.getArtifactCoordinates().getVersion())
           .setType(packagerClassLoaderModel.getArtifactCoordinates().getType())
           .setClassifier(packagerClassLoaderModel.getArtifactCoordinates().getClassifier())
+          .setMetadata(singletonMap(org.mule.tools.api.classloader.model.ClassLoaderModel.class.getName(),
+                                    packagerClassLoaderModel))
           .build();
     } else {
       if (attributes instanceof PluginExtendedBundleDescriptorAttributes) {
@@ -120,10 +131,6 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
           .setClassifier(artifactType.equals(PLUGIN) ? MULE_PLUGIN_CLASSIFIER : model.getPackaging())
           .build();
     }
-  }
-
-  private boolean isHeavyPackage(File artifactFile) {
-    return getClassLoaderModelDescriptor(artifactFile).exists();
   }
 
   protected File getClassLoaderModelDescriptor(File artifactFile) {

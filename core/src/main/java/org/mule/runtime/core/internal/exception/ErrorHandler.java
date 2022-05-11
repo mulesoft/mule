@@ -6,23 +6,29 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableList;
-import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.component.location.Location.ERROR_HANDLER;
+import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.REUSE_GLOBAL_ERROR_HANDLER;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
+
 import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
@@ -30,7 +36,8 @@ import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
-import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
+import org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener;
+import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
@@ -63,9 +70,6 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   protected String name;
 
   @Inject
-  private NotificationDispatcher notificationDispatcher;
-
-  @Inject
   private ErrorTypeRepository errorTypeRepository;
 
   @Inject
@@ -73,6 +77,9 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
   @Inject
   private Collection<ExceptionContextProvider> exceptionContextProviders;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   private final MessagingExceptionResolver messagingExceptionResolver = new MessagingExceptionResolver(this);
 
@@ -179,18 +186,36 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
   private void addDefaultErrorHandlerIfRequired() throws InitialisationException {
     MessagingExceptionHandlerAcceptor lastAcceptor = exceptionListeners.get(exceptionListeners.size() - 1);
-    if (!lastAcceptor.acceptsAll() && !matchesAny(lastAcceptor)) {
-      String defaultErrorHandlerName = getMuleContext().getConfiguration().getDefaultErrorHandlerName();
-      if (defaultErrorHandlerName != null && defaultErrorHandlerName.equals(name)) {
-        logger
-            .warn("Default 'error-handler' should include a final \"catch-all\" 'on-error-propagate'. Attempting implicit injection.");
-      }
-      OnErrorPropagateHandler acceptsAllOnErrorPropagate = new OnErrorPropagateHandler();
-      acceptsAllOnErrorPropagate.setRootContainerName(getRootContainerLocation().toString());
-      acceptsAllOnErrorPropagate.setNotificationFirer(notificationDispatcher);
-      initialiseIfNeeded(acceptsAllOnErrorPropagate, muleContext);
-      this.exceptionListeners.add(acceptsAllOnErrorPropagate);
+    if (lastAcceptor.acceptsAll() || matchesAny(lastAcceptor)) {
+      return;
     }
+
+    boolean inDefaultErrorHandler = false;
+    String defaultErrorHandlerName = getMuleContext().getConfiguration().getDefaultErrorHandlerName();
+    if (defaultErrorHandlerName != null && defaultErrorHandlerName.equals(name)) {
+      if (featureFlaggingService.isEnabled(REUSE_GLOBAL_ERROR_HANDLER)) {
+        inDefaultErrorHandler = true;
+      }
+      logger
+          .warn("Default 'error-handler' should include a final \"catch-all\" 'on-error-propagate'. Attempting implicit injection.");
+    }
+
+    OnErrorPropagateHandler acceptsAllOnErrorPropagate = new OnErrorPropagateHandler();
+    acceptsAllOnErrorPropagate.setRootContainerName(getRootContainerLocation().toString());
+    acceptsAllOnErrorPropagate.setExceptionListener(new DefaultExceptionListener());
+    initialiseIfNeeded(acceptsAllOnErrorPropagate, muleContext);
+
+    if (this.getLocation() != null && shouldAddLocationToDefaultErrorHandler()) {
+      String location = this.getLocation().getLocation();
+      String containerLocation =
+          inDefaultErrorHandler ? location : location.substring(0, location.length() - ERROR_HANDLER.length() - 1);
+      acceptsAllOnErrorPropagate.setFlowLocation(builderFromStringRepresentation(containerLocation).build());
+    }
+    this.exceptionListeners.add(acceptsAllOnErrorPropagate);
+  }
+
+  public boolean shouldAddLocationToDefaultErrorHandler() {
+    return featureFlaggingService.isEnabled(DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING);
   }
 
   /**
@@ -202,7 +227,8 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
    * @return whether this is an {@link OnErrorPropagateHandler} with a matcher for "ANY"
    */
   private boolean matchesAny(MessagingExceptionHandlerAcceptor acceptor) {
-    return acceptor instanceof OnErrorPropagateHandler && ((OnErrorPropagateHandler) acceptor).acceptsErrorType(anyErrorType);
+    return acceptor instanceof OnErrorPropagateHandler && ((OnErrorPropagateHandler) acceptor).acceptsErrorType(anyErrorType)
+        && !((OnErrorPropagateHandler) acceptor).hasWhenExpression();
   }
 
   private void validateConfiguredExceptionStrategies() {
@@ -245,8 +271,11 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
   public void setStatistics(FlowConstructStatistics flowStatistics) {
     for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
-      if (exceptionListener instanceof AbstractExceptionListener) {
-        ((AbstractExceptionListener) exceptionListener).setStatistics(flowStatistics);
+      if (exceptionListener instanceof AbstractDeclaredExceptionListener) {
+        ((AbstractDeclaredExceptionListener) exceptionListener).getExceptionListener().setStatistics(flowStatistics);
+      }
+      if (exceptionListener instanceof OnCriticalErrorHandler) {
+        ((OnCriticalErrorHandler) exceptionListener).getExceptionListener().setStatistics(flowStatistics);
       }
     }
   }

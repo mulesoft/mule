@@ -14,7 +14,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -39,15 +39,9 @@ import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
-import org.mule.runtime.core.internal.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +50,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -67,8 +67,10 @@ import io.qameta.allure.Story;
 public class CompositeProcessorChainRouterTestCase extends AbstractMuleContextTestCase {
 
   private CompositeProcessorChainRouter chainRouter;
-  private AsyncDelegateMessageProcessor async;
   private Scheduler scheduler;
+
+  @Rule
+  public ExpectedException expected = none();
 
   @Before
   public void setup() throws MuleException {
@@ -88,10 +90,6 @@ public class CompositeProcessorChainRouterTestCase extends AbstractMuleContextTe
   public void tearDown() throws MuleException {
     chainRouter.stop();
     chainRouter.dispose();
-    if (async != null) {
-      async.stop();
-      async.dispose();
-    }
     scheduler.stop();
   }
 
@@ -140,56 +138,14 @@ public class CompositeProcessorChainRouterTestCase extends AbstractMuleContextTe
 
     latch.await();
 
+    expected.expect(TimeoutException.class);
     try {
       future.get(BLOCK_TIMEOUT, MILLISECONDS);
-      fail("Timeout expected");
-    } catch (TimeoutException te) {
+    } finally {
+      childEventContext.get().success();
+
+      assertThat(future.get(BLOCK_TIMEOUT, MILLISECONDS).get().getMessage(), equalTo(testEvent().getMessage()));
     }
-
-    childEventContext.get().success();
-
-    assertThat(future.get(BLOCK_TIMEOUT, MILLISECONDS).get().getMessage(), equalTo(testEvent().getMessage()));
-  }
-
-  @Test
-  @Description("Ensure that when an async scope is used as part of the execution of one of the composite chains then the chain does not complete and the next chains is not executed until the child context completes.")
-  public void asyncDelegateChain() throws Exception {
-    Latch latch = new Latch();
-    Latch asyncLatch = new Latch();
-
-    DefaultMessageProcessorChainBuilder delegateBuilder = new DefaultMessageProcessorChainBuilder();
-    delegateBuilder.chain(event -> {
-      try {
-        asyncLatch.countDown();
-        latch.await();
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
-      }
-      return event;
-    });
-
-    async = new AsyncDelegateMessageProcessor(delegateBuilder);
-    muleContext.getInjector().inject(async);
-    async.setAnnotations(getAppleFlowComponentLocationAnnotations());
-
-    chainRouter = createCompositeProcessorChainRouter(newChain(empty(), async), newChain(empty(), event -> event));
-    chainRouter.start();
-
-    // CompletableFuture is not returned immediately because simply invoking CompositeProcessorChainRouter there is no async
-    // hand-off and so this blocks until child context completes.
-    Future<CompletableFuture<Event>> future = scheduler.submit(() -> chainRouter.execute(testEvent()));
-
-    asyncLatch.await();
-
-    try {
-      future.get(BLOCK_TIMEOUT, MILLISECONDS);
-      fail("Timeout expected");
-    } catch (TimeoutException te) {
-    }
-
-    latch.countDown();
-
-    assertThat(future.get(BLOCK_TIMEOUT, MILLISECONDS).get().getMessage(), equalTo(testEvent().getMessage()));
   }
 
   @Test
@@ -228,7 +184,7 @@ public class CompositeProcessorChainRouterTestCase extends AbstractMuleContextTe
 
   private static class ProcessingStrategyChainRouter extends CompositeProcessorChainRouter {
 
-    private ProcessingStrategy processingStrategy;
+    private final ProcessingStrategy processingStrategy;
 
     ProcessingStrategyChainRouter(ProcessingStrategy processingStrategy) {
       this.processingStrategy = processingStrategy;

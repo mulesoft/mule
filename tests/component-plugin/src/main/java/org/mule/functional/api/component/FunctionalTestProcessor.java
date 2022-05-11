@@ -17,7 +17,6 @@ import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.functional.api.exception.FunctionalTestException;
 import org.mule.functional.api.notification.FunctionalTestNotification;
 import org.mule.functional.api.notification.FunctionalTestNotificationListener;
@@ -42,14 +41,15 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 /**
  * <code>FunctionalTestProcessor</code> is a service that can be used by functional tests. This service accepts an EventCallback
@@ -169,6 +169,15 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
     }
   }
 
+  @Override
+  public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+    if (processor == null) {
+      return Processor.super.apply(publisher);
+    } else {
+      return processor.apply(publisher);
+    }
+  }
+
   /**
    * Always throws a {@link FunctionalTestException}. This methodis only called if {@link #isThrowException()} is true.
    *
@@ -197,7 +206,7 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
    * {@link #getAppendString()} can contain expressions.
    *
    * @param contents the string vlaue of the current message payload
-   * @param event the current event
+   * @param event    the current event
    * @return a concatenated string of the current payload and the appendString
    */
   protected String append(String contents, CoreEvent event) {
@@ -349,7 +358,7 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
    * property to true.
    *
    * @param throwException true if an exception should always be thrown from this instance. If the {@link #getReturnData()}
-   *        property is set and is of type java.lang.Exception, that exception will be thrown.
+   *                       property is set and is of type java.lang.Exception, that exception will be thrown.
    */
   public void setThrowException(boolean throwException) {
     this.throwException = throwException;

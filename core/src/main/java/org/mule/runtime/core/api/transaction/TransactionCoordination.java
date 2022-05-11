@@ -7,11 +7,13 @@
 package org.mule.runtime.core.api.transaction;
 
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.processor.DelegateTransaction;
+import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 
-import org.apache.commons.collections.ArrayStack;
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +29,13 @@ public final class TransactionCoordination {
    * {@link #bindTransaction(Transaction)}, it may be more consistent to have it as an instance variable.
    */
   private final ThreadLocal<Transaction> transactions = new ThreadLocal<>();
-  private final ThreadLocal<Transaction> suspendedTransaction = new ThreadLocal<>();
-  private final ThreadLocal<ArrayStack> isolatedTransactions = new ThreadLocal<>();
+  private final ThreadLocal<Deque<Transaction>> suspendedTransaction = new ThreadLocal<>();
+  private final ThreadLocal<Deque<Transaction>> isolatedTransactions = new ThreadLocal<>();
+
+  public boolean runningNestedTransaction() {
+    Deque<Transaction> suspended = suspendedTransaction.get();
+    return suspended != null && suspended.size() >= 1;
+  }
 
   /** Lock variable that is used to access {@link #txCounter}. */
   private final Object txCounterLock = new Object();
@@ -111,8 +118,7 @@ public final class TransactionCoordination {
 
   public void resumeXaTransactionIfAvailable() {
     try {
-      Transaction tx = suspendedTransaction.get();
-      if (tx != null) {
+      if (suspendedTransaction.get() != null && suspendedTransaction.get().peek() != null) {
         resumeSuspendedTransaction();
       }
     } catch (TransactionException e) {
@@ -171,20 +177,25 @@ public final class TransactionCoordination {
     }
 
     TransactionCoordination.getInstance().unbindTransaction(tx);
-    suspendedTransaction.set(tx);
+    if (suspendedTransaction.get() == null) {
+      suspendedTransaction.set(new ArrayDeque<>());
+    }
+    suspendedTransaction.get().push(tx);
   }
 
   public void resumeSuspendedTransaction() throws TransactionException {
-    Transaction tx = suspendedTransaction.get();
+    Transaction tx = (suspendedTransaction.get() == null) ? null : suspendedTransaction.get().pop();
     if (logger.isDebugEnabled()) {
       logger.debug("Re-binding and Resuming " + tx);
     }
     TransactionCoordination.getInstance().bindTransaction(tx);
-    suspendedTransaction.remove();
     tx.resume();
   }
 
   public void clear() {
+    if (suspendedTransaction.get() != null) {
+      suspendedTransaction.get().clear();
+    }
     suspendedTransaction.remove();
     transactions.remove();
     if (isolatedTransactions.get() != null) {
@@ -197,7 +208,7 @@ public final class TransactionCoordination {
     Transaction currentTransaction = transactions.get();
     if (currentTransaction != null) {
       if (isolatedTransactions.get() == null) {
-        isolatedTransactions.set(new ArrayStack());
+        isolatedTransactions.set(new ArrayDeque<>());
       }
       isolatedTransactions.get().push(transactions.get());
       transactions.set(null);
@@ -206,7 +217,7 @@ public final class TransactionCoordination {
 
   public void restoreIsolatedTransaction() {
     if (isolatedTransactions.get() != null && !isolatedTransactions.get().isEmpty()) {
-      transactions.set((Transaction) isolatedTransactions.get().pop());
+      transactions.set(isolatedTransactions.get().pop());
     }
   }
 

@@ -15,35 +15,43 @@ import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZ
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.withArtifactMuleContext;
-import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveArtifactStatusDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
+import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener;
-import org.mule.runtime.core.internal.context.DefaultMuleContext;
+import org.mule.runtime.core.internal.context.FlowStoppedPersistenceListener;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 
 import java.io.IOException;
-import java.util.Optional;
-
-import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
-import org.mule.runtime.core.internal.context.FlowStoppedPersistenceListener;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DefaultArtifactDeployer<T extends DeployableArtifact> implements ArtifactDeployer<T> {
 
-  protected transient final Logger logger = LoggerFactory.getLogger(getClass());
-  private HashMap<String, List<FlowStoppedPersistenceListener>> appsFlowStoppedListeners = new HashMap<>();
+  private static final Logger logger = getLogger(DefaultArtifactDeployer.class);
+  private final Map<String, List<FlowStoppedPersistenceListener>> appsFlowStoppedListeners = new ConcurrentHashMap<>();
+
+  private final Supplier<Scheduler> artifactStartExecutor;
+
+  public DefaultArtifactDeployer(Supplier<Scheduler> artifactStartExecutor) {
+    this.artifactStartExecutor = artifactStartExecutor;
+  }
 
   @Override
   public void deploy(T artifact, boolean startArtifact) {
@@ -51,14 +59,31 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
       artifact.install();
       doInit(artifact);
       addFlowStoppedListeners(artifact);
-      if (startArtifact && shouldStartArtifact(artifact)) {
-        artifact.start();
+      if (startArtifact && shouldStartArtifactAccordingToPersistedStatus(artifact)) {
+        // The purpose of dispatching this to a separate thread is to have a clean call stack when starting the app.
+        // This is needed in order to prevent an StackOverflowError when starting apps with really long flows.
+        final Future<?> startTask = artifactStartExecutor.get().submit(() -> {
+          try {
+            artifact.start();
+          } catch (Throwable t) {
+            artifact.dispose();
+            logger.error("Failed to deploy artifact [{}]", artifact.getArtifactName());
+            throw t;
+          }
+        });
+
+        // Wait till start finishes
+        try {
+          startTask.get();
+        } catch (ExecutionException e) {
+          throw e.getCause();
+        }
       }
 
       ArtifactStoppedPersistenceListener artifactStoppedDeploymentListener =
           new ArtifactStoppedDeploymentPersistenceListener(artifact.getArtifactName());
       withArtifactMuleContext(artifact, muleContext -> {
-        MuleRegistry muleRegistry = ((DefaultMuleContext) muleContext).getRegistry();
+        MuleRegistry muleRegistry = ((MuleContextWithRegistry) muleContext).getRegistry();
         muleRegistry.registerObject(ARTIFACT_STOPPED_LISTENER, artifactStoppedDeploymentListener);
       });
     } catch (Throwable t) {
@@ -68,25 +93,26 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
         throw ((DeploymentException) t);
       }
 
-      final String msg = format("Failed to deploy artifact [%s]", artifact.getArtifactName());
-      throw new DeploymentException(createStaticMessage(msg), t);
+      throw new DeploymentException(createStaticMessage("Failed to deploy artifact [%s]", artifact.getArtifactName()), t);
     }
   }
 
   private void addFlowStoppedListeners(T artifact) {
     appsFlowStoppedListeners.put(artifact.getArtifactName(), new ArrayList<>());
-    for (Flow flow : artifact.getRegistry().lookupAllByType(Flow.class)) {
-      FlowStoppedPersistenceListener flowStoppedPersistenceListener =
-          new FlowStoppedDeploymentPersistenceListener(flow.getName(), artifact.getArtifactName());
-      ((DefaultFlowBuilder.DefaultFlow) flow).addFlowStoppedListener(flowStoppedPersistenceListener);
-      appsFlowStoppedListeners.get(artifact.getArtifactName()).add(flowStoppedPersistenceListener);
+    if (artifact.getArtifactContext() != null && artifact.getArtifactContext().getRegistry() != null) {
+      for (Flow flow : artifact.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
+        FlowStoppedPersistenceListener flowStoppedPersistenceListener =
+            new FlowStoppedDeploymentPersistenceListener(flow.getName(), artifact.getArtifactName());
+        ((DefaultFlowBuilder.DefaultFlow) flow).addFlowStoppedListener(flowStoppedPersistenceListener);
+        appsFlowStoppedListeners.get(artifact.getArtifactName()).add(flowStoppedPersistenceListener);
+      }
     }
   }
 
   /**
    * Initializes the artifact by taking into account deployment properties
-   * {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_LAZY_INIT_DEPLOYMENT_PROPERTY}
-   * and {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY}.
+   * {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_LAZY_INIT_DEPLOYMENT_PROPERTY} and
+   * {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY}.
    *
    * @param artifact the T artifact to be initialized
    */
@@ -111,9 +137,9 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
   @Override
   public void undeploy(T artifact) {
     try {
-      doNotPersistFlowsStop(artifact.getArtifactName());
       doNotPersistArtifactStop(artifact);
       tryToStopArtifact(artifact);
+      deletePersistence(artifact);
       tryToDisposeArtifact(artifact);
     } catch (Throwable t) {
       if (t instanceof DeploymentException) {
@@ -146,32 +172,37 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
     }
   }
 
-  private Boolean shouldStartArtifact(T artifact) {
-    Properties deploymentProperties = null;
+  /**
+   * Checks the persisted property START_ARTIFACT_ON_DEPLOYMENT_PROPERTY to know if the artifact should be started or not. If the
+   * artifact was purposely stopped and then the mule was restarted, the artifact should maintain its status and not start on
+   * deployment.
+   */
+  private Boolean shouldStartArtifactAccordingToPersistedStatus(T artifact) {
+    Properties artifactStatusProperties = null;
     try {
-      deploymentProperties = resolveDeploymentProperties(artifact.getArtifactName(), empty());
+      artifactStatusProperties = resolveArtifactStatusDeploymentProperties(artifact.getArtifactName(), empty());
     } catch (IOException e) {
       logger.error("Failed to load deployment property for artifact "
           + artifact.getArtifactName(), e);
     }
-    return deploymentProperties != null
-        && parseBoolean(deploymentProperties.getProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, "true"));
+    return artifactStatusProperties != null
+        && parseBoolean(artifactStatusProperties.getProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, "true"));
   }
 
+  @Override
   public void doNotPersistArtifactStop(T artifact) {
-    Registry artifactRegistry = artifact.getRegistry();
-
-    if (artifactRegistry != null) {
+    if (artifact.getArtifactContext() != null && artifact.getArtifactContext().getRegistry() != null) {
       Optional<ArtifactStoppedPersistenceListener> optionalArtifactStoppedListener =
-          artifactRegistry.lookupByName(ARTIFACT_STOPPED_LISTENER);
+          artifact.getArtifactContext().getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER);
       optionalArtifactStoppedListener.ifPresent(ArtifactStoppedPersistenceListener::doNotPersist);
     }
   }
 
-  public void doNotPersistFlowsStop(String artifactName) {
-    if (appsFlowStoppedListeners.containsKey(artifactName)) {
-      appsFlowStoppedListeners.get(artifactName)
-          .forEach(FlowStoppedPersistenceListener::doNotPersist);
+  private void deletePersistence(T artifact) {
+    if (artifact.getArtifactContext() != null && artifact.getArtifactContext().getRegistry() != null) {
+      Optional<ArtifactStoppedPersistenceListener> optionalArtifactStoppedListener =
+          artifact.getArtifactContext().getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER);
+      optionalArtifactStoppedListener.ifPresent(ArtifactStoppedPersistenceListener::deletePersistenceProperties);
     }
   }
 

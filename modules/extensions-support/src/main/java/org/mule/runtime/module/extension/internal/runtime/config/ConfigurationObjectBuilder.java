@@ -22,9 +22,9 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 /**
  * Implementation of {@link ObjectBuilder} to create instances that match a given {@link ConfigurationModel}.
  * <p>
- * The object instances are created through the {@link ConfigurationFactory#newInstance()}
- * method. A {@link ResolverSet} is also used to automatically set this builders properties. The name of the properties in the
- * {@link ResolverSet} must match the name of an actual property in the prototype class
+ * The object instances are created through the {@link ConfigurationFactory#newInstance()} method. A {@link ResolverSet} is also
+ * used to automatically set this builders properties. The name of the properties in the {@link ResolverSet} must match the name
+ * of an actual property in the prototype class
  *
  * @since 3.7.0
  */

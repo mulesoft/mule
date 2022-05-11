@@ -32,9 +32,9 @@ public class QueueReaderMessageProcessor implements Processor {
   /**
    * Creates a queue reader
    *
-   * @param registry application's mule context. Not null.
+   * @param registry  application's mule context. Not null.
    * @param queueName name of the queue to use. Non empty
-   * @param timeout number of milliseconds to wait for an available event. Non negative. Null means no timeout required.
+   * @param timeout   number of milliseconds to wait for an available event. Non negative. Null means no timeout required.
    */
   public QueueReaderMessageProcessor(Registry registry, String queueName, Long timeout) {
     checkArgument(!StringUtils.isEmpty(queueName), "Queue name cannot be empty");

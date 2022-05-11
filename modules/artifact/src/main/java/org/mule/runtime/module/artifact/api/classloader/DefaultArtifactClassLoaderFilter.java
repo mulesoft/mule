@@ -43,7 +43,7 @@ public final class DefaultArtifactClassLoaderFilter implements ArtifactClassLoad
    * Creates a new classLoader filter
    *
    * @param exportedClassPackages class package names to export. Can be empty
-   * @param exportedResources resource file names to export. Can be empty
+   * @param exportedResources     resource file names to export. Can be empty
    */
   public DefaultArtifactClassLoaderFilter(Set<String> exportedClassPackages, Set<String> exportedResources) {
     checkArgument(exportedClassPackages != null, "Exported class packages cannot be null");
@@ -64,7 +64,8 @@ public final class DefaultArtifactClassLoaderFilter implements ArtifactClassLoad
   private String sanitizePackageName(String exportedClassPackage) {
     exportedClassPackage = exportedClassPackage.trim();
     exportedClassPackage = exportedClassPackage.endsWith(".")
-        ? exportedClassPackage.substring(0, exportedClassPackage.length() - 1) : exportedClassPackage;
+        ? exportedClassPackage.substring(0, exportedClassPackage.length() - 1)
+        : exportedClassPackage;
     return exportedClassPackage;
   }
 
@@ -105,7 +106,8 @@ public final class DefaultArtifactClassLoaderFilter implements ArtifactClassLoad
       sanitizedResource = (resourceName.charAt(0) == RESOURCE_SEPARATOR) ? resourceName.substring(1) : resourceName;
       if (sanitizedResource.length() > 0) {
         sanitizedResource = sanitizedResource.charAt(sanitizedResource.length() - 1) == RESOURCE_SEPARATOR
-            ? sanitizedResource.substring(0, sanitizedResource.length() - 1) : sanitizedResource;
+            ? sanitizedResource.substring(0, sanitizedResource.length() - 1)
+            : sanitizedResource;
       }
     }
     return sanitizedResource;

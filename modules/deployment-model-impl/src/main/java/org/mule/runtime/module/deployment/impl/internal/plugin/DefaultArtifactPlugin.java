@@ -12,8 +12,8 @@ import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
 
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
 import java.io.File;
 
@@ -28,8 +28,9 @@ public class DefaultArtifactPlugin implements ArtifactPlugin {
 
   /**
    * Creates a new plugin
+   * 
    * @param artifactId
-   * @param descriptor describes the plugin to create. Non null.
+   * @param descriptor  describes the plugin to create. Non null.
    * @param classLoader classloader to use on this plugin. Non null.
    */
   public DefaultArtifactPlugin(String artifactId, ArtifactPluginDescriptor descriptor, ArtifactClassLoader classLoader) {

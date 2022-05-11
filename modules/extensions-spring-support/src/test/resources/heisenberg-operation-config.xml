@@ -43,6 +43,7 @@
             <heisenberg:known-address value="one address"/>
         </heisenberg:known-addresses>
         <heisenberg:inline-barber-preferences beardTrimming="MUSTACHE" fullyBald="false"/>
+        <heisenberg:inline-second-barber-preferences beardTrimming="GOATIE" fullyBald="true"/>
     </heisenberg:config>
 
     <flow name="sayMyName">

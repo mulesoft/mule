@@ -20,6 +20,7 @@ import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_ARTIFACTS;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_PROPERTIES_FILE;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXTRA_BOOT_PACKAGES;
 import static org.mule.test.runner.utils.RunnerModuleUtils.getExcludedProperties;
+
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.SettingsSupplierFactory;
 import org.mule.maven.client.api.model.MavenConfiguration;
@@ -38,9 +39,6 @@ import org.mule.test.runner.api.WorkspaceLocationResolver;
 import org.mule.test.runner.classification.DefaultWorkspaceReader;
 import org.mule.test.runner.maven.AutoDiscoverWorkspaceLocationResolver;
 
-import com.google.common.base.Throwables;
-import com.google.common.collect.Sets;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -53,6 +51,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import com.google.common.base.Throwables;
+import com.google.common.collect.Sets;
 import org.junit.internal.builders.AnnotatedBuilder;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
@@ -193,7 +193,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
   /**
    * Creates the {@link ArtifactClassLoaderHolder} with the isolated class loaders.
    *
-   * @param klass the test class being executed
+   * @param klass               the test class being executed
    * @param runnerConfiguration {@link RunnerConfiguration} based on annotated test class.
    * @return creates a {@link ArtifactClassLoaderHolder} that would be used to run the test. This way the test will be isolated
    *         and it will behave similar as an application running in a Mule standalone container.
@@ -338,10 +338,10 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
    * Invokes the method to inject the plugin class loaders as the test is annotated with {@link PluginClassLoadersAware}.
    *
    * @param artifactClassLoaderHolder the result {@link ArtifactClassLoader}s defined for container, plugins and application
-   * @param isolatedTestClass the test {@link Class} loaded with the isolated {@link ClassLoader}
+   * @param isolatedTestClass         the test {@link Class} loaded with the isolated {@link ClassLoader}
    * @throws IllegalStateException if the test doesn't have an annotated method to inject plugin class loaders or if it has more
-   *         than one method annotated.
-   * @throws Throwable if an error ocurrs while setting the list of {@link ArtifactClassLoader}s for plugins.
+   *                               than one method annotated.
+   * @throws Throwable             if an error ocurrs while setting the list of {@link ArtifactClassLoader}s for plugins.
    */
   private static void injectPluginsClassLoaders(ArtifactClassLoaderHolder artifactClassLoaderHolder, Class<?> isolatedTestClass)
       throws Throwable {

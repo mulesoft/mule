@@ -31,7 +31,7 @@ public class TestConnectorConfig {
    * Reads an event from a given queue waiting up to the specified wait time if necessary for an element to become available.
    *
    * @param queueName name of the queue which the event is read from. Non empty
-   * @param timeout maximum number of milliseconds to wait for an available event. Non negative
+   * @param timeout   maximum number of milliseconds to wait for an available event. Non negative
    * @return a non null event if available before the timeout expires, null otherwise.
    */
   public CoreEvent poll(String queueName, long timeout) {
@@ -69,7 +69,7 @@ public class TestConnectorConfig {
    * Writes a even to to a given queue waiting if necessary for space to become available
    *
    * @param queueName name of the queue which the event is write to. Non empty
-   * @param event event to be stored. Non null
+   * @param event     event to be stored. Non null
    */
   public void write(String queueName, CoreEvent event) {
     checkArgument(!StringUtils.isEmpty(queueName), "Queue name cannot be empty");

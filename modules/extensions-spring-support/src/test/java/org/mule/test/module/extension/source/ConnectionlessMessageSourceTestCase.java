@@ -9,6 +9,7 @@ package org.mule.test.module.extension.source;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.Location;
@@ -19,11 +20,14 @@ import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+
+@Feature(SOURCES)
 public class ConnectionlessMessageSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "connectionless-message-source.xml";
+    return "source/connectionless-message-source.xml";
   }
 
   @Test

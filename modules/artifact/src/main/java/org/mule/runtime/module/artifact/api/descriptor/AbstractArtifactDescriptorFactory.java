@@ -12,6 +12,8 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_FOLDER;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -20,8 +22,7 @@ import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.util.IOUtils;
 
-import com.google.common.collect.ImmutableMap;
-
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -29,6 +30,10 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+
+import com.google.common.collect.ImmutableMap;
+
+import org.slf4j.Logger;
 
 /**
  * Base class to create artifact descriptors
@@ -42,15 +47,20 @@ import java.util.Properties;
 public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleArtifactModel, T extends ArtifactDescriptor>
     implements ArtifactDescriptorFactory<T> {
 
+  private static final Logger LOGGER = getLogger(AbstractArtifactDescriptorFactory.class);
+
   public static final String ARTIFACT_DESCRIPTOR_DOES_NOT_EXISTS_ERROR = "Artifact descriptor does not exists: ";
   protected final DescriptorLoaderRepository descriptorLoaderRepository;
-  private ArtifactDescriptorValidator artifactDescriptorValidator;
+  private final ArtifactDescriptorValidator artifactDescriptorValidator;
 
   /**
    * Creates a new factory
    *
-   * @param descriptorLoaderRepository contains all the {@link ClassLoaderModelLoader} registered on the container. Non null
-   * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the {@link ArtifactDescriptorValidator} in order to check the state of the descriptor once loaded.
+   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderModelLoader} registered on the container. Non
+   *                                           null
+   * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the
+   *                                           {@link ArtifactDescriptorValidator} in order to check the state of the descriptor
+   *                                           once loaded.
    */
   public AbstractArtifactDescriptorFactory(DescriptorLoaderRepository descriptorLoaderRepository,
                                            ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
@@ -70,13 +80,13 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
     return createArtifact(artifactFolder, deploymentProperties, artifactModel);
   }
 
-  protected T createArtifact(File artifactFolder, Optional<Properties> deploymentProperties, M artifactModel) {
+  public T createArtifact(File artifactFolder, Optional<Properties> deploymentProperties, M artifactModel) {
     T artifactDescriptor =
         loadFromJsonDescriptor(artifactFolder, artifactModel, deploymentProperties);
     return artifactDescriptor;
   }
 
-  protected M createArtifactModel(File artifactFolder) {
+  public M createArtifactModel(File artifactFolder) {
     final File artifactJsonFile = new File(artifactFolder, MULE_ARTIFACT_FOLDER + separator + getDescriptorFileName());
     if (!artifactJsonFile.exists()) {
       throw new ArtifactDescriptorCreateException(ARTIFACT_DESCRIPTOR_DOES_NOT_EXISTS_ERROR + artifactJsonFile);
@@ -94,7 +104,7 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
    * Loads a descriptor from an artifact model
    *
    * @param artifactLocation folder where the artifact is located, it can be a folder or file depending on the artifact type.
-   * @param artifactModel model representing the artifact.
+   * @param artifactModel    model representing the artifact.
    * @return a descriptor matching the provided model.
    */
   protected final T loadFromJsonDescriptor(File artifactLocation, M artifactModel, Optional<Properties> deploymentProperties) {
@@ -145,15 +155,15 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
   /**
    * Allows subclasses to customize descriptor based on the provided model
    *
-   * @param artifactModel artifact model created from the JSON descriptor
-   * @param descriptor descriptor created from the model and configured with common attributes
+   * @param artifactModel    artifact model created from the JSON descriptor
+   * @param descriptor       descriptor created from the model and configured with common attributes
    * @param artifactLocation folder where the artifact is located, it can be a folder or file depending on the artifact type.
    */
   protected abstract void doDescriptorConfig(M artifactModel, T descriptor, File artifactLocation);
 
   /**
-   * @param artifactLocation folder where the artifact is located, it can be a folder or file depending on the artifact type.
-   * @param name name for the created artifact
+   * @param artifactLocation     folder where the artifact is located, it can be a folder or file depending on the artifact type.
+   * @param name                 name for the created artifact
    * @param deploymentProperties properties provided for the deployment process.
    * @return a new descriptor of the type required by the factory.
    */
@@ -164,7 +174,11 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
   }
 
   private String getDescriptorContent(File jsonFile) {
-    try (InputStream stream = new FileInputStream(jsonFile)) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Loading artifact descriptor from '{}'..." + jsonFile.getAbsolutePath());
+    }
+
+    try (InputStream stream = new BufferedInputStream(new FileInputStream(jsonFile))) {
       return IOUtils.toString(stream);
     } catch (IOException e) {
       throw new IllegalArgumentException(format("Could not read extension describer on artifact '%s'",
@@ -202,8 +216,10 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
                                                               MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor,
                                                               BundleDescriptor bundleDescriptor) {
     // Adding BundleDescriptor to avoid resolving it again while loading the class loader model
-    return ImmutableMap.<String, Object>builder().putAll(classLoaderModelLoaderDescriptor.getAttributes())
-        .put(BundleDescriptor.class.getName(), bundleDescriptor).build();
+    return ImmutableMap.<String, Object>builder()
+        .putAll(classLoaderModelLoaderDescriptor.getAttributes())
+        .put(BundleDescriptor.class.getName(), bundleDescriptor)
+        .build();
   }
 
   protected BundleDescriptor getBundleDescriptor(File appFolder, M artifactModel, Optional<Properties> deploymentProperties) {

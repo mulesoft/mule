@@ -15,6 +15,7 @@ import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.metadata.fixed.InputJsonType;
 import org.mule.runtime.extension.api.annotation.metadata.fixed.InputXmlType;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -28,6 +29,7 @@ import java.io.InputStream;
 @Alias("custom-static-metadata")
 @EmitsResponse
 @MetadataScope(outputResolver = JavaOutputStaticTypeResolver.class)
+@MediaType(value = "application/java", strict = false)
 public class CustomStaticMetadataSource extends Source<Object, StringAttributes> {
 
   public static String onSuccessResult;

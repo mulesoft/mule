@@ -10,18 +10,20 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
-import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.sdk.api.annotation.dsl.xml.Xml;
 import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.test.data.sample.extension.connection.SampleDataConnectionProvider;
 import org.mule.test.data.sample.extension.source.AliasedParameterGroupListener;
 import org.mule.test.data.sample.extension.source.ComplexParameterGroupListener;
 import org.mule.test.data.sample.extension.source.ConfigTestSampleDataListener;
 import org.mule.test.data.sample.extension.source.ConnectedTestSampleDataListener;
+import org.mule.test.data.sample.extension.source.FailingTestSampleDataListener;
 import org.mule.test.data.sample.extension.source.MuleContextAwareTestSampleDataListener;
 import org.mule.test.data.sample.extension.source.ParameterGroupListener;
 import org.mule.test.data.sample.extension.source.ShowInDslParameterGroupListener;
 import org.mule.test.data.sample.extension.source.SimpleTestSampleDataListener;
+import org.mule.test.data.sample.extension.source.SimpleTestSampleDataListenerWithTwoBoundActingParameters;
 
 @Extension(name = SampleDataExtension.EXTENSION_NAME)
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/sample-data", prefix = "sample-data")
@@ -29,7 +31,8 @@ import org.mule.test.data.sample.extension.source.SimpleTestSampleDataListener;
 @Operations(SampleDataOperations.class)
 @Sources({SimpleTestSampleDataListener.class, ConnectedTestSampleDataListener.class, ConfigTestSampleDataListener.class,
     ParameterGroupListener.class, ShowInDslParameterGroupListener.class, AliasedParameterGroupListener.class,
-    ComplexParameterGroupListener.class, MuleContextAwareTestSampleDataListener.class
+    ComplexParameterGroupListener.class, MuleContextAwareTestSampleDataListener.class,
+    SimpleTestSampleDataListenerWithTwoBoundActingParameters.class, FailingTestSampleDataListener.class
 })
 public class SampleDataExtension {
 

@@ -28,10 +28,9 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 /**
- * A {@link ReconnectableConnectionProviderWrapper} which makes sure that by the time the
- * {@link ConnectionProvider#connect()} method is invoked on the delegate, the authorization dance has
- * been completed and the {@link ClientCredentialsState} and {@link OAuthCallbackValue} fields have
- * been properly injected
+ * A {@link ReconnectableConnectionProviderWrapper} which makes sure that by the time the {@link ConnectionProvider#connect()}
+ * method is invoked on the delegate, the authorization dance has been completed and the {@link ClientCredentialsState} and
+ * {@link OAuthCallbackValue} fields have been properly injected
  *
  * @since 4.2.1
  */
@@ -40,7 +39,7 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends BaseOAuthConn
   private final ClientCredentialsConfig oauthConfig;
 
   private final ClientCredentialsOAuthHandler oauthHandler;
-  private final FieldSetter<ConnectionProvider<C>, ClientCredentialsState> oauthStateSetter;
+  private final FieldSetter<Object, ClientCredentialsState> oauthStateSetter;
   private final RunOnce dance;
 
   private ClientCredentialsOAuthDancer dancer;
@@ -53,7 +52,7 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends BaseOAuthConn
     super(delegate, reconnectionConfig, callbackValues);
     this.oauthConfig = oauthConfig;
     this.oauthHandler = oauthHandler;
-    oauthStateSetter = getOAuthStateSetter(delegate, ClientCredentialsState.class, oauthConfig.getGrantType());
+    oauthStateSetter = getOAuthStateSetter(getDelegateForInjection(), ClientCredentialsState.class, oauthConfig.getGrantType());
     dance = Once.of(this::updateOAuthState);
   }
 
@@ -79,7 +78,7 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends BaseOAuthConn
   }
 
   private void updateOAuthState() {
-    final ConnectionProvider<C> delegate = getDelegate();
+    final Object delegate = getDelegateForInjection();
     ResourceOwnerOAuthContext context = getContext();
     oauthStateSetter.set(delegate, new UpdatingClientCredentialsState(
                                                                       dancer,

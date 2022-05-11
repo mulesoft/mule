@@ -6,9 +6,18 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.CRITICAL_ERROR_TYPE;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.EXPRESSION;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_HANDLER;
+
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -22,13 +31,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.EXPRESSION;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.internal.exception.DefaultErrorTypeRepository.CRITICAL_ERROR_TYPE;
-import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
-import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_HANDLER;
+import static org.mockito.junit.MockitoJUnit.rule;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -40,6 +43,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -52,9 +56,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoRule;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -62,8 +66,10 @@ import io.qameta.allure.Story;
 @SmallTest
 @Feature(ERROR_HANDLING)
 @Story(ERROR_HANDLER)
-@RunWith(MockitoJUnitRunner.class)
 public class ErrorHandlerTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public MockitoRule rule = rule().silent();
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -156,6 +162,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
   @Test
   public void ifUserDefaultHasPropagateSpecificThenGetsInjectedOurDefault() throws Exception {
     OnErrorPropagateHandler onError = new OnErrorPropagateHandler();
+    onError.setExceptionListener(new DefaultExceptionListener());
     onError.setErrorType("EXPRESSION");
 
     verifyInjectionWithConfiguredOnError(onError);
@@ -164,6 +171,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
   @Test
   public void ifUserDefaultHasPropagateAnyThenOurDefaultIsNotInjected() throws Exception {
     OnErrorPropagateHandler onError = new OnErrorPropagateHandler();
+    onError.setExceptionListener(new DefaultExceptionListener());
     onError.setErrorType("ANY");
 
     verifyNoInjectionWithConfiguredOnError(onError);
@@ -171,7 +179,9 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void ifUserDefaultHasEmptyPropagateThenOurDefaultIsNotInjected() throws Exception {
-    verifyNoInjectionWithConfiguredOnError(new OnErrorPropagateHandler());
+    OnErrorPropagateHandler onError = new OnErrorPropagateHandler();
+    onError.setExceptionListener(new DefaultExceptionListener());
+    verifyNoInjectionWithConfiguredOnError(onError);
   }
 
   private void verifyInjectionWithConfiguredOnError(MessagingExceptionHandlerAcceptor onError) throws InitialisationException {
@@ -210,7 +220,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
   }
 
   private void mockErrorRepository() {
-    ErrorTypeRepository errorTypeRepository = mockMuleContext.getErrorTypeRepository();
+    ErrorTypeRepository errorTypeRepository = spy(mockMuleContext.getErrorTypeRepository());
     ErrorType anyErrorType = mock(ErrorType.class);
     when(errorTypeRepository.lookupErrorType(ANY)).thenReturn(of(anyErrorType));
     when(errorTypeRepository.lookupErrorType(EXPRESSION)).thenReturn(of(mock(ErrorType.class)));

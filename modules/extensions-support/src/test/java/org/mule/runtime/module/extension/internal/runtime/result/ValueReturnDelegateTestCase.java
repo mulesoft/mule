@@ -11,12 +11,10 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;
@@ -24,11 +22,9 @@ import org.junit.Test;
 @SmallTest
 public class ValueReturnDelegateTestCase extends ValueReturnDelegateContractTestCase {
 
-  public CursorComponentDecoratorFactory componentDecoratorFactory = NO_OP_INSTANCE;
-
   @Override
   protected ReturnDelegate createReturnDelegate() throws InitialisationException {
-    return new ValueReturnDelegate(componentModel, componentDecoratorFactory,
+    return new ValueReturnDelegate(componentModel,
                                    getCursorProviderFactory(), muleContext);
   }
 

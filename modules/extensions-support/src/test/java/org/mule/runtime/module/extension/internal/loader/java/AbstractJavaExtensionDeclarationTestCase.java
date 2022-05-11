@@ -6,12 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import static java.util.Collections.emptySet;
-import static org.apache.commons.collections.CollectionUtils.find;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
 
@@ -26,45 +25,60 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarati
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.extension.api.declaration.type.RedeliveryPolicyTypeBuilder;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.test.module.extension.internal.util.ExtensionDeclarationTestUtils;
 
 import java.util.List;
 
 public abstract class AbstractJavaExtensionDeclarationTestCase extends AbstractMuleTestCase {
 
-  private DefaultJavaModelLoaderDelegate loader;
+  private ExtensionDeclarer declarer;
 
-  protected DefaultJavaModelLoaderDelegate getLoader() {
-    return loader;
+  protected ExtensionDeclarer getDeclarer() {
+    return declarer;
   }
 
-  protected void setLoader(DefaultJavaModelLoaderDelegate loader) {
-    this.loader = loader;
+  protected void setDeclarer(ExtensionDeclarer declarer) {
+    this.declarer = declarer;
   }
 
-  protected DefaultJavaModelLoaderDelegate loaderFor(final Class<?> type) {
-    return new DefaultJavaModelLoaderDelegate(type, getProductVersion());
+  protected ExtensionDeclarer declarerFor(final Class<?> type) {
+    return ExtensionDeclarationTestUtils.declarerFor(type, getProductVersion());
+  }
+
+  protected ExtensionDeclarer declarerFor(final Class<?> type, String version) {
+    return ExtensionDeclarationTestUtils.declarerFor(type, version);
+  }
+
+  protected ExtensionDeclarer declarerFor(Class<?> type, ExtensionLoadingContext ctx) {
+    return declarerFor(type, getProductVersion(), ctx);
+  }
+
+  protected ExtensionDeclarer declarerFor(Class<?> type, String version, ExtensionLoadingContext ctx) {
+    return ExtensionDeclarationTestUtils.declarerFor(type, version, ctx);
   }
 
   protected ExtensionDeclarer declareExtension() {
-    return declareExtension(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
-  }
-
-  protected ExtensionDeclarer declareExtension(ExtensionLoadingContext context) {
-    return getLoader().declare(context);
+    return declarer;
   }
 
   protected ConfigurationDeclaration getConfiguration(ExtensionDeclaration extensionDeclaration, final String configurationName) {
-    return (ConfigurationDeclaration) find(extensionDeclaration.getConfigurations(),
-                                           object -> ((ConfigurationDeclaration) object).getName().equals(configurationName));
+    return extensionDeclaration.getConfigurations()
+        .stream()
+        .filter(config -> config.getName().equals(configurationName))
+        .findAny()
+        .orElse(null);
   }
 
   protected OperationDeclaration getOperation(WithOperationsDeclaration declaration, final String operationName) {
-    return (OperationDeclaration) find(declaration.getOperations(),
-                                       object -> ((OperationDeclaration) object).getName().equals(operationName));
+    List<OperationDeclaration> operations = declaration.getOperations();
+    return operations.stream()
+        .filter(operation -> operation.getName().equals(operationName))
+        .findAny()
+        .orElse(null);
   }
 
   protected Pair<ParameterGroupDeclaration, ParameterDeclaration> findParameterInGroup(ParameterizedDeclaration<?> declaration,
@@ -79,11 +93,19 @@ public abstract class AbstractJavaExtensionDeclarationTestCase extends AbstractM
   }
 
   protected ParameterDeclaration findParameter(List<ParameterDeclaration> parameters, final String name) {
-    return (ParameterDeclaration) find(parameters, object -> name.equals(((ParameterDeclaration) object).getName()));
+    return parameters.stream()
+        .filter(param -> param.getName().equals(name))
+        .findAny()
+        .orElse(null);
   }
 
   protected void assertConfigRefParam(ParameterModel configRef) {
     assertThat(configRef.getName(), is(CONFIG_ATTRIBUTE_NAME));
     assertType(configRef.getType(), ConfigurationProvider.class, ObjectType.class);
+  }
+
+  protected void assertRedeliveryPolicyParameter(ParameterModel redelivery) {
+    assertThat(redelivery.getName(), is(REDELIVERY_POLICY_PARAMETER_NAME));
+    assertThat(redelivery.getType(), is(equalTo(new RedeliveryPolicyTypeBuilder().buildRedeliveryPolicyType())));
   }
 }

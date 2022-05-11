@@ -27,7 +27,7 @@ public class QueueManagerUtils {
    * Creates a file corresponding to the fist enqueued object in a given queue
    *
    * @param workingFolder container's working folder.
-   * @param queueName name of the queue where the object is added.
+   * @param queueName     name of the queue where the object is added.
    * @return the file corresponding to the enqueued object
    * @throws IOException if there is any problem creating the file.
    */

@@ -6,8 +6,12 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.type;
 
+import static java.lang.String.format;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceAnnotation;
+
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 
 /**
  * A generic contract for any kind of component that can contain an alias name or description
@@ -23,17 +27,32 @@ public interface WithAlias extends WithAnnotations, WithName {
    * @return The alias of the implementer component
    */
   default String getAlias() {
-    return getAnnotation(Alias.class)
-        .map(Alias::value)
-        .orElseGet(this::getName);
+    return mapReduceAnnotation(this,
+                               Alias.class,
+                               org.mule.sdk.api.annotation.Alias.class,
+                               value -> value.getStringValue(Alias::value),
+                               value -> value.getStringValue(org.mule.sdk.api.annotation.Alias::value),
+                               () -> new IllegalModelDefinitionException(format("Both %s and %s annotations are present on element '%s'",
+                                                                                Alias.class.getName(),
+                                                                                org.mule.sdk.api.annotation.Alias.class.getName(),
+                                                                                getName())))
+                                                                                    .orElseGet(this::getName);
   }
 
   /**
    * @return The description of the implementer component
    */
   default String getDescription() {
-    return getAnnotation(Alias.class)
-        .map(Alias::description)
-        .orElse(EMPTY);
+    return mapReduceAnnotation(
+                               this,
+                               Alias.class,
+                               org.mule.sdk.api.annotation.Alias.class,
+                               value -> value.getStringValue(Alias::description),
+                               value -> value.getStringValue(org.mule.sdk.api.annotation.Alias::description),
+                               () -> new IllegalModelDefinitionException(format("Both %s and %s annotations are present on element '%s",
+                                                                                Alias.class.getName(),
+                                                                                org.mule.sdk.api.annotation.Alias.class.getName(),
+                                                                                getName())))
+                                                                                    .orElse(EMPTY);
   }
 }

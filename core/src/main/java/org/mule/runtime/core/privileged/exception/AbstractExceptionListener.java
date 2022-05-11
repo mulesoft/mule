@@ -6,19 +6,22 @@
  */
 package org.mule.runtime.core.privileged.exception;
 
-import static java.lang.Boolean.TRUE;
-import static java.text.MessageFormat.format;
-import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.exception.ExceptionHelper.sanitize;
 import static org.mule.runtime.api.exception.MuleException.isVerboseExceptions;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.SecurityNotification.SECURITY_AUTHENTICATION_FAILED;
-import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
-import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
+
+import static java.lang.Boolean.TRUE;
+import static java.text.MessageFormat.format;
+
+import static org.apache.commons.lang3.StringUtils.defaultString;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -35,6 +38,7 @@ import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
 import java.util.List;
@@ -51,8 +55,11 @@ import org.slf4j.LoggerFactory;
  * from <code>AbstractMessagingExceptionStrategy</code> (if you are creating a Messaging Exception Strategy) or
  * <code>AbstractSystemExceptionStrategy</code> (if you are creating a System Exception Strategy) rather than directly from this
  * class.
+ * 
+ * @deprecated Use either {@link AbstractDeclaredExceptionListener} or {@link DefaultExceptionListener}.
  */
 @NoExtend
+@Deprecated
 public abstract class AbstractExceptionListener extends AbstractMessageProcessorOwner {
 
   protected static final String NOT_SET = "<not set>";
@@ -118,7 +125,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     // nothing to do
   }
 
-  protected void fireNotification(Exception ex, CoreEvent event) {
+  protected void fireNotification(Exception ex, CoreEvent event, ComponentLocation componentLocation) {
     if (enableNotifications) {
       if (ex.getCause() != null && getCause(ex) instanceof SecurityException) {
         fireNotification(new SecurityNotification((SecurityException) getCause(ex), SECURITY_AUTHENTICATION_FAILED));
@@ -127,9 +134,14 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         if (ex instanceof MessagingException) {
           component = ((MessagingException) ex).getFailingComponent();
         }
-        fireNotification(new ExceptionNotification(createInfo(event, ex, component), getLocation()));
+        fireNotification(new ExceptionNotification(createInfo(event, ex, component),
+                                                   componentLocation != null ? componentLocation : getLocation()));
       }
     }
+  }
+
+  protected void fireNotification(Exception ex, CoreEvent event) {
+    fireNotification(ex, event, null);
   }
 
   private Throwable getCause(Exception ex) {
@@ -159,9 +171,11 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
       doLogException("Caught exception in Exception Strategy: " + t.getMessage(), t);
       return;
     }
-    //First check if exception was not logged already
-    if (resolvedException.getFirst().getExceptionInfo().isAlreadyLogged()) {
-      //Don't log anything, error while getting root or exception already logged.
+    // First check if exception was not logged already
+    // MULE-19344: Always log FlowBackPressureExceptions because they are created as a single instance.
+    if (resolvedException.getFirst().getExceptionInfo().isAlreadyLogged()
+        && !(resolvedException.getFirst() instanceof FlowBackPressureException)) {
+      // Don't log anything, error while getting root or exception already logged.
       return;
     }
     doLogException(resolvedException.getSecond(), null);
@@ -181,7 +195,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
    * itself. This implementation logs the the message itself to the logs if it is not null
    *
    * @param event The MuleEvent currently being processed
-   * @param t the fatal exception to log
+   * @param t     the fatal exception to log
    */
   protected void logFatal(CoreEvent event, Throwable t) {
     if (statistics != null && statistics.isEnabled()) {
@@ -202,8 +216,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   }
 
   /**
-   * Fires a server notification to all registered
-   * {@link ExceptionNotificationListener} eventManager.
+   * Fires a server notification to all registered {@link ExceptionNotificationListener} eventManager.
    *
    * @param notification the notification to fire.
    */

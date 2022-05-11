@@ -13,10 +13,12 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -51,15 +53,14 @@ import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.config.Reconfigurable;
 import org.apache.logging.log4j.core.util.WatchManager;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
 
   private static final String CURRENT_DIRECTORY = ".";
@@ -69,12 +70,15 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
   private static final String FILE_PATTERN_PROPERTY = "filePattern";
   private static final String FILE_PATTERN_TEMPLATE_DATE_SECTION = "%d{yyyy-MM-dd}";
 
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
+
   private LoggerContextConfigurer contextConfigurer;
 
-  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS)
   private MuleLoggerContext context;
 
-  @Mock(answer = Answers.RETURNS_DEEP_STUBS, extraInterfaces = {Reconfigurable.class})
+  @Mock(answer = RETURNS_DEEP_STUBS, extraInterfaces = {Reconfigurable.class})
   private DefaultConfiguration configuration;
 
   private Object converter;
@@ -131,6 +135,16 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
       LoggerConfig rootLogger = ((AbstractConfiguration) context.getConfiguration()).getRootLogger();
       verify(rootLogger).addAppender(forcedConsoleAppender, Level.ALL, null);
     });
+  }
+
+  @Test
+  public void replaceColonWithDash() {
+    when(context.getArtifactName()).thenReturn("my:app");
+    when(context.isArtifactClassloader()).thenReturn(true);
+    contextConfigurer.update(context);
+    ArgumentCaptor<RollingFileAppender> appenderCaptor = ArgumentCaptor.forClass(RollingFileAppender.class);
+    verify(context.getConfiguration(), atLeastOnce()).addAppender(appenderCaptor.capture());
+    assertThat(appenderCaptor.getValue().getFileName().contains(":"), is(false));
   }
 
   @Test

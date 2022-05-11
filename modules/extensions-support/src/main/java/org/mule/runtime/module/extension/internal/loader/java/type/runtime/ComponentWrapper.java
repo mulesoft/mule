@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
-import static java.util.Arrays.stream;
-import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.annotation.ExpressionFunctions;
@@ -22,10 +21,9 @@ import org.mule.runtime.module.extension.api.loader.java.type.OperationContainer
 import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * Abstract implementation of {@link ComponentWrapper}
@@ -43,19 +41,11 @@ abstract class ComponentWrapper extends TypeWrapper implements ComponentElement 
    */
   @Override
   public List<SourceElement> getSources() {
-    List<SourceElement> elements = new ArrayList<>();
-    collectSources(elements, Sources.class, Sources::value);
-    collectSources(elements, org.mule.sdk.api.annotation.Sources.class, org.mule.sdk.api.annotation.Sources::value);
-
-    return elements;
-  }
-
-  private <A extends Annotation> void collectSources(List<SourceElement> accumulator,
-                                                     Class<A> annotationClass,
-                                                     Function<A, Class[]> extractionFunction) {
-    getAnnotation(annotationClass)
-        .map(a -> stream(extractionFunction.apply(a)))
-        .ifPresent(stream -> stream.forEach(s -> accumulator.add(new SourceTypeWrapper(s, typeLoader))));
+    return concat(
+                  collectElements(Sources.class, Sources::value),
+                  collectElements(org.mule.sdk.api.annotation.Sources.class, org.mule.sdk.api.annotation.Sources::value))
+                      .map(s -> new SourceTypeWrapper(s, typeLoader))
+                      .collect(toList());
   }
 
   /**
@@ -63,13 +53,9 @@ abstract class ComponentWrapper extends TypeWrapper implements ComponentElement 
    */
   @Override
   public List<OperationContainerElement> getOperationContainers() {
-
-    final Optional<Operations> optionalOperations = this.getAnnotation(Operations.class);
-    if (optionalOperations.isPresent()) {
-      return stream(optionalOperations.get().value()).map((Class<?> aClass) -> new OperationContainerWrapper(aClass, typeLoader))
-          .collect(toList());
-    }
-    return emptyList();
+    return getOperationClassStream()
+        .map(aClass -> new OperationContainerWrapper(aClass, typeLoader))
+        .collect(toList());
   }
 
   /**
@@ -77,13 +63,9 @@ abstract class ComponentWrapper extends TypeWrapper implements ComponentElement 
    */
   @Override
   public List<FunctionContainerElement> getFunctionContainers() {
-
-    final Optional<ExpressionFunctions> functions = this.getAnnotation(ExpressionFunctions.class);
-    if (functions.isPresent()) {
-      return stream(functions.get().value()).map((Class<?> aClass) -> new FunctionContainerWrapper(aClass, typeLoader))
-          .collect(toList());
-    }
-    return emptyList();
+    return getExpressionFunctionClassStream()
+        .map(c -> new FunctionContainerWrapper(c, typeLoader))
+        .collect(toList());
   }
 
   /**
@@ -91,11 +73,31 @@ abstract class ComponentWrapper extends TypeWrapper implements ComponentElement 
    */
   @Override
   public List<ConnectionProviderElement> getConnectionProviders() {
+    return concat(
+                  collectElements(ConnectionProviders.class, ConnectionProviders::value),
+                  collectElements(org.mule.sdk.api.annotation.connectivity.ConnectionProviders.class,
+                                  org.mule.sdk.api.annotation.connectivity.ConnectionProviders::value))
+                                      .map(c -> new ConnectionProviderTypeWrapper(c, typeLoader))
+                                      .collect(toList());
+  }
 
-    final Optional<ConnectionProviders> optionalProviders = this.getAnnotation(ConnectionProviders.class);
-    if (optionalProviders.isPresent()) {
-      return stream(optionalProviders.get().value()).map(c -> new ConnectionProviderTypeWrapper(c, typeLoader)).collect(toList());
-    }
-    return emptyList();
+  protected <A extends Annotation> Stream<Class> collectElements(Class<A> annotationClass,
+                                                                 Function<A, Class[]> extractTypeFunction) {
+    return getAnnotation(annotationClass)
+        .map(a -> Stream.of(extractTypeFunction.apply(a)))
+        .orElse(Stream.empty());
+  }
+
+  protected Stream<Class> getOperationClassStream() {
+    return concat(
+                  collectElements(Operations.class, Operations::value),
+                  collectElements(org.mule.sdk.api.annotation.Operations.class, org.mule.sdk.api.annotation.Operations::value));
+  }
+
+  protected Stream<Class> getExpressionFunctionClassStream() {
+    return concat(
+                  collectElements(ExpressionFunctions.class, ExpressionFunctions::value),
+                  collectElements(org.mule.sdk.api.annotation.ExpressionFunctions.class,
+                                  org.mule.sdk.api.annotation.ExpressionFunctions::value));
   }
 }

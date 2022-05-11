@@ -9,6 +9,7 @@ package org.mule.runtime.module.service.internal.discoverer;
 
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.internal.manager.LazyServiceProxy;
 import org.mule.runtime.module.service.internal.manager.ServiceRegistry;
@@ -30,9 +31,11 @@ import java.util.List;
 public class ReflectionServiceResolver implements ServiceResolver {
 
   private final ServiceRegistry serviceRegistry;
+  private final Injector containerInjector;
 
-  public ReflectionServiceResolver(ServiceRegistry serviceRegistry) {
+  public ReflectionServiceResolver(ServiceRegistry serviceRegistry, Injector containerInjector) {
     this.serviceRegistry = serviceRegistry;
+    this.containerInjector = containerInjector;
   }
 
   @Override
@@ -40,7 +43,7 @@ public class ReflectionServiceResolver implements ServiceResolver {
 
     List<Service> services = new ArrayList<>(assemblies.size());
     for (ServiceAssembly assembly : assemblies) {
-      Service service = LazyServiceProxy.from(assembly, serviceRegistry);
+      Service service = LazyServiceProxy.from(assembly, serviceRegistry, containerInjector);
 
       serviceRegistry.register(service, assembly);
       services.add(service);

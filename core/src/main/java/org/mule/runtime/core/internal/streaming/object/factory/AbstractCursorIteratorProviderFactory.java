@@ -83,8 +83,8 @@ public abstract class AbstractCursorIteratorProviderFactory implements CursorIte
   /**
    * Implementations should use this method to actually create the output value
    *
-   * @param iterator the streaming iterator
-   * @param eventContext the root context of the event on which streaming is happening
+   * @param iterator            the streaming iterator
+   * @param eventContext        the root context of the event on which streaming is happening
    * @param originatingLocation the {@link ComponentLocation} where the cursor was created
    */
   protected abstract Object resolve(Iterator iterator, EventContext eventContext, ComponentLocation originatingLocation);

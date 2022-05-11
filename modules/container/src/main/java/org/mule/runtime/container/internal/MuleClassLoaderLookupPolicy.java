@@ -7,11 +7,12 @@
 
 package org.mule.runtime.container.internal;
 
-import static org.apache.commons.lang3.ClassUtils.getPackageName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ParentOnlyLookupStrategy.PARENT_ONLY;
+
+import static org.apache.commons.lang3.ClassUtils.getPackageName;
 
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Defines which resources in a class loader should be looked up using parent-first, parent-only or child-first strategies.
@@ -38,9 +40,9 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
   /**
    * Creates a new lookup policy based on the provided configuration.
    *
-   * @param lookupStrategies lookup strategy to use with specific packages. Non null.
-   * @param rootSystemPackages packages that must use {@link ContainerOnlyLookupStrategy}. Any inner package extending
-   *        from a system package root will use the same approach.
+   * @param lookupStrategies   lookup strategy to use with specific packages. Non null.
+   * @param rootSystemPackages packages that must use {@link ContainerOnlyLookupStrategy}. Any inner package extending from a
+   *                           system package root will use the same approach.
    */
   public MuleClassLoaderLookupPolicy(Map<String, LookupStrategy> lookupStrategies, Set<String> rootSystemPackages) {
     checkArgument(lookupStrategies != null, "Lookup strategies cannot be null");
@@ -62,9 +64,13 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
 
   private void validateLookupPolicies(Map<String, LookupStrategy> lookupStrategies) {
     for (String packageName : lookupStrategies.keySet()) {
-      if (isSystemPackage(packageName) && !(lookupStrategies.get(packageName) instanceof ContainerOnlyLookupStrategy)) {
-        throw new IllegalArgumentException(invalidLookupPolicyOverrideError(packageName, lookupStrategies.get(packageName)));
-      }
+      validateLookupPolicy(packageName, lookupStrategies.get(packageName));
+    }
+  }
+
+  private void validateLookupPolicy(String packageName, LookupStrategy lookupStrategy) {
+    if (isSystemPackage(packageName) && !(lookupStrategy instanceof ContainerOnlyLookupStrategy)) {
+      throw new IllegalArgumentException(invalidLookupPolicyOverrideError(packageName, lookupStrategy));
     }
   }
 
@@ -123,6 +129,11 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
   }
 
   @Override
+  public ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy) {
+    return extend(packages, lookupStrategy, false);
+  }
+
+  @Override
   public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies, boolean overwrite) {
     validateLookupPolicies(lookupStrategies);
     final Map<String, LookupStrategy> newLookupStrategies = copy(this.configuredLookupStrategies);
@@ -132,6 +143,23 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
         newLookupStrategies.put(packageName, lookupStrategies.get(packageName));
       }
     }
+
+    final MuleClassLoaderLookupPolicy muleClassLoaderLookupPolicy =
+        new MuleClassLoaderLookupPolicy(newLookupStrategies, rootSystemPackages);
+
+    return muleClassLoaderLookupPolicy;
+  }
+
+  @Override
+  public ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy, boolean overwrite) {
+    final Map<String, LookupStrategy> newLookupStrategies = copy(this.configuredLookupStrategies);
+
+    packages.forEach(packageName -> {
+      validateLookupPolicy(packageName, lookupStrategy);
+      if (overwrite || !newLookupStrategies.containsKey(normalizePackageName(packageName))) {
+        newLookupStrategies.put(packageName, lookupStrategy);
+      }
+    });
 
     final MuleClassLoaderLookupPolicy muleClassLoaderLookupPolicy =
         new MuleClassLoaderLookupPolicy(newLookupStrategies, rootSystemPackages);

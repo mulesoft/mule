@@ -18,8 +18,8 @@ import org.w3c.dom.Document;
 
 /**
  *
- * Serializer that can convert an {@link ArtifactDeclaration} into a readable and processable XML representation
- * and from a mule XML configuration file into an {@link ArtifactDeclaration} representation.
+ * Serializer that can convert an {@link ArtifactDeclaration} into a readable and processable XML representation and from a mule
+ * XML configuration file into an {@link ArtifactDeclaration} representation.
  *
  * @since 4.0
  */
@@ -29,8 +29,8 @@ public interface ArtifactDeclarationXmlSerializer {
   /**
    * Provides an instance of the default implementation of the {@link ArtifactDeclarationXmlSerializer}.
    *
-   * @param context a {@link DslResolvingContext} that provides access to all the {@link ExtensionModel extensions}
-   *                required for loading a given {@code artifact config} to an {@link ArtifactDeclaration}
+   * @param context a {@link DslResolvingContext} that provides access to all the {@link ExtensionModel extensions} required for
+   *                loading a given {@code artifact config} to an {@link ArtifactDeclaration}
    * @return an instance of the default implementation of the {@link ArtifactDeclarationXmlSerializer}
    */
   static ArtifactDeclarationXmlSerializer getDefault(DslResolvingContext context) {
@@ -56,7 +56,7 @@ public interface ArtifactDeclarationXmlSerializer {
   /**
    * Creates an {@link ArtifactDeclaration} from a given mule artifact XML configuration file.
    *
-   * @param name name of the file to display a better error messages (if there are any).
+   * @param name           name of the file to display a better error messages (if there are any).
    * @param configResource the input stream with the XML configuration content.
    * @return an {@link ArtifactDeclaration} that represents the given mule configuration.
    */

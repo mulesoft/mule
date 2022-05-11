@@ -42,10 +42,10 @@ public final class ExpressionLanguageUtils {
   private ExpressionLanguageUtils() {}
 
   /**
-   * Compiles the given {@code expression} using generic and precalculated {@link BindingContext}.
-   * Said {@link BindingContext} will already have all the usual bindings added by
-   * {@link org.mule.runtime.api.el.BindingContextUtils#addEventBuindingsToBuilder(Event, BindingContext)} plus all the
-   * extension modules and functions.
+   * Compiles the given {@code expression} using generic and precalculated {@link BindingContext}. Said {@link BindingContext}
+   * will already have all the usual bindings added by
+   * {@link org.mule.runtime.api.el.BindingContextUtils#addEventBuindingsToBuilder(Event, BindingContext)} plus all the extension
+   * modules and functions.
    * <p>
    * If you want to use your own {@link BindingContext} then hit {@link ExpressionLanguage#compile(String, BindingContext)}
    * directly.

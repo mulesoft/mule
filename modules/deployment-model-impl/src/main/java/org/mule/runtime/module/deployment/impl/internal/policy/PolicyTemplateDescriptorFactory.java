@@ -7,24 +7,25 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
-import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
+
+import static java.util.stream.Collectors.toSet;
+
 import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
 import org.mule.runtime.api.deployment.persistence.MulePolicyModelJsonSerializer;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepositoryFactory;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 
@@ -48,16 +49,19 @@ public class PolicyTemplateDescriptorFactory
   @SuppressWarnings({"unused"})
   public PolicyTemplateDescriptorFactory() {
     this(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
-         new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry()),
+         new DescriptorLoaderRepositoryFactory().createDescriptorLoaderRepository(),
          ArtifactDescriptorValidatorBuilder.builder());
   }
 
   /**
    * Creates a new factory
    *
-   * @param artifactPluginDescriptorLoader loads the artifact descriptor for plugins used on the policy template. Non null
-   * @param descriptorLoaderRepository contains all the {@link ClassLoaderModelLoader} registered on the container. Non null
-   * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the {@link ArtifactDescriptorValidator} in order to check the state of the descriptor once loaded.
+   * @param artifactPluginDescriptorLoader     loads the artifact descriptor for plugins used on the policy template. Non null
+   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderModelLoader} registered on the container. Non
+   *                                           null
+   * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the
+   *                                           {@link ArtifactDescriptorValidator} in order to check the state of the descriptor
+   *                                           once loaded.
    */
   public PolicyTemplateDescriptorFactory(ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,
                                          DescriptorLoaderRepository descriptorLoaderRepository,

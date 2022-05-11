@@ -7,13 +7,16 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.runtime.ExecutionTypeMapper.asProcessingType;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -37,6 +40,7 @@ import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecu
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import javax.inject.Inject;
 import java.util.List;
 
 /**
@@ -53,6 +57,9 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
   private final EntityMetadataMediator entityMetadataMediator;
 
   private final List<EnrichedErrorMapping> errorMappings;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   public OperationMessageProcessor(ExtensionModel extensionModel,
                                    OperationModel operationModel,
@@ -123,12 +130,26 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
    */
   @Override
   protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {
+    validatePolicyIsolation(configurationProvider);
     ConfigurationModel configurationModel = configurationProvider.getConfigurationModel();
     if (!configurationModel.getOperationModel(componentModel.getName()).isPresent() &&
         !configurationProvider.getExtensionModel().getOperationModel(componentModel.getName()).isPresent()) {
       throw new IllegalOperationException(format(
                                                  "Root component '%s' defines an usage of operation '%s' which points to configuration '%s'. "
                                                      + "The selected config does not support that operation.",
+                                                 getLocation().getRootContainerName(), componentModel.getName(),
+                                                 configurationProvider.getName()));
+    }
+  }
+
+  // TODO MULE-19350 move this validation to the artifact AST construction
+  private void validatePolicyIsolation(ConfigurationProvider configurationProvider) {
+    if (featureFlaggingService.isEnabled(ENABLE_POLICY_ISOLATION)
+        && muleContext.getArtifactType().equals(POLICY)
+        && configurationProvider.getExtensionModel() != extensionModel) {
+      throw new IllegalOperationException(format(
+                                                 "Root component '%s' defines an usage of operation '%s' which points to configuration '%s'. "
+                                                     + "The selected config is not part of the policy declaration and cannot be shared.",
                                                  getLocation().getRootContainerName(), componentModel.getName(),
                                                  configurationProvider.getName()));
     }
@@ -147,12 +168,18 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
   }
 
   @Override
-  protected boolean isAsync() {
-    if (!componentModel.isBlocking()) {
+  protected boolean mayCompleteInDifferentThread() {
+    // If the operation is non blocking we can guarantee that that the processor will jump threads.
+    if (!isBlocking()) {
       return true;
     }
 
-    return super.isAsync();
+    return super.mayCompleteInDifferentThread();
+  }
+
+  @Override
+  protected boolean isBlocking() {
+    return componentModel.isBlocking();
   }
 
   @Override

@@ -29,9 +29,10 @@ import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
+import static org.mule.runtime.core.internal.processor.rector.profiling.ProfilingTestUtils.mockProcessingStrategyProfilingChainWithoutTriggeringEvent;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
-import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServicesWithProfilingService;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.Component;
@@ -53,6 +54,7 @@ import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
+import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -61,6 +63,7 @@ import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -98,7 +101,9 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
   @Before
   public void createMocks() throws Exception {
     muleContext.dispose();
-    muleContext = mockContextWithServices();
+    InternalProfilingService coreProfilingService = mock(InternalProfilingService.class);
+    mockProcessingStrategyProfilingChainWithoutTriggeringEvent(coreProfilingService);
+    muleContext = mockContextWithServicesWithProfilingService(coreProfilingService);
     when(muleContext.getStatistics()).thenReturn(new AllStatistics());
     when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
     notificationFirer = getNotificationDispatcher(muleContext);
@@ -108,7 +113,9 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
   }
 
   private void mockErrorTypeLocator() {
-    ErrorTypeLocator typeLocator = ((PrivilegedMuleContext) muleContext).getErrorTypeLocator();
+    ErrorTypeLocator typeLocator = mock(ErrorTypeLocator.class);
+    ((ContributedErrorTypeLocator) ((PrivilegedMuleContext) muleContext).getErrorTypeLocator()).setDelegate(typeLocator);
+
     ErrorType errorType = mock(ErrorType.class);
     when(errorType.getIdentifier()).thenReturn("ID");
     when(errorType.getNamespace()).thenReturn("NS");

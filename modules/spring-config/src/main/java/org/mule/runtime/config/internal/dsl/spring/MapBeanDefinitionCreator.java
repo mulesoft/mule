@@ -12,6 +12,7 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -35,22 +36,33 @@ import org.springframework.beans.factory.support.ManagedList;
  *
  * @since 4.0
  */
-class MapBeanDefinitionCreator extends BeanDefinitionCreator {
+class MapBeanDefinitionCreator extends BeanDefinitionCreator<CreateParamBeanDefinitionRequest> {
 
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                        CreateBeanDefinitionRequest createBeanDefinitionRequest) {
-    ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
-    ComponentBuildingDefinition componentBuildingDefinition = createBeanDefinitionRequest.getComponentBuildingDefinition();
-    Class<?> type = createBeanDefinitionRequest.retrieveTypeVisitor().getType();
+                        CreateParamBeanDefinitionRequest request) {
+
+    if (request.getComponentHierarchy().isEmpty()) {
+      return false;
+    }
+
+    ComponentBuildingDefinition componentBuildingDefinition = request.getComponentBuildingDefinition();
+    Class<?> type = request.getSpringComponentModel().getType();
     if (Map.class.isAssignableFrom(type) && componentBuildingDefinition.getObjectFactoryType() == null) {
-      ManagedList managedList = componentModel.directChildrenStream()
+
+      Collection<ComponentAst> items = (Collection<ComponentAst>) request.getParam().getValue().getRight();
+
+      items.forEach(request.getNestedComponentParamProcessor());
+
+      ManagedList managedList = items.stream()
           .map(springComponentModels::get)
           .map(SpringComponentModel::getBeanDefinition)
           .collect(toCollection(ManagedList::new));
-      createBeanDefinitionRequest.getSpringComponentModel()
+
+      request.getSpringComponentModel()
           .setBeanDefinition(BeanDefinitionBuilder.genericBeanDefinition(MapFactoryBean.class)
               .addConstructorArgValue(managedList).addConstructorArgValue(type).getBeanDefinition());
+
       return true;
     }
     return false;

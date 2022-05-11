@@ -12,7 +12,6 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
-import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromTextContent;
 import static org.mule.runtime.dsl.api.component.CommonTypeConverters.stringToClassConverter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
@@ -119,12 +118,16 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(Object.class))
         .withObjectFactoryType(ReturnDataObjectFactory.class)
         .withSetterParameterDefinition("file", fromSimpleParameter("file").build())
-        .withSetterParameterDefinition("content", fromTextContent().build())
+        .withSetterParameterDefinition("content", fromSimpleParameter("content").build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("callback")
-        .withTypeDefinition(fromConfigurationAttribute("class")).build());
+        .withTypeDefinition(fromConfigurationAttribute(
+                                                       // TODO MULE-19657 add the group name
+                                                       // "callback",
+                                                       "class"))
+        .build());
 
     componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("assert")
@@ -204,7 +207,7 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
 
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier("check-equals").withTypeDefinition(fromType(EqualsLogChecker.class))
-            .withSetterParameterDefinition("expectedLogMessage", fromTextContent().build())
+            .withSetterParameterDefinition("expectedLogMessage", fromSimpleParameter("expectedLogMessage").build())
             .withSetterParameterDefinition("shouldFilterLogMessage", fromSimpleParameter("filterLog").build()).build());
 
     componentBuildingDefinitions
@@ -247,6 +250,10 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
     }
     for (StackTraceElement element : new Throwable().getStackTrace()) {
       if (element.getClassName().startsWith("org.junit.runners.")) {
+        internalIsRunningTests = true;
+        return true;
+      }
+      if (element.getClassName().startsWith("org.openjdk.jmh.runner.")) {
         internalIsRunningTests = true;
         return true;
       }

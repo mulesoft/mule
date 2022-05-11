@@ -13,9 +13,9 @@ import java.util.List;
 import org.eclipse.aether.artifact.Artifact;
 
 /**
- * Defines the result of the classification process for an artifact. It contains a {@link List} of {@link URL}s that should have the
- * plugin {@link ArtifactClassLoaderHolder} plus a {@link List} of {@link Class}es to be
- * exported in addition to the packages exported by the artifact, in order to run the test.
+ * Defines the result of the classification process for an artifact. It contains a {@link List} of {@link URL}s that should have
+ * the plugin {@link ArtifactClassLoaderHolder} plus a {@link List} of {@link Class}es to be exported in addition to the packages
+ * exported by the artifact, in order to run the test.
  * <p/>
  * It also has dependencies references and nested ones. It represents the graph of plugin dependencies also by the list of
  * children nodes.
@@ -32,10 +32,11 @@ public class ArtifactClassificationNode {
   /**
    * Creates an instance of the classification.
    *
-   * @param artifact the classified {@link Artifact}
-   * @param urls list of {@link URL}s that would be used to create the {@link java.net.URLClassLoader}
-   * @param exportClasses list of {@link Class}es that would be used for exporting as extra classes to the plugin
-   * @param artifactDependencies list of {@link ArtifactClassificationNode} plugin dependencies references for this artifact classified
+   * @param artifact             the classified {@link Artifact}
+   * @param urls                 list of {@link URL}s that would be used to create the {@link java.net.URLClassLoader}
+   * @param exportClasses        list of {@link Class}es that would be used for exporting as extra classes to the plugin
+   * @param artifactDependencies list of {@link ArtifactClassificationNode} plugin dependencies references for this artifact
+   *                             classified
    */
   public ArtifactClassificationNode(Artifact artifact, List<URL> urls, List<Class> exportClasses,
                                     List<ArtifactClassificationNode> artifactDependencies) {

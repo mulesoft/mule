@@ -6,16 +6,8 @@
  */
 package org.mule.runtime.module.tooling.internal;
 
-import static java.lang.Boolean.valueOf;
-import static java.lang.String.format;
-import static java.lang.System.getProperty;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.config.internal.LazyMuleArtifactContext.SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH;
+import static org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext.SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY;
@@ -23,6 +15,17 @@ import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUT
 import static org.mule.runtime.core.api.util.FileUtils.cleanDirectory;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.lookupPomFromMavenLocation;
+
+import static java.lang.Boolean.valueOf;
+import static java.lang.String.format;
+import static java.lang.System.getProperty;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
+import static org.apache.commons.io.FileUtils.deleteQuietly;
+
 import org.mule.api.annotation.NoImplement;
 import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
@@ -31,13 +34,14 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationWrapper;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
-import org.mule.runtime.module.deployment.impl.internal.application.ToolingApplicationDescriptorFactory;
+import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DeployableArtifactWrapper;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
@@ -80,21 +84,21 @@ public class DefaultToolingService implements ToolingService {
 
   private final DefaultDomainFactory domainFactory;
   private final DefaultApplicationFactory applicationFactory;
-  private final ToolingApplicationDescriptorFactory applicationDescriptorFactory;
+  private final AbstractDeployableDescriptorFactory<MuleApplicationModel, ApplicationDescriptor> applicationDescriptorFactory;
 
   private File toolingServiceAppsFolder;
   private ArtifactFileWriter artifactFileWriter;
 
   /**
-   * @param domainRepository {@link DomainRepository} to look up for already deployed domains.
-   * @param domainFactory factory for creating the {@link Domain}
-   * @param applicationFactory factory for creating the {@link Application}
-   * @param applicationDescriptorFactory {@link ToolingApplicationDescriptorFactory} to load the application descriptor.
+   * @param domainRepository             {@link DomainRepository} to look up for already deployed domains.
+   * @param domainFactory                factory for creating the {@link Domain}
+   * @param applicationFactory           factory for creating the {@link Application}
+   * @param applicationDescriptorFactory {@link AbstractDeployableDescriptorFactory} to load the application descriptor.
    */
   public DefaultToolingService(DomainRepository domainRepository,
                                DefaultDomainFactory domainFactory,
                                DefaultApplicationFactory applicationFactory,
-                               ToolingApplicationDescriptorFactory applicationDescriptorFactory) {
+                               AbstractDeployableDescriptorFactory<MuleApplicationModel, ApplicationDescriptor> applicationDescriptorFactory) {
     this.domainRepository = domainRepository;
     this.domainFactory = domainFactory;
     this.applicationFactory = applicationFactory;
@@ -146,7 +150,7 @@ public class DefaultToolingService implements ToolingService {
       throws IOException {
     Optional<Properties> mergedDeploymentProperties = of(createDeploymentProperties(deploymentProperties));
     MuleApplicationModel.MuleApplicationModelBuilder applicationArtifactModelBuilder =
-        applicationDescriptorFactory.createArtifactModelBuilder(toolingApplicationContent);
+        createArtifactModelBuilder(toolingApplicationContent, applicationDescriptorFactory);
     String domainName = mergedDeploymentProperties.get().getProperty(DEPLOYMENT_DOMAIN_NAME_REF);
     if (domainName != null) {
       Domain domain;
@@ -177,6 +181,31 @@ public class DefaultToolingService implements ToolingService {
     }
     return new ToolingApplicationWrapper(doCreateApplication(applicationDescriptorFactory.create(toolingApplicationContent,
                                                                                                  mergedDeploymentProperties)));
+  }
+
+  /**
+   * Creates a {@link MuleApplicationModel.MuleApplicationModelBuilder} for the application from its artifact folder.
+   *
+   * @param artifactFolder location of the application root folder.
+   * @return a {@link MuleApplicationModel.MuleApplicationModelBuilder}.
+   */
+  public MuleApplicationModel.MuleApplicationModelBuilder createArtifactModelBuilder(File artifactFolder,
+                                                                                     AbstractArtifactDescriptorFactory<MuleApplicationModel, ApplicationDescriptor> applicationDescriptorFactory) {
+    MuleApplicationModel muleApplicationModel = applicationDescriptorFactory.createArtifactModel(artifactFolder);
+
+    MuleApplicationModel.MuleApplicationModelBuilder builder =
+        new MuleApplicationModel.MuleApplicationModelBuilder();
+    builder.setRedeploymentEnabled(muleApplicationModel.isRedeploymentEnabled());
+    builder.setName(muleApplicationModel.getName());
+    builder.setConfigs(muleApplicationModel.getConfigs());
+    builder.setMinMuleVersion(muleApplicationModel.getMinMuleVersion());
+    builder.setRequiredProduct(muleApplicationModel.getRequiredProduct());
+    builder.setSecureProperties(muleApplicationModel.getSecureProperties());
+    builder.setLogConfigFile(muleApplicationModel.getLogConfigFile());
+    builder.withBundleDescriptorLoader(muleApplicationModel.getBundleDescriptorLoader());
+    builder.withClassLoaderModelDescriptorLoader(muleApplicationModel.getClassLoaderModelLoaderDescriptor());
+
+    return builder;
   }
 
   /**
@@ -389,9 +418,9 @@ public class DefaultToolingService implements ToolingService {
 
   public static class DomainMavenReactorResolver implements MavenReactorResolver {
 
-    private File domainArtifactLocation;
-    private File domainPomFile;
-    private BundleDescriptor domainBundleDescriptor;
+    private final File domainArtifactLocation;
+    private final File domainPomFile;
+    private final BundleDescriptor domainBundleDescriptor;
 
     public DomainMavenReactorResolver(File domainArtifactLocation, BundleDescriptor domainBundleDescriptor) {
       this.domainArtifactLocation = domainArtifactLocation;

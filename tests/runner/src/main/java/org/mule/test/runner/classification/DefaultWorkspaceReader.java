@@ -53,9 +53,9 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
   /**
    * Creates and instance of the workspace reader for the given classPath and workspaceLocationResolver.
    *
-   * @param classPath {@link URL}s to find the artifact's {@link URL}
+   * @param classPath                 {@link URL}s to find the artifact's {@link URL}
    * @param workspaceLocationResolver {@link WorkspaceLocationResolver} to retrieve the workspace reference for a given
-   *        {@link Artifact}
+   *                                  {@link Artifact}
    */
   public DefaultWorkspaceReader(List<URL> classPath, WorkspaceLocationResolver workspaceLocationResolver) {
     checkNotNull(classPath, "classPath cannot be null");
@@ -69,7 +69,7 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
    * Looks for a matching {@link URL} for a workspace {@link Artifact}. It also supports to look for jars or classes depending if
    * the artifacts were packaged or not.
    *
-   * @param artifact to be used in order to find the {@link URL} in list of urls
+   * @param artifact  to be used in order to find the {@link URL} in list of urls
    * @param classPath a list of {@link URL} obtained from the classPath
    * @return {@link File} that represents the {@link Artifact} passed or null
    */
@@ -158,7 +158,7 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
    * Resolves the location of the {@value #POM_XML} {@link File} taking into account {@value #MAVEN_SHADE_PLUGIN_ARTIFACT_ID}
    * plugin.
    *
-   * @param artifact {@link Artifact} to get its {@value #POM_XML}
+   * @param artifact      {@link Artifact} to get its {@value #POM_XML}
    * @param workspacePath {@link File} referencing the location of the {@link Artifact} in the workspace
    * @return {@link File} to the {@value #POM_XML} of the artifact from the workspace path
    */

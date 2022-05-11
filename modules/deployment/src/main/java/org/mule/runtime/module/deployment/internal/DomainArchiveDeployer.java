@@ -10,6 +10,8 @@ import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
@@ -30,16 +32,17 @@ import org.slf4j.LoggerFactory;
  * <p/>
  * Knows how to deploy / undeploy a domain and a domain bundle (zip with domain + domains apps).
  */
-public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
+public class DomainArchiveDeployer implements ArchiveDeployer<DomainDescriptor, Domain> {
 
   private transient final Logger logger = LoggerFactory.getLogger(getClass());
 
   public static final String DOMAIN_BUNDLE_APPS_FOLDER = "apps";
-  private final ArchiveDeployer<Domain> domainDeployer;
+  private final ArchiveDeployer<DomainDescriptor, Domain> domainDeployer;
   private final DeploymentService deploymentService;
-  private final ArchiveDeployer<Application> applicationDeployer;
+  private final ArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer;
 
-  public DomainArchiveDeployer(ArchiveDeployer<Domain> domainDeployer, ArchiveDeployer<Application> applicationDeployer,
+  public DomainArchiveDeployer(ArchiveDeployer<DomainDescriptor, Domain> domainDeployer,
+                               ArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer,
                                DeploymentService deploymentService) {
     this.domainDeployer = domainDeployer;
     this.applicationDeployer = applicationDeployer;
@@ -94,7 +97,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
   }
 
   @Override
-  public void setArtifactFactory(ArtifactFactory<Domain> artifactFactory) {
+  public void setArtifactFactory(ArtifactFactory<DomainDescriptor, Domain> artifactFactory) {
     domainDeployer.setArtifactFactory(artifactFactory);
   }
 
@@ -139,8 +142,4 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
     domainDeployer.doNotPersistArtifactStop(artifact);
   }
 
-  @Override
-  public void doNotPersistFlowsStop(String artifactName) {
-    domainDeployer.doNotPersistFlowsStop(artifactName);
-  }
 }

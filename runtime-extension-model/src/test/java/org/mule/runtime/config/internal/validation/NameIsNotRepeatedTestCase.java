@@ -6,19 +6,24 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static java.lang.String.format;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
 import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 
+import static java.lang.String.format;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
 import java.util.Optional;
 
 import org.junit.Test;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
 @Feature(MULE_DSL)
@@ -34,7 +39,25 @@ public class NameIsNotRepeatedTestCase extends AbstractCoreValidationTestCase {
 
   @Test
   public void repeatedGlobalNames() {
-    final Optional<String> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+    final Optional<ValidationResultItem> msg = runValidation(getConfigDsl())
+        .stream().findFirst();
+
+    assertThat(msg.get().getMessage(),
+               containsString(format("Two (or more) configuration elements have been defined with the same global name. Global name '%s' must be unique",
+                                     REPEATED_GLOBAL_NAME)));
+  }
+
+  @Test
+  @Issue("MULE-19959")
+  public void repeatedGlobalNamesAllReported() {
+    final Optional<ValidationResultItem> msg = runValidation(getConfigDsl())
+        .stream().findFirst();
+
+    assertThat(msg.get().getComponents(), hasSize(2));
+  }
+
+  protected String getConfigDsl() {
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
         "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
         "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
         "      xmlns:test=\"http://www.mulesoft.org/schema/mule/test\"\n" +
@@ -49,10 +72,6 @@ public class NameIsNotRepeatedTestCase extends AbstractCoreValidationTestCase {
         "        <logger/>\n" +
         "    </flow>\n" +
         "    \n" +
-        "</mule>");
-
-    assertThat(msg.get(),
-               containsString(format("Two configuration elements have been defined with the same global name. Global name [%s] must be unique",
-                                     REPEATED_GLOBAL_NAME)));
+        "</mule>";
   }
 }

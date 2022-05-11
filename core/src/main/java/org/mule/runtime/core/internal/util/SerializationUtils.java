@@ -49,9 +49,9 @@ public class SerializationUtils {
    * </p>
    *
    * @param inputStream the serialized object input stream, must not be null
-   * @param cl classloader which can load custom classes from the stream
+   * @param cl          classloader which can load custom classes from the stream
    * @return the deserialized object
-   * @throws IllegalArgumentException if <code>inputStream</code> is <code>null</code>
+   * @throws IllegalArgumentException                        if <code>inputStream</code> is <code>null</code>
    * @throws org.apache.commons.lang3.SerializationException (runtime) if the serialization fails
    */
   public static Object deserialize(InputStream inputStream, ClassLoader cl, MuleContext muleContext) {
@@ -93,10 +93,10 @@ public class SerializationUtils {
    * </p>
    *
    * @param objectData the serialized object, must not be null
-   * @param cl classloader which can load custom classes from the stream
+   * @param cl         classloader which can load custom classes from the stream
    * @return the deserialized object
    * @throws IllegalArgumentException if <code>objectData</code> is <code>null</code>
-   * @throws SerializationException (runtime) if the serialization fails
+   * @throws SerializationException   (runtime) if the serialization fails
    */
   private static Object deserialize(byte[] objectData, ClassLoader cl, MuleContext muleContext) {
     if (objectData == null) {

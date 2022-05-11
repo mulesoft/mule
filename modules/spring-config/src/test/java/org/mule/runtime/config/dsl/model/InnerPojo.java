@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.dsl.model;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +25,10 @@ public class InnerPojo {
     this.stringParam = stringParam;
     this.listParam = listParam;
     this.mapParam = mapParam;
+  }
+
+  public InnerPojo copy() {
+    return new InnerPojo(intParam, stringParam, new ArrayList<>(listParam), new HashMap<>(mapParam));
   }
 
   public int getIntParam() {

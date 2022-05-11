@@ -7,6 +7,7 @@
 package org.mule.test.module.extension.metadata;
 
 import static java.lang.String.format;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
@@ -27,6 +28,9 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.EUROPE;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.LA_PLATA;
 import static org.mule.test.module.extension.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.EXPLICIT_RESOLUTION;
+
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -159,9 +163,24 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<
     assertExpectedType(outputMetadataDescriptor.getAttributesMetadata().getType(), StringAttributes.class);
   }
 
+  @Test
+  public void getSourceMultilevelDynamicOutputMetadataImplicitResolution() throws Exception {
+    Location location = builder().globalName(SOURCE_METADATA_WITH_MULTILEVEL).addSourcePart().build();
+    MetadataResult<ComponentMetadataDescriptor<SourceModel>> outputMetadataResult =
+        metadataService.getSourceMetadata(location);
+    assertThat(outputMetadataResult.isSuccess(), is(true));
+    SourceModel sourceModel = outputMetadataResult.get().getModel();
+    MetadataType outputType = sourceModel.getOutput().getType();
+    assertThat(outputType, instanceOf(ObjectType.class));
+    ObjectType outputObjectType = (ObjectType) outputType;
+    assertThat(outputObjectType.getFieldByName(AMERICA).isPresent(), is(true));
+    assertThat(outputObjectType.getFieldByName(ARGENTINA).isPresent(), is(true));
+    assertThat(outputObjectType.getFieldByName(BUENOS_AIRES).isPresent(), is(true));
+  }
+
   /**
-   * Since the classloader for this tests is different from the one that actually initialize the components
-   * the STARTED/STOPPED information is retrieved building a key with the source status in the correct environment.
+   * Since the classloader for this tests is different from the one that actually initialize the components the STARTED/STOPPED
+   * information is retrieved building a key with the source status in the correct environment.
    */
   @Test
   public void sourcesMustNotStartWhenResolvingMetadata() {
@@ -171,8 +190,8 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<
   }
 
   /**
-   * Since the classloader for this tests is different from the one that actually initialize the components
-   * the STARTED/STOPPED information is retrieved building a key with the source status in the correct environment.
+   * Since the classloader for this tests is different from the one that actually initialize the components the STARTED/STOPPED
+   * information is retrieved building a key with the source status in the correct environment.
    */
   @Test
   public void sourcesMustStartConnectionProvidersWhenResolvingMetadata() {

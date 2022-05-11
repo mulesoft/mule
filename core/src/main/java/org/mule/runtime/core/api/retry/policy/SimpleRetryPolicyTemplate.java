@@ -11,7 +11,7 @@ import org.mule.runtime.core.internal.retry.policies.SimpleRetryPolicy;
 /**
  * This policy allows the user to configure how many times a retry should be attempted and how long to wait between retries.
  */
-public final class SimpleRetryPolicyTemplate extends AbstractPolicyTemplate {
+public class SimpleRetryPolicyTemplate extends AbstractPolicyTemplate {
 
   public static final int DEFAULT_FREQUENCY = 2000;
   public static final int DEFAULT_RETRY_COUNT = 2;

@@ -191,8 +191,8 @@ public final class Base64 {
    * actual number of significant bytes in your array is given by <var>numSigBytes</var>. The array <var>threeBytes</var> needs
    * only be as big as <var>numSigBytes</var>. Code can reuse a byte array by passing a four-byte array as <var>b4</var>.
    * 
-   * @param b4 A reusable byte array to reduce array instantiation
-   * @param threeBytes the array to convert
+   * @param b4          A reusable byte array to reduce array instantiation
+   * @param threeBytes  the array to convert
    * @param numSigBytes the number of significant bytes in your array
    * @return four byte array in Base64 notation.
    * @since 1.5.1
@@ -209,11 +209,11 @@ public final class Base64 {
    * <var>srcOffset</var> + 3 for the <var>source</var> array or <var>destOffset</var> + 4 for the <var>destination</var> array.
    * The actual number of significant bytes in your array is given by <var>numSigBytes</var>.
    * 
-   * @param source the array to convert
-   * @param srcOffset the index where conversion begins
+   * @param source      the array to convert
+   * @param srcOffset   the index where conversion begins
    * @param numSigBytes the number of significant bytes in your array
    * @param destination the array to hold the conversion
-   * @param destOffset the index where output will be put
+   * @param destOffset  the index where output will be put
    * @return the <var>destination</var> array
    * @since 1.3
    */
@@ -291,7 +291,7 @@ public final class Base64 {
    * Example: <code>encodeObject( myObj, Base64.GZIP | Base64.DONT_BREAK_LINES )</code>
    * 
    * @param serializableObject The object to encode
-   * @param options Specified options
+   * @param options            Specified options
    * @return The Base64-encoded object
    * @see Base64#GZIP
    * @see Base64#DONT_BREAK_LINES
@@ -377,7 +377,7 @@ public final class Base64 {
    * <p>
    * Example: <code>encodeBytes( myData, Base64.GZIP | Base64.DONT_BREAK_LINES )</code>
    * 
-   * @param source The data to convert
+   * @param source  The data to convert
    * @param options Specified options
    * @see Base64#GZIP
    * @see Base64#DONT_BREAK_LINES
@@ -391,8 +391,8 @@ public final class Base64 {
    * Encodes a byte array into Base64 notation. Does not GZip-compress data.
    * 
    * @param source The data to convert
-   * @param off Offset in array where conversion should begin
-   * @param len Length of data to convert
+   * @param off    Offset in array where conversion should begin
+   * @param len    Length of data to convert
    * @since 1.4
    */
   public static String encodeBytes(byte[] source, int off, int len) throws IOException {
@@ -415,9 +415,9 @@ public final class Base64 {
    * <p>
    * Example: <code>encodeBytes( myData, Base64.GZIP | Base64.DONT_BREAK_LINES )</code>
    * 
-   * @param source The data to convert
-   * @param off Offset in array where conversion should begin
-   * @param len Length of data to convert
+   * @param source  The data to convert
+   * @param off     Offset in array where conversion should begin
+   * @param len     Length of data to convert
    * @param options Specified options
    * @see Base64#GZIP
    * @see Base64#DONT_BREAK_LINES
@@ -515,10 +515,10 @@ public final class Base64 {
    * accomodate <var>srcOffset</var> + 4 for the <var>source</var> array or <var>destOffset</var> + 3 for the
    * <var>destination</var> array. This method returns the actual number of bytes that were converted from the Base64 encoding.
    * 
-   * @param source the array to convert
-   * @param srcOffset the index where conversion begins
+   * @param source      the array to convert
+   * @param srcOffset   the index where conversion begins
    * @param destination the array to hold the conversion
-   * @param destOffset the index where output will be put
+   * @param destOffset  the index where output will be put
    * @return the number of decoded bytes converted
    * @since 1.3
    */
@@ -585,8 +585,8 @@ public final class Base64 {
    * any other "fancy" features.
    * 
    * @param source The Base64 encoded data
-   * @param off The offset of where to begin decoding
-   * @param len The length of characters to decode
+   * @param off    The offset of where to begin decoding
+   * @param len    The length of characters to decode
    * @return decoded data
    * @since 1.3
    */
@@ -753,7 +753,7 @@ public final class Base64 {
    * Convenience method for encoding data to a file.
    * 
    * @param dataToEncode byte array of data to encode in base64 form
-   * @param filename Filename for saving encoded data
+   * @param filename     Filename for saving encoded data
    * @since 2.1
    */
   public static void encodeToFile(byte[] dataToEncode, String filename) throws IOException {
@@ -775,7 +775,7 @@ public final class Base64 {
    * Convenience method for decoding data to a file.
    * 
    * @param dataToDecode Base64-encoded data as a string
-   * @param filename Filename for saving decoded data
+   * @param filename     Filename for saving decoded data
    * @since 2.1
    */
   public static void decodeToFile(String dataToDecode, String filename) throws IOException {
@@ -922,7 +922,7 @@ public final class Base64 {
      * <p>
      * Example: <code>new Base64.InputStream( in, Base64.DECODE )</code>
      * 
-     * @param in the <tt>InputStream</tt> from which to read data.
+     * @param in      the <tt>InputStream</tt> from which to read data.
      * @param options Specified options
      * @see Base64#ENCODE
      * @see Base64#DECODE
@@ -1054,8 +1054,8 @@ public final class Base64 {
      * bytes read into array or -1 if end of stream is encountered.
      * 
      * @param dest array to hold values
-     * @param off offset for array
-     * @param len max number of bytes to read into array
+     * @param off  offset for array
+     * @param len  max number of bytes to read into array
      * @return bytes read into array or -1 if end of stream is encountered.
      * @since 1.3
      */
@@ -1127,7 +1127,7 @@ public final class Base64 {
      * <p>
      * Example: <code>new Base64.OutputStream( out, Base64.ENCODE )</code>
      * 
-     * @param out the <tt>OutputStream</tt> to which data will be written.
+     * @param out     the <tt>OutputStream</tt> to which data will be written.
      * @param options Specified options.
      * @see Base64#ENCODE
      * @see Base64#DECODE
@@ -1201,8 +1201,8 @@ public final class Base64 {
      * Calls {@link #write(int)} repeatedly until <var>len</var> bytes are written.
      * 
      * @param theBytes array from which to read bytes
-     * @param off offset for array
-     * @param len max number of bytes to read into array
+     * @param off      offset for array
+     * @param len      max number of bytes to read into array
      * @since 1.3
      */
     @Override

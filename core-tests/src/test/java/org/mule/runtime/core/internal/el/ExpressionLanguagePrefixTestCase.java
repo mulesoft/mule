@@ -17,12 +17,14 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAUL
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 
 import org.mule.runtime.core.internal.el.dataweave.DataWeaveExpressionLanguageAdaptor;
-import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Collection;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -30,10 +32,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.mockito.verification.VerificationMode;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
+import org.mockito.verification.VerificationMode;
 
 @Feature(EXPRESSION_LANGUAGE)
 @Story("Support Mixing DW and MEL in a same application")
@@ -43,7 +43,7 @@ public class ExpressionLanguagePrefixTestCase extends AbstractMuleTestCase {
 
   private ExpressionLanguageAdaptorHandler elAdapter;
   private DataWeaveExpressionLanguageAdaptor dwLanguage;
-  private MVELExpressionLanguage melLanguage;
+  private ExtendedExpressionLanguageAdaptor melLanguage;
 
   @Rule
   public SystemProperty melDefault;
@@ -71,7 +71,7 @@ public class ExpressionLanguagePrefixTestCase extends AbstractMuleTestCase {
   @Before
   public void before() {
     dwLanguage = mock(DataWeaveExpressionLanguageAdaptor.class);
-    melLanguage = mock(MVELExpressionLanguage.class);
+    melLanguage = mock(ExtendedExpressionLanguageAdaptor.class);
     elAdapter = new ExpressionLanguageAdaptorHandler(dwLanguage, melLanguage);
   }
 

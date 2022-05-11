@@ -11,14 +11,14 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 
 import java.util.List;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Resolves data type conversion finding an appropriate converter that is able to execute the required transformation. The lookup
@@ -28,11 +28,11 @@ public class DynamicDataTypeConversionResolver implements DataTypeConversionReso
 
   private static final Logger logger = LoggerFactory.getLogger(DynamicDataTypeConversionResolver.class);
 
-  private final MuleContext muleContext;
+  private final TransformersRegistry transformersRegistry;
 
   @Inject
-  public DynamicDataTypeConversionResolver(MuleContext muleContext) {
-    this.muleContext = muleContext;
+  public DynamicDataTypeConversionResolver(TransformersRegistry transformersRegistry) {
+    this.transformersRegistry = transformersRegistry;
   }
 
   @Override
@@ -41,7 +41,7 @@ public class DynamicDataTypeConversionResolver implements DataTypeConversionReso
 
     for (DataType targetDataType : targetDataTypes) {
       try {
-        transformer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(sourceType, targetDataType);
+        transformer = transformersRegistry.lookupTransformer(sourceType, targetDataType);
 
         if (transformer != null) {
           break;

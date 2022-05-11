@@ -44,9 +44,14 @@ import javax.xml.bind.annotation.XmlType;
 @XmlEnum
 public enum DerivationControl {
 
-  @XmlEnumValue("substitution") SUBSTITUTION("substitution"), @XmlEnumValue("extension") EXTENSION(
-      "extension"), @XmlEnumValue("restriction") RESTRICTION(
-          "restriction"), @XmlEnumValue("list") LIST("list"), @XmlEnumValue("union") UNION("union");
+  @XmlEnumValue("substitution")
+  SUBSTITUTION("substitution"), @XmlEnumValue("extension")
+  EXTENSION(
+      "extension"), @XmlEnumValue("restriction")
+  RESTRICTION(
+      "restriction"), @XmlEnumValue("list")
+  LIST("list"), @XmlEnumValue("union")
+  UNION("union");
 
   private final String value;
 

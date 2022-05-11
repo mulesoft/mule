@@ -24,7 +24,7 @@ public final class PropertiesBootstrapService implements BootstrapService {
    * Creates a new instance
    *
    * @param classLoader classLoader used to create bootstrapping objects
-   * @param properties properties defining the bootstrapping objects
+   * @param properties  properties defining the bootstrapping objects
    */
   public PropertiesBootstrapService(ClassLoader classLoader, Properties properties) {
     this.classLoader = classLoader;

@@ -17,20 +17,20 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.ReconnectionStrategyTypeBuilder.RECONNECTION_CONFIG;
-import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
+import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SUB_FLOW;
+import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.CONFIG_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
-import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
 
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
@@ -51,13 +51,12 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
-import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
-import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
+import org.mule.runtime.extension.internal.ast.property.GlobalElementComponentModelModelProperty;
+import org.mule.runtime.extension.internal.ast.property.OperationComponentModelModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.marvel.MarvelExtension;
@@ -80,6 +79,7 @@ import org.junit.runners.Parameterized.Parameters;
 import com.google.common.collect.ImmutableSet;
 
 import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 
 @RunWith(Parameterized.class)
 public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
@@ -93,7 +93,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
 
   /**
    * @param validateXml whether the XML must be valid while loading the extension model or not. Useful to determine if the default
-   *        values are properly feed when reading the document.
+   *                    values are properly feed when reading the document.
    */
   public XmlExtensionLoaderTestCase(boolean validateXml) {
     this.validateXml = validateXml;
@@ -148,7 +148,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(globalElementComponentModelModelProperty.isPresent(), is(true));
     assertThat(globalElementComponentModelModelProperty.get().getGlobalElements().size(), is(1));
 
-    assertThat(configurationModel.getOperationModels().size(), is(10));
+    assertThat(configurationModel.getOperationModels().size(), is(12));
 
     Optional<OperationModel> operationModel = configurationModel.getOperationModel("set-payload-add-param-and-property-values");
     assertThat(operationModel.isPresent(), is(true));
@@ -206,7 +206,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(extensionModel.getName(), is("module-json-custom-types"));
     assertThat(extensionModel.getConfigurationModels().size(), is(0));
     assertThat(extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent(), is(false));
-    assertThat(extensionModel.getOperationModels().size(), is(9));
+    assertThat(extensionModel.getOperationModels().size(), is(11));
 
     Optional<OperationModel> operationModel = extensionModel.getOperationModel("operation-with-custom-types");
     assertThat(operationModel.isPresent(), is(true));
@@ -341,7 +341,6 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(allParameterModels.get(0).getName(), is("paramWithDoc"));
     assertThat(allParameterModels.get(0).getDescription(), is("Documentation for the parameter"));
     assertThat(allParameterModels.get(0).getLayoutModel().get().getTabName().get(), is(Placement.DEFAULT_TAB));
-    assertThat(allParameterModels.get(0).getLayoutModel().get().getOrder().isPresent(), is(false));
 
     assertThat(allParameterModels.get(1).getName(), is("hiddenParamWithDoc"));
     assertThat(allParameterModels.get(1).getDescription(),
@@ -450,6 +449,29 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(extensionModel.getConfigurationModels().size(), is(0));
     assertThat(extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent(), is(false));
     assertThat(extensionModel.getOperationModels().size(), is(12));
+  }
+
+  @Test
+  @Issue("MULE-19483")
+  public void moduleCallingOperationsWithinModuleNoTnsSchemaLocation() {
+    String modulePath = "modules/module-calling-operations-within-module-no-tns-schema-location.xml";
+
+    if (validateXml) {
+      try {
+        getExtensionModelFrom(modulePath);
+        fail("Should not have reached up to this point, the XML is invalid and the ExtensionModel should not be generated.");
+      } catch (MuleRuntimeException e) {
+        assertThat(e.getMessage(), containsString("Invalid content was found starting with element"));
+        assertThat(e.getMessage(), containsString("internal-set-payload-hardcoded-value"));
+      }
+    } else {
+      ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
+
+      assertThat(extensionModel.getName(), is("module-calling-operations-within-module"));
+      assertThat(extensionModel.getConfigurationModels().size(), is(0));
+      assertThat(extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent(), is(false));
+      assertThat(extensionModel.getOperationModels().size(), is(12));
+    }
   }
 
   @Test
@@ -578,7 +600,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
    * If {@link #validateXml} is true, the XML of the smart connector must be validated when reading it. False otherwise. Useful to
    * simulate the {@link ExtensionModel} generation of a connector that has malformed message processors in the <body/> element.
    *
-   * @param modulePath relative path to the XML connector.
+   * @param modulePath        relative path to the XML connector.
    * @param expectedResources list of resources to export
    * @return an {@link ExtensionModel}
    */

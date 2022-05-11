@@ -7,8 +7,16 @@
 
 package org.mule.test.runner.api;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+
+import static com.google.common.collect.Lists.newArrayList;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -16,11 +24,8 @@ import static org.hamcrest.Matchers.emptyCollectionOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.rules.ExpectedException.none;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
+import static org.mockito.ArgumentMatchers.contains;
+
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -38,7 +43,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.Matchers;
 
 @SmallTest
 public class PluginResourcesResolverTestCase extends AbstractMuleTestCase {
@@ -59,7 +63,7 @@ public class PluginResourcesResolverTestCase extends AbstractMuleTestCase {
     PluginUrlClassification mulePluginClassification = newPluginUrlClassification(Collections.<URL>emptyList());
     PluginResourcesResolver resolver = new PluginResourcesResolver();
     expectedException.expect(IllegalStateException.class);
-    expectedException.expectMessage(Matchers.contains(MULE_ARTIFACT_JSON_DESCRIPTOR + " couldn't be found for plugin"));
+    expectedException.expectMessage(contains(MULE_ARTIFACT_JSON_DESCRIPTOR + " couldn't be found for plugin"));
     resolver.resolvePluginResourcesFor(mulePluginClassification);
   }
 
@@ -92,8 +96,7 @@ public class PluginResourcesResolverTestCase extends AbstractMuleTestCase {
   }
 
   private PluginUrlClassification newPluginUrlClassification(List<URL> urls) {
-    return new PluginUrlClassification(MULE_PLUGIN_CLASSIFIER, urls, Collections.<Class>emptyList(),
-                                       Collections.<String>emptyList());
+    return new PluginUrlClassification(MULE_PLUGIN_CLASSIFIER, urls, emptyList(), emptyList());
   }
 
   private void assertResolvedResources(PluginUrlClassification original, PluginUrlClassification resolved) {

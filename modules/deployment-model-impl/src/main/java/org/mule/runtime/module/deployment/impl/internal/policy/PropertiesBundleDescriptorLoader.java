@@ -39,8 +39,8 @@ public class PropertiesBundleDescriptorLoader implements BundleDescriptorLoader 
    *
    *
    * @param artifactFolder {@link File} where the current artifact to work with. Non null
-   * @param attributes attributes defined in the loader.
-   * @param artifactType the type of the artifact of the descriptor to be loaded.
+   * @param attributes     attributes defined in the loader.
+   * @param artifactType   the type of the artifact of the descriptor to be loaded.
    * @return a locator of the coordinates of the current artifact
    * @throws ArtifactDescriptorCreateException if any bundle descriptor required property is missing on the given attributes.
    */

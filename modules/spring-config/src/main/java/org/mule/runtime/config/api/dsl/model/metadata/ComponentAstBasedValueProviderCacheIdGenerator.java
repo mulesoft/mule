@@ -12,33 +12,37 @@ import static java.util.Optional.of;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.computeHashFor;
-import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.getSourceElementName;
+import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.computeIdFor;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.resolveConfigName;
 import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.sourceElementNameFromSimpleValue;
+import static org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedIdHelper.sourceElementName;
 import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.aValueProviderCacheId;
 import static org.mule.runtime.core.internal.value.cache.ValueProviderCacheId.ValueProviderCacheIdBuilder.fromElementWithName;
+
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
+import org.mule.runtime.core.internal.util.cache.CacheIdBuilderAdapter;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
-
-import com.google.common.base.Objects;
+import org.mule.runtime.module.extension.internal.value.ValueProviderUtils;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import com.google.common.base.Objects;
 
 /**
  * A {@link ComponentAst} based implementation of a {@link ValueProviderCacheIdGenerator}
@@ -74,6 +78,29 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
             .flatMap(infoMap -> resolveId(containerComponent, valueProviderModel, infoMap)));
   }
 
+  /**
+   * {@inheritDoc}
+   * <p/>
+   * The returned {@link ValueProviderCacheId} will contain all acting parameters required by the
+   * {@link org.mule.runtime.extension.api.values.ValueProvider} as parts. In case the {@link ComponentAst} corresponds to a
+   * Source or Operation, if the {@link org.mule.runtime.extension.api.values.ValueProvider} requires a connection or a
+   * configuration, their id will be added as part. The resolution of a config or connection id as part is different from the one
+   * done when their are the one's holding the resolving parameter. In the case they are parts needed by another
+   * {@link org.mule.runtime.extension.api.values.ValueProvider}, acting parameters will not exist. Therefore, only parameters
+   * required for metadata are used as input to calculate the {@link ValueProviderCacheId}.
+   */
+  @Override
+  public Optional<ValueProviderCacheId> getIdForResolvedValues(ComponentAst containerComponent, String parameterName,
+                                                               String targetPath) {
+    return ifContainsParameter(containerComponent, parameterName)
+        .flatMap(pm -> pm.getFieldValueProviderModels()
+            .stream()
+            .filter(fm -> Objects.equal(fm.getTargetSelector(), targetPath))
+            .findAny())
+        .flatMap(fieldModel -> resolveParametersInformation(containerComponent)
+            .flatMap(infoMap -> resolveId(containerComponent, fieldModel, infoMap)));
+  }
+
   private Optional<ParameterModel> ifContainsParameter(ComponentAst containerComponent, String parameterName) {
     return containerComponent.getModel(ParameterizedModel.class)
         .flatMap(parameterizedModel -> parameterizedModel
@@ -87,7 +114,7 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
     return containerComponent.getModel(ParameterizedModel.class)
         .map(parameterizedModel -> containerComponent.getParameters()
             .stream()
-            .map(p -> new ParameterModelInformation(p))
+            .map(ParameterModelInformation::new)
             .collect(toMap(i -> i.getParameterModel().getName(), identity())));
   }
 
@@ -95,23 +122,21 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
                                                    Map<String, ParameterModelInformation> parameterModelsInformation) {
     final Optional<ComponentModel> compModel = containerComponent.getModel(ComponentModel.class);
 
-    if (compModel.isPresent()) {
-      return resolveForComponentModel(containerComponent, valueProviderModel, parameterModelsInformation);
-    } else {
-      return resolveForGlobalElement(containerComponent, valueProviderModel, parameterModelsInformation);
-    }
+    return compModel
+        .map(c -> resolveForComponentModel(containerComponent, valueProviderModel, parameterModelsInformation))
+        .orElse(resolveForGlobalElement(containerComponent, valueProviderModel, parameterModelsInformation));
   }
 
   private Optional<ValueProviderCacheId> resolveForGlobalElement(ComponentAst containerComponent,
                                                                  ValueProviderModel valueProviderModel,
                                                                  Map<String, ParameterModelInformation> parameterModelsInformation) {
-    List<ValueProviderCacheId> parts = new LinkedList<>();
 
-    parts.addAll(resolveActingParameterIds(containerComponent, valueProviderModel, parameterModelsInformation));
+    List<ValueProviderCacheId> parts =
+        new LinkedList<>(resolveActingParameterIds(containerComponent, valueProviderModel, parameterModelsInformation));
     parts.add(resolveValueProviderId(valueProviderModel));
     parts.add(aValueProviderCacheId(fromElementWithName(VALUE_PROVIDER).withHashValueFrom(VALUE_PROVIDER)));
 
-    String id = getSourceElementName(containerComponent);
+    String id = sourceElementName(containerComponent);
     return of(aValueProviderCacheId(fromElementWithName(id).withHashValueFrom(resolveDslTagNamespace(containerComponent))
         .containing(parts)));
   }
@@ -126,7 +151,7 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
     parts.add(resolveValueProviderId(valueProviderModel));
     parts.add(aValueProviderCacheId(fromElementWithName(VALUE_PROVIDER).withHashValueFrom(VALUE_PROVIDER)));
 
-    String id = getSourceElementName(containerComponent);
+    String id = containerComponent.getIdentifier().toString();
     return of(aValueProviderCacheId(fromElementWithName(id).withHashValueFrom(resolveDslTagNamespace(containerComponent))
         .containing(parts)));
   }
@@ -202,21 +227,23 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
   private List<ValueProviderCacheId> resolveActingParameterIds(ComponentAst containerComponent,
                                                                ValueProviderModel valueProviderModel,
                                                                Map<String, ParameterModelInformation> parameterModelsInformation) {
-    return valueProviderModel.getActingParameters()
+    return valueProviderModel.getParameters()
         .stream()
+        .map(ActingParameterModel::getExtractionExpression)
+        .map(ValueProviderUtils::getParameterNameFromExtractionExpression)
         .filter(parameterModelsInformation::containsKey)
-        .map(ap -> resolveParameterId(containerComponent, parameterModelsInformation.get(ap).getParameterAst()))
+        .map(parameterModelsInformation::get)
+        .map(ParameterModelInformation::getParameterAst)
+        .map(ast -> resolveParameterId(containerComponent, ast))
         .collect(toList());
   }
 
   private ValueProviderCacheId resolveParameterId(ComponentAst containerComponent,
                                                   ComponentParameterAst componentParameterAst) {
-    return aValueProviderCacheId(fromElementWithName("param:"
-        + sourceElementNameFromSimpleValue(containerComponent, componentParameterAst))
-            .withHashValue(computeHashFor(componentParameterAst)));
+    return computeIdFor(containerComponent, componentParameterAst, ValueProviderCacheIdBuilderAdapter::new);
   }
 
-  private class ParameterModelInformation {
+  private static class ParameterModelInformation {
 
     private final ComponentParameterAst parameterAst;
 
@@ -233,5 +260,44 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
     }
 
   }
+
+  private static class ValueProviderCacheIdBuilderAdapter implements CacheIdBuilderAdapter<ValueProviderCacheId> {
+
+    private ValueProviderCacheId.ValueProviderCacheIdBuilder builder;
+
+    @Override
+    public CacheIdBuilderAdapter<ValueProviderCacheId> withSourceElementName(String name) {
+      this.builder = fromElementWithName(name);
+      return this;
+    }
+
+    @Override
+    public CacheIdBuilderAdapter<ValueProviderCacheId> withHashValue(int value) {
+      validateInitialized();
+      this.builder.withHashValue(value);
+      return this;
+    }
+
+    @Override
+    public CacheIdBuilderAdapter<ValueProviderCacheId> containing(List<ValueProviderCacheId> parts) {
+      validateInitialized();
+      this.builder.containing(parts);
+      return this;
+    }
+
+    @Override
+    public ValueProviderCacheId build() {
+      validateInitialized();
+      return aValueProviderCacheId(this.builder);
+    }
+
+    private void validateInitialized() {
+      if (this.builder == null) {
+        throw new RuntimeException("withSourceElementName() never called");
+      }
+    }
+
+  }
+
 
 }

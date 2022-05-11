@@ -30,23 +30,18 @@ import org.apache.logging.log4j.core.util.ShutdownCallbackRegistry;
 import org.apache.logging.log4j.spi.LoggerContextFactory;
 
 /**
- * Implementation of {@link LoggerContextFactory} which acts as the bootstrap for mule's logging
- * mechanism.
+ * Implementation of {@link LoggerContextFactory} which acts as the bootstrap for mule's logging mechanism.
  * <p/>
- * It forces {@link ArtifactAwareContextSelector} as the only selector,
- * {@link XmlConfigurationFactory} as the only available
- * {@link ConfigurationFactory}, and sets
- * {@link AsyncLoggerExceptionHandler} as the {@link ExceptionHandler}
- * for failing async loggers.
+ * It forces {@link ArtifactAwareContextSelector} as the only selector, {@link XmlConfigurationFactory} as the only available
+ * {@link ConfigurationFactory}, and sets {@link AsyncLoggerExceptionHandler} as the {@link ExceptionHandler} for failing async
+ * loggers.
  * <p/>
- * Other than that, it's pretty much a copy paste of {@link Log4jContextFactory}, due to that
- * classes' lack of extensibility.
+ * Other than that, it's pretty much a copy paste of {@link Log4jContextFactory}, due to that classes' lack of extensibility.
  * <p/>
- * By forcing {@link XmlConfigurationFactory} as the only available
- * {@link ConfigurationFactory} we're disabling log4j2's ability to take json and yaml
- * configurations. This is so because those configuration factories depend on versions of the jackson libraries which would cause
- * conflict with the ones in mule. TODO: Upgrade the jackson libraries bundled with mule so that this restriction can be lifted
- * off
+ * By forcing {@link XmlConfigurationFactory} as the only available {@link ConfigurationFactory} we're disabling log4j2's ability
+ * to take json and yaml configurations. This is so because those configuration factories depend on versions of the jackson
+ * libraries which would cause conflict with the ones in mule. TODO: Upgrade the jackson libraries bundled with mule so that this
+ * restriction can be lifted off
  * <p/>
  * This class also implements {@link ShutdownCallbackRegistry} to avoid default behaviour which is
  *

@@ -27,6 +27,7 @@ public final class FunctionalReadWriteLock {
 
   /**
    * Functional interface for releasing a subject lock.
+   * 
    * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually instead
    */
   @FunctionalInterface
@@ -68,7 +69,7 @@ public final class FunctionalReadWriteLock {
    * {@link #withReadLock(CheckedRunnable)} or {@link #withReadLock(CheckedSupplier)} instead.
    *
    * @param function the protected function
-   * @param <T> the generic type of the return value
+   * @param <T>      the generic type of the return value
    * @return the function's output
    */
   public <T> T withReadLock(CheckedFunction<LockReleaser, T> function) {
@@ -85,7 +86,7 @@ public final class FunctionalReadWriteLock {
    * Executes the given supplier under the protection of the read lock and returns the generated value.
    *
    * @param supplier a {@link CheckedSupplier}
-   * @param <T> the generic type of the output value
+   * @param <T>      the generic type of the output value
    * @return the generated value
    */
   public <T> T withReadLock(CheckedSupplier<T> supplier) {
@@ -105,7 +106,7 @@ public final class FunctionalReadWriteLock {
    * Executes the given supplier under the protection of the write lock and returns the generated value.
    *
    * @param supplier a {@link CheckedSupplier}
-   * @param <T> the generic type of the output value
+   * @param <T>      the generic type of the output value
    * @return the generated value
    */
   public <T> T withWriteLock(CheckedSupplier<T> supplier) {

@@ -8,8 +8,8 @@ package org.mule.runtime.config.internal.util;
 
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
-import org.mule.runtime.config.internal.OptionalObjectsController;
 import org.mule.runtime.config.internal.processor.DiscardedOptionalBeanPostProcessor;
+import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -29,6 +29,7 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
  * @since 3.7.0
  * @see DiscardedOptionalBeanPostProcessor
  */
+// TODO W-10736276 Remove this
 public class LaxInstantiationStrategyWrapper implements InstantiationStrategy {
 
   private final InstantiationStrategy delegate;

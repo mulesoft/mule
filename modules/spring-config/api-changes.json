@@ -3,6 +3,19 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter org.mule.runtime.core.api.config.ConfigurationBuilder org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory::createConfigurationBuilder(java.lang.String[], ===org.mule.runtime.core.api.MuleContext===) throws org.mule.runtime.core.api.config.ConfigurationException",
+          "new": "parameter org.mule.runtime.core.api.config.ConfigurationBuilder org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory::createConfigurationBuilder(java.lang.String[], ===org.mule.runtime.deployment.model.api.artifact.ArtifactContext===) throws org.mule.runtime.core.api.config.ConfigurationException",
+          "oldType": "org.mule.runtime.core.api.MuleContext",
+          "newType": "org.mule.runtime.deployment.model.api.artifact.ArtifactContext",
+          "package": "org.mule.runtime.config.api",
+          "classSimpleName": "SpringXmlConfigurationBuilderFactory",
+          "methodName": "createConfigurationBuilder",
+          "parameterIndex": "1",
+          "elementKind": "parameter",
+          "justification": "MULE-19204: Api used for testing and its uses updated"
+        },
+        {
           "code": "java.annotation.removed",
           "old": "interface org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider",
           "new": "interface org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider",

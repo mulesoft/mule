@@ -6,6 +6,7 @@
  */
 package org.mule.test.infrastructure.deployment;
 
+import static org.apache.logging.log4j.LogManager.shutdown;
 import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildHttpServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
@@ -13,6 +14,8 @@ import static org.mule.functional.services.TestServicesUtils.buildSchedulerServi
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,9 +41,9 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
   @Before
   public void setUp() throws Exception {
     muleServer = new FakeMuleServer(muleHome.getRoot().getAbsolutePath(), getCoreExtensions());
-    muleServer.addZippedService(buildSchedulerServiceFile(compilerWorkFolder.newFolder("schedulerService")));
-    muleServer.addZippedService(buildHttpServiceFile(compilerWorkFolder.newFolder("httpService")));
-    muleServer.addZippedService(buildExpressionLanguageServiceFile(compilerWorkFolder.newFolder("expressionLanguageService")));
+    muleServer.addZippedService(getSchedulerService());
+    muleServer.addZippedService(getHttpService());
+    muleServer.addZippedService(getExpressionLanguageService());
   }
 
   @After
@@ -49,5 +52,18 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
       muleServer.stop();
       muleServer = null;
     }
+    shutdown();
+  }
+
+  protected File getExpressionLanguageService() throws IOException {
+    return buildExpressionLanguageServiceFile(compilerWorkFolder.newFolder("expressionLanguageService"));
+  }
+
+  protected File getSchedulerService() throws IOException {
+    return buildSchedulerServiceFile(compilerWorkFolder.newFolder("schedulerService"));
+  }
+
+  protected File getHttpService() throws IOException {
+    return buildHttpServiceFile(compilerWorkFolder.newFolder("httpService"));
   }
 }

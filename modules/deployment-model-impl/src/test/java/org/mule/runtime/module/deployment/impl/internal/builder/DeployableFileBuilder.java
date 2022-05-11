@@ -6,22 +6,23 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.builder;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.REPOSITORY_FOLDER;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASS_LOADER_MODEL_VERSION_120;
 import static org.mule.runtime.module.deployment.impl.internal.maven.HeavyweightClassLoaderModelBuilder.CLASS_LOADER_MODEL_VERSION_110;
 import static org.mule.tck.ZipUtils.compress;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.serializeToFile;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.UUID;
@@ -75,7 +76,8 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
   }
 
   /**
-   * Adds a new dependency that will be visible only to the plugin defined by the groupId and artifactId of the {@link ArtifactPluginFileBuilder}.
+   * Adds a new dependency that will be visible only to the plugin defined by the groupId and artifactId of the
+   * {@link ArtifactPluginFileBuilder}.
    *
    * @param dependencyFileBuilder shared dependency.
    * @return the same builder instance

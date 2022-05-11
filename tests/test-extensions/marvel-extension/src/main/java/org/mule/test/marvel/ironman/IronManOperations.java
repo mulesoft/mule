@@ -20,10 +20,10 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.display.ClassValue;
 import org.mule.runtime.extension.api.annotation.param.display.Path;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.sdk.api.annotation.param.display.ClassValue;
 import org.mule.test.marvel.model.Missile;
 import org.mule.test.marvel.model.Villain;
 
@@ -52,11 +52,11 @@ public class IronManOperations implements Initialisable, Disposable {
   public void fireMissile(@Config IronMan ironMan,
                           @Connection Missile missile,
                           Villain at,
-                          CompletionCallback<String, Void> callback) {
+                          org.mule.sdk.api.runtime.process.CompletionCallback<String, Void> callback) {
     final Runnable launch = () -> {
       try {
         ironMan.track(missile);
-        callback.success(Result.<String, Void>builder()
+        callback.success(org.mule.sdk.api.runtime.operation.Result.<String, Void>builder()
             .output(missile.fireAt(at)).build());
       } catch (Exception e) {
         callback.error(e);
@@ -69,7 +69,7 @@ public class IronManOperations implements Initialisable, Disposable {
 
   @MediaType(TEXT_PLAIN)
   public void fireMissileMishap(@Config IronMan ironMan,
-                                @Connection Missile missile,
+                                @org.mule.sdk.api.annotation.param.Connection Missile missile,
                                 Villain at,
                                 CompletionCallback<String, Void> callback) {
     // A non blocking operation throwing an exception instead of calling callback#error.
@@ -80,12 +80,12 @@ public class IronManOperations implements Initialisable, Disposable {
   public void fireMissileEpicShot(@Config IronMan ironMan,
                                   @Connection Missile missile,
                                   Villain at,
-                                  CompletionCallback<String, Void> callback) {
+                                  org.mule.sdk.api.runtime.process.CompletionCallback<String, Void> callback) {
     // the last missile being fired in the movie has the hero looking at the missile going forward to its target. Doesn't look
     // epic if he's doing something else.
     try {
       ironMan.track(missile);
-      callback.success(Result.<String, Void>builder()
+      callback.success(org.mule.sdk.api.runtime.operation.Result.<String, Void>builder()
           .output(missile.fireAt(at)).build());
     } catch (Exception e) {
       callback.error(e);

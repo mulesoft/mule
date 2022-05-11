@@ -7,10 +7,9 @@
 package org.mule.runtime.module.extension.soap.internal.loader.property;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
-import org.mule.runtime.extension.api.annotation.Extension;
 
 /**
- * An immutable model property which indicates that an {@link Extension} is a Soap Based Extension.
+ * An immutable model property which indicates that the extension is a Soap Based one.
  *
  * @since 4.0
  */

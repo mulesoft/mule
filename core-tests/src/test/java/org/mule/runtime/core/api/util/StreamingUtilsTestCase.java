@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.util;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -19,6 +20,7 @@ import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.core.api.util.StreamingUtils.consumeRepeatablePayload;
 import static org.mule.runtime.core.api.util.StreamingUtils.consumeRepeatableValue;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
@@ -31,20 +33,20 @@ import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider;
 import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 import org.mule.runtime.core.api.streaming.object.InMemoryCursorIteratorConfig;
 import org.mule.runtime.core.internal.streaming.bytes.ByteArrayCursorStreamProvider;
-import org.mule.runtime.core.internal.streaming.object.InMemoryCursorIteratorProvider;
 import org.mule.runtime.core.internal.streaming.bytes.SimpleByteBufferManager;
+import org.mule.runtime.core.internal.streaming.object.InMemoryCursorIteratorProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+
 import org.junit.Test;
 
 @SmallTest
@@ -52,7 +54,7 @@ import org.junit.Test;
 @Story(STREAMING)
 public class StreamingUtilsTestCase extends AbstractMuleTestCase {
 
-  private static final List<String> TEST_LIST = Arrays.asList("Apple", "Banana", "Kiwi");
+  private static final List<String> TEST_LIST = asList("Apple", "Banana", "Kiwi");
 
   @Test
   @Description("Test that repeatable stream in the payload is consumed into another fully in memory stream provider")

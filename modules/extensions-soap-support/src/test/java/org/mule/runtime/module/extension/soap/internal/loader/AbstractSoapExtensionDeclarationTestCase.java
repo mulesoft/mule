@@ -13,7 +13,6 @@ import static org.hamcrest.Matchers.is;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
-import org.mule.runtime.module.extension.soap.api.loader.SoapExtensionModelLoader;
 
 import java.util.List;
 import java.util.Optional;

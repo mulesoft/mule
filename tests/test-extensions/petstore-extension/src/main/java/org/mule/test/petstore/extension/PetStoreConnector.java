@@ -30,8 +30,9 @@ import java.util.concurrent.atomic.AtomicInteger;
     PooledPetStoreConnectionProviderWithValidConnection.class})
 @ErrorTypes(PetstoreErrorTypeDefinition.class)
 @Sources({PetStoreSource.class, FailingPetStoreSource.class, SentientSource.class, PetAdoptionSource.class,
-    PetStoreStreamSource.class, PartialPetAdoptionSource.class, ConnectedPetAdoptionSource.class, PetFailingPollingSource.class,
-    PetFilterPollingSource.class})
+    PetAdoptionSchedulerInParamSource.class, PetStoreStreamSource.class, PartialPetAdoptionSource.class,
+    ConnectedPetAdoptionSource.class, PetFailingPollingSource.class, PetFilterPollingSource.class,
+    PetStoreSimpleSourceWithSdkApi.class})
 @org.mule.sdk.api.annotation.Sources({NumberPetAdoptionSource.class, WatermarkingPetAdoptionSource.class,
     PetStoreListSource.class, PetAdoptionLimitingSource.class})
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/petstore", prefix = "petstore")
@@ -41,34 +42,41 @@ public class PetStoreConnector {
    * Indicates how many times a {@link PetStoreConnector} was started.
    */
   private static AtomicInteger timesStarted = new AtomicInteger();
-
+  // ref: MULE-19264. Created to cover the case of a parameter group name with spaces.
+  @ParameterGroup(name = "Advanced Leash Configuration", showInDsl = true)
+  public AdvancedLeashConfiguration advancedLeashConfiguration;
+  @DefaultEncoding
+  String encoding;
+  @RuntimeVersion
+  MuleVersion runtimeVersion;
   @Parameter
   private List<String> pets;
-
   @Parameter
   @Optional
   private TlsContextFactory tls;
-
   @Parameter
   @Optional
   private PetCage cage;
-
   @Parameter
   @Optional
   private List<PetCage> cages;
-
   @ParameterGroup(name = "Cashier")
   private ExclusiveCashier cashier;
-
   @Parameter
   @Optional
   private Aquarium aquarium;
 
-  @DefaultEncoding
-  String encoding;
+  public static int getTimesStarted() {
+    return timesStarted.get();
+  }
 
-  @RuntimeVersion
-  MuleVersion runtimeVersion;
+  public static int incTimesStarted() {
+    return timesStarted.incrementAndGet();
+  }
+
+  public static void clearTimesStarted() {
+    timesStarted.set(0);
+  }
 
   public List<String> getPets() {
     return pets;
@@ -88,18 +96,6 @@ public class PetStoreConnector {
 
   public String getEncoding() {
     return encoding;
-  }
-
-  public static int getTimesStarted() {
-    return timesStarted.get();
-  }
-
-  public static int incTimesStarted() {
-    return timesStarted.incrementAndGet();
-  }
-
-  public static void clearTimesStarted() {
-    timesStarted.set(0);
   }
 
   public TlsContextFactory getTls() {

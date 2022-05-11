@@ -18,8 +18,8 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
- * An implementation of {@link AuthorizationCodeListener} which registers an {@link AuthorizationCodeListener}
- * in order to get updated state when a refresh token operation is completed or the resource is simply re-authorized.
+ * An implementation of {@link AuthorizationCodeListener} which registers an {@link AuthorizationCodeListener} in order to get
+ * updated state when a refresh token operation is completed or the resource is simply re-authorized.
  */
 public class UpdatingAuthorizationCodeState implements AuthorizationCodeState {
 
@@ -31,7 +31,7 @@ public class UpdatingAuthorizationCodeState implements AuthorizationCodeState {
                                         ResourceOwnerOAuthContext initialContext,
                                         Consumer<ResourceOwnerOAuthContext> onUpdate) {
     delegate = toAuthorizationCodeState(config, initialContext);
-    dancer.addListener(new AuthorizationCodeListener() {
+    dancer.addListener(initialContext.getResourceOwnerId(), new AuthorizationCodeListener() {
 
       @Override
       public void onAuthorizationCompleted(ResourceOwnerOAuthContext context) {

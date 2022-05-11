@@ -28,9 +28,8 @@ public class MediaTypeUtils {
   /**
    * This method returns a default {@link MediaType} given a {@link ComponentModel}.
    *
-   * The first that applies will happen:
-   * - If the component has a {@link MediaTypeModelProperty}, and this property has a MediaType, this one will be returned.
-   * - If the compenent has an Output, a MediaType acording to this output will be returned.
+   * The first that applies will happen: - If the component has a {@link MediaTypeModelProperty}, and this property has a
+   * MediaType, this one will be returned. - If the compenent has an Output, a MediaType acording to this output will be returned.
    * - Otherwise, the ANY MediaType will be returned.
    *
    * @param componentModel {@link ComponentModel} that we want to get the defaultMediaType from.

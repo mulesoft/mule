@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import org.mule.runtime.api.meta.NamedObject;
+import static java.util.stream.Collectors.toList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.NamedDeclaration;
@@ -15,19 +18,11 @@ import org.mule.runtime.api.meta.model.display.LayoutModel;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.stream.Collectors.toList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
 class EnricherTestUtils {
 
   private EnricherTestUtils() {}
 
   public static <T extends NamedDeclaration> T getDeclaration(List<T> operationList, String name) {
-    return operationList.stream().filter(operation -> operation.getName().equals(name)).collect(toList()).get(0);
-  }
-
-  static <T extends NamedObject> T getNamedObject(List<T> operationList, String name) {
     return operationList.stream().filter(operation -> operation.getName().equals(name)).collect(toList()).get(0);
   }
 

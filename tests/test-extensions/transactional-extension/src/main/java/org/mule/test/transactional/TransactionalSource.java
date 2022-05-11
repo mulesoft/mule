@@ -10,7 +10,6 @@ import static java.util.concurrent.Executors.newFixedThreadPool;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
@@ -25,6 +24,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
 import org.mule.runtime.extension.api.tx.TransactionHandle;
 import org.mule.test.transactional.connection.DummyXaResource;
 import org.mule.test.transactional.connection.TestTransactionalConnection;
@@ -42,6 +42,8 @@ public class TransactionalSource extends Source<TestTransactionalConnection, Obj
 
   @Parameter
   TransactionType txType;
+
+  private SourceTransactionalAction txAction;
 
   @Connection
   private ConnectionProvider<TestTransactionalConnection> connectionProvider;
@@ -101,7 +103,7 @@ public class TransactionalSource extends Source<TestTransactionalConnection, Obj
   }
 
   @OnSuccess
-  public void onSuccess(SourceCallbackContext ctx)
+  public void onSuccess(org.mule.sdk.api.runtime.source.SourceCallbackContext ctx)
       throws TransactionException {
     ctx.getTransactionHandle().commit();
     isSuccess = true;
@@ -115,7 +117,7 @@ public class TransactionalSource extends Source<TestTransactionalConnection, Obj
   }
 
   @OnTerminate
-  public void onTerminate(SourceCallbackContext ctx) {
+  public void onTerminate(org.mule.sdk.api.runtime.source.SourceCallbackContext ctx) {
     Boolean isXa = (Boolean) ctx.getVariable(IS_XA).get();
     if (isXa) {
       TestXaTransactionalConnection connection = ctx.getConnection();

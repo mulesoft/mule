@@ -7,7 +7,6 @@
 
 package org.mule.tck.junit4.matcher;
 
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.core.StringContains;
 
@@ -27,12 +26,6 @@ public class StringContainsIgnoringLineBreaks extends StringContains {
     return sWithoutLineBreaks.indexOf(substringWithoutLineBreaks) >= 0;
   }
 
-  @Override
-  protected String relationship() {
-    return "containing ignoring line breaks ";
-  }
-
-  @Factory
   public static Matcher<String> containsStringIgnoringLineBreaks(String substring) {
     return new StringContainsIgnoringLineBreaks(substring);
   }

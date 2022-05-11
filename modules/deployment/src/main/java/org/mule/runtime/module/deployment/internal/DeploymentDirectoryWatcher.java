@@ -6,32 +6,39 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
+import static org.mule.runtime.core.internal.logging.LogUtil.log;
+import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
+import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
+import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
+
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.sort;
+import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.collections.CollectionUtils.find;
-import static org.apache.commons.collections.CollectionUtils.subtract;
+import static java.util.stream.Collectors.toSet;
+
 import static org.apache.commons.io.IOCase.INSENSITIVE;
+import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
-import static org.mule.runtime.core.internal.logging.LogUtil.log;
-import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
-import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
-import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
-import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.artifact.api.Artifact;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.runtime.module.deployment.internal.util.DebuggableReentrantLock;
 import org.mule.runtime.module.deployment.internal.util.ElementAddedEvent;
 import org.mule.runtime.module.deployment.internal.util.ElementRemovedEvent;
@@ -40,18 +47,17 @@ import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
-import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.io.filefilter.AndFileFilter;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
@@ -76,21 +82,13 @@ public class DeploymentDirectoryWatcher implements Runnable {
   public static final IOFileFilter ZIP_ARTIFACT_FILTER =
       new AndFileFilter(new SuffixFileFilter(ZIP_FILE_SUFFIX, INSENSITIVE), FileFileFilter.FILE);
 
-  /**
-   * Property used to change the deployment mode to deploy only the indicated applications with no redeployment.
-   * mule -M-Dmule.deploy.applications=app1:app2:app3
-   * This can also be done passing an additional command line option (deprecated) like:
-   *  mule -app app1:app2:app3 will restrict deployment only to those specified apps.
-   */
-  public static final String DEPLOYMENT_APPLICATION_PROPERTY = "mule.deploy.applications";
-
   protected static final int DEFAULT_CHANGES_CHECK_INTERVAL_MS = 5000;
 
   protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
   private final ReentrantLock deploymentLock;
-  private final ArchiveDeployer<Domain> domainArchiveDeployer;
-  protected final ArchiveDeployer<Application> applicationArchiveDeployer;
+  private final ArchiveDeployer<DomainDescriptor, Domain> domainArchiveDeployer;
+  protected final ArchiveDeployer<ApplicationDescriptor, Application> applicationArchiveDeployer;
   protected final Supplier<SchedulerService> schedulerServiceSupplier;
   private final ArtifactTimestampListener<Application> applicationTimestampListener;
   private final ArtifactTimestampListener<Domain> domainTimestampListener;
@@ -104,8 +102,9 @@ public class DeploymentDirectoryWatcher implements Runnable {
   protected volatile boolean dirty;
 
   public DeploymentDirectoryWatcher(DomainBundleArchiveDeployer domainBundleDeployer,
-                                    final ArchiveDeployer<Domain> domainArchiveDeployer,
-                                    final ArchiveDeployer<Application> applicationArchiveDeployer, ObservableList<Domain> domains,
+                                    final ArchiveDeployer<DomainDescriptor, Domain> domainArchiveDeployer,
+                                    final ArchiveDeployer<ApplicationDescriptor, Application> applicationArchiveDeployer,
+                                    ObservableList<Domain> domains,
                                     ObservableList<Application> applications, Supplier<SchedulerService> schedulerServiceSupplier,
                                     final ReentrantLock deploymentLock) {
     this.domainBundleDeployer = domainBundleDeployer;
@@ -133,20 +132,20 @@ public class DeploymentDirectoryWatcher implements Runnable {
       }
     });
     this.schedulerServiceSupplier = schedulerServiceSupplier;
-    this.applicationTimestampListener = new ArtifactTimestampListener(applications);
-    this.domainTimestampListener = new ArtifactTimestampListener(domains);
+    this.applicationTimestampListener = new ArtifactTimestampListener<>(applications);
+    this.domainTimestampListener = new ArtifactTimestampListener<>(domains);
   }
 
   /**
    * Starts the process of deployment / undeployment of artifact.
    * <p/>
-   * It wil schedule a task for periodically scan the deployment directories.
+   * It will schedule a task for periodically scan the deployment directories.
    */
   public void start() {
     deploymentLock.lock();
     deleteAllAnchors();
 
-    String appString = System.getProperty(DEPLOYMENT_APPLICATION_PROPERTY);
+    String appString = getProperty(DEPLOYMENT_APPLICATION_PROPERTY);
 
     try {
       if (appString == null) {
@@ -157,7 +156,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
         // stated applications to launch
         scheduleChangeMonitor();
       } else {
-        String[] explodedDomains = domainsDir.list(DirectoryFileFilter.DIRECTORY);
+        String[] explodedDomains = domainsDir.list(DIRECTORY);
         String[] packagedDomains = domainsDir.list(JAR_ARTIFACT_FILTER);
 
         deployPackedDomains(packagedDomains);
@@ -198,7 +197,6 @@ public class DeploymentDirectoryWatcher implements Runnable {
     deploymentLock.lock();
     try {
       notifyStopListeners();
-      notifyFlowStopListeners();
       stopArtifacts(applications);
       stopArtifacts(domains);
     } finally {
@@ -221,7 +219,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
   private static int getChangesCheckIntervalMs() {
     try {
-      String value = System.getProperty(CHANGE_CHECK_INTERVAL_PROPERTY);
+      String value = getProperty(CHANGE_CHECK_INTERVAL_PROPERTY);
       return Integer.parseInt(value);
     } catch (NumberFormatException e) {
       return DEFAULT_CHANGES_CHECK_INTERVAL_MS;
@@ -323,8 +321,12 @@ public class DeploymentDirectoryWatcher implements Runnable {
       sort(apps);
       deployExplodedApps(apps);
     } catch (Exception e) {
-      // preserve the flag for the thread
-      Thread.currentThread().interrupt();
+      if (e instanceof InterruptedException) {
+        // preserve the flag for the thread
+        currentThread().interrupt();
+      } else {
+        logger.error("Exception processing deployment watch dir.", e);
+      }
     } finally {
       if (deploymentLock.isHeldByCurrentThread()) {
         deploymentLock.unlock();
@@ -346,8 +348,12 @@ public class DeploymentDirectoryWatcher implements Runnable {
     }
   }
 
-  public <T extends Artifact> T findArtifact(String artifactName, ObservableList<T> artifacts) {
-    return (T) find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactName));
+  public <D extends DeployableArtifactDescriptor, T extends Artifact<D>> T findArtifact(String artifactName,
+                                                                                        ObservableList<T> artifacts) {
+    return artifacts.stream()
+        .filter(artifact -> artifact.getArtifactName().equals(artifactName))
+        .findFirst()
+        .orElse(null);
   }
 
   private void undeployRemovedDomains() {
@@ -358,8 +364,9 @@ public class DeploymentDirectoryWatcher implements Runnable {
     undeployRemovedArtifacts(appsDir, applications, applicationArchiveDeployer);
   }
 
-  private void undeployRemovedArtifacts(File artifactDir, ObservableList<? extends Artifact> artifacts,
-                                        ArchiveDeployer<? extends Artifact> archiveDeployer) {
+  private <D extends DeployableArtifactDescriptor> void undeployRemovedArtifacts(File artifactDir,
+                                                                                 ObservableList<? extends Artifact<D>> artifacts,
+                                                                                 ArchiveDeployer<D, ? extends Artifact<D>> archiveDeployer) {
     // we care only about removed anchors
     String[] currentAnchors = artifactDir.list(new SuffixFileFilter(ARTIFACT_ANCHOR_SUFFIX));
     if (logger.isDebugEnabled()) {
@@ -371,9 +378,11 @@ public class DeploymentDirectoryWatcher implements Runnable {
       logger.debug(sb.toString());
     }
 
-    String[] artifactAnchors = findExpectedAnchorFiles(artifacts);
-    @SuppressWarnings("unchecked")
-    final Collection<String> deletedAnchors = subtract(Arrays.asList(artifactAnchors), Arrays.asList(currentAnchors));
+    final Set<String> currentAnchorsSet = stream(currentAnchors).collect(toSet());
+    Collection<String> deletedAnchors = stream(findExpectedAnchorFiles(artifacts))
+        .filter(a -> !currentAnchorsSet.contains(a))
+        .collect(toList());
+
     if (logger.isDebugEnabled()) {
       StringBuilder sb = new StringBuilder();
       sb.append(format("Deleted anchors:%n"));
@@ -402,10 +411,10 @@ public class DeploymentDirectoryWatcher implements Runnable {
    *
    * @return a non null list of file names
    */
-  private String[] findExpectedAnchorFiles(ObservableList<? extends Artifact> artifacts) {
+  private <D extends DeployableArtifactDescriptor> String[] findExpectedAnchorFiles(ObservableList<? extends Artifact<D>> artifacts) {
     String[] anchors = new String[artifacts.size()];
     int i = 0;
-    for (Artifact artifact : artifacts) {
+    for (Artifact<D> artifact : artifacts) {
       anchors[i++] = artifact.getArtifactName() + ARTIFACT_ANCHOR_SUFFIX;
     }
     return anchors;
@@ -469,8 +478,8 @@ public class DeploymentDirectoryWatcher implements Runnable {
     redeployModifiedArtifacts(redeployableApplications, applicationArchiveDeployer);
   }
 
-  private <T extends DeployableArtifact> Collection<String> getArtifactsToRedeploy(Collection<T> collection,
-                                                                                   ArtifactTimestampListener<T> artifactTimestampListener) {
+  private <D extends DeployableArtifactDescriptor, T extends DeployableArtifact<D>> Collection<String> getArtifactsToRedeploy(Collection<T> collection,
+                                                                                                                              ArtifactTimestampListener<T> artifactTimestampListener) {
     return collection.stream()
         .filter(artifact -> artifact.getDescriptor().isRedeploymentEnabled())
         .filter(artifactTimestampListener::isArtifactResourceUpdated)
@@ -478,8 +487,8 @@ public class DeploymentDirectoryWatcher implements Runnable {
         .collect(toList());
   }
 
-  private <T extends Artifact> void redeployModifiedArtifacts(Collection<String> artifactNames,
-                                                              ArchiveDeployer<T> artifactArchiveDeployer) {
+  private <D extends DeployableArtifactDescriptor, T extends Artifact<D>> void redeployModifiedArtifacts(Collection<String> artifactNames,
+                                                                                                         ArchiveDeployer<D, T> artifactArchiveDeployer) {
     for (String artifactName : artifactNames) {
       try {
         artifactArchiveDeployer.redeploy(artifactName, empty());
@@ -555,12 +564,6 @@ public class DeploymentDirectoryWatcher implements Runnable {
         }
         return false;
       });
-    }
-  }
-
-  private void notifyFlowStopListeners() {
-    for (Application application : applications) {
-      applicationArchiveDeployer.doNotPersistFlowsStop(application.getArtifactName());
     }
   }
 

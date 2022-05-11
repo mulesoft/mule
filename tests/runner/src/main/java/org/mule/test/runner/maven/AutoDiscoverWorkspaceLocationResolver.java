@@ -108,8 +108,8 @@ public class AutoDiscoverWorkspaceLocationResolver implements WorkspaceLocationR
    * are also listed as entries in class path.
    *
    * @param rootProjectDirectoryProperty the root directory of the multi-module project build session
-   * @param classPath the whole class path built by IDE or Maven (surefire Maven plugin)
-   * @param rootArtifactClassesFolder the current rootArtifact directory
+   * @param classPath                    the whole class path built by IDE or Maven (surefire Maven plugin)
+   * @param rootArtifactClassesFolder    the current rootArtifact directory
    */
   private void discoverMavenReactorProjects(String rootProjectDirectoryProperty, List<URL> classPath,
                                             File rootArtifactClassesFolder) {
@@ -207,7 +207,7 @@ public class AutoDiscoverWorkspaceLocationResolver implements WorkspaceLocationR
    * Adds the resolved artifact with its path.
    *
    * @param artifactId the Maven artifactId found in workspace
-   * @param path the {@link Path} location to the artifactId
+   * @param path       the {@link Path} location to the artifactId
    */
   private void resolvedArtifact(String artifactId, Path path) {
     logger.trace("Resolved artifactId from workspace at {}={}", artifactId, path);

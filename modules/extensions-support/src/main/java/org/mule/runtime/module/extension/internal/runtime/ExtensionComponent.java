@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIGURATION;
@@ -16,8 +17,10 @@ import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.ne
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.core.privileged.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
@@ -27,6 +30,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -78,8 +82,8 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.extension.api.values.ComponentValueProvider;
-import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
 import org.mule.runtime.module.extension.internal.data.sample.SampleDataProviderMediator;
 import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataContext;
@@ -124,26 +128,24 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   private final LazyValue<Boolean> requiresConfig = new LazyValue<>(this::computeRequiresConfig);
 
   protected final ExtensionManager extensionManager;
-  protected final ClassLoader classLoader;
+  protected ClassLoader classLoader;
   protected final T componentModel;
 
   protected CursorProviderFactory cursorProviderFactory;
 
   /**
-   * Only to be accessed through {@link #getValueProviderMediator()} as this is a lazy value only used
-   * in design time.
+   * Only to be accessed through {@link #getValueProviderMediator()} as this is a lazy value only used in design time.
    *
-   * Purposely not modeled as a {@link LazyValue} to prevent the creation of unnecessary instances when not
-   * running in design time or when the underlying component doesn't support the capability in the first place
+   * Purposely not modeled as a {@link LazyValue} to prevent the creation of unnecessary instances when not running in design time
+   * or when the underlying component doesn't support the capability in the first place
    */
   private ValueProviderMediator<T> valueProviderMediator;
 
   /**
-   * Only to be accessed through {@link #getSampleDataProviderMediator()} as this is a lazy value only used
-   * in design time.
+   * Only to be accessed through {@link #getSampleDataProviderMediator()} as this is a lazy value only used in design time.
    *
-   * Purposely not modeled as a {@link LazyValue} to prevent the creation of unnecessary instances when not
-   * running in design time or when the underlying component doesn't support the capability in the first place
+   * Purposely not modeled as a {@link LazyValue} to prevent the creation of unnecessary instances when not running in design time
+   * or when the underlying component doesn't support the capability in the first place
    */
   private SampleDataProviderMediator sampleDataProviderMediator;
 
@@ -171,6 +173,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   @Inject
   protected ErrorTypeRepository errorTypeRepository;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   private MetadataCacheIdGeneratorFactory<ComponentAst> cacheIdGeneratorFactory;
 
@@ -206,6 +211,17 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
           .map(p -> (CursorProviderFactory) streamingManager.forObjects().getDefaultCursorProviderFactory())
           .orElseGet(() -> streamingManager.forBytes().getDefaultCursorProviderFactory());
     }
+
+    if (!featureFlaggingService.isEnabled(START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER) &&
+        classLoader != null && classLoader.getParent() != null &&
+        classLoader.getParent() instanceof RegionClassLoader) {
+      classLoader = from(classLoader, ((RegionClassLoader) classLoader.getParent()).getOwnerClassLoader().getClassLoader());
+    }
+
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(format("Starting extensions with %s", classLoader));
+    }
+
     withContextClassLoader(classLoader, () -> {
       validateConfigurationProviderIsNotExpression();
       initConfigurationResolver();
@@ -425,12 +441,45 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    * {@inheritDoc}
    */
   @Override
-  public Set<Value> getValues(String parameterName) throws ValueResolvingException {
+  public Set<Value> getValues(String parameterName) throws org.mule.runtime.extension.api.values.ValueResolvingException {
+    // TODO: MULE-19298 - throws org.mule.sdk.api.values.ValueResolvingException
+    try {
+      return runWithResolvingContext(context -> withContextClassLoader(classLoader, () -> getValueProviderMediator().getValues(
+                                                                                                                               parameterName,
+                                                                                                                               getParameterValueResolver(),
+                                                                                                                               (CheckedSupplier<Object>) () -> context
+                                                                                                                                   .getConnection()
+                                                                                                                                   .orElse(null),
+                                                                                                                               (CheckedSupplier<Object>) () -> context
+                                                                                                                                   .getConfig()
+                                                                                                                                   .orElse(null),
+                                                                                                                               context
+                                                                                                                                   .getConnectionProvider()
+                                                                                                                                   .orElse(null))));
+    } catch (MuleRuntimeException e) {
+      Throwable rootException = getRootException(e);
+      if (rootException instanceof org.mule.runtime.extension.api.values.ValueResolvingException) {
+        throw (org.mule.runtime.extension.api.values.ValueResolvingException) rootException;
+      } else {
+        throw new org.mule.runtime.extension.api.values.ValueResolvingException("An unknown error occurred trying to resolve values. "
+            + e.getCause().getMessage(),
+                                                                                UNKNOWN, e);
+      }
+    } catch (Exception e) {
+      throw new org.mule.runtime.extension.api.values.ValueResolvingException("An unknown error occurred trying to resolve values. "
+          + e.getCause().getMessage(),
+                                                                              UNKNOWN, e);
+    }
+  }
+
+  @Override
+  public Set<Value> getValues(String parameterName, String targetSelector)
+      throws org.mule.runtime.extension.api.values.ValueResolvingException {
     try {
       return runWithResolvingContext(context -> withContextClassLoader(classLoader,
                                                                        () -> getValueProviderMediator()
                                                                            .getValues(parameterName,
-                                                                                      getParameterValueResolver(),
+                                                                                      getParameterValueResolver(), targetSelector,
                                                                                       (CheckedSupplier<Object>) () -> context
                                                                                           .getConnection().orElse(null),
                                                                                       (CheckedSupplier<Object>) () -> context
@@ -439,15 +488,17 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                                                                                           .orElse(null))));
     } catch (MuleRuntimeException e) {
       Throwable rootException = getRootException(e);
-      if (rootException instanceof ValueResolvingException) {
-        throw (ValueResolvingException) rootException;
+      if (rootException instanceof org.mule.runtime.extension.api.values.ValueResolvingException) {
+        throw (org.mule.runtime.extension.api.values.ValueResolvingException) rootException;
       } else {
-        throw new ValueResolvingException("An unknown error occurred trying to resolve values. " + e.getCause().getMessage(),
-                                          UNKNOWN, e);
+        throw new org.mule.runtime.extension.api.values.ValueResolvingException("An unknown error occurred trying to resolve values. "
+            + e.getCause().getMessage(),
+                                                                                UNKNOWN, e);
       }
     } catch (Exception e) {
-      throw new ValueResolvingException("An unknown error occurred trying to resolve values. " + e.getCause().getMessage(),
-                                        UNKNOWN, e);
+      throw new org.mule.runtime.extension.api.values.ValueResolvingException("An unknown error occurred trying to resolve values. "
+          + e.getCause().getMessage(),
+                                                                              UNKNOWN, e);
     }
   }
 
@@ -463,14 +514,10 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                          (CheckedSupplier<Object>) () -> context.getConfig().orElse(null),
                          (CheckedSupplier<ConnectionProvider>) () -> context.getConnectionProvider().orElse(null))));
     } catch (MuleRuntimeException e) {
-      Throwable rootException = getRootException(e);
-      if (rootException instanceof SampleDataException) {
-        throw (SampleDataException) rootException;
-      } else {
-        throw new SampleDataException("An unknown error occurred trying to obtain Sample Data. " + e.getCause().getMessage(),
-                                      SampleDataException.UNKNOWN, e);
-      }
-
+      throw extractOfType(e, SampleDataException.class).orElseGet(
+                                                                  () -> new SampleDataException("An unknown error occurred trying to obtain Sample Data. "
+                                                                      + e.getCause().getMessage(),
+                                                                                                SampleDataException.UNKNOWN, e));
     } catch (Exception e) {
       throw new SampleDataException("An unknown error occurred trying to obtain Sample Data. " + e.getCause().getMessage(),
                                     SampleDataException.UNKNOWN, e);
@@ -665,7 +712,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     if (valueProviderMediator == null) {
       synchronized (this) {
         if (valueProviderMediator == null) {
-          valueProviderMediator = new ValueProviderMediator<>(componentModel, () -> muleContext, () -> reflectionCache);
+          valueProviderMediator =
+              new ValueProviderMediator<>(componentModel, () -> muleContext, () -> reflectionCache);
         }
       }
     }

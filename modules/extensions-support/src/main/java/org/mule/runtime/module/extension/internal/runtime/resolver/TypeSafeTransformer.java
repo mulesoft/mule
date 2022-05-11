@@ -28,12 +28,13 @@ public class TypeSafeTransformer {
    * Given a {@code value) it will try to transform it to the expected type defined in the {@code expectedDataType}
    *
    * @param value the value to transform
-   * @param valueDataType the value's {@link DataType}
+   * 
+   * @param valueDataType    the value's {@link DataType}
    * @param expectedDataType the expected type's {@link DataType}
-   * @param event the event to perform the transformation
+   * @param event            the event to perform the transformation
    * @return the transformed value
    * @throws MessageTransformerException If a problem occurs transforming the value
-   * @throws TransformerException If a problem occurs transforming the value
+   * @throws TransformerException        If a problem occurs transforming the value
    */
   public <T> T transform(Object value, DataType valueDataType, DataType expectedDataType)
       throws MessageTransformerException, TransformerException {

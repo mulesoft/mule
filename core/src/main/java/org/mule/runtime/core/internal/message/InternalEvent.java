@@ -34,6 +34,7 @@ public interface InternalEvent extends PrivilegedEvent {
 
   /**
    * Internal parameters used by the runtime to pass information around.
+   * 
    * @deprecated since 4.3.0. Replace with {@link EventInternalContext} attributes
    */
   @Deprecated
@@ -41,6 +42,7 @@ public interface InternalEvent extends PrivilegedEvent {
 
   /**
    * Internal parameters used by the runtime to pass information around.
+   * 
    * @deprecated since 4.3.0. Replace with {@link EventInternalContext} attributes
    */
   @Deprecated
@@ -56,7 +58,7 @@ public interface InternalEvent extends PrivilegedEvent {
    * Sets context related to the source-flow dispatch
    *
    * @return a {@link FlowProcessMediatorContext} with state from source-flow dispatch
-   * @param context an {@link FlowProcessMediatorContext}
+   * @param flowProcessMediatorContext an {@link FlowProcessMediatorContext}
    * @since 4.4, 4.3.1
    */
   void setFlowProcessMediatorContext(FlowProcessMediatorContext flowProcessMediatorContext);
@@ -69,6 +71,7 @@ public interface InternalEvent extends PrivilegedEvent {
 
   /**
    * Sets context related to the SDK
+   * 
    * @param context an {@link EventInternalContext}
    * @since 4.3.0
    */
@@ -82,6 +85,7 @@ public interface InternalEvent extends PrivilegedEvent {
 
   /**
    * Sets context related to the foreach processor
+   * 
    * @param context an {@link EventInternalContext}
    * @since 4.4, 4.3.1
    */
@@ -136,7 +140,7 @@ public interface InternalEvent extends PrivilegedEvent {
   }
 
   @NoImplement
-  public interface Builder extends PrivilegedEvent.Builder {
+  interface Builder extends PrivilegedEvent.Builder {
 
     /**
      * Set a map of parameters to be internal by the runtime to pass information within the context of an event
@@ -149,7 +153,7 @@ public interface InternalEvent extends PrivilegedEvent {
     /**
      * Adds an internal parameter.
      *
-     * @param key the parameter key
+     * @param key   the parameter key
      * @param value the parameter value
      * @return the builder instance
      */

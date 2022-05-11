@@ -29,7 +29,7 @@ public interface FlowExceptionHandler extends Function<Exception, Publisher<Core
    * Take some action when a messaging exception has occurred (i.e., there was a message in play when the exception occurred).
    *
    * @param exception which occurred
-   * @param event which was being processed when the exception occurred
+   * @param event     which was being processed when the exception occurred
    * @return new event to route on to the rest of the flow, generally with ExceptionPayload set on the message
    * @deprecated Use {@link FlowExceptionHandler#router(Function, Consumer, Consumer)}
    */
@@ -66,8 +66,8 @@ public interface FlowExceptionHandler extends Function<Exception, Publisher<Core
    * or success.
    *
    * @param publisherPostProcessor allows to modify the publisher that will handle the error.
-   * @param continueCallback the callback called in case the error is successfully handled
-   * @param propagateCallback the callback is called in case the error-handling fails
+   * @param continueCallback       the callback called in case the error is successfully handled
+   * @param propagateCallback      the callback is called in case the error-handling fails
    * @return the router for an error.
    *
    * @since 4.3

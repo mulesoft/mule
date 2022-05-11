@@ -14,8 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Groups the sum of all the parameters that a user configured in order to consume
- * an OAuth provider through an extension
+ * Groups the sum of all the parameters that a user configured in order to consume an OAuth provider through an extension
  *
  * @since 4.0
  */

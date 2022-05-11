@@ -23,12 +23,9 @@ import java.util.OptionalLong;
  ** <p>
  * There are three distinct types of entities, depending on their content:
  * <ul>
- * <li><b>streamed</b>: The content is received from a stream.
- *     </li>
- * <li><b>composed</b>: The content is made of several parts.
- *     </li>
- * <li><b>neither of the above</b>: The content is in memory and whole.
- *     </li>
+ * <li><b>streamed</b>: The content is received from a stream.</li>
+ * <li><b>composed</b>: The content is made of several parts.</li>
+ * <li><b>neither of the above</b>: The content is in memory and whole.</li>
  * </ul>
  * These will determine how the content can be accessed although there may overlap.
  *
@@ -46,7 +43,8 @@ public interface HttpEntity {
   boolean isStreaming();
 
   /**
-   * Tells whether or not this entity is composed of several parts, in which case they should be available through {@link #getParts()}.
+   * Tells whether or not this entity is composed of several parts, in which case they should be available through
+   * {@link #getParts()}.
    *
    * @return {@code true} if there are several content parts, {@code false} otherwise
    */

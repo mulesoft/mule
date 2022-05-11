@@ -25,9 +25,9 @@ import java.util.Optional;
  * would occur at deployment time, meaning that apps with illegal expressions that were never executed will fail to deploy.
  * <p>
  * This class represents such an expression and holds the original {@link ExpressionCompilationException}. Because DataWeave does
- * not accept custom implementations of {@link CompiledExpression}, evaluation of this expression will fail. It is then
- * the {@link DataWeaveExpressionLanguageAdaptor} responsibility to propagate the {@link #getCompilationException()} exception
- * (it's a nasty job but somebody has to do it).
+ * not accept custom implementations of {@link CompiledExpression}, evaluation of this expression will fail. It is then the
+ * {@link DataWeaveExpressionLanguageAdaptor} responsibility to propagate the {@link #getCompilationException()} exception (it's a
+ * nasty job but somebody has to do it).
  *
  * @since 4.3.0
  */

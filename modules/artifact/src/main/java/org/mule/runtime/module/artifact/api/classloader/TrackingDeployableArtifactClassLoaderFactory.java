@@ -8,6 +8,7 @@
 package org.mule.runtime.module.artifact.api.classloader;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
@@ -38,14 +39,19 @@ public final class TrackingDeployableArtifactClassLoaderFactory<T extends Artifa
   }
 
   @Override
-  public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, T descriptor,
-                                    List<ArtifactClassLoader> artifactPluginClassLoaders) {
+  public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, T descriptor) {
     ArtifactClassLoader artifactClassLoader =
-        artifactClassLoaderFactory.create(artifactId, parent, descriptor, artifactPluginClassLoaders);
+        artifactClassLoaderFactory.create(artifactId, parent, descriptor);
 
     track(artifactClassLoader);
 
     return artifactClassLoader;
+  }
+
+  @Override
+  public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, T descriptor,
+                                    List<ArtifactClassLoader> artifactPluginClassLoaders) {
+    return create(artifactId, parent, descriptor);
   }
 
   private void track(ArtifactClassLoader artifactClassLoader) {

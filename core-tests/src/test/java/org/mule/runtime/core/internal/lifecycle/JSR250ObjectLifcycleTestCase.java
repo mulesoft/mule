@@ -12,10 +12,10 @@ import static org.junit.Assert.fail;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import org.junit.Test;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+
+import org.junit.Test;
 
 /**
  * Test lifecycle behaviour and restrictions on lifecyce methods

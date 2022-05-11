@@ -14,16 +14,18 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
 /**
- * Utility class created for leak testing.
- * It extends a PhantomReference and implements a Hamcrest Matcher which checks that the reference is enqueued, because
- * it means that there isn't any strong reference pointing to the referent object.
+ * Utility class created for leak testing. It extends a PhantomReference and implements a Hamcrest Matcher which checks that the
+ * reference is enqueued, because it means that there isn't any strong reference pointing to the referent object.
  *
  * Usage example:
+ * 
  * <pre>
- * {@code
- *     CollectableReference<String> collectableReference = new CollectableReference<>(new String("Hello world"));
- *     System.out.println(collectableReference.get());
- *     assertThat(collectableReference, is(eventually(collectedByGc())));
+ * 
+ * {
+ *   &#64;code
+ *   CollectableReference<String> collectableReference = new CollectableReference<>(new String("Hello world"));
+ *   System.out.println(collectableReference.get());
+ *   assertThat(collectableReference, is(eventually(collectedByGc())));
  * }
  * </pre>
  *
@@ -57,9 +59,9 @@ public class CollectableReference<T> extends PhantomReference<T> {
   }
 
   /**
-   * This matcher checks that there aren't strong references to the object passed to the CollectableReference constructor.
-   * It drops the internal CollectableReference strong reference and runs the garbage collector, so the user only needs
-   * to use it within a Prober.
+   * This matcher checks that there aren't strong references to the object passed to the CollectableReference constructor. It
+   * drops the internal CollectableReference strong reference and runs the garbage collector, so the user only needs to use it
+   * within a Prober.
    */
   private static class CollectedByGC extends TypeSafeMatcher<CollectableReference> {
 

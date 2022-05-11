@@ -15,12 +15,14 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.internal.connection.ConnectionUtils.unwrap;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
+import static org.mule.runtime.core.internal.util.InjectionUtils.getInjectionTarget;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getCallbackValuesExtractors;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.updateOAuthParameters;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.validateOAuthConnection;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver.fromValues;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromStaticValues;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -35,6 +37,7 @@ import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
@@ -43,7 +46,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.core.api.util.func.Once.RunOnce;
-import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ConnectionUtils;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -60,7 +62,6 @@ import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProvi
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConnectionProviderWrapper;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
@@ -106,7 +107,8 @@ public class PlatformManagedOAuthConnectionProvider<C>
   private PlatformManagedOAuthDancer dancer;
   private ConnectionProvider<C> delegate;
   private ConnectionProvider<C> unwrappedDelegate;
-  private FieldSetter<ConnectionProvider<C>, OAuthState> oauthStateFieldSetter;
+  private Object delegateForInjection;
+  private FieldSetter<Object, OAuthState> oauthStateFieldSetter;
   private PlatformManagedConnectionDescriptor descriptor;
   private PoolingListener<C> delegatePoolingListener;
 
@@ -149,7 +151,8 @@ public class PlatformManagedOAuthConnectionProvider<C>
     try {
       descriptor = fetchConnectionDescriptor();
       delegate = createDelegate(descriptor);
-      unwrappedDelegate = unwrapConnectionProvider(delegate);
+      unwrappedDelegate = unwrap(delegate);
+      delegateForInjection = getInjectionTarget(unwrappedDelegate);
       delegatePoolingListener = getDelegatePoolingListener();
       initialiseDelegate();
       startIfNeeded(getRetryPolicyTemplate());
@@ -158,12 +161,6 @@ public class PlatformManagedOAuthConnectionProvider<C>
       disposeIfNeeded(dancer, LOGGER);
       throw e;
     }
-  }
-
-  private ConnectionProvider<C> unwrapConnectionProvider(ConnectionProvider<C> connectionProvider) {
-    return connectionProvider instanceof ConnectionProviderWrapper
-        ? unwrapConnectionProvider(((ConnectionProviderWrapper<C>) connectionProvider).getDelegate())
-        : connectionProvider;
   }
 
   @Override
@@ -194,23 +191,16 @@ public class PlatformManagedOAuthConnectionProvider<C>
       throw e;
     }
 
-    oauthStateFieldSetter = getOAuthStateSetter(unwrappedDelegate);
+    oauthStateFieldSetter = getOAuthStateSetter(delegateForInjection);
   }
 
   private ConnectionProvider<C> createDelegate(PlatformManagedConnectionDescriptor descriptor) throws MuleException {
-    ParametersResolver resolver = fromValues(descriptor.getParameters(),
-                                             muleContext,
-                                             false,
-                                             new ReflectionCache(),
-                                             expressionManager,
-                                             this.toString());
-    Class<? extends ConnectionProvider> connectionProviderDelegateClass =
+    Class<?> connectionProviderDelegateClass =
         getImplementingType(oauthConfig.getDelegateConnectionProviderModel())
             .orElseThrow(() -> new IllegalStateException("Delegate connection provider must have an implementing type."));
 
     return (ConnectionProvider<C>) withContextClassLoader(getClassLoader(oauthConfig.getExtensionModel()), () -> {
-      ResolverSet delegateResolverSet =
-          resolver.getParametersAsResolverSet(oauthConfig.getDelegateConnectionProviderModel(), muleContext);
+      ResolverSet delegateResolverSet = getResolverSetFromParameterValues(descriptor.getParameters());
       ConnectionProviderObjectBuilder builder =
           new DefaultConnectionProviderObjectBuilder<>(connectionProviderDelegateClass,
                                                        oauthConfig.getDelegateConnectionProviderModel(),
@@ -238,6 +228,22 @@ public class PlatformManagedOAuthConnectionProvider<C>
     }, MuleException.class, e -> e);
   }
 
+  private ResolverSet getResolverSetFromParameterValues(Map<String, Object> parameters) throws MuleException {
+    return getResolverSetForParameterizedModel(oauthConfig.getDelegateConnectionProviderModel(), parameters);
+  }
+
+  private ResolverSet getResolverSetForParameterizedModel(ParameterizedModel parameterizedModel,
+                                                          Map<String, Object> parameters)
+      throws MuleException {
+    return getResolverSetFromStaticValues(parameterizedModel,
+                                          parameters,
+                                          muleContext,
+                                          false,
+                                          new ReflectionCache(),
+                                          expressionManager,
+                                          this.toString());
+  }
+
   private PlatformManagedConnectionDescriptor fetchConnectionDescriptor() throws MuleException {
     try {
       return dancer.getConnectionDescriptor().get();
@@ -256,18 +262,18 @@ public class PlatformManagedOAuthConnectionProvider<C>
                                     e);
   }
 
-  private FieldSetter<ConnectionProvider<C>, OAuthState> getOAuthStateSetter(ConnectionProvider<C> delegate) {
-    Reference<FieldSetter<ConnectionProvider<C>, ? extends OAuthState>> setter = new Reference<>();
+  private FieldSetter<Object, OAuthState> getOAuthStateSetter(Object target) {
+    Reference<FieldSetter<Object, ? extends OAuthState>> setter = new Reference<>();
     oauthConfig.getDelegateGrantType().accept(new OAuthGrantTypeVisitor() {
 
       @Override
       public void visit(AuthorizationCodeGrantType grantType) {
-        setter.set(ExtensionsOAuthUtils.getOAuthStateSetter(delegate, AuthorizationCodeState.class, oauthConfig.getGrantType()));
+        setter.set(ExtensionsOAuthUtils.getOAuthStateSetter(target, AuthorizationCodeState.class, oauthConfig.getGrantType()));
       }
 
       @Override
       public void visit(ClientCredentialsGrantType grantType) {
-        setter.set(ExtensionsOAuthUtils.getOAuthStateSetter(delegate, ClientCredentialsState.class, oauthConfig.getGrantType()));
+        setter.set(ExtensionsOAuthUtils.getOAuthStateSetter(target, ClientCredentialsState.class, oauthConfig.getGrantType()));
       }
 
       @Override
@@ -276,7 +282,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
       }
     });
 
-    return (FieldSetter<ConnectionProvider<C>, OAuthState>) setter.get();
+    return (FieldSetter<Object, OAuthState>) setter.get();
   }
 
   private IllegalConnectionProviderModelDefinitionException illegalDelegateException() {
@@ -301,19 +307,20 @@ public class PlatformManagedOAuthConnectionProvider<C>
   }
 
   private void updateOAuthState() {
-    Consumer<ResourceOwnerOAuthContext> onUpdate = context -> updateOAuthParameters(unwrappedDelegate, callbackValues, context);
+    Consumer<ResourceOwnerOAuthContext> onUpdate =
+        context -> updateOAuthParameters(delegateForInjection, callbackValues, context);
     oauthConfig.getDelegateGrantType().accept(new OAuthGrantTypeVisitor() {
 
       @Override
       public void visit(AuthorizationCodeGrantType grantType) {
-        oauthStateFieldSetter.set(unwrappedDelegate, new PlatformAuthorizationCodeStateAdapter(dancer,
-                                                                                               descriptor,
-                                                                                               onUpdate));
+        oauthStateFieldSetter.set(delegateForInjection, new PlatformAuthorizationCodeStateAdapter(dancer,
+                                                                                                  descriptor,
+                                                                                                  onUpdate));
       }
 
       @Override
       public void visit(ClientCredentialsGrantType grantType) {
-        oauthStateFieldSetter.set(unwrappedDelegate, new PlatformClientCredentialsOAuthStateAdapter(dancer, onUpdate));
+        oauthStateFieldSetter.set(delegateForInjection, new PlatformClientCredentialsOAuthStateAdapter(dancer, onUpdate));
       }
 
       @Override
@@ -337,6 +344,11 @@ public class PlatformManagedOAuthConnectionProvider<C>
   @Override
   public Optional<ReconnectionConfig> getReconnectionConfig() {
     return ofNullable(reconnectionConfig);
+  }
+
+  @Override
+  public Optional<String> getOwnerConfigName() {
+    return ofNullable(this.oauthConfig.getOwnerConfigName());
   }
 
   @Override

@@ -8,8 +8,8 @@ package org.mule.test.heisenberg.extension;
 
 import static java.util.Optional.ofNullable;
 
-import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
-import org.mule.runtime.extension.api.error.MuleErrors;
+import org.mule.sdk.api.error.ErrorTypeDefinition;
+import org.mule.sdk.api.error.MuleErrors;
 
 import java.util.Optional;
 

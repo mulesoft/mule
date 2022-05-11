@@ -8,9 +8,11 @@ package org.mule.runtime.config.internal.validation;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.recursiveStreamWithHierarchy;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULESOFT_VENDOR;
+import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -21,6 +23,7 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
@@ -34,11 +37,9 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
-import org.apache.commons.io.input.ReaderInputStream;
 
 import com.google.common.collect.ImmutableList;
+import org.apache.commons.io.input.ReaderInputStream;
 
 public abstract class AbstractCoreValidationTestCase {
 
@@ -64,6 +65,9 @@ public abstract class AbstractCoreValidationTestCase {
             .build());
 
     final ConfigurationDeclarer config = extensionDeclarer.withConfig("config");
+    final ConfigurationDeclarer otherConfig = extensionDeclarer.withConfig("otherConfig");
+    otherConfig.onDefaultParameterGroup().withRequiredParameter("count").ofType(ExtensionsTypeLoaderFactory.getDefault()
+        .createTypeLoader(MuleExtensionModelProvider.class.getClassLoader()).load(Integer.class));
 
     final OperationDeclarer operation = extensionDeclarer.withOperation("operation");
     operation.withOutput().ofType(typeLoader.load(void.class));
@@ -73,13 +77,13 @@ public abstract class AbstractCoreValidationTestCase {
         .withExtensionModel(MuleExtensionModelProvider.getExtensionModel())
         .withExtensionModel(new ExtensionModelFactory()
             .create(new DefaultExtensionLoadingContext(extensionDeclarer,
-                                                       AbstractCoreValidationTestCase.class.getClassLoader(),
-                                                       new NullDslResolvingContext())))
+                                                       builder(AbstractCoreValidationTestCase.class.getClassLoader(),
+                                                               new NullDslResolvingContext()).build())))
         .withSchemaValidationsDisabled()
         .build();
   }
 
-  protected Optional<String> runValidation(final String... xmlConfigs) {
+  protected List<ValidationResultItem> runValidation(final String... xmlConfigs) {
     final List<Pair<String, InputStream>> configs = new ArrayList<>();
 
     for (int i = 0; i < xmlConfigs.length; i++) {
@@ -91,10 +95,8 @@ public abstract class AbstractCoreValidationTestCase {
     return recursiveStreamWithHierarchy(ast)
         .filter(c -> getValidation().applicable()
             .test(ImmutableList.<ComponentAst>builder().addAll(c.getSecond()).add(c.getFirst()).build()))
-        .map(c -> getValidation().validate(c.getFirst(), ast))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .findFirst();
+        .flatMap(c -> getValidation().validateMany(c.getFirst(), ast).stream())
+        .collect(toList());
   }
 
   protected abstract Validation getValidation();

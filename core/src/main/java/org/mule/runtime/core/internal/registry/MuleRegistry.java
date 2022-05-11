@@ -7,14 +7,10 @@
 package org.mule.runtime.core.internal.registry;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.api.transformer.TransformerException;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Adds lookup/register/unregister methods for Mule-specific entities to the standard Registry interface.
@@ -27,64 +23,34 @@ public interface MuleRegistry extends Registry {
    *
    * @see Registry#registerObject(String, Object, Object)
    */
+  // TODO W-10781591 Remove this
   int LIFECYCLE_BYPASS_FLAG = 0x01;
 
   /**
    * Determines whether Inject processors should get executed on an object added to the registry Inject processors are responsible
    * for processing inject interfaces such as {@link org.mule.runtime.core.api.context.MuleContextAware}
    */
+  // TODO W-10781591 Remove this
   int INJECT_PROCESSORS_BYPASS_FLAG = 0x02;
 
   /**
    * Determines whether pre-init processors should get executed on an object added to the registry. Pre init processors are
    * basically object processors that do not inject members into objects. These processors happen after the inject processors
    */
+  // TODO W-10781591 Remove this
   int PRE_INIT_PROCESSORS_BYPASS_FLAG = 0x04;
 
   // /////////////////////////////////////////////////////////////////////////
   // Lookup methods - these should NOT create a new object, only return existing ones
   // /////////////////////////////////////////////////////////////////////////
 
-  Transformer lookupTransformer(String name);
-
   FlowConstruct lookupFlowConstruct(String name);
-
-  /**
-   * This method will return a list of {@link org.mule.runtime.core.api.transformer.Transformer} objects that accept the given
-   * input and return the given output type of object
-   * <p/>
-   * All {@link Transformer}s found will have a source that is compatible with source parameter
-   * (since if a transformer can transform a super type, it should be able to transform any type that extends it)
-   * and a target such that target parameter isCompatibleWith() the {@link Transformer}'s one
-   * (since if we want a transformer that returns an specific type, it should return exactly that type or any type that extends it.)
-   *
-   * @param source The desired input type for the transformer
-   * @param result the desired output type for the transformer
-   * @return a list of matching transformers. If there were no matches an empty list is returned.
-   * @since 3.0.0
-   */
-  List<Transformer> lookupTransformers(DataType source, DataType result);
-
-  /**
-   * Will find a transformer that is the closest match to the desired input and output.
-   *
-   * @param source The desired input type for the transformer
-   * @param result the desired output type for the transformer
-   * @return A transformer that exactly matches or the will accept the input and output parameters
-   * @throws TransformerException will be thrown if there is more than one match
-   * @since 3.0.0
-   */
-  Transformer lookupTransformer(DataType source, DataType result) throws TransformerException;
 
   Collection<FlowConstruct> lookupFlowConstructs();
 
   // /////////////////////////////////////////////////////////////////////////
   // Registration methods
   // /////////////////////////////////////////////////////////////////////////
-
-  void registerTransformer(Transformer transformer) throws MuleException;
-
-  void unregisterTransformer(String transformerName) throws MuleException;
 
   void registerFlowConstruct(FlowConstruct flowConstruct) throws MuleException;
 

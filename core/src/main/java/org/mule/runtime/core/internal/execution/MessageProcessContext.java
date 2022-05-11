@@ -7,8 +7,6 @@
 package org.mule.runtime.core.internal.execution;
 
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
-import org.mule.runtime.core.api.management.stats.PayloadStatistics;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
@@ -20,8 +18,7 @@ import java.util.concurrent.Executor;
 /**
  * Context for processing one message from a {@link MessageSource}.
  *
- * Mule {@link MessageSource} implementations should create one instance of MessageProcessContext
- * per message that generates.
+ * Mule {@link MessageSource} implementations should create one instance of MessageProcessContext per message that generates.
  *
  * MessageProcessContext is responsible for - Define if the incoming message can be processed in a separate thread - Provide
  * access to the {@link MessageSource} of the message - Provide access to the {@link FlowConstruct} were the message is going to
@@ -55,11 +52,6 @@ public interface MessageProcessContext {
    * @return the exception resolver for this context's source
    */
   MessagingExceptionResolver getMessagingExceptionResolver();
-
-  /**
-   * @return the factory for payload decorators to accumulate {@link PayloadStatistics}.
-   */
-  CursorComponentDecoratorFactory getComponentDecoratorFactory();
 
   FlowConstruct getFlowConstruct();
 }

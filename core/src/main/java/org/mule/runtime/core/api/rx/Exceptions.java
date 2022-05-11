@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.rx;
 
 import static reactor.core.Exceptions.isBubbling;
+import static reactor.core.Exceptions.isErrorCallbackNotImplemented;
 import static reactor.core.Exceptions.propagate;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -41,7 +42,7 @@ public class Exceptions {
    * {@code flux.subscribe(Exceptions.checked(v -> checkedMethod(v)}
    *
    * @param checkedConsumer the consumer that throws a checked exception
-   * @param <T> the type of the input to the operation
+   * @param <T>             the type of the input to the operation
    * @return consumer that adapts {@link CheckedConsumer} and {@link reactor.core.Exceptions#propagate(Throwable)}'s checked
    *         exceptions
    * @see reactor.core.Exceptions#propagate(Throwable)
@@ -56,8 +57,8 @@ public class Exceptions {
    * to avoid try/catch blocks and improve readability.
    *
    * @param checkedBiConsumer the biconsumer that throws a chedked exception
-   * @param <T> the type of the first argument to the operation
-   * @param <U> the type of the second argument to the operation
+   * @param <T>               the type of the first argument to the operation
+   * @param <U>               the type of the second argument to the operation
    * @return biconsumer that adapts {@link CheckedBiConsumer} and {@link reactor.core.Exceptions#propagate(Throwable)}'s checked
    *         exceptions
    * @see reactor.core.Exceptions#propagate(Throwable)
@@ -74,8 +75,8 @@ public class Exceptions {
    * {@code flux.map(Exceptions.checked(v -> checkedMethod(v)).subscribe(Subscribers.unbounded())}
    *
    * @param checkedFunction the function that throws a checked exception
-   * @param <T> the type of the input to the function
-   * @param <R> the type of the result of the function
+   * @param <T>             the type of the input to the function
+   * @param <R>             the type of the result of the function
    * @return function that adapts {@link CheckedFunction} and {@link reactor.core.Exceptions#propagate(Throwable)}'s checked
    *         exceptions
    * @see reactor.core.Exceptions#propagate(Throwable)
@@ -90,9 +91,9 @@ public class Exceptions {
    * to avoid try/catch blocks and improve readability.
    *
    * @param checkedBiFunction the bifunction that throws a checked exception
-   * @param <T> the type of the first argument to the function
-   * @param <U> the type of the second argument to the function
-   * @param <R> the type of the result of the function
+   * @param <T>               the type of the first argument to the function
+   * @param <U>               the type of the second argument to the function
+   * @param <R>               the type of the result of the function
    * @return bifunction that adapts {@link CheckedBiFunction} and {@link reactor.core.Exceptions#propagate(Throwable)}'s checked
    *         exceptions
    * @see reactor.core.Exceptions#propagate(Throwable)
@@ -107,8 +108,8 @@ public class Exceptions {
    * to avoid try/catch blocks and improve readability.
    *
    * @param checkedBiConsumer the biconsumer that throws a checked exception
-   * @param <T> the type of the first argument to the function
-   * @param <U> the type of the second argument to the function
+   * @param <T>               the type of the first argument to the function
+   * @param <U>               the type of the second argument to the function
    * @return a biconsumer that adapts {@code checkedBiConsumer} and {@link reactor.core.Exceptions#propagate(Throwable)}'s checked
    *         exceptions
    * @see reactor.core.Exceptions#propagate(Throwable)
@@ -126,7 +127,7 @@ public class Exceptions {
    * {@code flux.filter(Exceptions.checked(v -> checkedMethod(v)).subscribe(Subscribers.unbounded())}
    *
    * @param checkedPredicate the predicate that throws a checked exception
-   * @param <T> the type of the input to the predicate
+   * @param <T>              the type of the input to the predicate
    * @return predicate that adapts {@link CheckedPredicate} and {@link reactor.core.Exceptions#propagate(Throwable)}'s checked
    *         exceptions
    * @see reactor.core.Exceptions#propagate(Throwable)
@@ -141,8 +142,8 @@ public class Exceptions {
    * which throw checked exceptions to avoid try/catch blocks and improve readability.
    *
    * @param checkedBiPredicate the bipredicate that throws a checked exception
-   * @param <T> the type of the first argument to the predicate
-   * @param <U> the type of the second argument the predicate
+   * @param <T>                the type of the first argument to the predicate
+   * @param <U>                the type of the second argument the predicate
    * @return bipredicate that adapts {@link CheckedBiPredicate} and {@link reactor.core.Exceptions#propagate(Throwable)}'s checked
    *         exceptions
    * @see reactor.core.Exceptions#propagate(Throwable)
@@ -206,6 +207,9 @@ public class Exceptions {
     } else if (t instanceof VirtualMachineError) {
       return new MuleFatalException(t);
     } else if (isBubbling(t)) {
+      return new MuleRuntimeException(unwrap(t));
+    } else if (isErrorCallbackNotImplemented(t)) {
+      // This type of fatal Reactor exceptions was added later see MULE-19593 for more details
       return new MuleRuntimeException(unwrap(t));
     } else {
       return t;

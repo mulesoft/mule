@@ -6,30 +6,48 @@
  */
 package org.mule.runtime.config.internal.factories;
 
-import static java.util.Collections.singletonMap;
+import static java.util.Arrays.asList;
+import static java.util.Optional.of;
+import static org.mockito.Mockito.mock;
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.internal.processor.TryScope;
 import org.mule.runtime.core.internal.registry.SimpleRegistry;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
 
-@RunWith(MockitoJUnitRunner.class)
+import javax.xml.namespace.QName;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
 public class TryProcessorFactoryBeanTestCase extends AbstractMuleTestCase {
 
-  private MuleContextWithRegistry muleContextMock = mockContextWithServices();
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
+
+  private final MuleContextWithRegistry muleContextMock = mockContextWithServices();
 
   private SimpleRegistry registry;
 
@@ -44,10 +62,22 @@ public class TryProcessorFactoryBeanTestCase extends AbstractMuleTestCase {
     TryProcessorFactoryBean tryProcessorFactoryBean = new TryProcessorFactoryBean();
     tryProcessorFactoryBean.setTransactionalAction(ACTION_INDIFFERENT_STRING);
     tryProcessorFactoryBean.setTransactionType(LOCAL);
-    tryProcessorFactoryBean.setAnnotations(singletonMap(ROOT_CONTAINER_NAME_KEY, "root"));
+
+    final Map<QName, Object> annotations = new HashMap<>();
+    annotations.put(LOCATION_KEY, new DefaultComponentLocation(of("root"),
+                                                               asList(new DefaultLocationPart("root",
+                                                                                              of(TypedComponentIdentifier
+                                                                                                  .builder()
+                                                                                                  .identifier(mock(ComponentIdentifier.class))
+                                                                                                  .type(FLOW).build()),
+                                                                                              Optional.empty(),
+                                                                                              OptionalInt.empty(),
+                                                                                              OptionalInt.empty()))));
+    annotations.put(ROOT_CONTAINER_NAME_KEY, "root");
+    tryProcessorFactoryBean.setAnnotations(annotations);
     registry.inject(tryProcessorFactoryBean);
 
-    TryScope tryMessageProcessor = (TryScope) tryProcessorFactoryBean.getObject();
+    TryScope tryMessageProcessor = tryProcessorFactoryBean.getObject();
     initialiseIfNeeded(tryMessageProcessor, muleContextMock);
     tryMessageProcessor.start();
   }

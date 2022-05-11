@@ -8,6 +8,7 @@ package org.mule.runtime.module.deployment.internal;
 
 import static java.lang.String.valueOf;
 import static java.util.Optional.of;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveArtifactStatusDeploymentProperties;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
 
@@ -27,8 +28,8 @@ final class ArtifactStoppedDeploymentPersistenceListener implements ArtifactStop
 
   private static transient final Logger logger = LoggerFactory.getLogger(ArtifactStoppedDeploymentPersistenceListener.class);
   /**
-   * A possible race condition could happen if a stop request and a shutdown request
-   * are concurrently sent to mule, in order to prevent it this property is defined as an AtomicBoolean.
+   * A possible race condition could happen if a stop request and a shutdown request are concurrently sent to mule, in order to
+   * prevent it this property is defined as an AtomicBoolean.
    */
   private AtomicBoolean shouldPersist;
   private String artifactName;
@@ -43,7 +44,7 @@ final class ArtifactStoppedDeploymentPersistenceListener implements ArtifactStop
     Properties properties = new Properties();
     properties.setProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, valueOf(true));
     try {
-      resolveDeploymentProperties(artifactName, of(properties));
+      resolveArtifactStatusDeploymentProperties(artifactName, of(properties));
     } catch (IOException e) {
       logger.error("ArtifactStoppedDeploymentPersistenceListener failed to process notification onStart for artifact "
           + artifactName, e);
@@ -58,7 +59,7 @@ final class ArtifactStoppedDeploymentPersistenceListener implements ArtifactStop
     Properties properties = new Properties();
     properties.setProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, valueOf(false));
     try {
-      resolveDeploymentProperties(artifactName, of(properties));
+      resolveArtifactStatusDeploymentProperties(artifactName, of(properties));
     } catch (IOException e) {
       logger.error("ArtifactStoppedDeploymentPersistenceListener failed to process notification onStop for artifact "
           + artifactName, e);
@@ -68,5 +69,15 @@ final class ArtifactStoppedDeploymentPersistenceListener implements ArtifactStop
   @Override
   public void doNotPersist() {
     shouldPersist.set(false);
+  }
+
+  @Override
+  public void deletePersistenceProperties() {
+    try {
+      resolveArtifactStatusDeploymentProperties(artifactName, of(new Properties()));
+    } catch (IOException e) {
+      logger.error("ArtifactStoppedDeploymentPersistenceListener failed to delete persistence for artifact {}",
+                   artifactName, e);
+    }
   }
 }

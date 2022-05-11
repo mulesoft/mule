@@ -29,9 +29,8 @@ public interface WebSocketBroadcaster {
   /**
    * Broadcast the {@code content} to the given {@code sockets}.
    * <p>
-   * An {@code errorCallback} is used to notify errors while broadcasting. If is communication with
-   * socket N fails, communication with all the remaining N + M sockets will still be attempted. The callback
-   * will be invoked once per failing socket.
+   * An {@code errorCallback} is used to notify errors while broadcasting. If is communication with socket N fails, communication
+   * with all the remaining N + M sockets will still be attempted. The callback will be invoked once per failing socket.
    * <p>
    * Sockets that are either closed or have lost connection will be discarded.
    *
@@ -47,14 +46,13 @@ public interface WebSocketBroadcaster {
   /**
    * Broadcast the {@code content} to the given {@code sockets}.
    * <p>
-   * An {@code errorCallback} is used to notify errors while broadcasting. If is communication with
-   * socket N fails, communication with all the remaining N + M sockets will still be attempted. The callback
-   * will be invoked once per failing socket.
+   * An {@code errorCallback} is used to notify errors while broadcasting. If is communication with socket N fails, communication
+   * with all the remaining N + M sockets will still be attempted. The callback will be invoked once per failing socket.
    * <p>
    * Sockets that are either closed or have lost connection will be discarded.
    * <p>
-   * Socket that have lost connection to the remote system and support reconnection will be reconnected using the
-   * given {@code retryPolicyTemplate} and {@code reconnectionScheduler}
+   * Socket that have lost connection to the remote system and support reconnection will be reconnected using the given
+   * {@code retryPolicyTemplate} and {@code reconnectionScheduler}
    *
    * @param sockets       the {@link WebSocket sockets} to broadcast to
    * @param content       the content to be sent

@@ -11,7 +11,7 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.module.extension.internal.loader.enricher.MetadataTypeEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.MetadataTypeEnricher;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -19,8 +19,7 @@ import java.io.Serializable;
 import org.springframework.core.ResolvableType;
 
 /**
- * Wrapper for {@link Class} of parameter method that provide utility methods to facilitate the introspection of the
- * {@link Class}
+ * Wrapper for {@link Class} of parameter method that provide utility methods to facilitate the introspection of the {@link Class}
  *
  * @since 4.2
  */

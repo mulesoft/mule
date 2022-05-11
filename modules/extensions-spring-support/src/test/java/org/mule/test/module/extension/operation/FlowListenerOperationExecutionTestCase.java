@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.extension.operation;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -17,17 +18,36 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
+import org.mule.test.runner.RunnerDelegateTo;
 import org.mule.test.vegan.extension.BananaConfig;
 
-import org.junit.Test;
+import java.util.Collection;
 
+import org.junit.Test;
+import org.junit.runners.Parameterized;
+
+@RunnerDelegateTo(Parameterized.class)
 public class FlowListenerOperationExecutionTestCase extends AbstractExtensionFunctionalTestCase {
 
   private BananaConfig config;
 
+  @Parameterized.Parameter(0)
+  public String parameterizationName;
+
+  @Parameterized.Parameter(1)
+  public String configName;
+
+  @Parameterized.Parameters(name = "{0}")
+  public static Collection<Object[]> data() {
+    return asList(new Object[][] {
+        {"Using Extensions API", "vegan-flow-listener-operation-config.xml"},
+        {"Using SDK API", "sdk-vegan-flow-listener-operation-config.xml"},
+    });
+  }
+
   @Override
   protected String getConfigFile() {
-    return "vegan-flow-listener-operation-config.xml";
+    return configName;
   }
 
   @Override

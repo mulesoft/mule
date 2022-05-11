@@ -8,12 +8,16 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
+
+import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 
 import java.util.ArrayList;
@@ -31,12 +35,13 @@ import java.util.function.Supplier;
  */
 public class ParallelDeploymentDirectoryWatcher extends DeploymentDirectoryWatcher {
 
+  public static final int MAX_APPS_IN_PARALLEL_DEPLOYMENT = 20;
+
   private Scheduler threadPoolExecutor;
 
-  public ParallelDeploymentDirectoryWatcher(
-                                            DomainBundleArchiveDeployer domainBundleDeployer,
-                                            ArchiveDeployer<Domain> domainArchiveDeployer,
-                                            ArchiveDeployer<Application> applicationArchiveDeployer,
+  public ParallelDeploymentDirectoryWatcher(DomainBundleArchiveDeployer domainBundleDeployer,
+                                            ArchiveDeployer<DomainDescriptor, Domain> domainArchiveDeployer,
+                                            ArchiveDeployer<ApplicationDescriptor, Application> applicationArchiveDeployer,
                                             ObservableList<Domain> domains, ObservableList<Application> applications,
                                             Supplier<SchedulerService> schedulerServiceSupplier, ReentrantLock deploymentLock) {
     super(domainBundleDeployer, domainArchiveDeployer, applicationArchiveDeployer, domains, applications,
@@ -89,7 +94,8 @@ public class ParallelDeploymentDirectoryWatcher extends DeploymentDirectoryWatch
 
   private void waitForTasksToFinish(List<Callable<Object>> tasks) {
     this.threadPoolExecutor =
-        schedulerServiceSupplier.get().ioScheduler(config().withName("parallelDeployment").withMaxConcurrentTasks(20));
+        schedulerServiceSupplier.get()
+            .ioScheduler(config().withName("parallelDeployment").withMaxConcurrentTasks(MAX_APPS_IN_PARALLEL_DEPLOYMENT));
     try {
       final List<Future<Object>> futures = threadPoolExecutor.invokeAll(tasks);
 
@@ -102,7 +108,7 @@ public class ParallelDeploymentDirectoryWatcher extends DeploymentDirectoryWatch
       }
 
     } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
+      currentThread().interrupt();
     } finally {
       threadPoolExecutor.stop();
     }

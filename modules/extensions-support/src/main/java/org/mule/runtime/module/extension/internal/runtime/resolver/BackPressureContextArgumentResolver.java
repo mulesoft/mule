@@ -23,7 +23,8 @@ import org.mule.runtime.module.extension.internal.runtime.source.ImmutableBackPr
  */
 public class BackPressureContextArgumentResolver implements ArgumentResolver<BackPressureContext> {
 
-  private final ArgumentResolver<SourceCallbackContext> callbackContextResolver = new SourceCallbackContextArgumentResolver();
+  private final ArgumentResolver<SourceCallbackContext> callbackContextResolver =
+      new LegacySourceCallbackContextArgumentResolver();
 
   @Override
   public BackPressureContext resolve(ExecutionContext executionContext) {

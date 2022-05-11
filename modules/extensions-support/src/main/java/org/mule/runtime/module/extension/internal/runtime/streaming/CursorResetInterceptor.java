@@ -10,75 +10,86 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionExc
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * This interceptor tracks all the {@link Cursor cursors} that were resolved as parameters of a given operation
- * execution and the position they were in <b>before</b> the execution.
+ * This interceptor tracks all the {@link Cursor cursors} that were resolved as parameters of a given operation execution and the
+ * position they were in <b>before</b> the execution.
  *
- * If the operation fails with a {@link ConnectionException}, then the SDK will attempt to reconnect. This interceptor
- * makes sure that all those cursors are set back on their original positions before the retry is attempted, since otherwise,
- * the stream would be corrupted and the repeatable promise broken.
+ * If the operation fails with a {@link ConnectionException}, then the SDK will attempt to reconnect. This interceptor makes sure
+ * that all those cursors are set back on their original positions before the retry is attempted, since otherwise, the stream
+ * would be corrupted and the repeatable promise broken.
  *
  * @since 4.1
  */
 public class CursorResetInterceptor implements Interceptor<OperationModel> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CursorResetInterceptor.class);
-  private static final String CURSOR_POSITIONS = "CURSOR_POSITIONS";
+  public static final String CURSOR_RESET_HANDLER_VARIABLE = "CURSOR_RESET_HANDLER";
+  private final Map<ParameterGroupModel, Set<ParameterModel>> cursorParametersMap;
+  private final ReflectionCache reflectionCache;
 
-  private final List<String> cursorParamNames;
-
-  public CursorResetInterceptor(List<String> cursorParamNames) {
-    this.cursorParamNames = cursorParamNames;
+  public CursorResetInterceptor(Map<ParameterGroupModel, Set<ParameterModel>> cursorParametersMap,
+                                ReflectionCache reflectionCache) {
+    this.cursorParametersMap = cursorParametersMap;
+    this.reflectionCache = reflectionCache;
   }
 
   @Override
   public void before(ExecutionContext<OperationModel> ctx) throws Exception {
-    List<Pair<Cursor, Long>> cursorPositions = new ArrayList<>(cursorParamNames.size());
-    for (String cursorParamName : cursorParamNames) {
-      Object value = ctx.getParameterOrDefault(cursorParamName, null);
-      if (value instanceof Cursor) {
-        final Cursor cursor = (Cursor) value;
-        cursorPositions.add(new Pair<>(cursor, cursor.getPosition()));
-      }
-    }
-
-    if (!cursorPositions.isEmpty()) {
-      ((ExecutionContextAdapter<OperationModel>) ctx).setVariable(CURSOR_POSITIONS, cursorPositions);
+    List<Cursor> cursors = getParameterCursors(ctx);
+    if (!cursors.isEmpty()) {
+      ((ExecutionContextAdapter<OperationModel>) ctx).setVariable(CURSOR_RESET_HANDLER_VARIABLE,
+                                                                  new CursorResetHandler(cursors));
     }
   }
 
   @Override
   public Throwable onError(ExecutionContext<OperationModel> executionContext, Throwable exception) {
     extractConnectionException(exception).ifPresent(cne -> {
-      List<Pair<Cursor, Long>> cursorPositions =
-          ((ExecutionContextAdapter<OperationModel>) executionContext).removeVariable(CURSOR_POSITIONS);
-      if (cursorPositions != null) {
-        cursorPositions.forEach(pair -> {
-          try {
-            pair.getFirst().seek(pair.getSecond());
-          } catch (IOException e) {
-            if (LOGGER.isWarnEnabled()) {
-              LOGGER.warn("Could not reset cursor back to position " + pair.getSecond() + ". Inconsistencies might occur if "
-                  + "reconnection attempted", e);
-            }
-          }
-        });
+      CursorResetHandler cursorResetHandler =
+          ((ExecutionContextAdapter<OperationModel>) executionContext).removeVariable(CURSOR_RESET_HANDLER_VARIABLE);
+      if (cursorResetHandler != null) {
+        cursorResetHandler.resetCursors();
       }
     });
 
     return exception;
+  }
+
+  private List<Cursor> getParameterCursors(ExecutionContext<OperationModel> ctx) {
+    List<Cursor> cursors = new ArrayList<>();
+    cursorParametersMap.forEach(((parameterGroupModel, parameterModels) -> {
+      parameterModels.forEach(parameterModel -> {
+        Object value = getParameterValue(ctx, parameterGroupModel, parameterModel);
+        if (value instanceof Cursor) {
+          cursors.add((Cursor) value);
+        }
+      });
+    }));
+    return cursors;
+  }
+
+  private Object getParameterValue(ExecutionContext<OperationModel> ctx, ParameterGroupModel parameterGroupModel,
+                                   ParameterModel parameterModel) {
+    // TODO MULE-19446: Fix ExecutionContext API to correctly handle parameters value retrieval when defined within a parameter
+    // group with showInDsl=true
+    Object value = IntrospectionUtils.getParameterOrDefault(ctx, parameterGroupModel, parameterModel, null, reflectionCache);
+    if (value instanceof TypedValue) {
+      value = ((TypedValue) value).getValue();
+    }
+    return value;
   }
 }

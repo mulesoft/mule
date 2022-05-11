@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -41,6 +42,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_
 import static org.mule.test.marvel.ironman.IronMan.CONFIG_NAME;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
+import static org.mule.test.vegan.extension.VeganExtension.KIWI;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
@@ -67,7 +69,6 @@ import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
-import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.source.BackPressure;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
@@ -75,6 +76,8 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
+import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
+import org.mule.sdk.api.annotation.error.ErrorTypes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergConnectionProvider;
@@ -230,7 +233,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void untesteableConnetionProvider() throws Exception {
+  public void untestableConnectionProvider() throws Exception {
     ConnectionProviderModel connectionProviderModel = veganExtension.getConfigurationModel(APPLE)
         .map(c -> c.getConnectionProviders().get(0))
         .get();
@@ -239,7 +242,16 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void testeableConnectionProvider() throws Exception {
+  public void untestableSdkConnectionProvider() throws Exception {
+    ConnectionProviderModel connectionProviderModel = veganExtension.getConfigurationModel(KIWI)
+        .map(c -> c.getConnectionProviders().get(0))
+        .get();
+
+    assertThat(connectionProviderModel.supportsConnectivityTesting(), is(false));
+  }
+
+  @Test
+  public void testableConnectionProvider() throws Exception {
     ConnectionProviderModel connectionProviderModel = veganExtension.getConfigurationModel(BANANA)
         .map(c -> c.getConnectionProviders().get(0))
         .get();
@@ -276,14 +288,14 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void sourceWithDefaultBackPressureStrategies() {
+  public void sourceWithInheritedBackPressureStrategies() {
     SourceModel source = heisenbergExtension.getConfigurationModels().get(0).getSourceModel("ReconnectableListenPayments").get();
 
-    Optional<ParameterModel> parameter = source.getAllParameterModels().stream()
-        .filter(p -> BACK_PRESSURE_STRATEGY_PARAMETER_NAME.equals(p.getName()))
-        .findAny();
+    BackPressureStrategyModelProperty backPressureStrategyModelProperty =
+        source.getModelProperty(BackPressureStrategyModelProperty.class).get();
 
-    assertThat(parameter.isPresent(), is(false));
+    assertThat(backPressureStrategyModelProperty.getDefaultMode(), is(FAIL));
+    assertThat(backPressureStrategyModelProperty.getSupportedModes(), hasItems(FAIL, DROP));
   }
 
   @Test
@@ -389,7 +401,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   @Export(classes = {HeisenbergExtension.class, HeisenbergException.class}, resources = "methRecipe.json")
   @SubTypeMapping(baseType = Weapon.class, subTypes = {Ricin.class})
   @SubTypeMapping(baseType = Investment.class, subTypes = {CarWash.class, CarDealer.class})
-  @ErrorTypes(HeisenbergErrors.class)
+  @org.mule.sdk.api.annotation.error.ErrorTypes(HeisenbergErrors.class)
   public static class IllegalBackPressureHeisenbergExtension extends HeisenbergExtension {
 
   }

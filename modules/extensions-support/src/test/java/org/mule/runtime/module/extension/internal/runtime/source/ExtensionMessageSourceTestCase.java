@@ -7,13 +7,16 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.util.Arrays.asList;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getThrowables;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,29 +30,48 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.util.MuleSystemProperties.COMPUTE_CONNECTION_ERRORS_IN_STATS_PROPERTY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.createMockLogger;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogRegex;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
+import static org.slf4j.event.Level.DEBUG;
+import static org.slf4j.event.Level.ERROR;
+import static org.slf4j.event.Level.WARN;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.notification.ExceptionNotification;
+import org.mule.runtime.api.notification.ExceptionNotificationListener;
+import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
+import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.api.util.ExceptionUtils;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.sdk.api.runtime.exception.ExceptionHandler;
 import org.mule.sdk.api.runtime.source.Source;
 import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
-import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
+import org.mule.test.heisenberg.extension.exception.SdkHeisenbergConnectionExceptionEnricher;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.resource.spi.work.Work;
@@ -57,27 +79,49 @@ import javax.resource.spi.work.Work;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.InOrder;
+import org.slf4j.Logger;
 
 @RunWith(Parameterized.class)
 public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {
 
-  private static final int TEST_TIMEOUT = 2000;
-  private static final int TEST_POLL_DELAY = 10;
+  protected static final int TEST_TIMEOUT = 3000;
+  protected static final int TEST_POLL_DELAY = 1000;
+  protected String property;
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
     return asList(new Object[][] {
-        {"primary node only", true},
-        {"all nodes", false}
+        {"primary node only sync", true, false},
+        {"primary node only async", true, true},
+        {"all nodes sync", false, false},
+        {"all nodes async", false, true}
     });
   }
 
-  public ExtensionMessageSourceTestCase(String name, boolean primaryNodeOnly) {
+  public ExtensionMessageSourceTestCase(String name, boolean primaryNodeOnly, boolean isAsync) {
     this.primaryNodeOnly = primaryNodeOnly;
+    if (isAsync) {
+      this.retryPolicyTemplate = new AsynchronousRetryTemplate(new SimpleRetryPolicyTemplate(0, 2));
+    } else {
+      SimpleRetryPolicyTemplate template = new SimpleRetryPolicyTemplate(0, 2);
+      template.setNotificationFirer(notificationDispatcher);
+      this.retryPolicyTemplate = template;
+    }
+  }
+
+  @Override
+  protected void doSetUpBeforeMuleContextCreation() {
+    property = System.setProperty(COMPUTE_CONNECTION_ERRORS_IN_STATS_PROPERTY, "true");
+  }
+
+  @After
+  public void restoreProperty() {
+    System.clearProperty(COMPUTE_CONNECTION_ERRORS_IN_STATS_PROPERTY);
   }
 
   @Test
@@ -86,10 +130,12 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     when(sourceCallbackFactory.createSourceCallback(any())).thenReturn(sourceCallback);
 
     AtomicBoolean handled = new AtomicBoolean(false);
+    Latch latch = new Latch();
 
     doAnswer(invocationOnMock -> {
       sourceCallback.handle(result);
       handled.set(true);
+      latch.release();
       return null;
     }).when(source).onStart(sourceCallback);
 
@@ -100,6 +146,7 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
 
     start();
 
+    latch.await();
     assertThat(handled.get(), is(true));
   }
 
@@ -143,11 +190,42 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     ConnectionException connectionException = new ConnectionException(ERROR_MESSAGE);
     MuleException e = new DefaultMuleException(connectionException);
     doThrow(e).when(source).onStart(any());
-    expectedException.expect(is(instanceOf(RetryPolicyExhaustedException.class)));
-    expectedException.expectCause(is(connectionException));
+    if (!this.retryPolicyTemplate.isAsync()) {
+      expectedException.expect(is(instanceOf(RetryPolicyExhaustedException.class)));
+      expectedException.expectCause(is(connectionException));
+    } else {
+      expectedException.none();
+    }
 
     messageSource.initialise();
     messageSource.start();
+  }
+
+  @Test
+  public void dispatchNotificationWhenFailToStart() throws Exception {
+    final Latch latch = new Latch();
+    final List<ExceptionNotification> notifications = new ArrayList<>();
+    final ExceptionNotificationListener listener = notification -> {
+      notifications.add(notification);
+      latch.release();
+    };
+    registerNotificationListener(listener);
+
+    ConnectionException connectionException = new ConnectionException(ERROR_MESSAGE);
+    MuleException e = new DefaultMuleException(connectionException);
+    doThrow(e).when(source).onStart(any());
+
+    messageSource.initialise();
+    try {
+      messageSource.start();
+      latch.await(5, SECONDS);
+      assertThat(notifications.get(0), is(instanceOf(ExceptionNotification.class)));
+      assertThat(notifications.get(0).getException(), instanceOf(RetryPolicyExhaustedException.class));
+    } catch (Exception ex) {
+      latch.await(5, SECONDS);
+      assertThat(notifications.get(0), is(instanceOf(ExceptionNotification.class)));
+      assertThat(notifications.get(0).getException(), instanceOf(RetryPolicyExhaustedException.class));
+    }
   }
 
   @Test
@@ -156,8 +234,12 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     MuleException e = new DefaultMuleException(connectionException);
     doThrow(e).when(source).onStart(any());
     doThrow(new NullPointerException()).when(source).onStop();
-    expectedException.expect(is(instanceOf(RetryPolicyExhaustedException.class)));
-    expectedException.expectCause(is(connectionException));
+    if (!this.retryPolicyTemplate.isAsync()) {
+      expectedException.expect(is(instanceOf(RetryPolicyExhaustedException.class)));
+      expectedException.expectCause(is(connectionException));
+    } else {
+      expectedException.expect(is(instanceOf(DefaultMuleException.class)));
+    }
 
     messageSource.initialise();
     messageSource.start();
@@ -170,9 +252,20 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     doThrow(new RuntimeException(connectionException)).when(source).onStart(sourceCallback);
 
     final Throwable throwable = catchThrowable(messageSource::start);
-    assertThat(throwable, is(instanceOf(RetryPolicyExhaustedException.class)));
-    assertThat(throwable, is(exhaustedBecauseOf(connectionException)));
-    verify(source, times(3)).onStart(sourceCallback);
+    if (!this.retryPolicyTemplate.isAsync()) {
+      assertThat(throwable, is(instanceOf(RetryPolicyExhaustedException.class)));
+      assertThat(throwable, is(exhaustedBecauseOf(connectionException)));
+    } else {
+      new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+        assertNull(throwable);
+        return true;
+      }));
+    }
+
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+      verify(source, times(3)).onStart(sourceCallback);
+      return true;
+    }));
   }
 
   @Test
@@ -181,9 +274,19 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
 
     messageSource.initialise();
     final Throwable throwable = catchThrowable(messageSource::start);
-    assertThat(throwable, is(instanceOf(RetryPolicyExhaustedException.class)));
-    assertThat(getThrowables(throwable), hasItemInArray(instanceOf(IOException.class)));
-    verify(source, times(3)).onStart(sourceCallback);
+    if (!this.retryPolicyTemplate.isAsync()) {
+      assertThat(throwable, is(instanceOf(RetryPolicyExhaustedException.class)));
+      assertThat(getThrowables(throwable), hasItemInArray(instanceOf(IOException.class)));
+    } else {
+      new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+        assertNull(throwable);
+        return true;
+      }));
+    }
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+      verify(source, times(3)).onStart(sourceCallback);
+      return true;
+    }));
   }
 
   @Test
@@ -223,23 +326,33 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   public void startFailsWithRandomException() throws Exception {
     Exception e = new RuntimeException();
     doThrow(e).when(source).onStart(sourceCallback);
-    expectedException.expect(exhaustedBecauseOf(new BaseMatcher<Throwable>() {
+    if (!this.retryPolicyTemplate.isAsync()) {
+      expectedException.expect(exhaustedBecauseOf(new BaseMatcher<Throwable>() {
 
-      private final Matcher<Exception> exceptionMatcher = hasCause(sameInstance(e));
+        private final Matcher<Exception> exceptionMatcher = hasCause(sameInstance(e));
 
-      @Override
-      public boolean matches(Object item) {
-        return exceptionMatcher.matches(item);
-      }
+        @Override
+        public boolean matches(Object item) {
+          return exceptionMatcher.matches(item);
+        }
 
-      @Override
-      public void describeTo(Description description) {
-        exceptionMatcher.describeTo(description);
-      }
-    }));
+        @Override
+        public void describeTo(Description description) {
+          exceptionMatcher.describeTo(description);
+        }
+      }));
+    } else {
+      expectedException.none();
+    }
 
     initialise();
     messageSource.start();
+
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+      verify(source, times(3)).onStart(sourceCallback);
+      verify(source, times(3)).onStop();
+      return true;
+    }));
   }
 
   @Test
@@ -250,10 +363,13 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     }
 
     final Injector injector = muleContext.getInjector();
-    InOrder inOrder = inOrder(injector, source);
-    inOrder.verify(injector).inject(source);
-    inOrder.verify((Initialisable) source).initialise();
-    inOrder.verify(source).onStart(sourceCallback);
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+      InOrder inOrder = inOrder(injector, source);
+      inOrder.verify(injector).inject(source);
+      inOrder.verify((Initialisable) source).initialise();
+      inOrder.verify(source).onStart(sourceCallback);
+      return true;
+    }));
   }
 
   @Test
@@ -289,7 +405,7 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
 
   @Test
   public void enrichExceptionWithSourceExceptionEnricher() throws Exception {
-    when(enricherFactory.createHandler()).thenReturn(new HeisenbergConnectionExceptionEnricher());
+    when(enricherFactory.createHandler()).thenReturn(new SdkHeisenbergConnectionExceptionEnricher());
     mockExceptionEnricher(sourceModel, enricherFactory);
     mockExceptionEnricher(sourceModel, enricherFactory);
     ExtensionMessageSource messageSource = getNewExtensionMessageSourceInstance();
@@ -298,8 +414,15 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     doThrow(new RuntimeException(ERROR_MESSAGE)).when(source).onStart(sourceCallback);
     Throwable t = catchThrowable(messageSource::start);
 
-    assertThat(ExceptionUtils.containsType(t, ConnectionException.class), is(true));
-    assertThat(t.getMessage(), containsString(ENRICHED_MESSAGE + ERROR_MESSAGE));
+    if (!this.retryPolicyTemplate.isAsync()) {
+      assertThat(ExceptionUtils.containsType(t, ConnectionException.class), is(true));
+      assertThat(t.getMessage(), containsString(ENRICHED_MESSAGE + ERROR_MESSAGE));
+    } else {
+      new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+        assertNull(t);
+        return true;
+      }));
+    }
 
     messageSource.stop();
   }
@@ -317,8 +440,14 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     doThrow(new RuntimeException(ERROR_MESSAGE)).when(source).onStart(sourceCallback);
     Throwable t = catchThrowable(messageSource::start);
 
-    assertThat(t.getMessage(), containsString(enrichedErrorMessage));
-
+    if (!this.retryPolicyTemplate.isAsync()) {
+      assertThat(t.getMessage(), containsString(enrichedErrorMessage));
+    } else {
+      new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+        assertNull(t);
+        return true;
+      }));
+    }
     messageSource.stop();
   }
 
@@ -373,8 +502,11 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     messageSource.onException(new ConnectionException(ERROR_MESSAGE));
     new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> !messageSource.isReconnecting()));
 
-    verify(source, times(3)).onStart(sourceCallback);
-    verify(source, times(2)).onStop();
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+      verify(source, times(3)).onStart(sourceCallback);
+      verify(source, times(2)).onStop();
+      return true;
+    }));
   }
 
   @Test
@@ -386,8 +518,11 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     messageSource.onException(connectionException);
     new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> !messageSource.isReconnecting()));
 
-    verify(source, times(4)).onStart(sourceCallback);
-    verify(source, times(4)).onStop();
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+      verify(source, times(4)).onStart(sourceCallback);
+      verify(source, times(4)).onStop();
+      return true;
+    }));
   }
 
   private BaseMatcher<Throwable> exhaustedBecauseOf(Throwable cause) {
@@ -421,6 +556,95 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     messageSource.start();
     final Object metadataKeyValue = messageSource.getParameterValueResolver().getParameterValue(METADATA_KEY);
     assertThat(metadataKeyValue, is(person));
+  }
+
+  @Test
+  public void getRetryPolicyExhaustedAndConnectionErrorsAreComputed() throws Exception {
+
+    muleContext.getStatistics().setEnabled(true);
+    messageSource.initialise();
+    final ConnectionException connectionException = new ConnectionException(ERROR_MESSAGE);
+    doThrow(new RuntimeException(connectionException)).when(source).onStart(sourceCallback);
+    final Throwable throwable = catchThrowable(messageSource::start);
+
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+      assertThat(muleContext.getStatistics().getApplicationStatistics().getConnectionErrors(), equalTo(2l));
+      assertThat(muleContext.getStatistics().getApplicationStatistics().getExecutionErrors(), equalTo(2l));
+      return true;
+    }));
+  }
+
+  @Test
+  public void sourceInitializedLogMessage() throws Exception {
+    ArrayList<String> debugMessages = new ArrayList<>();
+    Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(debugMessages, DEBUG));
+    messageSource.initialise();
+    if (primaryNodeOnly) {
+      verifyLogMessage(debugMessages,
+                       "Message source 'source' on flow 'appleFlow' running on the primary node is initializing. Note that this Message source must run on the primary node only.");
+    } else {
+      verifyLogMessage(debugMessages,
+                       "Message source 'source' on flow 'appleFlow' is initializing. This is the primary node of the cluster.");
+    }
+    setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
+  }
+
+  @Test
+  public void sourceStartedLogMessage() throws Exception {
+    ArrayList<String> debugMessages = new ArrayList<>();
+    Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(debugMessages, DEBUG));
+    messageSource.initialise();
+    messageSource.start();
+    verifyLogMessage(debugMessages, "Message source 'source' on flow 'appleFlow' is starting");
+    setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
+  }
+
+  @Test
+  public void sourceStoppedLogMessage() throws Exception {
+    ArrayList<String> debugMessages = new ArrayList<>();
+    Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(debugMessages, DEBUG));
+    messageSource.initialise();
+    messageSource.start();
+    messageSource.stop();
+    verifyLogMessage(debugMessages, "Message source 'source' on flow 'appleFlow' is stopping");
+    setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
+  }
+
+
+  @Test
+  public void getRetryPolicyExhaustedAndLogShutdownMessage() throws Exception {
+    ArrayList<String> errorMessages = new ArrayList<>();
+    Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(errorMessages, ERROR));
+    start();
+    ConnectionException e = new ConnectionException(ERROR_MESSAGE);
+    doThrow(e).when(source).onStart(any());
+    messageSource.onException(e);
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+      verifyLogRegex(errorMessages,
+                     "Message source 'source' on flow 'appleFlow' could not be reconnected. Will be shutdown. (.*)");
+      return true;
+    }));
+    setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
+  }
+
+  public void reconnectAndLogSuccessMessage() throws Exception {
+    ArrayList<String> warnMessages = new ArrayList<>();
+    Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(warnMessages, WARN));
+    start();
+    ConnectionException e = new ConnectionException(ERROR_MESSAGE);
+    messageSource.onException(e);
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+      verifyLogMessage(warnMessages, "Message source 'source' on flow 'appleFlow' successfully reconnected");
+      return true;
+    }));
+    setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
+  }
+
+  private void registerNotificationListener(ExceptionNotificationListener exceptionNotificationListener)
+      throws RegistrationException {
+    MuleRegistry muleRegistry = ((MuleContextWithRegistry) muleContext).getRegistry();
+    NotificationListenerRegistry notificationListenerRegistry = muleRegistry.lookupObject(NotificationListenerRegistry.class);
+    notificationListenerRegistry.registerListener(exceptionNotificationListener);
   }
 
   private class DummySource extends Source {

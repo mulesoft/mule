@@ -13,11 +13,11 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.core.ResolvableType.forMethodReturnType;
 
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.utils.ParameterUtils;
 
 import javax.lang.model.element.ExecutableElement;
 
@@ -102,7 +102,7 @@ public class MethodWrapper<T extends Type> implements MethodElement<T> {
    */
   @Override
   public List<ExtensionParameter> getParameterGroups() {
-    return getParametersAnnotatedWith(ParameterGroup.class);
+    return ParameterUtils.getParameterGroups(this);
   }
 
   /**

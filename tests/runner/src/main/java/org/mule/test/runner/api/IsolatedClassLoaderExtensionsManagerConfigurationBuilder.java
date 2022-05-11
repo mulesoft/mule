@@ -60,7 +60,7 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
    * defined for the extension.
    *
    * @param pluginsClassLoaders the list of {@link ArtifactClassLoader} created for each plugin found in the dependencies (either
-   *        plugin or extension plugin).
+   *                            plugin or extension plugin).
    */
   public IsolatedClassLoaderExtensionsManagerConfigurationBuilder(final List<ArtifactClassLoader> pluginsClassLoaders) {
     this.extensionManagerFactory = new DefaultExtensionManagerFactory();

@@ -15,8 +15,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * Decorates an {@link Iterator} with items of random types and uses a {@link Function}
- * to guarantee that, when exposed, those items have been transformed.
+ * Decorates an {@link Iterator} with items of random types and uses a {@link Function} to guarantee that, when exposed, those
+ * items have been transformed.
  * <p>
  * This allows to lazily transform the iterated items without the need to fully consuming the stream and generate a new iterator
  * <p>

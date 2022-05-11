@@ -18,10 +18,8 @@ import java.util.Optional;
 import java.util.OptionalLong;
 
 /**
- * A {@link Result} that is created based on the resulting {@link CoreEvent}
- * of that execution.
- * This allows for executions to be concatenated by the plugin's developer without losing
- * information of the event propagated through the flow.
+ * A {@link Result} that is created based on the resulting {@link CoreEvent} of that execution. This allows for executions to be
+ * concatenated by the plugin's developer without losing information of the event propagated through the flow.
  *
  * @param <T> the generic type of the output value
  * @param <A> the generic type of the message attributes

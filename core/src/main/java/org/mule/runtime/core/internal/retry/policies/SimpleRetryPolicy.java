@@ -71,7 +71,7 @@ public class SimpleRetryPolicy implements RetryPolicy {
     net.jodah.failsafe.RetryPolicy<Object> actingPolicy = new net.jodah.failsafe.RetryPolicy<>()
         .handleIf(shouldRetry)
         .withMaxRetries(count != RETRY_COUNT_FOREVER ? count : -1)
-        .withDelay(frequency)
+        .withDelay(frequency.isZero() ? ofMillis(1) : frequency)
         .onRetry(listener -> {
           logRetrying(listener.getAttemptCount());
           onRetry.accept(listener.getLastFailure());

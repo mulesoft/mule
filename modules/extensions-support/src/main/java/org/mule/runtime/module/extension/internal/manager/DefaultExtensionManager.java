@@ -12,6 +12,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConfigurationForComponent;
@@ -21,7 +22,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
 
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.exception.ErrorTypeRepository;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -38,7 +39,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
-import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
@@ -49,6 +49,7 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -71,6 +72,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
 
   private final ImplicitConfigurationProviderFactory implicitConfigurationProviderFactory =
       new DefaultImplicitConfigurationProviderFactory();
+  private final AtomicBoolean initialised = new AtomicBoolean(false);
 
   @Inject
   private ReflectionCache reflectionCache;
@@ -79,23 +81,21 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   private ExpressionManager expressionManager;
 
   @Inject
-  private ErrorTypeRepository errorTypeRepository;
-
-  @Inject
-  private ErrorTypeLocator errorTypeLocator;
+  private FeatureFlaggingService featureFlaggingService;
 
   private MuleContext muleContext;
   private ExtensionRegistry extensionRegistry;
   private ConfigurationExpirationMonitor configurationExpirationMonitor;
-  private ExtensionErrorsRegistrant extensionErrorsRegistrant;
 
   private ExtensionActivator extensionActivator;
 
   @Override
   public void initialise() throws InitialisationException {
-    extensionRegistry = new ExtensionRegistry(new DefaultRegistry(muleContext));
-    extensionErrorsRegistrant = new ExtensionErrorsRegistrant(errorTypeRepository, errorTypeLocator);
-    extensionActivator = new ExtensionActivator(extensionErrorsRegistrant, muleContext);
+    if (initialised.compareAndSet(false, true)) {
+      extensionRegistry = new ExtensionRegistry(new DefaultRegistry(muleContext));
+      extensionActivator = new ExtensionActivator(muleContext);
+      initialiseIfNeeded(implicitConfigurationProviderFactory, muleContext);
+    }
   }
 
   /**
@@ -196,11 +196,16 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   @Override
   public Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel, ComponentModel componentModel) {
     Set<ConfigurationModel> configurationsForComponent = getConfigurationForComponent(extensionModel, componentModel);
-    Optional<ConfigurationModel> config = getConfigurationModelForExtension(extensionModel, configurationsForComponent);
-    if (!config.isPresent() && requiresConfig(extensionModel, componentModel)) {
+    Optional<ConfigurationModel> extensionConfigurationModel =
+        getConfigurationModelForExtension(extensionModel, configurationsForComponent);
+    if (!extensionConfigurationModel.isPresent() && requiresConfig(extensionModel, componentModel)) {
       throw new NoConfigRefFoundException(extensionModel, componentModel);
     }
-    return config.flatMap(c -> getConfigurationProvider(getImplicitConfigurationProviderName(extensionModel, c)));
+    return extensionConfigurationModel
+        .flatMap(c -> getConfigurationProvider(getImplicitConfigurationProviderName(extensionModel, c,
+                                                                                    muleContext.getArtifactType(),
+                                                                                    muleContext.getId(),
+                                                                                    featureFlaggingService)));
   }
 
   /**
@@ -213,20 +218,23 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   }
 
   private ConfigurationProvider createImplicitConfiguration(ExtensionModel extensionModel,
-                                                            ConfigurationModel implicitConfigurationModel,
+                                                            ConfigurationModel configurationModel,
                                                             CoreEvent muleEvent) {
-    String implicitConfigurationProviderName = getImplicitConfigurationProviderName(extensionModel, implicitConfigurationModel);
+
+    String implicitConfigurationProviderName =
+        getImplicitConfigurationProviderName(extensionModel, configurationModel, muleContext.getArtifactType(),
+                                             muleContext.getId(), featureFlaggingService);
+
     return extensionRegistry.getConfigurationProvider(implicitConfigurationProviderName).orElseGet(() -> {
       synchronized (extensionModel) {
         // check that another thread didn't beat us to create the instance
         return extensionRegistry.getConfigurationProvider(implicitConfigurationProviderName).orElseGet(() -> {
           ConfigurationProvider implicitConfigurationProvider =
               implicitConfigurationProviderFactory.createImplicitConfigurationProvider(extensionModel,
-                                                                                       implicitConfigurationModel,
+                                                                                       configurationModel,
                                                                                        muleEvent,
                                                                                        getReflectionCache(),
-                                                                                       expressionManager,
-                                                                                       muleContext);
+                                                                                       expressionManager);
           registerConfigurationProvider(implicitConfigurationProvider);
           return implicitConfigurationProvider;
         });

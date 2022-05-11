@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.exception;
 
-import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -16,16 +16,17 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
+import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
+import org.mule.sdk.api.runtime.exception.ExceptionHandler;
 
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
- * Given a {@link ExtensionModel} and another {@link EnrichableModel}, this class will
- * test for a {@link ExceptionHandlerModelProperty} to determine the {@link ExceptionHandler}
- * which should be use. If no such property is available then a default {@link NullExceptionHandler}
- * is used.
+ * Given a {@link ExtensionModel} and another {@link EnrichableModel}, this class will test for a
+ * {@link ExceptionHandlerModelProperty} to determine the {@link ExceptionHandler} which should be use. If no such property is
+ * available then a default {@link NullExceptionHandler} is used.
  * <p>
  * It also contains all the logic for operations and sources {@link Throwable} process and handling.
  *
@@ -49,9 +50,16 @@ public final class ExceptionHandlerManager {
   }
 
   private ErrorType resolveConnectionErrorType(ExtensionModel extensionModel, ErrorTypeRepository errorTypeRepository) {
+    String extensionNamespace = (extensionModel.getName() != null ? extensionModel.getName().toUpperCase() : null);
+    String namespaceFromXmlDsl = extensionModel.getXmlDslModel().getPrefix().toUpperCase();
+    Predicate<ErrorModel> connectivityErrorCondition = errorModel -> errorModel.getType().equals(CONNECTIVITY_ERROR_IDENTIFIER);
+    Predicate<ErrorModel> extensionConnectivityErrorCondition =
+        connectivityErrorCondition.and(errorModel -> errorModel.getNamespace().equals(extensionNamespace)
+            || errorModel.getNamespace().equals(namespaceFromXmlDsl));
+
     return extensionModel.getErrorModels().stream()
-        .filter(errorModel -> errorModel.getType().equals(CONNECTIVITY_ERROR_IDENTIFIER))
-        .findFirst()
+        .filter(extensionConnectivityErrorCondition).findFirst().map(Optional::of)
+        .orElseGet(() -> extensionModel.getErrorModels().stream().filter(connectivityErrorCondition).findFirst())
         .map(errorModel -> errorTypeRepository.getErrorType(ComponentIdentifier.builder()
             .namespace(errorModel.getNamespace())
             .name(errorModel.getType())
@@ -61,8 +69,8 @@ public final class ExceptionHandlerManager {
   }
 
   /**
-   * Process the {@link Throwable} parameter to obtain the correct failure and if its an exception this method will enrich it
-   * with the obtained {@link ExceptionHandler} for this manager instance.
+   * Process the {@link Throwable} parameter to obtain the correct failure and if its an exception this method will enrich it with
+   * the obtained {@link ExceptionHandler} for this manager instance.
    */
   public Throwable process(Throwable t) {
     Throwable handled = handleThrowable(t);
@@ -73,9 +81,8 @@ public final class ExceptionHandlerManager {
   /**
    * Given a {@link Throwable} instance this method will get the specific failure reason.
    * <p>
-   * If there is a {@link ConnectionException} in the stacktrace is going to be considered the main failure reason,
-   * otherwise it will check if there is a {@link SdkMethodInvocationException} wrapper exception
-   * in the stacktrace wrapping the real failure.
+   * If there is a {@link ConnectionException} in the stacktrace is going to be considered the main failure reason, otherwise it
+   * will check if there is a {@link SdkMethodInvocationException} wrapper exception in the stacktrace wrapping the real failure.
    */
   public Throwable handleThrowable(Throwable e) {
     Optional<ConnectionException> connectionException = extractConnectionException(e);

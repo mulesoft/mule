@@ -15,8 +15,8 @@ import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
 
 /**
- * Registers a handler for the Mule Artifact protocol, so that every time an URL has {@link #PROTOCOL} it will be
- * handled by {@link MuleArtifactUrlConnection}.
+ * Registers a handler for the Mule Artifact protocol, so that every time an URL has {@link #PROTOCOL} it will be handled by
+ * {@link MuleArtifactUrlConnection}.
  *
  * @since 4.0
  */
@@ -29,8 +29,8 @@ public final class MuleArtifactUrlStreamHandler extends URLStreamHandler {
   public final static String PROTOCOL = "muleartifact";
 
   /**
-   * Registers the Mule Artifact protocol {@link #PROTOCOL} into the {@link URL#setURLStreamHandlerFactory(URLStreamHandlerFactory)}
-   * through the {@link MuleUrlStreamHandlerFactory}.
+   * Registers the Mule Artifact protocol {@link #PROTOCOL} into the
+   * {@link URL#setURLStreamHandlerFactory(URLStreamHandlerFactory)} through the {@link MuleUrlStreamHandlerFactory}.
    */
   public static void register() {
     MuleUrlStreamHandlerFactory.registerHandler(PROTOCOL, new MuleArtifactUrlStreamHandler());

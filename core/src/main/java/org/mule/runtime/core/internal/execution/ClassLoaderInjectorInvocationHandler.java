@@ -52,8 +52,9 @@ public class ClassLoaderInjectorInvocationHandler implements InvocationHandler {
   /**
    * Creates a new proxy
    *
-   * @param delegate object to be proxied. Non null
-   * @param classLoader classloader to be configured on the current thread's context classlaoder before invoking a method on {@link #delegate}. Non null.
+   * @param delegate    object to be proxied. Non null
+   * @param classLoader classloader to be configured on the current thread's context classlaoder before invoking a method on
+   *                    {@link #delegate}. Non null.
    * @return a proxy for the given object
    */
   public static Object createClassLoaderInjectorInvocationHandler(Object delegate, ClassLoader classLoader) {

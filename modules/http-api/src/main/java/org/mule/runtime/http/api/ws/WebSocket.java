@@ -87,13 +87,13 @@ public interface WebSocket {
    * be mindful that the new WebSocket will share the same id as this one. Having two active sockets with the same ID might be
    * problematic depending on the use case.
    * <p>
-   * This method does not alter the current state of {@code this} instance. It merely generates a new WebSocket similar to
-   * this one.
+   * This method does not alter the current state of {@code this} instance. It merely generates a new WebSocket similar to this
+   * one.
    * <p>
-   * Not all implementations are required to support this method as it's not possible to do in some cases. The general contract
-   * is that this method should only be called when {@link #supportsReconnection()} returns {@code true}. Invoking this method
-   * on an implementation that doesn't support it will result in a {@link CompletableFuture} immediately and exceptionally
-   * completed with an {@link javax.naming.OperationNotSupportedException}.
+   * Not all implementations are required to support this method as it's not possible to do in some cases. The general contract is
+   * that this method should only be called when {@link #supportsReconnection()} returns {@code true}. Invoking this method on an
+   * implementation that doesn't support it will result in a {@link CompletableFuture} immediately and exceptionally completed
+   * with an {@link javax.naming.OperationNotSupportedException}.
    *
    * @param retryPolicyTemplate the retry policy to use while reconnecting
    * @param scheduler           the scheduler on which reconnection work should happen
@@ -133,9 +133,9 @@ public interface WebSocket {
   /**
    * Sends the given frame in its binary representation.
    * <p>
-   * The {@code frameBytes} passed here are not a binary payload but the complete DataFrame that gets sent through the
-   * wire per the WebSockets specification. This method is useful when the exact same content has to be sent many times
-   * and the actual frame is cached as a performance improvement.
+   * The {@code frameBytes} passed here are not a binary payload but the complete DataFrame that gets sent through the wire per
+   * the WebSockets specification. This method is useful when the exact same content has to be sent many times and the actual
+   * frame is cached as a performance improvement.
    * <p>
    * The {@code frameBytes} can be (but are not forced to) be generated through the {@link #toTextFrame(String, boolean)} and
    * {@link #toBinaryFrame(byte[], boolean)} methods
@@ -149,8 +149,8 @@ public interface WebSocket {
   /**
    * Transforms the given {@code data} into a text data frame per the WebSockets specification.
    * <p>
-   * The returned frame is the actual set of bytes to be sent through the wire as specified by the protocol. This is not just
-   * a mere binary representation of the {@code data}.
+   * The returned frame is the actual set of bytes to be sent through the wire as specified by the protocol. This is not just a
+   * mere binary representation of the {@code data}.
    * <p>
    * The returned frame is to be sent through the {@link #sendFrame(byte[])} method. Using this frame as input of the
    * {@link #send(InputStream, MediaType)} method will result in a frame wrapping another frame.
@@ -165,8 +165,8 @@ public interface WebSocket {
   /**
    * Transforms the given {@code data} into a binary data frame per the WebSockets specification.
    * <p>
-   * The returned frame is the actual set of bytes to be sent through the wire as specified by the protocol. This is not just
-   * a mere binary representation of the {@code data}.
+   * The returned frame is the actual set of bytes to be sent through the wire as specified by the protocol. This is not just a
+   * mere binary representation of the {@code data}.
    * <p>
    * The returned frame is to be sent through the {@link #sendFrame(byte[])} method. Using this frame as input of the
    * {@link #send(InputStream, MediaType)} method will result in a frame wrapping another frame.
@@ -190,9 +190,9 @@ public interface WebSocket {
   /**
    * Tests whether the {@link #close(WebSocketCloseCode, String)} method has been called on {@code this} instance or not.
    * <p>
-   * Notice that this method differs from {@link #isConnected()} in that even though the socket might not have been closed,
-   * it might still have lost its connection to the remote system. There's no forced correlation between the output values of
-   * both methods.
+   * Notice that this method differs from {@link #isConnected()} in that even though the socket might not have been closed, it
+   * might still have lost its connection to the remote system. There's no forced correlation between the output values of both
+   * methods.
    *
    * @return Whether this socket has been closed or not
    * @since 4.2.2
@@ -202,9 +202,9 @@ public interface WebSocket {
   /**
    * Tests whether this socket's connection to the remote system is still active.
    * <p>
-   * Notice that this method differs from {@link #isClosed()} ()} in that even though the socket might not have been closed,
-   * it might still have lost its connection to the remote system. There's no forced correlation between the output values of
-   * both methods.
+   * Notice that this method differs from {@link #isClosed()} ()} in that even though the socket might not have been closed, it
+   * might still have lost its connection to the remote system. There's no forced correlation between the output values of both
+   * methods.
    *
    * @return Whether this socket's connection is still active.
    * @since 4.2.2

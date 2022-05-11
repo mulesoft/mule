@@ -29,8 +29,7 @@ public final class TestLegacyEventUtils {
   public static final FlowExceptionHandler HANDLER = NullExceptionHandler.getInstance();
 
   /**
-   * @return the {@link FlowExceptionHandler} to be applied if an exception is unhandled during the processing of the given
-   *         event.
+   * @return the {@link FlowExceptionHandler} to be applied if an exception is unhandled during the processing of the given event.
    */
   public static FlowExceptionHandler getEffectiveExceptionHandler(CoreEvent event) {
     Field exceptionHandlerField;

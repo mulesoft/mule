@@ -20,6 +20,7 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManag
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.tooling.api.ToolingService;
+import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +31,7 @@ import java.util.Map;
  *
  * @param <T> class of the implementation builder
  *
- * since 4.1
+ *            since 4.1
  */
 public class ContainerInjectorBuilder<T extends ContainerInjectorBuilder> {
 
@@ -117,6 +118,12 @@ public class ContainerInjectorBuilder<T extends ContainerInjectorBuilder> {
     return getThis();
   }
 
+  public T withTroubleshootingService(TroubleshootingService troubleshootingService) {
+    registerObject(TroubleshootingService.class.getName(), troubleshootingService);
+
+    return getThis();
+  }
+
   /**
    * Creates the injector for the container
    *
@@ -137,7 +144,7 @@ public class ContainerInjectorBuilder<T extends ContainerInjectorBuilder> {
   /**
    * Registers an object to make it available as a candidate to be injected
    *
-   * @param key name of the object to be registered
+   * @param key   name of the object to be registered
    * @param value object to register
    */
   protected final void registerObject(String key, Object value) {
@@ -150,8 +157,8 @@ public class ContainerInjectorBuilder<T extends ContainerInjectorBuilder> {
   }
 
   /**
-     * @return current instance. Used just to avoid compilation warnings.
-     */
+   * @return current instance. Used just to avoid compilation warnings.
+   */
   protected T getThis() {
     return (T) this;
   }

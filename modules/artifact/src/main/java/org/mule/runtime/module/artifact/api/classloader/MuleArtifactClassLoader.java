@@ -6,17 +6,20 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
 import static java.lang.reflect.Modifier.isAbstract;
+
 import static org.apache.commons.io.FilenameUtils.normalize;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
+import org.mule.module.artifact.classloader.IBMMQResourceReleaser;
 import org.mule.module.artifact.classloader.ScalaClassValueReleaser;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -60,7 +63,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
   private static final String NO_WILDCARD = "([^\\" + WILDCARD + "]+)";
   private static final String NO_WILDCARD_NO_SPACES = "([^\\" + WILDCARD + "|\\s]+)";
-  private static final String NO_SPACES = "(\\S+)";
+  private static final String NO_SPACES = "([^\\s]+)";
 
   static final Pattern GAV_EXTENDED_PATTERN = Pattern.compile(
                                                               RESOURCE_PREFIX
@@ -98,6 +101,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   private String resourceReleaserClassLocation = DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION;
   private final ResourceReleaser classLoaderReferenceReleaser;
   private volatile boolean shouldReleaseJdbcReferences = false;
+  private volatile boolean shouldReleaseIbmMQResources = false;
   private ResourceReleaser jdbcResourceReleaserInstance;
   private final ResourceReleaser scalaClassValueReleaserInstance;
   private final ArtifactDescriptor artifactDescriptor;
@@ -107,11 +111,11 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   /**
    * Constructs a new {@link MuleArtifactClassLoader} for the given URLs
    *
-   * @param artifactId artifact unique ID. Non empty.
+   * @param artifactId         artifact unique ID. Non empty.
    * @param artifactDescriptor descriptor for the artifact owning the created class loader. Non null.
-   * @param urls the URLs from which to load classes and resources
-   * @param parent the parent class loader for delegation
-   * @param lookupPolicy policy used to guide the lookup process. Non null
+   * @param urls               the URLs from which to load classes and resources
+   * @param parent             the parent class loader for delegation
+   * @param lookupPolicy       policy used to guide the lookup process. Non null
    */
   public MuleArtifactClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor, URL[] urls, ClassLoader parent,
                                  ClassLoaderLookupPolicy lookupPolicy) {
@@ -120,7 +124,6 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     checkArgument(artifactDescriptor != null, "artifactDescriptor cannot be null");
     this.artifactId = artifactId;
     this.artifactDescriptor = artifactDescriptor;
-
     this.classLoaderReferenceReleaser = new ClassLoaderResourceReleaser(this);
     this.scalaClassValueReleaserInstance = new ScalaClassValueReleaser();
   }
@@ -260,6 +263,9 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
         !(clazz.equals(Driver.class) || clazz.isInterface() || isAbstract(clazz.getModifiers()))) {
       shouldReleaseJdbcReferences = true;
     }
+    if (!shouldReleaseIbmMQResources && name.startsWith("com.ibm.mq")) {
+      shouldReleaseIbmMQResources = true;
+    }
     return clazz;
   }
 
@@ -306,6 +312,11 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     } catch (Exception e) {
       reportPossibleLeak(e, artifactId);
     }
+
+    if (shouldReleaseIbmMQResources) {
+      new IBMMQResourceReleaser(this).release();
+    }
+
     super.dispose();
     shutdownListeners();
   }

@@ -9,15 +9,14 @@ package org.mule.tck.junit4.matcher;
 
 import org.hamcrest.Description;
 import org.hamcrest.DiagnosingMatcher;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 
 
 /**
  * Tests whether the value has a given class name in the class hierarchy.
  * <p>
- * Similar to {@link org.hamcrest.core.IsInstanceOf} but useful when there is not access to the class that has to be matched,
- * for example, when the class is not exposed on the API.
+ * Similar to {@link org.hamcrest.core.IsInstanceOf} but useful when there is not access to the class that has to be matched, for
+ * example, when the class is not exposed on the API.
  */
 public class HasClassInHierarchy extends DiagnosingMatcher<Object> {
 
@@ -55,7 +54,6 @@ public class HasClassInHierarchy extends DiagnosingMatcher<Object> {
   }
 
   @SuppressWarnings("unchecked")
-  @Factory
   /**
    * Creates a matcher that will check if a given object has a given class name in the hierarchy.
    *

@@ -12,6 +12,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
+import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 
@@ -74,14 +75,23 @@ public abstract class AbstractComponentDefinitionParser<T extends ComponentModel
         .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
         .withConstructorParameterDefinition(fromReferenceObject(Registry.class).build())
         .withConstructorParameterDefinition(fromReferenceObject(PolicyManager.class).build())
-        .withSetterParameterDefinition(TARGET_PARAMETER_NAME,
-                                       fromSimpleParameter(TARGET_PARAMETER_NAME).build())
-        .withSetterParameterDefinition(TARGET_VALUE_PARAMETER_NAME,
-                                       fromSimpleParameter(TARGET_VALUE_PARAMETER_NAME).build())
         .withSetterParameterDefinition(CURSOR_PROVIDER_FACTORY_FIELD_NAME,
                                        fromChildConfiguration(CursorProviderFactory.class).build())
-        .withSetterParameterDefinition("errorMappings", fromChildCollectionConfiguration(EnrichedErrorMapping.class).build())
         .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build());
+
+    if (hasOutputGroup()) {
+      finalBuilder = finalBuilder
+          .withSetterParameterDefinition(TARGET_PARAMETER_NAME,
+                                         fromSimpleParameter(TARGET_PARAMETER_NAME).build())
+          .withSetterParameterDefinition(TARGET_VALUE_PARAMETER_NAME,
+                                         fromSimpleParameter(TARGET_VALUE_PARAMETER_NAME).build());
+    }
+
+    if (hasErrorMappingsGroup()) {
+      finalBuilder = finalBuilder
+          .withSetterParameterDefinition(ERROR_MAPPINGS_PARAMETER_NAME,
+                                         fromChildCollectionConfiguration(EnrichedErrorMapping.class).build());
+    }
 
     Optional<? extends NestableElementModel> nestedChain = componentModel.getNestedComponents().stream()
         .filter(c -> c instanceof NestedChainModel)
@@ -108,8 +118,19 @@ public abstract class AbstractComponentDefinitionParser<T extends ComponentModel
     return finalBuilder;
   }
 
+  protected boolean hasErrorMappingsGroup() {
+    return false;
+  }
+
+  protected boolean hasOutputGroup() {
+    return false;
+  }
+
   protected abstract Class<? extends ComponentMessageProcessor> getMessageProcessorType();
 
   protected abstract Class<? extends ComponentMessageProcessorObjectFactory> getMessageProcessorFactoryType();
 
+  public final T getComponentModel() {
+    return componentModel;
+  }
 }

@@ -33,8 +33,8 @@ public class ConcurrencyUtils {
   }
 
   /**
-   * Returns the value of the given {@code supplier} between the boundaries of
-   * the given {@code lock}. It guarantees that the lock is released
+   * Returns the value of the given {@code supplier} between the boundaries of the given {@code lock}. It guarantees that the lock
+   * is released
    *
    * @param lock     a {@link Lock}
    * @param supplier a {@link CheckedSupplier}
@@ -53,8 +53,7 @@ public class ConcurrencyUtils {
   }
 
   /**
-   * Execute the given {@code delegate} between the boundaries of
-   * the given {@code lock}. It guarantees that the lock is released
+   * Execute the given {@code delegate} between the boundaries of the given {@code lock}. It guarantees that the lock is released
    *
    * @param lock     a {@link Lock}
    * @param delegate a {@link CheckedRunnable}

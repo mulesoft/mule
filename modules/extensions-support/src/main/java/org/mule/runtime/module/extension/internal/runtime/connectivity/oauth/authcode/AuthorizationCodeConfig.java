@@ -17,8 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Holds the values used to configure an extension to consume a particular OAuth provider using
- * the Authorization-Code grant type
+ * Holds the values used to configure an extension to consume a particular OAuth provider using the Authorization-Code grant type
  *
  * @since 4.0
  */

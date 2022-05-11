@@ -7,12 +7,6 @@
 
 package org.mule.runtime.module.deployment.impl.internal.builder;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static java.io.File.separator;
-import static java.util.Collections.emptyMap;
-import static java.util.Optional.ofNullable;
-import static org.apache.commons.io.FileUtils.writeStringToFile;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
@@ -24,9 +18,18 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_ARTIFACTS_IDS;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_FOLDER;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+
+import static java.io.File.separator;
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.ofNullable;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.commons.io.FileUtils.writeStringToFile;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -48,7 +51,7 @@ import java.util.Properties;
  */
 public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<ArtifactPluginFileBuilder> {
 
-  private Properties properties = new Properties();
+  private final Properties properties = new Properties();
   private MulePluginModel mulePluginModel;
 
   /**
@@ -69,7 +72,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
   /**
    * Adds a property into the plugin properties file.
    *
-   * @param propertyName name fo the property to add. Non empty
+   * @param propertyName  name fo the property to add. Non empty
    * @param propertyValue value of the property to add. Non null.
    * @return the same builder instance
    */
@@ -85,7 +88,8 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
    * Adds a describer into the plugin describer file.
    *
    * @param mulePluginModel the describer to store under
-   *        {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER}/{@link ArtifactDescriptor#MULE_ARTIFACT_JSON_DESCRIPTOR} file
+   *                        {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER}/{@link ArtifactDescriptor#MULE_ARTIFACT_JSON_DESCRIPTOR}
+   *                        file
    * @return the same builder instance
    */
   public ArtifactPluginFileBuilder describedBy(MulePluginModel mulePluginModel) {
@@ -99,7 +103,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
    * Adds a class file to the artifact classes folder.
    *
    * @param classFile class file to include. Non null.
-   * @param alias path where the file must be added inside the app file
+   * @param alias     path where the file must be added inside the app file
    * @return the same builder instance
    */
   @Override

@@ -37,7 +37,7 @@ public class ToolingArtifactClassLoader implements ArtifactClassLoader {
    * {@link RegionClassLoader#getArtifactPluginClassLoaders()} the class loader responsible of handling the
    * {@code artifactPluginDescriptor}.
    *
-   * @param regionClassLoader class loader used to execute the {@link #dispose()} properly.
+   * @param regionClassLoader           class loader used to execute the {@link #dispose()} properly.
    * @param delegateArtifactClassLoader {@link ArtifactClassLoader} where this classloader should delegate.
    */
   public ToolingArtifactClassLoader(RegionClassLoader regionClassLoader,

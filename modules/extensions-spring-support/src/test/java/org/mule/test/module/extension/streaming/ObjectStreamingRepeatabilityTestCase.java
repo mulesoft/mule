@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.extension.streaming;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
@@ -15,7 +16,6 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.test.marvel.model.Relic;
 import org.mule.test.runner.RunnerDelegateTo;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Rule;
@@ -38,8 +38,9 @@ public class ObjectStreamingRepeatabilityTestCase extends AbstractStreamingExten
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[][] {{"Repeatable items", "repeatable-iterable-items-config.xml", true},
-        {"Non repeatable items", "non-repeatable-iterable-items-config.xml", false}});
+    return asList(new Object[][] {
+        {"Repeatable items", "streaming/repeatable-iterable-items-config.xml", true},
+        {"Non repeatable items", "streaming/non-repeatable-iterable-items-config.xml", false}});
   }
 
   @Rule

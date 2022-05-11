@@ -13,8 +13,8 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 
 /**
- * This extension exposes operations to validate resource access from a plugin and service, but also exposes a resource to validate
- * exported ones can in fact be accessed.
+ * This extension exposes operations to validate resource access from a plugin and service, but also exposes a resource to
+ * validate exported ones can in fact be accessed.
  */
 @Extension(name = "ResourceExtension")
 @Xml(prefix = "rs")

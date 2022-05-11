@@ -16,11 +16,19 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mule.test.heisenberg.extension.HeisenbergOperationLifecycleValidator.DISPOSE_CALL_COUNT;
+import static org.mule.test.heisenberg.extension.HeisenbergOperationLifecycleValidator.INITIALIZE_CALL_COUNT;
+import static org.mule.test.heisenberg.extension.HeisenbergOperationLifecycleValidator.START_CALL_COUNT;
+import static org.mule.test.heisenberg.extension.HeisenbergOperationLifecycleValidator.STOP_CALL_COUNT;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.event.Event;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.heisenberg.extension.model.Ricin;
@@ -32,6 +40,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -58,6 +67,11 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
     return true;
   }
 
+  @Before
+  public void before() {
+    resetExtensionLifecycleCounters();
+  }
+
   @After
   public void after() {
     if (executor != null) {
@@ -68,6 +82,15 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
   @Test
   public void voidRouter() throws Exception {
     CoreEvent internalEvent = flowRunner("voidRouter").withPayload("message").withAttributes("other").run();
+
+    assertThat(internalEvent.getMessage().getPayload().getValue(), is("message"));
+    assertThat(internalEvent.getMessage().getAttributes().getValue(), is("other"));
+    assertThat(internalEvent.getVariables().get("newAttributes"), is(nullValue()));
+  }
+
+  @Test
+  public void sdkVoidRouter() throws Exception {
+    CoreEvent internalEvent = flowRunner("sdkVoidRouter").withPayload("message").withAttributes("other").run();
 
     assertThat(internalEvent.getMessage().getPayload().getValue(), is("message"));
     assertThat(internalEvent.getMessage().getAttributes().getValue(), is("other"));
@@ -109,8 +132,8 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
   }
 
   /**
-   * Executes the same flow concurrently to check that no race condition exists because
-   * two different instances of Chain are being used
+   * Executes the same flow concurrently to check that no race condition exists because two different instances of Chain are being
+   * used
    */
   @Test
   public void concurrentRouterExecution() throws Exception {
@@ -214,5 +237,54 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
     assertThat(internalEvent.getMessage().getPayload().getValue(), is(nullValue()));
     assertThat(internalEvent.getVariables().get("before"), is(nullValue()));
     assertThat(internalEvent.getVariables().get("after"), is(nullValue()));
+  }
+
+  @Test
+  public void twoRoutesRouterLazilyStarted() throws Exception {
+    CoreEvent internalEvent = flowRunner("twoRoutesRouterLazilyStarted")
+        .withVariable("executeWhen", true)
+        .withVariable("executeOther", false).run();
+
+    assertThat(internalEvent.getMessage().getPayload().getValue(), is("mule:set-payload"));
+    assertThat(internalEvent.getVariables().get("newPayload").getValue(), is("mule:set-payload"));
+  }
+
+  @Test
+  public void twoRoutesRouterWithCustomOperationLazilyStarted() throws Exception {
+    CoreEvent internalEvent = flowRunner("twoRoutesRouterWithCustomOperationLazilyStarted")
+        .withVariable("executeWhen", true)
+        .withVariable("executeOther", false).run();
+
+    assertThat(internalEvent.getMessage().getPayload().getValue(), is("mule:set-payload"));
+    assertThat(internalEvent.getVariables().get("newPayload").getValue(), is("mule:set-payload"));
+  }
+
+  @Test
+  public void routerLifecycleIsAttachedToFlowLifecycle() throws Exception {
+    FlowConstruct flow = getFlowConstruct("routerLifecycleIsAttachedToFlowLifecycle");
+    assertThat(flow.getLifecycleState().isStopped(), is(true));
+
+    resetExtensionLifecycleCounters();
+    ((Startable) flow).start();
+    assertLifecycleMethodsCalls(0, 2, 0, 0);
+
+    resetExtensionLifecycleCounters();
+    ((Stoppable) flow).stop();
+    assertLifecycleMethodsCalls(0, 0, 2, 0);
+
+    resetExtensionLifecycleCounters();
+    ((Disposable) flow).dispose();
+    assertLifecycleMethodsCalls(0, 0, 0, 2);
+  }
+
+  private void assertLifecycleMethodsCalls(int initializeCalls, int startCalls, int stopCalls, int disposeCalls) {
+    assertThat(INITIALIZE_CALL_COUNT, is(initializeCalls));
+    assertThat(START_CALL_COUNT, is(startCalls));
+    assertThat(STOP_CALL_COUNT, is(stopCalls));
+    assertThat(DISPOSE_CALL_COUNT, is(disposeCalls));
+  }
+
+  private void resetExtensionLifecycleCounters() {
+    INITIALIZE_CALL_COUNT = START_CALL_COUNT = STOP_CALL_COUNT = DISPOSE_CALL_COUNT = 0;
   }
 }

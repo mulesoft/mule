@@ -89,7 +89,7 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
    * @param appArchiveUri
    * @param appProperties
    * @throws IOException
-     */
+   */
   void deploy(URI appArchiveUri, Properties appProperties) throws IOException;
 
   /**
@@ -102,7 +102,7 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
   /**
    * Undeploys and redeploys an application including the provided appProperties.
    *
-   * @param artifactName then name of the application to redeploy
+   * @param artifactName  then name of the application to redeploy
    * @param appProperties map of properties to include
    */
   void redeploy(String artifactName, Properties appProperties);
@@ -110,7 +110,7 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
   /**
    * Undeploys and redeploys an application using a new artifact URI and including the provided appProperties.
    *
-   * @param archiveUri location of the application file
+   * @param archiveUri    location of the application file
    * @param appProperties map of properties to include
    */
   void redeploy(URI archiveUri, Properties appProperties) throws IOException;
@@ -140,7 +140,7 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
   /**
    * Deploys a domain bundled as a zip from the given URL to the mule container
    *
-   * @param domainArchiveUri location of the zip domain file.
+   * @param domainArchiveUri     location of the zip domain file.
    * @param deploymentProperties the properties to override during the deployment process.
    * @throws IOException
    */
@@ -150,7 +150,7 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
   /**
    * Undeploys and redeploys a domain
    *
-   * @param domainName then name of the domain to redeploy.
+   * @param domainName           then name of the domain to redeploy.
    * @param deploymentProperties the properties to override during the deployment process.
    */
   void redeployDomain(String domainName, Properties deploymentProperties);

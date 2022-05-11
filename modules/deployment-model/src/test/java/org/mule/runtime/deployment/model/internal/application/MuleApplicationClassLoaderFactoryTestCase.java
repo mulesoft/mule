@@ -7,29 +7,34 @@
 
 package org.mule.runtime.deployment.model.internal.application;
 
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
+import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.applicationClassLoaderFactory;
+import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
 import static java.lang.System.setProperty;
+import static java.nio.file.Files.createTempDirectory;
 import static java.util.Collections.emptyList;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
-import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.FileUtils;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
-import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinderFactory;
+import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import org.junit.After;
 import org.junit.Before;
@@ -48,9 +53,14 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
 
   private final ArtifactClassLoader parentArtifactClassLoader = mock(ArtifactClassLoader.class);
   private final ClassLoaderLookupPolicy classLoaderLookupPolicy = mock(ClassLoaderLookupPolicy.class);
-  private final NativeLibraryFinderFactory nativeLibraryFinderFactory = mock(NativeLibraryFinderFactory.class);
-  private final MuleApplicationClassLoaderFactory classLoaderFactory =
-      new MuleApplicationClassLoaderFactory(nativeLibraryFinderFactory);
+  private final DeployableArtifactClassLoaderFactory<ApplicationDescriptor> classLoaderFactory =
+      applicationClassLoaderFactory(name -> {
+        try {
+          return createTempDirectory(name).toFile();
+        } catch (IOException e) {
+          throw new MuleRuntimeException(e);
+        }
+      });
   private String previousMuleHome;
   private ApplicationDescriptor descriptor;
 
@@ -84,11 +94,9 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
 
   @Test
   public void createsClassLoader() throws Exception {
-
     final MuleApplicationClassLoader artifactClassLoader =
         (MuleApplicationClassLoader) classLoaderFactory.create(APP_ID, parentArtifactClassLoader, descriptor, emptyList());
 
-    verify(nativeLibraryFinderFactory).create(APP_NAME, new URL[0]);
     assertThat(artifactClassLoader.getParent(), is(parentArtifactClassLoader.getClassLoader()));
     assertThat(artifactClassLoader.getArtifactId(), is(APP_ID));
   }

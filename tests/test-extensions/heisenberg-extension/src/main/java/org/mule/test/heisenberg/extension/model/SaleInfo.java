@@ -12,8 +12,7 @@ import org.mule.test.heisenberg.extension.HeisenbergOperations;
 import java.util.Map;
 
 /**
- * DON'T USE THIS CLASS BEYOND {@link HeisenbergOperations#processSale(Map)}
- * READ: MULE-10303
+ * DON'T USE THIS CLASS BEYOND {@link HeisenbergOperations#processSale(Map)} READ: MULE-10303
  */
 public class SaleInfo {
 

@@ -11,9 +11,8 @@ import java.util.Map;
 /**
  * A component that can be restarted.
  *
- * When restarted {@link #beginRestart()} needs to be called and will return a {@link Map}. After the restart is
- * performed, the {@link #finishRestart(RestartContext)} will be called with the value that the {@link #beginRestart()} method
- * have generated.
+ * When restarted {@link #beginRestart()} needs to be called and will return a {@link Map}. After the restart is performed, the
+ * {@link #finishRestart(RestartContext)} will be called with the value that the {@link #beginRestart()} method have generated.
  *
  * @since 4.2.3 4.3.1 4.4.0
  */

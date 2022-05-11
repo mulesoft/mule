@@ -7,12 +7,12 @@
 package org.mule.functional.junit4.matchers;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
 /**
  * Matcher to check the class name of an {@link Object}
+ * 
  * @param <T> the type of {@link Object} to match
  */
 public class ClassNameMatcher<T> extends TypeSafeMatcher<T> {
@@ -39,7 +39,6 @@ public class ClassNameMatcher<T> extends TypeSafeMatcher<T> {
     matcher.describeMismatch(item.getClass().getName(), description);
   }
 
-  @Factory
   public static <T> Matcher<T> hasClassName(final Matcher<String> matcher) {
     return new ClassNameMatcher<T>(matcher);
   }

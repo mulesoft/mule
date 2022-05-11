@@ -27,9 +27,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.Converter;
 
-import org.mule.runtime.core.internal.transformer.simple.ByteArrayToInputStream;
+import org.mule.runtime.core.internal.transformer.simple.InputStreamToByteArray;
 import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
-import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToSerializable;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -178,9 +177,9 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
   @Test
   public void equalsReturnsTrueOnCompositeConvertersWithSameNameAndSameTransformationChain() {
     Converter byteArrayToObjectConverter = new ByteArrayToObject();
-    Converter byteArrayToInputStreamConverter = new ByteArrayToInputStream();
-    CompositeConverter compositeConverterA = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter);
-    CompositeConverter compositeConverterB = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter);
+    Converter inputStreamToByteArrayConverter = new InputStreamToByteArray();
+    CompositeConverter compositeConverterA = new CompositeConverter(byteArrayToObjectConverter, inputStreamToByteArrayConverter);
+    CompositeConverter compositeConverterB = new CompositeConverter(byteArrayToObjectConverter, inputStreamToByteArrayConverter);
 
     assertThat(compositeConverterA, equalTo(compositeConverterB));
   }
@@ -189,9 +188,9 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
   @Test
   public void equalsReturnsFalseOnCompositeConvertersWithDifferentTransformationChain() {
     Converter byteArrayToObjectConverter = new ByteArrayToObject();
-    Converter byteArrayToInputStreamConverter = new ByteArrayToInputStream();
-    CompositeConverter compositeConverterA = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter);
-    CompositeConverter compositeConverterB = new CompositeConverter(byteArrayToInputStreamConverter, byteArrayToObjectConverter);
+    Converter inputStreamToByteArrayConverter = new InputStreamToByteArray();
+    CompositeConverter compositeConverterA = new CompositeConverter(byteArrayToObjectConverter, inputStreamToByteArrayConverter);
+    CompositeConverter compositeConverterB = new CompositeConverter(inputStreamToByteArrayConverter, byteArrayToObjectConverter);
 
     assertThat(compositeConverterA, not(equalTo(compositeConverterB)));
   }
@@ -199,16 +198,16 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
   @Test
   public void hashCodeForCompositeConvertersChangesWithDifferentTransformationChain() {
     Converter byteArrayToObjectConverter = new ByteArrayToObject();
-    Converter byteArrayToInputStreamConverter = new ByteArrayToInputStream();
+    Converter inputStreamToByteArrayConverter = new InputStreamToByteArray();
 
     Converter byteArrayToObjectConverter2 = new ByteArrayToObject();
-    Converter byteArrayToInputStreamConverter2 = new ByteArrayToInputStream();
+    Converter inputStreamToByteArrayConverter2 = new InputStreamToByteArray();
 
-    int hashCodeConverterA = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter).hashCode();
+    int hashCodeConverterA = new CompositeConverter(byteArrayToObjectConverter, inputStreamToByteArrayConverter).hashCode();
 
-    int hashCodeConverterAClone = new CompositeConverter(byteArrayToObjectConverter, byteArrayToInputStreamConverter).hashCode();
+    int hashCodeConverterAClone = new CompositeConverter(byteArrayToObjectConverter, inputStreamToByteArrayConverter).hashCode();
     int hashCodeConverterAnotherClone =
-        new CompositeConverter(byteArrayToObjectConverter2, byteArrayToInputStreamConverter2).hashCode();
+        new CompositeConverter(byteArrayToObjectConverter2, inputStreamToByteArrayConverter2).hashCode();
 
     assertThat(Arrays.asList(hashCodeConverterAClone, hashCodeConverterAnotherClone), everyItem(equalTo(hashCodeConverterA)));
   }

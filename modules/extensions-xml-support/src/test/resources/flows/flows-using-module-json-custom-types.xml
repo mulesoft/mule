@@ -6,13 +6,12 @@
       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
       http://www.mulesoft.org/schema/mule/module-json-custom-types http://www.mulesoft.org/schema/mule/module-json-custom-types/current/mule-module-json-custom-types.xsd">
 
-
     <flow name="testIsJsonType1FromPayloadFlow">
-        <modulejson:is-jsontype1 aParameter="#[payload]" />
+        <modulejson:is-jsontype1 aParameter="#[payload]"/>
     </flow>
 
     <flow name="testIsJsonType1FromExpressionFlow">
-        <modulejson:is-jsontype1 aParameter="#[{ 'street_type': 'Avenue', 'street_name': 'calle 7'}]" />
+        <modulejson:is-jsontype1 aParameter="#[{ 'street_type': 'Avenue', 'street_name': 'calle 7'}]"/>
     </flow>
 
     <flow name="testIsJsonType1ContentFromPayloadFlow">
@@ -29,11 +28,11 @@
 
 
     <flow name="testIsJsonType2FromPayloadFlow">
-        <modulejson:is-jsontype2 aParameter="#[payload]" />
+        <modulejson:is-jsontype2 aParameter="#[payload]"/>
     </flow>
 
     <flow name="testIsJsonType2FromExpressionFlow">
-        <modulejson:is-jsontype2 aParameter="#[{ 'firstName': 'Dardo', 'lastName': 'Rocha', 'age': 83}]" />
+        <modulejson:is-jsontype2 aParameter="#[{ 'firstName': 'Dardo', 'lastName': 'Rocha', 'age': 83}]"/>
     </flow>
 
     <flow name="testHardcodedType1Flow">
@@ -42,30 +41,50 @@
 
     <flow name="testHardcodedType1AndExtractFieldsInVarsFlow">
         <modulejson:get-hardcoded-type1/>
-        <set-variable variableName="extracted-street_type" value="#[payload.street_type]" />
-        <set-variable variableName="extracted-street_name" value="#[payload.street_name]" />
+        <set-variable variableName="extracted-street_type" value="#[payload.street_type]"/>
+        <set-variable variableName="extracted-street_name" value="#[payload.street_name]"/>
     </flow>
 
     <flow name="testCopyJsonType1FromExpressionFlow">
-        <modulejson:copy-jsontype1 aParameter="#[{ 'street_type': 'Avenue', 'street_name': 'calle 7'}]" />
+        <modulejson:copy-jsontype1 aParameter="#[{ 'street_type': 'Avenue', 'street_name': 'calle 7'}]"/>
     </flow>
 
     <flow name="testExtractingJsonResponseAndFeedingSimpleType">
         <!-- working with the payload -->
         <modulejson:get-hardcoded-type1-as-json/>
         <modulejson:check-street-is-avenue street="Boulevard" target="checkingNotAvenue"/>
-        <modulejson:check-street-is-avenue street="#[{ 'street_type': 'Avenue', 'street_name': 'calle 7'}.street_type]" target="checkingFromExpression"/>
+        <modulejson:check-street-is-avenue street="#[{ 'street_type': 'Avenue', 'street_name': 'calle 7'}.street_type]"
+                                           target="checkingFromExpression"/>
         <modulejson:check-street-is-avenue street="#[payload.street_type]" target="checkingFromHardcodedType1"/>
         <!-- working with variable and checking the target does put the correct datatype in the binding -->
         <modulejson:get-hardcoded-type1-as-json target="someVariable"/>
-        <modulejson:check-street-is-avenue street="#[vars.someVariable.street_type]" target="checkingFromHardcodedType1WithVariables"/>
+        <modulejson:check-street-is-avenue street="#[vars.someVariable.street_type]"
+                                           target="checkingFromHardcodedType1WithVariables"/>
     </flow>
-    
+
     <flow name="testJoinStringArray">
         <modulejson:join-string-array behaviourArray="#[['1', '2']]">
             <modulejson:content-array>
                 <![CDATA[#[%dw 2.0 output application/json --- ['a', 'b']]]]>
             </modulejson:content-array>
         </modulejson:join-string-array>
+    </flow>
+
+    <flow name="testJoinInlineStringArray">
+        <modulejson:join-arrays>
+            <modulejson:ids>
+                <modulejson:id value="1"/>
+                <modulejson:id value="2"/>
+            </modulejson:ids>
+            <modulejson:content-array>
+                <![CDATA[#[%dw 2.0 output application/json --- ['a', 'b']]]]>
+            </modulejson:content-array>
+        </modulejson:join-arrays>
+    </flow>
+
+    <flow name="testOperationWithLiteralParameter">
+        <modulejson:operation-with-input-data>
+            <modulejson:input-data><![CDATA[Test]]></modulejson:input-data>
+        </modulejson:operation-with-input-data>
     </flow>
 </mule>

@@ -14,20 +14,20 @@ import static java.util.Optional.of;
 import static org.mule.runtime.api.component.execution.CompletableCallback.always;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureAction.FAIL;
-import static org.mule.runtime.extension.api.tx.SourceTransactionalAction.NONE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.BACK_PRESSURE_ACTION_CONTEXT_PARAM;
-import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.COMPONENT_DECORATOR_FACTORY_KEY;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.fetchConfigFieldFromSourceObject;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.fetchConnectionFieldFromSourceObject;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsOfType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
-import static org.reflections.ReflectionUtils.getAllFields;
-import static org.reflections.ReflectionUtils.withAnnotation;
+import static org.mule.sdk.api.tx.SourceTransactionalAction.NONE;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 
@@ -57,35 +57,33 @@ import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.management.stats.CursorDecoratorFactory;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
-import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.connectivity.Reconnectable;
 import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
-import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
 import org.mule.runtime.extension.internal.property.TransactionalActionModelProperty;
 import org.mule.runtime.extension.internal.property.TransactionalTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ReactiveReconnectionCallback;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.SdkReconnectableAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.source.legacy.LegacySourceWrapper;
-import org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper;
+import org.mule.runtime.module.extension.internal.runtime.source.legacy.SourceTransactionalActionUtils;
 import org.mule.runtime.module.extension.internal.runtime.source.poll.RestartContext;
 import org.mule.runtime.module.extension.internal.runtime.source.poll.Restartable;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
+import org.mule.sdk.api.runtime.connectivity.Reconnectable;
 import org.mule.sdk.api.runtime.source.Source;
 import org.mule.sdk.api.runtime.source.SourceCallback;
+import org.mule.sdk.api.tx.SourceTransactionalAction;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -93,12 +91,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
@@ -130,6 +126,7 @@ public class SourceAdapter implements Lifecycle, Restartable {
   private final Supplier<Object> sourceInvokationTarget;
 
   private ErrorType flowBackPressueErrorType;
+  private ErrorType redeliveryExhaustedErrorType;
   private boolean initialised = false;
 
   @Inject
@@ -140,9 +137,6 @@ public class SourceAdapter implements Lifecycle, Restartable {
 
   @Inject
   private ExpressionManager expressionManager;
-
-  @Inject
-  private CursorDecoratorFactory cursorDecoratorFactory;
 
   @Inject
   private Collection<ExceptionContextProvider> exceptionContextProviders;
@@ -237,8 +231,6 @@ public class SourceAdapter implements Lifecycle, Restartable {
                                                                              sourceModel,
                                                                              sourceInvokationTarget.get(),
                                                                              m, cursorProviderFactory,
-                                                                             cursorDecoratorFactory
-                                                                                 .componentDecoratorFactory(component),
                                                                              streamingManager,
                                                                              component,
                                                                              muleContext,
@@ -260,6 +252,8 @@ public class SourceAdapter implements Lifecycle, Restartable {
 
     flowBackPressueErrorType = errorTypeRepository.getErrorType(FLOW_BACK_PRESSURE)
         .orElseThrow(() -> new IllegalStateException("FLOW_BACK_PRESSURE error type not found"));
+    redeliveryExhaustedErrorType = errorTypeRepository.getErrorType(REDELIVERY_EXHAUSTED)
+        .orElseThrow(() -> new IllegalStateException("REDELIVERY_EXHAUSTED error type not found"));
 
     initialiseIfNeeded(nonCallbackParameters, true, muleContext);
     initialiseIfNeeded(errorCallbackParameters, true, muleContext);
@@ -338,6 +332,9 @@ public class SourceAdapter implements Lifecycle, Restartable {
       final boolean isBackPressureError = event.getError()
           .map(e -> flowBackPressueErrorType.equals(e.getErrorType()))
           .orElse(false);
+      final boolean isRedeliveryExhaustedError = event.getError()
+          .map(e -> redeliveryExhaustedErrorType.equals(e.getErrorType()))
+          .orElse(false);
 
       SourceCallbackExecutor executor;
       if (isBackPressureError) {
@@ -350,7 +347,11 @@ public class SourceAdapter implements Lifecycle, Restartable {
       }
 
       if (context.getTransactionHandle().isTransacted()) {
-        callback = callback.finallyBefore(this::rollback);
+        if (isRedeliveryExhaustedError) {
+          callback = callback.finallyBefore(this::commit);
+        } else {
+          callback = callback.finallyBefore(this::rollback);
+        }
       }
 
       executor.execute(event, parameters, context, callback);
@@ -408,7 +409,6 @@ public class SourceAdapter implements Lifecycle, Restartable {
       return ValueResolvingContext.builder(event)
           .withExpressionManager(expressionManager)
           .withConfig(configurationInstance)
-          .withProperty(COMPONENT_DECORATOR_FACTORY_KEY, cursorDecoratorFactory.componentDecoratorFactory(component))
           .resolveCursors(false)
           .build();
     }
@@ -485,11 +485,13 @@ public class SourceAdapter implements Lifecycle, Restartable {
   }
 
   private <T> Optional<FieldSetter<Object, T>> fetchConfigurationField() {
-    return fetchField(Config.class).map(FieldSetter::new);
+    Optional<Field> configurationField = fetchConfigFieldFromSourceObject(sourceInvokationTarget.get());
+    return configurationField.map(FieldSetter::new);
   }
 
   private <T> Optional<FieldSetter<Object, T>> fetchConnectionProviderField() {
-    return fetchField(Connection.class).map(field -> {
+    Optional<Field> connectionField = fetchConnectionFieldFromSourceObject(sourceInvokationTarget.get());
+    return connectionField.map(field -> {
       if (!ConnectionProvider.class.equals(field.getType())) {
         throw new IllegalModelDefinitionException(format(
                                                          "Message Source defined on class '%s' has field '%s' of type '%s' annotated with @%s. That annotation can only be "
@@ -504,24 +506,6 @@ public class SourceAdapter implements Lifecycle, Restartable {
     });
   }
 
-  private Optional<Field> fetchField(Class<? extends Annotation> annotation) {
-    Set<Field> fields = getAllFields(sourceInvokationTarget.get().getClass(), withAnnotation(annotation));
-    if (CollectionUtils.isEmpty(fields)) {
-      return empty();
-    }
-
-    if (fields.size() > 1) {
-      // TODO: MULE-9220 Move this to a syntax validator
-      throw new IllegalModelDefinitionException(
-                                                format("Message Source defined on class '%s' has more than one field annotated with '@%s'. "
-                                                    + "Only one field in the class can bare such annotation",
-                                                       sourceInvokationTarget.get().getClass().getName(),
-                                                       annotation.getSimpleName()));
-    }
-
-    return of(fields.iterator().next());
-  }
-
   public String getName() {
     return getSourceName(sourceInvokationTarget.get().getClass());
   }
@@ -531,26 +515,36 @@ public class SourceAdapter implements Lifecycle, Restartable {
   }
 
   Optional<Publisher<Void>> getReconnectionAction(ConnectionException e) {
-    if (sourceInvokationTarget.get() instanceof Reconnectable) {
-      return of(
-                create(sink -> ((Reconnectable) sourceInvokationTarget.get()).reconnect(e,
-                                                                                        new ReactiveReconnectionCallback(sink))));
-    }
-
-    return empty();
+    Optional<Reconnectable> adapter = SdkReconnectableAdapter.from(sourceInvokationTarget.get());
+    return adapter.map(reconnectable -> create(sink -> (reconnectable).reconnect(e, new ReactiveReconnectionCallback(sink))));
   }
 
   public SourceTransactionalAction getTransactionalAction() {
-    return getNonCallbackParameterValue(getTransactionalActionFieldName(), SourceTransactionalAction.class)
-        .orElse(NONE);
+    Optional<Object> transactionalAction = getNonCallbackParameterValue(getTransactionalActionFieldName());
+    if (transactionalAction.isPresent()) {
+      try {
+        return SourceTransactionalActionUtils.from(transactionalAction.get());
+      } catch (Exception e) {
+        throw new IllegalStateException("The resolved value is not a " + SourceTransactionalAction.class.getSimpleName(), e);
+      }
+    } else {
+      return NONE;
+    }
   }
 
   TransactionType getTransactionalType() {
-    return getNonCallbackParameterValue(getTransactionTypeFieldName(), TransactionType.class)
-        .orElse(LOCAL);
+    Optional<Object> transactionalType = getNonCallbackParameterValue(getTransactionTypeFieldName());
+    if (transactionalType.isPresent()) {
+      if (transactionalType.get() instanceof TransactionType) {
+        return (TransactionType) transactionalType.get();
+      }
+      throw new IllegalStateException("The resolved value is not a " + TransactionType.class.getSimpleName());
+    } else {
+      return LOCAL;
+    }
   }
 
-  private <T> Optional<T> getNonCallbackParameterValue(String fieldName, Class<T> type) {
+  private <T> Optional<T> getNonCallbackParameterValue(String fieldName) {
     ValueResolver<T> valueResolver = (ValueResolver<T>) nonCallbackParameters.getResolvers().get(fieldName);
 
     if (valueResolver == null) {
@@ -563,16 +557,11 @@ public class SourceAdapter implements Lifecycle, Restartable {
     try (ValueResolvingContext context = ValueResolvingContext.builder(initialiserEvent, expressionManager).build()) {
       object = valueResolver.resolve(context);
     } catch (MuleException e) {
-      throw new MuleRuntimeException(createStaticMessage("Unable to get the " + type.getSimpleName()
-          + " value for Message Source"), e);
+      throw new MuleRuntimeException(createStaticMessage("Unable to get the " + fieldName + " value for Message Source"), e);
     } finally {
       if (initialiserEvent != null) {
         ((BaseEventContext) initialiserEvent.getContext()).success();
       }
-    }
-
-    if (!(type.isInstance(object))) {
-      throw new IllegalStateException("The resolved value is not a " + type.getSimpleName());
     }
 
     return of(object);

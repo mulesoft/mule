@@ -99,7 +99,7 @@ public class TestEventBuilder {
   /**
    * Prepares a property with the given key and value to be sent as an inbound property of the product.
    *
-   * @param key the key of the inbound property to add
+   * @param key   the key of the inbound property to add
    * @param value the value of the inbound property to add
    * @return this {@link TestEventBuilder}
    * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
@@ -128,7 +128,7 @@ public class TestEventBuilder {
   /**
    * Prepares a property with the given key and value to be sent as an outbound property of the product.
    *
-   * @param key the key of the outbound property to add
+   * @param key   the key of the outbound property to add
    * @param value the value of the outbound property to add
    * @return this {@link TestEventBuilder}
    * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
@@ -143,7 +143,7 @@ public class TestEventBuilder {
   /**
    * Prepares an attachment with the given key and value to be sent in the product.
    *
-   * @param key the key of the attachment to add
+   * @param key   the key of the attachment to add
    * @param value the {@link DataHandler} for the attachment to add
    * @return this {@link TestEventBuilder}
    * @deprecated Transport infrastructure is deprecated.
@@ -158,7 +158,7 @@ public class TestEventBuilder {
   /**
    * Prepares a property with the given key and value to be sent as a session property of the product.
    *
-   * @param key the key of the session property to add
+   * @param key   the key of the session property to add
    * @param value the value of the session property to add
    * @return this {@link TestEventBuilder}
    * @deprecated Transport infrastructure is deprecated.
@@ -206,7 +206,7 @@ public class TestEventBuilder {
   /**
    * Prepares a flow variable with the given key and value to be set in the product.
    *
-   * @param key the key of the flow variable to put
+   * @param key   the key of the flow variable to put
    * @param value the value of the flow variable to put
    * @return this {@link TestEventBuilder}
    */
@@ -219,8 +219,8 @@ public class TestEventBuilder {
   /**
    * Prepares a flow variable with the given key and value to be set in the product.
    *
-   * @param key the key of the flow variable to put
-   * @param value the value of the flow variable to put
+   * @param key      the key of the flow variable to put
+   * @param value    the value of the flow variable to put
    * @param dataType the data type of the variable
    * @return this {@link TestEventBuilder}
    */
@@ -268,9 +268,9 @@ public class TestEventBuilder {
 
     EventContext eventContext;
     if (externalCompletionCallback != null) {
-      eventContext = create(flow, TEST_CONNECTOR_LOCATION, sourceCorrelationId, of(externalCompletionCallback));
+      eventContext = create(flow, flow.getLocation(), sourceCorrelationId, of(externalCompletionCallback));
     } else {
-      eventContext = create(flow, TEST_CONNECTOR_LOCATION, sourceCorrelationId);
+      eventContext = create(flow, flow.getLocation(), sourceCorrelationId);
     }
 
     CoreEvent.Builder builder = InternalEvent.builder(eventContext)

@@ -7,66 +7,57 @@
 
 package org.mule.runtime.core.internal.registry;
 
+import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.TransfromersStory.TRANSFORMERS;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.internal.registry.TransformerResolver.RegistryAction.ADDED;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
+
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Converter;
-import org.mule.runtime.core.internal.context.DefaultMuleContext;
+import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.transformer.DefaultTransformersRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import org.junit.Test;
+
 import org.mockito.ArgumentCaptor;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(REGISTRY)
+@Story(TRANSFORMERS)
 public class ConvertersNotRegisteredTwiceTestCase extends AbstractMuleContextTestCase {
 
-  private MuleRegistryHelper registryHelper;
-
-  @Override
-  protected void addBuilders(List<ConfigurationBuilder> builders) {
-    super.addBuilders(builders);
-    builders.add(0, new AbstractConfigurationBuilder() {
-
-      @Override
-      protected void doConfigure(MuleContext muleContext) throws Exception {
-        registryHelper = (MuleRegistryHelper) ((MuleContextWithRegistry) muleContext).getRegistry();
-        registryHelper = spy(registryHelper);
-        ((DefaultMuleContext) muleContext).setRegistry(registryHelper);
-      }
-    });
-  }
+  private final DefaultTransformersRegistry transformersRegistry = spy(new DefaultTransformersRegistry());
 
   @Test
-  public void noDuplicates() {
-    ArgumentCaptor<TransformerResolver> transformerResolverCaptor = forClass(TransformerResolver.class);
-    verify(registryHelper, atLeastOnce()).registerTransformerResolver(transformerResolverCaptor.capture());
-    assertNoDuplicatesNorEmpty(transformerResolverCaptor.getAllValues());
+  public void noDuplicates() throws InitialisationException {
+    transformersRegistry
+        .setTransformers(new ArrayList<>(((MuleContextWithRegistry) muleContext).getRegistry().lookupObjects(Transformer.class)));
+    transformersRegistry.initialise();
 
     ArgumentCaptor<Converter> converterArgumentCaptor = forClass(Converter.class);
-    verify(registryHelper, atLeastOnce()).notifyTransformerResolvers(converterArgumentCaptor.capture(), same(ADDED));
+    verify(transformersRegistry, atLeastOnce()).notifyTransformerResolvers(converterArgumentCaptor.capture());
     assertNoDuplicatesNorEmpty(converterArgumentCaptor.getAllValues());
   }
 
   private <T> void assertNoDuplicatesNorEmpty(Collection<T> collection) {
     assertThat(collection, is(not(empty())));
 
-    Set<T> noDuplicates = new HashSet<>(collection);
-    assertThat(noDuplicates, hasSize(collection.size()));
+    assertThat(new HashSet<>(collection), hasSize(collection.size()));
   }
 }

@@ -11,8 +11,13 @@ import static java.lang.Thread.currentThread;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
@@ -21,32 +26,44 @@ import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOI
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NONE;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.StringUtils.DASH;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
-import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
+import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
-import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
-import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.collection.SmallMap;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -67,14 +84,13 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
 import org.mule.runtime.extension.api.runtime.source.SdkSourceFactory;
+import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
-import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
-import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
-import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
@@ -83,21 +99,30 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SdkSourceFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ComponentExecutorCompletableAdapterFactory;
 import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ReactiveOperationExecutorFactoryWrapper;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
+import org.mule.sdk.api.tx.OperationTransactionalAction;
+import org.mule.sdk.api.tx.SourceTransactionalAction;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -107,6 +132,8 @@ import com.google.common.collect.ImmutableMap;
  * @since 3.7.0
  */
 public class MuleExtensionUtils {
+
+  private static final String IMPLICIT_CONFIGURATION_SUFFIX = DASH + "implicit";
 
   /**
    * @param componentModel a {@link ComponentModel}
@@ -133,7 +160,6 @@ public class MuleExtensionUtils {
     }
     return false;
   }
-
 
   public static Map<String, Object> toMap(ResolverSet resolverSet, ValueResolvingContext ctx) throws MuleException {
     ImmutableMap.Builder<String, Object> map = ImmutableMap.builder();
@@ -435,24 +461,6 @@ public class MuleExtensionUtils {
     return model.getModelProperty(modelPropertyType).map(map).orElseThrow(exceptionSupplier);
   }
 
-  /**
-   * @return the extension's error namespace for a given {@link ExtensionModel}
-   */
-  public static String getExtensionsNamespace(ExtensionModel extensionModel) {
-    return getExtensionsNamespace(extensionModel.getXmlDslModel());
-  }
-
-  /**
-   * @return the extension's error namespace for a given {@link ExtensionDeclaration}
-   */
-  public static String getExtensionsNamespace(ExtensionDeclaration extensionDeclaration) {
-    return getExtensionsNamespace(extensionDeclaration.getXmlDslModel());
-  }
-
-  private static String getExtensionsNamespace(XmlDslModel dslModel) {
-    return dslModel.getPrefix().toUpperCase();
-  }
-
   public static ExtensionModel loadExtension(Class<?> clazz) {
     return loadExtension(clazz, new SmallMap<>());
   }
@@ -464,9 +472,68 @@ public class MuleExtensionUtils {
     return new DefaultJavaExtensionModelLoader().loadExtensionModel(clazz.getClassLoader(), dslResolvingContext, params);
   }
 
-  public static String getImplicitConfigurationProviderName(ExtensionModel extensionModel,
-                                                            ConfigurationModel implicitConfigurationModel) {
-    return format("%s-%s-implicit", extensionModel.getName(), implicitConfigurationModel.getName());
+  /**
+   * Resolves the {@link org.mule.runtime.extension.api.runtime.config.ConfigurationProvider} name for an extension.
+   * 
+   * @param extensionModel                         The {@link ExtensionModel} of the extension.
+   * @param configurationModel                     The {@link ConfigurationModel} of the extension.
+   * @param extendedArtifactType                   The {@link ArtifactType} of the extended artifact.
+   * @param extendedArtifactId                     The unique id of the extended artifact.
+   * @param extendedArtifactFeatureFlaggingService The {@link FeatureFlaggingService} of the extended artifact.
+   * @return The {@link org.mule.runtime.extension.api.runtime.config.ConfigurationProvider} name.
+   */
+  public static String getImplicitConfigurationProviderName(ExtensionModel extensionModel, ConfigurationModel configurationModel,
+                                                            ArtifactType extendedArtifactType, String extendedArtifactId,
+                                                            FeatureFlaggingService extendedArtifactFeatureFlaggingService) {
+    if (extendedArtifactType.equals(POLICY)) {
+      return getFeatureFlaggedPolicyExtensionsImplicitConfigurationProviderName(extensionModel, configurationModel,
+                                                                                extendedArtifactId,
+                                                                                extendedArtifactFeatureFlaggingService);
+    } else {
+      return getImplicitConfigurationProviderName(extensionModel, configurationModel);
+    }
+  }
+
+  /**
+   * Resolves the {@link org.mule.runtime.extension.api.runtime.config.ConfigurationProvider} name for a policy extension, taking
+   * into account the {@link MuleRuntimeFeature#ENABLE_POLICY_ISOLATION} feature flag.
+   *
+   * @param extensionModel     The configurable {@link ExtensionModel}.
+   * @param configurationModel The {@link ConfigurationModel} that represents the extension configuration.
+   * @return The {@link org.mule.runtime.extension.api.runtime.config.ConfigurationProvider} name.
+   */
+  private static String getFeatureFlaggedPolicyExtensionsImplicitConfigurationProviderName(ExtensionModel extensionModel,
+                                                                                           ConfigurationModel configurationModel,
+                                                                                           String extendedArtifactId,
+                                                                                           FeatureFlaggingService featureFlaggingService) {
+    if (featureFlaggingService.isEnabled(ENABLE_POLICY_ISOLATION)) {
+      // Implicit configuration providers cannot be inherited from the parent (application) MuleContext registry, so a different
+      // name is returned,
+      // which will force the instantiation of a new ConfigurationProvider that will be stored in the policy MuleContext registry.
+      return getImplicitConfigurationProviderName(extensionModel, configurationModel, extendedArtifactId);
+    } else {
+      // Implicit configuration provider is inherited from the parent (application) MuleContext registry.
+      return getImplicitConfigurationProviderName(extensionModel, configurationModel);
+    }
+  }
+
+  private static String getImplicitConfigurationProviderName(ExtensionModel extensionModel,
+                                                             ConfigurationModel implicitConfigurationModel,
+                                                             String extendedArtifactId) {
+    return extensionModel.getName() +
+        DASH +
+        implicitConfigurationModel.getName() +
+        DASH +
+        extendedArtifactId +
+        IMPLICIT_CONFIGURATION_SUFFIX;
+  }
+
+  private static String getImplicitConfigurationProviderName(ExtensionModel extensionModel,
+                                                             ConfigurationModel implicitConfigurationModel) {
+    return extensionModel.getName() +
+        DASH +
+        implicitConfigurationModel.getName() +
+        IMPLICIT_CONFIGURATION_SUFFIX;
   }
 
   /**
@@ -530,8 +597,8 @@ public class MuleExtensionUtils {
   }
 
   /**
-   * Tests the given {@code enrichableModel} for a {@link ImplementingTypeModelProperty} and if present it
-   * returns the enclosed implementing type.
+   * Tests the given {@code enrichableModel} for a {@link ImplementingTypeModelProperty} and if present it returns the enclosed
+   * implementing type.
    *
    * @param enrichableModel the provider to get the implemented type from
    * @return an {@link Optional} that either has the provider implementing type, or is empty
@@ -583,5 +650,122 @@ public class MuleExtensionUtils {
       return java.util.Optional.of(defaultValue);
     }
     return java.util.Optional.empty();
+  }
+
+  /**
+   * Checks the given {@link ParameterGroupModel}s against the given resolved parameters and validates that the group
+   * exclusiveness is honored.
+   *
+   * @param model                 the model that owns the parameter groups
+   * @param groups                the parameter groups in the model whose exclusiveness must be honored
+   * @param parameters            the resolved parameters
+   * @param aliasedParameterNames the alias for each parameter if it has one
+   *
+   * @throws ConfigurationException if the group exclusiveness is not honored by the resolved parameters.
+   *
+   * @since 4.4.0
+   */
+  public static void checkParameterGroupExclusiveness(Optional<ParameterizedModel> model,
+                                                      List<ParameterGroupModel> groups,
+                                                      Map<String, ?> parameters, Map<String, String> aliasedParameterNames)
+      throws ConfigurationException {
+    for (ParameterGroupModel group : groups) {
+      for (ExclusiveParametersModel exclusiveModel : group.getExclusiveParametersModels()) {
+        Set<String> parameterNames = resolveParameterNames(group, parameters, aliasedParameterNames);
+        Collection<String> definedExclusiveParameters = exclusiveModel.getExclusiveParameterNames()
+            .stream()
+            .filter(parameterNames::contains)
+            .collect(toSet());
+        if (definedExclusiveParameters.isEmpty() && exclusiveModel.isOneRequired()) {
+          throw new ConfigurationException((createStaticMessage(format(
+                                                                       "Parameter group '%s' requires that one of its optional parameters should be set but all of them are missing. "
+                                                                           + "One of the following should be set: [%s]",
+                                                                       group.getName(),
+                                                                       Joiner.on(", ")
+                                                                           .join(exclusiveModel
+                                                                               .getExclusiveParameterNames())))));
+        } else if (definedExclusiveParameters.size() > 1) {
+          if (model.isPresent()) {
+            throw new ConfigurationException(createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same time: [%s]",
+                                                                        getComponentModelTypeName(model.get()),
+                                                                        getModelName(model.get()),
+                                                                        Joiner.on(", ").join(definedExclusiveParameters))));
+          } else {
+            throw new ConfigurationException(createStaticMessage(format("The following parameters cannot be set at the same time: [%s]",
+                                                                        Joiner.on(", ").join(definedExclusiveParameters))));
+          }
+        }
+      }
+    }
+  }
+
+  private static Set<String> resolveParameterNames(ParameterGroupModel group, Map<String, ?> parameters,
+                                                   Map<String, String> aliasedParameterNames)
+      throws ConfigurationException {
+    if (group.isShowInDsl()) {
+      ExtensionParameterDescriptorModelProperty property = group.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
+          .orElseThrow(() -> new ConfigurationException(createStaticMessage("Could not find ExtensionParameterDescriptorModelProperty for the parameter group %s",
+                                                                            group.getName())));
+      String containerName = property.getExtensionParameter().getName();
+      try {
+        Object parameter = parameters.get(containerName);
+        if (parameter == null) {
+          throw new ConfigurationException(createStaticMessage("Was expecting a parameter with name [%s] among the resolved parameters",
+                                                               containerName));
+        }
+        if (parameter instanceof ParameterValueResolver) {
+          return ((ParameterValueResolver) parameter).getParameters().keySet().stream()
+              .map(name -> aliasedParameterNames.getOrDefault(name, name)).collect(toSet());
+        } else {
+          throw new MuleRuntimeException(createStaticMessage("Was expecting parameter with name [%s] to be of class ParameterValueResolver but was of class %s",
+                                                             containerName, parameters.get(containerName).getClass()));
+        }
+      } catch (ValueResolvingException e) {
+        throw new MuleRuntimeException(createStaticMessage("Failed to resolve the parameters for [%s]", containerName), e);
+      }
+    } else {
+      return parameters.keySet().stream().map(name -> aliasedParameterNames.getOrDefault(name, name)).collect(Collectors.toSet());
+    }
+  }
+
+  /**
+   * Checks if the given type correspondes to a source complition callback
+   *
+   * @param clazz the type to check
+   * @return whether the type is a source completion callback or not
+   *
+   * @since 4.5
+   */
+  public static boolean isSourceCompletionCallbackType(Class<?> clazz) {
+    return SourceCompletionCallback.class.equals(clazz)
+        || org.mule.sdk.api.runtime.source.SourceCompletionCallback.class.equals(clazz);
+  }
+
+  /**
+   * Finds an operation of the given {@code operationName} in the passed {@code extensionModel}
+   *
+   * @param extensionModel an {@link ExtensionModel}
+   * @param operationName  the name of the target operation
+   * @return optionally an {@link OperationModel}
+   * @since 4.5.0
+   */
+  public static Optional<OperationModel> findOperation(ExtensionModel extensionModel, String operationName) {
+    Reference<OperationModel> operation = new Reference<>();
+    new ExtensionWalker() {
+
+      @Override
+      protected void onOperation(HasOperationModels owner, OperationModel model) {
+        if (operationName.equals(model.getName())) {
+          operation.set(model);
+          stop();
+        }
+      }
+    }.walk(extensionModel);
+
+    return ofNullable(operation.get());
+  }
+
+  public static <T extends NamedObject> T getNamedObject(List<T> elemenets, String name) {
+    return elemenets.stream().filter(elem -> elem.getName().equals(name)).findFirst().get();
   }
 }

@@ -94,18 +94,14 @@ public class FlowStoppedDeploymentPersistenceListenerTestCase {
   }
 
   @Test
-  @Description("checkIfFlowShouldStart method should check deployment properties")
-  public void checkIfFlowShouldStartMethodMustSetShouldStartPropertyAsFalseWhenDeploymentPropertyIsFalse() throws Exception {
+  @Description("shouldStart method should check deployment properties")
+  public void shouldStartMethodMustReturnFalseWhenDeploymentPropertyIsFalse() throws Exception {
     createListener();
 
     Properties properties = new Properties();
     properties.setProperty(propertyName, valueOf(false));
     resolveFlowDeploymentProperties(appName, of(properties));
 
-    flowStoppedDeploymentListener.checkIfFlowShouldStart();
-
     assertThat(flowStoppedDeploymentListener.shouldStart(), is(false));
-    // Property should be reset
-    assertThat(flowStoppedDeploymentListener.shouldStart(), is(true));
   }
 }

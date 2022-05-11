@@ -13,7 +13,7 @@ import org.mule.tck.testmodels.fruit.WaterMelon;
 
 public class EatKiwiOperation {
 
-  public Kiwi eatKiwi(@Connection Kiwi kiwi, @Config KiwiConfig config) {
+  public Kiwi eatKiwi(@org.mule.sdk.api.annotation.param.Connection Kiwi kiwi, @Config KiwiConfig config) {
     kiwi.bite();
     return kiwi;
   }

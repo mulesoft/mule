@@ -14,7 +14,7 @@ import org.mule.test.implicit.config.extension.extension.api.ImplicitConfigExten
 
 public class ImplicitOperations {
 
-  public ImplicitConfigExtension getConfig(@Config ImplicitConfigExtension config) {
+  public ImplicitConfigExtension getConfig(@org.mule.sdk.api.annotation.param.Config ImplicitConfigExtension config) {
     return config;
   }
 

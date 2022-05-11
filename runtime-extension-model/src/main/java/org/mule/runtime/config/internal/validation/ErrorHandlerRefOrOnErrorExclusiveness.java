@@ -9,15 +9,19 @@ package org.mule.runtime.config.internal.validation;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
 import java.util.List;
 import java.util.Optional;
@@ -55,10 +59,11 @@ public class ErrorHandlerRefOrOnErrorExclusiveness implements Validation {
   }
 
   @Override
-  public Optional<String> validate(ComponentAst component, ArtifactAst artifact) {
-    if (component.getParameter(REFERENCE_ATTRIBUTE).getValue().getValue().isPresent()
+  public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
+    final ComponentParameterAst refParam = component.getParameter(DEFAULT_GROUP_NAME, REFERENCE_ATTRIBUTE);
+    if (refParam.getValue().getValue().isPresent()
         && component.directChildrenStream().count() > 0) {
-      return of("A reference 'error-handler' cannot have 'on-error's.");
+      return of(create(component, refParam, this, "A reference 'error-handler' cannot have 'on-error's."));
     } else {
       return empty();
     }

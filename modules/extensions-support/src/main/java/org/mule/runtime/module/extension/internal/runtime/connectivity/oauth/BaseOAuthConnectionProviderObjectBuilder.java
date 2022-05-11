@@ -45,8 +45,7 @@ import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Base class for {@link DefaultConnectionProviderObjectBuilder} specializations which yield OAuth enabled connection
- * providers
+ * Base class for {@link DefaultConnectionProviderObjectBuilder} specializations which yield OAuth enabled connection providers
  *
  * @param <C> the generic type of the connections to be produced
  * @since 4.2.1
@@ -158,7 +157,7 @@ public abstract class BaseOAuthConnectionProviderObjectBuilder<C> extends Defaul
         alias = parameter.getName();
       }
 
-      final Object value = valueFunction.apply(alias);
+      final Object value = valueFunction.apply(parameter.getName());
 
       if (value == null) {
         return;

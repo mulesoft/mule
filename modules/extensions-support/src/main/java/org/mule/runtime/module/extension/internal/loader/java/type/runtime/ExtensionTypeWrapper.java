@@ -9,27 +9,27 @@ package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.getExtensionInfo;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.annotation.Configurations;
-import org.mule.runtime.extension.api.annotation.ExpressionFunctions;
-import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.FunctionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ParameterizableTypeElement;
+import org.mule.runtime.module.extension.internal.loader.java.info.ExtensionInfo;
 
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.WeakHashMap;
-import java.util.stream.Stream;
 
 /**
  * {@link ConfigurationWrapper} specification for classes that are considered as Extensions
@@ -38,10 +38,11 @@ import java.util.stream.Stream;
  */
 public class ExtensionTypeWrapper<T> extends ComponentWrapper implements ExtensionElement, ParameterizableTypeElement {
 
-  private LazyValue<Extension> extensionAnnotation = new LazyValue<>(() -> getAnnotation(Extension.class).get());
+  private LazyValue<ExtensionInfo> extensionInfo;
 
   public ExtensionTypeWrapper(Class<T> aClass, ClassTypeLoader typeLoader) {
     super(aClass, newCachedClassTypeLoader(typeLoader));
+    extensionInfo = new LazyValue<>(() -> getExtensionInfo(aClass));
   }
 
   private static ClassTypeLoader newCachedClassTypeLoader(ClassTypeLoader classTypeLoader) {
@@ -52,13 +53,17 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
    * {@inheritDoc}
    */
   public List<ConfigurationElement> getConfigurations() {
-    final Optional<Configurations> optionalConfigurations = this.getAnnotation(Configurations.class);
-    if (optionalConfigurations.isPresent()) {
-      final Configurations configurations = optionalConfigurations.get();
-      return Stream.of(configurations.value()).map((Class<?> aClass) -> new ConfigurationWrapper(aClass, typeLoader))
-          .collect(toList());
-    }
-    return emptyList();
+    return mapReduceSingleAnnotation(
+                                     this,
+                                     Configurations.class,
+                                     org.mule.sdk.api.annotation.Configurations.class,
+                                     value -> value.getClassArrayValue(Configurations::value),
+                                     value -> value.getClassArrayValue(org.mule.sdk.api.annotation.Configurations::value))
+                                         .map(types -> types.stream()
+                                             .map(type -> (ConfigurationElement) new ConfigurationWrapper(type.getDeclaringClass()
+                                                 .get(), typeLoader))
+                                             .collect(toList()))
+                                         .orElse(emptyList());
   }
 
   /**
@@ -66,12 +71,10 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
    */
   @Override
   public List<OperationElement> getOperations() {
-    return getAnnotation(Operations.class)
-        .map(classes -> Stream.of(classes.value())
-            .flatMap(clazz -> getApiMethods(clazz).stream())
-            .map(clazz -> (OperationElement) new OperationWrapper(clazz, typeLoader))
-            .collect(toList()))
-        .orElse(emptyList());
+    return getOperationClassStream()
+        .flatMap(clazz -> getApiMethods(clazz).stream())
+        .map(clazz -> (OperationElement) new OperationWrapper(clazz, typeLoader))
+        .collect(toList());
   }
 
   /**
@@ -79,27 +82,25 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
    */
   @Override
   public List<FunctionElement> getFunctions() {
-    return getAnnotation(ExpressionFunctions.class)
-        .map(classes -> Stream.of(classes.value())
-            .flatMap(clazz -> getApiMethods(clazz).stream())
-            .map(clazz -> (FunctionElement) new FunctionWrapper(clazz, typeLoader))
-            .collect(toList()))
-        .orElse(emptyList());
+    return getExpressionFunctionClassStream()
+        .flatMap(clazz -> getApiMethods(clazz).stream())
+        .map(clazz -> (FunctionElement) new FunctionWrapper(clazz, typeLoader))
+        .collect(toList());
   }
 
   @Override
   public Category getCategory() {
-    return extensionAnnotation.get().category();
+    return extensionInfo.get().getCategory();
   }
 
   @Override
   public String getVendor() {
-    return extensionAnnotation.get().vendor();
+    return extensionInfo.get().getVendor();
   }
 
   @Override
   public String getName() {
-    return extensionAnnotation.get().name();
+    return extensionInfo.get().getName();
   }
 
   private static class CachedClassTypeLoader implements ClassTypeLoader {

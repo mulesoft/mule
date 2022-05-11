@@ -40,8 +40,8 @@ public interface ToolingService extends Initialisable, Stoppable {
   ConnectivityTestingServiceBuilder newConnectivityTestingServiceBuilder();
 
   /**
-   * Provides a {@link DeclarationSessionBuilder} to create a {@link org.mule.runtime.module.tooling.api.artifact.DeclarationSession}
-   * by providing required configuration elements.
+   * Provides a {@link DeclarationSessionBuilder} to create a
+   * {@link org.mule.runtime.module.tooling.api.artifact.DeclarationSession} by providing required configuration elements.
    *
    * @return a builder to create a {@link org.mule.runtime.module.tooling.api.artifact.DeclarationSession}
    *
@@ -52,23 +52,23 @@ public interface ToolingService extends Initialisable, Stoppable {
   /**
    * Creates an {@link Application} from a set of resources.
    * <p/>
-   * The created application will be created lazily meaning that the application resources
-   * will be created based on the different request made to the application.
+   * The created application will be created lazily meaning that the application resources will be created based on the different
+   * request made to the application.
    * <p/>
-   * Only requested components will be executed. All sources for flows will be stop unless
-   * they are requested to be started by the client.
+   * Only requested components will be executed. All sources for flows will be stop unless they are requested to be started by the
+   * client.
    * <p/>
-   * If a domain dependency is defined for the application it will be deployed. Both domain and application
-   * will be deployed using a random unique identifier allowing to get multiple deployments of both application and domain. Be
-   * aware that resources (ports, file system, etc) are shared so in those cases where resources are needed by the application or domain a deployment
+   * If a domain dependency is defined for the application it will be deployed. Both domain and application will be deployed using
+   * a random unique identifier allowing to get multiple deployments of both application and domain. Be aware that resources
+   * (ports, file system, etc) are shared so in those cases where resources are needed by the application or domain a deployment
    * exception could happen.
    * <p/>
-   * The application will be deployed using {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY}
-   * so the application logs are muted.
+   * The application will be deployed using
+   * {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY} so the application
+   * logs are muted.
    *
-   * @param applicationLocation location of the application content. The application content
-   *                            may be a folder holding an exploded structure for an application
-   *                            or may be a zip file containing the resources of the application.
+   * @param applicationLocation location of the application content. The application content may be a folder holding an exploded
+   *                            structure for an application or may be a zip file containing the resources of the application.
    * @return the created application.
    * @throws IOException
    */
@@ -77,25 +77,25 @@ public interface ToolingService extends Initialisable, Stoppable {
   /**
    * Creates an {@link Application} from a set of resources.
    * <p/>
-   * The created application will be created lazily meaning that the application resources
-   * will be created based on the different request made to the application.
+   * The created application will be created lazily meaning that the application resources will be created based on the different
+   * request made to the application.
    * <p/>
-   * Only requested components will be executed. All sources for flows will be stop unless
-   * they are requested to be started by the client.
+   * Only requested components will be executed. All sources for flows will be stop unless they are requested to be started by the
+   * client.
    * <p/>
-   * If a domain dependency is defined for the application it will be deployed. Both domain and application
-   * will be deployed using a random unique identifier allowing to get multiple deployments of both application and domain. Be
-   * aware that resources (ports, file system, etc) are shared so in those cases where resources are needed by the application or domain a deployment
+   * If a domain dependency is defined for the application it will be deployed. Both domain and application will be deployed using
+   * a random unique identifier allowing to get multiple deployments of both application and domain. Be aware that resources
+   * (ports, file system, etc) are shared so in those cases where resources are needed by the application or domain a deployment
    * exception could happen.
    * <p/>
-   * The application will be deployed using {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY}
-   * so the application logs are muted.
+   * The application will be deployed using
+   * {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY} so the application
+   * logs are muted.
    *
-   * @param applicationLocation location of the application content. The application content
-   *                            may be a folder holding an exploded structure for an application
-   *                            or may be a zip file containing the resources of the application.
+   * @param applicationLocation  location of the application content. The application content may be a folder holding an exploded
+   *                             structure for an application or may be a zip file containing the resources of the application.
    * @param deploymentProperties defines the deployment properties to be used when deploying the application.
-   * @return                     the created application.
+   * @return the created application.
    * @throws IOException
    */
   default Application createApplication(File applicationLocation, Optional<Properties> deploymentProperties) throws IOException {
@@ -116,7 +116,7 @@ public interface ToolingService extends Initialisable, Stoppable {
   /**
    * Creates an application but from the content byte[], see {@link #createApplication(File, Optional)} for more details.
    *
-   * @param appContent the content of the application.
+   * @param appContent           the content of the application.
    * @param deploymentProperties defines the deployment properties to be used when deploying the application.
    * @return the created application.
    * @throws IOException
@@ -128,21 +128,21 @@ public interface ToolingService extends Initialisable, Stoppable {
   /**
    * Creates a {@link org.mule.runtime.deployment.model.api.domain.Domain} from a set of resources.
    * <p/>
-   * The created domain will be created lazily meaning that the domain resources
-   * will be created based on the different request made to the domain.
+   * The created domain will be created lazily meaning that the domain resources will be created based on the different request
+   * made to the domain.
    * <p/>
-   * Only requested components will be executed. All sources for flows will be stop unless
-   * they are requested to be started by the client.
+   * Only requested components will be executed. All sources for flows will be stop unless they are requested to be started by the
+   * client.
    * <p/>
-   * Be aware that resources (ports, file system, etc) are shared so in those cases where resources are needed by the domain a deployment
-   * exception could happen.
+   * Be aware that resources (ports, file system, etc) are shared so in those cases where resources are needed by the domain a
+   * deployment exception could happen.
    * <p/>
-   * The domain will be deployed using {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY}
-   * so the domain logs are muted.
+   * The domain will be deployed using
+   * {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY} so the domain logs
+   * are muted.
    *
-   * @param domainLocation location of the domain content. The domain content
-   *                          may be a folder holding an exploded structure for an domain
-   *                          or may be a jar file containing the resources of the domain.
+   * @param domainLocation       location of the domain content. The domain content may be a folder holding an exploded structure
+   *                             for an domain or may be a jar file containing the resources of the domain.
    * @param deploymentProperties defines the deployment properties to be used when deploying the domain.
    * @return the created domain.
    * @throws IOException
@@ -154,21 +154,21 @@ public interface ToolingService extends Initialisable, Stoppable {
   /**
    * Creates a {@link org.mule.runtime.deployment.model.api.domain.Domain} from a set of resources.
    * <p/>
-   * The created domain will be created lazily meaning that the domain resources
-   * will be created based on the different request made to the domain.
+   * The created domain will be created lazily meaning that the domain resources will be created based on the different request
+   * made to the domain.
    * <p/>
-   * Only requested components will be executed. All sources for flows will be stop unless
-   * they are requested to be started by the client.
+   * Only requested components will be executed. All sources for flows will be stop unless they are requested to be started by the
+   * client.
    * <p/>
-   * Be aware that resources (ports, file system, etc) are shared so in those cases where resources are needed by the domain a deployment
-   * exception could happen.
+   * Be aware that resources (ports, file system, etc) are shared so in those cases where resources are needed by the domain a
+   * deployment exception could happen.
    * <p/>
-   * The domain will be deployed using {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY}
-   * so the domain logs are muted.
+   * The domain will be deployed using
+   * {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY} so the domain logs
+   * are muted.
    *
-   * @param domainLocation location of the domain content. The domain content
-   *                          may be a folder holding an exploded structure for an domain
-   *                          or may be a jar file containing the resources of the domain.
+   * @param domainLocation location of the domain content. The domain content may be a folder holding an exploded structure for an
+   *                       domain or may be a jar file containing the resources of the domain.
    * @return the created domain.
    * @throws IOException
    */
@@ -190,7 +190,7 @@ public interface ToolingService extends Initialisable, Stoppable {
   /**
    * Creates a domain but from the content byte[], see {@link #createDomain(File)} for more details.
    *
-   * @param domainContent the content of the domain.
+   * @param domainContent        the content of the domain.
    * @param deploymentProperties defines the deployment properties to be used when deploying the application.
    * @return the created domain.
    * @throws IOException

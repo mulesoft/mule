@@ -24,7 +24,7 @@ public interface LifecycleInterceptor {
    * be skipped. Note that {@code this} interceptor is not responsible from actually preventing the phase from being applied. It's
    * the invoker's responsibility to skip the {@code object} if the interceptor indicates so.
    *
-   * @param phase the phase being applied
+   * @param phase  the phase being applied
    * @param object the target object
    * @return whether the {@code phase} should be applied or cancelled for the given {@code object}
    */
@@ -33,10 +33,10 @@ public interface LifecycleInterceptor {
   /**
    * Invoked after the given {@code phase} was applied over the {@code object}.
    *
-   * @param phase the phase that was applied
-   * @param object the target object
-   * @param exceptionThrownOptional an optional with an exception. If present then there was an error execution the phase, otherwise the
-   *        phase execution was successful
+   * @param phase                   the phase that was applied
+   * @param object                  the target object
+   * @param exceptionThrownOptional an optional with an exception. If present then there was an error execution the phase,
+   *                                otherwise the phase execution was successful
    */
   void afterPhaseExecution(LifecyclePhase phase, Object object, Optional<Exception> exceptionThrownOptional);
 

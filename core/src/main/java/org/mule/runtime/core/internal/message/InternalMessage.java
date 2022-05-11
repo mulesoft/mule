@@ -181,7 +181,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
      * @param key
      * @param value
      * @return a {@link Builder}
-     * @deprecated Transport infrastructure is deprecated. 
+     * @deprecated Transport infrastructure is deprecated.
      */
     @Deprecated
     Builder addInboundAttachment(String key, DataHandler value);
@@ -190,7 +190,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
      * @param key
      * @param value
      * @return a {@link Builder}
-     * @deprecated Transport infrastructure is deprecated. 
+     * @deprecated Transport infrastructure is deprecated.
      */
     @Deprecated
     Builder addOutboundAttachment(String key, DataHandler value);
@@ -198,7 +198,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     /**
      * @param key
      * @return a {@link Builder}
-     * @deprecated Transport infrastructure is deprecated. 
+     * @deprecated Transport infrastructure is deprecated.
      */
     @Deprecated
     Builder removeInboundAttachment(String key);
@@ -206,7 +206,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     /**
      * @param key
      * @return a {@link Builder}
-     * @deprecated Transport infrastructure is deprecated. 
+     * @deprecated Transport infrastructure is deprecated.
      */
     @Deprecated
     Builder removeOutboundAttachment(String key);
@@ -230,7 +230,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     /**
      * @param inboundAttachments
      * @return a {@link Builder}
-     * @deprecated Transport infrastructure is deprecated. 
+     * @deprecated Transport infrastructure is deprecated.
      */
     @Deprecated
     Builder inboundAttachments(Map<String, DataHandler> inboundAttachments);
@@ -238,7 +238,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     /**
      * @param outbundAttachments
      * @return a {@link Builder}
-     * @deprecated Transport infrastructure is deprecated. 
+     * @deprecated Transport infrastructure is deprecated.
      */
     @Deprecated
     Builder outboundAttachments(Map<String, DataHandler> outbundAttachments);
@@ -267,9 +267,9 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     @Override
     CollectionBuilder attributesMediaType(MediaType mediaType);
 
-    /* 
-    * @deprecated This field is no longer populated
-    */
+    /*
+     * @deprecated This field is no longer populated
+     */
     @Deprecated
     @Override
     CollectionBuilder exceptionPayload(ExceptionPayload exceptionPayload);

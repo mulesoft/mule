@@ -6,22 +6,22 @@
  */
 package org.mule.runtime.config.internal.model;
 
-import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyRecursively;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.properties.PropertiesResolverUtils.createConfigurationAttributeResolver;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.config.internal.model.ApplicationModelAstPostProcessor.AST_POST_PROCESSORS;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_BYTE_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_OBJECTS_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getGroupAndParametersPairs;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.CRON_STRATEGY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
@@ -35,34 +35,21 @@ import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELE
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
-import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.util.AstTraversalDirection;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
-import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
-import org.mule.runtime.api.config.FeatureFlaggingService;
-import org.mule.runtime.properties.api.ResourceProvider;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
-
-import org.slf4j.Logger;
 
 /**
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
@@ -76,9 +63,7 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-public class ApplicationModel implements ArtifactAst {
-
-  private static final Logger LOGGER = getLogger(ApplicationModel.class);
+public abstract class ApplicationModel {
 
   // TODO MULE-9692 move this logic elsewhere. This are here just for the language rules and those should be processed elsewhere.
   public static final String ERROR_MAPPING = "error-mapping";
@@ -159,131 +144,82 @@ public class ApplicationModel implements ArtifactAst {
   public static final ComponentIdentifier NON_REPEATABLE_ITERABLE_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(NON_REPEATABLE_OBJECTS_STREAM_ALIAS).build();
 
-  private ArtifactAst ast;
-  private final ArtifactAst originalAst;
-  private final PropertiesResolverConfigurationProperties configurationProperties;
-  private final Map<String, ComponentAst> namedTopLevelComponentModels = new HashMap<>();
-
-  /**
-   * Creates an {code ApplicationModel} from an {@link ArtifactAst}.
-   * <p/>
-   * A set of validations are applied that may make creation fail.
-   *
-   * @param artifactAst the mule artifact configuration content.
-   * @param deploymentProperties values for replacement of properties in the DSL
-   * @param parentConfigurationProperties the {@link ConfigurationProperties} of the parent artifact. For instance, application
-   *        will receive the domain resolver.
-   * @param externalResourceProvider the provider for configuration properties files and ${file::name.txt} placeholders
-   */
-  public ApplicationModel(ArtifactAst artifactAst,
-                          Map<String, String> deploymentProperties,
-                          Optional<ConfigurationProperties> parentConfigurationProperties,
-                          ResourceProvider externalResourceProvider) {
-    this(artifactAst, deploymentProperties, parentConfigurationProperties, externalResourceProvider, null);
-  }
-
-
-  /**
-   * Creates an {code ApplicationModel} from an {@link ArtifactAst}.
-   * <p/>
-   * A set of validations are applied that may make creation fail.
-   *
-   * @param artifactAst
-   * @param deploymentProperties
-   * @param parentConfigurationProperties
-   * @param externalResourceProvider
-   * @param featureFlaggingService
-   */
-  public ApplicationModel(ArtifactAst artifactAst,
-                          Map<String, String> deploymentProperties,
-                          Optional<ConfigurationProperties> parentConfigurationProperties,
-                          ResourceProvider externalResourceProvider,
-                          FeatureFlaggingService featureFlaggingService) {
-    this.originalAst = artifactAst;
-
-    this.configurationProperties = createConfigurationAttributeResolver(originalAst, parentConfigurationProperties,
-                                                                        deploymentProperties, externalResourceProvider,
-                                                                        ofNullable(featureFlaggingService));
-    try {
-      initialiseIfNeeded(configurationProperties.getConfigurationPropertiesResolver());
-    } catch (InitialisationException e) {
-      throw new MuleRuntimeException(e);
-    }
-
-    this.originalAst
-        .updatePropertiesResolver(configurationProperties.getConfigurationPropertiesResolver());
-
-    this.ast = originalAst;
-    indexComponentModels(originalAst);
-  }
-
-  private void indexComponentModels(ArtifactAst originalAst) {
-    originalAst.topLevelComponentsStream()
-        .forEach(componentModel -> componentModel.getComponentId()
-            .ifPresent(name -> namedTopLevelComponentModels.put(name, componentModel)));
-  }
-
   /**
    * Preprocesses the ArtifactAst so that it can be deployed to runtime.
    *
    * @param extensionModels Extension models to be used when macro expand the current {@link ApplicationModel}
    */
-  public void prepareAstForRuntime(Set<ExtensionModel> extensionModels) {
+  public static ArtifactAst prepareAstForRuntime(ArtifactAst ast, Set<ExtensionModel> extensionModels) {
     ast = processSourcesRedeliveryPolicy(ast);
-    ast = doXmlSdk1MacroExpansion(ast, extensionModels);
-  }
 
-  /**
-   * We force the current instance of {@link ApplicationModel} to be highly cohesive with {@link MacroExpansionModulesModel} as
-   * it's responsibility of this object to properly initialize and expand every global element/operation into the concrete set of
-   * message processors
-   *
-   * @param ast
-   * @param extensionModels Set of {@link ExtensionModel extensionModels} that will be used to check if the element has to be
-   *        expanded.
-   */
-  private ArtifactAst doXmlSdk1MacroExpansion(ArtifactAst ast, Set<ExtensionModel> extensionModels) {
-    return new MacroExpansionModulesModel(ast, extensionModels).expand();
-  }
+    for (ApplicationModelAstPostProcessor astPostProcessor : AST_POST_PROCESSORS.get()) {
+      ast = astPostProcessor.postProcessAst(ast, extensionModels);
+    }
 
-  public void close() {
-    disposeIfNeeded(configurationProperties.getConfigurationPropertiesResolver(), LOGGER);
+    return ast;
   }
 
   /**
    * Process from any message source the redelivery-policy to make it part of the final pipeline.
    */
-  private ArtifactAst processSourcesRedeliveryPolicy(ArtifactAst ast) {
+  private static ArtifactAst processSourcesRedeliveryPolicy(ArtifactAst ast) {
     return copyRecursively(ast, flow -> {
 
-      if (FLOW_IDENTIFIER.equals(flow.getIdentifier())) {
-        return flow.directChildrenStream().findFirst()
-            .filter(comp -> comp.getModel(SourceModel.class).isPresent())
-            .map(source -> source.directChildrenStream()
-                .filter(childComponent -> REDELIVERY_POLICY_IDENTIFIER.equals(childComponent.getIdentifier()))
-                .findAny()
-                .map(redeliveryPolicy -> transformFlowWithRedeliveryPolicy(flow, source, redeliveryPolicy))
-                .orElse(flow))
-            .orElse(flow);
+      if (!FLOW_IDENTIFIER.equals(flow.getIdentifier())) {
+        return flow;
       }
 
-      return flow;
-
+      return flow.directChildrenStream().findFirst()
+          .filter(comp -> comp.getModel(SourceModel.class).isPresent())
+          .flatMap(comp -> getGroupAndParametersPairs(comp.getModel(SourceModel.class).get())
+              .filter(pairGroupSource -> {
+                final ComponentParameterAst redeliveryPolicyParam =
+                    comp.getParameter(pairGroupSource.getFirst().getName(), REDELIVERY_POLICY_PARAMETER_NAME);
+                if (redeliveryPolicyParam != null) {
+                  final ComponentAst redeliveryPolicy = (ComponentAst) redeliveryPolicyParam.getValue().getRight();
+                  return redeliveryPolicy != null;
+                }
+                return false;
+              })
+              .map(pairGroupSource -> {
+                final ComponentAst redeliveryPolicy = (ComponentAst) comp
+                    .getParameter(pairGroupSource.getFirst().getName(), REDELIVERY_POLICY_PARAMETER_NAME).getValue().getRight();
+                return transformFlowWithRedeliveryPolicy(flow, comp, redeliveryPolicy);
+              })
+              .findFirst())
+          .orElse(flow);
     });
   }
 
-  private ComponentAst transformFlowWithRedeliveryPolicy(ComponentAst flow, ComponentAst source, ComponentAst redeliveryPolicy) {
+  private static ComponentAst transformFlowWithRedeliveryPolicy(ComponentAst flow, ComponentAst source,
+                                                                ComponentAst redeliveryPolicy) {
     final List<ComponentAst> newFlowChildren = new ArrayList<>();
 
+    // The transformed source is the same with the redelivery-policy removed...
     newFlowChildren.add(new BaseComponentAstDecorator(source) {
 
       @Override
       public Stream<ComponentAst> directChildrenStream() {
-        // The transformed source is the same with the redelivery-policy removed...
         return super.directChildrenStream()
             .filter(sourceChild -> sourceChild != redeliveryPolicy);
-
       }
+
+      @Override
+      public ComponentParameterAst getParameter(String groupName, String paramName) {
+        if (REDELIVERY_POLICY_PARAMETER_NAME.equals(paramName)) {
+          return null;
+        } else {
+          return getDecorated().getParameter(groupName, paramName);
+        }
+      };
+
+      @Override
+      public Collection<ComponentParameterAst> getParameters() {
+        return getDecorated().getParameters().stream()
+            .filter(p -> !p.getModel().getName().equals(REDELIVERY_POLICY_PARAMETER_NAME))
+            .collect(toList());
+      };
+
     });
     newFlowChildren.add(new BaseComponentAstDecorator(redeliveryPolicy) {
 
@@ -308,60 +244,11 @@ public class ApplicationModel implements ArtifactAst {
       public Stream<ComponentAst> directChildrenStream() {
         return newFlowChildren.stream();
       }
-
     };
   }
 
-  public Optional<ComponentAst> findComponentDefinitionModel(ComponentIdentifier componentIdentifier) {
-    return topLevelComponentsStream()
+  public static Optional<ComponentAst> findComponentDefinitionModel(ArtifactAst ast, ComponentIdentifier componentIdentifier) {
+    return ast.topLevelComponentsStream()
         .filter(componentModel -> componentModel.getIdentifier().equals(componentIdentifier)).findFirst();
   }
-
-  /**
-   * Find a named component configuration.
-   *
-   * @param name the expected value for the name attribute configuration.
-   * @return the component if present, if not, an empty {@link Optional}
-   */
-  public Optional<ComponentAst> findTopLevelNamedComponent(String name) {
-    return ofNullable(namedTopLevelComponentModels.getOrDefault(name, null));
-  }
-
-  /**
-   * @return the attributes resolver for this artifact.
-   */
-  public ConfigurationProperties getConfigurationProperties() {
-    return configurationProperties;
-  }
-
-  @Override
-  public Set<ExtensionModel> dependencies() {
-    return ast.dependencies();
-  }
-
-  @Override
-  public Stream<ComponentAst> recursiveStream(AstTraversalDirection direction) {
-    return ast.recursiveStream(direction);
-  }
-
-  @Override
-  public Spliterator<ComponentAst> recursiveSpliterator(AstTraversalDirection direction) {
-    return ast.recursiveSpliterator(direction);
-  }
-
-  @Override
-  public Stream<ComponentAst> topLevelComponentsStream() {
-    return ast.topLevelComponentsStream();
-  }
-
-  @Override
-  public Spliterator<ComponentAst> topLevelComponentsSpliterator() {
-    return ast.topLevelComponentsSpliterator();
-  }
-
-  @Override
-  public void updatePropertiesResolver(UnaryOperator<String> newPropertiesResolver) {
-    ast.updatePropertiesResolver(newPropertiesResolver);
-  }
-
 }

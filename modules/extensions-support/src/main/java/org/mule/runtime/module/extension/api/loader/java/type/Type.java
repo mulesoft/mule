@@ -39,7 +39,7 @@ public interface Type extends WithAnnotations, WithName, WithAlias, WithDeclarin
   /**
    * @param annotations classes that the fields of this type should be annotated with
    * @return A list of {@link FieldElement} that represent the list of {@link Field} that the {@link Type} declares and are
-   * annotated with the given annotation
+   *         annotated with the given annotation
    */
   List<FieldElement> getAnnotatedFields(Class<? extends Annotation>... annotations);
 
@@ -133,6 +133,16 @@ public interface Type extends WithAnnotations, WithName, WithAlias, WithDeclarin
   MetadataType asMetadataType();
 
   String getTypeName();
+
+  /**
+   * Returns a {@link Type} representing the class that {@code this} type directly extends.
+   *
+   * If either {@code this} or the resolved super type match the {@link Object} type then {@link Optional#empty()} is returned
+   *
+   * @return the super type
+   * @since 4.5.0
+   */
+  Optional<Type> getSuperType();
 
   /**
    * @return The {@link ClassInformationAnnotation} describing the current {@link Type}

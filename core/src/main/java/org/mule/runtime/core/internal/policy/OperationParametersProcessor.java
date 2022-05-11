@@ -11,8 +11,8 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import java.util.Map;
 
 /**
- * Implementation of this interfaces must provide functions to convert and {@link CoreEvent} to the response parameters of the success
- * and failure response functions.
+ * Implementation of this interfaces must provide functions to convert and {@link CoreEvent} to the response parameters of the
+ * success and failure response functions.
  *
  * @since 4.0
  */

@@ -7,6 +7,10 @@
 package org.mule.functional.junit4;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
+import static java.lang.System.currentTimeMillis;
+import static java.nio.file.Files.createTempDirectory;
+
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.ClasspathModuleDiscoverer;
@@ -16,9 +20,8 @@ import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.JreModuleDiscoverer;
 import org.mule.runtime.container.internal.ModuleDiscoverer;
 
-import com.google.common.io.Files;
-
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +31,7 @@ import java.util.List;
  */
 public class FunctionalTestModuleRepository implements ModuleRepository {
 
-  private ModuleRepository moduleRepository;
+  private final ModuleRepository moduleRepository;
 
   public FunctionalTestModuleRepository() {
     moduleRepository =
@@ -36,8 +39,8 @@ public class FunctionalTestModuleRepository implements ModuleRepository {
   }
 
   /**
-   * Test module discover that uses a custom implementation of a classpath module discovered in order to use a temporary folder for service module
-   * files.
+   * Test module discover that uses a custom implementation of a classpath module discovered in order to use a temporary folder
+   * for service module files.
    */
   private class TestContainerModuleDiscoverer implements ModuleDiscoverer {
 
@@ -52,17 +55,16 @@ public class FunctionalTestModuleRepository implements ModuleRepository {
     protected List<ModuleDiscoverer> getModuleDiscoverers(ClassLoader containerClassLoader) {
       List<ModuleDiscoverer> result = new ArrayList<>();
       result.add(new JreModuleDiscoverer());
-      result.add(new ClasspathModuleDiscoverer(containerClassLoader) {
 
-        @Override
-        protected File createModulesTemporaryFolder() {
-          File temp = Files.createTempDir();
-          temp.deleteOnExit();
-          return temp;
-        }
+      try {
+        File temp = createTempDirectory("" + currentTimeMillis()).toFile();
+        temp.deleteOnExit();
+        result.add(new ClasspathModuleDiscoverer(containerClassLoader, temp));
+        return result;
+      } catch (IOException e) {
+        throw new IllegalStateException("Cannot create temo dir", e);
+      }
 
-      });
-      return result;
     }
 
     @Override

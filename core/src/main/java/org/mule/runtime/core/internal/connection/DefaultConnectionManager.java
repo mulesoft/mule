@@ -121,9 +121,15 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter 
    */
   @Override
   public <C> ConnectionValidationResult testConnectivity(ConnectionProvider<C> connectionProvider) {
-    return doTestConnectivity(() -> doTestConnectivity(connectionProvider,
-                                                       managementStrategyFactory.getStrategy(connectionProvider)
-                                                           .getConnectionHandler()));
+    return doTestConnectivity(() -> {
+      try {
+        return doTestConnectivity(connectionProvider,
+                                  managementStrategyFactory.getStrategy(connectionProvider)
+                                      .getConnectionHandler());
+      } catch (ConnectionException e) {
+        return failure(e.getMessage(), e.getErrorType().orElse(null), e);
+      }
+    });
   }
 
   /**

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.el.datetime;
 
+import static org.mule.runtime.api.store.ObjectStoreSettings.unmanagedPersistent;
+
 import static java.util.Calendar.DATE;
 import static java.util.Calendar.DAY_OF_MONTH;
 import static java.util.Calendar.DAY_OF_WEEK;
@@ -16,11 +18,13 @@ import static java.util.Calendar.MONTH;
 import static java.util.Calendar.SECOND;
 import static java.util.Calendar.WEEK_OF_MONTH;
 import static java.util.Calendar.WEEK_OF_YEAR;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.api.store.ObjectStoreSettings.unmanagedPersistent;
+
 import org.mule.runtime.api.store.ObjectStore;
-import org.mule.runtime.core.internal.el.datetime.DateTime;
+import org.mule.runtime.api.store.ObjectStoreManager;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.text.SimpleDateFormat;
@@ -39,15 +43,15 @@ import org.junit.Test;
 
 public class DateTimeTestCase extends AbstractMuleContextTestCase {
 
-  private Calendar currentCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+  private final Calendar currentCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 
-  private DateTime now = new DateTime(currentCalendar).withTimeZone("UTC");
+  private final DateTime now = new DateTime(currentCalendar).withTimeZone("UTC");
 
-  private Calendar currentCalendarPST = Calendar.getInstance(TimeZone.getTimeZone("PST"));
-  private DateTime nowPST = new DateTime(currentCalendarPST).changeTimeZone("PST");
+  private final Calendar currentCalendarPST = Calendar.getInstance(TimeZone.getTimeZone("PST"));
+  private final DateTime nowPST = new DateTime(currentCalendarPST).changeTimeZone("PST");
 
-  private Calendar currentCalendarGmtMinus3 = Calendar.getInstance(TimeZone.getTimeZone("GMT-03:00"));
-  private DateTime nowGmtMinus3 = new DateTime(currentCalendarGmtMinus3).changeTimeZone("GMT-03:00");
+  private final Calendar currentCalendarGmtMinus3 = Calendar.getInstance(TimeZone.getTimeZone("GMT-03:00"));
+  private final DateTime nowGmtMinus3 = new DateTime(currentCalendarGmtMinus3).changeTimeZone("GMT-03:00");
 
   @Test
   public void milliSeconds() {
@@ -265,8 +269,8 @@ public class DateTimeTestCase extends AbstractMuleContextTestCase {
   @Test
   public void serialization() throws Exception {
     final String key = "key";
-    ObjectStore<DateTime> os =
-        muleContext.getObjectStoreManager().createObjectStore("DateTimeTestCase", unmanagedPersistent());
+    ObjectStore<DateTime> os = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(ObjectStoreManager.class)
+        .createObjectStore("DateTimeTestCase", unmanagedPersistent());
     try {
       os.store(key, now);
       DateTime recovered = os.retrieve(key);

@@ -24,7 +24,6 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -54,10 +53,10 @@ public class ReactiveMethodOperationExecutor<M extends ComponentModel>
   private final GeneratedMethodComponentExecutor<M> executor;
   private MuleContext muleContext;
 
-  public ReactiveMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance,
-                                         CursorComponentDecoratorFactory componentDecoratorFactory) {
-    executor = new GeneratedMethodComponentExecutor<>(operationModel.getParameterGroupModels(), operationMethod,
-                                                      operationInstance, componentDecoratorFactory);
+  public ReactiveMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
+    executor =
+        new GeneratedMethodComponentExecutor<>(operationModel.getParameterGroupModels(), operationMethod,
+                                               operationInstance);
   }
 
   /**

@@ -34,8 +34,7 @@ public interface WebSocketConnectionHandler {
   void onConnect(WebSocket socket, WebSocketRequest request) throws WebSocketConnectionRejectedException;
 
   /**
-   * Invoked when the {@code socket} is closed. This method will be invoked whether the socket was
-   * closed locally or remotely.
+   * Invoked when the {@code socket} is closed. This method will be invoked whether the socket was closed locally or remotely.
    *
    * @param socket    the established {@link WebSocket}
    * @param request   the inbound {@link WebSocketRequest request}

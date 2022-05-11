@@ -10,6 +10,7 @@ import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
@@ -40,14 +41,30 @@ public interface MuleConfiguration {
 
   String getDomainId();
 
+  /**
+   * @deprecated this is a leftover from Mule 3
+   */
+  @Deprecated
   String getSystemModelType();
 
+  /**
+   * @deprecated this is a leftover from Mule 3
+   */
+  @Deprecated
   String getSystemName();
 
   boolean isAutoWrapMessageAwareTransform();
 
+  /**
+   * @deprecated this is a leftover from Mule 3
+   */
+  @Deprecated
   boolean isCacheMessageAsBytes();
 
+  /**
+   * @deprecated this is a leftover from Mule 3
+   */
+  @Deprecated
   boolean isEnableStreaming();
 
   boolean isValidateExpressions();
@@ -55,7 +72,9 @@ public interface MuleConfiguration {
   /**
    * @return Whether this context was deployed in lazy init mode
    * @since 4.3.0
+   * @deprecated Since 4.4 this will always return {@code false}. Components/artifacts need not to know if the deployment is lazy.
    */
+  @Deprecated
   boolean isLazyInit();
 
   @Deprecated
@@ -109,7 +128,7 @@ public interface MuleConfiguration {
 
   /**
    * @param extensionType class instance of the extension type
-   * @param <T> type of the extension
+   * @param <T>           type of the extension
    * @return extension configured of type extensionType, if there's no such extension then null.
    */
   <T> T getExtension(final Class<T> extensionType);
@@ -153,4 +172,17 @@ public interface MuleConfiguration {
    */
   Optional<MuleVersion> getMinMuleVersion();
 
+  /**
+   * @return the default Correlation ID generator for every source. Empty value will be returned if internal mule correlation id
+   *         must be kept
+   *
+   * @since 4.4.0
+   */
+  Optional<CorrelationIdGenerator> getDefaultCorrelationIdGenerator();
+
+  /**
+   * @return Optionally returns the {@link ArtifactCoordinates} for the deployed app
+   * @since 4.5.0
+   */
+  Optional<ArtifactCoordinates> getArtifactCoordinates();
 }

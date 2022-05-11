@@ -21,8 +21,9 @@ import java.util.Optional;
 /**
  * Uses a {@link ImplicitConnectionProviderFactory} to create an implicit {@link ConnectionProvider}.
  * <p>
- * This is a static {@link ValueResolver}. The {@link ConnectionProvider} is created the first time the {@link #resolve(ValueResolvingContext)}
- * method is invoked on {@code this} instance. Subsequent invocations will return the same instance.
+ * This is a static {@link ValueResolver}. The {@link ConnectionProvider} is created the first time the
+ * {@link #resolve(ValueResolvingContext)} method is invoked on {@code this} instance. Subsequent invocations will return the same
+ * instance.
  * <p>
  * This class is thread-safe
  *
@@ -58,11 +59,6 @@ public final class ImplicitConnectionProviderValueResolver<C> implements Connect
   @Override
   public boolean isDynamic() {
     return implicitConnectionProviderFactory.isDynamic();
-  }
-
-  @Override
-  public boolean isContent() {
-    return false;
   }
 
   /**

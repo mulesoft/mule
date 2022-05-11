@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api;
 
 public enum MessageExchangePattern {
+
   ONE_WAY {
 
     @Override

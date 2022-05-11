@@ -20,8 +20,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
 /**
- * Describes the the class in which a parameter group is being implemented and the
- * element which contains it
+ * Describes the the class in which a parameter group is being implemented and the element which contains it
  *
  * @since 4.0
  */
@@ -40,9 +39,9 @@ public final class ParameterGroupDescriptor {
   private final MetadataType metadataType;
 
   /**
-   * The member in which the generated value of {@link #type} is to be assigned. For {@link ParameterGroupDescriptor}
-   * used as fields of a class, this container should be parameterized as a {@link Field}. And if it is used
-   * as an argument of an operation it should the corresponding {@link Method}'s {@link Parameter}.
+   * The member in which the generated value of {@link #type} is to be assigned. For {@link ParameterGroupDescriptor} used as
+   * fields of a class, this container should be parameterized as a {@link Field}. And if it is used as an argument of an
+   * operation it should the corresponding {@link Method}'s {@link Parameter}.
    */
   private final AnnotatedElement container;
   private ExtensionParameter groupParameterType;

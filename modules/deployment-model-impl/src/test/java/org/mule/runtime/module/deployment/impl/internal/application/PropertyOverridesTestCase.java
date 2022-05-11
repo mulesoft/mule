@@ -9,11 +9,13 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 import static org.apache.commons.io.IOUtils.copy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
+
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepositoryFactory;
+import org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
-import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -30,7 +32,7 @@ import org.junit.Test;
  */
 public class PropertyOverridesTestCase extends AbstractMuleTestCase {
 
-  private Map<String, String> existingProperties = new HashMap<>();
+  private final Map<String, String> existingProperties = new HashMap<>();
 
   private void setSystemProperties() {
     setSystemProperty("texas", "province");
@@ -51,7 +53,9 @@ public class PropertyOverridesTestCase extends AbstractMuleTestCase {
     output.close();
     ApplicationDescriptor descriptor = new ApplicationDescriptor("app");
     ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
+        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(artifactDescriptorFactoryProvider()
+            .createArtifactPluginDescriptorFactory(new DescriptorLoaderRepositoryFactory().createDescriptorLoaderRepository(),
+                                                   ArtifactDescriptorValidatorBuilder.builder())),
                                          new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry()),
                                          ArtifactDescriptorValidatorBuilder.builder());
     applicationDescriptorFactory.setApplicationProperties(descriptor, tempProps);

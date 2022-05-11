@@ -20,6 +20,8 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isM
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getFieldDefaultValueValueResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getNullSafeDefaultImplementedType;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isConfigOverride;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
@@ -35,7 +37,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
@@ -72,11 +73,11 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
   /**
    * Creates a new instance
    *
-   * @param delegate the {@link ValueResolver} to wrap
-   * @param type the type of the value this resolver returns
+   * @param delegate        the {@link ValueResolver} to wrap
+   * @param type            the type of the value this resolver returns
    * @param reflectionCache the cache for expensive reflection lookups
-   * @param muleContext the current {@link MuleContext}
-   * @param <T> the generic type of the produced values
+   * @param muleContext     the current {@link MuleContext}
+   * @param <T>             the generic type of the produced values
    * @return a new null safe {@link ValueResolver}
    * @throws IllegalParameterModelDefinitionException if used on parameters of not supported types
    */
@@ -136,10 +137,10 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
             parametersResolver.resolveParameterGroups(childGroup, groupBuilder);
 
           } else {
-            NullSafe nullSafe = field.getAnnotation(NullSafe.class);
-            if (nullSafe != null) {
+            Optional<Class<?>> defaultImplementingType = getNullSafeDefaultImplementedType(field);
+            if (defaultImplementingType.isPresent()) {
               MetadataType nullSafeType;
-              final Class<?> nullSafeClass = nullSafe.defaultImplementingType();
+              final Class<?> nullSafeClass = defaultImplementingType.get();
               if (Object.class.equals(nullSafeClass)) {
                 nullSafeType = objectField.getValue();
               } else {
@@ -153,7 +154,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
                                                               expressionManager, muleContext, parametersResolver);
             }
 
-            if (field.getAnnotation(ConfigOverride.class) != null) {
+            if (isConfigOverride(field)) {
               ValueResolver<?> fieldDelegate = fieldResolver != null ? fieldResolver : new StaticValueResolver<>(null);
               fieldResolver = ConfigOverrideValueResolverWrapper.of(fieldDelegate, field.getName(), field.getType(),
                                                                     reflectionCache, muleContext, clazz.getName());
@@ -211,13 +212,9 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
   }
 
   @Override
-  public boolean isContent() {
-    return delegate.isContent();
-  }
-
-  @Override
   public void initialise() throws InitialisationException {
     initialiseIfNeeded(delegate, muleContext);
     initialiseIfNeeded(fallback, muleContext);
   }
+
 }

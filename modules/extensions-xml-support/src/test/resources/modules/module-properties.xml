@@ -3,9 +3,11 @@
         xmlns="http://www.mulesoft.org/schema/mule/module"
         xmlns:mule="http://www.mulesoft.org/schema/mule/core"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:tns="http://www.mulesoft.org/schema/mule/module-properties"
         xsi:schemaLocation="
            http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
-           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           http://www.mulesoft.org/schema/mule/module-properties http://www.mulesoft.org/schema/mule/module-properties/current/mule-module-properties.xsd">
 
     <mule:global-property name="mule-global-property" value="a-constant-global-value" />
 
@@ -89,6 +91,46 @@
         <body>
             <!-- notice we need to add the folder modules to be sure it will be loaded in the context of the running test -->
             <mule:set-payload value="${file::modules/module-properties-file.txt}"/>
+        </body>
+        <output type="string"/>
+    </operation>
+    
+    <operation name="set-payload-add-param-and-property-values-thru-internal-operation">
+        <parameters>
+            <parameter name="inputParam" type="string"/>
+        </parameters>
+        <body>
+            <tns:set-payload-add-param-and-property-values value1="#[vars.inputParam]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="call-private-nested-operations">
+        <parameters>
+            <parameter name="inputParam" type="string"/>
+        </parameters>
+        <body>
+          <tns:call-another-private-nested-operation nested_inputParam="#[vars.inputParam ++ ' These are two']"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="call-another-private-nested-operation" visibility="PRIVATE">
+        <parameters>
+            <parameter name="nested_inputParam" type="string"/>
+        </parameters>
+        <body>
+            <tns:set-payload-with-all-properties deeper_nested_inputParam="#[vars.nested_inputParam ++ ' nice properties, ' ++ vars.defaultConfigPropertyUseOptional]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-with-all-properties" visibility="PRIVATE">
+        <parameters>
+            <parameter name="deeper_nested_inputParam" type="string"/>
+        </parameters>
+        <body>
+          <mule:set-payload value="#[vars.deeper_nested_inputParam ++  ' and ' ++ vars.defaultConfigParam]"/>
         </body>
         <output type="string"/>
     </operation>

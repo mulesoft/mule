@@ -7,6 +7,7 @@
 package org.mule.runtime.config.dsl.model;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -71,20 +72,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableList;
+import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.internal.creation.MockSettingsImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableList;
-
-import io.qameta.allure.Issue;
-
-//@RunWith(FlakinessDetectorTestRunner.class)
-//@FlakyTest
 public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadataCacheIdGeneratorTestCase {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ModelBasedMetadataCacheKeyGeneratorTestCase.class);
@@ -743,10 +739,8 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
 
   private void mockRequiredForMetadataModelProperty(EnrichableModel model, List<String> parameterNames) {
     if (parameterNames == null) {
-      List<String> allParameterNames = parameterGroupModel.getParameterModels().stream()
-          .map(parameterModel -> parameterModel.getName()).collect(Collectors.toList());
       when(model.getModelProperty(RequiredForMetadataModelProperty.class))
-          .thenReturn(of(new RequiredForMetadataModelProperty(allParameterNames)));
+          .thenReturn(of(new RequiredForMetadataModelProperty(emptyList())));
     } else {
       RequiredForMetadataModelProperty requiredForMetadataModelProperty = new RequiredForMetadataModelProperty(parameterNames);
 
@@ -914,7 +908,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
 
     when(operationModel.getParameterGroupModels()).thenReturn(Arrays.asList(parameterGroupModel, metadataKeyIdGroup));
     when(operationModel.getAllParameterModels()).thenReturn(ImmutableList.<ParameterModel>builder()
-        .addAll(defaultGroupParameterModels)
+        .addAll(componentParameterModels)
         .addAll(partParameterModels)
         .build());
   }

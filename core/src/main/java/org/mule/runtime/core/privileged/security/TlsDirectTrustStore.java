@@ -53,7 +53,8 @@ public interface TlsDirectTrustStore extends TlsIndirectTrustStore {
 
   /**
    * @param trustManagerFactory The source of trust information if the store is accessed directly (some connectors generate trust
-   *        stores indirectly through System properties in which case this value will be ignored - see {@link TlsConfiguration}).
+   *                            stores indirectly through System properties in which case this value will be ignored - see
+   *                            {@link TlsConfiguration}).
    */
   void setTrustManagerFactory(TrustManagerFactory trustManagerFactory);
 

@@ -23,11 +23,11 @@ import java.util.function.Supplier;
 public interface RequestMatcherRegistry<T> {
 
   /**
-   * Includes a new matcher to return the desired {@code item}. The matcher's path and method will be analysed to determine whether
-   * any collisions exists with the already registered objects.
+   * Includes a new matcher to return the desired {@code item}. The matcher's path and method will be analysed to determine
+   * whether any collisions exists with the already registered objects.
    *
-   * @param matcher the {@link PathAndMethodRequestMatcher} to associate with the  {@code item}
-   * @param item the object to register under the {@code matcher}
+   * @param matcher the {@link PathAndMethodRequestMatcher} to associate with the {@code item}
+   * @param item    the object to register under the {@code matcher}
    * @throws MatcherCollisionException if a collision is found
    */
   RequestMatcherRegistryEntry add(PathAndMethodRequestMatcher matcher, T item);
@@ -46,7 +46,7 @@ public interface RequestMatcherRegistry<T> {
    * {@link PathAndMethodRequestMatcher PathAndMethodRequestMatchers}.
    *
    * @param method the HTTP method to match against
-   * @param path the full path to match against (must not contain wildcard or parametrization)
+   * @param path   the full path to match against (must not contain wildcard or parametrization)
    * @return the matching registered object
    */
   default T find(String method, String path) {
@@ -77,7 +77,8 @@ public interface RequestMatcherRegistry<T> {
   }
 
   /**
-   * Builder of {@link RequestMatcherRegistry}. Instances can only be obtained via {@link HttpService#getRequestMatcherRegistryBuilder()}.
+   * Builder of {@link RequestMatcherRegistry}. Instances can only be obtained via
+   * {@link HttpService#getRequestMatcherRegistryBuilder()}.
    *
    * @param <T> the type of object associated to the registry
    * @since 4.1.5
@@ -85,8 +86,8 @@ public interface RequestMatcherRegistry<T> {
   interface RequestMatcherRegistryBuilder<T> {
 
     /**
-     * Determines which item should be returned if a method mismatch occurs, meaning a path match was found but the method
-     * was not valid. If not set, {@code null} will be returned by default.
+     * Determines which item should be returned if a method mismatch occurs, meaning a path match was found but the method was not
+     * valid. If not set, {@code null} will be returned by default.
      *
      * @param itemSupplier a supplier of the value to return
      * @return this builder
@@ -103,7 +104,8 @@ public interface RequestMatcherRegistry<T> {
 
 
     /**
-     * Determines which item should be returned if an invalid request is provided. If not set, {@code null} will be returned by default.
+     * Determines which item should be returned if an invalid request is provided. If not set, {@code null} will be returned by
+     * default.
      *
      * @param itemSupplier a supplier of the value to return
      * @return this builder

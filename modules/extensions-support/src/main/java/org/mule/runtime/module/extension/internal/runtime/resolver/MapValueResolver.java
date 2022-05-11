@@ -26,8 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * A {@link ValueResolver} that takes a list of {@link ValueResolver}s and upon invocation of {@link #resolve(ValueResolvingContext)} it return a
- * {@link Map} of values with the outcome of each original resolver.
+ * A {@link ValueResolver} that takes a list of {@link ValueResolver}s and upon invocation of
+ * {@link #resolve(ValueResolvingContext)} it return a {@link Map} of values with the outcome of each original resolver.
  * <p/>
  * This class implements {@link Lifecycle} and propagates those events to each of the {@code resolvers}
  *
@@ -44,10 +44,10 @@ public final class MapValueResolver<K, V> implements ValueResolver<Map<K, V>>, I
   /**
    * Creates a new instance
    *
-   * @param mapType the {@link Class} for a concrete {@link Map} type with a default constructor
-   * @param keyResolvers a not {@code null} {@link List} of resolvers for map key params
+   * @param mapType        the {@link Class} for a concrete {@link Map} type with a default constructor
+   * @param keyResolvers   a not {@code null} {@link List} of resolvers for map key params
    * @param valueResolvers a not {@code null} {@link List} of resolvers for map value params
-   * @param muleContext the artifact {@link MuleContext} that will be used for initialisation of resolvers
+   * @param muleContext    the artifact {@link MuleContext} that will be used for initialisation of resolvers
    */
   public MapValueResolver(Class<? extends Map> mapType, List<ValueResolver<K>> keyResolvers,
                           List<ValueResolver<V>> valueResolvers, ReflectionCache reflectionCache, MuleContext muleContext) {
@@ -108,11 +108,6 @@ public final class MapValueResolver<K, V> implements ValueResolver<Map<K, V>>, I
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-  }
-
-  @Override
-  public boolean isContent() {
-    return false;
   }
 
   private Map<K, V> instantiateMap() {

@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.core.internal.el;
 
-import static java.util.Optional.of;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.el.BindingContext.builder;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -18,23 +15,26 @@ import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignabl
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_FUNCTIONS;
 
+import static java.util.Optional.of;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.api.el.BindingContext;
-import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
-
-import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+
+import org.junit.Before;
+import org.junit.Test;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -45,27 +45,24 @@ public class GlobalBindingContextProviderTestCase extends AbstractMuleContextTes
 
   public static final String KEY = "testProvider";
 
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    Map<String, Object> objects = new HashMap<>();
+  private ExtendedExpressionManager expressionManager;
 
-    DefaultExpressionLanguageFactoryService weaveExpressionExecutor = new WeaveDefaultExpressionLanguageFactoryService(null);
-    objects.put(weaveExpressionExecutor.getName(), weaveExpressionExecutor);
-    objects.put(KEY, new TestGlobalBindingContextProvider());
-
-    return objects;
+  @Before
+  public void before() {
+    expressionManager = muleContext.getExpressionManager();
+    expressionManager.addGlobalBindings(new TestGlobalBindingContextProvider().getBindingContext());
   }
 
   @Test
   public void variable() {
-    TypedValue result = muleContext.getExpressionManager().evaluate("number");
+    TypedValue result = expressionManager.evaluate("number");
     assertThat(result.getValue(), is(1));
     assertThat(result.getDataType(), is(assignableTo(NUMBER)));
   }
 
   @Test
   public void function() {
-    TypedValue result = muleContext.getExpressionManager().evaluate("repeat('oa', 3)");
+    TypedValue result = expressionManager.evaluate("repeat('oa', 3)");
     assertThat(result.getValue(), is("oaoaoa"));
     assertThat(result.getDataType(), is(assignableTo(STRING)));
   }

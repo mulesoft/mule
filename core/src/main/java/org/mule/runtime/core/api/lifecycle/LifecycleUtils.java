@@ -29,7 +29,6 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import java.util.Collection;
 import java.util.Optional;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 
 /**
@@ -285,21 +284,28 @@ public class LifecycleUtils {
    * @param properties the current properties
    * @return Whether the lazy init property has been set
    * @since 4.3.0
+   *
+   * @deprecated since 4.4, do not rely on deployment properties at runtime.
    */
+  @Deprecated
   public static boolean isLazyInitMode(ConfigurationProperties properties) {
     return properties != null && properties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
   }
 
   /**
-   * Checks if the {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY} property
-   * has been set on the given {@code properties}.
+   * Checks if the
+   * {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY}
+   * property has been set on the given {@code properties}.
    * <p>
    * If {@code properties} is {@code null} then {@code false} is returned.
    *
    * @param properties the current properties
    * @return Whether the DSL declaration validation property has been set
    * @since 4.3.0
+   *
+   * @deprecated since 4.4, do not rely on deployment properties at runtime.
    */
+  @Deprecated
   public static boolean isDslDeclarationValidationEnabled(ConfigurationProperties properties) {
     return properties != null
         && properties.resolveBooleanProperty(MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY).orElse(false);
@@ -332,10 +338,6 @@ public class LifecycleUtils {
 
   private static void doApplyPhase(String phase, Collection<? extends Object> objects, MuleContext muleContext, Logger logger)
       throws MuleException {
-    if (CollectionUtils.isEmpty(objects)) {
-      return;
-    }
-
     for (Object object : objects) {
       object = unwrap(object);
       if (object == null) {

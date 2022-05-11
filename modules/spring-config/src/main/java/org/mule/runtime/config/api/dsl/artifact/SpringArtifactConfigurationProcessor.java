@@ -22,7 +22,10 @@ import org.mule.runtime.deployment.model.internal.artifact.ImmutableArtifactCont
  * runtime object using the spring bean container.
  *
  * @since 4.0
+ * 
+ * @deprecated Use another implementation of {@link ArtifactConfigurationProcessor} instead.
  */
+@Deprecated
 public final class SpringArtifactConfigurationProcessor implements ArtifactConfigurationProcessor {
 
   @Override
@@ -43,9 +46,11 @@ public final class SpringArtifactConfigurationProcessor implements ArtifactConfi
                                           artifactContextConfiguration.getArtifactType(),
                                           artifactContextConfiguration.isEnableLazyInitialization(),
                                           artifactContextConfiguration.isDisableXmlValidations(),
-                                          artifactContextConfiguration.getRuntimeLockFactory());
-    artifactContextConfiguration.getParentContext()
-        .ifPresent(parentMuleContext -> springXmlConfigurationBuilder.setParentContext(parentMuleContext));
+                                          artifactContextConfiguration.getRuntimeLockFactory(),
+                                          artifactContextConfiguration.getMemoryManagementService());
+    artifactContextConfiguration.getParentArtifactContext()
+        .ifPresent(parentContext -> springXmlConfigurationBuilder.setParentContext(parentContext.getMuleContext(),
+                                                                                   parentContext.getArtifactAst()));
     artifactContextConfiguration.getServiceConfigurators().stream()
         .forEach(springXmlConfigurationBuilder::addServiceConfigurator);
     springXmlConfigurationBuilder.configure(artifactContextConfiguration.getMuleContext());

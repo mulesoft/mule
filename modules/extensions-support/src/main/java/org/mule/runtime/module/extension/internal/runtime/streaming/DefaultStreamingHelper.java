@@ -13,7 +13,6 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -36,7 +35,6 @@ public class DefaultStreamingHelper implements StreamingHelper {
 
   private final CursorStreamProviderFactory cursorStreamProviderFactory;
   private final CursorIteratorProviderFactory cursorIteratorProviderFactory;
-  private final CursorComponentDecoratorFactory componentDecoratorFactory;
   private final CoreEvent event;
   private final ComponentLocation originatingLocation;
 
@@ -49,12 +47,10 @@ public class DefaultStreamingHelper implements StreamingHelper {
    */
   public DefaultStreamingHelper(CursorStreamProviderFactory cursorStreamProviderFactory,
                                 CursorIteratorProviderFactory cursorIteratorProviderFactory,
-                                CursorComponentDecoratorFactory componentDecoratorFactory,
                                 CoreEvent event,
                                 ComponentLocation originatingLocation) {
     this.cursorStreamProviderFactory = cursorStreamProviderFactory;
     this.cursorIteratorProviderFactory = cursorIteratorProviderFactory;
-    this.componentDecoratorFactory = componentDecoratorFactory;
     this.event = event;
     this.originatingLocation = originatingLocation;
   }
@@ -93,11 +89,9 @@ public class DefaultStreamingHelper implements StreamingHelper {
     }
 
     if (value instanceof InputStream) {
-      value = resolveCursorStreamProvider(componentDecoratorFactory
-          .decorateOutput((InputStream) value, event.getCorrelationId()));
+      value = resolveCursorStreamProvider((InputStream) value);
     } else if (value instanceof Iterator) {
-      value = resolveCursorIteratorProvider(componentDecoratorFactory
-          .decorateOutput((Iterator) value, event.getCorrelationId()));
+      value = resolveCursorIteratorProvider((Iterator) value);
     } else if (value instanceof TypedValue) {
       value = resolveCursorTypedValueProvider((TypedValue) value);
     }

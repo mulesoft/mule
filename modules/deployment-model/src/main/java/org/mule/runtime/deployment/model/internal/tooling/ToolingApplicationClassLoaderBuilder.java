@@ -7,26 +7,29 @@
 
 package org.mule.runtime.deployment.model.internal.tooling;
 
-import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.internal.tooling.ToolingRegionClassLoader.newToolingRegionClassLoader;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
+import static java.lang.String.format;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
-import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
 import java.io.IOException;
 import java.net.URL;
@@ -34,10 +37,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * {@link ArtifactClassLoader} builder for class loaders required by {@link Application} artifacts for Tooling.
- * The main different between this kind of applications vs the ones deployed through the deployment service is that
- * Tooling has to access the {@link ArtifactClassLoader} and it should be simple for Tooling to dispose resources, therefore
- * a {@link ToolingArtifactClassLoader} is created by this builder.
+ * {@link ArtifactClassLoader} builder for class loaders required by {@link Application} artifacts for Tooling. The main different
+ * between this kind of applications vs the ones deployed through the deployment service is that Tooling has to access the
+ * {@link ArtifactClassLoader} and it should be simple for Tooling to dispose resources, therefore a
+ * {@link ToolingArtifactClassLoader} is created by this builder.
  *
  * @since 4.0
  */
@@ -55,7 +58,7 @@ public class ToolingApplicationClassLoaderBuilder
    * {@code artifactClassLoaderBuilder} is used for building the common parts of artifacts.
    *
    * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes
-   * @param pluginClassLoadersFactory creates the class loaders for the plugins included in the application's region. Non null
+   * @param pluginClassLoadersFactory  creates the class loaders for the plugins included in the application's region. Non null
    */
   public ToolingApplicationClassLoaderBuilder(DeployableArtifactClassLoaderFactory<ApplicationDescriptor> artifactClassLoaderFactory,
                                               RegionPluginClassLoadersFactory pluginClassLoadersFactory) {
@@ -71,7 +74,8 @@ public class ToolingApplicationClassLoaderBuilder
    * @return a {@code MuleDeployableArtifactClassLoader} created from the provided configuration.
    * @throws IOException exception cause when it was not possible to access the file provided as dependencies
    */
-  public ToolingArtifactClassLoader build() throws IOException {
+  @Override
+  public ToolingArtifactClassLoader build() {
     ArtifactClassLoader ownerArtifactClassLoader = super.build();
     ClassLoader parent = ownerArtifactClassLoader.getClassLoader().getParent();
     if (!(parent instanceof RegionClassLoader)) {
@@ -84,7 +88,7 @@ public class ToolingApplicationClassLoaderBuilder
 
   @Override
   protected ArtifactClassLoader createArtifactClassLoader(String artifactId, RegionClassLoader regionClassLoader) {
-    return artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor, artifactPluginClassLoaders);
+    return artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor);
   }
 
   @Override
@@ -97,8 +101,8 @@ public class ToolingApplicationClassLoaderBuilder
 
   /**
    * @param parentClassLoader parent class loader for the artifact class loader that should have all the {@link URL}s needed from
-   *        tooling side when loading the {@link ExtensionModel}. Among those, there will be mule-api, extensions-api,
-   *        extensions-support and so on.
+   *                          tooling side when loading the {@link ExtensionModel}. Among those, there will be mule-api,
+   *                          extensions-api, extensions-support and so on.
    * @return the builder
    */
   public ToolingApplicationClassLoaderBuilder setParentClassLoader(ArtifactClassLoader parentClassLoader) {
@@ -107,8 +111,8 @@ public class ToolingApplicationClassLoaderBuilder
   }
 
   /**
-   * @param domainArtifactClassLoader domain parent class loader for the artifact class loader. It will check for plugins to define
-   *                                  the parent lookup policy if a domain parent artifact class loader has been set.
+   * @param domainArtifactClassLoader domain parent class loader for the artifact class loader. It will check for plugins to
+   *                                  define the parent lookup policy if a domain parent artifact class loader has been set.
    * @return the builder
    */
   public ToolingApplicationClassLoaderBuilder setDomainParentClassLoader(ArtifactClassLoader domainArtifactClassLoader) {
@@ -139,6 +143,17 @@ public class ToolingApplicationClassLoaderBuilder
   @Override
   protected ArtifactClassLoader getParentClassLoader() {
     return parentClassLoader;
+  }
+
+  /**
+   * @param artifactPluginDescriptors set of plugins descriptors that will be used by the application.
+   * @return the builder
+   *
+   * @since 4.5
+   */
+  // Keep compatibility with usages of the factory that expect the descriptor from previous version.
+  public AbstractArtifactClassLoaderBuilder addArtifactPluginDescriptors(org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor... artifactPluginDescriptors) {
+    return super.addArtifactPluginDescriptors(artifactPluginDescriptors);
   }
 
   @Override

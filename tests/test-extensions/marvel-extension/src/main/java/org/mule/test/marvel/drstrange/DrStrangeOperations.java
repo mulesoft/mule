@@ -12,10 +12,13 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.test.marvel.drstrange.DrStrangeErrorTypeDefinition.CUSTOM_ERROR;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.extension.api.annotation.error.Throws;
@@ -27,6 +30,8 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.reference.FlowReference;
 import org.mule.runtime.extension.api.annotation.param.stereotype.ComponentId;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.test.marvel.model.Relic;
@@ -61,7 +66,8 @@ public class DrStrangeOperations {
 
   @Throws(CustomErrorProvider.class)
   @MediaType(TEXT_PLAIN)
-  public String readStream(@Connection MysticConnection connection, @Optional(defaultValue = PAYLOAD) InputStream stream)
+  public String readStream(@org.mule.sdk.api.annotation.param.Connection MysticConnection connection,
+                           @Optional(defaultValue = PAYLOAD) InputStream stream)
       throws IOException {
     try {
       return IOUtils.toString(stream);
@@ -86,7 +92,8 @@ public class DrStrangeOperations {
   }
 
   @Stereotype(ReferableOperationStereotypeDefinition.class)
-  public void withFlowReference(@Config DrStrange dr, @Optional @FlowReference String flowRef, @ComponentId String name) {
+  public void withFlowReference(@org.mule.sdk.api.annotation.param.Config DrStrange dr, @Optional @FlowReference String flowRef,
+                                @ComponentId String name) {
 
     if (!StringUtils.isBlank(flowRef)) {
       if (!locator.find(Location.builder().globalName(flowRef).build()).isPresent()) {
@@ -177,5 +184,36 @@ public class DrStrangeOperations {
         // Do nothing.
       }
     };
+  }
+
+  /**
+   * "Dr. Strange and the Multiple Stream Readers of Madness", featuring an SDK scope.
+   * <p>
+   * Consume the payload stream both at the beginning and the end of the provided chain.
+   *
+   * @param operations
+   * @param callback
+   * @param payload
+   * @param attributes
+   */
+  @MediaType(TEXT_PLAIN)
+  public void scopeverse(Chain operations,
+                         CompletionCallback<Object, Object> callback,
+                         @Optional(defaultValue = "#[payload]") TypedValue<Object> payload,
+                         @Optional(defaultValue = "#[attributes]") TypedValue<Object> attributes) {
+    // Consume the stream
+    IOUtils.toString(((InputStream) payload.getValue()));
+
+    operations.process(payload, attributes,
+                       result -> {
+                         // Consume the stream
+                         // the ResultOutput arrives here as a CursorStreamProvider. Changing this to a CursorStream in the chain
+                         // infrastructure would break backwards compatibility, causing a CCE.
+                         IOUtils.toString((((CursorStreamProvider) result.getOutput())).openCursor());
+                         callback.success(result);
+                       },
+                       (error, previous) -> {
+                         callback.error(error);
+                       });
   }
 }

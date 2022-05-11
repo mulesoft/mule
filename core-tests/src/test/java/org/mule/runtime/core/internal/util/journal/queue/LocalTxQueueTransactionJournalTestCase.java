@@ -6,7 +6,12 @@
  */
 package org.mule.runtime.core.internal.util.journal.queue;
 
+import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
+import static org.mule.runtime.core.internal.util.journal.TransactionJournal.TX1_LOG_FILE_NAME;
+import static org.mule.runtime.core.internal.util.journal.TransactionJournal.TX2_LOG_FILE_NAME;
+
 import static java.lang.Math.abs;
+
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.core.Is.is;
@@ -15,8 +20,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.internal.util.journal.TransactionJournal.TX1_LOG_FILE_NAME;
-import static org.mule.runtime.core.internal.util.journal.TransactionJournal.TX2_LOG_FILE_NAME;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.util.queue.DefaultQueueStore;
@@ -26,13 +29,14 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Random;
 
+import com.google.common.collect.Multimap;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
-
-import com.google.common.collect.Multimap;
 
 public class LocalTxQueueTransactionJournalTestCase extends AbstractMuleContextTestCase {
 
@@ -49,6 +53,15 @@ public class LocalTxQueueTransactionJournalTestCase extends AbstractMuleContextT
 
   private final DefaultQueueStore mockQueueInfo = mock(DefaultQueueStore.class, RETURNS_DEEP_STUBS.get());
 
+  @Before
+  public void setUp() {
+    currentMuleContext.set(muleContext);
+  }
+
+  @After
+  public void teardown() {
+    currentMuleContext.set(null);
+  }
 
   @Before
   public void setUpMocks() {

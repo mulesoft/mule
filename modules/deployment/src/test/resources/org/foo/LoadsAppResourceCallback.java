@@ -9,15 +9,12 @@ package org.foo;
 
 import static java.lang.Thread.currentThread;
 
-import org.mule.functional.api.component.EventCallback;
-import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.module.deployment.api.EventCallback;
 
-public class LoadsAppResourceCallback extends AbstractComponent implements EventCallback {
+public class LoadsAppResourceCallback implements EventCallback {
 
   @Override
-  public void eventReceived(CoreEvent event, Object component, MuleContext muleContext) throws Exception {
+  public void eventReceived(String payload) throws Exception {
     ClassLoader tccl = currentThread().getContextClassLoader();
 
     if (tccl.getResource("test-resource.txt") == null) {
@@ -33,7 +30,7 @@ public class LoadsAppResourceCallback extends AbstractComponent implements Event
       throw new AssertionError("Couldn't load exported class", e);
     }
     try {
-      tccl.loadClass("org.foo.EchoTest");
+      tccl.loadClass("org.foo.echo.Plugin2Echo");
       throw new AssertionError("Could load not exported class");
     } catch (ClassNotFoundException e) {
       // expected

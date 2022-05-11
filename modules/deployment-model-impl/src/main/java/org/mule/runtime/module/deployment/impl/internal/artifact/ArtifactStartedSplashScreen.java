@@ -8,11 +8,12 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+
 import org.mule.runtime.core.internal.util.splash.SplashScreen;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.Artifact;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 
 import java.io.File;
 import java.util.ArrayList;

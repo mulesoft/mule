@@ -13,8 +13,8 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import java.io.InputStream;
 
 /**
- * Specialization of {@link CursorStreamProvider} which creates {@link CursorStreamProvider} instances
- * out of {@link InputStream} instances
+ * Specialization of {@link CursorStreamProvider} which creates {@link CursorStreamProvider} instances out of {@link InputStream}
+ * instances
  *
  * @since 4.0
  */

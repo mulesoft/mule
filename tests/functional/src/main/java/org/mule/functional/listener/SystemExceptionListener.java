@@ -69,7 +69,7 @@ public class SystemExceptionListener {
 
   /**
    * @param timeout milliseconds to wait when calling {@link #waitUntilAllNotificationsAreReceived()} for an exception to be
-   *        handled
+   *                handled
    */
   public SystemExceptionListener setTimeoutInMillis(int timeout) {
     this.timeout = timeout;

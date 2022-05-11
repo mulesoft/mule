@@ -11,7 +11,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
@@ -60,17 +59,14 @@ public class DataTypeMatcher extends TypeSafeMatcher<DataType> {
         .appendText(", encoding = ").appendValue(dataType.getMediaType().getCharset());
   }
 
-  @Factory
   public static Matcher<DataType> like(Class type, MediaType mimeType, Charset encoding) {
     return new DataTypeMatcher(type, mimeType, encoding);
   }
 
-  @Factory
   public static Matcher<DataType> like(Class type, MediaType mimeType) {
     return new DataTypeMatcher(type, mimeType, mimeType.getCharset().orElse(null));
   }
 
-  @Factory
   public static Matcher<DataType> like(DataType dataType) {
     return new DataTypeMatcher(dataType.getType(), dataType.getMediaType(), dataType.getMediaType().getCharset().orElse(null));
   }

@@ -94,4 +94,28 @@
         </body>
         <output type="string"/>
     </operation>
+
+    <operation name="join-arrays">
+        <parameters>
+            <parameter name="ids" type="ids"/>
+            <parameter name="contentArray" type="TypeStringArray" role="CONTENT"/>
+        </parameters>
+        <body>
+            <mule:set-variable variableName="idsAsString" value="#[output application/java  --- vars.ids joinBy '-']"/>
+            <mule:set-variable variableName="contentAsString"
+                               value="#[output application/java  --- vars.contentArray joinBy '-']"/>
+            <mule:set-payload value="#[vars.idsAsString ++ '_' ++ vars.contentAsString]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="operation-with-input-data">
+        <parameters>
+            <parameter name="input-data" type="input-data-type" use="REQUIRED" role="PRIMARY"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[vars['input-data']]"/>
+        </body>
+        <output type="string"/>
+    </operation>
 </module>

@@ -16,8 +16,8 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.slf4j.Logger;
 
 /**
- * {@link FlowExceptionHandler} which can be used to configure a {@link MessageProcessorChain} to not handle errors, only log them.
- * This should be the case when error handling is impossible but errors should not be simply ignored.
+ * {@link FlowExceptionHandler} which can be used to configure a {@link MessageProcessorChain} to not handle errors, only log
+ * them. This should be the case when error handling is impossible but errors should not be simply ignored.
  *
  * @since 4.0
  */

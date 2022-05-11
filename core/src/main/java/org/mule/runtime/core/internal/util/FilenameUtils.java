@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.util;
 
+import static java.io.File.separator;
 import org.mule.runtime.core.api.util.FileUtils;
 
 import java.io.File;
@@ -26,10 +27,35 @@ public class FilenameUtils {
 
       buf.append(component);
       if (i < pathComponents.length - 1) {
-        buf.append(File.separator);
+        buf.append(separator);
       }
     }
     return FileUtils.newFile(buf.toString());
+  }
+
+  public static String normalizeDecodedPath(String resource, boolean isWindows) {
+    if (resource == null) {
+      return null;
+    }
+
+    if (!resource.startsWith("file:/")) {
+      return resource;
+    }
+
+    // Remove the "file:/"
+    resource = resource.substring(6);
+
+    if (isWindows) {
+      if (resource.startsWith("/")) {
+        return separator + resource;
+      }
+    } else {
+      if (!resource.startsWith(separator)) {
+        return separator + resource;
+      }
+    }
+
+    return resource;
   }
 
   /**

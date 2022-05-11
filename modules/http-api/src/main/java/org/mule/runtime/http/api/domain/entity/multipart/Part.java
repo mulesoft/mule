@@ -47,13 +47,13 @@ public interface Part {
   long getSize();
 
   /**
-   * Returns the value of the specified mime header as a {@link String}. If the Part did not include a header of the
-   * specified name, this method returns {@code null}. If there are multiple headers with the same name, this method returns
-   * the first header in the part. The header name is case insensitive. You can use this method with any request header.
+   * Returns the value of the specified mime header as a {@link String}. If the Part did not include a header of the specified
+   * name, this method returns {@code null}. If there are multiple headers with the same name, this method returns the first
+   * header in the part. The header name is case insensitive. You can use this method with any request header.
    *
    * @param name a {@link String} specifying the header name
-   * @return a {@link String} containing the value of the requested header, or {@code null} if the part does not have a
-   *         header of that name
+   * @return a {@link String} containing the value of the requested header, or {@code null} if the part does not have a header of
+   *         that name
    */
   String getHeader(String name);
 

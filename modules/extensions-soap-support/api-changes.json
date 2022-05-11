@@ -1,0 +1,16 @@
+{
+  "4.5.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.extension.soap.api.loader.SoapExtensionModelLoader",
+          "package": "org.mule.runtime.module.extension.soap.api.loader",
+          "classSimpleName": "SoapExtensionModelLoader",
+          "elementKind": "class",
+          "justification": "API is impossible to implement nor consume"
+        }
+      ]
+    }
+  }
+}

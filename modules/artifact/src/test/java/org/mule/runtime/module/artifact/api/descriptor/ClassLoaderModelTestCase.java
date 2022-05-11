@@ -7,15 +7,25 @@
 
 package org.mule.runtime.module.artifact.api.descriptor;
 
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_MODEL;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
 
-public class ClassLoaderModelTestCase {
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(CLASSLOADING_ISOLATION)
+@Story(CLASSLOADER_MODEL)
+public class ClassLoaderModelTestCase extends AbstractMuleTestCase {
 
   @Test
   public void sanitizesExportedResources() {

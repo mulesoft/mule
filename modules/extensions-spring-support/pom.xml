@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.4.0-SNAPSHOT</version>
+        <version>4.5.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-extensions-spring-support</artifactId>
     <name>Mule Extensions Spring Support</name>
@@ -17,7 +17,7 @@
 
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <jsoup.version>1.11.3</jsoup.version>
+        <jsoup.version>1.14.2</jsoup.version>
     </properties>
 
     <build>
@@ -48,11 +48,6 @@
         <!-- Mule Dependencies -->
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-spring-config</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -65,6 +60,11 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <!-- TypedValueParameterOperationExecutionTestCase fails if this dependency is not here, even if it comes transitively -->
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-metadata-model-xml</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
@@ -91,13 +91,8 @@
             <artifactId>reflections</artifactId>
         </dependency>
         <dependency>
-            <groupId>jboss</groupId>
-            <artifactId>javassist</artifactId>
-        </dependency>
-        <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>${jodaTimeVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.dom4j</groupId>
@@ -105,6 +100,15 @@
         </dependency>
 
         <!-- Test dependencies -->
+        <dependency>
+            <!-- Needed for tests to be able to parse test config files -->
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-spring-config</artifactId>
+            <version>${project.version}</version>
+            <!-- provided instead of test so that the test framework doesn't wrongfully assume that this goes in -->
+            <!-- the app classpath, this needs to go into the container classloader -->
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.mule.runtime</groupId>
@@ -131,6 +135,14 @@
             <version>${muleTestComponentsVersion}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <!-- Excluding as it will be resolved with SNAPSHOT version because test-components
+                    is SNAPSHOT to avoid a circular dep within mule and mule-test-artifacts repos -->
+                    <groupId>org.mule.sdk</groupId>
+                    <artifactId>mule-sdk-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>xmlunit</groupId>
@@ -307,6 +319,13 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-football-soap-extension</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-semantic-terms-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>

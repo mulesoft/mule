@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.function;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.api.metadata.DataType.fromType;
@@ -17,10 +18,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.slf4j.LoggerFactory.getLogger;
-import static org.springframework.util.ReflectionUtils.invokeMethod;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.function.FunctionModel;
@@ -33,6 +34,7 @@ import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
@@ -81,11 +83,17 @@ public class ReflectiveExpressionFunctionExecutor implements Lifecycle, Function
 
   @Override
   public Object call(Object[] parameters, BindingContext context) {
-    Thread thread = Thread.currentThread();
+    Thread thread = currentThread();
     ClassLoader currentClassLoader = thread.getContextClassLoader();
     setContextClassLoader(thread, currentClassLoader, extensionClassLoader);
+
+    Object[] target = parametersResolver.apply(parameters);
     try {
-      return invokeMethod(method, componentInstance, parametersResolver.apply(parameters));
+      return method.invoke(componentInstance, target);
+    } catch (InvocationTargetException ex) {
+      throw new MuleRuntimeException(ex.getTargetException());
+    } catch (IllegalAccessException ex) {
+      throw new IllegalStateException("Unexpected reflection exception - " + ex.getClass().getName() + ": " + ex.getMessage());
     } finally {
       setContextClassLoader(thread, extensionClassLoader, currentClassLoader);
     }

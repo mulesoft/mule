@@ -56,14 +56,10 @@ public final class DefaultMuleContextFactory implements MuleContextFactory {
   public MuleContext createMuleContext(final List<ConfigurationBuilder> configurationBuilders,
                                        MuleContextBuilder muleContextBuilder)
       throws InitialisationException, ConfigurationException {
-    return doCreateMuleContext(muleContextBuilder, new ContextConfigurator() {
-
-      @Override
-      public void configure(MuleContext muleContext) throws ConfigurationException {
-        // Configure
-        for (ConfigurationBuilder configBuilder : configurationBuilders) {
-          configBuilder.configure(muleContext);
-        }
+    return doCreateMuleContext(muleContextBuilder, muleContext -> {
+      // Configure
+      for (ConfigurationBuilder configBuilder : configurationBuilders) {
+        configBuilder.configure(muleContext);
       }
     });
   }
@@ -74,13 +70,7 @@ public final class DefaultMuleContextFactory implements MuleContextFactory {
   @Override
   public MuleContext createMuleContext(final ConfigurationBuilder configurationBuilder, MuleContextBuilder muleContextBuilder)
       throws InitialisationException, ConfigurationException {
-    return doCreateMuleContext(muleContextBuilder, new ContextConfigurator() {
-
-      @Override
-      public void configure(MuleContext muleContext) throws ConfigurationException {
-        configurationBuilder.configure(muleContext);
-      }
-    });
+    return doCreateMuleContext(muleContextBuilder, muleContext -> configurationBuilder.configure(muleContext));
   }
 
   // Additional Factory methods provided by this implementation.
@@ -90,12 +80,14 @@ public final class DefaultMuleContextFactory implements MuleContextFactory {
    * either use a default {@link ConfigurationBuilder} to implement this, or do some auto-detection to determine the
    * {@link ConfigurationBuilder} that should be used.
    *
-   * @param resource comma seperated list of configuration resources.
+   * @param resource comma separated list of configuration resources.
    * @throws InitialisationException
    * @throws ConfigurationException
+   * @deprecated Use SpringXmlConfigurationBuilder instead
    */
+  @Deprecated
   public MuleContext createMuleContext(String resource) throws InitialisationException, ConfigurationException {
-    return createMuleContext(resource, null);
+    return createMuleContext(resource, emptyMap());
   }
 
   /**
@@ -103,22 +95,21 @@ public final class DefaultMuleContextFactory implements MuleContextFactory {
    * either use a default {@link ConfigurationBuilder} to implement this, or do some auto-detection to determine the
    * {@link ConfigurationBuilder} that should be used. Properties if provided are used to replace "property placeholder" value in
    * configuration files.
+   *
+   * @deprecated Use SpringXmlConfigurationBuilder instead
    */
+  @Deprecated
   public MuleContext createMuleContext(final String configResources, final Map<String, Object> properties)
       throws InitialisationException, ConfigurationException {
-    return doCreateMuleContext(MuleContextBuilder.builder(APP), new ContextConfigurator() {
-
-      @Override
-      public void configure(MuleContext muleContext) throws ConfigurationException {
-        // Configure with startup properties
-        if (properties != null && !properties.isEmpty()) {
-          new SimpleConfigurationBuilder(properties).configure(muleContext);
-        }
-
-        // Automatically resolve Configuration to be used and delegate configuration
-        // to it.
-        new AutoConfigurationBuilder(configResources, emptyMap(), APP).configure(muleContext);
+    return doCreateMuleContext(MuleContextBuilder.builder(APP), muleContext -> {
+      // Configure with startup properties
+      if (!properties.isEmpty()) {
+        new SimpleConfigurationBuilder(properties).configure(muleContext);
       }
+
+      // Automatically resolve Configuration to be used and delegate configuration
+      // to it.
+      new AutoConfigurationBuilder(configResources, emptyMap(), APP).configure(muleContext);
     });
   }
 
@@ -161,19 +152,15 @@ public final class DefaultMuleContextFactory implements MuleContextFactory {
     // Create MuleContext
     MuleContextBuilder contextBuilder = MuleContextBuilder.builder(APP);
     contextBuilder.setMuleConfiguration(configuration);
-    return doCreateMuleContext(contextBuilder, new ContextConfigurator() {
+    return doCreateMuleContext(contextBuilder, muleContext -> {
+      // Configure with startup properties
+      if (!properties.isEmpty()) {
+        new SimpleConfigurationBuilder(properties).configure(muleContext);
+      }
 
-      @Override
-      public void configure(MuleContext muleContext) throws ConfigurationException {
-        // Configure with startup properties
-        if (properties != null && !properties.isEmpty()) {
-          new SimpleConfigurationBuilder(properties).configure(muleContext);
-        }
-
-        // Configure with configurationBuilder
-        for (ConfigurationBuilder configurationBuilder : configurationBuilders) {
-          configurationBuilder.configure(muleContext);
-        }
+      // Configure with configurationBuilder
+      for (ConfigurationBuilder configurationBuilder : configurationBuilders) {
+        configurationBuilder.configure(muleContext);
       }
     });
   }

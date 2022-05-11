@@ -37,6 +37,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
@@ -47,8 +48,8 @@ import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 
 /**
- * A {@link MetadataTypeVisitor} implementation that creates a {@link ValueResolver} instances
- * depending on a parameter {@link MetadataType}.
+ * A {@link MetadataTypeVisitor} implementation that creates a {@link ValueResolver} instances depending on a parameter
+ * {@link MetadataType}.
  *
  * @since 4.2
  */
@@ -60,16 +61,13 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
 
   private final DslSyntaxResolver dslSyntaxResolver;
   private final Object defaultValue;
-  private final boolean content;
   private final boolean acceptsReferences;
 
   public ValueResolverFactoryTypeVisitor(DslSyntaxResolver dslSyntaxResolver, String parameterName,
-                                         Object value, Object defaultValue, boolean content, boolean acceptsReferences,
-                                         Class<?> expectedClass) {
+                                         Object value, Object defaultValue, boolean acceptsReferences, Class<?> expectedClass) {
     super(parameterName, value, expectedClass);
     this.dslSyntaxResolver = dslSyntaxResolver;
     this.defaultValue = defaultValue;
-    this.content = content;
     this.acceptsReferences = acceptsReferences;
   }
 
@@ -99,7 +97,7 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
     } else {
       valueResolver = acceptsReferences
           ? defaultValueResolverParsingDelegate.parse(getValue().toString(), objectType, null)
-          : new StaticValueResolver<>(getValue(), content);
+          : new StaticValueResolver<>(getValue());
     }
 
     setResolver(valueResolver);
@@ -111,7 +109,7 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
         .map(delegate -> delegate.parse(getValue().toString(), metadataType, null))
         .orElseGet(() -> acceptsReferences
             ? defaultValueResolverParsingDelegate.parse(getValue().toString(), metadataType, null)
-            : new TypeSafeValueResolverWrapper(new StaticValueResolver<>(getValue(), content), getExpectedClass()));
+            : new TypeSafeValueResolverWrapper(new StaticValueResolver<>(getValue()), getExpectedClass()));
 
     setResolver(delegateResolver);
   }
@@ -124,7 +122,7 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
 
     if (value == null) {
       if (defaultValue == null) {
-        return new StaticValueResolver<>(null, content);
+        return new StaticValueResolver<>(null);
       }
 
       value = defaultValue;
@@ -150,6 +148,9 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(dateTime.toDate());
         constructedValue = calendar;
+      } else if (type.equals(ZonedDateTime.class)) {
+        Instant instant = ofEpochMilli(dateTime.getMillis());
+        constructedValue = ZonedDateTime.ofInstant(instant, ZoneId.of(dateTime.getZone().getID()));
       }
 
       if (constructedValue == null) {
@@ -160,8 +161,8 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
       }
     }
 
-    if (value instanceof Date || value instanceof LocalDate || value instanceof LocalDateTime || value instanceof Calendar) {
-      return new StaticValueResolver<>(value, content);
+    if (hasValidType(value)) {
+      return new StaticValueResolver<>(value);
     }
 
     throw new IllegalArgumentException(format("Could not transform value of type '%s' to a valid date type",
@@ -174,5 +175,10 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
     } catch (DateTimeParseException e) {
       throw new IllegalArgumentException(format("Could not parse value '%s' according to ISO 8601", value));
     }
+  }
+
+  private boolean hasValidType(Object value) {
+    return value instanceof Date || value instanceof LocalDate || value instanceof LocalDateTime
+        || value instanceof Calendar || value instanceof ZonedDateTime;
   }
 }

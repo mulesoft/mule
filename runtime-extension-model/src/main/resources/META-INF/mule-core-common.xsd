@@ -49,7 +49,7 @@
     <xsd:element name="mule" type="muleType">
         <xsd:annotation>
             <xsd:documentation>
-                Either the root element of a Mule configuration, or a "top-level" element in a Spring configuration that contains further Mule elements.
+                The root element of a Mule configuration.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -756,6 +756,13 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             An optional reference to an ObjectSerializer to be used as the application's default
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="correlationIdGeneratorExpression" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The default correlation id generation expression for every source. This must be DataWeave expression.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -1583,57 +1590,6 @@
     <xsd:complexType name="abstractSecurityFilterType">
         <xsd:complexContent>
             <xsd:extension base="abstractMessageProcessorType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="username-password-filter" type="usernamePasswordFilterType" substitutionGroup="abstract-security-filter">
-        <xsd:annotation>
-            <xsd:documentation>
-                Authenticates a message based on username and password expressions.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="usernamePasswordFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractSecurityFilterType">
-                <xsd:attribute name="username" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            A Mule expression which extracts the username from the message. Defaults to #[mel:message.inboundProperties.username].
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="password" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            A Mule expression which extracts the password from the message. Defaults to #[mel:message.inboundProperties.password].
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="custom-security-filter" type="customSecurityFilterType" substitutionGroup="abstract-security-filter">
-        <xsd:annotation>
-            <xsd:documentation>
-                Allows developers to configure custom security filters
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="customSecurityFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractSecurityFilterType">
-                <xsd:attribute name="ref" type="xsd:string" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The name of the security filter to use.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -2526,7 +2482,7 @@
     <xsd:element name="until-successful" substitutionGroup="abstract-routing-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Attempts to route a message to the message processor it contains in an asynchronous manner.
+                Attempts to route a message to its inner chain in a synchronous manner.
                 Routing is considered successful if no error has been raised and, optionally, if the response matches an expression
             </xsd:documentation>
         </xsd:annotation>
@@ -2567,11 +2523,19 @@
             <xsd:complexContent>
                 <xsd:extension base="abstractRoutingMessageProcessorType">
                     <xsd:sequence>
+                        <xsd:element ref="abstract-fork-join-strategy" minOccurs="0" maxOccurs="1">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    Strategy that determines how multiple routes should be processed and how their results are aggregated.
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
                         <xsd:element ref="route" minOccurs="2" maxOccurs="unbounded"/>
                         <xsd:element ref="abstract-fork-join-strategy" minOccurs="0" maxOccurs="1">
                             <xsd:annotation>
                                 <xsd:documentation>
                                     Strategy that determines how multiple routes should be processed and how their results are aggregated.
+                                    @Deprecated since 4.4. Use the element before the routes for consistency with routers created with the SDK.
                                 </xsd:documentation>
                             </xsd:annotation>
                         </xsd:element>

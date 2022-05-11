@@ -32,8 +32,8 @@ public final class AddVariablePropertyConfigurator
    * Configures the common parameters of every transformer.
    *
    * @param propVarSetterInstance the transformar instance
-   * @param parameters the set of parameters configured in the component model according to the
-   *        {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}
+   * @param parameters            the set of parameters configured in the component model according to the
+   *                              {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}
    */
   @Override
   public void configure(AbstractAddVariablePropertyProcessor propVarSetterInstance, Map<String, Object> parameters) {

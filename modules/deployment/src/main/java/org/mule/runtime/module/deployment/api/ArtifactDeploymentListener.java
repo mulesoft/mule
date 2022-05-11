@@ -23,7 +23,7 @@ public interface ArtifactDeploymentListener {
   /**
    * Notifies that a deploy for a given artifact has started.
    *
-   * @param type the artifact type
+   * @param type         the artifact type
    * @param artifactName the name of the artifact being deployed
    */
   default void onDeploymentStart(ArtifactType type, String artifactName) {
@@ -33,7 +33,7 @@ public interface ArtifactDeploymentListener {
   /**
    * Notifies that a deploy for a given artifact has successfully finished.
    *
-   * @param type the artifact type
+   * @param type         the artifact type
    * @param artifactName the name of the artifact being deployed
    */
   default void onDeploymentSuccess(ArtifactType type, String artifactName) {
@@ -43,9 +43,9 @@ public interface ArtifactDeploymentListener {
   /**
    * Notifies that a deploy for a given artifact has finished with a failure.
    *
-   * @param type the artifact type
+   * @param type         the artifact type
    * @param artifactName the name of the artifact being deployed
-   * @param cause the cause of the failure
+   * @param cause        the cause of the failure
    */
   default void onDeploymentFailure(ArtifactType type, String artifactName, Throwable cause) {
 
@@ -54,9 +54,9 @@ public interface ArtifactDeploymentListener {
   /**
    * Notifies that an un-deployment for a given artifact has started.
    *
-   * @param type the artifact type
+   * @param type         the artifact type
    * @param artifactName the name of the artifact being un-deployed
-   * @param type the artifact type
+   * @param type         the artifact type
    */
   default void onUndeploymentStart(ArtifactType type, String artifactName) {
 
@@ -65,7 +65,7 @@ public interface ArtifactDeploymentListener {
   /**
    * Notifies that an un-deployment for a given artifact has successfully finished.
    *
-   * @param type the artifact type
+   * @param type         the artifact type
    * @param artifactName the name of the artifact being un-deployed
    */
   default void onUndeploymentSuccess(ArtifactType type, String artifactName) {
@@ -75,9 +75,9 @@ public interface ArtifactDeploymentListener {
   /**
    * Notifies that an un-deployment for a given artifact has finished with a failure.
    *
-   * @param type the artifact type
+   * @param type         the artifact type
    * @param artifactName the name of the artifact being un-deployed
-   * @param cause the cause of the failure
+   * @param cause        the cause of the failure
    */
   default void onUndeploymentFailure(ArtifactType type, String artifactName, Throwable cause) {
 
@@ -86,8 +86,8 @@ public interface ArtifactDeploymentListener {
   /**
    * Notifies the artifact creation for a given artifact.
    *
-   * @param type the artifact type
-   * @param artifactName name of the application that owns the mule context
+   * @param type                 the artifact type
+   * @param artifactName         name of the application that owns the mule context
    * @param customizationService customization service for server plugins
    */
   default void onArtifactCreated(ArtifactType type, String artifactName, CustomizationService customizationService) {
@@ -97,9 +97,9 @@ public interface ArtifactDeploymentListener {
   /**
    * Notifies the artifact initialisation for a given artifact.
    *
-   * @param type the artifact type
+   * @param type         the artifact type
    * @param artifactName name of the application that owns the mule context
-   * @param registry mule registry for the application being deployed
+   * @param registry     mule registry for the application being deployed
    */
   default void onArtifactInitialised(ArtifactType type, String artifactName, Registry registry) {
 

@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.security;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
+
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
@@ -62,12 +63,8 @@ public class MuleSecurityManagerConfigurator extends AbstractComponentFactory<Se
     }
 
     securityManagers.stream().forEach(securityManager -> {
-      providers.stream().forEach(provider -> {
-        securityManager.addProvider(provider);
-      });
-      encryptionStrategies.stream().forEach(encryptionStrategy -> {
-        securityManager.addEncryptionStrategy(encryptionStrategy);
-      });
+      providers.stream().forEach(provider -> securityManager.addProvider(provider));
+      encryptionStrategies.stream().forEach(encryptionStrategy -> securityManager.addEncryptionStrategy(encryptionStrategy));
     });
 
     return factorySecurityManager;

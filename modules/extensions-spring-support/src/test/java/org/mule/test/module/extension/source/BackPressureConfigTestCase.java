@@ -12,6 +12,9 @@ import static org.mule.runtime.api.component.location.Location.builderFromString
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
+import static org.mule.test.allure.AllureConstants.ExecutionEngineFeature.ExecutionEngineStory.BACKPRESSURE;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
@@ -19,11 +22,16 @@ import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(SOURCES)
+@Story(BACKPRESSURE)
 public class BackPressureConfigTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "heisenberg-backpressure-config.xml";
+    return "source/heisenberg-backpressure-config.xml";
   }
 
   @Override
@@ -42,8 +50,8 @@ public class BackPressureConfigTestCase extends AbstractExtensionFunctionalTestC
   }
 
   @Test
-  public void defaultCase() {
-    assertStrategy("defaultCase", WAIT);
+  public void inheritDefaultFromParentSourceClass() {
+    assertStrategy("defaultCase", FAIL);
   }
 
   private void assertStrategy(String flowName, BackPressureStrategy expected) {

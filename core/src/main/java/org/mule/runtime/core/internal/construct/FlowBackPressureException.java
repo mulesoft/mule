@@ -21,7 +21,6 @@ import java.util.concurrent.RejectedExecutionException;
  */
 public abstract class FlowBackPressureException extends MuleException {
 
-  static final String BACK_PRESSURE_ERROR_MESSAGE = "Flow '%s' is unable to accept new events at this time. Reason: %s";
   private static final long serialVersionUID = -4973370165925845336L;
 
   private final Component flow;
@@ -44,17 +43,27 @@ public abstract class FlowBackPressureException extends MuleException {
     this.flow = flow;
   }
 
+  /**
+   * @return An instance of the right type of {@link FlowBackPressureException} according to the given {@link BackPressureReason}.
+   */
+  public static FlowBackPressureException createFlowBackPressureException(Component flow, BackPressureReason reason) {
+    return createFlowBackPressureException(flow, reason, null);
+  }
+
+  /**
+   * @return An instance of the right type of {@link FlowBackPressureException} according to the given {@link BackPressureReason}.
+   */
   public static FlowBackPressureException createFlowBackPressureException(Component flow, BackPressureReason reason,
                                                                           Throwable cause) {
     switch (reason) {
       case MAX_CONCURRENCY_EXCEEDED:
-        return new FlowBackPressureMaxConcurrencyExceededException(flow, reason, cause);
+        return new FlowBackPressureMaxConcurrencyExceededException(flow, cause);
       case REQUIRED_SCHEDULER_BUSY:
-        return new FlowBackPressureRequiredSchedulerBusyException(flow, reason, cause);
+        return new FlowBackPressureRequiredSchedulerBusyException(flow, cause);
       case REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER:
-        return new FlowBackPressureRequiredSchedulerBusyWithFullBufferException(flow, reason, cause);
+        return new FlowBackPressureRequiredSchedulerBusyWithFullBufferException(flow, cause);
       case EVENTS_ACCUMULATED:
-        return new FlowBackPressureEventsAccumulatedException(flow, reason, cause);
+        return new FlowBackPressureEventsAccumulatedException(flow, cause);
       default:
         throw new IllegalArgumentException("Cannot build a FlowBackPressureException with a cause without a reason");
     }

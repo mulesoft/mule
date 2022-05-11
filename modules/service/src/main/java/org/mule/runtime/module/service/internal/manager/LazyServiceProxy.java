@@ -16,12 +16,15 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.slf4j.LoggerFactory.getLogger;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.core.internal.util.DefaultMethodInvoker;
@@ -40,8 +43,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 
 /**
- * A {@link Service} proxy which allows to defer the actual load and creation of the service until the first invokation of
- * one of its contract methods. Lifecycle will also be applied lazily.
+ * A {@link Service} proxy which allows to defer the actual load and creation of the service until the first invokation of one of
+ * its contract methods. Lifecycle will also be applied lazily.
  * <p>
  * Use in tandem with the {@link LazyServiceAssembly} for a truly lazy effect.
  *
@@ -66,8 +69,8 @@ public class LazyServiceProxy implements InvocationHandler {
    * @param serviceRegistry the {@link ServiceRegistry}
    * @return a new {@link Service} proxy
    */
-  public static Service from(ServiceAssembly assembly, ServiceRegistry serviceRegistry) {
-    return proxy(assembly, new LazyServiceProxy(assembly, serviceRegistry));
+  public static Service from(ServiceAssembly assembly, ServiceRegistry serviceRegistry, Injector containerInjector) {
+    return proxy(assembly, new LazyServiceProxy(assembly, serviceRegistry, containerInjector));
   }
 
   private static Service proxy(ServiceAssembly assembly, InvocationHandler handler) {
@@ -77,10 +80,10 @@ public class LazyServiceProxy implements InvocationHandler {
                                       handler);
   }
 
-  protected LazyServiceProxy(ServiceAssembly assembly, ServiceRegistry serviceRegistry) {
+  protected LazyServiceProxy(ServiceAssembly assembly, ServiceRegistry serviceRegistry, Injector containerInjector) {
     this.assembly = assembly;
     this.serviceRegistry = serviceRegistry;
-    this.service = new LazyValue<>(createService());
+    this.service = new LazyValue<>(createService(containerInjector));
   }
 
   protected LazyServiceProxy(ServiceAssembly assembly,
@@ -92,8 +95,7 @@ public class LazyServiceProxy implements InvocationHandler {
   }
 
   /**
-   * Creates a new proxy {@link Service} equivalent to this one, but to be used in the context of a deployed
-   * application.
+   * Creates a new proxy {@link Service} equivalent to this one, but to be used in the context of a deployed application.
    *
    * @param methodInvoker The {@link MethodInvoker} to use
    * @return a new application specific proxy
@@ -126,23 +128,25 @@ public class LazyServiceProxy implements InvocationHandler {
     this.methodInvoker = methodInvoker;
   }
 
-  private CheckedSupplier<Service> createService() {
+  private CheckedSupplier<Service> createService(Injector containerInjector) {
     return () -> {
-      Service service = withServiceClassLoader(() -> instantiateService());
+      Service serviceInstance = withServiceClassLoader(() -> instantiateService(containerInjector));
       if (started.compareAndSet(false, true)) {
-        doStart(service);
+        doStart(serviceInstance);
         stopped.set(false);
       }
-      return service;
+      return serviceInstance;
     };
   }
 
-  private Service instantiateService() throws ServiceResolutionError {
+  private Service instantiateService(Injector containerInjector) throws ServiceResolutionError, MuleException {
     ServiceProvider provider = assembly.getServiceProvider();
     serviceRegistry.inject(provider);
-    Service service = provider.getServiceDefinition().getService();
-
-    return service;
+    Service serviceInstance = provider.getServiceDefinition().getService();
+    if (containerInjector != null) {
+      containerInjector.inject(serviceInstance);
+    }
+    return serviceInstance;
   }
 
   protected synchronized Object handleStart() {

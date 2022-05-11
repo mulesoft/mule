@@ -6,7 +6,15 @@
  */
 package org.mule.runtime.core.api;
 
+import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
+import static org.mule.runtime.core.internal.exception.MessagingException.PAYLOAD_INFO_KEY;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+
 import static java.util.Optional.empty;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -19,12 +27,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
-import static org.mule.runtime.core.internal.exception.MessagingException.PAYLOAD_INFO_KEY;
-import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -48,18 +50,20 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.SocketException;
 
-import org.hamcrest.core.Is;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.hamcrest.core.Is;
+
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.mockito.stubbing.Answer;
 
-@RunWith(MockitoJUnitRunner.class)
 @SmallTest
 public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
 
@@ -69,6 +73,9 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   private boolean originalVerboseExceptions;
 
   private final MessagingExceptionLocationProvider locationProvider = new MessagingExceptionLocationProvider();
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock
   private MuleContext mockContext;

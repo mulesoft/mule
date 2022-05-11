@@ -18,8 +18,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * {@link TypeKeysResolver} implementation which resolves automatically {@link MetadataKey}s for boolean based
- * MetadataKey Id parameters.
+ * {@link TypeKeysResolver} implementation which resolves automatically {@link MetadataKey}s for boolean based MetadataKey Id
+ * parameters.
  * </p>
  * This resolver will only return the possible values of a boolean: {@code true} and {@code false}
  *

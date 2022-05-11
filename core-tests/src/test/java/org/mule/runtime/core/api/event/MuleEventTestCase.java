@@ -7,7 +7,9 @@
 package org.mule.runtime.core.api.event;
 
 import static java.util.Collections.singletonMap;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertArrayEquals;
@@ -16,6 +18,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 import static org.mule.test.allure.AllureConstants.MuleEvent.MULE_EVENT;
 
@@ -32,6 +35,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.security.DefaultSecurityContextFactory;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -40,17 +44,18 @@ import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 
 @Feature(MULE_EVENT)
@@ -58,6 +63,11 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
+
+  @Before
+  public void setUp() {
+    currentMuleContext.set(muleContext);
+  }
 
   @After
   public void teardown() {
@@ -131,7 +141,6 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     }
     PrivilegedEvent testEvent = this.<PrivilegedEvent.Builder>getEventBuilder()
         .message(of(new ByteArrayInputStream(payload.toString().getBytes()))).build();
-    currentMuleContext.set(muleContext);
     byte[] serializedEvent = muleContext.getObjectSerializer().getExternalProtocol().serialize(testEvent);
     testEvent = muleContext.getObjectSerializer().getExternalProtocol().deserialize(serializedEvent);
 
@@ -139,19 +148,21 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   }
 
   private void createAndRegisterTransformersEndpointBuilderService() throws Exception {
+    TransformersRegistry transformersRegistry =
+        ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(TransformersRegistry.class);
+
     Transformer trans1 = new TestEventTransformer();
     trans1.setName("OptimusPrime");
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(trans1);
+    transformersRegistry.registerTransformer(trans1);
 
     Transformer trans2 = new TestEventTransformer();
     trans2.setName("Bumblebee");
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(trans2);
+    transformersRegistry.registerTransformer(trans2);
 
     List<Transformer> transformers = new ArrayList<>();
     transformers.add(trans1);
     transformers.add(trans2);
   }
-
 
   @Test
   public void testFlowVarNamesAddImmutable() throws Exception {
@@ -259,6 +270,112 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     TypedValue<?> actual = newEvent.getVariables().get(key);
     assertThat(actual.getValue(), is(value));
   }
+
+  @Test
+  public void setParameters() throws Exception {
+    Map<String, Object> parameters = testParameterValues();
+    CoreEvent event = getEventBuilder()
+        .message(of(""))
+        .parameters(parameters)
+        .build();
+
+    assertTypedValueMap(parameters, event.getParameters());
+  }
+
+  @Test
+  public void modifyParameters() throws Exception {
+    Map<String, Object> parameters = testParameterValues();
+    CoreEvent event = getEventBuilder()
+        .message(of(""))
+        .parameters(parameters)
+        .build();
+
+    Map<String, Object> mutatedParams = new HashMap<>(parameters);
+    mutatedParams.put("I'm", "a new entry");
+
+    CoreEvent eventCopy = CoreEvent.builder(event)
+        .parameters(mutatedParams)
+        .build();
+
+    assertThat(event.getParameters(), is(not(sameInstance(eventCopy.getParameters()))));
+    assertTypedValueMap(parameters, event.getParameters());
+    assertTypedValueMap(mutatedParams, eventCopy.getParameters());
+  }
+
+  @Test
+  public void clearParameters() throws Exception {
+    Map<String, Object> parameters = testParameterValues();
+    CoreEvent event = getEventBuilder()
+        .message(of(""))
+        .parameters(parameters)
+        .build();
+
+    assertTypedValueMap(parameters, event.getParameters());
+    CoreEvent eventCopy = CoreEvent.builder(event)
+        .clearParameters()
+        .build();
+
+    assertTypedValueMap(parameters, event.getParameters());
+    assertThat(eventCopy.getParameters().isEmpty(), is(true));
+  }
+
+  @Test
+  public void parametersKeptInCopies() throws Exception {
+    Map<String, Object> parameters = testParameterValues();
+    CoreEvent event = getEventBuilder()
+        .message(of(""))
+        .parameters(parameters)
+        .build();
+
+    assertTypedValueMap(parameters, event.getParameters());
+    CoreEvent eventCopy = CoreEvent.builder(event)
+        .message(Message.of("I'm a copy"))
+        .build();
+
+    assertThat(event.getParameters(), is(sameInstance(eventCopy.getParameters())));
+  }
+
+  @Test
+  public void parametersAreImmutable() throws Exception {
+    CoreEvent event = getEventBuilder()
+        .message(of(""))
+        .parameters(testParameterValues())
+        .build();
+
+    expectedException.expect(UnsupportedOperationException.class);
+    event.getParameters().put("a new param", new TypedValue<>("value", STRING));
+  }
+
+  @Test
+  public void typedValueParametersPreserved() throws Exception {
+    Map<String, TypedValue<?>> typedValueMap = new HashMap<>();
+    testParameterValues().forEach((k, v) -> typedValueMap.put(k, new TypedValue<>(v, STRING)));
+
+    CoreEvent event = getEventBuilder()
+        .message(of(""))
+        .parameters(typedValueMap)
+        .build();
+
+    event.getParameters().forEach((k, v) -> assertThat(v, is(sameInstance(typedValueMap.get(k)))));
+  }
+
+  private Map<String, Object> testParameterValues() {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("param1", "value1");
+    parameters.put("param2", "value2");
+
+    return parameters;
+  }
+
+  private void assertTypedValueMap(Map<String, Object> expected, Map<String, TypedValue<?>> actual) {
+    assertThat(actual.size(), is(expected.size()));
+    expected.forEach((k, v) -> {
+      TypedValue<?> value = actual.get(k);
+      assertThat(value, is(notNullValue()));
+      assertThat(value.getValue(), equalTo(v));
+    });
+  }
+
 
   @Test
   public void securityContextCopy() throws Exception {

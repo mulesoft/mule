@@ -67,6 +67,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     return child(parent, componentLocation, NullExceptionHandler.getInstance());
   }
 
+  public static BaseEventContext child(BaseEventContext parent, Optional<ComponentLocation> componentLocation,
+                                       final String correlationId) {
+    return child(parent, componentLocation, NullExceptionHandler.getInstance(), correlationId);
+  }
+
   /**
    * Builds a new child execution context from a parent context. A child context delegates all getters to the parent context but
    * has it's own completion lifecycle. Completion of the child context will not cause the parent context to complete. This is
@@ -80,8 +85,13 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    */
   public static BaseEventContext child(BaseEventContext parent, Optional<ComponentLocation> componentLocation,
                                        FlowExceptionHandler exceptionHandler) {
-    BaseEventContext child =
-        new ChildEventContext(parent, componentLocation.orElse(null), exceptionHandler, parent.getDepthLevel() + 1);
+    return child(parent, componentLocation, exceptionHandler, null);
+  }
+
+  public static BaseEventContext child(BaseEventContext parent, Optional<ComponentLocation> componentLocation,
+                                       FlowExceptionHandler exceptionHandler, final String correlationId) {
+    BaseEventContext child = new ChildEventContext(parent, componentLocation.orElse(null), exceptionHandler,
+                                                   parent.getDepthLevel() + 1, correlationId);
     if (parent instanceof AbstractEventContext) {
       ((AbstractEventContext) parent).addChildContext(child);
     }
@@ -96,13 +106,18 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   private final String serverId;
   private final ComponentLocation location;
 
-  private final ProcessingTime processingTime;
+  private ProcessingTime processingTime;
 
   private transient EventStreamingState streamingState;
 
   @Override
   public String getId() {
     return id;
+  }
+
+  @Override
+  public String getRootId() {
+    return getRootContext().getCorrelationId();
   }
 
   @Override
@@ -160,8 +175,8 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    *
    * @param flow               the flow that processes events of this context.
    * @param location           the location of the component that received the first message for this context.
-   * @param correlationId      the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of this
-   *                           context, if available.
+   * @param correlationId      the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of
+   *                           this context, if available.
    * @param externalCompletion future that completes when source completes enabling termination of {@link BaseEventContext} to
    *                           depend on completion of source.
    */
@@ -186,11 +201,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * Builds a new execution context with the given parameters.
    *
    * @param flow               the flow that processes events of this context.
-   * @param exceptionHandler   the exception handler that will deal with an error context. This will be used instead of the one from
-   *                           the given {@code flow}
+   * @param exceptionHandler   the exception handler that will deal with an error context. This will be used instead of the one
+   *                           from the given {@code flow}
    * @param location           the location of the component that received the first message for this context.
-   * @param correlationId      the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of this
-   *                           context, if available.
+   * @param correlationId      the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of
+   *                           this context, if available.
    * @param externalCompletion future that completes when source completes enabling termination of {@link BaseEventContext} to
    *                           depend on completion of source.
    */
@@ -217,8 +232,8 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @param id                 the unique id for this event context.
    * @param serverId           the id of the running mule server
    * @param location           the location of the component that received the first message for this context.
-   * @param correlationId      the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of this
-   *                           context, if available.
+   * @param correlationId      the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of
+   *                           this context, if available.
    * @param externalCompletion future that completes when source completes enabling termination of {@link BaseEventContext} to
    *                           depend on completion of source.
    */
@@ -230,14 +245,14 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   /**
    * Builds a new execution context with the given parameters.
    *
-   * @param id the unique id for this event context.
-   * @param serverId the id of the running mule server
-   * @param location the location of the component that received the first message for this context.
-   * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of this
-   *        context, if available.
+   * @param id                 the unique id for this event context.
+   * @param serverId           the id of the running mule server
+   * @param location           the location of the component that received the first message for this context.
+   * @param correlationId      the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of
+   *                           this context, if available.
    * @param externalCompletion future that completes when source completes enabling termination of {@link BaseEventContext} to
-   *        depend on completion of source.
-   * @param exceptionHandler the exception handler that will deal with an error context
+   *                           depend on completion of source.
+   * @param exceptionHandler   the exception handler that will deal with an error context
    *
    * @deprecated since 4.3.0, use {@link #DefaultEventContext(String, String, ComponentLocation, String, Optional)} instead and
    *             rely on the provided {@code processor} to do the error handling.
@@ -264,11 +279,10 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   }
 
   /**
-   * Tracks the given {@code provider} as one owned by this event. Upon completion of this context,
-   * the {@code provider} will be automatically closed and its resources freed.
+   * Tracks the given {@code provider} as one owned by this event. Upon completion of this context, the {@code provider} will be
+   * automatically closed and its resources freed.
    * <p>
-   * Consumers of this method <b>MUST</b> discard the passed {@code provider} and continue using the returned one
-   * instead.
+   * Consumers of this method <b>MUST</b> discard the passed {@code provider} and continue using the returned one instead.
    *
    * @param provider    a {@link CursorStreamProvider}
    * @param ghostBuster the {@link StreamingGhostBuster}
@@ -311,9 +325,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     private final BaseEventContext parent;
     private final ComponentLocation componentLocation;
     private final String id;
+    private final String correlationId;
+    private final String rootId;
 
     private ChildEventContext(BaseEventContext parent, ComponentLocation componentLocation,
-                              FlowExceptionHandler messagingExceptionHandler, int depthLevel) {
+                              FlowExceptionHandler messagingExceptionHandler, int depthLevel, final String correlationId) {
       super(messagingExceptionHandler, depthLevel, empty());
       this.flowCallStack = parent.getFlowCallStack().clone();
       this.root = parent.getRootContext();
@@ -322,6 +338,13 @@ public final class DefaultEventContext extends AbstractEventContext implements S
       this.id = parent.getId() != null
           ? parent.getId().concat("_").concat(Integer.toString(identityHashCode(this)))
           : Integer.toString(identityHashCode(this));
+      this.correlationId = correlationId != null ? correlationId : parent.getCorrelationId();
+      this.rootId = root.getRootId();
+    }
+
+    private ChildEventContext(BaseEventContext parent, ComponentLocation componentLocation,
+                              FlowExceptionHandler messagingExceptionHandler, int depthLevel) {
+      this(parent, componentLocation, messagingExceptionHandler, depthLevel, null);
     }
 
     @Override
@@ -330,8 +353,13 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     }
 
     @Override
+    public String getRootId() {
+      return this.rootId;
+    }
+
+    @Override
     public String getCorrelationId() {
-      return parent.getCorrelationId();
+      return correlationId;
     }
 
     @Override

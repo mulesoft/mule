@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.config.internal.processor;
 
-import java.beans.PropertyDescriptor;
+import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 
-import org.mule.runtime.config.internal.OptionalObjectsController;
+import java.beans.PropertyDescriptor;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
@@ -21,6 +21,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
  *
  * @since 3.7.0
  */
+// TODO W-10736276 Remove this
 public class DiscardedOptionalBeanPostProcessor implements InstantiationAwareBeanPostProcessor {
 
   private final OptionalObjectsController optionalObjectsController;

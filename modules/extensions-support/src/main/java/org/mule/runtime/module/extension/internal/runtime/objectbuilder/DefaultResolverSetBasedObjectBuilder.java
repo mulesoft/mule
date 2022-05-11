@@ -16,8 +16,8 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 /**
- * Default implementation of {@link ResolverSetBasedObjectBuilder} which uses reflection
- * and a default constructor to instantiate the generated objects
+ * Default implementation of {@link ResolverSetBasedObjectBuilder} which uses reflection and a default constructor to instantiate
+ * the generated objects
  *
  * @param <T> the generic type of the produced objects
  * @since 4.0

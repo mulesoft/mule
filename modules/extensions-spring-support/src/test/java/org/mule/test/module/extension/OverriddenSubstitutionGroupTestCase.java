@@ -20,7 +20,7 @@ public class OverriddenSubstitutionGroupTestCase extends AbstractExtensionFuncti
 
   @Test
   public void testSchemaIsCorrectlyGenerated() throws Exception {
-    //If not exception is because the schema generation is ok
+    // If not exception is because the schema generation is ok
     try {
       flowRunner("doNothing").run();
     } catch (Exception e) {

@@ -29,7 +29,7 @@ public interface ComponentAnnotations {
    * Updates the {@link Component} root container name.
    *
    * @param rootContainerName the root container name of the object.
-   * @param component the {@link Component} to update.
+   * @param component         the {@link Component} to update.
    */
   static void updateRootContainerName(String rootContainerName, Component component) {
     Map<QName, Object> previousAnnotations = new HashMap<>(component.getAnnotations());

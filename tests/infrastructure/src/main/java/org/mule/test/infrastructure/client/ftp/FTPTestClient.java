@@ -102,7 +102,7 @@ public class FTPTestClient {
   /**
    * Upload a file to the ftp server
    *
-   * @param path the path to write in
+   * @param path    the path to write in
    * @param content the file's content
    * @return true if successful, false if not
    * @throws IOException
@@ -114,7 +114,7 @@ public class FTPTestClient {
   /**
    * Upload a file to the ftp server
    *
-   * @param path the path to write in
+   * @param path    the path to write in
    * @param content the file's binary content
    * @return true if successful, false if not
    * @throws IOException

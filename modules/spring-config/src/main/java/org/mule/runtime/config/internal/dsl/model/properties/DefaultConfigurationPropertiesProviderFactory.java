@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.dsl.model.properties;
 
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -40,9 +41,9 @@ public final class DefaultConfigurationPropertiesProviderFactory implements Conf
   public ConfigurationPropertiesProvider createProvider(ComponentAst providerElementDeclaration,
                                                         UnaryOperator<String> localResolver,
                                                         ResourceProvider externalResourceProvider) {
-    String file = requireNonNull(providerElementDeclaration.getParameter("file").getResolvedRawValue(),
+    String file = requireNonNull(providerElementDeclaration.getParameter(DEFAULT_GROUP_NAME, "file").getResolvedRawValue(),
                                  "Required attribute 'file' of 'configuration-properties' not found");
-    final ComponentParameterAst encodingParam = providerElementDeclaration.getParameter("encoding");
+    final ComponentParameterAst encodingParam = providerElementDeclaration.getParameter(DEFAULT_GROUP_NAME, "encoding");
     String encoding = encodingParam != null ? encodingParam.getResolvedRawValue() : null;
     return new DefaultConfigurationPropertiesProvider(file, encoding, externalResourceProvider);
   }

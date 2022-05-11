@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor.getInfrastructureType;
+import static org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureTypeResolver.getInfrastructureType;
 import static org.springframework.core.ResolvableType.forField;
 
 import org.mule.metadata.api.ClassTypeLoader;

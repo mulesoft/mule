@@ -73,8 +73,8 @@ public final class ExpiryMonitor implements Runnable, Disposable {
    * Adds an expirable object to monitor. If the Object is already being monitored it will be reset and the millisecond timeout
    * will be ignored
    *
-   * @param value the expiry value
-   * @param timeUnit The time unit of the Expiry value
+   * @param value     the expiry value
+   * @param timeUnit  The time unit of the Expiry value
    * @param expirable the object that will expire
    */
   public void addExpirable(long value, TimeUnit timeUnit, Expirable expirable) {

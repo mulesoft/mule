@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 
 import static java.util.Optional.empty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.isLazyInitMode;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 
@@ -20,6 +19,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -71,7 +71,11 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
           .filter(component -> component instanceof NestedChainModel)
           .findFirst()
           .ifPresent(chain -> parameters.put(chain.getName(),
-                                             new ProcessorChainValueResolver(nestedChain)));
+                                             new ProcessorChainValueResolver(registry.lookupByType(StreamingManager.class).get(),
+                                                                             nestedChain)));
+
+      // For MULE-18771 we need access to the chain's location to create a new event and sdk context
+      nestedChain.setAnnotations(this.getAnnotations());
     } else {
       nestedChain = null;
     }
@@ -81,7 +85,6 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
         .setParameters(parameters)
         .setTarget(target)
         .setTargetValue(targetValue)
-        .setLazyMode(isLazyInitMode(properties))
         .setCursorProviderFactory(cursorProviderFactory)
         .setRetryPolicyTemplate(retryPolicyTemplate)
         .setNestedChain(nestedChain)

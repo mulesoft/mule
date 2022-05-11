@@ -7,17 +7,25 @@
 
 package org.mule.runtime.module.artifact.api.descriptor;
 
-import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
+import static com.google.common.base.Preconditions.checkState;
+
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
+
+import java.util.Map;
 import java.util.Optional;
 
 /**
  * Describes a bundle by its Maven coordinates.
  */
-public final class BundleDescriptor {
+public final class BundleDescriptor implements ArtifactCoordinates {
+
+  public static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
 
   private static final String STRINGARTIFACT_FILENAME_SEPARATOR = "-";
   private String groupId;
@@ -28,12 +36,16 @@ public final class BundleDescriptor {
   private Optional<String> classifier = empty();
   private volatile String artifactFileName;
 
+  private Map<String, Object> metadata = emptyMap();
+
   private BundleDescriptor() {}
 
+  @Override
   public String getGroupId() {
     return this.groupId;
   }
 
+  @Override
   public String getArtifactId() {
     return this.artifactId;
   }
@@ -42,6 +54,7 @@ public final class BundleDescriptor {
     return baseVersion;
   }
 
+  @Override
   public String getVersion() {
     return this.version;
   }
@@ -55,7 +68,16 @@ public final class BundleDescriptor {
   }
 
   public boolean isPlugin() {
-    return classifier.map(classifier -> classifier.equals("mule-plugin")).orElse(false);
+    return classifier.map(classifier -> classifier.equals(MULE_PLUGIN_CLASSIFIER)).orElse(false);
+  }
+
+  /**
+   * @return any metadata associated the bundle.
+   * 
+   * @since 4.5
+   */
+  public Map<String, Object> getMetadata() {
+    return metadata;
   }
 
   @Override
@@ -144,7 +166,7 @@ public final class BundleDescriptor {
     private static final String CLASSIFIER = "classifier";
     private static final String REQUIRED_FIELD_NOT_FOUND_TEMPLATE = "bundle cannot be created with null or empty %s";
 
-    private BundleDescriptor bundleDependency = new BundleDescriptor();
+    private final BundleDescriptor bundleDependency = new BundleDescriptor();
 
     /**
      * @param groupId the group id of the bundle. Cannot be null or empty.
@@ -210,6 +232,17 @@ public final class BundleDescriptor {
      */
     public BundleDescriptor.Builder setClassifier(String classifier) {
       bundleDependency.classifier = ofNullable(classifier);
+      return this;
+    }
+
+    /**
+     * Sets the metadata associated the bundle.
+     *
+     * @param metadata metadata associated the bundle. Cannot be null
+     * @return the builder
+     */
+    public BundleDescriptor.Builder setMetadata(Map<String, Object> metadata) {
+      bundleDependency.metadata = requireNonNull(metadata);
       return this;
     }
 

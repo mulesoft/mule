@@ -14,6 +14,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.source.CronSchedulerConfiguration;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.util.TimeZone;
@@ -39,6 +40,7 @@ public final class CronScheduler extends PeriodicScheduler implements CronSchedu
   private String expression;
 
   @Parameter
+  @Optional
   @Expression(NOT_SUPPORTED)
   private String timeZone;
 

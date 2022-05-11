@@ -65,7 +65,7 @@ public class DynamicPort extends SystemProperty {
    * Creates a dynamic port resource for a given port name.
    *
    * @param name the name assigned to the port number. On resource creation a new system property will be created with that name
-   *        and the value will be the port number.
+   *             and the value will be the port number.
    */
   public DynamicPort(String name) {
     super(name);

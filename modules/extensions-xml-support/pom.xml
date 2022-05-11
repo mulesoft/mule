@@ -6,7 +6,7 @@
     <parent>
         <artifactId>mule-modules</artifactId>
         <groupId>org.mule.runtime</groupId>
-        <version>4.4.0-SNAPSHOT</version>
+        <version>4.5.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-extensions-xml-support</artifactId>
     <name>Mule Extensions XML Support</name>
@@ -30,22 +30,25 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-metadata-model-catalog</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-extensions-api</artifactId>
         </dependency>
         <dependency>
-            <!-- TODO(fernandezlautaro): MULE-11009 needed dependency as we heavily rely  org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory to generate an ExtensionModel from a Describer -->
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-extensions-support</artifactId>
+            <artifactId>mule-artifact-ast-xml-parser</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-extensions-spring-support</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <!-- TODO(fernandezlautaro): MULE-9646 + MULE-9637 needed dependency as we heavily rely on org.mule.runtime.config.api.dsl.model.ComponentModel and org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationParser to make templating work -->
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-spring-config</artifactId>
+            <artifactId>mule-module-properties-config</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-artifact-activation</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -62,6 +65,16 @@
         </dependency>
 
         <!--Test Dependencies-->
+        <dependency>
+            <!-- Needed for tests to be able to parse test config files -->
+            <!-- Also required for ApplicationModelAstPostProcessor -->
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-spring-config</artifactId>
+            <version>${project.version}</version>
+            <!-- provided instead of test so that the test framework doesn't wrongfully assume that this goes in -->
+            <!-- the app classpath, this needs to go into the container classloader -->
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
@@ -91,6 +104,20 @@
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-unit</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-extensions-support</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-extensions-spring-support</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -177,11 +204,6 @@
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_3.0_spec</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-extensions-spring-support</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <!--TODO: MULE-10837-->
         <dependency>

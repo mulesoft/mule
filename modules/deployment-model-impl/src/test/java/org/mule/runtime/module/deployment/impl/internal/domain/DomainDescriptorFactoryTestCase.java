@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
-import static java.util.Optional.empty;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
+import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import static java.util.Optional.empty;
+
+import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepositoryFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
+import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DeployableArtifactDescriptorFactoryTestCase;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
-import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 
 import java.io.File;
@@ -62,7 +64,9 @@ public class DomainDescriptorFactoryTestCase
 
   @Override
   protected DomainDescriptorFactory createDeployableDescriptorFactory() {
-    return new DomainDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
+    return new DomainDescriptorFactory(new ArtifactPluginDescriptorLoader(artifactDescriptorFactoryProvider()
+        .createArtifactPluginDescriptorFactory(new DescriptorLoaderRepositoryFactory().createDescriptorLoaderRepository(),
+                                               ArtifactDescriptorValidatorBuilder.builder())),
                                        createDescriptorLoaderRepository(), ArtifactDescriptorValidatorBuilder.builder());
   }
 }

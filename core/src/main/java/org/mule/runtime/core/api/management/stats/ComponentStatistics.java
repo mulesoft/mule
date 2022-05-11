@@ -139,9 +139,9 @@ public class ComponentStatistics implements Statistics {
   /**
    * Add a new execution-time measurement for one branch of processing an event.
    * 
-   * @param first true if this is the first branch for this event
+   * @param first  true if this is the first branch for this event
    * @param branch the time to execute this branch
-   * @param total the total time (so far) for processing this event
+   * @param total  the total time (so far) for processing this event
    */
   public synchronized void addExecutionBranchTime(boolean first, long branch, long total) {
     // TODO MULE-9151 - ComponentStatistics should really create distinct Event

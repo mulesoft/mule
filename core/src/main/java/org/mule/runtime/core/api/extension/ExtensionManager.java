@@ -41,16 +41,14 @@ public interface ExtensionManager {
   void registerExtension(ExtensionModel extensionModel);
 
   /**
-   * Returns an immutable {@link Set} listing all the discovered
-   * {@link ExtensionModel extensionModels}.
+   * Returns an immutable {@link Set} listing all the discovered {@link ExtensionModel extensionModels}.
    *
    * @return an immutable {@link Set}. Will not be {@code null} but might be empty
    */
   Set<ExtensionModel> getExtensions();
 
   /**
-   * Returns an {@link Optional} {@link ExtensionModel} which
-   * name equals {@code extensionName}.
+   * Returns an {@link Optional} {@link ExtensionModel} which name equals {@code extensionName}.
    *
    * @param extensionName the name of the extensions you want.
    * @return an {@link Optional}. It will be empty if no such extension is registered
@@ -74,8 +72,8 @@ public interface ExtensionManager {
   ConfigurationInstance getConfiguration(String configurationProviderName, CoreEvent event);
 
   /**
-   * Delegates into {@link #getConfigurationProvider(ExtensionModel, ComponentModel, CoreEvent)} to locate a suitable provider
-   * and uses the given {@code muleEvent} to obtain a {@link ConfigurationInstance} out of it.
+   * Delegates into {@link #getConfigurationProvider(ExtensionModel, ComponentModel, CoreEvent)} to locate a suitable provider and
+   * uses the given {@code muleEvent} to obtain a {@link ConfigurationInstance} out of it.
    * <p>
    * By the mere fact of this configuration being returned, the value of {@link ConfigurationStats#getLastUsedMillis()} will be
    * updated for the returned {@link ConfigurationInstance}
@@ -93,8 +91,7 @@ public interface ExtensionManager {
   /**
    * Returns an optional {@link ConfigurationProvider} for the given {@code extensionModel} and {@code componentModel}.
    * <p>
-   * Because no {@link ConfigurationProvider} is specified, the following algorithm will be applied to
-   * try and determine the
+   * Because no {@link ConfigurationProvider} is specified, the following algorithm will be applied to try and determine the
    * instance to be returned:
    * <ul>
    * <li>If <b>one</b> (and only one) {@link ConfigurationProvider} is registered, capable of handing configurations of the given

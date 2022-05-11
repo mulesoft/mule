@@ -13,8 +13,8 @@ import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 /**
  * Allows to get notified about certain events related to Platform Managed OAuth tokens
  * <p>
- * Platform Managed OAuth is an experimental feature. It will only be enabled on selected environments and scenarios. Backwards compatibility is
- * not guaranteed.
+ * Platform Managed OAuth is an experimental feature. It will only be enabled on selected environments and scenarios. Backwards
+ * compatibility is not guaranteed.
  *
  * @since 4.3.0
  */

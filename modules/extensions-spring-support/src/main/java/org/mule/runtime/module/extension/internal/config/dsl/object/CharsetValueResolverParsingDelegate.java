@@ -32,9 +32,9 @@ public class CharsetValueResolverParsingDelegate implements ValueResolverParsing
   }
 
   /**
-   * @param key the parsed entity key
+   * @param key          the parsed entity key
    * @param metadataType a {@link MetadataType}
-   * @param elementDsl the {@link DslElementSyntax} of the parsed element
+   * @param elementDsl   the {@link DslElementSyntax} of the parsed element
    * @return A {@link ValueResolver} which resolves to the {@link Charset} corresponding with the given {@code key}
    */
   @Override

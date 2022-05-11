@@ -98,6 +98,13 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
     assertExpected(new StaticValueResolver(null), toMetadataType(DynamicPojoWithMap.class), false, pojo);
   }
 
+  @Test
+  public void testNullSafeSdkAndLegacyAnnotation() throws Exception {
+    PojoUsingSdkApiAndLegacyApi pojo = new PojoUsingSdkApiAndLegacyApi();
+    pojo.setParameters(new ASimplePojo(), new ASimplePojo());
+    assertExpected(new StaticValueResolver(null), toMetadataType(PojoUsingSdkApiAndLegacyApi.class), false, pojo);
+  }
+
   private void assertExpected(ValueResolver valueResolver, MetadataType type, boolean isDynamic, Object expected)
       throws Exception {
     ValueResolver resolver = NullSafeValueResolverWrapper.of(valueResolver, type, reflectionCache, expressionManager,
@@ -210,6 +217,61 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
     @Override
     public int hashCode() {
       return Objects.hash(staticDefaultValue);
+    }
+  }
+
+  public static class PojoUsingSdkApiAndLegacyApi {
+
+    public PojoUsingSdkApiAndLegacyApi() {}
+
+    @Parameter
+    @Optional
+    @NullSafe
+    private ASimplePojo parameter1;
+
+    @Parameter
+    @Optional
+    @org.mule.sdk.api.annotation.param.NullSafe
+    private ASimplePojo parameter2;
+
+    public void setParameters(ASimplePojo parameter1, ASimplePojo parameter2) {
+      this.parameter1 = parameter1;
+      this.parameter2 = parameter2;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (o instanceof PojoUsingSdkApiAndLegacyApi) {
+        PojoUsingSdkApiAndLegacyApi that = (PojoUsingSdkApiAndLegacyApi) o;
+        return Objects.equals(parameter1, that.parameter1) && Objects.equals(parameter2, that.parameter2);
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(parameter1, parameter2);
+    }
+  }
+
+  public static class ASimplePojo {
+
+    public String parameter = "parameter";
+
+    public ASimplePojo() {}
+
+    @Override
+    public boolean equals(Object o) {
+      if (o instanceof ASimplePojo) {
+        ASimplePojo that = (ASimplePojo) o;
+        return Objects.equals(this.parameter, that.parameter);
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(parameter);
     }
   }
 }

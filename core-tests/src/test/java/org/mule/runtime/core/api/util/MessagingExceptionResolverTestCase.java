@@ -16,18 +16,17 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.exception.MuleExceptionInfo.INFO_CAUSED_BY_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider.getCoreErrorTypeRepo;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
+import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.api.message.Error;
@@ -35,13 +34,11 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ExceptionMapper;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory;
-import org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.connector.DispatchException;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
@@ -57,6 +54,9 @@ import javax.xml.namespace.QName;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 
 @SmallTest
 @Feature(ERROR_HANDLING)
@@ -77,8 +77,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   private final MuleFatalException FATAL_EXCEPTION = new MuleFatalException(createStaticMessage("CRITICAL!!!!!!"));
   private final java.lang.Error ERROR = new java.lang.Error("AN ERROR");
 
-  private final ErrorTypeRepository repository = ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository();
-  private final ErrorTypeLocator locator = ErrorTypeLocatorFactory.createDefaultErrorTypeLocator(repository);
+  private final ErrorTypeLocator locator = createDefaultErrorTypeLocator(getCoreErrorTypeRepo());
 
   private final ErrorType UNKNOWN = locator.lookupErrorType(Exception.class);
   private final ErrorType FATAL = locator.lookupErrorType(FATAL_EXCEPTION.getClass());
@@ -187,7 +186,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   @Test
   public void resolveCorrectConnectionException() {
     ErrorType expected = ErrorTypeBuilder.builder().namespace("NS").identifier("CONNECTION").parentErrorType(CONNECTION).build();
-    ErrorTypeLocator locator = ErrorTypeLocator.builder(repository)
+    ErrorTypeLocator locator = ErrorTypeLocator.builder(getCoreErrorTypeRepo())
         .addComponentExceptionMapper(ci, ExceptionMapper.builder()
             .addExceptionMapping(ConnectionException.class, expected)
             .build())

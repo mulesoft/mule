@@ -8,6 +8,7 @@ package org.mule.runtime.core.privileged.processor;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.EMPTY_LIST;
+import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -16,8 +17,8 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.isA;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -28,7 +29,9 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_WITH_CHILD_CONTEXT;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContextDontPropagateErrors;
@@ -41,12 +44,18 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextBlocking;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.TypedComponentIdentifier;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.component.location.LocationPart;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -101,6 +110,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   private Flow flow;
   private Publisher<CoreEvent> responsePublisher;
 
+  private Processor chain;
+
   @Before
   public void setup() throws MuleException {
     flow = mock(Flow.class, RETURNS_DEEP_STUBS);
@@ -116,6 +127,13 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     if (flow != null) {
       flow.stop();
       flow.dispose();
+    }
+
+    if (chain != null) {
+      stopIfNeeded(chain);
+      disposeIfNeeded(chain, getLogger(getClass()));
+
+      chain = null;
     }
   }
 
@@ -144,7 +162,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void processToApplyMapInChain() throws Exception {
-    assertThat(processToApply(input, createChain(map)), is(output));
+    chain = createChain(map);
+    assertThat(processToApply(input, chain), is(output));
     assertThat(from(responsePublisher).toFuture().isDone(), is(false));
   }
 
@@ -162,7 +181,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void processToApplyAckAndStopInChain() throws Exception {
-    assertThat(processToApply(input, createChain(ackAndStop)), is(nullValue()));
+    chain = createChain(ackAndStop);
+    assertThat(processToApply(input, chain), is(nullValue()));
     assertThat(from(responsePublisher).block(), is(nullValue()));
   }
 
@@ -180,7 +200,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void processToApplyRespondAndStopInChain() throws Exception {
-    assertThat(processToApply(input, createChain(respondAndStop)), is(response));
+    chain = createChain(respondAndStop);
+    assertThat(processToApply(input, chain), is(response));
     assertThat(from(responsePublisher).block(), is(response));
   }
 
@@ -198,7 +219,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void processToApplyAckAndMapInChain() throws Exception {
-    assertThat(processToApply(input, createChain(ackAndMap)), is(output));
+    chain = createChain(ackAndMap);
+    assertThat(processToApply(input, chain), is(output));
     assertThat(from(responsePublisher).block(), is(nullValue()));
   }
 
@@ -216,7 +238,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void processToApplyRespondAndMapInChain() throws Exception {
-    assertThat(processToApply(input, createChain(respondAndMap)), is(output));
+    chain = createChain(respondAndMap);
+    assertThat(processToApply(input, chain), is(output));
     assertThat(from(responsePublisher).block(), is(response));
   }
 
@@ -298,8 +321,9 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void processWithChildContextBlockingErrorInChainRegainsParentContext() throws Exception {
+    chain = createChain(error);
     try {
-      processWithChildContextBlocking(input, createChain(error), Optional.empty());
+      processWithChildContextBlocking(input, chain, Optional.empty());
       fail("Exception expected");
     } catch (Throwable t) {
       assertThat(t, is(instanceOf(MessagingException.class)));
@@ -312,7 +336,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   @Issue("MULE-16892")
   public void processWithChildContextErrorInChainMantainsChildContext() throws Exception {
     Reference<EventContext> contextReference = new Reference<>();
-    from(processWithChildContext(input, createChain(error), Optional.empty()))
+    chain = createChain(error);
+    from(processWithChildContext(input, chain, Optional.empty()))
         .doOnError(e -> {
           if (e instanceof MessagingException) {
             contextReference.set(((MessagingException) e).getEvent().getContext());
@@ -364,6 +389,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     final DefaultFlowCallStack inputFlowCallStack = (DefaultFlowCallStack) input.getFlowCallStack();
     Reference<DefaultFlowCallStack> childFlowCallStack = new Reference<>();
 
+    chain = createChain(error);
+
     try {
       parentStack.stream().forEachOrdered(inputFlowCallStack::push);
 
@@ -380,7 +407,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
       from(applyWithChildContextDontPropagateErrors(
                                                     applyWithChildContextDontPropagateErrors(just(input), childWithStack,
                                                                                              Optional.empty()),
-                                                    createChain(error), Optional.empty())).subscribe();
+                                                    chain, Optional.empty())).subscribe();
     } finally {
       assertThat(childFlowCallStack.get(), is(not(nullValue())));
       assertThat(inputFlowCallStack.getElements(), is(childFlowCallStack.get().getElements()));
@@ -391,7 +418,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   @Issue("MULE-16892")
   public void processWithChildContextDontCompleteErrorInChainRegainsParentContext() throws Exception {
     Reference<EventContext> contextReference = new Reference<>();
-    from(processWithChildContextDontComplete(input, createChain(error), Optional.empty()))
+    chain = createChain(error);
+    from(processWithChildContextDontComplete(input, chain, Optional.empty()))
         .doOnError(e -> {
           if (e instanceof MessagingException) {
             contextReference.set(((MessagingException) e).getEvent().getContext());
@@ -409,7 +437,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   public void applyWithChildContextErrorInChainRegainsParentContext() throws Exception {
     Reference<EventContext> contextReference = new Reference<>();
 
-    Processor errorProcessor = createChain(error);
+    chain = createChain(error);
+    Processor errorProcessor = chain;
     just(input).transform(inputPub -> from(applyWithChildContext(inputPub, errorProcessor, Optional.empty()))
         .doOnError(e -> {
           if (e instanceof MessagingException) {
@@ -428,7 +457,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
     ((DefaultFlowCallStack) input.getFlowCallStack()).push(new FlowStackElement("flow", "processor"));
 
-    Processor errorProcessor = createChain(error);
+    chain = createChain(error);
+    Processor errorProcessor = chain;
     just(input).transform(inputPub -> from(applyWithChildContextDontPropagateErrors(inputPub, errorProcessor, Optional.empty()))
         .doOnError(e -> {
           if (e instanceof MessagingException) {
@@ -443,7 +473,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void processWithChildContextBlockingSuccessInChainRegainsParentContext() throws Exception {
-    CoreEvent event = processWithChildContextBlocking(input, createChain(map), Optional.empty());
+    chain = createChain(map);
+    CoreEvent event = processWithChildContextBlocking(input, chain, Optional.empty());
     assertThat(event.getContext(), sameInstance(input.getContext()));
   }
 
@@ -668,8 +699,9 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void processToApplyErrorInChain() throws Exception {
+    chain = createChain(error);
     try {
-      processToApply(input, createChain(error));
+      processToApply(input, chain);
       fail("Exception expected");
     } catch (Throwable t) {
       assertThat(t, is(instanceOf(MessagingException.class)));
@@ -708,7 +740,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void processMapInChain() throws Exception {
-    assertThat(from(MessageProcessors.process(input, createChain(map))).block(), is(output));
+    chain = createChain(map);
+    assertThat(from(MessageProcessors.process(input, chain)).block(), is(output));
     assertThat(from(responsePublisher).toFuture().get(), equalTo(output));
   }
 
@@ -726,7 +759,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void processAckAndStopInChain() throws Exception {
-    assertThat(from(MessageProcessors.process(input, createChain(ackAndStop))).block(), is(nullValue()));
+    chain = createChain(ackAndStop);
+    assertThat(from(MessageProcessors.process(input, chain)).block(), is(nullValue()));
     assertThat(from(responsePublisher).block(), is(nullValue()));
   }
 
@@ -744,7 +778,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void processRespondAndStopInChain() throws Exception {
-    assertThat(from(MessageProcessors.process(input, createChain(respondAndStop))).block(), is(response));
+    chain = createChain(respondAndStop);
+    assertThat(from(MessageProcessors.process(input, chain)).block(), is(response));
     assertThat(from(responsePublisher).block(), is(response));
   }
 
@@ -763,7 +798,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void processAckAndMapInChain() throws Exception {
-    assertThat(from(MessageProcessors.process(input, createChain(ackAndMap))).block(), is(output));
+    chain = createChain(ackAndMap);
+    assertThat(from(MessageProcessors.process(input, chain)).block(), is(output));
     assertThat(from(responsePublisher).block(), is(nullValue()));
   }
 
@@ -781,7 +817,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void processRespondAndMapInChain() throws Exception {
-    assertThat(from(MessageProcessors.process(input, createChain(respondAndMap))).block(), is(output));
+    chain = createChain(respondAndMap);
+    assertThat(from(MessageProcessors.process(input, chain)).block(), is(output));
     assertThat(from(responsePublisher).block(), is(response));
   }
 
@@ -806,8 +843,9 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void processErrorInChain() throws Exception {
+    chain = createChain(error);
     try {
-      from(MessageProcessors.process(input, createChain(error))).block();
+      from(MessageProcessors.process(input, chain)).block();
       fail("Exception expected");
     } catch (Throwable t) {
       assertThat(t.getCause(), is(instanceOf(MessagingException.class)));
@@ -880,6 +918,37 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     when(locator.find(location)).thenReturn(Optional.of(policy));
 
     assertThat(getProcessingStrategy(locator, location).get(), sameInstance(ps));
+  }
+
+  @Test
+  @Issue("MULE-19924")
+  public void processingStrategyFromFlowWhenComponentInTopLevelScope() {
+    final ProcessingStrategy ps = mock(ProcessingStrategy.class);
+
+    // The Flow acting as root container will return the processing strategy
+    final Flow flow = mock(DefaultFlow.class);
+    when(flow.getProcessingStrategy()).thenReturn(ps);
+
+    final Location rootContainerLocation = Location.builderFromStringRepresentation("myFlow").build();
+
+    // When the locator is requested to find the root container location, it finds the Flow
+    final ConfigurationComponentLocator locator = mock(ConfigurationComponentLocator.class);
+    when(locator.find(rootContainerLocation)).thenReturn(Optional.of(flow));
+
+    // A ComponentLocation that has a Scope as top level
+    final TypedComponentIdentifier typedComponentIdentifier = mock(TypedComponentIdentifier.class);
+    when(typedComponentIdentifier.getType()).thenReturn(TypedComponentIdentifier.ComponentType.SCOPE);
+    final LocationPart locationPart = mock(LocationPart.class);
+    when(locationPart.getPartIdentifier()).thenReturn(Optional.of(typedComponentIdentifier));
+    final ComponentLocation componentLocation = mock(ComponentLocation.class);
+    when(componentLocation.getParts()).thenReturn(singletonList(locationPart));
+
+    // Any component that has the Flow as root container but a scope as top level (i.e.: subflow)
+    final Component nestedComponent = mock(AbstractComponent.class);
+    when(nestedComponent.getRootContainerLocation()).thenReturn(rootContainerLocation);
+    when(nestedComponent.getLocation()).thenReturn(componentLocation);
+
+    assertThat(getProcessingStrategy(locator, nestedComponent), is(Optional.of(ps)));
   }
 
   private Processor createChain(ReactiveProcessor processor) throws InitialisationException {

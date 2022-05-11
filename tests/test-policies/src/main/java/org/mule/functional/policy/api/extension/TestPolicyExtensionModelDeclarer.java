@@ -8,17 +8,15 @@ package org.mule.functional.policy.api.extension;
 
 import static org.mule.functional.policy.api.TestPolicyXmlNamespaceInfoProvider.TEST_POLICY_NAMESPACE;
 import static org.mule.functional.policy.api.TestPolicyXmlNamespaceInfoProvider.TEST_POLICY_PREFIX;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.Category.SELECT;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.ANY_TYPE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
 
-import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
-import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
@@ -32,8 +30,6 @@ import org.mule.runtime.module.extension.api.loader.java.property.CustomLocation
 class TestPolicyExtensionModelDeclarer {
 
   public ExtensionDeclarer createExtensionModel() {
-    final BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JavaTypeLoader.JAVA);
-
     ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer()
         .named(TEST_POLICY_PREFIX)
         .describedAs("Mule Runtime and Integration Platform: test Policy components")
@@ -49,13 +45,14 @@ class TestPolicyExtensionModelDeclarer {
             .setSchemaLocation(buildSchemaLocation(TEST_POLICY_PREFIX, TEST_POLICY_NAMESPACE))
             .build());
 
-    declareProxy(typeBuilder, extensionDeclarer);
+    declareProxy(extensionDeclarer);
     declareExecuteNext(extensionDeclarer);
+    declareCustomProcessor(extensionDeclarer);
 
     return extensionDeclarer;
   }
 
-  private void declareProxy(final BaseTypeBuilder typeBuilder, ExtensionDeclarer extensionDeclarer) {
+  private void declareProxy(ExtensionDeclarer extensionDeclarer) {
     final ConstructDeclarer proxyDeclarer = extensionDeclarer.withConstruct("proxy")
         .allowingTopLevelDefinition();
 
@@ -64,21 +61,21 @@ class TestPolicyExtensionModelDeclarer {
         .withRequiredParameter("name")
         .describedAs("The name used to identify this policy.")
         .asComponentId()
-        .ofType(typeBuilder.stringType().build());
+        .ofType(STRING_TYPE);
 
-    final NestedRouteDeclarer sourceDeclarer = proxyDeclarer
+    proxyDeclarer
         .withRoute("source")
-        .withModelProperty(new CustomLocationPartModelProperty("source", false));
+        .withMinOccurs(0)
+        .withModelProperty(new CustomLocationPartModelProperty("source", false))
+        .withChain();
 
-    sourceDeclarer.withChain();
-
-    final NestedRouteDeclarer operationDeclarer = proxyDeclarer
+    proxyDeclarer
         .withRoute("operation")
-        .withModelProperty(new CustomLocationPartModelProperty("operation", false));
-
-    operationDeclarer.withChain();
+        .withMinOccurs(1)
+        .withMaxOccurs(1)
+        .withModelProperty(new CustomLocationPartModelProperty("operation", false))
+        .withChain();
   }
-
 
   private void declareExecuteNext(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer executeNext = extensionDeclarer
@@ -87,8 +84,18 @@ class TestPolicyExtensionModelDeclarer {
 
     // By this operation alone we cannot determine what its output will be, it will depend on the context on which this operation
     // is located.
-    executeNext.withOutput().ofType(BaseTypeBuilder.create(JAVA).anyType().build());
-    executeNext.withOutputAttributes().ofType(BaseTypeBuilder.create(JAVA).anyType().build());
+    executeNext.withOutput().ofType(ANY_TYPE);
+    executeNext.withOutputAttributes().ofType(ANY_TYPE);
   }
 
+  private void declareCustomProcessor(ExtensionDeclarer extensionDeclarer) {
+    OperationDeclarer executeNext = extensionDeclarer
+        .withOperation("customProcessor")
+        .withModelProperty(new NoErrorMappingModelProperty());
+
+    executeNext.withOutput().ofType(ANY_TYPE);
+    executeNext.withOutputAttributes().ofType(ANY_TYPE);
+
+    executeNext.onDefaultParameterGroup().withRequiredParameter("class").ofType(STRING_TYPE);
+  }
 }

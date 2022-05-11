@@ -33,7 +33,8 @@ public class ReconnectionOperations {
   public static volatile int getPageCalls = 0;
 
   /**
-   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
+   * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the
+   * payload.
    */
   public void switchConnection() {
     fail = !fail;

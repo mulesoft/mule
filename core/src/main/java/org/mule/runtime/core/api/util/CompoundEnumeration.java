@@ -39,6 +39,7 @@ public class CompoundEnumeration<E> implements Enumeration<E> {
 
   /**
    * Checks if the enumeration has more elements.
+   * 
    * @return true if there are still elements, false otherwise.
    */
   public boolean hasMoreElements() {
@@ -47,6 +48,7 @@ public class CompoundEnumeration<E> implements Enumeration<E> {
 
   /**
    * Returns the next element in the {@link CompoundEnumeration}
+   * 
    * @return <E>
    */
   public E nextElement() {

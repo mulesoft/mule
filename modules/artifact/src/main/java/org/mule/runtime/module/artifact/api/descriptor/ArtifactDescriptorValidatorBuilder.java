@@ -16,8 +16,8 @@ import com.google.common.collect.ImmutableList;
 import java.util.function.Supplier;
 
 /**
- * Builder that allows to create a {@link ArtifactDescriptorValidator} with different aspects:
- * from checking minMuleVersion to checking the artifact version format.
+ * Builder that allows to create a {@link ArtifactDescriptorValidator} with different aspects: from checking minMuleVersion to
+ * checking the artifact version format.
  *
  * @since 4.1
  */
@@ -44,8 +44,8 @@ public final class ArtifactDescriptorValidatorBuilder {
   }
 
   /**
-   * Sets a validation for minMuleVersion, {@link ArtifactDescriptor} created should defined the current Mule Runtime
-   * version as minMuleVersion or a prior version.
+   * Sets a validation for minMuleVersion, {@link ArtifactDescriptor} created should defined the current Mule Runtime version as
+   * minMuleVersion or a prior version.
    *
    * @return this
    */
@@ -55,8 +55,8 @@ public final class ArtifactDescriptorValidatorBuilder {
   }
 
   /**
-   * Sets a validation for minMuleVersion as {@link #validateMinMuleVersion()} but the Mule Runtime version could
-   * be provided as a supplier. Used by Tooling.
+   * Sets a validation for minMuleVersion as {@link #validateMinMuleVersion()} but the Mule Runtime version could be provided as a
+   * supplier. Used by Tooling.
    *
    * @return this
    */
@@ -67,8 +67,8 @@ public final class ArtifactDescriptorValidatorBuilder {
   }
 
   /**
-   * Sets a validation for minMuleVersion as {@link #validateMinMuleVersion()} but the validation should only consider
-   * semantic version when checking the minMuleVersion vs Mule Runtime version.
+   * Sets a validation for minMuleVersion as {@link #validateMinMuleVersion()} but the validation should only consider semantic
+   * version when checking the minMuleVersion vs Mule Runtime version.
    *
    * @return this
    */
@@ -79,7 +79,8 @@ public final class ArtifactDescriptorValidatorBuilder {
   }
 
   /**
-   * Sets a validation for Mule product, {@link ArtifactDescriptor} should match {@link org.mule.runtime.api.deployment.meta.Product}.
+   * Sets a validation for Mule product, {@link ArtifactDescriptor} should match
+   * {@link org.mule.runtime.api.deployment.meta.Product}.
    *
    * @return this
    */

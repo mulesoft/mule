@@ -6,28 +6,23 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
+import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 import org.mule.runtime.core.internal.util.journal.queue.XaQueueTxJournalEntry;
 import org.mule.runtime.core.internal.util.journal.queue.XaTxQueueTransactionJournal;
-import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.transaction.xa.Xid;
 
-import org.apache.commons.collections.Closure;
-import org.apache.commons.collections.CollectionUtils;
-
 /**
- * Implementation of {@link XaQueueTransactionContext} for persistent queues using XA
- * transactions
+ * Implementation of {@link XaQueueTransactionContext} for persistent queues using XA transactions
  */
 public class PersistentXaTransactionContext implements XaQueueTransactionContext {
 
   private final XaTxQueueTransactionJournal transactionJournal;
   private final QueueProvider queueProvider;
-  private Xid xid;
+  private final Xid xid;
 
   public PersistentXaTransactionContext(XaTxQueueTransactionJournal simpleTxQueueTransactionJournal, QueueProvider queueProvider,
                                         Xid xid) {
@@ -36,21 +31,25 @@ public class PersistentXaTransactionContext implements XaQueueTransactionContext
     this.xid = xid;
   }
 
+  @Override
   public boolean offer(QueueStore queue, Serializable item, long offerTimeout) throws InterruptedException {
     this.transactionJournal.logAdd(xid, queue, item);
     return true;
   }
 
+  @Override
   public void untake(QueueStore queue, Serializable item) throws InterruptedException {
     this.transactionJournal.logAddFirst(xid, queue, item);
   }
 
+  @Override
   public void clear(QueueStore queue) throws InterruptedException {
     synchronized (queue) {
       while (poll(queue, 100) != null);
     }
   }
 
+  @Override
   public Serializable poll(QueueStore queue, long pollTimeout) throws InterruptedException {
     synchronized (queue) {
       Serializable value = queue.poll(pollTimeout);
@@ -61,22 +60,19 @@ public class PersistentXaTransactionContext implements XaQueueTransactionContext
     }
   }
 
+  @Override
   public Serializable peek(QueueStore queue) throws InterruptedException {
     return queue.peek();
   }
 
+  @Override
   public int size(QueueStore queue) {
-    final AtomicInteger addSize = new AtomicInteger(0);
-    CollectionUtils.forAllDo(this.transactionJournal.getLogEntriesForTx(xid), new Closure() {
+    int addSize = (int) this.transactionJournal.getLogEntriesForTx(xid)
+        .stream()
+        .filter(value -> value.isAdd() || value.isAddFirst())
+        .count();
 
-      @Override
-      public void execute(Object value) {
-        if (((XaQueueTxJournalEntry) value).isAdd() || ((XaQueueTxJournalEntry) value).isAddFirst()) {
-          addSize.incrementAndGet();
-        }
-      }
-    });
-    return queue.getSize() + addSize.get();
+    return queue.getSize() + addSize;
   }
 
   @Override

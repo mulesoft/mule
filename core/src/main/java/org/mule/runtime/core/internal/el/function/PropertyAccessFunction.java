@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.core.internal.el.function;
 
+import static org.mule.runtime.api.metadata.DataType.STRING;
+
 import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
-import static org.mule.runtime.api.metadata.DataType.STRING;
+
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
@@ -26,11 +28,7 @@ import java.util.Optional;
  */
 public class PropertyAccessFunction implements ExpressionFunction {
 
-  private ConfigurationProperties configurationProperties;
-
-  public PropertyAccessFunction(ConfigurationProperties configurationProperties) {
-    this.configurationProperties = configurationProperties;
-  }
+  private volatile ConfigurationProperties configurationProperties;
 
   @Override
   public Object call(Object[] parameters, BindingContext context) {
@@ -48,4 +46,7 @@ public class PropertyAccessFunction implements ExpressionFunction {
     return singletonList(new FunctionParameter("name", STRING));
   }
 
+  public void setConfigurationProperties(ConfigurationProperties configurationProperties) {
+    this.configurationProperties = configurationProperties;
+  }
 }

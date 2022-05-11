@@ -36,8 +36,8 @@ import java.util.Objects;
 public class ClientCredentialsOAuthHandler extends OAuthHandler<ClientCredentialsOAuthDancer> {
 
   /**
-   * Becomes aware of the given {@code config} and makes sure that the access token callback
-   * and authorization endpoints are provisioned.
+   * Becomes aware of the given {@code config} and makes sure that the access token callback and authorization endpoints are
+   * provisioned.
    *
    * @param config an {@link ClientCredentialsConfig}
    */
@@ -69,8 +69,8 @@ public class ClientCredentialsOAuthHandler extends OAuthHandler<ClientCredential
   }
 
   /**
-   * Retrieves the {@link ResourceOwnerOAuthContext} for the given {@code config}. If no such context yet exists,
-   * then it performs the OAuth authorization and returns the resulting context.
+   * Retrieves the {@link ResourceOwnerOAuthContext} for the given {@code config}. If no such context yet exists, then it performs
+   * the OAuth authorization and returns the resulting context.
    *
    * @param config a {@link ClientCredentialsConfig}
    * @return the {@link ResourceOwnerOAuthContext} for the given {@code config}.

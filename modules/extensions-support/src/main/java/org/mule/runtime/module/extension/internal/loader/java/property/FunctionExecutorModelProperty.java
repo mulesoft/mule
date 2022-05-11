@@ -11,9 +11,8 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.module.extension.internal.runtime.function.FunctionExecutorFactory;
 
 /**
- * A {@link ModelProperty} meant to be used on {@link OperationModel operation models},
- * which provides access to a {@link FunctionExecutorFactory} used to execute such
- * operation
+ * A {@link ModelProperty} meant to be used on {@link OperationModel operation models}, which provides access to a
+ * {@link FunctionExecutorFactory} used to execute such operation
  *
  * @since 4.0
  */

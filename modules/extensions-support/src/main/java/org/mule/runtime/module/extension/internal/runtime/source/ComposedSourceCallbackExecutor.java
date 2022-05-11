@@ -17,8 +17,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 
 /**
- * A {@link SourceCallbackExecutor} that allows chain the execution of two
- * delegating {@link SourceCallbackExecutor}s.
+ * A {@link SourceCallbackExecutor} that allows chain the execution of two delegating {@link SourceCallbackExecutor}s.
  *
  * @since 4.1
  */

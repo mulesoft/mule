@@ -6,33 +6,39 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static org.mockito.Mockito.mock;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
+import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 
+import static org.mockito.Mockito.mock;
+
+import org.mule.runtime.api.deployment.meta.MulePluginModel;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil;
 import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
-import org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory;
-import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
-import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
+import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepositoryFactory;
+import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
+import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilderFactory;
+import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
+import org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver;
+import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
-import org.mule.runtime.module.artifact.api.classloader.TrackingArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
-import org.mule.runtime.module.deployment.impl.internal.application.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.TestApplicationWrapper;
+import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultArtifactDescriptorFactoryProvider;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
-import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
-import org.mule.runtime.module.deployment.impl.internal.plugin.BundlePluginDependenciesResolver;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,31 +71,33 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
           serviceRepository, extensionModelLoaderRepository, classLoaderRepository, policyTemplateClassLoaderBuilderFactory,
           pluginDependenciesResolver, artifactPluginDescriptorLoader,
           discoverLicenseValidator(TestApplicationFactory.class.getClassLoader()),
-          RuntimeLockFactoryUtil.getRuntimeLockFactory());
+          RuntimeLockFactoryUtil.getRuntimeLockFactory(),
+          mock(MemoryManagementService.class),
+          serializedAstWithFallbackArtifactConfigurationProcessor());
   }
 
-  public static TestApplicationFactory createTestApplicationFactory(MuleApplicationClassLoaderFactory applicationClassLoaderFactory,
-                                                                    DomainManager domainManager,
+  public static TestApplicationFactory createTestApplicationFactory(DomainManager domainManager,
                                                                     ServiceRepository serviceRepository,
                                                                     ExtensionModelLoaderRepository extensionModelLoaderRepository,
                                                                     ModuleRepository moduleRepository,
                                                                     DescriptorLoaderRepository descriptorLoaderRepository) {
-    ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory =
-        new ArtifactPluginDescriptorFactory();
+    AbstractArtifactDescriptorFactory<MulePluginModel, ArtifactPluginDescriptor> artifactPluginDescriptorFactory =
+        artifactDescriptorFactoryProvider()
+            .createArtifactPluginDescriptorFactory(new DescriptorLoaderRepositoryFactory().createDescriptorLoaderRepository(),
+                                                   ArtifactDescriptorValidatorBuilder.builder());
     ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader =
         new ArtifactPluginDescriptorLoader(artifactPluginDescriptorFactory);
     ApplicationDescriptorFactory applicationDescriptorFactory =
         new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
                                          ArtifactDescriptorValidatorBuilder.builder());
     final DefaultClassLoaderManager artifactClassLoaderManager = new DefaultClassLoaderManager();
-    PluginDependenciesResolver pluginDependenciesResolver = new BundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
+    PluginDependenciesResolver pluginDependenciesResolver =
+        new DefaultArtifactDescriptorFactoryProvider().createBundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
 
+    DefaultArtifactClassLoaderResolver artifactClassLoaderResolver = new DefaultArtifactClassLoaderResolver(moduleRepository,
+                                                                                                            new DefaultNativeLibraryFinderFactory(name -> getAppDataFolder(name)));
     ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory =
-        new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory,
-                                                 new TrackingArtifactClassLoaderFactory<>(artifactClassLoaderManager,
-                                                                                          new ArtifactPluginClassLoaderFactory()),
-                                                 new DefaultRegionPluginClassLoadersFactory(new ArtifactPluginClassLoaderFactory(),
-                                                                                            moduleRepository));
+        new ApplicationClassLoaderBuilderFactory(artifactClassLoaderResolver);
 
     return new TestApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
                                       domainManager, serviceRepository,

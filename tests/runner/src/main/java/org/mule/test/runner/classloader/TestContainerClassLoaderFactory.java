@@ -50,9 +50,9 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
    * differences when running applications in standalone container vs junit.
    *
    * @param extraBootPackages {@link List} of {@link String}s extra boot packages that need to be appended to the container (junit
-   *        for instance)
-   * @param urls {@link URL}s that were classified to be added to the container {@link ClassLoader}
-   * @param moduleRepository provides access to the modules available on the container. Non null.
+   *                          for instance)
+   * @param urls              {@link URL}s that were classified to be added to the container {@link ClassLoader}
+   * @param moduleRepository  provides access to the modules available on the container. Non null.
    */
   public TestContainerClassLoaderFactory(final List<String> extraBootPackages, final URL[] urls,
                                          ModuleRepository moduleRepository) {
@@ -91,11 +91,11 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
    * The {@code muleModules} parameter will be ignored due to it has all the modules in classpath, instead they are discovered
    * once again but using a {@link URLClassLoader} that has the {@link URL}'s classified for the container {@link ClassLoader}.
    *
-   * @param parentClassLoader the parent {@link ClassLoader} to delegate PARENT look ups
-   * @param muleModules {@link MuleModule} discovered from the launcher {@link ClassLoader} but will be not considered here due to
-   *        it has all the class path
+   * @param parentClassLoader     the parent {@link ClassLoader} to delegate PARENT look ups
+   * @param muleModules           {@link MuleModule} discovered from the launcher {@link ClassLoader} but will be not considered
+   *                              here due to it has all the class path
    * @param containerLookupPolicy the default {@link ClassLoaderLookupPolicy} defined for a container but will be ignored due to
-   *        it has to be different when running with a full class path as parent {@link ClassLoader}
+   *                              it has to be different when running with a full class path as parent {@link ClassLoader}
    * @param artifactDescriptor
    * @return the {@link ArtifactClassLoader} to be used for the container
    */

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:ex="http://www.mulesoft.org/schema/mule/exception"
+      xmlns:callback="http://www.mulesoft.org/schema/mule/callback"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-      http://www.mulesoft.org/schema/mule/exception http://www.mulesoft.org/schema/mule/test/current/mule-exception.xsd">
+      http://www.mulesoft.org/schema/mule/callback http://www.mulesoft.org/schema/mule/callback/current/mule-callback.xsd">
 
         <flow name="main">
-            <ex:throw-exception exceptionClassName="org.exception.CustomException" error="ANY"/>
+            <callback:throw-exception exceptionClassName="org.exception.CustomException" error="ANY"/>
         </flow>
 
 </mule>

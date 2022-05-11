@@ -14,8 +14,7 @@ import org.mule.runtime.core.internal.streaming.bytes.InMemoryStreamBuffer;
 import java.io.InputStream;
 
 /**
- * An implementation of {@link AbstractCursorStreamProvider} which yields
- * cursors that only use memory for buffering
+ * An implementation of {@link AbstractCursorStreamProvider} which yields cursors that only use memory for buffering
  *
  * @since 4.0
  */
@@ -26,10 +25,10 @@ public final class InMemoryCursorStreamProvider extends AbstractCursorStreamProv
   /**
    * Creates a new instance
    *
-   * @param wrappedStream the stream to buffer from
-   * @param config        the config of the generated buffer
-   * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
-   * @param originatingLocation indicates where the cursor was created
+   * @param wrappedStream            the stream to buffer from
+   * @param config                   the config of the generated buffer
+   * @param bufferManager            the {@link ByteBufferManager} that will be used to allocate all buffers
+   * @param originatingLocation      indicates where the cursor was created
    * @param trackCursorProviderClose if the provider should save the stack trace from where it was closed
    *
    * @since 4.3.0

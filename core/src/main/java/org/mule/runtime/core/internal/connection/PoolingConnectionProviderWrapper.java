@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.connection;
 
 import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;

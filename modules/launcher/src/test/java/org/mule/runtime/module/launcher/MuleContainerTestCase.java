@@ -6,6 +6,16 @@
  */
 package org.mule.runtime.module.launcher;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
+import static org.mule.runtime.module.launcher.MuleContainer.APP_COMMAND_LINE_OPTION;
+import static org.mule.runtime.module.launcher.MuleContainer.INVALID_DEPLOY_APP_CONFIGURATION_ERROR;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+
+import static java.lang.System.clearProperty;
+import static java.lang.System.getProperty;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -13,20 +23,16 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
-import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.DEPLOYMENT_APPLICATION_PROPERTY;
-import static org.mule.runtime.module.launcher.MuleContainer.APP_COMMAND_LINE_OPTION;
-import static org.mule.runtime.module.launcher.MuleContainer.INVALID_DEPLOY_APP_CONFIGURATION_ERROR;
-import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.module.deployment.api.DeploymentService;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.log4j2.MuleLog4jContextFactory;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
 import org.mule.runtime.module.tooling.api.ToolingService;
+import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
@@ -37,10 +43,12 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.spi.LoggerContextFactory;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import org.mockito.InOrder;
 
 @SmallTest
@@ -60,16 +68,18 @@ public class MuleContainerTestCase extends AbstractMuleTestCase {
 
   private MuleCoreExtensionManagerServer coreExtensionManager;
 
-  private DeploymentService deploymentService = mock(DeploymentService.class);
+  private final DeploymentService deploymentService = mock(DeploymentService.class);
 
-  private RepositoryService repositoryService = mock(RepositoryService.class);
+  private final RepositoryService repositoryService = mock(RepositoryService.class);
 
   private final ServiceManager serviceManager = mock(ServiceManager.class);
 
   private final ExtensionModelLoaderManager extensionModelLoaderManager = mock(ExtensionModelLoaderManager.class);
 
-  private ToolingService toolingService = mock(ToolingService.class);
-  private Map<String, Object> commandLineOptions = new HashMap<>();
+  private final TroubleshootingService troubleshootingService = mock(TroubleshootingService.class);
+
+  private final ToolingService toolingService = mock(ToolingService.class);
+  private final Map<String, Object> commandLineOptions = new HashMap<>();
 
   @Before
   public void setUp() throws Exception {
@@ -78,9 +88,9 @@ public class MuleContainerTestCase extends AbstractMuleTestCase {
     FileUtils.deleteDirectory(getExecutionFolder());
   }
 
-  private MuleContainer createMuleContainer() {
+  private MuleContainer createMuleContainer() throws InitialisationException {
     return new MuleContainer(deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager,
-                             extensionModelLoaderManager) {
+                             extensionModelLoaderManager, troubleshootingService) {
 
       @Override
       Map<String, Object> getCommandLineOptions(String[] args) {
@@ -211,10 +221,10 @@ public class MuleContainerTestCase extends AbstractMuleTestCase {
 
       container.start(false);
 
-      assertThat(System.getProperty(DEPLOYMENT_APPLICATION_PROPERTY), equalTo(APP_NAME));
+      assertThat(getProperty(DEPLOYMENT_APPLICATION_PROPERTY), equalTo(APP_NAME));
     } finally {
-      if (System.getProperty(DEPLOYMENT_APPLICATION_PROPERTY) != null) {
-        System.clearProperty(DEPLOYMENT_APPLICATION_PROPERTY);
+      if (getProperty(DEPLOYMENT_APPLICATION_PROPERTY) != null) {
+        clearProperty(DEPLOYMENT_APPLICATION_PROPERTY);
       }
     }
   }

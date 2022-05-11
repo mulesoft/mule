@@ -7,28 +7,34 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Integer.MAX_VALUE;
-import static java.util.Arrays.asList;
+import static java.lang.Thread.currentThread;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
-import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.FLOW;
-import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
+import static org.mule.tck.junit4.matcher.Eventually.eventually;
+import static org.mule.tck.util.CollectableReference.collectedByGc;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.DEFAULT;
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
+import io.qameta.allure.Issue;
+import org.junit.Test;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.TransactionAwareProcessingStrategyTestCase;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory.ProactorStreamEmitterProcessingStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
-
-import java.util.Collection;
+import org.mule.tck.util.CollectableReference;
 
 import org.junit.After;
 import org.junit.runner.RunWith;
@@ -45,13 +51,8 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
     extends ProactorStreamEmitterProcessingStrategyTestCase
     implements TransactionAwareProcessingStrategyTestCase {
 
-  public TransactionAwareProactorStreamEmitterProcessingStrategyTestCase(Mode mode) {
-    super(mode);
-  }
-
-  @Parameterized.Parameters(name = "{0}")
-  public static Collection<Mode> parameters() {
-    return asList(FLOW, SOURCE);
+  public TransactionAwareProactorStreamEmitterProcessingStrategyTestCase(Mode mode, boolean profiling) {
+    super(mode, profiling);
   }
 
   @After
@@ -111,6 +112,50 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
     assertThat(threads, not(hasItem(startsWith(IO))));
     assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
+  @Test
+  @Issue("MULE-19209")
+  public void txDoesNotLeakThread() throws Exception {
+    ThreadReferenceCaptor captor = new ThreadReferenceCaptor();
+    flow = flowBuilder.get().processors(captor).build();
+
+    startFlow();
+    // we cannot do a thread.join because we must not set a strong reference
+    Latch latch = new Latch();
+
+    asyncExecutor.submit(() -> {
+      try {
+        getInstance().bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
+        processFlow(testEvent());
+        threads.clear();
+        latch.release();
+      } catch (Exception e) {
+      }
+    });
+
+    latch.await();
+    asyncExecutor.stop();
+
+    assertThat(captor.reference, is(eventually(collectedByGc())));
+  }
+
+  @Test
+  public void testTransactionProfiling() throws Exception {
+    getInstance()
+        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
+    testProfiling();
+  }
+
+  public static class ThreadReferenceCaptor implements Processor {
+
+    public CollectableReference<Thread> reference;
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      reference = new CollectableReference<>(currentThread());
+      return event;
+    }
   }
 
 }

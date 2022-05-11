@@ -9,7 +9,7 @@ package org.mule.runtime.config.internal.util;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.config.internal.MuleArtifactContext;
+import org.mule.runtime.config.internal.context.MuleArtifactContext;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -62,7 +62,7 @@ public final class ComponentBuildingDefinitionUtils {
   /**
    * Retrieve the {@link ComponentBuildingDefinition}s from a set of extension models.
    *
-   * @param extensionModels the set of extension models.
+   * @param extensionModels     the set of extension models.
    * @param dslResolvingContext
    * @return the list of {@link ComponentBuildingDefinition}s to be used for creating components declared by the extension models.
    */

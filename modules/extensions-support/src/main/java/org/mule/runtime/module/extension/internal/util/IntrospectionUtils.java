@@ -19,22 +19,24 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static javax.lang.model.element.ElementKind.METHOD;
 import static javax.lang.model.element.Modifier.PUBLIC;
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isEnum;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isObjectType;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getId;
-import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
+import static org.mule.runtime.extension.internal.loader.util.JavaParserUtils.toMuleApi;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.isIgnoreDisabled;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
+import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.hasParameterGroupAnnotation;
 import static org.reflections.ReflectionUtils.getAllFields;
+import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.core.ResolvableType.NONE;
 import static org.springframework.util.ConcurrentReferenceHashMap.ReferenceType.WEAK;
@@ -87,6 +89,8 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
+import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -97,18 +101,17 @@ import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueType
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.api.runtime.parameter.Literal;
-import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.runtime.extension.internal.loader.util.JavaParserUtils;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
-import org.mule.runtime.module.extension.internal.loader.enricher.MetadataTypeEnricher;
-import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.MetadataTypeEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEncodingModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
@@ -117,7 +120,11 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 import org.mule.runtime.module.extension.internal.loader.java.property.RuntimeVersionModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser;
+import org.mule.sdk.api.annotation.param.NullSafe;
 import org.mule.sdk.api.annotation.param.RuntimeVersion;
+import org.mule.sdk.api.runtime.parameter.Literal;
+import org.mule.sdk.api.runtime.parameter.ParameterResolver;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -128,7 +135,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -143,6 +149,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -177,6 +184,8 @@ public final class IntrospectionUtils {
     setWeakHashCaches();
   }
 
+  private IntrospectionUtils() {}
+
   /**
    * Set caches in spring so that they are weakly (and not softly) referenced by default.
    * <p>
@@ -195,8 +204,6 @@ public final class IntrospectionUtils {
       }
     }
   }
-
-  private IntrospectionUtils() {}
 
   /**
    * Returns a {@link MetadataType} representing the given {@link Class} type.
@@ -535,7 +542,7 @@ public final class IntrospectionUtils {
    * @param method     a not {@code null} {@link Method}
    * @param typeLoader a {@link ClassTypeLoader} to be used to create the returned {@link MetadataType}s
    * @return an array of {@link MetadataType} matching the method's arguments. If the method doesn't take any, then the array will
-   * be empty
+   *         be empty
    * @throws IllegalArgumentException is method is {@code null}
    */
   public static MetadataType[] getMethodArgumentTypes(Method method, ClassTypeLoader typeLoader) {
@@ -706,7 +713,7 @@ public final class IntrospectionUtils {
 
     List<java.lang.reflect.Type> generics = getSuperClassGenerics(type, superClass);
 
-    if (isEmpty(generics) && !Object.class.equals(superClass)) {
+    if (generics.isEmpty() && !Object.class.equals(superClass)) {
       return findGenericsInSuperHierarchy(superClass);
     }
 
@@ -978,10 +985,21 @@ public final class IntrospectionUtils {
     return typeElements;
   }
 
-
-  public static List<Field> getAnnotatedFields(Class<?> clazz, Class<? extends Annotation> annotationType) {
+  /**
+   * Returns a {@link Stream} with the fields annotated with any of the given {@code annotationTypes}
+   *
+   * @param clazz           The class to instrospect
+   * @param annotationTypes the annotation types
+   * @return a {@link Stream}
+   * @since 4.5.0
+   */
+  public static Stream<Field> getAnnotatedFieldsStream(Class<?> clazz, Class<? extends Annotation>... annotationTypes) {
     return getDescendingHierarchy(clazz).stream().flatMap(type -> stream(type.getDeclaredFields()))
-        .filter(field -> field.getAnnotation(annotationType) != null).collect(toImmutableList());
+        .filter(field -> Stream.of(annotationTypes).anyMatch(annotationType -> field.getAnnotation(annotationType) != null));
+  }
+
+  public static List<Field> getAnnotatedFields(Class<?> clazz, Class<? extends Annotation>... annotationTypes) {
+    return getAnnotatedFieldsStream(clazz, annotationTypes).collect(toImmutableList());
   }
 
   public static List<Field> getFields(Class<?> clazz) {
@@ -1026,16 +1044,33 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * Returns the {@link Alias} name of the given {@code element}. If the element doesn't have an alias, then the default name is
-   * return
+   * Returns the {@link Alias} or {@link org.mule.sdk.api.annotation.Alias} name of the given {@code field}.
+   * <p>
+   * If the element doesn't have an alias, then the default name is returned
    *
-   * @param element an annotated member
-   * @param <T>     the generic type of the element
+   * @param field the introspected field
    * @return an alias name
    */
-  public static <T extends AnnotatedElement & Member> String getAlias(T element) {
-    Alias alias = element.getAnnotation(Alias.class);
-    return alias != null ? alias.value() : element.getName();
+  public static String getAlias(Field field) {
+    return JavaParserUtils.getAlias(field);
+  }
+
+  /**
+   * @param field a field
+   * @return whether the given {@code field} is a config override
+   */
+  public static boolean isConfigOverride(Field field) {
+    return JavaParserUtils.isConfigOverride(field);
+  }
+
+  /**
+   * @param field a field
+   * @return {@link NullSafe#defaultImplementingType()} {@link Optional} or
+   *         {@link org.mule.runtime.extension.api.annotation.param.NullSafe#defaultImplementingType()} {@link Optional} in case
+   *         the given {@link Field field} is annotated.
+   */
+  public static Optional<Class<?>> getNullSafeDefaultImplementedType(Field field) {
+    return JavaParserUtils.getNullSafeDefaultImplementedType(field);
   }
 
   private static List<Class<?>> getDescendingHierarchy(Class<?> type) {
@@ -1082,21 +1117,21 @@ public final class IntrospectionUtils {
     }
   }
 
-  public static ExpressionSupport getExpressionSupport(AnnotatedElement object) {
-    return getExpressionSupport(object.getAnnotation(Expression.class));
-  }
-
-  public static ExpressionSupport getExpressionSupport(Expression expressionAnnotation) {
-    return expressionAnnotation != null ? expressionAnnotation.value() : SUPPORTED;
+  public static Optional<ExpressionSupport> getExpressionSupport(WithAnnotations annotatedElement,
+                                                                 String elementType,
+                                                                 String elementName) {
+    return mapReduceSingleAnnotation(
+                                     annotatedElement,
+                                     elementType,
+                                     elementName,
+                                     Expression.class,
+                                     org.mule.sdk.api.annotation.Expression.class,
+                                     value -> value.getEnumValue(Expression::value),
+                                     value -> toMuleApi(value.getEnumValue(org.mule.sdk.api.annotation.Expression::value)));
   }
 
   public static String getSourceName(Class<?> sourceType) {
-    Alias alias = sourceType.getAnnotation(Alias.class);
-    if (alias != null) {
-      return alias.value();
-    }
-
-    return sourceType.getSimpleName();
+    return JavaParserUtils.getAlias(sourceType);
   }
 
   /**
@@ -1296,7 +1331,7 @@ public final class IntrospectionUtils {
    * @return a boolean indicating if the parameter is considered as a parameter container
    */
   public static boolean isParameterContainer(Set<Class<? extends Annotation>> annotations, MetadataType parameterType) {
-    return (annotations.contains(ParameterGroup.class) || isMultiLevelMetadataKeyId(annotations, parameterType));
+    return hasParameterGroupAnnotation(annotations) || isMultiLevelMetadataKeyId(annotations, parameterType);
   }
 
   public static java.util.Optional<AnnotatedElement> getAnnotatedElement(BaseDeclaration<?> declaration) {
@@ -1453,8 +1488,8 @@ public final class IntrospectionUtils {
 
   /**
    * Sets the {@code configName}, {@code encoding} and {@link MuleVersion} into the fields of the target annotated with
-   * {@link RefName}, {@link DefaultEncoding} and {@link RuntimeVersion} respectively if present and the {@code model}
-   * contains the {@link DeclaringMemberModelProperty}.
+   * {@link RefName}, {@link DefaultEncoding} and {@link RuntimeVersion} respectively if present and the {@code model} contains
+   * the {@link DeclaringMemberModelProperty}.
    *
    * @param model       enriched with {@link InjectedFieldModelProperty}
    * @param target      object in which the fields are going to be set
@@ -1470,8 +1505,8 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * Sets the {@code encoding} value into the field of the {@code target} annotated {@link DefaultEncoding} if the
-   * {@code model} contains the {@link DeclaringMemberModelProperty} property and the value is not {@code null}.
+   * Sets the {@code encoding} value into the field of the {@code target} annotated {@link DefaultEncoding} if the {@code model}
+   * contains the {@link DeclaringMemberModelProperty} property and the value is not {@code null}.
    *
    * @param model    enriched with {@link DefaultEncodingModelProperty}
    * @param target   object in which the fields are going to be set
@@ -1483,8 +1518,8 @@ public final class IntrospectionUtils {
   }
 
   /**
-   *  Sets the {@link MuleVersion} into the field of the {@code target} annotated {@link RuntimeVersion} if the
-   *  {@code model} contains the {@link DeclaringMemberModelProperty} property and the value is not {@code null}.
+   * Sets the {@link MuleVersion} into the field of the {@code target} annotated {@link RuntimeVersion} if the {@code model}
+   * contains the {@link DeclaringMemberModelProperty} property and the value is not {@code null}.
    *
    * @param model       enriched with {@link DefaultEncodingModelProperty}
    * @param target      object in which the fields are going to be set
@@ -1511,23 +1546,23 @@ public final class IntrospectionUtils {
   public static void injectFields(Object target, String configName, String encoding, MuleVersion muleVersion,
                                   ReflectionCache reflectionCache) {
     set(getDefaultEncodingFieldSetter(target, reflectionCache), target, encoding);
-    set(getFieldSetterForAnnotatedField(target, RefName.class, reflectionCache), target, configName);
+    set(getRefNameFieldSetter(target, reflectionCache), target, configName);
     set(getFieldSetterForAnnotatedField(target, RuntimeVersion.class, reflectionCache), target, muleVersion);
   }
 
   /**
-   * Introspects the {@code target} object for a field annotated with {@link RefName}. If found, it injects the {@code configName}
-   * value into it.
+   * Introspects the {@code target} object for a field annotated with {@link RefName} or
+   * {@link org.mule.sdk.api.annotation.param.RefName}. If found, it injects the {@code configName} value into it.
    * <p>
-   * The {@code target} object is expected to have only one field annotated with {@link RefName} and that field is required to be
-   * a String.
+   * The {@code target} object is expected to have only one field annotated with {@link RefName} or
+   * {@link org.mule.sdk.api.annotation.param.RefName} and that field is required to be a String.
    *
    * @param target          object in which the value are going to be set
    * @param configName      the value to be injected
    * @param reflectionCache the cache for expensive reflection lookups
    */
   public static void injectRefName(Object target, String configName, ReflectionCache reflectionCache) {
-    set(getFieldSetterForAnnotatedField(target, RefName.class, reflectionCache), target, configName);
+    set(getRefNameFieldSetter(target, reflectionCache), target, configName);
   }
 
   /**
@@ -1535,10 +1570,42 @@ public final class IntrospectionUtils {
    *
    * @param target          object in which the fields are going to be set
    * @param reflectionCache the cache for expensive reflection lookups
-   * @throws {@link IllegalModelDefinitionException} if there is more than one field annotated with {@link DefaultEncoding}
+   * @throws IllegalModelDefinitionException} if there is more than one field annotated with {@link DefaultEncoding}
    */
   public static Optional<FieldSetter> getDefaultEncodingFieldSetter(Object target, ReflectionCache reflectionCache) {
-    return getFieldSetterForAnnotatedField(target, DefaultEncoding.class, reflectionCache);
+    Optional<FieldSetter> legacyDefaultEncodingFieldSetter =
+        getFieldSetterForAnnotatedField(target, DefaultEncoding.class, reflectionCache);
+    return legacyDefaultEncodingFieldSetter.isPresent() ? legacyDefaultEncodingFieldSetter
+        : getFieldSetterForAnnotatedField(target, org.mule.sdk.api.annotation.param.DefaultEncoding.class, reflectionCache);
+  }
+
+  /**
+   * Returns {@link FieldSetter} for a field in the {@code target} annotated {@link RefName} or
+   * {@link org.mule.sdk.api.annotation.param.RefName} if present.
+   *
+   * @param target          object in which the fields are going to be set
+   * @param reflectionCache the cache for expensive reflection lookups
+   * @return the {@link FieldSetter}
+   * @throws IllegalModelDefinitionException if there is more than one field annotated with {@link RefName} and or
+   *                                         {@link org.mule.sdk.api.annotation.param.RefName}
+   */
+  public static Optional<FieldSetter> getRefNameFieldSetter(Object target, ReflectionCache reflectionCache) {
+    Optional<FieldSetter> legacyRefNameFieldSetter =
+        getFieldSetterForAnnotatedField(target, RefName.class, reflectionCache);
+    Optional<FieldSetter> sdkRefNameFieldSetter =
+        getFieldSetterForAnnotatedField(target, org.mule.sdk.api.annotation.param.RefName.class, reflectionCache);
+    if (legacyRefNameFieldSetter.isPresent() & sdkRefNameFieldSetter.isPresent()) {
+      throw new IllegalModelDefinitionException(format(
+                                                       "Class '%s' has 2 fields annotated with '@%s' or '@%s'. Only one field may carry those annotations",
+                                                       target.getClass().getName(), RefName.class.getName(),
+                                                       org.mule.sdk.api.annotation.param.RefName.class.getName()));
+    } else if (legacyRefNameFieldSetter.isPresent()) {
+      return legacyRefNameFieldSetter;
+    } else if (sdkRefNameFieldSetter.isPresent()) {
+      return sdkRefNameFieldSetter;
+    } else {
+      return empty();
+    }
   }
 
   /**
@@ -1647,8 +1714,8 @@ public final class IntrospectionUtils {
 
 
   /**
-   * Sets the given {@code value} into the {@code target}, if it contains a field named {@code fieldName}.
-   * Nothing happens if such field doesn't exist.
+   * Sets the given {@code value} into the {@code target}, if it contains a field named {@code fieldName}. Nothing happens if such
+   * field doesn't exist.
    *
    * @param target          the object in which the value is to be set
    * @param value           the value to set
@@ -1675,4 +1742,113 @@ public final class IntrospectionUtils {
     FieldSetter setter = new FieldSetter<>(field);
     setter.set(target, value);
   }
+
+  /**
+   * Returns, for each parameter group defined on the component model, all the parameters matching with the given filter
+   *
+   * @param componentModel the component model used to filter the parameters
+   * @param filter         the filter to apply to the group model parameters
+   * @return The map having the parameter group as key and a set of its parameters matching the filter as value
+   */
+  public static Map<ParameterGroupModel, Set<ParameterModel>> getFilteredParameters(ComponentModel componentModel,
+                                                                                    Predicate<ParameterModel> filter) {
+    Map<ParameterGroupModel, Set<ParameterModel>> filteredParameters = new HashMap<>();
+    componentModel.getParameterGroupModels().forEach(parameterGroupModel -> {
+      parameterGroupModel.getParameterModels().stream()
+          .filter(filter)
+          .forEach(p -> filteredParameters.computeIfAbsent(parameterGroupModel, k -> new HashSet<>()).add(p));
+    });
+    return filteredParameters;
+  }
+
+  /**
+   * Returns the value associated to a parameter with model {@code parameterModel} on the group {@code parameterGroupModel} or
+   * {@code defaultValue} if such parameter is not present
+   *
+   * @param ctx                 the execution where to look for the parameter
+   * @param parameterGroupModel the parameter group where the parameter is defined
+   * @param parameterModel      the parameter model which value will be returned
+   * @param defaultValue        the default value to return in case the parameter is not present
+   * @param reflectionCache     the {@link ReflectionCache} used to introspect the parameter value
+   * @param <T>                 the returned value's generic type
+   * @return the parameter's value or {@code defaultValue}
+   */
+  public static <T> T getParameterOrDefault(ExecutionContext<? extends ComponentModel> ctx,
+                                            ParameterGroupModel parameterGroupModel,
+                                            ParameterModel parameterModel, T defaultValue, ReflectionCache reflectionCache) {
+    if (!parameterGroupModel.isShowInDsl()) {
+      return ctx.getParameterOrDefault(parameterModel.getName(), defaultValue);
+    } else {
+      try {
+        Object container = ctx.getParameterOrDefault(getGroupModelContainerName(parameterGroupModel), defaultValue);
+        return (T) getParameterValue(container, parameterModel, reflectionCache);
+      } catch (Exception e) {
+        return defaultValue;
+      }
+    }
+  }
+
+  /**
+   * Returns the value for the given parameter of an object instance
+   *
+   * @param object          The object where to grab the parameter value from
+   * @param parameterModel  The parameter model for the parameter to obtain the value
+   * @param reflectionCache the cache for expensive reflection lookups
+   * @return The value of the parameter with the given parameter model on the object instance
+   * @throws IllegalAccessException if is unavailable to access to the field
+   * @throws NoSuchFieldException   if the field doesn't exist in the given object instance
+   */
+  public static Object getParameterValue(Object object, ParameterModel parameterModel,
+                                         ReflectionCache reflectionCache)
+      throws IllegalAccessException, NoSuchFieldException {
+    Optional<Field> field = getField(object.getClass(), parameterModel, reflectionCache);
+    if (field.isPresent()) {
+      return getFieldValue(object, field.get().getName(), reflectionCache);
+    }
+    throw new NoSuchFieldException();
+  }
+
+  /**
+   * Given a Source object, fetches the Config field from the object if any.
+   *
+   * @param object the source object
+   * @return an Optional containing the config field if any
+   * @since 4.5
+   */
+  public static Optional<Field> fetchConfigFieldFromSourceObject(Object object) {
+    return fetchFieldFromSourceObject(object, Config.class, org.mule.sdk.api.annotation.param.Config.class);
+  }
+
+  /**
+   * Given a Source object, fetches the Connection field from the object if any.
+   *
+   * @param object the source object
+   * @return an Optional containing the connection field if any
+   * @since 4.5
+   */
+  public static Optional<Field> fetchConnectionFieldFromSourceObject(Object object) {
+    return fetchFieldFromSourceObject(object, Connection.class, org.mule.sdk.api.annotation.param.Connection.class);
+  }
+
+  private static Optional<Field> fetchFieldFromSourceObject(Object object, Class<? extends Annotation>... annotations) {
+    Set<Field> fields = new HashSet<>();
+    for (Class<? extends Annotation> annotation : annotations) {
+      fields.addAll(getAllFields(object.getClass(), withAnnotation(annotation)));
+    }
+    if (fields.isEmpty()) {
+      return empty();
+    }
+
+    if (fields.size() > 1) {
+      // TODO: MULE-9220 Move this to a syntax validator
+      throw new IllegalModelDefinitionException(
+                                                format("Message Source defined on class '%s' has more than one field annotated with '@%s'. "
+                                                    + "Only one field in the class can bare such annotation",
+                                                       object.getClass().getName(),
+                                                       annotations[0].getClass().getSimpleName()));
+    }
+
+    return of(fields.iterator().next());
+  }
+
 }

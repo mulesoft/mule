@@ -7,7 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import org.mule.runtime.module.artifact.api.Artifact;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +17,7 @@ import java.util.Properties;
 /**
  * Generic Factory for an {@link Artifact}.
  */
-public interface ArtifactFactory<T extends Artifact> {
+public interface ArtifactFactory<D extends DeployableArtifactDescriptor, T extends Artifact<D>> {
 
   /**
    * @return the directory of the Artifact. Usually this directory contains the Artifact resources
@@ -27,7 +27,7 @@ public interface ArtifactFactory<T extends Artifact> {
   /**
    * Creates an Artifact
    *
-   * @param artifactDir directory where the artifact is located
+   * @param artifactDir          directory where the artifact is located
    * @param deploymentProperties deployment properties for configuration management
    * @return the newly created Artifact
    */

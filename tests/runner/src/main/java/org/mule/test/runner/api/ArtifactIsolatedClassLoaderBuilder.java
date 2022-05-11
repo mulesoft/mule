@@ -10,10 +10,10 @@ package org.mule.test.runner.api;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+import static org.mule.test.runner.maven.ArtifactFactory.createFromPomFile;
 
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.test.runner.classloader.IsolatedClassLoaderFactory;
-import org.mule.test.runner.maven.MavenModelFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,9 +21,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.artifact.DefaultArtifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +36,8 @@ import org.slf4j.LoggerFactory;
  * <li>{@link ClassPathClassifier}: classifies the classpath URLs and builds the {@link List} or {@link java.net.URL}s for each
  * {@link ClassLoader}</li>
  * <p/>
- * The object built by this builder is a {@link ArtifactClassLoaderHolder} that references the
- * {@link ArtifactClassLoader} for the application, plugins and container.
+ * The object built by this builder is a {@link ArtifactClassLoaderHolder} that references the {@link ArtifactClassLoader} for the
+ * application, plugins and container.
  *
  * @since 4.0
  */
@@ -69,8 +67,8 @@ public class ArtifactIsolatedClassLoaderBuilder {
   private List<String> extraBootPackages;
 
   /**
-   * Sets the {@link Set} of Maven coordinates in format {@code <groupId>:<artifactId>} or {@code <groupId>:<artifactId>:<classifier>}
-   * in order to be added to the sharedLib {@link ArtifactClassLoader}
+   * Sets the {@link Set} of Maven coordinates in format {@code <groupId>:<artifactId>} or
+   * {@code <groupId>:<artifactId>:<classifier>} in order to be added to the sharedLib {@link ArtifactClassLoader}
    *
    * @param applicationSharedLibCoordinates {@link List} of Maven coordinates to add
    * @return this
@@ -81,8 +79,8 @@ public class ArtifactIsolatedClassLoaderBuilder {
   }
 
   /**
-   * Sets the {@link Set} of Maven coordinates in format {@code <groupId>:<artifactId>} or {@code <groupId>:<artifactId>:<classifier>}
-   * in order to be added to the application {@link ArtifactClassLoader}
+   * Sets the {@link Set} of Maven coordinates in format {@code <groupId>:<artifactId>} or
+   * {@code <groupId>:<artifactId>:<classifier>} in order to be added to the application {@link ArtifactClassLoader}
    *
    * @param applicationLibCoordinates {@link List} of Maven coordinates to add
    * @return this
@@ -93,9 +91,9 @@ public class ArtifactIsolatedClassLoaderBuilder {
   }
 
   /**
-   * Sets the {@link Set} of Maven coordinates in format {@code <groupId>:<artifactId>} or {@code <groupId>:<artifactId>:<classifier>}
-   * in order to be exported on the test runner's {@link ArtifactClassLoader} in addition to test classes and resources from the
-   * module being tested
+   * Sets the {@link Set} of Maven coordinates in format {@code <groupId>:<artifactId>} or
+   * {@code <groupId>:<artifactId>:<classifier>} in order to be exported on the test runner's {@link ArtifactClassLoader} in
+   * addition to test classes and resources from the module being tested
    *
    * @param testRunnerExportedLibCoordinates {@link List} of Maven coordinates to add
    * @return this
@@ -155,7 +153,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
    * packages. In format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    *
    * @param excludedArtifacts Maven artifacts to be excluded from artifact class loaders created here due to they are going to be
-   *        added as boot packages. In format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
+   *                          added as boot packages. In format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setExcludedArtifacts(Set<String> excludedArtifacts) {
@@ -166,9 +164,9 @@ public class ArtifactIsolatedClassLoaderBuilder {
   /**
    * Sets the {@link List} of {@link String}s containing the extra boot packages defined to be appended to the container in
    * addition to the pre-defined ones.
-   * 
+   *
    * @param extraBootPackages {@link List} of {@link String}s containing the extra boot packages defined to be appended to the
-   *        container in addition to the pre-defined ones.
+   *                          container in addition to the pre-defined ones.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setExtraBootPackages(List<String> extraBootPackages) {
@@ -181,7 +179,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
    * addition to the pre-defined ones.
    *
    * @param extraPrivilegedArtifacts {@link List} of {@link String}s containing the extra privileged artifacts defined to be
-   *        appended to the container in addition to the pre-defined ones.
+   *                                 appended to the container in addition to the pre-defined ones.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setExtraPrivilegedArtifacts(Set<String> extraPrivilegedArtifacts) {
@@ -195,7 +193,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
    * <p/>
    *
    * @param providedExclusions Maven artifacts to be excluded from the {@code provided} scope direct dependencies of the
-   *        rootArtifact. In format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
+   *                           rootArtifact. In format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setProvidedExclusions(final Set<String> providedExclusions) {
@@ -208,7 +206,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
    * {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    *
    * @param testExclusions {@link Set} of exclusion Maven coordinates to be excluded from test dependencies of rootArtifact. In
-   *        format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
+   *                       format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setTestExclusions(final Set<String> testExclusions) {
@@ -221,7 +219,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
    * {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    *
    * @param testInclusions {@link Set} of inclusion Maven coordinates to be excluded from test dependencies of rootArtifact. In
-   *        format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
+   *                       format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setTestInclusions(final Set<String> testInclusions) {
@@ -234,7 +232,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
    * for testing purposes only.
    *
    * @param exportPluginClasses of {@link Class}es to be exported by rootArtifact (if it is a Mule plugin) in addition to their
-   *        APIs, for testing purposes only.
+   *                            APIs, for testing purposes only.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setExportPluginClasses(final Set<Class> exportPluginClasses) {
@@ -243,8 +241,8 @@ public class ArtifactIsolatedClassLoaderBuilder {
   }
 
   /**
-   * Sets to {@code true} if while building the a plugin {@link ArtifactClassLoader}
-   * for an {@link org.mule.runtime.extension.api.annotation.Extension} the metadata should be generated.
+   * Sets to {@code true} if while building the a plugin {@link ArtifactClassLoader} for an
+   * {@link org.mule.runtime.extension.api.annotation.Extension} the metadata should be generated.
    *
    * @param extensionMetadataGenerationEnabled {@code boolean} to enable Extension metadata generation.
    * @return this
@@ -255,11 +253,11 @@ public class ArtifactIsolatedClassLoaderBuilder {
   }
 
   /**
-   * Sets a {@link List} of {@link URL}s to be appended to the application
-   * {@link ArtifactClassLoader} in addition to the ones classified.
+   * Sets a {@link List} of {@link URL}s to be appended to the application {@link ArtifactClassLoader} in addition to the ones
+   * classified.
    *
-   * @param {@link List} of {@link URL}s to be appended to the application
-   *        {@link ArtifactClassLoader} in addition to the ones classified.
+   * @param {@link List} of {@link URL}s to be appended to the application {@link ArtifactClassLoader} in addition to the ones
+   *               classified.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setTestRunnerPluginUrls(List<URL> testRunnerPluginUrls) {
@@ -268,8 +266,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
   }
 
   /**
-   * Builds the {@link ArtifactClassLoaderHolder} with the
-   * {@link ArtifactClassLoader}s for application, plugins and container.
+   * Builds the {@link ArtifactClassLoaderHolder} with the {@link ArtifactClassLoader}s for application, plugins and container.
    *
    * @return a {@link ArtifactClassLoaderHolder} as output of the classification process.
    * @throws {@link IOException} if there was an error while creating the classification context
@@ -314,11 +311,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
   private Artifact getRootArtifact(File rootArtifactClassesFolder) {
     File pomFile = new File(rootArtifactClassesFolder.getParentFile().getParentFile(), POM_XML);
     logger.debug("Reading rootArtifact from pom file: {}", pomFile);
-    Model model = MavenModelFactory.createMavenProject(pomFile);
-
-    return new DefaultArtifact(model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId(),
-                               model.getArtifactId(), model.getPackaging(),
-                               model.getVersion() != null ? model.getVersion() : model.getParent().getVersion());
+    return createFromPomFile(pomFile);
   }
 
 }

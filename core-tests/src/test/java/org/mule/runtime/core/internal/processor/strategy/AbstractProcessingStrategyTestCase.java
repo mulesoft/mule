@@ -6,12 +6,47 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.util.Collections.singleton;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
+import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
+import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_OPERATION_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_FLOW_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.core.api.construct.Flow.builder;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.FLOW_BACK_PRESSURE_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
+import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
+import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.FLOW;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
+import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
+import static org.mule.tck.probe.PollingProber.DEFAULT_TIMEOUT;
+import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
+
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.synchronizedSet;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -24,27 +59,14 @@ import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeThat;
-import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
-import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
-import static org.mule.runtime.core.api.construct.Flow.builder;
-import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.runtime.core.api.exception.Errors.Identifiers.FLOW_BACK_PRESSURE_ERROR_IDENTIFIER;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
-import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
-import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
-import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
-import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
-import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
-import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
-import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
-import static org.mule.tck.probe.PollingProber.DEFAULT_TIMEOUT;
-import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.bubble;
 import static reactor.core.Exceptions.propagate;
@@ -60,6 +82,10 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.api.notification.MessageProcessorNotificationListener;
+import org.mule.runtime.api.profiling.ProfilingDataConsumer;
+import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
+import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
@@ -73,21 +99,25 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.util.rx.RetrySchedulerWrapper;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -120,7 +150,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
+import org.junit.Assert;
+import org.mockito.InOrder;
 import reactor.core.publisher.Flux;
 
 @RunWith(Parameterized.class)
@@ -128,6 +159,9 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   private static final Logger LOGGER = getLogger(AbstractProcessingStrategyTestCase.class);
   private static final int CONCURRENT_TEST_CONCURRENCY = 8;
+  protected final ProfilingDataConsumer<ComponentProcessingStrategyProfilingEventContext> profilingDataConsumer =
+      mock(ProfilingDataConsumer.class);
+  private final boolean profiling;
 
   protected Mode mode;
   protected static final String CPU_LIGHT = "cpuLight";
@@ -207,6 +241,14 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     }
   };
 
+  protected final ProfilingService profilingService = new DefaultProfilingService() {
+
+    @Override
+    public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
+      return () -> singleton(profilingDataConsumer);
+    }
+  };
+
   protected ProcessingStrategy ps;
   protected CountDownLatch innerPublisherLatch;
 
@@ -221,14 +263,22 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
+  @Rule
+  public SystemProperty enableProfilingServiceProperty;
 
-  public AbstractProcessingStrategyTestCase(Mode mode) {
+  public AbstractProcessingStrategyTestCase(Mode mode, boolean profiling) {
     this.mode = mode;
+    this.enableProfilingServiceProperty =
+        new SystemProperty((ENABLE_PROFILING_SERVICE.getOverridingSystemPropertyName().get()),
+                           Boolean.toString(profiling));
+    this.profiling = profiling;
   }
 
-  @Parameterized.Parameters(name = "{0}")
-  public static Collection<Mode> modeParameters() {
-    return asList(new Mode[] {Mode.FLOW, SOURCE});
+  @Parameterized.Parameters(name = "{0} - Profiling: {1}")
+  public static List<Object[]> modeParameters() {
+    return asList(new Object[] {FLOW, false},
+                  new Object[] {FLOW, true},
+                  new Object[] {SOURCE, false});
   }
 
   @Before
@@ -279,6 +329,30 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
         .source(triggerableMessageSource)
         // Avoid logging of errors by using a null exception handler.
         .messagingExceptionHandler((exception, event) -> event);
+
+    // Profiling events mocking
+    when(profilingDataConsumer.getProfilingEventTypes())
+        .thenReturn(new HashSet<>(Arrays.asList(PS_SCHEDULING_FLOW_EXECUTION, STARTING_FLOW_EXECUTION, FLOW_EXECUTED,
+                                                PS_SCHEDULING_OPERATION_EXECUTION, PS_STARTING_OPERATION_EXECUTION,
+                                                PS_OPERATION_EXECUTED, PS_FLOW_MESSAGE_PASSING)));
+    when(profilingDataConsumer.getEventContextFilter()).thenReturn(processingStrategyProfilingEventContext -> true);
+
+    setFeaturesState(profiling);
+  }
+
+  private void setFeaturesState(boolean state) throws RegistrationException {
+    ProfilingFeatureFlaggingService featureFlaggingService =
+        ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(ProfilingFeatureFlaggingService.class);
+    featureFlaggingService
+        .toggleProfilingFeature(PS_SCHEDULING_FLOW_EXECUTION, profilingDataConsumer.getClass().getName(), state);
+    featureFlaggingService.toggleProfilingFeature(STARTING_FLOW_EXECUTION, profilingDataConsumer.getClass().getName(), state);
+    featureFlaggingService.toggleProfilingFeature(FLOW_EXECUTED, profilingDataConsumer.getClass().getName(), state);
+    featureFlaggingService
+        .toggleProfilingFeature(PS_SCHEDULING_OPERATION_EXECUTION, profilingDataConsumer.getClass().getName(), state);
+    featureFlaggingService
+        .toggleProfilingFeature(PS_STARTING_OPERATION_EXECUTION, profilingDataConsumer.getClass().getName(), state);
+    featureFlaggingService.toggleProfilingFeature(PS_OPERATION_EXECUTED, profilingDataConsumer.getClass().getName(), state);
+    featureFlaggingService.toggleProfilingFeature(PS_FLOW_MESSAGE_PASSING, profilingDataConsumer.getClass().getName(), state);
   }
 
   @Override
@@ -313,6 +387,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     asyncExecutor.assertNoFailures();
 
     cachedThreadPool.shutdownNow();
+    setFeaturesState(false);
   }
 
   @Test
@@ -342,7 +417,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   protected void internalConcurrent(Builder flowBuilder, boolean blocks, ProcessingType processingType, int invocations,
                                     Processor... processorsBeforeLatch)
       throws MuleException, InterruptedException {
-    MultipleInvocationLatchedProcessor latchedProcessor = new MultipleInvocationLatchedProcessor(processingType, invocations);
+    MultipleInvocationLatchedProcessor latchedProcessor =
+        new MultipleInvocationLatchedProcessor(processingType, invocations);
 
     List<Processor> processors = new ArrayList<>(asList(processorsBeforeLatch));
     processors.add(latchedProcessor);
@@ -464,7 +540,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   @Test
   public void mix2() throws Exception {
     flow = flowBuilder.get().processors(cpuLightProcessor, cpuLightProcessor, blockingProcessor, blockingProcessor,
-                                        cpuLightProcessor, cpuIntensiveProcessor, cpuIntensiveProcessor, cpuLightProcessor)
+                                        cpuLightProcessor, cpuIntensiveProcessor, cpuIntensiveProcessor,
+                                        cpuLightProcessor)
         .build();
     startFlow();
 
@@ -541,7 +618,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       asyncExecutor.submit(() -> {
         for (int j = 0; j < STREAM_ITERATIONS / CONCURRENT_TEST_CONCURRENCY; j++) {
           try {
-            dispatchFlow(newEvent(), t -> latch.countDown(), response -> bubble(new AssertionError("Unexpected error")));
+            dispatchFlow(newEvent(), t -> latch.countDown(),
+                         response -> bubble(new AssertionError("Unexpected error")));
           } catch (MuleException e) {
             throw new RuntimeException(e);
           }
@@ -616,6 +694,30 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
     assertThat(threads.toString(), threads, hasSize(equalTo(1)));
     assertThat(threads.toString(), threads, hasItem(currentThread().getName()));
+  }
+
+  protected void assertProcessingStrategyProfiling() {
+    if (parseBoolean(enableProfilingServiceProperty.getValue())) {
+      InOrder profilingDataConsumerAssertions = inOrder(profilingDataConsumer);
+      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
+          .onProfilingEvent(eq(STARTING_FLOW_EXECUTION), any(ComponentProcessingStrategyProfilingEventContext.class));
+      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
+          .onProfilingEvent(eq(PS_SCHEDULING_OPERATION_EXECUTION), any(ComponentProcessingStrategyProfilingEventContext.class));
+      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
+          .onProfilingEvent(eq(PS_STARTING_OPERATION_EXECUTION), any(ComponentProcessingStrategyProfilingEventContext.class));
+      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
+          .onProfilingEvent(eq(PS_OPERATION_EXECUTED), any(ComponentProcessingStrategyProfilingEventContext.class));
+      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
+          .onProfilingEvent(eq(PS_FLOW_MESSAGE_PASSING), any(ComponentProcessingStrategyProfilingEventContext.class));
+      profilingDataConsumerAssertions.verify(profilingDataConsumer, times(1))
+          .onProfilingEvent(eq(FLOW_EXECUTED), any(ComponentProcessingStrategyProfilingEventContext.class));
+    } else {
+      verify(profilingDataConsumer, never()).onProfilingEvent(any(), any());
+    }
+  }
+
+  protected void assertProcessingStrategyTracing() {
+    Assert.assertThat(profilingService.getTracingService().getCurrentExecutionContext(), notNullValue());
   }
 
   protected interface TransactionAwareProcessingStrategyTestCase {

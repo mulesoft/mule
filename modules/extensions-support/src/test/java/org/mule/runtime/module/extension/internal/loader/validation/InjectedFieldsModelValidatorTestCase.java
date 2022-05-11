@@ -39,6 +39,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
+import org.mule.runtime.module.extension.internal.loader.java.validation.InjectedFieldsModelValidator;
 import org.mule.sdk.api.annotation.param.RuntimeVersion;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -146,6 +147,22 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
     validate(extensionModel, validator);
   }
 
+  @Test
+  public void legacyApiConfigRef() {
+    when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
+    mockImplementingType(configurationModel, ConfigLegacyApiRefName.class);
+
+    validate(extensionModel, validator);
+  }
+
+  @Test
+  public void sdkApiConfigRef() {
+    when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
+    mockImplementingType(configurationModel, ConfigSdkApiRefName.class);
+
+    validate(extensionModel, validator);
+  }
+
   @Test(expected = IllegalModelDefinitionException.class)
   public void repeatedRefNameConfigField() {
     when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
@@ -208,7 +225,7 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
     @Optional
     public String someParameter;
 
-    @DefaultEncoding
+    @org.mule.sdk.api.annotation.param.DefaultEncoding
     private String encoding1;
 
     @DefaultEncoding
@@ -225,7 +242,7 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
 
     }
 
-    public void singleEncoding(@DefaultEncoding String encoding1) {
+    public void singleEncoding(@org.mule.sdk.api.annotation.param.DefaultEncoding String encoding1) {
 
     }
 
@@ -239,7 +256,7 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
     @DefaultEncoding
     private String encoding1;
 
-    @DefaultEncoding
+    @org.mule.sdk.api.annotation.param.DefaultEncoding
     private String encoding2;
 
     @Override
@@ -258,7 +275,7 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
     @DefaultEncoding
     private String encoding1;
 
-    @DefaultEncoding
+    @org.mule.sdk.api.annotation.param.DefaultEncoding
     private String encoding2;
   }
 
@@ -268,12 +285,24 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
     private Boolean encoding1;
   }
 
+  public static class ConfigLegacyApiRefName {
+
+    @RefName
+    private String refName;
+  }
+
+  public static class ConfigSdkApiRefName {
+
+    @org.mule.sdk.api.annotation.param.RefName
+    private String refName;
+  }
+
   public static class ConfigRepeatedRefName {
 
     @RefName
     private String refName1;
 
-    @RefName
+    @org.mule.sdk.api.annotation.param.RefName
     private String refName2;
   }
 

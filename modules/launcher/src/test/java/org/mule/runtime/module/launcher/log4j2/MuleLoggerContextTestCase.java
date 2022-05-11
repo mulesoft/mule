@@ -26,13 +26,13 @@ import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.selector.ContextSelector;
 import org.apache.logging.log4j.message.MessageFactory;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class MuleLoggerContextTestCase extends AbstractMuleTestCase {
 
   private static final String DEFAULT_CONTEXT_NAME = "Default";
@@ -40,6 +40,9 @@ public class MuleLoggerContextTestCase extends AbstractMuleTestCase {
   private static final String CATEGORY = MuleLoggerContextTestCase.class.getName();
   private static final String TEST_APPENDER = "testAppender";
   private static final Level LEVEL = Level.ERROR;
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock
   private ContextSelector contextSelector;

@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.core.internal.registry;
 
+import static org.mule.runtime.api.metadata.DataType.fromType;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.TransfromersStory.TRANSFORMERS;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -21,19 +25,26 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.transformer.ResolverException;
 import org.mule.runtime.core.internal.transformer.builder.MockConverterBuilder;
+import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @SmallTest
+@Feature(REGISTRY)
+@Story(TRANSFORMERS)
 public class TypeBasedTransformerResolverTestCase extends AbstractMuleTestCase {
 
-  private MuleContextWithRegistry muleContext = mock(MuleContextWithRegistry.class, RETURNS_DEEP_STUBS);
-  private MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
+  private final MuleContextWithRegistry muleContext = mock(MuleContextWithRegistry.class, RETURNS_DEEP_STUBS);
+  private final MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
 
   public static class A {
   }
@@ -41,8 +52,8 @@ public class TypeBasedTransformerResolverTestCase extends AbstractMuleTestCase {
   public static class B {
   }
 
-  private DataType dataTypeA = DataType.fromType(A.class);
-  private DataType dataTypeB = DataType.fromType(B.class);
+  private final DataType dataTypeA = fromType(A.class);
+  private final DataType dataTypeB = fromType(B.class);
 
   @Before
   public void setUp() throws Exception {
@@ -51,12 +62,11 @@ public class TypeBasedTransformerResolverTestCase extends AbstractMuleTestCase {
 
   @Test
   public void doesNotFailIfCannotResolveType() throws ResolverException, TransformerException {
-    MuleRegistry muleRegistry = mock(MuleRegistry.class);
-    when(muleContext.getRegistry()).thenReturn(muleRegistry);
-    ArrayList<Transformer> transformers = new ArrayList<>();
-    when(muleRegistry.lookupTransformers(dataTypeA, dataTypeB)).thenReturn(transformers);
+    TransformersRegistry transformersRegistry = mock(TransformersRegistry.class);
+    List<Transformer> transformers = new ArrayList<>();
+    when(transformersRegistry.lookupTransformers(dataTypeA, dataTypeB)).thenReturn(transformers);
     TypeBasedTransformerResolver resolver = new TypeBasedTransformerResolver();
-    resolver.setMuleContext(muleContext);
+    resolver.setTransformersRegistry(transformersRegistry);
 
     Transformer resolvedTransformer = resolver.resolve(dataTypeA, dataTypeB);
     assertNull(resolvedTransformer);
@@ -64,17 +74,15 @@ public class TypeBasedTransformerResolverTestCase extends AbstractMuleTestCase {
 
   @Test
   public void resolvesTypeWithOneMatchingTransformer() throws ResolverException, TransformerException {
-    MuleRegistry muleRegistry = mock(MuleRegistry.class);
-    when(muleContext.getRegistry()).thenReturn(muleRegistry);
+    TransformersRegistry transformersRegistry = mock(TransformersRegistry.class);
     Transformer aToBConverter = new MockConverterBuilder().from(dataTypeA).to(dataTypeB).build();
 
-    ArrayList<Transformer> transformers = new ArrayList<>();
+    List<Transformer> transformers = new ArrayList<>();
     transformers.add(aToBConverter);
-    when(muleRegistry.lookupTransformers(dataTypeA, dataTypeB)).thenReturn(transformers);
-
+    when(transformersRegistry.lookupTransformers(dataTypeA, dataTypeB)).thenReturn(transformers);
 
     TypeBasedTransformerResolver resolver = new TypeBasedTransformerResolver();
-    resolver.setMuleContext(muleContext);
+    resolver.setTransformersRegistry(transformersRegistry);
 
     Transformer resolvedTransformer = resolver.resolve(dataTypeA, dataTypeB);
     assertEquals(aToBConverter, resolvedTransformer);
@@ -82,19 +90,17 @@ public class TypeBasedTransformerResolverTestCase extends AbstractMuleTestCase {
 
   @Test
   public void resolvesTypeWithTwoMatchingTransformer() throws ResolverException, TransformerException {
-    MuleRegistry muleRegistry = mock(MuleRegistry.class);
-    when(muleContext.getRegistry()).thenReturn(muleRegistry);
+    TransformersRegistry transformersRegistry = mock(TransformersRegistry.class);
     Transformer aToBConverter = new MockConverterBuilder().from(dataTypeA).to(dataTypeB).weighting(1).build();
     Transformer betterAToBConverter = new MockConverterBuilder().from(dataTypeA).to(dataTypeB).weighting(2).build();
 
-    ArrayList<Transformer> transformers = new ArrayList<>();
+    List<Transformer> transformers = new ArrayList<>();
     transformers.add(aToBConverter);
     transformers.add(betterAToBConverter);
-    when(muleRegistry.lookupTransformers(dataTypeA, dataTypeB)).thenReturn(transformers);
-
+    when(transformersRegistry.lookupTransformers(dataTypeA, dataTypeB)).thenReturn(transformers);
 
     TypeBasedTransformerResolver resolver = new TypeBasedTransformerResolver();
-    resolver.setMuleContext(muleContext);
+    resolver.setTransformersRegistry(transformersRegistry);
 
     Transformer resolvedTransformer = resolver.resolve(dataTypeA, dataTypeB);
     assertEquals(betterAToBConverter, resolvedTransformer);
@@ -102,8 +108,9 @@ public class TypeBasedTransformerResolverTestCase extends AbstractMuleTestCase {
 
   @Test
   public void fallbacksNotRegistered() throws Exception {
+    TransformersRegistry transformersRegistry = mock(TransformersRegistry.class);
     TypeBasedTransformerResolver resolver = new TypeBasedTransformerResolver();
-    resolver.setMuleContext(muleContext);
+    resolver.setTransformersRegistry(transformersRegistry);
     resolver.initialise();
 
     verify(muleContext, never()).getRegistry();

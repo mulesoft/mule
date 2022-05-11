@@ -64,7 +64,8 @@ public class DslElementIdHelper {
     return getModelName(element.getModel())
         .map(modelName -> isBlank(element.getDsl().getPrefix()) ? modelName : element.getDsl().getPrefix() + ":" + modelName)
         .orElseGet(() -> element.getIdentifier().map(Object::toString).orElse(isBlank(element.getDsl().getElementName())
-            ? element.getDsl().getAttributeName() : element.getDsl().getElementName()));
+            ? element.getDsl().getAttributeName()
+            : element.getDsl().getElementName()));
   }
 
   static Optional<String> resolveConfigName(DslElementModel<?> elementModel) {

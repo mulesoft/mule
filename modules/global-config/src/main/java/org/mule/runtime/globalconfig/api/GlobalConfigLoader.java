@@ -14,23 +14,25 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 import static org.mule.runtime.globalconfig.internal.ClusterConfigBuilder.defaultClusterConfig;
 import static org.mule.runtime.globalconfig.internal.MavenConfigBuilder.defaultMavenConfig;
+
 import org.mule.maven.client.api.model.MavenConfiguration;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.globalconfig.api.cluster.ClusterConfig;
 import org.mule.runtime.globalconfig.api.exception.RuntimeGlobalConfigException;
 import org.mule.runtime.globalconfig.internal.ClusterConfigBuilder;
 import org.mule.runtime.globalconfig.internal.MavenConfigBuilder;
-
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-import com.typesafe.config.ConfigParseOptions;
-import com.typesafe.config.ConfigRenderOptions;
-import com.typesafe.config.ConfigResolveOptions;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.locks.StampedLock;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigParseOptions;
+import com.typesafe.config.ConfigRenderOptions;
+import com.typesafe.config.ConfigResolveOptions;
 
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
@@ -83,15 +85,15 @@ public class GlobalConfigLoader {
     } else {
       String effectiveConfigAsJson =
           muleRuntimeConfig.root().render(ConfigRenderOptions.concise().setJson(true).setComments(false));
-      String prettyPrintConfig = muleRuntimeConfig.root()
-          .render(ConfigRenderOptions.defaults().setComments(true).setJson(true).setFormatted(true));
+      Supplier<String> prettyPrintConfig = new LazyValue<>(() -> muleRuntimeConfig.root()
+          .render(ConfigRenderOptions.defaults().setComments(true).setJson(true).setFormatted(true)));
       try (
           InputStream schemaStream = GlobalConfigLoader.class.getClassLoader().getResourceAsStream(MULE_SCHEMA_JSON_LOCATION)) {
         JSONObject rawSchema = new JSONObject(new JSONTokener(schemaStream));
         Schema schema = SchemaLoader.load(rawSchema);
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("Using effective mule-config.json configuration: \n"
-              + prettyPrintConfig);
+              + prettyPrintConfig.get());
         }
         schema.validate(new JSONObject(effectiveConfigAsJson));
         parseMavenConfig(muleRuntimeConfig);
@@ -99,7 +101,7 @@ public class GlobalConfigLoader {
       } catch (ValidationException e) {
         LOGGER
             .info(format("Mule global config exception. Effective configuration is (config is a merge of MULE_HOME/conf/%s.json and system properties): \n %s",
-                         configFileName, prettyPrintConfig));
+                         configFileName, prettyPrintConfig.get()));
         throw new RuntimeGlobalConfigException(e);
       } catch (IOException e) {
         throw new RuntimeGlobalConfigException(
@@ -147,10 +149,14 @@ public class GlobalConfigLoader {
   }
 
   /**
-   * @return the maven configuration to use for the runtime.
+   * @return the Maven configuration to use for the runtime.
    */
   public static MavenConfiguration getMavenConfig() {
     return safelyGetConfig(() -> mavenConfig);
+  }
+
+  public static void setMavenConfig(MavenConfiguration mavenConfig) {
+    GlobalConfigLoader.mavenConfig = mavenConfig;
   }
 
   /**

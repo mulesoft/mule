@@ -34,8 +34,6 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.inject.Inject;
-
 /**
  * Base implementation of an {@link ObjectBuilder} which generates object based on an {@link EnrichableModel} for with parameter
  * groups have been defined based on a {@link ParameterGroupModelProperty}
@@ -46,7 +44,7 @@ import javax.inject.Inject;
 public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<T>, Initialisable {
 
   protected final ResolverSet resolverSet;
-  private final List<ValueSetter> singleValueSetters;
+  protected List<ValueSetter> singleValueSetters;
   private final List<ValueSetter> groupValueSetters;
   private final ConcurrentMap<Class<?>, Optional<FieldSetter>> encodingFieldSetter = new ConcurrentHashMap<>();
 
@@ -106,7 +104,7 @@ public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<
     }
   }
 
-  private List<ValueSetter> createSingleValueSetters(Class<?> prototypeClass, ResolverSet resolverSet) {
+  protected List<ValueSetter> createSingleValueSetters(Class<?> prototypeClass, ResolverSet resolverSet) {
     return resolverSet.getResolvers().keySet().stream().map(parameterName -> {
       // if no field, then it means this is a group attribute
       return getField(prototypeClass, parameterName, getReflectionCache()).map(f -> new SingleValueSetter(parameterName, f));

@@ -28,8 +28,8 @@ import java.util.Collection;
  * A {@link MetadataResolverFactory} implementation for {@link Query} operations, it provides initialized instances of
  * {@link OutputTypeResolver} and {@link QueryEntityResolver}.
  *
- * {@link AttributesTypeResolver}, {@link InputTypeResolver} and {@link TypeKeysResolver} returned instances are
- * always instances of {@link NullMetadataResolver}.
+ * {@link AttributesTypeResolver}, {@link InputTypeResolver} and {@link TypeKeysResolver} returned instances are always instances
+ * of {@link NullMetadataResolver}.
  *
  * @since 4.0
  */

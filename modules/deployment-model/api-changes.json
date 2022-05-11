@@ -1,4 +1,322 @@
 {
+  "4.5.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.class.nonFinalClassInheritsFromNewClass",
+          "old": "class org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants",
+          "new": "class org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants",
+          "superClass": "org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants",
+          "package": "org.mule.runtime.deployment.model.api.artifact",
+          "classSimpleName": "ArtifactDescriptorConstants",
+          "elementKind": "class",
+          "justification": "Not a real issue"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method D org.mule.runtime.deployment.model.api.DeployableArtifact<D extends org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor>::getDescriptor()",
+          "new": "method D org.mule.runtime.deployment.model.api.DeployableArtifact<D extends org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor>::getDescriptor()",
+          "oldType": "D extends org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor",
+          "newType": "D extends org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor",
+          "package": "org.mule.runtime.deployment.model.api",
+          "classSimpleName": "DeployableArtifact",
+          "methodName": "getDescriptor",
+          "elementKind": "method",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.class.noLongerImplementsInterface",
+          "old": "interface org.mule.runtime.deployment.model.api.DeployableArtifact<D extends org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor>",
+          "new": "interface org.mule.runtime.deployment.model.api.DeployableArtifact<D extends org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor>",
+          "interface": "org.mule.runtime.module.artifact.api.Artifact<D extends org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor>",
+          "package": "org.mule.runtime.deployment.model.api",
+          "classSimpleName": "DeployableArtifact",
+          "elementKind": "interface",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.generics.formalTypeParameterChanged",
+          "old": "interface org.mule.runtime.deployment.model.api.DeployableArtifact<D extends org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor>",
+          "new": "interface org.mule.runtime.deployment.model.api.DeployableArtifact<D extends org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor>",
+          "oldTypeParameter": "D extends org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor",
+          "newTypeParameter": "D extends org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor",
+          "package": "org.mule.runtime.deployment.model.api",
+          "classSimpleName": "DeployableArtifact",
+          "elementKind": "interface",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.class.superTypeTypeParametersChanged",
+          "old": "interface org.mule.runtime.deployment.model.api.DeployableArtifact<D extends org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor>",
+          "new": "interface org.mule.runtime.deployment.model.api.DeployableArtifact<D extends org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor>",
+          "oldSuperType": "org.mule.runtime.module.artifact.api.Artifact<D extends org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor>",
+          "newSuperType": "org.mule.runtime.module.artifact.api.Artifact<D extends org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor>",
+          "package": "org.mule.runtime.deployment.model.api",
+          "classSimpleName": "DeployableArtifact",
+          "elementKind": "interface",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method java.util.Set<org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor> org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor::getPlugins()",
+          "new": "method java.util.Set<org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor> org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor::getPlugins() @ org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor",
+          "oldType": "java.util.Set<org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor>",
+          "newType": "java.util.Set<org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor>",
+          "package": "org.mule.runtime.deployment.model.api",
+          "classSimpleName": "DeployableArtifactDescriptor",
+          "methodName": "getPlugins",
+          "elementKind": "method",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.class.nonFinalClassInheritsFromNewClass",
+          "old": "class org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor",
+          "new": "class org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor",
+          "superClass": "org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor",
+          "package": "org.mule.runtime.deployment.model.api",
+          "classSimpleName": "DeployableArtifactDescriptor",
+          "elementKind": "class",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.class.noLongerImplementsInterface",
+          "old": "interface org.mule.runtime.deployment.model.api.application.Application",
+          "new": "interface org.mule.runtime.deployment.model.api.application.Application",
+          "interface": "org.mule.runtime.deployment.model.api.DeployableArtifact<org.mule.runtime.deployment.model.api.application.ApplicationDescriptor>",
+          "package": "org.mule.runtime.deployment.model.api.application",
+          "classSimpleName": "Application",
+          "elementKind": "interface",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.class.noLongerImplementsInterface",
+          "old": "interface org.mule.runtime.deployment.model.api.application.Application",
+          "new": "interface org.mule.runtime.deployment.model.api.application.Application",
+          "interface": "org.mule.runtime.module.artifact.api.Artifact<org.mule.runtime.deployment.model.api.application.ApplicationDescriptor>",
+          "package": "org.mule.runtime.deployment.model.api.application",
+          "classSimpleName": "Application",
+          "elementKind": "interface",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.class.superTypeTypeParametersChanged",
+          "old": "interface org.mule.runtime.deployment.model.api.application.Application",
+          "new": "interface org.mule.runtime.deployment.model.api.application.Application",
+          "oldSuperType": "org.mule.runtime.deployment.model.api.DeployableArtifact<org.mule.runtime.deployment.model.api.application.ApplicationDescriptor>",
+          "newSuperType": "org.mule.runtime.deployment.model.api.DeployableArtifact<org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor>",
+          "package": "org.mule.runtime.deployment.model.api.application",
+          "classSimpleName": "Application",
+          "elementKind": "interface",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.class.noLongerInheritsFromClass",
+          "old": "class org.mule.runtime.deployment.model.api.application.ApplicationDescriptor",
+          "new": "class org.mule.runtime.deployment.model.api.application.ApplicationDescriptor",
+          "superClass": "org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor",
+          "package": "org.mule.runtime.deployment.model.api.application",
+          "classSimpleName": "ApplicationDescriptor",
+          "elementKind": "class",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.class.nonFinalClassInheritsFromNewClass",
+          "old": "class org.mule.runtime.deployment.model.api.application.ApplicationDescriptor",
+          "new": "class org.mule.runtime.deployment.model.api.application.ApplicationDescriptor",
+          "superClass": "org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor",
+          "package": "org.mule.runtime.deployment.model.api.application",
+          "classSimpleName": "ApplicationDescriptor",
+          "elementKind": "class",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.class.nonFinalClassInheritsFromNewClass",
+          "old": "class org.mule.runtime.deployment.model.api.application.ApplicationDescriptor",
+          "new": "class org.mule.runtime.deployment.model.api.application.ApplicationDescriptor",
+          "superClass": "org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor",
+          "package": "org.mule.runtime.deployment.model.api.application",
+          "classSimpleName": "ApplicationDescriptor",
+          "elementKind": "class",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.class.noLongerImplementsInterface",
+          "old": "interface org.mule.runtime.deployment.model.api.domain.Domain",
+          "new": "interface org.mule.runtime.deployment.model.api.domain.Domain",
+          "interface": "org.mule.runtime.deployment.model.api.DeployableArtifact<org.mule.runtime.deployment.model.api.domain.DomainDescriptor>",
+          "package": "org.mule.runtime.deployment.model.api.domain",
+          "classSimpleName": "Domain",
+          "elementKind": "interface",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.class.noLongerImplementsInterface",
+          "old": "interface org.mule.runtime.deployment.model.api.domain.Domain",
+          "new": "interface org.mule.runtime.deployment.model.api.domain.Domain",
+          "interface": "org.mule.runtime.module.artifact.api.Artifact<org.mule.runtime.deployment.model.api.domain.DomainDescriptor>",
+          "package": "org.mule.runtime.deployment.model.api.domain",
+          "classSimpleName": "Domain",
+          "elementKind": "interface",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.class.superTypeTypeParametersChanged",
+          "old": "interface org.mule.runtime.deployment.model.api.domain.Domain",
+          "new": "interface org.mule.runtime.deployment.model.api.domain.Domain",
+          "oldSuperType": "org.mule.runtime.deployment.model.api.DeployableArtifact<org.mule.runtime.deployment.model.api.domain.DomainDescriptor>",
+          "newSuperType": "org.mule.runtime.deployment.model.api.DeployableArtifact<org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor>",
+          "package": "org.mule.runtime.deployment.model.api.domain",
+          "classSimpleName": "Domain",
+          "elementKind": "interface",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.class.noLongerInheritsFromClass",
+          "old": "class org.mule.runtime.deployment.model.api.domain.DomainDescriptor",
+          "new": "class org.mule.runtime.deployment.model.api.domain.DomainDescriptor",
+          "superClass": "org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor",
+          "package": "org.mule.runtime.deployment.model.api.domain",
+          "classSimpleName": "DomainDescriptor",
+          "elementKind": "class",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.class.nonFinalClassInheritsFromNewClass",
+          "old": "class org.mule.runtime.deployment.model.api.domain.DomainDescriptor",
+          "new": "class org.mule.runtime.deployment.model.api.domain.DomainDescriptor",
+          "superClass": "org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor",
+          "package": "org.mule.runtime.deployment.model.api.domain",
+          "classSimpleName": "DomainDescriptor",
+          "elementKind": "class",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.class.nonFinalClassInheritsFromNewClass",
+          "old": "class org.mule.runtime.deployment.model.api.domain.DomainDescriptor",
+          "new": "class org.mule.runtime.deployment.model.api.domain.DomainDescriptor",
+          "superClass": "org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor",
+          "package": "org.mule.runtime.deployment.model.api.domain",
+          "classSimpleName": "DomainDescriptor",
+          "elementKind": "class",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method D org.mule.runtime.module.artifact.api.Artifact<D extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>::getDescriptor() @ org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin",
+          "new": "method D org.mule.runtime.module.artifact.api.Artifact<D extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>::getDescriptor() @ org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin",
+          "oldType": "org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor",
+          "newType": "org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor",
+          "package": "org.mule.runtime.deployment.model.api.plugin",
+          "classSimpleName": "ArtifactPlugin",
+          "methodName": "getDescriptor",
+          "elementKind": "method",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.class.noLongerImplementsInterface",
+          "old": "interface org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin",
+          "new": "interface org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin",
+          "interface": "org.mule.runtime.module.artifact.api.Artifact<org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor>",
+          "package": "org.mule.runtime.deployment.model.api.plugin",
+          "classSimpleName": "ArtifactPlugin",
+          "elementKind": "interface",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.class.superTypeTypeParametersChanged",
+          "old": "interface org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin",
+          "new": "interface org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin",
+          "oldSuperType": "org.mule.runtime.module.artifact.api.Artifact<org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor>",
+          "newSuperType": "org.mule.runtime.module.artifact.api.Artifact<org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor>",
+          "package": "org.mule.runtime.deployment.model.api.plugin",
+          "classSimpleName": "ArtifactPlugin",
+          "elementKind": "interface",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method java.util.Optional<org.mule.runtime.deployment.model.api.plugin.LoaderDescriber> org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor::getExtensionModelDescriptorProperty()",
+          "new": "method java.util.Optional<org.mule.runtime.module.artifact.api.plugin.LoaderDescriber> org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor::getExtensionModelDescriptorProperty() @ org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor",
+          "oldType": "java.util.Optional<org.mule.runtime.deployment.model.api.plugin.LoaderDescriber>",
+          "newType": "java.util.Optional<org.mule.runtime.module.artifact.api.plugin.LoaderDescriber>",
+          "package": "org.mule.runtime.deployment.model.api.plugin",
+          "classSimpleName": "ArtifactPluginDescriptor",
+          "methodName": "getExtensionModelDescriptorProperty",
+          "elementKind": "method",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.class.noLongerInheritsFromClass",
+          "old": "class org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor",
+          "new": "class org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor",
+          "superClass": "org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor",
+          "package": "org.mule.runtime.deployment.model.api.plugin",
+          "classSimpleName": "ArtifactPluginDescriptor",
+          "elementKind": "class",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method java.util.Set<org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor> org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor::getPlugins()",
+          "new": "method java.util.Set<org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor> org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor::getPlugins()",
+          "oldType": "java.util.Set<org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor>",
+          "newType": "java.util.Set<org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor>",
+          "package": "org.mule.runtime.deployment.model.api.policy",
+          "classSimpleName": "PolicyTemplateDescriptor",
+          "methodName": "getPlugins",
+          "elementKind": "method",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.method.parameterTypeParameterChanged",
+          "old": "parameter void org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor::setPlugins(===java.util.Set<org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor>===)",
+          "new": "parameter void org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor::setPlugins(===java.util.Set<org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor>===)",
+          "oldType": "java.util.Set<org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor>",
+          "newType": "java.util.Set<org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor>",
+          "package": "org.mule.runtime.deployment.model.api.policy",
+          "classSimpleName": "PolicyTemplateDescriptor",
+          "methodName": "setPlugins",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory::create(java.lang.String, ===org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor===, java.lang.ClassLoader, org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy)",
+          "new": "parameter org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory::create(java.lang.String, ===org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor===, java.lang.ClassLoader, org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy)",
+          "oldType": "org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor",
+          "newType": "org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor",
+          "package": "org.mule.runtime.deployment.model.api.plugin",
+          "classSimpleName": "ArtifactPluginClassLoaderFactory",
+          "methodName": "create",
+          "parameterIndex": "1",
+          "elementKind": "parameter",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.class.noLongerImplementsInterface",
+          "old": "class org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory",
+          "new": "class org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory",
+          "interface": "org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory<org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor>",
+          "package": "org.mule.runtime.deployment.model.api.plugin",
+          "classSimpleName": "ArtifactPluginClassLoaderFactory",
+          "elementKind": "class",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        },
+        {
+          "code": "java.class.superTypeTypeParametersChanged",
+          "old": "class org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory",
+          "new": "class org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory",
+          "oldSuperType": "org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory<org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor>",
+          "newSuperType": "org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory<org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor>",
+          "package": "org.mule.runtime.deployment.model.api.plugin",
+          "classSimpleName": "ArtifactPluginClassLoaderFactory",
+          "elementKind": "class",
+          "justification": "W-10742243: Usages of this API are intended to be recompiled against this new version."
+        }
+      ]
+    }
+  },
   "4.1.1": {
     "revapi": {
       "ignore": [

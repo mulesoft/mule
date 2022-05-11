@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
+
+    <petstore:config name="petstore" cashierName="jim">
+        <petstore:pooled-connection username="john" password="****">
+            <reconnection>
+                <reconnect/>
+            </reconnection>
+        </petstore:pooled-connection>
+        <petstore:pets>
+            <petstore:pet value="Lassie"/>
+            <petstore:pet value="Sapo Pepe"/>
+            <petstore:pet value="My mother's parrot"/>
+        </petstore:pets>
+    </petstore:config>
+
+    <flow name="streamingReconnect">
+        <petstore:get-pets config-ref="petstore" ownerName="jo" ownerSignature="#[vars.signature]"/>
+    </flow>
+
+    <flow name="streamingReconnectWithClosedStream">
+        <petstore:get-streamed-signature signature="#[vars.signature]"/>
+        <petstore:get-pets-with-intermitent-connection-problem-and-closing-stream config-ref="petstore" ownerName="jo"
+                                                                                  ownerSignature="#[payload]"/>
+        <set-payload value="SUCCESS"/>
+    </flow>
+
+    <flow name="streamingTypedValueReconnectWithClosedStream">
+        <petstore:get-streamed-signature signature="#[vars.signature]"/>
+        <petstore:get-pets-with-intermitent-connection-problem-and-closing-typed-value-stream config-ref="petstore" ownerName="jo"
+                                                                                  ownerSignature="#[payload]"/>
+        <set-payload value="SUCCESS"/>
+    </flow>
+
+    <flow name="streamingReconnectWithClosedStreamInParameterGroup">
+        <petstore:get-streamed-signature signature="#[vars.signature]"/>
+        <petstore:get-pets-with-intermitent-connection-problem-and-closing-stream-in-parameter-group config-ref="petstore" name="jo" signature="#[payload]"/>
+        <set-payload value="SUCCESS"/>
+    </flow>
+
+    <flow name="streamingReconnectWithClosedStreamInParameterGroupShownInDsl">
+        <petstore:get-streamed-signature signature="#[vars.signature]"/>
+        <petstore:get-pets-with-intermitent-connection-problem-and-closing-stream-in-parameter-group-shown-in-dsl config-ref="petstore">
+            <petstore:owner name="jo" signature="#[payload]"/>
+        </petstore:get-pets-with-intermitent-connection-problem-and-closing-stream-in-parameter-group-shown-in-dsl>
+        <set-payload value="SUCCESS"/>
+    </flow>
+
+    <flow name="streamingReconnectWithParameterGroup">
+        <petstore:get-pets-with-parameter-group config-ref="petstore" name="jo" signature="#[vars.signature]"/>
+    </flow>
+
+    <flow name="streamingReconnectWithParameterGroupShowDsl">
+        <petstore:get-pets-with-parameter-group-show-dsl config-ref="petstore">
+            <petstore:owner name="jo" signature="#[vars.signature]"/>
+        </petstore:get-pets-with-parameter-group-show-dsl>
+    </flow>
+
+    <flow name="streamingReconnectWithParameterGroupShowDslWithTypedParameter">
+        <petstore:get-pets-with-parameter-group-show-dsl config-ref="petstore">
+            <petstore:owner name="jo" signature="#[vars.signature]" address="#[vars.address]"/>
+        </petstore:get-pets-with-parameter-group-show-dsl>
+    </flow>
+
+    <flow name="streamingReconnectWithParameterGroupShowDslWithParameterWithAlias">
+        <petstore:get-pets-with-parameter-group-show-dsl config-ref="petstore">
+            <petstore:owner name="jo" signature="#[vars.signature]" certificate="#[vars.certificate]"/>
+        </petstore:get-pets-with-parameter-group-show-dsl>
+    </flow>
+
+    <flow name="streamingReconnectWithTypedParameter">
+        <petstore:get-pets-with-typed-input-stream-parameter config-ref="petstore" owner="jo" signature="#[vars.signature]"/>
+    </flow>
+
+</mule>

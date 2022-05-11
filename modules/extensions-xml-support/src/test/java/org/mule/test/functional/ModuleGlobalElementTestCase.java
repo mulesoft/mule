@@ -11,8 +11,8 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
-import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 
 import org.mule.test.petstore.extension.PetStoreClient;
@@ -89,8 +89,8 @@ public class ModuleGlobalElementTestCase extends AbstractCeXmlExtensionMuleArtif
 
   @Override
   public boolean mustRegenerateComponentBuildingDefinitionRegistryFactory() {
-    // returns true because not same extensions are loaded by all tests. 
-    // returning false will fails while creating application context on some tests. 
+    // returns true because not same extensions are loaded by all tests.
+    // returning false will fails while creating application context on some tests.
     return true;
   }
 

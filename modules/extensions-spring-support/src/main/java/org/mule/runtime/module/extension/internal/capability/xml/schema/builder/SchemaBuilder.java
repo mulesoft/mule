@@ -6,40 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.schema.builder;
 
-import static com.google.common.hash.Hashing.sha256;
-import static java.lang.String.format;
-import static java.lang.String.join;
-import static java.math.BigInteger.ONE;
-import static java.math.BigInteger.ZERO;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
-import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.api.util.NameUtils.sanitizeName;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.EE_SCHEMA_LOCATION;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.ENUM_TYPE_SUFFIX;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MAX_ONE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_OPERATION_TRANSACTIONAL_ACTION_TYPE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_SCHEMA_LOCATION;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_TLS_NAMESPACE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_TLS_SCHEMA_LOCATION;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_TRANSACTION_TYPE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.PRIVATE_OBJECT_STORE_ELEMENT;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.SCHEDULING_STRATEGY_ELEMENT;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.SPRING_FRAMEWORK_NAMESPACE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.STRING;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.TLS_CONTEXT_TYPE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.USE_OPTIONAL;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.USE_REQUIRED;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.XML_NAMESPACE;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
@@ -49,10 +19,41 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.componentH
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+import static org.mule.runtime.module.extension.internal.capability.xml.DocumenterUtils.isOperationTransactionalActionType;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.builder.ObjectTypeSchemaDelegate.getAbstractElementName;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.ENUM_TYPE_SUFFIX;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MAX_ONE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_OPERATION_TRANSACTIONAL_ACTION_TYPE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_PROPERTY_PLACEHOLDER_TYPE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_TLS_NAMESPACE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_TLS_SCHEMA_LOCATION;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_TRANSACTION_TYPE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.PRIVATE_OBJECT_STORE_ELEMENT;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.SCHEDULING_STRATEGY_ELEMENT;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.STRING;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.TLS_CONTEXT_TYPE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.USE_OPTIONAL;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.USE_REQUIRED;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.XML_NAMESPACE;
+
+import static java.lang.String.format;
+import static java.lang.String.join;
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.ZERO;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
+
+import static com.google.common.hash.Hashing.sha256;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
@@ -77,7 +78,6 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.tx.TransactionType;
-import org.mule.runtime.config.internal.dsl.SchemaConstants;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.declaration.type.annotation.SubstitutionGroup;
@@ -85,7 +85,6 @@ import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
-import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.extension.api.util.ParameterModelComparator;
@@ -129,6 +128,8 @@ import javax.xml.namespace.QName;
  */
 public final class SchemaBuilder {
 
+  public String EE_SCHEMA_LOCATION = format("%s/%s/%s.xsd", EE_NAMESPACE, "current", EE_PREFIX);
+
   private static final String GLOBAL_ABSTRACT_ELEMENT_MASK = "global-%s";
   private static final String AUTOGENERATED_TYPEID_MASK = "AUTOGENERATED_%s_";
 
@@ -164,7 +165,6 @@ public final class SchemaBuilder {
     builder.schema.setAttributeFormDefault(FormChoice.UNQUALIFIED);
     builder.withDslSyntaxResolver(extensionModel, dslContext)
         .importXmlNamespace()
-        .importSpringFrameworkNamespace()
         .importMuleNamespace();
 
     builder.initialiseDelegates();
@@ -230,18 +230,10 @@ public final class SchemaBuilder {
     return this;
   }
 
-  private SchemaBuilder importSpringFrameworkNamespace() {
-    Import springFrameworkImport = new Import();
-    springFrameworkImport.setNamespace(SPRING_FRAMEWORK_NAMESPACE);
-    springFrameworkImport.setSchemaLocation(SPRING_FRAMEWORK_SCHEMA_LOCATION);
-    schema.getIncludeOrImportOrRedefine().add(springFrameworkImport);
-    return this;
-  }
-
   private Import createMuleImport() {
     Import muleSchemaImport = new Import();
     muleSchemaImport.setNamespace(CORE_NAMESPACE);
-    muleSchemaImport.setSchemaLocation(MULE_SCHEMA_LOCATION);
+    muleSchemaImport.setSchemaLocation(CORE_SCHEMA_LOCATION);
     return muleSchemaImport;
   }
 
@@ -335,7 +327,7 @@ public final class SchemaBuilder {
     TopLevelSimpleType enumSimpleType = new TopLevelSimpleType();
 
     Optional<String> enumTypeId = getOrCreateEnumTypeId(enumType);
-    enumSimpleType.setName(sanitizeName(enumTypeId) + SchemaConstants.ENUM_TYPE_SUFFIX);
+    enumSimpleType.setName(sanitizeName(enumTypeId) + ENUM_TYPE_SUFFIX);
 
     Union union = new Union();
     union.getSimpleType().add(createEnumSimpleType(enumAnnotation));
@@ -349,7 +341,7 @@ public final class SchemaBuilder {
     LocalSimpleType expression = new LocalSimpleType();
     Restriction restriction = new Restriction();
     expression.setRestriction(restriction);
-    restriction.setBase(SchemaConstants.MULE_PROPERTY_PLACEHOLDER_TYPE);
+    restriction.setBase(MULE_PROPERTY_PLACEHOLDER_TYPE);
 
     return expression;
   }
@@ -410,7 +402,7 @@ public final class SchemaBuilder {
         attribute.setName(name);
 
         String typeName = getOrCreateEnumTypeId(enumType).get();
-        if (OperationTransactionalAction.class.getName().equals(typeName)) {
+        if (isOperationTransactionalActionType(typeName)) {
           attribute.setType(MULE_OPERATION_TRANSACTIONAL_ACTION_TYPE);
         } else if (TransactionType.class.getName().equals(typeName)) {
           attribute.setType(MULE_TRANSACTION_TYPE);
@@ -448,8 +440,8 @@ public final class SchemaBuilder {
    * <xs:element minOccurs="0" maxOccurs="1" ref="ns:global-abstract-type-name"></xs:element> </xs:choice> </xs:complexType>
    * <p/>
    *
-   * @param typeDsl {@link DslElementSyntax} of the referenced type
-   * @param type the {@link MetadataType type} of the base element that will be referenced
+   * @param typeDsl   {@link DslElementSyntax} of the referenced type
+   * @param type      the {@link MetadataType type} of the base element that will be referenced
    * @param minOccurs {@link BigInteger#ZERO} if the {@code group} is optional or {@link BigInteger#ONE} if required
    * @param maxOccurs the maximum number of occurrences for this group
    * @return a {@link ExplicitGroup Choice} group with the necessary options for this case
@@ -532,8 +524,8 @@ public final class SchemaBuilder {
    * <p>
    * <xs:element type="ns:org.mule.test.OtherType" substitutionGroup="ns:abstract-type-name" name="other-type"></xs:element>
    *
-   * @param typeDsl {@link DslElementSyntax} of the referenced {@code type}
-   * @param type {@link MetadataType} of the referenced {@code type}
+   * @param typeDsl    {@link DslElementSyntax} of the referenced {@code type}
+   * @param type       {@link MetadataType} of the referenced {@code type}
    * @param isRequired whether or not the element element is required
    * @return the {@link TopLevelElement element} representing the reference
    */

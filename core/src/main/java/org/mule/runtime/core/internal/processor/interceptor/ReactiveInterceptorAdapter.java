@@ -4,17 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.core.internal.processor.interceptor;
 
 import static java.lang.String.valueOf;
-import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.util.collection.SmallMap.forSize;
-import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
@@ -43,10 +41,8 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.internal.interception.ReactiveInterceptor;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
+import org.mule.runtime.core.internal.processor.HasParamsAsTemplateProcessor;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
-import org.mule.runtime.core.internal.processor.simple.ParseTemplateProcessor;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 import java.util.LinkedList;
@@ -116,12 +112,26 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
                   .cast(CoreEvent.class)
                   .transform(next)
                   .onErrorMap(MessagingException.class,
-                              error -> createMessagingException(doAfter(interceptor, (Component) component, of(error.getCause()))
-                                  .apply((InternalEvent) error.getEvent()),
-                                                                error.getCause(),
-                                                                error.getFailingComponent() != null ? error.getFailingComponent()
-                                                                    : (Component) component,
-                                                                of(error)))
+                              error -> {
+                                InternalEvent resolvedEvent = doAfter(interceptor, (Component) component,
+                                                                      of(error.getCause()))
+                                                                          .apply((InternalEvent) error.getEvent());
+                                Component failingComponent = error.getFailingComponent() != null
+                                    ? error.getFailingComponent()
+                                    : (Component) component;
+
+                                if (interceptor.isErrorMappingRequired(componentLocation)) {
+                                  return resolveMessagingException(resolvedEvent,
+                                                                   error.getCause(),
+                                                                   failingComponent,
+                                                                   of(error));
+                                } else {
+                                  return createMessagingException(resolvedEvent,
+                                                                  error.getCause(),
+                                                                  failingComponent,
+                                                                  of(error));
+                                }
+                              })
                   .cast(InternalEvent.class)
                   .map(doAfter(interceptor, (Component) component, empty()))
                   .subscriberContext(innerCtx -> innerCtx.put(WITHIN_PROCESS_TO_APPLY, true))
@@ -142,24 +152,16 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
                      component.getLocation().getLocation());
       }
       try {
-        Thread currentThread = currentThread();
-        ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-        ClassLoader contextClassLoader = interceptor.getClassLoader();
-        setContextClassLoader(currentThread, currentClassLoader, contextClassLoader);
-        try {
-          interceptor.before(component.getLocation(),
-                             getResolvedParams(eventWithResolvedParams),
-                             interceptionEvent);
-        } finally {
-          setContextClassLoader(currentThread, contextClassLoader, currentClassLoader);
-        }
+        withContextClassLoader(interceptor.getClassLoader(), () -> interceptor.before(component.getLocation(),
+                                                                                      getResolvedParams(eventWithResolvedParams),
+                                                                                      interceptionEvent));
 
         return interceptionEvent.resolve();
       } catch (Exception e) {
-        if (e.getCause() instanceof MessagingException) {
-          throw propagate(e.getCause());
+        if (e.getCause().getCause() instanceof MessagingException) {
+          throw propagate(e.getCause().getCause());
         } else {
-          throw propagate(new MessagingException(interceptionEvent.resolve(), e, component));
+          throw propagate(new MessagingException(interceptionEvent.resolve(), e.getCause(), component));
         }
       }
     };
@@ -176,25 +178,14 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
                      component.getLocation().getLocation());
       }
       try {
-        Thread currentThread = currentThread();
-        ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-        ClassLoader contextClassLoader = interceptor.getClass().getClassLoader();
-        setContextClassLoader(currentThread, currentClassLoader, contextClassLoader);
-        try {
-          interceptor.after(component.getLocation(), interceptionEvent, thrown);
-        } finally {
-          setContextClassLoader(currentThread, contextClassLoader, currentClassLoader);
-        }
+        withContextClassLoader(interceptor.getClassLoader(),
+                               () -> interceptor.after(component.getLocation(), interceptionEvent, thrown));
 
         return interceptionEvent.resolve();
       } catch (Exception e) {
-        throw propagate(createMessagingException(interceptionEvent.resolve(), e, component, empty()));
+        throw propagate(resolveMessagingException(interceptionEvent.resolve(), e.getCause(), component, empty()));
       }
     };
-  }
-
-  private boolean isInterceptable(ReactiveProcessor component) {
-    return component instanceof Component && ((Component) component).getLocation() != null;
   }
 
   @Override
@@ -227,7 +218,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
         // handling exceptions here in the interceptor adapter code. Any exception is to be handling by the interceptor
         // implementation
         if (expressionManager.isExpression(providedValue)) {
-          if (component instanceof LoggerMessageProcessor || component instanceof ParseTemplateProcessor) {
+          if (component instanceof HasParamsAsTemplateProcessor) {
             return expressionManager.parseLogTemplate(providedValue, event, component.getLocation(),
                                                       NULL_BINDING_CONTEXT);
           } else {

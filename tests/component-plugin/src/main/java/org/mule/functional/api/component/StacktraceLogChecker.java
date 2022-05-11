@@ -84,7 +84,7 @@ public class StacktraceLogChecker extends AbstractLogChecker {
   }
 
   private MethodCall createMethodCallFromMatcher(java.util.regex.Matcher matcher) {
-    //If no line number found,is probably due to native method
+    // If no line number found,is probably due to native method
     if (matcher.group(4).equals(EMPTY)) {
       return new MethodCall(matcher.group(1), matcher.group(2), matcher.group(3));
     }
@@ -125,16 +125,15 @@ public class StacktraceLogChecker extends AbstractLogChecker {
     }
 
     /**
-     * {@link org.hamcrest.Matcher} to compare two Method calls.
-     * Two method calls will be compatible if all their defined fields are equal. If a field is not defined(null),
-     * if will be ignored in the comparison.
+     * {@link org.hamcrest.Matcher} to compare two Method calls. Two method calls will be compatible if all their defined fields
+     * are equal. If a field is not defined(null), if will be ignored in the comparison.
      *
      * For example:
      *
      * MethodCall(null,null,null,null) will be compatible with every other MethodCall.
      *
-     * MethodCall(aPackage,aClass,aMethod,null) will be compatible with MethodCall(aPackage,aClass,aMethod,128)
-     * but won't be compatible with MethodCall(otherPackage,aClass,aMethod,null).
+     * MethodCall(aPackage,aClass,aMethod,null) will be compatible with MethodCall(aPackage,aClass,aMethod,128) but won't be
+     * compatible with MethodCall(otherPackage,aClass,aMethod,null).
      *
      * @param thisCall
      * @return a {@link org.hamcrest.Matcher} for checking compatible method calls.

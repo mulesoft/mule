@@ -6,11 +6,6 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
@@ -21,18 +16,26 @@ import static org.mule.runtime.core.api.context.notification.MuleContextNotifica
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_INITIALISED;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTED;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STOPPED;
+import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager.isCompatibleBundle;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
+
+import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
+
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.Notification.Action;
@@ -41,26 +44,27 @@ import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
-import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
+import org.mule.runtime.core.api.data.sample.SampleDataService;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.logging.LogUtil;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.InstallException;
 import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
+import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifact;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
@@ -68,7 +72,6 @@ import org.mule.runtime.module.deployment.impl.internal.domain.AmbiguousDomainRe
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.deployment.impl.internal.domain.IncompatibleDomainException;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 
 import java.io.File;
 import java.net.URL;
@@ -93,6 +96,8 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
   private final ClassLoaderRepository classLoaderRepository;
   private final File location;
+  private final MemoryManagementService memoryManagementService;
+  private final ArtifactConfigurationProcessor artifactConfigurationProcessor;
   private ApplicationStatus status;
 
   protected MuleContextListener muleContextListener;
@@ -110,7 +115,9 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
                                 ExtensionModelLoaderRepository extensionModelLoaderRepository, File location,
                                 ClassLoaderRepository classLoaderRepository,
                                 ApplicationPolicyProvider applicationPolicyProvider,
-                                LockFactory runtimeLockFactory) {
+                                LockFactory runtimeLockFactory,
+                                MemoryManagementService memoryManagementService,
+                                ArtifactConfigurationProcessor artifactConfigurationProcessor) {
     super("app", "application", deploymentClassLoader);
     this.descriptor = descriptor;
     this.domainRepository = domainRepository;
@@ -121,6 +128,8 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
     this.location = location;
     this.policyManager = applicationPolicyProvider;
     this.runtimeLockFactory = runtimeLockFactory;
+    this.memoryManagementService = memoryManagementService;
+    this.artifactConfigurationProcessor = artifactConfigurationProcessor;
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
     if (this.deploymentClassLoader == null) {
       throw new IllegalArgumentException("Classloader cannot be null");
@@ -176,7 +185,6 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
       log(miniSplash(format("Starting %s '%s'", shortArtifactType, descriptor.getName())));
     });
     try {
-      checkIfFlowsShouldStart();
       this.artifactContext.getMuleContext().start();
       persistArtifactState(START);
 
@@ -214,23 +222,33 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
     });
     try {
       ArtifactContextBuilder artifactBuilder =
-          newBuilder().setArtifactProperties(merge(descriptor.getAppProperties(), getProperties())).setArtifactType(APP)
+          newBuilder()
+              .setArtifactProperties(merge(descriptor.getAppProperties(), getProperties()))
+              .setArtifactType(APP)
+              .setArtifactConfigurationProcessor(null)
               .setDataFolderName(descriptor.getDataFolderName())
-              .setArtifactName(descriptor.getName()).setArtifactInstallationDirectory(descriptor.getArtifactLocation())
+              .setArtifactName(descriptor.getName())
+              .setArtifactInstallationDirectory(descriptor.getArtifactLocation())
+              .setArtifactConfigurationProcessor(artifactConfigurationProcessor)
               .setConfigurationFiles(descriptor.getConfigResources().toArray(new String[descriptor.getConfigResources().size()]))
               .setDefaultEncoding(descriptor.getEncoding())
-              .setArtifactPlugins(artifactPlugins).setExecutionClassloader(deploymentClassLoader.getClassLoader())
-              .setEnableLazyInit(lazy).setDisableXmlValidations(disableXmlValidations).setServiceRepository(serviceRepository)
+              .setArtifactPlugins(artifactPlugins)
+              .setExecutionClassloader(deploymentClassLoader.getClassLoader())
+              .setEnableLazyInit(lazy)
+              .setDisableXmlValidations(disableXmlValidations)
+              .setServiceRepository(serviceRepository)
               .setExtensionModelLoaderRepository(extensionModelLoaderRepository)
               .setClassLoaderRepository(classLoaderRepository)
               .setArtifactDeclaration(descriptor.getArtifactDeclaration())
               .setProperties(ofNullable(resolveDeploymentProperties(descriptor.getDataFolderName(),
                                                                     descriptor.getDeploymentProperties())))
               .setPolicyProvider(policyManager)
-              .setRuntimeLockFactory(runtimeLockFactory);
+              .setRuntimeLockFactory(runtimeLockFactory)
+              .setMemoryManagementService(memoryManagementService)
+              .setArtifactCoordinates(descriptor.getBundleDescriptor());
 
       Domain domain = getApplicationDomain(domainRepository, descriptor);
-      if (domain.getRegistry() != null) {
+      if (domain.getArtifactContext() != null) {
         artifactBuilder.setParentArtifact(domain);
       }
       if (muleContextListener != null) {
@@ -344,6 +362,11 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   }
 
   @Override
+  public SampleDataService getSampleDataService() {
+    return (SampleDataService) artifactContext.getRegistry().lookupByName(SAMPLE_DATA_SERVICE_KEY).get();
+  }
+
+  @Override
   public String getArtifactName() {
     return descriptor.getName();
   }
@@ -432,12 +455,6 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
     }
 
     return domainRepository.getCompatibleDomain(domainBundleDescriptor.get());
-  }
-
-  private void checkIfFlowsShouldStart() {
-    for (Flow flow : getRegistry().lookupAllByType(Flow.class)) {
-      ((DefaultFlowBuilder.DefaultFlow) flow).checkIfFlowShouldStart();
-    }
   }
 
 }

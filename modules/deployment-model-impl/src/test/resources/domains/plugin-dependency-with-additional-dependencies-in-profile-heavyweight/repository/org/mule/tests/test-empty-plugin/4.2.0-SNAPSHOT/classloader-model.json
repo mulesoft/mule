@@ -1,0 +1,11 @@
+{
+  "version": "1.1.0",
+  "artifactCoordinates": {
+    "groupId": "org.mule.tests",
+    "artifactId": "test-empty-plugin",
+    "version": "4.2.0-SNAPSHOT",
+    "type": "jar",
+    "classifier": "mule-plugin"
+  },
+  "dependencies": []
+}

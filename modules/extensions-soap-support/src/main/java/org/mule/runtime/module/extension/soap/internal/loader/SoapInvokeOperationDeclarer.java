@@ -43,6 +43,7 @@ import org.mule.runtime.extension.api.soap.SoapOutputPayload;
 import org.mule.runtime.extension.api.soap.WebServiceTypeKey;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
+import org.mule.runtime.module.extension.internal.loader.delegate.StereotypeModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
@@ -88,6 +89,12 @@ public class SoapInvokeOperationDeclarer {
 
   private static final BaseTypeBuilder TYPE_BUILDER = BaseTypeBuilder.create(JAVA);
 
+  private final StereotypeModelLoaderDelegate stereotypeDelegate;
+
+  public SoapInvokeOperationDeclarer(StereotypeModelLoaderDelegate stereotypeDelegate) {
+    this.stereotypeDelegate = stereotypeDelegate;
+  }
+
   /**
    * Declares the invoke operation.
    *
@@ -96,13 +103,13 @@ public class SoapInvokeOperationDeclarer {
    * @param soapErrors     the {@link ErrorModel}s that this operation can throw.
    */
   void declare(ConfigurationDeclarer configDeclarer, ClassTypeLoader loader, Set<ErrorModel> soapErrors) {
-
     ReflectionCache reflectionCache = new ReflectionCache();
 
     OperationDeclarer operation = configDeclarer.withOperation(OPERATION_NAME)
         .describedAs(OPERATION_DESCRIPTION)
         .requiresConnection(true)
         .blocking(true)
+        .withStereotype(stereotypeDelegate.getDefaultOperationStereotype(OPERATION_NAME))
         .withModelProperty(new CompletableComponentExecutorModelProperty(new SoapOperationExecutorFactory()))
         .withModelProperty(new ConnectivityModelProperty(ForwardingSoapClient.class));
 

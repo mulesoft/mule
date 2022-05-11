@@ -10,9 +10,8 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
-import org.mule.runtime.module.extension.internal.resources.manifest.ClassloaderClassPackageFinder;
 import org.mule.runtime.module.extension.internal.resources.manifest.DefaultClassPackageFinder;
-import org.mule.runtime.module.extension.internal.resources.manifest.ExportedArtifactsCollector;
+import org.mule.runtime.module.extension.internal.resources.manifest.ExportedPackagesCollector;
 import org.mule.runtime.module.extension.internal.resources.manifest.ProcessingEnvironmentClassPackageFinder;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -22,8 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * {@link ExtensionModelValidator} which validates that the exported packages for the current extension exports
- * API declared packages and doesn't export packages declared as internal.
+ * {@link ExtensionModelValidator} which validates that the exported packages for the current extension exports API declared
+ * packages and doesn't export packages declared as internal.
  *
  * @since 4.1
  */
@@ -44,8 +43,8 @@ public class ExportedPackagesValidator implements ExtensionModelValidator {
   @Override
   public void validate(ExtensionModel model, ProblemsReporter problemsReporter) {
     if (shouldValidate()) {
-      ExportedArtifactsCollector exportedArtifactsCollector = getExportedArtifactsCollector(model);
-      Map<String, Collection<String>> exportedPackages = exportedArtifactsCollector.getDetailedExportedPackages();
+      ExportedPackagesCollector exportedPackagesCollector = getExportedArtifactsCollector(model);
+      Map<String, Collection<String>> exportedPackages = exportedPackagesCollector.getDetailedExportedPackages();
 
       Map<String, Collection<String>> internalPackages = new HashMap<>();
       Map<String, Collection<String>> noVisibilityDeclaredPackages = new HashMap<>();
@@ -53,7 +52,7 @@ public class ExportedPackagesValidator implements ExtensionModelValidator {
       exportedPackages
           .forEach((packageName, classes) -> {
             if (packageName.contains(".api.") || packageName.endsWith(".api")) {
-              //valid package
+              // valid package
             } else if (packageName.contains(".internal.") || packageName.endsWith(".internal")) {
               internalPackages.put(packageName, classes);
             } else {
@@ -104,13 +103,13 @@ public class ExportedPackagesValidator implements ExtensionModelValidator {
     return strictValidation != null ? Boolean.valueOf(strictValidation) : true;
   }
 
-  private ExportedArtifactsCollector getExportedArtifactsCollector(ExtensionModel extensionModel) {
+  private ExportedPackagesCollector getExportedArtifactsCollector(ExtensionModel extensionModel) {
     if (processingEnv != null) {
       DefaultClassPackageFinder defaultClassPackageFinder = new DefaultClassPackageFinder();
       defaultClassPackageFinder.addAdditionalPackageFinder(new ProcessingEnvironmentClassPackageFinder(processingEnv));
-      return new ExportedArtifactsCollector(extensionModel, defaultClassPackageFinder);
+      return new ExportedPackagesCollector(extensionModel, defaultClassPackageFinder);
     } else {
-      return new ExportedArtifactsCollector(extensionModel);
+      return new ExportedPackagesCollector(extensionModel);
     }
   }
 }

@@ -51,9 +51,9 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
   }
 
   /**
-   * @param dataType the type to check against
+   * @param dataType   the type to check against
    * @param exactMatch if set to true, this method will look for an exact match to the data type, if false it will look for a
-   *        compatible data type.
+   *                   compatible data type.
    * @return whether the data type is supported
    */
   @Override

@@ -39,8 +39,8 @@ public class FileSystemPolicyClassLoaderModelLoader implements ClassLoaderModelL
    * {@value LIB_DIR} folder and resources located inside the artifact folder.
    *
    * @param artifactFolder {@link File} where the current plugin to work with.
-   * @param attributes collection of attributes describing the loader. Non null.
-   * @param artifactType artifactType the type of the artifact of the descriptor to be loaded.
+   * @param attributes     collection of attributes describing the loader. Non null.
+   * @param artifactType   artifactType the type of the artifact of the descriptor to be loaded.
    * 
    * @return a {@link ClassLoaderModel} loaded with all its dependencies and URLs
    */

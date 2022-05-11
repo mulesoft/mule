@@ -6,30 +6,42 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static java.lang.String.format;
-import static java.lang.System.getProperties;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.io.FileUtils.copyDirectory;
-import static org.apache.commons.io.FileUtils.toFile;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
+import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
 import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
-import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.DEPLOYMENT_APPLICATION_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.ParallelDeploymentDirectoryWatcher.MAX_APPS_IN_PARALLEL_DEPLOYMENT;
+
+import static java.lang.String.format;
+import static java.lang.System.getProperties;
+import static java.lang.System.getProperty;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.Collectors.toList;
+
+import static org.apache.commons.io.FileUtils.copyDirectory;
+import static org.apache.commons.io.FileUtils.toFile;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceRepository;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.module.artifact.api.Artifact;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.StartupListener;
@@ -44,12 +56,12 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
@@ -66,10 +78,12 @@ public class MuleDeploymentService implements DeploymentService {
   public static final IOFileFilter JAR_ARTIFACT_FILTER =
       new AndFileFilter(new SuffixFileFilter(JAR_FILE_SUFFIX), FileFileFilter.FILE);
   public static final String PARALLEL_DEPLOYMENT_PROPERTY = SYSTEM_PROPERTY_PREFIX + "deployment.parallel";
+  private static final int MAX_QUEUED_STARTING_ARTIFACTS = 256;
 
   protected transient final Logger logger = LoggerFactory.getLogger(getClass());
   // fair lock
   private final ReentrantLock deploymentLock = new DebuggableReentrantLock(true);
+  private final LazyValue<Scheduler> artifactStartExecutor;
 
   private final ObservableList<Application> applications = new ObservableList<>();
   private final ObservableList<Domain> domains = new ObservableList<>();
@@ -81,17 +95,22 @@ public class MuleDeploymentService implements DeploymentService {
   private final CompositeDeploymentListener applicationDeploymentListener = new CompositeDeploymentListener();
   private final CompositeDeploymentListener domainDeploymentListener = new CompositeDeploymentListener();
   private final CompositeDeploymentListener domainBundleDeploymentListener = new CompositeDeploymentListener();
-  private final ArchiveDeployer<Domain> domainDeployer;
+  private final ArchiveDeployer<DomainDescriptor, Domain> domainDeployer;
   private final DeploymentDirectoryWatcher deploymentDirectoryWatcher;
-  private final DefaultArchiveDeployer<Application> applicationDeployer;
+  private final DefaultArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer;
   private final DomainBundleArchiveDeployer domainBundleDeployer;
 
   public MuleDeploymentService(DefaultDomainFactory domainFactory, DefaultApplicationFactory applicationFactory,
-                               Supplier<SchedulerService> schedulerServiceSupplier) {
+                               Supplier<SchedulerService> artifactStartExecutorSupplier) {
+    artifactStartExecutor = new LazyValue<>(() -> artifactStartExecutorSupplier.get()
+        .customScheduler(config()
+            .withName("ArtifactDeployer.start")
+            .withMaxConcurrentTasks(useParallelDeployment() ? MAX_APPS_IN_PARALLEL_DEPLOYMENT : 1),
+                         MAX_QUEUED_STARTING_ARTIFACTS));
     // TODO MULE-9653 : Migrate domain class loader creation to use ArtifactClassLoaderBuilder which already has support for
     // artifact plugins.
-    ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<>();
-    ArtifactDeployer<Domain> domainMuleDeployer = new DefaultArtifactDeployer<>();
+    ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<>(artifactStartExecutor);
+    ArtifactDeployer<Domain> domainMuleDeployer = new DefaultArtifactDeployer<>(artifactStartExecutor);
 
     this.applicationDeployer = new DefaultArchiveDeployer<>(applicationMuleDeployer, applicationFactory, applications,
                                                             NOP_ARTIFACT_DEPLOYMENT_TEMPLATE,
@@ -114,21 +133,21 @@ public class MuleDeploymentService implements DeploymentService {
       this.deploymentDirectoryWatcher =
           new ParallelDeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains,
                                                  applications,
-                                                 schedulerServiceSupplier, deploymentLock);
+                                                 artifactStartExecutorSupplier, deploymentLock);
     } else {
       this.deploymentDirectoryWatcher =
           new DeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains, applications,
-                                         schedulerServiceSupplier,
+                                         artifactStartExecutorSupplier,
                                          deploymentLock);
     }
   }
 
-  private boolean useParallelDeployment() {
+  static boolean useParallelDeployment() {
     return getProperties().containsKey(PARALLEL_DEPLOYMENT_PROPERTY);
   }
 
   private boolean isDeployingSelectedAppsInOrder() {
-    return !isEmpty(System.getProperty(DEPLOYMENT_APPLICATION_PROPERTY));
+    return !isEmpty(getProperty(DEPLOYMENT_APPLICATION_PROPERTY));
   }
 
   @Override
@@ -159,6 +178,7 @@ public class MuleDeploymentService implements DeploymentService {
   @Override
   public void stop() {
     deploymentDirectoryWatcher.stop();
+    artifactStartExecutor.ifComputed(ExecutorService::shutdownNow);
   }
 
   @Override
@@ -182,12 +202,12 @@ public class MuleDeploymentService implements DeploymentService {
 
   @Override
   public List<Application> getApplications() {
-    return Collections.unmodifiableList(applications);
+    return unmodifiableList(applications);
   }
 
   @Override
   public List<Domain> getDomains() {
-    return Collections.unmodifiableList(domains);
+    return unmodifiableList(domains);
   }
 
   /**
@@ -201,7 +221,7 @@ public class MuleDeploymentService implements DeploymentService {
     return domainDeployer.getArtifactsZombieMap();
   }
 
-  public void setAppFactory(ArtifactFactory<Application> appFactory) {
+  public void setAppFactory(ArtifactFactory<ApplicationDescriptor, Application> appFactory) {
     this.applicationDeployer.setArtifactFactory(appFactory);
   }
 
@@ -317,7 +337,7 @@ public class MuleDeploymentService implements DeploymentService {
     domainBundleDeploymentListener.removeDeploymentListener(listener);
   }
 
-  public void setDomainFactory(ArtifactFactory<Domain> domainFactory) {
+  public void setDomainFactory(ArtifactFactory<DomainDescriptor, Domain> domainFactory) {
     this.domainDeployer.setArtifactFactory(domainFactory);
   }
 
@@ -335,8 +355,10 @@ public class MuleDeploymentService implements DeploymentService {
 
   }
 
-  private void deployTemplateMethod(final URI artifactArchiveUri, final Optional<Properties> deploymentProperties,
-                                    File artifactDeploymentFolder, ArchiveDeployer archiveDeployer)
+  private <D extends DeployableArtifactDescriptor, T extends Artifact<D>> void deployTemplateMethod(final URI artifactArchiveUri,
+                                                                                                    final Optional<Properties> deploymentProperties,
+                                                                                                    File artifactDeploymentFolder,
+                                                                                                    ArchiveDeployer<D, T> archiveDeployer)
       throws IOException {
     executeSynchronized(() -> {
       try {
@@ -414,17 +436,19 @@ public class MuleDeploymentService implements DeploymentService {
   /**
    * Creates a {@link DomainArchiveDeployer}. Override this method for testing purposes.
    *
-   * @param domainFactory the domainFactory to provide to the {@link DomainArchiveDeployer}.
-   * @param domainMuleDeployer the domainMuleDeployer to provide to the {@link DomainArchiveDeployer}.
-   * @param domains the domains that this DeploymentService manages.
-   * @param applicationDeployer the applicationDeployer to provide to the {@link DomainArchiveDeployer}.
+   * @param domainFactory                 the domainFactory to provide to the {@link DomainArchiveDeployer}.
+   * @param domainMuleDeployer            the domainMuleDeployer to provide to the {@link DomainArchiveDeployer}.
+   * @param domains                       the domains that this DeploymentService manages.
+   * @param applicationDeployer           the applicationDeployer to provide to the {@link DomainArchiveDeployer}.
    * @param applicationDeploymentListener the applicationDeployer listener to provide to the {@link DomainDeploymentTemplate}.
-   * @param domainDeploymentListener the domainDeploymentListener to provide to the {@link DeploymentMuleContextListenerFactory}
+   * @param domainDeploymentListener      the domainDeploymentListener to provide to the
+   *                                      {@link DeploymentMuleContextListenerFactory}
    * @return the DomainArchiveDeployer.
    */
   protected DomainArchiveDeployer createDomainArchiveDeployer(DefaultDomainFactory domainFactory,
-                                                              ArtifactDeployer domainMuleDeployer, ObservableList<Domain> domains,
-                                                              DefaultArchiveDeployer<Application> applicationDeployer,
+                                                              ArtifactDeployer<Domain> domainMuleDeployer,
+                                                              ObservableList<Domain> domains,
+                                                              DefaultArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer,
                                                               CompositeDeploymentListener applicationDeploymentListener,
                                                               DeploymentListener domainDeploymentListener) {
     return new DomainArchiveDeployer(new DefaultArchiveDeployer<>(domainMuleDeployer, domainFactory, domains,

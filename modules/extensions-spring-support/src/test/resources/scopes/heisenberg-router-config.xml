@@ -141,8 +141,55 @@
         </heisenberg:void-router>
     </flow>
 
+    <flow name="sdkVoidRouter">
+        <heisenberg:sdk-void-router>
+            <heisenberg:when message="myString">
+                <heisenberg:lifecycle-validator expected="#[payload]"/>
+                <set-variable variableName="newAttributes" value="ATTRIBUTES_VAR"/>
+                <set-payload value="MODIFIED"/>
+            </heisenberg:when>
+        </heisenberg:sdk-void-router>
+    </flow>
+
     <flow name="routerField">
         <heisenberg:router-field expected="#[vars.expected]" newValue="#[vars.newValue]"/>
+    </flow>
+
+    <flow name="twoRoutesRouterLazilyStarted" initialState="stopped">
+        <heisenberg:two-routes-router processorName="mule:set-payload">
+            <heisenberg:when message="myString" execute="#[vars.executeWhen]">
+                <set-variable variableName="newPayload" value="#[payload]"/>
+                <set-variable variableName="newAttributes" value="#[attributes]"/>
+            </heisenberg:when>
+            <heisenberg:other execute="#[vars.executeOther]">
+                <logger/>
+            </heisenberg:other>
+        </heisenberg:two-routes-router>
+    </flow>
+
+    <flow name="twoRoutesRouterWithCustomOperationLazilyStarted" initialState="stopped">
+        <heisenberg:two-routes-router processorName="mule:set-payload">
+            <heisenberg:when message="myString" execute="#[vars.executeWhen]">
+                <set-variable variableName="newPayload" value="#[payload]"/>
+                <set-variable variableName="newAttributes" value="#[attributes]"/>
+                <heisenberg:lifecycle-validator expected="start"/>
+            </heisenberg:when>
+            <heisenberg:other execute="#[vars.executeOther]">
+                <logger/>
+            </heisenberg:other>
+        </heisenberg:two-routes-router>
+    </flow>
+
+    <flow name="routerLifecycleIsAttachedToFlowLifecycle" initialState="stopped">
+        <heisenberg:two-routes-router processorName="mule:set-payload">
+            <heisenberg:when message="myString" execute="#[vars.executeWhen]">
+                <set-variable variableName="newPayload" value="#[payload]"/>
+                <heisenberg:lifecycle-validator expected="start"/>
+            </heisenberg:when>
+            <heisenberg:other execute="#[vars.executeOther]">
+                <heisenberg:lifecycle-validator expected="start"/>
+            </heisenberg:other>
+        </heisenberg:two-routes-router>
     </flow>
 
 </mule>

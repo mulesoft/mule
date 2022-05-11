@@ -6,14 +6,16 @@
  */
 package org.mule;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.lookupObject;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
+
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
+
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.event.EventContext;
@@ -22,7 +24,6 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -57,7 +58,7 @@ public class EventContextBenchmark extends AbstractBenchmark {
     muleContext = createMuleContextWithServices();
     muleContext.start();
     flow = createFlow(muleContext);
-    registerObject(muleContext, FLOW_NAME, flow, FlowConstruct.class);
+    registerObject(muleContext, FLOW_NAME, flow);
     Message.Builder messageBuilder = Message.builder().value(PAYLOAD);
     CoreEvent.Builder eventBuilder =
         CoreEvent.builder(create(flow, CONNECTOR_LOCATION)).message(messageBuilder.build());

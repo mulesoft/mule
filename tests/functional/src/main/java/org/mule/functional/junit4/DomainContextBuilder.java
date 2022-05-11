@@ -7,28 +7,36 @@
 package org.mule.functional.junit4;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singleton;
 import static org.mule.functional.junit4.FunctionalTestCase.extensionManagerWithMuleExtModelBuilder;
-import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.ast.api.ArtifactType;
+import org.mule.runtime.config.api.ArtifactContextFactory;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.tck.config.TestPolicyProviderConfigurationBuilder;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class DomainContextBuilder {
 
   private String contextId;
   private String[] domainConfig = new String[0];
+  private ArtifactCoordinates artifactCoordinates;
 
   private TestServicesConfigurationBuilder testServicesConfigBuilder;
 
@@ -44,19 +52,33 @@ public class DomainContextBuilder {
     return this;
   }
 
-  public MuleContext build() throws Exception {
-    List<ConfigurationBuilder> builders = new ArrayList<>(3);
+  /**
+   * Set's the application's {@link ArtifactCoordinates}
+   *
+   * @param artifactCoordinates the app's {@link ArtifactCoordinates}
+   * @return {@code this} builder
+   * @since 4.5.0
+   */
+  public DomainContextBuilder setArtifactCoordinates(ArtifactCoordinates artifactCoordinates) {
+    this.artifactCoordinates = artifactCoordinates;
+    return this;
+  }
+
+  public ArtifactContext build() throws Exception {
+    List<ConfigurationBuilder> builders = new ArrayList<>(4);
     ConfigurationBuilder cfgBuilder = getDomainBuilder(domainConfig);
-    builders.add(extensionManagerWithMuleExtModelBuilder());
+    testServicesConfigBuilder = new TestServicesConfigurationBuilder();
+    cfgBuilder.addServiceConfigurator(testServicesConfigBuilder);
+    builders.add(extensionManagerWithMuleExtModelBuilder(getExtensionModels()));
     builders.add(new TestPolicyProviderConfigurationBuilder());
     builders.add(cfgBuilder);
-    testServicesConfigBuilder = new TestServicesConfigurationBuilder();
     addBuilders(builders);
     final DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
     if (contextId != null) {
       muleConfiguration.setId(contextId);
     }
     muleContextBuilder.setMuleConfiguration(muleConfiguration);
+    muleContextBuilder.setArtifactCoordinates(artifactCoordinates);
     DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
     MuleContext domainContext = muleContextFactory.createMuleContext(builders, muleContextBuilder);
     domainContext.start();
@@ -70,14 +92,21 @@ public class DomainContextBuilder {
     };
     domainContext.getNotificationManager().addListener(listener);
 
-    return domainContext;
+    return ((ArtifactContextFactory) cfgBuilder).createArtifactContext();
   }
 
   protected void addBuilders(List<ConfigurationBuilder> builders) {
     builders.add(testServicesConfigBuilder);
   }
 
-  protected ConfigurationBuilder getDomainBuilder(String[] configResources) throws Exception {
-    return createConfigurationBuilder(configResources, emptyMap(), DOMAIN);
+  private ConfigurationBuilder getDomainBuilder(String[] configResources) throws Exception {
+    ArtifactAstXmlParserConfigurationBuilder appBuilder =
+        new ArtifactAstXmlParserConfigurationBuilder(emptyMap(), false, false, false, configResources);
+    appBuilder.setArtifactType(ArtifactType.DOMAIN);
+    return appBuilder;
+  }
+
+  protected Set<ExtensionModel> getExtensionModels() {
+    return singleton(getExtensionModel());
   }
 }

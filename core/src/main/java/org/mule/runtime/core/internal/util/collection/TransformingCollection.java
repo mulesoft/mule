@@ -20,8 +20,8 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
- * Decorates a {@link Collection} with items of random types and uses a {@link Function}
- * to guarantee that, when exposed, those items have been transformed.
+ * Decorates a {@link Collection} with items of random types and uses a {@link Function} to guarantee that, when exposed, those
+ * items have been transformed.
  * <p>
  * This allows to lazily transform the items of the collection without making a full copy of the collection
  *
@@ -40,7 +40,7 @@ public class TransformingCollection<T> implements Collection<T> {
   /**
    * Creates a new instance in which the given {@code transform} will be applied to all items
    *
-   * @param delegate the decorated collection
+   * @param delegate    the decorated collection
    * @param transformer the transformer
    */
   public TransformingCollection(Collection<Object> delegate, Function<Object, T> transformer) {
@@ -48,12 +48,12 @@ public class TransformingCollection<T> implements Collection<T> {
   }
 
   /**
-   * Creates a new instance in which the given {@code transform} will <b>ONLY</b> be applied to
-   * items which are not instances of the {@code targetType}
+   * Creates a new instance in which the given {@code transform} will <b>ONLY</b> be applied to items which are not instances of
+   * the {@code targetType}
    *
-   * @param delegate the decorated collection
+   * @param delegate    the decorated collection
    * @param transformer the transformer
-   * @param targetType the expected type of the transformed instances.
+   * @param targetType  the expected type of the transformed instances.
    */
   public TransformingCollection(Collection<Object> delegate, Function<Object, T> transformer, Class<T> targetType) {
     this.delegate = delegate;

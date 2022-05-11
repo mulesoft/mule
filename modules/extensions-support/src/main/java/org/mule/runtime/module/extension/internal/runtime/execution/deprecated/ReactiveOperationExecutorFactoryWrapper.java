@@ -34,15 +34,15 @@ public final class ReactiveOperationExecutorFactoryWrapper<T extends ComponentMo
   /**
    * Creates a new instance
    *
-   * @param delegate     the {@link ComponentExecutorFactory} to be decorated
+   * @param delegate the {@link ComponentExecutorFactory} to be decorated
    */
   public ReactiveOperationExecutorFactoryWrapper(ComponentExecutorFactory<T> delegate) {
     this.delegate = delegate;
   }
 
   /**
-   * @return a {@link ReactiveInterceptableOperationExecutorWrapper} which decorates the result of propagating this invocation to the
-   * {@link #delegate}
+   * @return a {@link ReactiveInterceptableOperationExecutorWrapper} which decorates the result of propagating this invocation to
+   *         the {@link #delegate}
    */
 
   @Override

@@ -21,8 +21,7 @@ public interface ObjectTypeParametersResolver {
    * Adds the required {@link ValueResolver}s for the object parameters into the builder
    *
    * @param objectType the {@link ObjectType} to introspect
-   * @param builder the {@link ObjectBuilder} being used to create
-   *                the owner object of the parameters
+   * @param builder    the {@link ObjectBuilder} being used to create the owner object of the parameters
    */
   void resolveParameters(ObjectType objectType, DefaultObjectBuilder builder);
 
@@ -30,8 +29,7 @@ public interface ObjectTypeParametersResolver {
    * Adds the required {@link ValueResolver}s for the object parameters groups into the builder
    *
    * @param objectType the {@link ObjectType} to introspect
-   * @param builder the {@link ObjectBuilder} being used to create
-   *                the owner object of the parameters
+   * @param builder    the {@link ObjectBuilder} being used to create the owner object of the parameters
    */
   void resolveParameterGroups(ObjectType objectType, DefaultObjectBuilder builder);
 }

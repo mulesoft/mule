@@ -9,8 +9,7 @@ package org.mule.runtime.core.internal.connection;
 import org.mule.runtime.api.connection.ConnectionProvider;
 
 /**
- * Interface to be used in {@link ConnectionProvider} indicating that the marked one has a {@link ConnectionProvider}
- * delegate;
+ * Interface to be used in {@link ConnectionProvider} indicating that the marked one has a {@link ConnectionProvider} delegate;
  *
  * @since 4.0
  */

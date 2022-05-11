@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
 import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
 import java.util.Optional;
 
@@ -31,7 +33,7 @@ public class NamedTopLevelElementsHaveNameTestCase extends AbstractCoreValidatio
 
   @Test
   public void namelessTopLevelElement() {
-    final Optional<String> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
         "<mule xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
         "      xmlns:heisenberg=\"http://www.mulesoft.org/schema/mule/heisenberg\"\n" +
         "      xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
@@ -43,10 +45,11 @@ public class NamedTopLevelElementsHaveNameTestCase extends AbstractCoreValidatio
         "    <flow>\n" +
         "        <logger/>\n" +
         "    </flow>\n" +
-        "</mule>");
+        "</mule>")
+            .stream().findFirst();
 
-    assertThat(msg.get(),
-               containsString("Global element 'mule:flow' does not provide a name attribute."));
+    assertThat(msg.get().getMessage(),
+               containsString("Global element 'flow' does not provide a name attribute."));
   }
 
 }

@@ -63,11 +63,6 @@ public class ConnectionProviderResolver<C> extends AbstractComponent
     return valueResolver.isDynamic();
   }
 
-  @Override
-  public boolean isContent() {
-    return false;
-  }
-
   /**
    * {@inheritDoc}
    */
@@ -94,5 +89,4 @@ public class ConnectionProviderResolver<C> extends AbstractComponent
   public void start() throws MuleException {
     startIfNeeded(objectBuilder);
   }
-
 }

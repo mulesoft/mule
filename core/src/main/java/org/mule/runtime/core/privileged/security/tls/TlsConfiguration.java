@@ -75,18 +75,17 @@ import org.slf4j.LoggerFactory;
  * <h2>Configuration</h2>
  * <p/>
  * The documentation in this class is intended more for programmers than end uses. If you are configuring a connector the
- * interfaces {@link TlsIndirectTrustStore}, {@link TlsDirectTrustStore},
- * {@link TlsDirectKeyStore} and {@link TlsIndirectKeyStore} should provide guidance to individual properties. In addition you
- * should check the documentation for the specific protocol / connector used and may also need to read the discussion on direct
- * and indirect socket and store creation below (or, more simply, just use whichever key store interface your connector
- * implements!).
+ * interfaces {@link TlsIndirectTrustStore}, {@link TlsDirectTrustStore}, {@link TlsDirectKeyStore} and
+ * {@link TlsIndirectKeyStore} should provide guidance to individual properties. In addition you should check the documentation
+ * for the specific protocol / connector used and may also need to read the discussion on direct and indirect socket and store
+ * creation below (or, more simply, just use whichever key store interface your connector implements!).
  * <p/>
  * <h2>Programming</h2>
  * <p/>
  * This class is intended to be used as a delegate as we typically want to add security to an already existing connector (so we
- * inherit from that connector, implement the appropriate interfaces from
- * {@link TlsIndirectTrustStore}, {@link TlsDirectTrustStore}, {@link TlsDirectKeyStore} and
- * {@link TlsIndirectKeyStore}, and then forward calls to the interfaces to an instance of this class).
+ * inherit from that connector, implement the appropriate interfaces from {@link TlsIndirectTrustStore},
+ * {@link TlsDirectTrustStore}, {@link TlsDirectKeyStore} and {@link TlsIndirectKeyStore}, and then forward calls to the
+ * interfaces to an instance of this class).
  * <p/>
  * <p>
  * For setting System properties (and reading them) use {@link TlsPropertiesMapper}. This can take a "namespace" which can then be
@@ -110,11 +109,10 @@ import org.slf4j.LoggerFactory;
  * </dl>
  * <p/>
  * Historically, many other transports relied on the indirect configurations defined above. So they implemented
- * {@link TlsIndirectTrustStore} (a superclass of {@link TlsDirectTrustStore}) and relied on
- * {@link TlsIndirectKeyStore} from the SSL configuration. For continuity these interfaces continue to be used, even though the
- * configurations are now typically (see individual connector/protocol documentation) specific to a protocol or connector.
- * <em>Note - these interfaces are new, but the original code had those methods, used as described. The new interfaces only make
- * things explicit.</em>
+ * {@link TlsIndirectTrustStore} (a superclass of {@link TlsDirectTrustStore}) and relied on {@link TlsIndirectKeyStore} from the
+ * SSL configuration. For continuity these interfaces continue to be used, even though the configurations are now typically (see
+ * individual connector/protocol documentation) specific to a protocol or connector. <em>Note - these interfaces are new, but the
+ * original code had those methods, used as described. The new interfaces only make things explicit.</em>
  * <p/>
  * <p>
  * <em>Note for programmers</em> One way to understand the above is to see that many protocols are handled by libraries that are
@@ -195,7 +193,7 @@ public final class TlsConfiguration extends AbstractComponent
   // and not a close fit to actual use (imho).
 
   /**
-   * @param anon If the connection is anonymous then we don't care about client keys
+   * @param anon      If the connection is anonymous then we don't care about client keys
    * @param namespace Namespace to use for global properties (for JSSE use JSSE_NAMESPACE)
    * @throws CreateException ON initialisation problems
    */

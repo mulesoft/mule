@@ -23,7 +23,7 @@ public interface ServiceProviderResolutionHelper {
   /**
    * Injects the required service dependencies in the given {@link ServiceProvider}
    *
-   * @param serviceProvider service provider to be injected. Non null.
+   * @param serviceProvider  service provider to be injected. Non null.
    * @param resolvedServices services which are available to be injected into the service provider. Non null.
    * @throws ServiceResolutionError in case a given service cannot be injected or there is a missing service dependency.
    */

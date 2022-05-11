@@ -45,7 +45,7 @@ public class ProcessingTime implements Serializable {
   /**
    * Create a Processing Time
    *
-   * @param stats never null
+   * @param stats       never null
    * @param muleContext
    */
   private ProcessingTime(FlowConstructStatistics stats, ProcessingTimeWatcher processorTimeWatcher) {

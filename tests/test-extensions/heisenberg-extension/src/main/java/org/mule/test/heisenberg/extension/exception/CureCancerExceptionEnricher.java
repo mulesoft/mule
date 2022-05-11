@@ -7,8 +7,8 @@
 package org.mule.test.heisenberg.extension.exception;
 
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
-import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
+import org.mule.sdk.api.exception.ModuleException;
 
 public class CureCancerExceptionEnricher extends ExceptionHandler {
 

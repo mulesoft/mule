@@ -7,6 +7,8 @@
 
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -17,21 +19,24 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.tck.util.MuleContextUtils;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class MuleContextDeploymentListenerTestCase extends AbstractMuleTestCase {
 
   private static final String APP_NAME = "app";
 
-  private MuleContext muleContext = MuleContextUtils.mockContextWithServices();
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
+
+  private final MuleContext muleContext = mockContextWithServices();
 
   @Mock
   private Registry registry;
@@ -40,7 +45,7 @@ public class MuleContextDeploymentListenerTestCase extends AbstractMuleTestCase 
   private CustomizationService customizationService;
 
   private final DeploymentListener deploymentListener = mock(DeploymentListener.class);
-  private MuleContextDeploymentListener contextListener = new MuleContextDeploymentListener(APP_NAME, deploymentListener);
+  private final MuleContextDeploymentListener contextListener = new MuleContextDeploymentListener(APP_NAME, deploymentListener);
 
   @Before
   public void before() {

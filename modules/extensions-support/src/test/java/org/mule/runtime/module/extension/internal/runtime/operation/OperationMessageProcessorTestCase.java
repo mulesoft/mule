@@ -28,6 +28,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
@@ -36,7 +37,6 @@ import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENS
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.util.collection.SmallMap.of;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
@@ -62,6 +62,7 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.CollectionDataType;
@@ -73,18 +74,27 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.el.DefaultExpressionManager;
-import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
+import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
+import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ResultTransformer;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -100,13 +110,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.google.common.reflect.TypeToken;
+
+import org.slf4j.MDC;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-
-import com.google.common.reflect.TypeToken;
 
 @SmallTest
 public class OperationMessageProcessorTestCase extends AbstractOperationMessageProcessorTestCase {
@@ -127,11 +140,11 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     when(operationModel.isBlocking()).thenReturn(false);
 
     OperationMessageProcessor operationMessageProcessor =
-        new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue, emptyList(),
-                                      resolverSet, cursorStreamProviderFactory, new NoRetryPolicyTemplate(), null,
-                                      extensionManager,
-                                      mockPolicyManager, reflectionCache, null,
-                                      muleContext.getConfiguration().getShutdownTimeout());
+        new TestOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue, emptyList(),
+                                          resolverSet, cursorStreamProviderFactory, new NoRetryPolicyTemplate(), null,
+                                          extensionManager,
+                                          mockPolicyManager, reflectionCache, null,
+                                          muleContext.getConfiguration().getShutdownTimeout());
     operationMessageProcessor.setAnnotations(getFlowComponentLocationAnnotations(FLOW_NAME));
     operationMessageProcessor.setComponentLocator(componentLocator);
 
@@ -332,7 +345,6 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     after();
     messageProcessor = createOperationMessageProcessor();
 
-    registerIntoMockContext(context, OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguage(context));
     registerIntoMockContext(context, DefaultExpressionLanguageFactoryService.class,
                             new WeaveDefaultExpressionLanguageFactoryService(null));
     doReturn(new DefaultExpressionManager()).when(context).getExpressionManager();
@@ -358,7 +370,6 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     after();
     messageProcessor = createOperationMessageProcessor();
 
-    registerIntoMockContext(context, OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguage(context));
     registerIntoMockContext(context, DefaultExpressionLanguageFactoryService.class,
                             new WeaveDefaultExpressionLanguageFactoryService(null));
     doReturn(new DefaultExpressionManager()).when(context)
@@ -456,6 +467,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     verify(operationExecutor).execute(same(context.get()), any());
     verify(context.get(), atLeastOnce()).getConfiguration();
     messageProcessor.disposeResolvedParameters(context.get());
+
+    verify(resolverSet, times(1)).resolve(any());
   }
 
   @Test
@@ -477,6 +490,17 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     verify(operationExecutor).execute(any(), any());
     verify(context.get(), never()).getConfiguration();
     messageProcessor.disposeResolvedParameters(context.get());
+  }
+
+  @Test
+  public void operationExecutionHasCorrelationIdAndProcessorPathInMDC() throws MuleException {
+    String expectedCorrelationId = event.getCorrelationId();
+    String expectedProcessorPath = messageProcessor.getLocation().getLocation();
+
+    messageProcessor.process(event);
+    Map<String, String> mdc = ((TestOperationMessageProcessor) messageProcessor).getLastOperationExecutionMDC();
+    assertThat(mdc.get("correlationId"), is(expectedCorrelationId));
+    assertThat(mdc.get("processorPath"), is(expectedProcessorPath));
   }
 
   @Test
@@ -531,5 +555,34 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Override
   protected boolean isGracefulShutdown() {
     return true;
+  }
+
+  private static class TestOperationMessageProcessor extends OperationMessageProcessor {
+
+
+    private Map<String, String> lastOperationExecutionMDC;
+
+    public TestOperationMessageProcessor(ExtensionModel extensionModel, OperationModel operationModel,
+                                         ConfigurationProvider configurationProvider, String target, String targetValue,
+                                         List<EnrichedErrorMapping> errorMappings, ResolverSet resolverSet,
+                                         CursorProviderFactory cursorProviderFactory, RetryPolicyTemplate retryPolicyTemplate,
+                                         MessageProcessorChain nestedChain, ExtensionManager extensionManager,
+                                         PolicyManager policyManager, ReflectionCache reflectionCache,
+                                         ResultTransformer resultTransformer, long terminationTimeout) {
+      super(extensionModel, operationModel, configurationProvider, target, targetValue, errorMappings, resolverSet,
+            cursorProviderFactory, retryPolicyTemplate, nestedChain, extensionManager, policyManager, reflectionCache,
+            resultTransformer, terminationTimeout);
+    }
+
+    @Override
+    protected void executeOperation(ExecutionContextAdapter<OperationModel> operationContext,
+                                    CompletableComponentExecutor.ExecutorCallback callback) {
+      lastOperationExecutionMDC = MDC.getCopyOfContextMap();
+      super.executeOperation(operationContext, callback);
+    }
+
+    public Map<String, String> getLastOperationExecutionMDC() {
+      return lastOperationExecutionMDC;
+    }
   }
 }

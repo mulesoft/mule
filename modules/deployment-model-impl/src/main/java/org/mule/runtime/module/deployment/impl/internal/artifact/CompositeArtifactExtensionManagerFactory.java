@@ -13,12 +13,12 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_M
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
+import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.module.deployment.impl.internal.policy.ArtifactExtensionManagerFactory;
-import org.mule.runtime.module.deployment.impl.internal.policy.CompositeArtifactExtensionManager;
+import org.mule.runtime.module.extension.internal.manager.CompositeArtifactExtensionManager;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 
 import java.util.List;
 
@@ -32,10 +32,10 @@ public class CompositeArtifactExtensionManagerFactory extends ArtifactExtensionM
   /**
    * Creates a new factory
    *
-   * @param parentArtifact application on which the policies are applied. Non null.
+   * @param parentArtifact                 application on which the policies are applied. Non null.
    * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
-   * @param artifactPlugins artifact plugins deployed inside the artifact. Non null.
-   * @param extensionManagerFactory creates the {@link ExtensionManager} for the artifact. Non null
+   * @param artifactPlugins                artifact plugins deployed inside the artifact. Non null.
+   * @param extensionManagerFactory        creates the {@link ExtensionManager} for the artifact. Non null
    */
   public CompositeArtifactExtensionManagerFactory(DeployableArtifact parentArtifact,
                                                   ExtensionModelLoaderRepository extensionModelLoaderRepository,
@@ -50,7 +50,7 @@ public class CompositeArtifactExtensionManagerFactory extends ArtifactExtensionM
   @Override
   public ExtensionManager create(MuleContext muleContext) {
     ExtensionManager parentExtensionManager =
-        parentArtifact.getRegistry().<ExtensionManager>lookupByName(OBJECT_EXTENSION_MANAGER).get();
+        parentArtifact.getArtifactContext().getRegistry().<ExtensionManager>lookupByName(OBJECT_EXTENSION_MANAGER).get();
 
     ExtensionManager extensionManager = super.create(muleContext, parentExtensionManager.getExtensions());
 

@@ -6,6 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
+import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_MVEL_DW;
+
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
@@ -19,28 +27,28 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
-import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.el.DefaultExpressionManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import org.mockito.verification.VerificationMode;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(EXPRESSION_LANGUAGE)
+@Story(SUPPORT_MVEL_DW)
 public class TypeSafeExpressionValueResolverMelDefaultTestCase extends AbstractMuleContextTestCase {
 
   private static final String HELLO_WORLD = "Hello World!";
@@ -56,17 +64,13 @@ public class TypeSafeExpressionValueResolverMelDefaultTestCase extends AbstractM
   private ExtendedExpressionManager expressionManager;
 
   @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    final Map<String, Object> objects = new HashMap<>();
-    objects.putAll(super.getStartUpRegistryObjects());
-    objects.put(COMPATIBILITY_PLUGIN_INSTALLED, new Object());
-    return objects;
-  }
-
-  @Override
   protected void doSetUp() throws Exception {
     muleContext = spy(muleContext);
     expressionManager = spy(muleContext.getExpressionManager());
+
+    ((DefaultExpressionManager) expressionManager).setMelDefault(true);
+    ((DefaultExpressionManager) expressionManager)
+        .setExpressionLanguage((((MuleContextWithRegistry) muleContext).getRegistry()).lookupObject(OBJECT_EXPRESSION_LANGUAGE));
 
     when(muleContext.getExpressionManager()).thenReturn(expressionManager);
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject("_muleExpressionManager", expressionManager);

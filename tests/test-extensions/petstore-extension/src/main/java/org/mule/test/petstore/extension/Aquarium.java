@@ -14,7 +14,7 @@ import java.util.Objects;
 
 public class Aquarium {
 
-  @ParameterGroup(name = "pond")
+  @org.mule.sdk.api.annotation.param.ParameterGroup(name = "pond")
   public Pond pond;
 
   @Parameter

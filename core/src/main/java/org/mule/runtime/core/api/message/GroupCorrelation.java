@@ -37,7 +37,7 @@ public final class GroupCorrelation implements Serializable {
   /**
    * Builds a new {@link GroupCorrelation} with the given parameters.
    *
-   * @param sequence see {@link #getSequence()}.
+   * @param sequence  see {@link #getSequence()}.
    * @param groupSize see {@link #getGroupSize()}.
    */
   private GroupCorrelation(int sequence, int groupSize) {

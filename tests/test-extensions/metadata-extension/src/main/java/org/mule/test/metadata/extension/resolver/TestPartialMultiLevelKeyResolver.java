@@ -7,16 +7,23 @@
 package org.mule.test.metadata.extension.resolver;
 
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
+import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.APPLICATION_JAVA_MIME_TYPE;
+
+import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.builder.ObjectTypeBuilder;
+import org.mule.metadata.api.model.MetadataFormat;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.PartialTypeKeysResolver;
 import org.mule.test.metadata.extension.LocationKey;
 
 public class TestPartialMultiLevelKeyResolver extends TestMultiLevelKeyResolver
-    implements PartialTypeKeysResolver<LocationKey> {
+    implements PartialTypeKeysResolver<LocationKey>, OutputTypeResolver<LocationKey> {
 
   @Override
   public MetadataKey resolveChilds(MetadataContext context, LocationKey partial)
@@ -56,6 +63,17 @@ public class TestPartialMultiLevelKeyResolver extends TestMultiLevelKeyResolver
   @Override
   public String getResolverName() {
     return "PartialTestMultiLevelKeyResolver";
+  }
+
+  @Override
+  public MetadataType getOutputType(MetadataContext context, LocationKey key)
+      throws MetadataResolvingException, ConnectionException {
+    final ObjectTypeBuilder objectBuilder =
+        BaseTypeBuilder.create(new MetadataFormat(key.toString(), key.toString(), APPLICATION_JAVA_MIME_TYPE)).objectType();
+    objectBuilder.addField().key(key.getContinent()).value().stringType();
+    objectBuilder.addField().key(key.getCity()).value().stringType();
+    objectBuilder.addField().key(key.getCountry()).value().stringType();
+    return objectBuilder.build();
   }
 
 }

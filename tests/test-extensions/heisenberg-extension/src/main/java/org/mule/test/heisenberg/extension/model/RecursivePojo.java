@@ -6,11 +6,10 @@
  */
 package org.mule.test.heisenberg.extension.model;
 
-
-import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.sdk.api.annotation.dsl.xml.TypeDsl;
 
 import java.util.List;
 import java.util.Map;

@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.core.api;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noTransformerFoundForMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObjectNotOfSpecifiedType;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -23,7 +24,7 @@ import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -39,6 +40,9 @@ import javax.inject.Inject;
 public class DefaultTransformationService implements TransformationService {
 
   protected MuleContext muleContext;
+
+  @Inject
+  private TransformersRegistry transformersRegistry;
 
   @Inject
   public DefaultTransformationService(MuleContext muleContext) {
@@ -59,7 +63,8 @@ public class DefaultTransformationService implements TransformationService {
    * @param outputDataType the desired return type
    * @return The converted payload of this message. Note that this method will not alter the payload of this message *unless* the
    *         payload is an InputStream in which case the stream will be read and the payload will become the fully read stream.
-   * @throws MessageTransformerException if a transformer cannot be found or there is an error during transformation of the payload
+   * @throws MessageTransformerException if a transformer cannot be found or there is an error during transformation of the
+   *                                     payload
    */
   private Message internalTransform(Message message, DataType outputDataType) throws MessageTransformerException {
     checkNotNull(message, "Message cannot be null");
@@ -69,19 +74,19 @@ public class DefaultTransformationService implements TransformationService {
   }
 
   /**
-   * @param value the value to transform
-   * @param valueDataType the value's {@link DataType}
+   * @param value            the value to transform
+   * @param valueDataType    the value's {@link DataType}
    * @param expectedDataType the expected type's {@link DataType}
    * @return the transformed value
    * @throws MessageTransformerException If a problem occurs transforming the value
-   * @throws TransformerException If a problem occurs transforming the value
+   * @throws TransformerException        If a problem occurs transforming the value
    */
   private Object internalTransform(Object value, DataType valueDataType, DataType expectedDataType)
       throws MessageTransformerException, TransformerException {
     Transformer transformer;
     if (value != null) {
       try {
-        transformer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(valueDataType, expectedDataType);
+        transformer = transformersRegistry.lookupTransformer(valueDataType, expectedDataType);
       } catch (TransformerException e) {
         throw new TransformerException(createStaticMessage("The value '%s' of type %s could not be transformed to the desired type %s",
                                                            value.toString().trim(), value.getClass().getName(),
@@ -100,11 +105,12 @@ public class DefaultTransformationService implements TransformationService {
    * be checked for compatibility.
    *
    * @param resultType the desired return type
-   * @param encoding the encoding to use if required
+   * @param encoding   the encoding to use if required
    * @return The converted payload of this message. Note that this method will not alter the payload of this message <b>unless</b>
    *         the payload is an {@link InputStream} in which case the stream will be read and the payload will become the fully
    *         read stream.
-   * @throws MessageTransformerException if a transformer cannot be found or there is an error during transformation of the payload.
+   * @throws MessageTransformerException if a transformer cannot be found or there is an error during transformation of the
+   *                                     payload.
    */
   @SuppressWarnings("unchecked")
   protected <T> T getPayload(Message message, DataType resultType, Charset encoding) throws MessageTransformerException {
@@ -123,7 +129,7 @@ public class DefaultTransformationService implements TransformationService {
     // The transformer to execute on this message
     Transformer transformer = null;
     try {
-      transformer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(dataType, resultType);
+      transformer = transformersRegistry.lookupTransformer(dataType, resultType);
       if (transformer == null) {
         throw new MessageTransformerException(noTransformerFoundForMessage(dataType, resultType), null, message);
       }

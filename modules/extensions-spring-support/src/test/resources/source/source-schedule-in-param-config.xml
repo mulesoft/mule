@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+
+               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
+
+    <object name="adopt" class="org.mule.test.module.extension.source.SourceScheduleInParamTestCase$AdoptionProcessor"/>
+
+    <flow name="vanilla" initialState="stopped">
+        <petstore:pet-adoption-scheduler-in-param-source>
+            <petstore:polling>
+                <scheduling-strategy>
+                    <fixed-frequency frequency="1000"/>
+                </scheduling-strategy>
+            </petstore:polling>
+        </petstore:pet-adoption-scheduler-in-param-source>
+        <flow-ref name="adopt"/>
+    </flow>
+
+    <flow name="failingPoll" initialState="stopped">
+        <petstore:pet-adoption-scheduler-in-param-source>
+            <petstore:polling>
+                <scheduling-strategy>
+                    <fixed-frequency frequency="1000"/>
+                </scheduling-strategy>
+            </petstore:polling>
+        </petstore:pet-adoption-scheduler-in-param-source>
+        <raise-error type="TEST:EXPECTED"/>
+    </flow>
+
+    <petstore:config name="petstore" cashierName="jim">
+        <petstore:connection username="john" password="doe"/>
+        <petstore:pets>
+            <petstore:pet value="Grumpy Cat"/>
+        </petstore:pets>
+    </petstore:config>
+
+    <flow name="longFrequencyPoll" initialState="stopped">
+        <petstore:pet-adoption-scheduler-in-param-source>
+            <petstore:polling>
+                <scheduling-strategy>
+                    <fixed-frequency startDelay="200" frequency="100000"/>
+                </scheduling-strategy>
+            </petstore:polling>
+        </petstore:pet-adoption-scheduler-in-param-source>
+        <logger level="INFO" message="#[payload]"/>
+    </flow>
+
+    <flow name="pollWithExplicitFixedFrequency" initialState="stopped">
+        <petstore:pet-adoption-scheduler-in-param-source>
+            <petstore:polling>
+                <scheduling-strategy>
+                    <fixed-frequency frequency="60001"/>
+                </scheduling-strategy>
+            </petstore:polling>
+        </petstore:pet-adoption-scheduler-in-param-source>
+        <logger level="INFO" message="#[payload]"/>
+    </flow>
+
+    <flow name="pollWithExplicitDefaultFixedFrequency" initialState="stopped">
+        <petstore:pet-adoption-scheduler-in-param-source>
+            <petstore:polling>
+                <scheduling-strategy>
+                    <fixed-frequency frequency="60000"/>
+                </scheduling-strategy>
+            </petstore:polling>
+        </petstore:pet-adoption-scheduler-in-param-source>
+        <logger level="INFO" message="#[payload]"/>
+    </flow>
+
+    <flow name="pollWithExplicitPreviousDefaultFixedFrequency" initialState="stopped">
+        <petstore:pet-adoption-scheduler-in-param-source>
+            <petstore:polling>
+                <scheduling-strategy>
+                    <fixed-frequency frequency="1000"/>
+                </scheduling-strategy>
+            </petstore:polling>
+        </petstore:pet-adoption-scheduler-in-param-source>
+        <logger level="INFO" message="#[payload]"/>
+    </flow>
+
+    <flow name="pollWithImplicitFixedFrequency" initialState="stopped">
+        <petstore:pet-adoption-scheduler-in-param-source>
+            <petstore:polling>
+                <scheduling-strategy>
+                    <fixed-frequency/>
+                </scheduling-strategy>
+            </petstore:polling>
+        </petstore:pet-adoption-scheduler-in-param-source>
+        <logger level="INFO" message="#[payload]"/>
+    </flow>
+
+</mule>

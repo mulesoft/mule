@@ -17,6 +17,7 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADA
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.dsql.DsqlParser.isDsqlQuery;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
+
 import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -58,12 +59,13 @@ final class MetadataKeyIdObjectResolver {
   private static final DsqlParser dsqlParser = DsqlParser.getInstance();
   private final ComponentModel component;
   private final List<ParameterModel> keyParts;
+  private final Map<String, ParameterModel> parameterModelIndex = new HashMap<>();
   private final ReflectionCache reflectionCache = new ReflectionCache();
 
   public MetadataKeyIdObjectResolver(ComponentModel component) {
     checkArgument(component != null, "The ComponentModel cannot be null");
     this.component = component;
-    this.keyParts = getMetadataKeyParts(component);
+    this.keyParts = getMetadataKeyPartsAndPopulateIndex(component);
   }
 
   /**
@@ -83,10 +85,10 @@ final class MetadataKeyIdObjectResolver {
    * @param key the {@link MetadataKey} associated to the {@link MetadataKeyId}
    * @return a new instance of the {@link MetadataKeyId} parameter {@code type} with the values of the passed {@link MetadataKey}
    * @throws MetadataResolvingException if:
-   *         <ul>
-   *         <li>Parameter types is not instantiable</li>
-   *         <li>{@param key} does not provide the required levels</li>
-   *         </ul>
+   *                                    <ul>
+   *                                    <li>Parameter types is not instantiable</li>
+   *                                    <li>{@param key} does not provide the required levels</li>
+   *                                    </ul>
    */
   public Object resolve(MetadataKey key) throws MetadataResolvingException {
     return doResolve(key, false);
@@ -117,7 +119,7 @@ final class MetadataKeyIdObjectResolver {
    *
    * @return a new instance of the {@link MetadataKeyId} parameter {@code type}.
    * @throws MetadataResolvingException if the Parameter type is not instantiable.
-   * @throws IllegalArgumentException if cannot found the required default values for an specified key.
+   * @throws IllegalArgumentException   if cannot found the required default values for an specified key.
    */
   public Object resolve() throws MetadataResolvingException {
 
@@ -226,6 +228,8 @@ final class MetadataKeyIdObjectResolver {
     if (!partial) {
       final List<String> missingParts = fieldParts.keySet()
           .stream()
+          // If the key is not in index, return true. Else, check if required.
+          .filter(partName -> !parameterModelIndex.containsKey(partName) || parameterModelIndex.get(partName).isRequired())
           .filter(partName -> !currentParts.containsKey(partName))
           .collect(toList());
 
@@ -337,9 +341,10 @@ final class MetadataKeyIdObjectResolver {
     }
   }
 
-  private List<ParameterModel> getMetadataKeyParts(ComponentModel componentModel) {
+  private List<ParameterModel> getMetadataKeyPartsAndPopulateIndex(ComponentModel componentModel) {
     return componentModel.getAllParameterModels().stream()
         .filter(p -> p.getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
+        .peek(p -> parameterModelIndex.put(p.getName(), p))
         .sorted((p1, p2) -> {
           Optional<MetadataKeyPartModelProperty> mk1 = p1.getModelProperty(MetadataKeyPartModelProperty.class);
           Optional<MetadataKeyPartModelProperty> mk2 = p2.getModelProperty(MetadataKeyPartModelProperty.class);

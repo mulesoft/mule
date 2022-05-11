@@ -25,7 +25,8 @@ public class EatAppleOperation {
 
   @OutputResolver(output = AppleTypesResolver.class)
   @MediaType(value = ANY, strict = false)
-  public Object eatApple(@Connection Apple apple, @Config AppleConfig config, @MetadataKeyId @Optional String key) {
+  public Object eatApple(@org.mule.sdk.api.annotation.param.Connection Apple apple,
+                         @org.mule.sdk.api.annotation.param.Config AppleConfig config, @MetadataKeyId @Optional String key) {
     apple.bite();
     return apple;
   }

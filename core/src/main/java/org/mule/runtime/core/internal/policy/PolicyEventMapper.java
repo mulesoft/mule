@@ -89,7 +89,7 @@ public class PolicyEventMapper {
    * - restore variables from the operation policy initial event <br />
    * - message is propagated as it is <br />
    *
-   * @param result the event after the operation policy was completed
+   * @param result    the event after the operation policy was completed
    * @param propagate whether changes done after the operation was executed should be propagated or not
    */
   public CoreEvent onOperationPolicyFinish(CoreEvent result, boolean propagate) {
@@ -157,7 +157,7 @@ public class PolicyEventMapper {
    * As current policy is exiting, current variables are stored as an internal parameter and variables are restored from the
    * previously stored event. Also, message is restored or current one is preserved depending on propagation config.
    *
-   * @param event the event after the policy processors defined before the execute-next were executed
+   * @param event     the event after the policy processors defined before the execute-next were executed
    * @param propagate whether modifications to the message done by the executed policy processors should be propagated or not
    */
   public CoreEvent onSourcePolicyNext(CoreEvent event, boolean propagate) {
@@ -194,7 +194,7 @@ public class PolicyEventMapper {
    * parameters into a {@link Message}. Those response parameters are preserved as they are needed later. Variables are left as
    * they are since they will be restored when source policy's {@link #fromPolicyNext} is executed.
    *
-   * @param flowResult the event after flow was completed
+   * @param flowResult            the event after flow was completed
    * @param parametersTransformer does the transformation from flow's response parameters into a {@link Message}.
    */
   public CoreEvent onFlowFinish(CoreEvent flowResult,
@@ -231,8 +231,8 @@ public class PolicyEventMapper {
    * the error response parameters into a {@link Message}. Those error response parameters are preserved as they are needed later.
    * Variables are also restored since when this method is called, the source policy's {@link #fromPolicyNext} won't be.
    *
-   * @param event the event after the flow's error-handler is executed
-   * @param policyId the nearest to the flow (with the greater order) source policy.
+   * @param event                 the event after the flow's error-handler is executed
+   * @param policyId              the nearest to the flow (with the greater order) source policy.
    * @param parametersTransformer does the transformation from flow's response parameters into a {@link Message}.
    */
   public CoreEvent onFlowError(CoreEvent event, String policyId,

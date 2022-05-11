@@ -10,8 +10,8 @@ import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 
 /**
- * Manages components in charge of streaming objects so that the runtime can keep track of them,
- * enforce policies and make sure that all resources are reclaimed once no longer needed.
+ * Manages components in charge of streaming objects so that the runtime can keep track of them, enforce policies and make sure
+ * that all resources are reclaimed once no longer needed.
  *
  * @since 4.0
  */

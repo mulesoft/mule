@@ -16,8 +16,10 @@ import static java.util.Optional.of;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
@@ -46,6 +48,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -388,7 +391,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
     SourceModel sourceModel = new ImmutableSourceModel(SOURCE_NAME, "", false, false, asList(group), emptyList(), null, null,
                                                        of(sourceCallbackModel), empty(), empty(), false, false, false,
-                                                       null, SOURCE, emptySet(), emptySet(), emptySet(), null);
+                                                       null, SOURCE, emptySet(), PUBLIC, emptySet(), emptySet(), null);
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
     validate();
   }
@@ -921,6 +924,45 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     validate();
   }
 
+  @Test
+  public void wrappedTypesCanStillDefinePojoChildsOfDifferentType() {
+    ParameterModel firstParam = getParameter("SomePojo", SomePojo.class);
+    ParameterModel secondParam = getParameter("SomeOtherPojo", SomeOtherPojo.class);
+    when(operationModel.getAllParameterModels()).thenReturn(asList(firstParam, secondParam));
+    when(extensionModel.getSubTypes()).thenReturn(ImmutableSet
+        .of(new SubTypesModel(toMetadataType(ChildTest.class), ImmutableSet.of(toMetadataType(Pojo.class)))));
+    mockParameterGroup(operationModel, asList(firstParam, secondParam));
+
+    validate();
+  }
+
+  @Test
+  public void classLoaderIsNoLongerUsedToValidateSingularizedChildNames() {
+    ClassInformationAnnotation annotation = new ClassInformationAnnotation("Nonexistent", false, false, true, false, false,
+                                                                           emptyList(), "Nonexistantparent", emptyList(), false);
+    MetadataType childType = spy(toMetadataType(ChildTest.class));
+    when(childType.getAnnotation(ClassInformationAnnotation.class)).thenReturn(of(annotation));
+    ParameterModel plural = getParameter(CHILD_PLURAL_PARAM_NAME, baseTypeBuilder.arrayType().of(childType).build());
+    ParameterModel singular = getParameter(CHILD_SINGULAR_PARAM_NAME, childType);
+    when(constructModel.getAllParameterModels()).thenReturn(asList(singular, plural));
+    validate();
+  }
+
+  @Test
+  public void classLoaderIsNoLongerUsedToValidateContentNamesMatchType() {
+    ClassInformationAnnotation annotation = new ClassInformationAnnotation("Nonexistent", false, false, true, false, false,
+                                                                           emptyList(), "Nonexistantparent", emptyList(), false);
+    MetadataType pojoType = spy(toMetadataType(Pojo.class));
+    when(pojoType.getAnnotation(ClassInformationAnnotation.class)).thenReturn(of(annotation));
+    ParameterModel firstParam = getParameter(CHILD_SINGULAR_PARAM_NAME, pojoType);
+    when(firstParam.getRole()).thenReturn(PRIMARY_CONTENT);
+    ParameterModel secondParam = getParameter(CHILD_SINGULAR_PARAM_NAME, pojoType);
+    when(secondParam.getRole()).thenReturn(CONTENT);
+    when(operationModel.getAllParameterModels()).thenReturn(asList(firstParam));
+    when(sourceModel.getAllParameterModels()).thenReturn(asList(secondParam));
+    validate();
+  }
+
   private void mockParameterGroup(ParameterizedModel model, List<ParameterModel> parameters) {
     ParameterGroupModel group = mock(ParameterGroupModel.class);
 
@@ -1073,6 +1115,18 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     String anotherParameterName;
     @Parameter
     String anotherParameterName2;
+  }
+
+  public static class SomePojo {
+
+    @Parameter
+    ChildTest commonName;
+  }
+
+  public static class SomeOtherPojo {
+
+    @Parameter
+    Pojo commonName;
   }
 
 }

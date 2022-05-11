@@ -6,13 +6,16 @@
  */
 package org.mule.runtime.deployment.model.internal;
 
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
-import org.mule.runtime.core.api.util.UUID;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+
+import static java.util.Arrays.asList;
+import static java.util.function.UnaryOperator.identity;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
+
+import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy;
@@ -21,11 +24,9 @@ import org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoad
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,11 +46,8 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
   private final RegionPluginClassLoadersFactory pluginClassLoadersFactory;
-  private List<ArtifactPluginDescriptor> artifactPluginDescriptors = new LinkedList<>();
-  private String artifactId = UUID.getUUID();
+  private final List<ArtifactPluginDescriptor> artifactPluginDescriptors = new LinkedList<>();
   protected ArtifactDescriptor artifactDescriptor;
-  private ArtifactClassLoader parentClassLoader;
-  protected List<ArtifactClassLoader> artifactPluginClassLoaders = new ArrayList<>();
 
   /**
    * Creates an {@link AbstractArtifactClassLoaderBuilder}.
@@ -68,17 +66,6 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
    * @return the root class loader for all other class loaders
    */
   protected abstract ArtifactClassLoader getParentClassLoader();
-
-  /**
-   * @param artifactId unique identifier for this artifact. For instance, for Applications, it can be the app name. Must be not
-   *        null.
-   * @return the builder
-   */
-  public T setArtifactId(String artifactId) {
-    checkArgument(artifactId != null, "artifact id cannot be null");
-    this.artifactId = artifactId;
-    return (T) this;
-  }
 
   /**
    * @param artifactPluginDescriptors set of plugins descriptors that will be used by the application.
@@ -104,11 +91,11 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
    * and filters the artifact resources and plugins classes and resources are resolve correctly.
    *
    * @return a {@code ArtifactClassLoader} created from the provided configuration.
-   * @throws IOException exception cause when it was not possible to access the file provided as dependencies
+   * @throws RuntimeException exception cause when it was not possible to access the file provided as dependencies
    */
-  public ArtifactClassLoader build() throws IOException {
+  public ArtifactClassLoader build() {
     checkState(artifactDescriptor != null, "artifact descriptor cannot be null");
-    parentClassLoader = getParentClassLoader();
+    ArtifactClassLoader parentClassLoader = getParentClassLoader();
     checkState(parentClassLoader != null, "parent class loader cannot be null");
     final String artifactId = getArtifactId(artifactDescriptor);
     ClassLoaderLookupPolicy parentLookupPolicy = getParentLookupPolicy(parentClassLoader);
@@ -121,17 +108,17 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
         createArtifactClassLoaderFilter(artifactDescriptor.getClassLoaderModel(),
                                         parentLookupPolicy);
 
-    Map<String, LookupStrategy> appAdditionalLookupStrategy = new HashMap<>();
-    artifactClassLoaderFilter.getExportedClassPackages().stream().forEach(p -> appAdditionalLookupStrategy.put(p, PARENT_FIRST));
+    Map<String, LookupStrategy> appAdditionalLookupStrategy =
+        artifactClassLoaderFilter.getExportedClassPackages().stream()
+            .collect(toMap(identity(), p -> PARENT_FIRST));
 
-    artifactPluginClassLoaders =
+    final ArtifactClassLoader artifactClassLoader = createArtifactClassLoader(artifactId, regionClassLoader);
+    regionClassLoader.addClassLoader(artifactClassLoader, artifactClassLoaderFilter);
+
+    List<ArtifactClassLoader> artifactPluginClassLoaders =
         pluginClassLoadersFactory.createPluginClassLoaders(regionClassLoader, artifactPluginDescriptors,
                                                            regionClassLoader.getClassLoaderLookupPolicy()
                                                                .extend(appAdditionalLookupStrategy));
-
-    final ArtifactClassLoader artifactClassLoader = createArtifactClassLoader(artifactId, regionClassLoader);
-
-    regionClassLoader.addClassLoader(artifactClassLoader, artifactClassLoaderFilter);
 
     int artifactPluginIndex = 0;
     for (ArtifactPluginDescriptor artifactPluginDescriptor : artifactPluginDescriptors) {
@@ -146,6 +133,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
 
   /**
    * Template method to build different implementations of a {@link RegionClassLoader}
+   * 
    * @return a new {@link RegionClassLoader}
    */
   protected RegionClassLoader createRegionClassLoader(String artifactId,
@@ -169,7 +157,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
   /**
    * Creates the class loader for the artifact being built.
    *
-   * @param artifactId identifies the artifact being created. Non empty.
+   * @param artifactId        identifies the artifact being created. Non empty.
    * @param regionClassLoader class loader containing the artifact and dependant class loaders. Non null.
    * @return
    */

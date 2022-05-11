@@ -7,7 +7,7 @@
 
 package org.mule.runtime.config.internal.dsl.spring;
 
-import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.api.component.ComponentIdentifier;
 
 /**
  * Holder for the component identifier, it's bean value and the object {@code Class} that will be created from it.
@@ -22,15 +22,15 @@ class ComponentValue {
 
   private final Class<?> type;
   private final Object bean;
-  private final ComponentAst componentModel;
+  private final ComponentIdentifier componentIdentifier;
 
   /**
-   * @param componentModel the component for which the bean definition is provided
-   * @param type the type of the object to be created
-   * @param bean the bean definition
+   * @param componentIdentifier the identifier of the component for which the bean definition is provided
+   * @param type                the type of the object to be created
+   * @param bean                the bean definition
    */
-  public ComponentValue(ComponentAst componentModel, Class<?> type, Object bean) {
-    this.componentModel = componentModel;
+  public ComponentValue(ComponentIdentifier componentIdentifier, Class<?> type, Object bean) {
+    this.componentIdentifier = componentIdentifier;
     this.type = type;
     this.bean = bean;
   }
@@ -51,9 +51,9 @@ class ComponentValue {
   }
 
   /**
-   * @return the component model associated to the configuration.
+   * @return the identifier of the component model associated to the configuration.
    */
-  public ComponentAst getComponentModel() {
-    return componentModel;
+  public ComponentIdentifier getComponentIdentifier() {
+    return componentIdentifier;
   }
 }

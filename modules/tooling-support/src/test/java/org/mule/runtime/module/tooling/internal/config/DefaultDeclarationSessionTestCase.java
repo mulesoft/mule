@@ -6,27 +6,41 @@
  */
 package org.mule.runtime.module.tooling.internal.config;
 
+import static java.lang.Boolean.TRUE;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.module.tooling.internal.ApplicationSupplier;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.util.Properties;
+
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
-@RunWith(MockitoJUnitRunner.class)
 public class DefaultDeclarationSessionTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   private static final String EXPECTED_EXCEPTION = "Expected exception";
   private static final String CONFIG_NAME = "configName";
@@ -38,6 +52,20 @@ public class DefaultDeclarationSessionTestCase extends AbstractMuleTestCase {
   private ApplicationSupplier applicationSupplier;
   @Mock
   private Application application;
+
+  @Before
+  public void before() {
+    final Properties deploymentProperties = new Properties();
+    deploymentProperties.put(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY, TRUE.toString());
+
+    when(application.getDescriptor()).thenReturn(new ApplicationDescriptor("app", of(deploymentProperties)));
+    final Registry registry = mock(Registry.class);
+    when(registry.lookupByType(any(Class.class))).thenReturn(empty());
+    final ArtifactContext artifactContext = mock(ArtifactContext.class);
+    when(artifactContext.getRegistry()).thenReturn(registry);
+    when(application.getArtifactContext()).thenReturn(artifactContext);
+    when(application.getRegistry()).thenReturn(registry);
+  }
 
   @Test
   public void deploymentException() throws Exception {

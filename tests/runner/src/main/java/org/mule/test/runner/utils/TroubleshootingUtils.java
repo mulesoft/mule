@@ -255,7 +255,7 @@ public class TroubleshootingUtils {
     try {
       lastModifiedDate = new File(filePathURL.toURI()).lastModified();
     } catch (URISyntaxException e) {
-      //do nothing
+      // do nothing
     }
 
     return sdf.format(lastModifiedDate);

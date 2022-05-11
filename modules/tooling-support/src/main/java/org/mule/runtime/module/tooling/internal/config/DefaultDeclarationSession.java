@@ -62,21 +62,23 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
 
     final InternalDeclarationSession internalDeclarationService =
         new InternalDeclarationSession(application.getDescriptor().getArtifactDeclaration());
-    InternalDeclarationSession internalDeclarationSession = application.getRegistry()
-        .lookupByType(MuleContext.class)
-        .map(muleContext -> {
-          try {
-            return muleContext.getInjector().inject(internalDeclarationService);
-          } catch (MuleException e) {
-            throw new MuleRuntimeException(createStaticMessage("Could not inject values into DeclarationSession"));
-          }
-        })
-        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find injector to create InternalDeclarationSession")));
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Creation of declaration session to delegate calls took [{}ms]", currentTimeMillis() - startTime);
+    final MuleContext muleContext = application.getArtifactContext().getMuleContext();
+    if (muleContext == null) {
+      throw new MuleRuntimeException(createStaticMessage("Could not find injector to create InternalDeclarationSession"));
     }
 
-    return internalDeclarationSession;
+    try {
+      InternalDeclarationSession internalDeclarationSession = muleContext.getInjector().inject(internalDeclarationService);
+
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Creation of declaration session to delegate calls took [{}ms]", currentTimeMillis() - startTime);
+      }
+
+      return internalDeclarationSession;
+    } catch (MuleException e) {
+      throw new MuleRuntimeException(createStaticMessage("Could not inject values into DeclarationSession"));
+    }
+
   }
 
   private <T> T withInternalDeclarationSession(String functionName, Function<DeclarationSession, T> function) {
@@ -124,6 +126,22 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
   }
 
   @Override
+  public ValueResult getFieldValues(ParameterizedElementDeclaration component, String providerName, String targetSelector) {
+    try {
+      return withInternalDeclarationSession("getFieldValues()",
+                                            session -> session.getFieldValues(component, providerName, targetSelector));
+    } catch (Throwable t) {
+      LOGGER
+          .error(format("Error while resolving field values on component: '%s:%s' for providerName: '%s' with targetSelector: '%s'",
+                        component.getDeclaringExtension(),
+                        component.getName(), providerName,
+                        targetSelector),
+                 t);
+      throw t;
+    }
+  }
+
+  @Override
   public MetadataResult<MetadataKeysContainer> getMetadataKeys(ComponentElementDeclaration component) {
     try {
       return withInternalDeclarationSession("getMetadataKeys()", session -> session.getMetadataKeys(component));
@@ -141,6 +159,21 @@ public class DefaultDeclarationSession extends AbstractArtifactAgnosticService i
       return withInternalDeclarationSession("resolveComponentMetadata()", session -> session.resolveComponentMetadata(component));
     } catch (Throwable t) {
       LOGGER.error(format("Error while resolving metadata on component: '%s:%s'", component.getDeclaringExtension(),
+                          component.getName()),
+                   t);
+      throw t;
+    }
+  }
+
+  @Override
+  public void disposeMetadataCache(ComponentElementDeclaration component) {
+    try {
+      withInternalDeclarationSession("disposeMetadataCache()", session -> {
+        session.disposeMetadataCache(component);
+        return null;
+      });
+    } catch (Throwable t) {
+      LOGGER.error(format("Error while disposing metadata on component: '%s:%s'", component.getDeclaringExtension(),
                           component.getName()),
                    t);
       throw t;

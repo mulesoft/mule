@@ -23,7 +23,7 @@ import java.util.Map;
 
 final class ExtensionsFlowProcessingTemplate extends FlowProcessingTemplate {
 
-  private final SourceResultAdapter sourceMessage;
+  private SourceResultAdapter sourceMessage;
   private final SourceCompletionHandler completionHandler;
 
   ExtensionsFlowProcessingTemplate(SourceResultAdapter sourceMessage,
@@ -67,6 +67,8 @@ final class ExtensionsFlowProcessingTemplate extends FlowProcessingTemplate {
       completionHandler.onTerminate(either);
     } catch (Exception e) {
       throw propagateWrappingFatal(e);
+    } finally {
+      sourceMessage = null;
     }
   }
 

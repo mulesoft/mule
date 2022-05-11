@@ -306,7 +306,8 @@ class InfrastructureElementModelDelegate {
     checkArgument(!isBlank(objectValue.getTypeId()), "Missing declaration of which reconnection to use");
 
     String elementName = objectValue.getTypeId().equals(RECONNECT_ALIAS)
-        ? RECONNECT_ELEMENT_IDENTIFIER : RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
+        ? RECONNECT_ELEMENT_IDENTIFIER
+        : RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 
     cloneDeclarationToElement(parameterModel, paramDsl, parentConfig, parentElement, objectValue, elementName,
                               paramDsl.getNamespace());

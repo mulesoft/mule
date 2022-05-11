@@ -25,7 +25,6 @@ public class LocationKey {
   @Parameter
   private String country;
 
-  @Optional
   @DisplayName("State | City")
   @MetadataKeyPart(order = 3)
   @Parameter

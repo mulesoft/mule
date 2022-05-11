@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
 import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
 import java.util.Optional;
 
@@ -20,11 +22,10 @@ import org.junit.Test;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Features;
-import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
 
 @Features({@Feature(ERROR_HANDLING), @Feature(MULE_DSL)})
-@Stories({@Story("Validations"), @Story(DSL_VALIDATION_STORY)})
+@Story(DSL_VALIDATION_STORY)
 public class SourceErrorMappingTypeNotRepeatedTestCase extends AbstractCoreValidationTestCase {
 
   @Override
@@ -34,7 +35,7 @@ public class SourceErrorMappingTypeNotRepeatedTestCase extends AbstractCoreValid
 
   @Test
   public void repeatedMappingsNotAllowed() {
-    final Optional<String> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
         "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
         "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
         "      xmlns:test=\"http://www.mulesoft.org/schema/mule/test\"\n" +
@@ -60,9 +61,10 @@ public class SourceErrorMappingTypeNotRepeatedTestCase extends AbstractCoreValid
         "        </error-handler>\n" +
         "    </flow>\n" +
         "\n" +
-        "</mule>");
+        "</mule>")
+            .stream().findFirst();
 
-    assertThat(msg.get(),
+    assertThat(msg.get().getMessage(),
                containsString("Repeated source types are not allowed. Offending types are 'ROUTING', 'EXPRESSION'."));
   }
 

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:some="http://www.mulesoft.org/schema/mule/some"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/some http://www.mulesoft.org/schema/mule/some/current/mule-some.xsd">
+
+    <object name="capture"
+            class="org.mule.test.module.extension.source.SourceWithParameterGroupExclusiveOptionalsOneRequiredTestCase$CaptureProcessor"/>
+
+    <flow name="someParameter" initialState="stopped">
+        <some:another-emitting-source someParameter="hello dog!"/>
+        <flow-ref name="capture"/>
+    </flow>
+
+    <flow name="complexParameter" initialState="stopped">
+        <some:another-emitting-source>
+            <some:complex-parameter anotherParameter="hello bird!"/>
+        </some:another-emitting-source>
+        <flow-ref name="capture"/>
+    </flow>
+
+    <flow name="someParameterDslTrue" initialState="stopped">
+        <some:yet-another-emitting-source>
+            <some:awesome-parameter-group someParameter="hello dog!"/>
+        </some:yet-another-emitting-source>
+        <flow-ref name="capture"/>
+    </flow>
+
+    <flow name="complexParameterDslTrue" initialState="stopped">
+        <some:yet-another-emitting-source>
+            <some:awesome-parameter-group>
+                <some:complex-parameter anotherParameter="hello bird!"/>
+            </some:awesome-parameter-group>
+        </some:yet-another-emitting-source>
+        <flow-ref name="capture"/>
+    </flow>
+
+    <flow name="dslTrueRepeatedNameParameter" initialState="stopped">
+        <some:exclusive-optionals-emitting-source>
+            <some:parameter-group repeatedNameParameter="hello cat!"/>
+        </some:exclusive-optionals-emitting-source>
+        <flow-ref name="capture"/>
+    </flow>
+
+    <flow name="dslTrueComplexParameterWithRepeatedNameParameter" initialState="stopped">
+        <some:exclusive-optionals-emitting-source>
+            <some:parameter-group>
+                <some:complex-parameter anotherParameter="hello bird!" repeatedNameParameter="hi bird!"/>
+            </some:parameter-group>
+        </some:exclusive-optionals-emitting-source>
+        <flow-ref name="capture"/>
+    </flow>
+
+    <flow name="dslTrueRepeatedParameterNameInParameterGroup" initialState="stopped">
+        <some:exclusive-optionals-emitting-source>
+            <some:pojo-parameter anotherParameter="hello lizard!" repeatedNameParameter="hi lizard!"/>
+            <some:parameter-group>
+                <some:complex-parameter anotherParameter="hello bird!" repeatedNameParameter="hi bird!"/>
+            </some:parameter-group>
+        </some:exclusive-optionals-emitting-source>
+        <flow-ref name="capture"/>
+    </flow>
+
+    <flow name="dslTrueRepeatedParameterNameInSource" initialState="stopped">
+        <some:exclusive-optionals-emitting-source repeatedNameParameter="hi lizard!">
+            <some:parameter-group>
+                <some:complex-parameter anotherParameter="hello bird!" repeatedNameParameter="hi bird!"/>
+            </some:parameter-group>
+        </some:exclusive-optionals-emitting-source>
+        <flow-ref name="capture"/>
+    </flow>
+
+    <flow name="dslTrueComplexParameterWithParameterAlias" initialState="stopped">
+        <some:another-exclusive-optionals-emitting-source someParameter="hello cat!">
+            <some:alias-parameter-group>
+                <some:complex-parameter-alias another-parameter-alias="hello bird!"/>
+            </some:alias-parameter-group>
+        </some:another-exclusive-optionals-emitting-source>
+        <flow-ref name="capture"/>
+    </flow>
+
+    <flow name="dslTrueRepeatedParameterAliasInSource" initialState="stopped">
+        <some:another-exclusive-optionals-emitting-source someParameter="hello cat!" some-parameter-alias="hello lizard!">
+            <some:alias-parameter-group some-parameter-alias="hello bird!"/>
+        </some:another-exclusive-optionals-emitting-source>
+        <flow-ref name="capture"/>
+    </flow>
+
+</mule>

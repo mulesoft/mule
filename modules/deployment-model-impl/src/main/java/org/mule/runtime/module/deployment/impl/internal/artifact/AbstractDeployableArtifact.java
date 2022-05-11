@@ -6,25 +6,28 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
-import static java.lang.Boolean.TRUE;
-import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
-import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 
+import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
+
+import static org.apache.commons.lang3.StringUtils.capitalize;
+
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener;
-import org.mule.runtime.core.internal.context.DefaultMuleContext;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentStopException;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +56,12 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
 
   @Override
   public final void stop() {
+    if (getArtifactContext() != null && getArtifactContext().getRegistry() != null) {
+      for (Flow flow : getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
+        ((DefaultFlowBuilder.DefaultFlow) flow).doNotPersist();
+      }
+    }
+
     if (this.artifactContext == null
         || !this.artifactContext.getMuleContext().getLifecycleManager().isDirectTransition(Stoppable.PHASE_NAME)) {
       // domain never started, maybe due to a previous error
@@ -135,7 +144,7 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
 
   protected void persistArtifactState(String state) {
     ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener =
-        ((DefaultMuleContext) this.artifactContext.getMuleContext()).getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER);
+        ((MuleContextWithRegistry) this.artifactContext.getMuleContext()).getRegistry().lookupObject(ARTIFACT_STOPPED_LISTENER);
     if (artifactStoppedPersistenceListener != null && state.equals(START)) {
       artifactStoppedPersistenceListener.onStart();
     } else if (artifactStoppedPersistenceListener != null && state.equals(STOP)) {
@@ -143,4 +152,8 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
     }
   }
 
+  @Override
+  public ArtifactContext getArtifactContext() {
+    return artifactContext;
+  }
 }

@@ -7,10 +7,11 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
+import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.assertLayoutModel;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getNamedObject;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
@@ -28,10 +29,10 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.Optional;
 
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
-import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.assertLayoutModel;
-import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getNamedObject;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -147,7 +148,7 @@ public class ParameterGroupLayoutOrderTestCase {
   @Configuration(name = "GroupImplicitOrderConfig")
   public static class ParameterGroupImplicitOrder {
 
-    @ParameterGroup(name = GROUP_NAME)
+    @org.mule.sdk.api.annotation.param.ParameterGroup(name = GROUP_NAME)
     GroupImplicitOrder groupOne;
 
     @Parameter
@@ -192,7 +193,7 @@ public class ParameterGroupLayoutOrderTestCase {
   public static class ParameterGroupNoGeneral {
 
     @Placement(order = 1)
-    @ParameterGroup(name = GROUP_NAME)
+    @org.mule.sdk.api.annotation.param.ParameterGroup(name = GROUP_NAME)
     GroupImplicitOrder groupOne;
   }
 

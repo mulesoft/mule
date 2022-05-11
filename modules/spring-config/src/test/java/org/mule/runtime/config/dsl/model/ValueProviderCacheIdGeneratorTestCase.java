@@ -7,21 +7,28 @@
 package org.mule.runtime.config.dsl.model;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static junit.framework.TestCase.fail;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
+import static org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue.plain;
+import static org.mule.runtime.config.dsl.model.ComplexActingParameterUtils.forAllComplexActingParameterChanges;
+import static org.mule.runtime.config.dsl.model.DeclarationUtils.modifyParameter;
+import static org.mule.runtime.config.dsl.model.DeclarationUtils.removeParameter;
 
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
+import org.mule.runtime.api.meta.model.parameter.FieldValueProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
-import org.mule.runtime.app.declaration.api.ParameterElementDeclaration;
+import org.mule.runtime.app.declaration.api.ParameterValue;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
+import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -35,16 +42,13 @@ import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 
 import org.junit.Test;
-
-import com.google.common.collect.ImmutableMap;
 
 public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValueProviderExtensionTestCase {
 
@@ -59,6 +63,14 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
   private Optional<ValueProviderCacheId> computeIdFor(ArtifactDeclaration appDeclaration,
                                                       String location,
                                                       String parameterName)
+      throws Exception {
+    return this.computeIdFor(appDeclaration, location, parameterName, null);
+  }
+
+  private Optional<ValueProviderCacheId> computeIdFor(ArtifactDeclaration appDeclaration,
+                                                      String location,
+                                                      String parameterName,
+                                                      String targetSelector)
       throws Exception {
     ArtifactAst app = loadApplicationModel(appDeclaration);
     Locator locator = new Locator(app);
@@ -89,61 +101,32 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
       fail(format("missing declaration or model for: %s", location));
     }
 
-    Optional<ValueProviderCacheId> dslElementId =
-        dslElementModelValueProviderCacheIdGenerator.getIdForResolvedValues(dslElementModel, parameterName);
-    Optional<ValueProviderCacheId> componentBasedId =
-        componentBasedValueProviderCacheIdGenerator.getIdForResolvedValues(component, parameterName);
-    Optional<ValueProviderCacheId> declarationBasedId =
-        elementDeclarationValueProviderCacheIdGenerator.getIdForResolvedValues(elementDeclaration.get(), parameterName);
+    Optional<ValueProviderCacheId> dslElementId;
+    Optional<ValueProviderCacheId> componentBasedId;
+    Optional<ValueProviderCacheId> declarationBasedId;
+    Optional<ValueProviderCacheId> astId;
+    if (targetSelector == null) {
+      dslElementId = dslElementModelValueProviderCacheIdGenerator.getIdForResolvedValues(dslElementModel, parameterName);
+      componentBasedId = componentBasedValueProviderCacheIdGenerator.getIdForResolvedValues(component, parameterName);
+      declarationBasedId =
+          elementDeclarationValueProviderCacheIdGenerator.getIdForResolvedValues(elementDeclaration.get(), parameterName);
+      astId = componentAstBasedValueProviderCacheIdGenerator.getIdForResolvedValues(component, parameterName);
+    } else {
+      dslElementId =
+          dslElementModelValueProviderCacheIdGenerator.getIdForResolvedValues(dslElementModel, parameterName, targetSelector);
+      componentBasedId =
+          componentBasedValueProviderCacheIdGenerator.getIdForResolvedValues(component, parameterName, targetSelector);
+      declarationBasedId = elementDeclarationValueProviderCacheIdGenerator.getIdForResolvedValues(elementDeclaration.get(),
+                                                                                                  parameterName, targetSelector);
+      astId = componentAstBasedValueProviderCacheIdGenerator.getIdForResolvedValues(component, parameterName, targetSelector);
+    }
 
-    //TODO: ADD THIS CHECK MULE-18636
-    //checkIdsAreEqual(astId, dslElementId);
+    checkIdsAreEqual(astId, dslElementId);
     checkIdsAreEqual(dslElementId, componentBasedId);
     checkIdsAreEqual(componentBasedId, declarationBasedId);
 
-    //Any should be fine
+    // Any should be fine
     return dslElementId;
-  }
-
-  private Optional<ParameterizedElementDeclaration> getParameterElementDeclaration(ArtifactDeclaration artifactDeclaration,
-                                                                                   String location) {
-    AtomicBoolean isConnection = new AtomicBoolean(false);
-    if (location.endsWith("/connection")) {
-      isConnection.set(true);
-      location = location.split("/connection")[0];
-    }
-    return artifactDeclaration.<ParameterizedElementDeclaration>findElement(builderFromStringRepresentation(location).build())
-        .map(d -> isConnection.get() ? ((ConfigurationElementDeclaration) d).getConnection().orElse(null) : d);
-  }
-
-  private void modifyParameter(ArtifactDeclaration artifactDeclaration,
-                               String ownerLocation,
-                               String parameterName,
-                               Consumer<ParameterElementDeclaration> parameterConsumer) {
-    getParameterElementDeclaration(artifactDeclaration, ownerLocation)
-        .map(
-             owner -> owner.getParameterGroups()
-                 .stream()
-                 .flatMap(pg -> pg.getParameters().stream())
-                 .filter(p -> p.getName().equals(parameterName))
-                 .findAny()
-                 .map(fp -> {
-                   parameterConsumer.accept(fp);
-                   return EMPTY; // Needed to avoid exception
-                 })
-                 .orElseThrow(() -> new RuntimeException("Could not find parameter to modify")))
-        .orElseThrow(() -> new RuntimeException("Location not found"));
-  }
-
-  private void removeParameter(ArtifactDeclaration artifactDeclaration,
-                               String ownerLocation,
-                               String parameterName) {
-    if (!getParameterElementDeclaration(artifactDeclaration, ownerLocation)
-        .map(owner -> owner.getParameterGroups().stream()
-            .filter(pg -> pg.getParameters().removeIf(p -> p.getName().equals(parameterName))).findAny())
-        .orElseThrow(() -> new RuntimeException("Location not found")).isPresent()) {
-      throw new RuntimeException("Could not remove parameter from component");
-    }
   }
 
   @Test
@@ -449,183 +432,12 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
   @Test
   public void differentHashForComplexActingParameterValue() throws Exception {
     ArtifactDeclaration app = getBaseApp();
-    final int defaultInt = 0;
-    final String defaultString = "zero";
-    final List<String> defaultList = asList("one", "two", "three");
-    final Map<String, String> defaultMap = ImmutableMap.of("0", "zero", "1", "one");
-    final InnerPojo defaultInnerPojo = new InnerPojo(defaultInt, defaultString, defaultList, defaultMap);
-    final List<InnerPojo> defaultComplexList = asList(defaultInnerPojo);
-    final Map<String, InnerPojo> defaultComplexMap = ImmutableMap.of("0", defaultInnerPojo);
-
     List<Optional<ValueProviderCacheId>> allIds = new LinkedList<>();
-
-    allIds.add(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME));
-
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(1,
-                                                                                                                      defaultString,
-                                                                                                                      defaultList,
-                                                                                                                      defaultMap,
-                                                                                                                      defaultInnerPojo,
-                                                                                                                      defaultComplexList,
-                                                                                                                      defaultComplexMap)));
-    allIds.add(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME));
-
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(defaultInt,
-                                                                                                                      "one",
-                                                                                                                      defaultList,
-                                                                                                                      defaultMap,
-                                                                                                                      defaultInnerPojo,
-                                                                                                                      defaultComplexList,
-                                                                                                                      defaultComplexMap)));
-    allIds.add(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME));
-
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(defaultInt,
-                                                                                                                      defaultString,
-                                                                                                                      asList("one",
-                                                                                                                             "two",
-                                                                                                                             "four"),
-                                                                                                                      defaultMap,
-                                                                                                                      defaultInnerPojo,
-                                                                                                                      defaultComplexList,
-                                                                                                                      defaultComplexMap)));
-    allIds.add(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME));
-
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(defaultInt,
-                                                                                                                      defaultString,
-                                                                                                                      defaultList,
-                                                                                                                      ImmutableMap
-                                                                                                                          .of("2",
-                                                                                                                              "two",
-                                                                                                                              "3",
-                                                                                                                              "three"),
-                                                                                                                      defaultInnerPojo,
-                                                                                                                      defaultComplexList,
-                                                                                                                      defaultComplexMap)));
-    allIds.add(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME));
-
-    InnerPojo innerPojoChangedInt = new InnerPojo(1, defaultString, defaultList, defaultMap);
-    InnerPojo innerPojoChangedString = new InnerPojo(defaultInt, "one", defaultList, defaultMap);
-    InnerPojo innerPojoChangedList = new InnerPojo(defaultInt, defaultString, asList("one", "two", "four"), defaultMap);
-    InnerPojo innerPojoChangedMap =
-        new InnerPojo(defaultInt, defaultString, defaultList, ImmutableMap.of("0", "two", "1", "three"));
-
-
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(defaultInt,
-                                                                                                                      defaultString,
-                                                                                                                      defaultList,
-                                                                                                                      defaultMap,
-                                                                                                                      innerPojoChangedInt,
-                                                                                                                      defaultComplexList,
-                                                                                                                      defaultComplexMap)));
-    allIds.add(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME));
-
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(defaultInt,
-                                                                                                                      defaultString,
-                                                                                                                      defaultList,
-                                                                                                                      defaultMap,
-                                                                                                                      innerPojoChangedString,
-                                                                                                                      defaultComplexList,
-                                                                                                                      defaultComplexMap)));
-    allIds.add(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME));
-
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(defaultInt,
-                                                                                                                      defaultString,
-                                                                                                                      defaultList,
-                                                                                                                      defaultMap,
-                                                                                                                      innerPojoChangedList,
-                                                                                                                      defaultComplexList,
-                                                                                                                      defaultComplexMap)));
-    allIds.add(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME));
-
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(defaultInt,
-                                                                                                                      defaultString,
-                                                                                                                      defaultList,
-                                                                                                                      defaultMap,
-                                                                                                                      innerPojoChangedMap,
-                                                                                                                      defaultComplexList,
-                                                                                                                      defaultComplexMap)));
-    allIds.add(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME));
-
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(defaultInt,
-                                                                                                                      defaultString,
-                                                                                                                      defaultList,
-                                                                                                                      defaultMap,
-                                                                                                                      defaultInnerPojo,
-                                                                                                                      asList(innerPojoChangedInt),
-                                                                                                                      defaultComplexMap)));
-    allIds.add(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME));
-
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(defaultInt,
-                                                                                                                      defaultString,
-                                                                                                                      defaultList,
-                                                                                                                      defaultMap,
-                                                                                                                      defaultInnerPojo,
-                                                                                                                      asList(innerPojoChangedString),
-                                                                                                                      defaultComplexMap)));
-    allIds.add(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME));
-
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(defaultInt,
-                                                                                                                      defaultString,
-                                                                                                                      defaultList,
-                                                                                                                      defaultMap,
-                                                                                                                      defaultInnerPojo,
-                                                                                                                      asList(innerPojoChangedList),
-                                                                                                                      defaultComplexMap)));
-    allIds.add(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME));
-
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(defaultInt,
-                                                                                                                      defaultString,
-                                                                                                                      defaultList,
-                                                                                                                      defaultMap,
-                                                                                                                      defaultInnerPojo,
-                                                                                                                      asList(innerPojoChangedMap),
-                                                                                                                      defaultComplexMap)));
-    allIds.add(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME));
-
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(defaultInt,
-                                                                                                                      defaultString,
-                                                                                                                      defaultList,
-                                                                                                                      defaultMap,
-                                                                                                                      defaultInnerPojo,
-                                                                                                                      defaultComplexList,
-                                                                                                                      ImmutableMap
-                                                                                                                          .of("0",
-                                                                                                                              innerPojoChangedInt))));
-    allIds.add(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME));
-
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(defaultInt,
-                                                                                                                      defaultString,
-                                                                                                                      defaultList,
-                                                                                                                      defaultMap,
-                                                                                                                      defaultInnerPojo,
-                                                                                                                      defaultComplexList,
-                                                                                                                      ImmutableMap
-                                                                                                                          .of("0",
-                                                                                                                              innerPojoChangedString))));
-    allIds.add(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME));
-
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(defaultInt,
-                                                                                                                      defaultString,
-                                                                                                                      defaultList,
-                                                                                                                      defaultMap,
-                                                                                                                      defaultInnerPojo,
-                                                                                                                      defaultComplexList,
-                                                                                                                      ImmutableMap
-                                                                                                                          .of("0",
-                                                                                                                              innerPojoChangedList))));
-    allIds.add(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME));
-
-    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> p.setValue(newComplexActingParameter(defaultInt,
-                                                                                                                      defaultString,
-                                                                                                                      defaultList,
-                                                                                                                      defaultMap,
-                                                                                                                      defaultInnerPojo,
-                                                                                                                      defaultComplexList,
-                                                                                                                      ImmutableMap
-                                                                                                                          .of("0",
-                                                                                                                              innerPojoChangedMap))));
-    allIds.add(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME));
-
+    forAllComplexActingParameterChanges(app,
+                                        OPERATION_LOCATION,
+                                        COMPLEX_ACTING_PARAMETER_NAME,
+                                        v -> allIds
+                                            .add(computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME)));
 
     for (Optional<ValueProviderCacheId> idA : allIds) {
       for (Optional<ValueProviderCacheId> idB : allIds) {
@@ -636,4 +448,144 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
     }
   }
 
+  @Test
+  public void extractionExpressionIsUsedForActingParameters() throws Exception {
+    final String extractionExpression = "actingParameter";
+    final String otherParameterName = "otherParameterName";
+    ActingParameterModel actingParameterModel = createActingParameterModel(otherParameterName);
+    when(actingParameterModel.getExtractionExpression()).thenReturn(extractionExpression);
+    when(valueProviderModel.getActingParameters()).thenReturn(singletonList(otherParameterName));
+    when(valueProviderModel.getParameters()).thenReturn(singletonList(actingParameterModel));
+
+    ArtifactDeclaration app = getBaseApp();
+
+    Optional<ValueProviderCacheId> operationId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    assertThat(operationId.isPresent(), is(true));
+    modifyParameter(app, OPERATION_LOCATION, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
+    checkIdsAreDifferent(operationId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  // TODO(CMTS-208): This should fail once implemented
+  // Ideally, we would want to only use the actual field but that would require us to parse the extraction expression to actually
+  // find the field required. For now, the whole parameter will be used.
+  public void wholeParameterIsUsedIfExpressionPointsToField() throws Exception {
+    final String extractionExpression = COMPLEX_ACTING_PARAMETER_NAME + ".stringParam";
+    ActingParameterModel actingParameterModel = createActingParameterModel(ACTING_PARAMETER_NAME);
+    when(actingParameterModel.getExtractionExpression()).thenReturn(extractionExpression);
+    when(valueProviderModel.getParameters()).thenReturn(singletonList(actingParameterModel));
+
+    ArtifactDeclaration app = getBaseApp();
+
+    Optional<ValueProviderCacheId> operationId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME);
+    assertThat(operationId.isPresent(), is(true));
+    // Modify a parameter that should not affect the hash
+    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME, p -> {
+      Map<String, ParameterValue> complexDeclaration = new HashMap<>(((ParameterObjectValue) p.getValue()).getParameters());
+      complexDeclaration.put("intParam", plain("999"));
+      ((ParameterObjectValue) p.getValue()).setParameters(complexDeclaration);
+    });
+    checkIdsAreDifferent(operationId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  public void presentFieldValueProviderGetsId() throws Exception {
+    final String targetSelector = "some.target.path";
+    FieldValueProviderModel fieldValueProviderModel = createFieldValueProviderModel(FIELD_VALUE_PROVIDER_NAME,
+                                                                                    FIELD_VALUE_PROVIDER_ID,
+                                                                                    targetSelector);
+    when(providedParameter.getFieldValueProviderModels()).thenReturn(singletonList(fieldValueProviderModel));
+
+    ArtifactDeclaration app = getBaseApp();
+    Optional<ValueProviderCacheId> cacheId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME, targetSelector);
+    assertThat(cacheId.isPresent(), equalTo(true));
+    cacheId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME, "other.field");
+    assertThat(cacheId.isPresent(), is(false));
+  }
+
+  @Test
+  // TODO(CMTS-208): This should fail once implemented
+  // Ideally we would want only the acting fields to modify the hash, but since there is still no way
+  // to correctly identify them without evaluating the path expression, we are using the whole parameter for caching
+  public void changesInParameterWithActingFieldReturnsDifferentHash() throws Exception {
+    final String targetSelector = "some.target.path";
+    FieldValueProviderModel fieldValueProviderModel =
+        createFieldValueProviderModel(FIELD_VALUE_PROVIDER_NAME, FIELD_VALUE_PROVIDER_ID, targetSelector);
+
+    ActingParameterModel actingParameterModel = createActingParameterModel(COMPLEX_ACTING_PARAMETER_NAME,
+                                                                           COMPLEX_ACTING_PARAMETER_NAME
+                                                                               + ".innerPojoParam.stringParam");
+
+    when(fieldValueProviderModel.getParameters()).thenReturn(singletonList(actingParameterModel));
+    when(providedParameterFromComplex.getFieldValueProviderModels()).thenReturn(singletonList(fieldValueProviderModel));
+
+    ArtifactDeclaration app = getBaseApp();
+
+    List<Optional<ValueProviderCacheId>> allIds = new LinkedList<>();
+    forAllComplexActingParameterChanges(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME,
+                                        v -> allIds.add(computeIdFor(app, OPERATION_LOCATION,
+                                                                     PROVIDED_FROM_COMPLEX_PARAMETER_NAME, targetSelector)));
+
+    // Every id in the list should be different to each other
+    for (Optional<ValueProviderCacheId> idA : allIds) {
+      for (Optional<ValueProviderCacheId> idB : allIds) {
+        if (idA != idB) {
+          checkIdsAreDifferent(idA, idB);
+        }
+      }
+    }
+  }
+
+  @Test
+  public void actingFieldFromNotExistentParameterIsNotConsideredForId() throws Exception {
+    final String targetSelector = "some.target.path";
+    FieldValueProviderModel fieldValueProviderModel =
+        createFieldValueProviderModel(FIELD_VALUE_PROVIDER_NAME, FIELD_VALUE_PROVIDER_ID, targetSelector);
+
+    ActingParameterModel actingParameterModel = createActingParameterModel(ACTING_PARAMETER_NAME,
+                                                                           "notExistentParam.stringParam");
+
+    when(fieldValueProviderModel.getParameters()).thenReturn(singletonList(actingParameterModel));
+    when(providedParameter.getFieldValueProviderModels()).thenReturn(singletonList(fieldValueProviderModel));
+
+    ArtifactDeclaration app = getBaseApp();
+
+    Optional<ValueProviderCacheId> id = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME, targetSelector);
+    assertThat(id.isPresent(), is(true));
+  }
+
+  @Test
+  public void actingFieldAsExpressionUsesWholeParameter() throws Exception {
+    final String targetSelector = "some.target.path";
+    FieldValueProviderModel fieldValueProviderModel =
+        createFieldValueProviderModel(FIELD_VALUE_PROVIDER_NAME, FIELD_VALUE_PROVIDER_ID, targetSelector);
+
+    ActingParameterModel actingParameterModel = createActingParameterModel(COMPLEX_ACTING_PARAMETER_NAME,
+                                                                           COMPLEX_ACTING_PARAMETER_NAME
+                                                                               + ".innerPojoParam.stringParam");
+
+    when(fieldValueProviderModel.getParameters()).thenReturn(singletonList(actingParameterModel));
+    when(providedParameterFromComplex.getFieldValueProviderModels()).thenReturn(singletonList(fieldValueProviderModel));
+
+    ArtifactDeclaration app = getBaseApp();
+
+    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME,
+                    p -> p.setValue(ParameterSimpleValue.of("#['complexActingParameter']")));
+    Optional<ValueProviderCacheId> originalExpressionId =
+        computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME, targetSelector);
+
+    modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME,
+                    p -> p.setValue(ParameterSimpleValue.of("#['otherComplexActingParameter']")));
+    Optional<ValueProviderCacheId> otherExpressionId =
+        computeIdFor(app, OPERATION_LOCATION, PROVIDED_FROM_COMPLEX_PARAMETER_NAME, targetSelector);
+
+    checkIdsAreDifferent(originalExpressionId, otherExpressionId);
+  }
+
+  @Test
+  public void invalidTargetSelector() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    assertThat(computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME, "this-is-not&a$$$val*d@path")
+        .isPresent(), is(false));
+  }
 }

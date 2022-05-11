@@ -16,7 +16,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.OAUTH2;
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.extension.api.exception.ModuleException;
+import org.mule.sdk.api.exception.ModuleException;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.util.TestConnectivityUtils;
 import org.mule.test.some.extension.CustomConnectionException;

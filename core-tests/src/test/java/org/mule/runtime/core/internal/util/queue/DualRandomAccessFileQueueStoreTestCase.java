@@ -6,21 +6,33 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
+import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
+
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
-import org.mule.runtime.core.internal.util.queue.DefaultQueueStore;
-import org.mule.runtime.core.internal.util.queue.QueueStore;
 import org.mule.tck.core.util.queue.QueueStoreTestCase;
 
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class DualRandomAccessFileQueueStoreTestCase extends QueueStoreTestCase {
+
+  @Before
+  public void setUp() {
+    currentMuleContext.set(muleContext);
+  }
+
+  @After
+  public void teardown() {
+    currentMuleContext.set(null);
+  }
 
   @Override
   protected QueueStore createQueueInfoDelegate(int capacity, MuleContext muleContext) {
@@ -41,8 +53,10 @@ public class DualRandomAccessFileQueueStoreTestCase extends QueueStoreTestCase {
 
   public static class CounterClass implements Serializable {
 
+    private static final long serialVersionUID = -6160255403847961698L;
+
     public static int numberOfInstances = 0;
-    private int value;
+    private final int value;
 
     public CounterClass(int value) {
       this.value = value;

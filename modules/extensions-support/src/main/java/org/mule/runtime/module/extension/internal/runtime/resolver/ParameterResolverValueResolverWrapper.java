@@ -53,7 +53,8 @@ public class ParameterResolverValueResolverWrapper<T>
       @Override
       public Optional<String> getExpression() {
         return resolver instanceof ExpressionBasedValueResolver
-            ? ofNullable(((ExpressionBasedValueResolver) resolver).getExpression()) : empty();
+            ? ofNullable(((ExpressionBasedValueResolver) resolver).getExpression())
+            : empty();
       }
     };
 
@@ -86,11 +87,6 @@ public class ParameterResolverValueResolverWrapper<T>
   @Override
   public boolean isDynamic() {
     return resolver.isDynamic();
-  }
-
-  @Override
-  public boolean isContent() {
-    return resolver.isContent();
   }
 
   @Override

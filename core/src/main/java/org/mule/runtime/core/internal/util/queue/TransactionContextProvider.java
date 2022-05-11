@@ -19,8 +19,8 @@ public interface TransactionContextProvider {
   boolean isTransactional();
 
   /**
-   * @return if {@link #isTransactional()} returns true it will return the
-   *         {@link QueueTransactionContext} related to the current session.
+   * @return if {@link #isTransactional()} returns true it will return the {@link QueueTransactionContext} related to the current
+   *         session.
    * @throws {@link MuleRuntimeException} if {@link #isTransactional()} is false.
    */
   QueueTransactionContext getTransactionalContext();

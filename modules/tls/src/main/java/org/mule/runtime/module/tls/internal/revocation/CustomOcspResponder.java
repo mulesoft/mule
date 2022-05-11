@@ -28,9 +28,8 @@ import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.ManagerFactoryParameters;
 
 /**
- * Uses a custom OCSP responder for certificate revocation checks, with a specific trusted certificate for
- * revocating other keys. This ignores extension points (additional tags for CRLDP or OCSP) present in the
- * certificate, if any.
+ * Uses a custom OCSP responder for certificate revocation checks, with a specific trusted certificate for revocating other keys.
+ * This ignores extension points (additional tags for CRLDP or OCSP) present in the certificate, if any.
  *
  * @since 4.1
  */

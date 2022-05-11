@@ -19,8 +19,8 @@ import java.util.Set;
 
 /**
  * Defines the result of the classification process for a plugin. It contains a {@link List} of {@link URL}s that should have the
- * plugin {@link ArtifactClassLoader} plus a {@link List} of {@link Class}es to be
- * exported in addition to the packages exported by the plugin, in order to run the test.
+ * plugin {@link ArtifactClassLoader} plus a {@link List} of {@link Class}es to be exported in addition to the packages exported
+ * by the plugin, in order to run the test.
  *
  * @since 4.0
  */
@@ -40,15 +40,17 @@ public class PluginUrlClassification {
 
   /**
    * Creates an instance of the classification.
-   * @param name a {@link String} representing the name of the plugin
-   * @param urls list of {@link URL}s that would be used to create the {@link java.net.URLClassLoader}
-   * @param exportClasses list of {@link Class}es that would be used for exporting as extra classes to the plugin.
-  *                      Can be {@code null}.
-   * @param pluginDependencies list of {@link String} plugin dependencies names for this plugin classified
-   * @param exportedPackages {@link Set} of exported packages by this plugin
-   * @param exportedResources {@link Set} of exported resources by this plugin
-   * @param privilegedExportedPackages* @param privilegedExportedPackages java packages exported by this module to privileged artifacts only
-   * @param privilegedArtifacts name of the artifacts with privileged access to the API.
+   * 
+   * @param name                        a {@link String} representing the name of the plugin
+   * @param urls                        list of {@link URL}s that would be used to create the {@link java.net.URLClassLoader}
+   * @param exportClasses               list of {@link Class}es that would be used for exporting as extra classes to the plugin.
+   *                                    Can be {@code null}.
+   * @param pluginDependencies          list of {@link String} plugin dependencies names for this plugin classified
+   * @param exportedPackages            {@link Set} of exported packages by this plugin
+   * @param exportedResources           {@link Set} of exported resources by this plugin
+   * @param privilegedExportedPackages* @param privilegedExportedPackages java packages exported by this module to privileged
+   *                                    artifacts only
+   * @param privilegedArtifacts         name of the artifacts with privileged access to the API.
    */
   public PluginUrlClassification(String name, List<URL> urls, List<Class> exportClasses, List<String> pluginDependencies,
                                  Set<String> exportedPackages, Set<String> exportedResources,

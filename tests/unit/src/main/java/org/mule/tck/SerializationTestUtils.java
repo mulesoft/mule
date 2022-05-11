@@ -10,19 +10,29 @@ package org.mule.tck;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.api.store.ObjectStoreSettings;
-import org.mule.runtime.core.api.MuleContext;
+
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.ObjectStoreManager;
+import org.mule.runtime.api.store.ObjectStoreSettings;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 public abstract class SerializationTestUtils {
 
   private static final String key = "SerializationTestComponentKey";
 
   public static <T extends Exception> T testException(T exception, MuleContext muleContext) {
-    ObjectStore<T> os = getObjectStore(muleContext);
+    ObjectStore<T> os;
+    try {
+      os = getObjectStore(muleContext);
+    } catch (RegistrationException e) {
+      throw new RuntimeException(e);
+    }
+
     try {
       os.store(key, exception);
       return os.retrieve(key);
@@ -37,9 +47,9 @@ public abstract class SerializationTestUtils {
     }
   }
 
-  private static <T extends Exception> ObjectStore<T> getObjectStore(MuleContext muleContext) {
-    return muleContext.getObjectStoreManager().createObjectStore("SerializationTestUtils",
-                                                                 ObjectStoreSettings.builder().persistent(true).build());
+  private static <T extends Exception> ObjectStore<T> getObjectStore(MuleContext muleContext) throws RegistrationException {
+    return ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(ObjectStoreManager.class)
+        .createObjectStore("SerializationTestUtils", ObjectStoreSettings.builder().persistent(true).build());
   }
 
   public static ObjectSerializer getJavaSerializerWithMockContext() {

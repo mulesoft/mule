@@ -60,8 +60,8 @@ public @interface ArtifactClassLoaderRunnerConfig {
   String[] applicationRuntimeLibs() default {};
 
   /**
-   * Runtime libraries in the format of {@code [groupId]:[artifactId]} or {@code [groupId]:[artifactId]:[classifier]} to be 
-   * exported on the test runner's {@link ArtifactClassLoader}. These artifacts have to be declared as {@code test} scope 
+   * Runtime libraries in the format of {@code [groupId]:[artifactId]} or {@code [groupId]:[artifactId]:[classifier]} to be
+   * exported on the test runner's {@link ArtifactClassLoader}. These artifacts have to be declared as {@code test} scope
    * dependencies for the rootArtifact.
    * <p/>
    * Be aware that only the artifact would be added as shared libraries, it will not include its dependencies.
@@ -71,8 +71,8 @@ public @interface ArtifactClassLoaderRunnerConfig {
   String[] testRunnerExportedRuntimeLibs() default {};
 
   /**
-   * Runtime libraries in the format of {@code [groupId]:[artifactId]} or {@code [groupId]:[artifactId]:[classifier]} to be added 
-   * as shared libraries to {@link ArtifactClassLoader}. These artifacts have to be declared as {@code test} scope dependencies 
+   * Runtime libraries in the format of {@code [groupId]:[artifactId]} or {@code [groupId]:[artifactId]:[classifier]} to be added
+   * as shared libraries to {@link ArtifactClassLoader}. These artifacts have to be declared as {@code test} scope dependencies
    * for the rootArtifact.
    * <p/>
    * Be aware that only the artifact would be added as shared libraries, it will not include its dependencies.
@@ -118,8 +118,8 @@ public @interface ArtifactClassLoaderRunnerConfig {
   String[] testInclusions() default {};
 
   /**
-   * Artifacts to be included as privileged artifacts for the all the modules. In format {@code [groupId]:[artifactId]}
-   * or {@code [groupId]:[artifactId]:[classifier]}.
+   * Artifacts to be included as privileged artifacts for the all the modules. In format {@code [groupId]:[artifactId]} or
+   * {@code [groupId]:[artifactId]:[classifier]}.
    * <p/>
    * This allows to add test plugins as privileged artifacts without having to modify the mule-module.properties of each module.
    *

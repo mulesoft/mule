@@ -24,9 +24,8 @@ import java.util.function.Supplier;
 
 
 /**
- * Default implementation of the {@link MetadataResolverFactory}, it provides initialized instances of
- * {@link TypeKeysResolver}, {@link TypeKeysResolver} and {@link OutputTypeResolver} of the classes passed in the
- * constructor.
+ * Default implementation of the {@link MetadataResolverFactory}, it provides initialized instances of {@link TypeKeysResolver},
+ * {@link TypeKeysResolver} and {@link OutputTypeResolver} of the classes passed in the constructor.
  *
  * @since 4.0
  */

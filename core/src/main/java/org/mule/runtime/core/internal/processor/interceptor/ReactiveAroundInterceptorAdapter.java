@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.processor.interceptor;
 import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
@@ -38,8 +39,8 @@ import reactor.util.context.Context;
 
 /**
  * Hooks the {@link ProcessorInterceptor}s
- * {@link ProcessorInterceptor#around(ComponentLocation, Map, InterceptionEvent, InterceptionAction)
- * around} method for a {@link Processor} into the {@code Reactor} pipeline.
+ * {@link ProcessorInterceptor#around(ComponentLocation, Map, InterceptionEvent, InterceptionAction) around} method for a
+ * {@link Processor} into the {@code Reactor} pipeline.
  *
  * @since 4.0
  */
@@ -90,33 +91,27 @@ public class ReactiveAroundInterceptorAdapter extends ReactiveInterceptorAdapter
     }
 
     try {
-      Thread currentThread = currentThread();
-      ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-      ClassLoader contextClassLoader = interceptor.getClass().getClassLoader();
-      setContextClassLoader(currentThread, currentClassLoader, contextClassLoader);
-      CompletableFuture<InterceptionEvent> interception;
-      try {
-        interception = interceptor.around(((Component) component).getLocation(),
-                                          getResolvedParams(eventWithResolvedParams), interceptionEvent,
-                                          reactiveInterceptionAction);
-      } finally {
-        setContextClassLoader(currentThread, contextClassLoader, currentClassLoader);
-      }
-
-      return interception.exceptionally(t -> {
-        if (t instanceof MessagingException) {
-          throw new CompletionException(t);
-        } else {
-          throw new CompletionException(createMessagingException(eventWithResolvedParams,
-                                                                 t instanceof CompletionException ? t.getCause()
-                                                                     : t,
-                                                                 (Component) component, empty()));
-        }
-      }).thenApply(interceptedEvent -> interceptedEvent != null
-          ? ((DefaultInterceptionEvent) interceptedEvent).resolve()
-          : null);
+      return withContextClassLoader(interceptor.getClassLoader(), () -> interceptor
+          .around(((Component) component).getLocation(),
+                  getResolvedParams(eventWithResolvedParams), interceptionEvent,
+                  reactiveInterceptionAction))
+                      .exceptionally(t -> {
+                        if (t instanceof MessagingException) {
+                          throw new CompletionException(t);
+                        } else {
+                          throw new CompletionException(resolveMessagingException(eventWithResolvedParams,
+                                                                                  t instanceof CompletionException
+                                                                                      ? t.getCause()
+                                                                                      : t,
+                                                                                  (Component) component,
+                                                                                  empty()));
+                        }
+                      })
+                      .thenApply(interceptedEvent -> interceptedEvent != null
+                          ? ((DefaultInterceptionEvent) interceptedEvent).resolve()
+                          : null);
     } catch (Exception e) {
-      throw propagate(createMessagingException(interceptionEvent.resolve(), e, (Component) component, empty()));
+      throw propagate(resolveMessagingException(interceptionEvent.resolve(), e, (Component) component, empty()));
     }
   }
 }

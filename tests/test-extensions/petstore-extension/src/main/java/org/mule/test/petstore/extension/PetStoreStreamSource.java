@@ -27,7 +27,7 @@ public class PetStoreStreamSource extends Source<InputStream, Object> {
   @ParameterGroup(name = "Breeder")
   private ExclusivePetBreeder breeder;
 
-  @DefaultEncoding
+  @org.mule.sdk.api.annotation.param.DefaultEncoding
   private String encoding;
 
   private int counter = 0;

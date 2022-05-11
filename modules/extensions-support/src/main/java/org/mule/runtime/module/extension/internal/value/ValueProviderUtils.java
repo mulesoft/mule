@@ -12,15 +12,16 @@ import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.api.value.Value;
-import org.mule.runtime.extension.api.values.ValueBuilder;
-import org.mule.runtime.extension.api.values.ValueProvider;
-import org.mule.runtime.extension.api.values.ValueResolvingException;
+import org.mule.sdk.api.values.Value;
+import org.mule.sdk.api.values.ValueBuilder;
+import org.mule.sdk.api.values.ValueProvider;
+import org.mule.sdk.api.values.ValueResolvingException;
 
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,20 @@ public class ValueProviderUtils {
 
   }
 
+  // TODO: MULE-19298 - Create interface to provide values to tooling client and remove the following method
+  static org.mule.runtime.extension.api.values.ValueBuilder cloneAndEnrichValue(org.mule.runtime.api.value.Value value,
+                                                                                Map<Integer, String> partOrderMapping) {
+    Value sdkValue = new SdkValueAdapter(value);
+    return cloneAndEnrichMuleValue(sdkValue, partOrderMapping, 1);
+  }
+
+  // TODO: MULE-19298 - Create interface to provide values to tooling client and remove the following method
+  public static org.mule.runtime.extension.api.values.ValueBuilder cloneAndEnrichValue(org.mule.runtime.api.value.Value value,
+                                                                                       List<ParameterModel> parameters) {
+    Value sdkValue = new SdkValueAdapter(value);
+    return cloneAndEnrichMuleValue(sdkValue, orderParts(parameters, null), 1);
+  }
+
   /**
    * Given a {@link Value}, this is navigated recursively cloning each {@link Value} of the tree structure creating a
    * {@link ValueBuilder} and adding the partName of each {@link Value} found.
@@ -52,7 +67,16 @@ public class ValueProviderUtils {
   }
 
   public static ValueBuilder cloneAndEnrichValue(Value value, List<ParameterModel> parameters) {
-    return cloneAndEnrichValue(value, orderParts(parameters), 1);
+    return cloneAndEnrichValue(value, orderParts(parameters, null), 1);
+  }
+
+  public static ValueBuilder cloneAndEnrichValue(Value value, List<ParameterModel> parameters, String providerId) {
+    return cloneAndEnrichValue(value, orderParts(parameters, providerId), 1);
+  }
+
+  public static ValueBuilder cloneAndEnrichValue(Value value, List<ParameterModel> parameters, String providerId,
+                                                 String targetSelector) {
+    return cloneAndEnrichValue(value, orderParts(parameters, providerId, targetSelector), 1);
   }
 
   /**
@@ -71,7 +95,35 @@ public class ValueProviderUtils {
     return keyBuilder;
   }
 
-  private static Map<Integer, String> orderParts(List<ParameterModel> parameters) {
+  static org.mule.runtime.extension.api.values.ValueBuilder cloneAndEnrichMuleValue(Value value,
+                                                                                    Map<Integer, String> partOrderMapping,
+                                                                                    int level) {
+    final org.mule.runtime.extension.api.values.ValueBuilder keyBuilder =
+        org.mule.runtime.extension.api.values.ValueBuilder.newValue(value.getId(), partOrderMapping.get(level))
+            .withDisplayName(value.getDisplayName());
+    value.getChilds().forEach(childKey -> keyBuilder.withChild(cloneAndEnrichMuleValue(childKey, partOrderMapping, level + 1)));
+    return keyBuilder;
+  }
+
+  private static Map<Integer, String> orderParts(List<ParameterModel> parameters, String providerId) {
+    return orderParts(parameters, providerId, null);
+  }
+
+  private static Map<Integer, String> orderParts(List<ParameterModel> parameters, String providerId, String targetSelector) {
+    if (parameters.size() == 1 && !parameters.get(0).getFieldValueProviderModels().isEmpty()) {
+      String providerName = parameters.get(0).getFieldValueProviderModels().stream()
+          .filter(fieldValueProviderModel -> fieldValueProviderModel.getTargetSelector()
+              .equals(targetSelector))
+          .map(fieldValueProviderModel -> fieldValueProviderModel.getProviderName()).findAny().get();
+      return parameters.get(0).getFieldValueProviderModels().stream()
+          .filter(fieldValueProviderModel -> fieldValueProviderModel.getProviderName().equals(providerName))
+          .collect(toMap(ValueProviderModel::getPartOrder,
+                         fieldModel -> parameters.get(0).getName() + "." + fieldModel.getTargetSelector(),
+                         (partName, anotherPartName) -> partName.substring(partName.indexOf(".") + 1).equals(targetSelector)
+                             ? partName
+                             : anotherPartName));
+    }
+
     return parameters.stream()
         .collect(toMap(param -> param.getValueProviderModel().get().getPartOrder(), NamedObject::getName));
   }
@@ -97,14 +149,16 @@ public class ValueProviderUtils {
    * @throws ValueResolvingException if an error occurs trying to resolve the values
    * @since 4.1.1
    */
-  public static Set<Value> valuesWithClassLoader(Callable<Set<Value>> valueResolver, ExtensionModel extensionModel)
-      throws ValueResolvingException {
-    Reference<ValueResolvingException> exceptionReference = new Reference<>();
-    Set<Value> values =
-        withContextClassLoader(getClassLoader(extensionModel), valueResolver, ValueResolvingException.class, (e) -> {
-          exceptionReference.set((ValueResolvingException) e);
-          return null;
-        });
+  public static Set<org.mule.runtime.api.value.Value> valuesWithClassLoader(Callable<Set<org.mule.runtime.api.value.Value>> valueResolver,
+                                                                            ExtensionModel extensionModel)
+      throws org.mule.runtime.extension.api.values.ValueResolvingException {
+    Reference<org.mule.runtime.extension.api.values.ValueResolvingException> exceptionReference = new Reference<>();
+    Set<org.mule.runtime.api.value.Value> values =
+        withContextClassLoader(getClassLoader(extensionModel), valueResolver,
+                               org.mule.runtime.extension.api.values.ValueResolvingException.class, (e) -> {
+                                 exceptionReference.set((org.mule.runtime.extension.api.values.ValueResolvingException) e);
+                                 return null;
+                               });
 
     if (exceptionReference.get() != null) {
       throw exceptionReference.get();
@@ -118,17 +172,42 @@ public class ValueProviderUtils {
    *
    * @param valueProviderClazz a class that implements the {@link ValueProvider} interface.
    * @return The id of the value provider
+   *
    * @since 4.4.0
    */
-  public static String getValueProviderId(Class<? extends ValueProvider> valueProviderClazz) {
-    ValueProvider valueProvider;
+  public static String getValueProviderId(Class valueProviderClazz) {
+    if (!org.mule.runtime.extension.api.values.ValueProvider.class.isAssignableFrom(valueProviderClazz) &&
+        !ValueProvider.class.isAssignableFrom(valueProviderClazz)) {
+      throw new IllegalStateException(format("Value Provider %s does not implement %s or %s",
+                                             valueProviderClazz.getName(),
+                                             org.mule.runtime.extension.api.values.ValueProvider.class.getName(),
+                                             ValueProvider.class.getName()));
+    }
+
+    Object valueProviderObject;
     try {
-      valueProvider = instantiateClass(valueProviderClazz);
+      valueProviderObject = instantiateClass(valueProviderClazz);
     } catch (Exception e) {
       throw new IllegalStateException(format("There was an error creating an instance of %s to retrieve the Id of the provider",
                                              valueProviderClazz.getName()),
                                       e);
     }
-    return valueProvider.getId();
+
+    return valueProviderObject instanceof org.mule.runtime.extension.api.values.ValueProvider
+        ? ((org.mule.runtime.extension.api.values.ValueProvider) valueProviderObject).getId()
+        : ((ValueProvider) valueProviderObject).getId();
+  }
+
+  /**
+   * Retrieves the name of the parameter an extraction expression is referring to
+   *
+   * @param extractionExpression an expression of a binding defined in an
+   *                             {@link org.mule.runtime.api.meta.model.parameter.ActingParameterModel}
+   * @return the name of the parameter it refers to
+   * @since 4.4.0
+   */
+  public static String getParameterNameFromExtractionExpression(String extractionExpression) {
+    int parameterNameDelimiter = extractionExpression.indexOf(".");
+    return parameterNameDelimiter < 0 ? extractionExpression : extractionExpression.substring(0, parameterNameDelimiter);
   }
 }

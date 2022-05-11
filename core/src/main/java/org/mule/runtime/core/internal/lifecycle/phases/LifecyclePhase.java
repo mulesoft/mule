@@ -24,8 +24,8 @@ public interface LifecyclePhase extends NamedObject {
   void registerSupportedPhase(String phase);
 
   /**
-   * Creates an returns a new {@link LifecycleObjectSorter} that is to be used to sort objects to which {@code this} phase
-   * is to be applied
+   * Creates an returns a new {@link LifecycleObjectSorter} that is to be used to sort objects to which {@code this} phase is to
+   * be applied
    *
    * @return a new and non-reusable {@link LifecycleObjectSorter}
    * @since 4.2.0

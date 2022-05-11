@@ -9,7 +9,6 @@ package org.mule.functional.junit4.matchers;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 
 public class MessageMatchers {
@@ -17,7 +16,6 @@ public class MessageMatchers {
   /**
    * Verifies the {@link Message}'s attributes using any {@link Message#getAttributes()} matcher.
    */
-  @Factory
   public static <T> Matcher<Message> hasAttributes(Matcher<T> attributesMatcher) {
     return new IsMessageWithAttributes<>(attributesMatcher);
   }
@@ -25,7 +23,6 @@ public class MessageMatchers {
   /**
    * Verifies the {@link Message}'s payload using a String matcher. Only works with String and InputStream payloads.
    */
-  @Factory
   public static Matcher<Message> hasPayload(Matcher<String> matcher) {
     return new IsMessageWithPayload(matcher);
   }
@@ -33,7 +30,6 @@ public class MessageMatchers {
   /**
    * Verifies the the {@link Message}'s media type via equals.
    */
-  @Factory
   public static Matcher<Message> hasMediaType(MediaType mediaType) {
     return new IsMessageWithMediaType(mediaType);
   }

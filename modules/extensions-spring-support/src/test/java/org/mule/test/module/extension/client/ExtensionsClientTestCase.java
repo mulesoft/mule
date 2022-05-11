@@ -106,7 +106,7 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   @Test
   public void executePagedOperation() throws Throwable {
     OperationParameters params = builder().configName(HEISENBERG_CONFIG).build();
-    Result<CursorIteratorProvider, Object> result = doExecute(HEISENBERG_EXT_NAME, "getPagedBlacklist", params);
+    Result<CursorIteratorProvider, Object> result = doExecute(HEISENBERG_EXT_NAME, "getPagedBlocklist", params);
     CursorIteratorProvider provider = result.getOutput();
     AtomicInteger count = new AtomicInteger(0);
     Iterator<Message> iterator = provider.openCursor();

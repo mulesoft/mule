@@ -18,22 +18,22 @@ import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.TARGET_TYPE;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
-import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
+import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator.EMPTY_TYPE_FORMAT_MESSAGE;
 import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator.TYPE_RAISE_ERROR_ATTRIBUTE;
 import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator.WRONG_VALUE_FORMAT_MESSAGE;
 import static org.mule.runtime.extension.internal.loader.validator.ForbiddenConfigurationPropertiesValidator.CONFIGURATION_PROPERTY_NOT_SUPPORTED_FORMAT_MESSAGE;
 import static org.mule.runtime.extension.internal.loader.validator.GlobalElementNamesValidator.ILLEGAL_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE;
 import static org.mule.runtime.extension.internal.loader.validator.GlobalElementNamesValidator.REPEATED_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE;
-import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
+import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
-import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -70,13 +70,13 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
   @Test
   public void repeatedParameterNamesThrowsException() {
     exception.expectMessage("repeated-parameter");
-    getExtensionModelFrom("validation/module-repeated-parameters.xml");
+    getExtensionModelFrom("validation/module-repeated-parameters.xml", getDependencyExtensions());
   }
 
   @Test
   public void repeatedOperationNamesThrowsException() {
     exception.expectMessage("repeated-operation");
-    getExtensionModelFrom("validation/module-repeated-operations.xml");
+    getExtensionModelFrom("validation/module-repeated-operations.xml", getDependencyExtensions());
   }
 
   @Test
@@ -103,7 +103,7 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
                                   containsString("[operation with spaces] is not a valid one"),
                                   containsString("[parameters with spaces] is not a valid one"),
                                   containsString("[property with spaces] is not a valid one")));
-    getExtensionModelFrom("validation/module-not-xml-valid-names.xml");
+    getExtensionModelFrom("validation/module-not-xml-valid-names.xml", getDependencyExtensions());
   }
 
   @Test
@@ -119,7 +119,7 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
                                                         RAISE_ERROR_IDENTIFIER.toString(),
                                                         TYPE_RAISE_ERROR_ATTRIBUTE,
                                                         "fail-raise-error-nested"))));
-    getExtensionModelFrom("validation/module-using-raise-error-empty-type.xml");
+    getExtensionModelFrom("validation/module-using-raise-error-empty-type.xml", getDependencyExtensions());
   }
 
   @Test
@@ -141,7 +141,7 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
                                                         "MODULE-USING-RAISE-ERROR",
                                                         "WRONG-PREFIX",
                                                         "fail-raise-error-nested"))));
-    getExtensionModelFrom("validation/module-using-raise-error-wrong-type.xml");
+    getExtensionModelFrom("validation/module-using-raise-error-wrong-type.xml", getDependencyExtensions());
   }
 
   @Test
@@ -205,7 +205,7 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
   @Test
   public void forbiddenConfigurationPropertiesThrowsException() {
     exception.expectMessage(format(CONFIGURATION_PROPERTY_NOT_SUPPORTED_FORMAT_MESSAGE, CONFIGURATION_PROPERTIES.toString()));
-    getExtensionModelFrom("validation/module-configuration-property-file.xml");
+    getExtensionModelFrom("validation/module-configuration-property-file.xml", getDependencyExtensions());
   }
 
   private ExtensionModel getExtensionModelFrom(String modulePath) {

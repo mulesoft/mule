@@ -61,7 +61,7 @@ public class BlockingProcessingStrategyFactory implements ProcessingStrategyFact
 
     @Override
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
-      if (processor.getProcessingType() == CPU_LITE_ASYNC) {
+      if (needsMonoBlock(processor)) {
         return publisher -> subscriberContext()
             .flatMapMany(ctx -> from(publisher).handle((event, sink) -> {
               try {
@@ -81,5 +81,21 @@ public class BlockingProcessingStrategyFactory implements ProcessingStrategyFact
       }
     }
 
+    /**
+     * This strategy adds a Mono.block call in order to preserve the thread because it's a precondition for transactions to work.
+     * However, there are some operations that don't need to use a Mono.block because they have a synchronous execution. It allows
+     * us to make a performance optimization for those operations. This method is intended to detect which operations do need a
+     * Mono.block and which don't.
+     *
+     * @param processor The processor.
+     * @return true if a Mono.block call is needed to wait for operation completion.
+     */
+    private static boolean needsMonoBlock(ReactiveProcessor processor) {
+      if (processor instanceof ComponentInnerProcessor) {
+        return !((ComponentInnerProcessor) processor).isBlocking();
+      } else {
+        return processor.getProcessingType() == CPU_LITE_ASYNC;
+      }
+    }
   }
 }

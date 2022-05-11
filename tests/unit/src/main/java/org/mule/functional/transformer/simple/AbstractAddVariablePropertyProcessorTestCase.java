@@ -16,6 +16,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
@@ -24,6 +26,7 @@ import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -32,10 +35,12 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 
 import javax.activation.MimeTypeParseException;
@@ -81,6 +86,12 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
     event = createTestEvent(message);
 
     afterAssertions = () -> verify(streamingManager, never()).manage(any(CursorProvider.class), any(EventContext.class));
+
+    FeatureFlaggingService featureFlaggingService = mock(FeatureFlaggingService.class);
+    Field f1 = addVariableProcessor.getClass().getSuperclass().getDeclaredField("featureFlaggingService");
+    f1.setAccessible(true);
+    f1.set(addVariableProcessor, featureFlaggingService);
+    when(featureFlaggingService.isEnabled(SET_VARIABLE_WITH_NULL_VALUE)).thenReturn(true);
   }
 
   @After
@@ -195,7 +206,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
 
     event = addVariableProcessor.process(event);
 
-    verifyRemoved(event, PLAIN_STRING_KEY);
+    verifyAdded(event, PLAIN_STRING_KEY, null);
   }
 
   @Test

@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
 
 import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
@@ -24,10 +25,10 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
+import org.mule.runtime.core.api.processor.HasLocation;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.internal.processor.ReferenceProcessor;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 
 import java.util.ArrayList;
@@ -77,8 +78,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     // Start from last but one message processor and work backwards
     for (int i = processors.size() - 1; i >= 0; i--) {
       Processor processor = initializeMessageProcessor(processors.get(i));
-      if (processor instanceof InterceptingMessageProcessor && (!(processor instanceof ReferenceProcessor)
-          || ((ReferenceProcessor) processor).getReferencedProcessor() instanceof InterceptingMessageProcessor)) {
+      if (processor instanceof InterceptingMessageProcessor) {
         atLeastOneIntercepting = true;
         InterceptingMessageProcessor interceptingProcessor = (InterceptingMessageProcessor) processor;
         // Processor is intercepting so we can't simply iterate
@@ -119,7 +119,8 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
       return new DefaultMessageProcessorChain(name != null ? "(chain) of " + name : "(chain)",
                                               processingStrategyOptional,
                                               new ArrayList<>(tempList),
-                                              messagingExceptionHandler);
+                                              messagingExceptionHandler,
+                                              location);
     }
   }
 
@@ -131,7 +132,8 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
       return new DefaultMessageProcessorChain(name != null ? "(chain) of " + name : "(chain)",
                                               processingStrategyOptional,
                                               new ArrayList<>(tempList),
-                                              NullExceptionHandler.getInstance());
+                                              NullExceptionHandler.getInstance(),
+                                              location);
     }
   }
 
@@ -139,7 +141,8 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                                                           List<Processor> processorsForLifecycle) {
     return new InterceptingMessageProcessorChain(name != null ? "(intercepting chain) of " + name : "(intercepting chain)",
                                                  ofNullable(processingStrategy), head,
-                                                 processors, processorsForLifecycle, NullExceptionHandler.getInstance());
+                                                 processors, processorsForLifecycle, NullExceptionHandler.getInstance(),
+                                                 location);
   }
 
   @Override
@@ -176,12 +179,22 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
   }
 
   @NoExtend
-  protected static class DefaultMessageProcessorChain extends AbstractMessageProcessorChain {
+  protected static class DefaultMessageProcessorChain extends AbstractMessageProcessorChain implements HasLocation {
+
+    private ComponentLocation pipeLineLocation;
 
     protected DefaultMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional,
                                            List<Processor> processors,
                                            FlowExceptionHandler messagingExceptionHandler) {
+      this(name, processingStrategyOptional, processors, messagingExceptionHandler, null);
+    }
+
+    protected DefaultMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional,
+                                           List<Processor> processors,
+                                           FlowExceptionHandler messagingExceptionHandler,
+                                           ComponentLocation pipeLineLocation) {
       super(name, processingStrategyOptional, processors, messagingExceptionHandler);
+      this.pipeLineLocation = pipeLineLocation;
     }
 
     /**
@@ -197,21 +210,38 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
             // just let the error be propagated to the outer chain...
             (exception, event) -> null);
     }
+
+    @Override
+    public ComponentLocation resolveLocation() {
+      return pipeLineLocation;
+    }
   }
 
-  static class InterceptingMessageProcessorChain extends AbstractMessageProcessorChain {
+
+  static class InterceptingMessageProcessorChain extends AbstractMessageProcessorChain implements HasLocation {
 
     private final Processor head;
     private final List<Processor> processorsForLifecycle;
+    private final ComponentLocation pipeLineLocation;
 
     protected InterceptingMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional,
                                                 Processor head,
                                                 List<Processor> processors,
                                                 List<Processor> processorsForLifecycle,
                                                 FlowExceptionHandler messagingExceptionHandler) {
+      this(name, processingStrategyOptional, head, processors, processorsForLifecycle, messagingExceptionHandler, null);
+    }
+
+    protected InterceptingMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional,
+                                                Processor head,
+                                                List<Processor> processors,
+                                                List<Processor> processorsForLifecycle,
+                                                FlowExceptionHandler messagingExceptionHandler,
+                                                ComponentLocation pipeLineLocation) {
       super(name, processingStrategyOptional, processors, messagingExceptionHandler);
       this.head = head;
       this.processorsForLifecycle = processorsForLifecycle;
+      this.pipeLineLocation = pipeLineLocation;
     }
 
     @Override
@@ -224,14 +254,18 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
       return singletonList(head);
     }
 
+    @Override
+    public ComponentLocation resolveLocation() {
+      return pipeLineLocation;
+    }
   }
 
   /**
    * Helper method to create a lazy processor from a chain builder so the chain builder can get access to a
    * {@link FlowConstruct}{@link ProcessingStrategy}.
    *
-   * @param chainBuilder the chain builder
-   * @param muleContext the context
+   * @param chainBuilder               the chain builder
+   * @param muleContext                the context
    * @param processingStrategySupplier a supplier of the processing strategy.
    * @return a lazy processor that will build the chain upon the first request.
    */
@@ -246,6 +280,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
 
     void setMessagingExceptionHandler(FlowExceptionHandler messagingExceptionHandler);
   }
+
 
   private static final class LazyProcessorChainBuilder extends AbstractMessageProcessorChain
       implements MessagingExceptionHandlerAware {

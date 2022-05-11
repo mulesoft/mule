@@ -10,12 +10,13 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
@@ -32,6 +33,7 @@ import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.HEALTHY;
 import static org.mule.test.heisenberg.extension.model.KnockeableDoor.knock;
 import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
+import static org.mule.test.heisenberg.extension.model.types.WeaponType.MELEE_WEAPON;
 
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -58,7 +60,6 @@ import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.SaleInfo;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
-import org.mule.test.heisenberg.extension.model.types.WeaponType;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.io.ByteArrayInputStream;
@@ -70,8 +71,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.hamcrest.Matchers;
-import org.hamcrest.collection.IsMapContaining;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -79,8 +78,8 @@ import org.junit.rules.ExpectedException;
 public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestCase {
 
   public static final String HEISENBERG = "heisenberg";
-  public static final String KILL_RESULT = String.format("Killed with: %s , Type %s and attribute %s", RICIN_KILL_MESSAGE,
-                                                         WeaponType.MELEE_WEAPON.name(), "Pizza on the rooftop");
+  public static final String KILL_RESULT = format("Killed with: %s , Type %s and attribute %s", RICIN_KILL_MESSAGE,
+                                                  MELEE_WEAPON.name(), "Pizza on the rooftop");
   private static final String GUSTAVO_FRING = "Gustavo Fring";
   private static final String GOODBYE_MESSAGE = "Say hello to my little friend";
   private static final String VICTIM = "Skyler";
@@ -102,11 +101,11 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
   @Test
   public void operationWithInjectedObjectsFromRegistry() throws Exception {
     Map<String, Object> result = (Map<String, Object>) runFlow("getInjectedObjects").getMessage().getPayload().getValue();
-    assertThat(result.get("object"), Matchers.instanceOf(Ricin.class));
-    assertThat(result.get("serializable"), Matchers.instanceOf(Serializable.class));
+    assertThat(result.get("object"), instanceOf(Ricin.class));
+    assertThat(result.get("serializable"), instanceOf(Serializable.class));
 
-    assertThat(result.get("object"), Matchers.is(registry.lookupByName("ricin-weapon").get()));
-    assertThat(result.get("serializable"), Matchers.is(registry.lookupByName("door").get()));
+    assertThat(result.get("object"), is(registry.lookupByName("ricin-weapon").get()));
+    assertThat(result.get("serializable"), is(registry.lookupByName("door").get()));
 
   }
 
@@ -270,6 +269,7 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
 
   @Test
   public void operationWithRequiredParameterButNullReturningExpression() throws Exception {
+    // This cannot be validated at the AST because the exception results of a provided expression evaluating to null
     expectedException.expect(hasRootCause(instanceOf(IllegalArgumentException.class)));
     runFlow("knockWithNullDoor");
   }
@@ -304,7 +304,7 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
     List<String> response =
         (List<String>) flowRunner("knockManyByExpression").withPayload(EMPTY_STRING).withVariable("doors", doors)
             .run().getMessage().getPayload().getValue();
-    assertThat(response, Matchers.contains(knock("Skyler"), knock("Saul")));
+    assertThat(response, contains(knock("Skyler"), knock("Saul")));
   }
 
   @Test
@@ -515,14 +515,14 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
   public void operationWithAliasedParametersAsChild() throws Exception {
     Map<String, Weapon> value =
         (Map<String, Weapon>) flowRunner("operationWithAliasedParametersAsChild").run().getMessage().getPayload().getValue();
-    assertThat(value, is(IsMapContaining.hasEntry(is("SomeName"), is(instanceOf(Ricin.class)))));
+    assertThat(value, is(hasEntry(is("SomeName"), is(instanceOf(Ricin.class)))));
   }
 
   @Test
   public void operationWithAliasedParametersAsReference() throws Exception {
     Map<String, Weapon> value =
         (Map<String, Weapon>) flowRunner("operationWithAliasedParametersAsChild").run().getMessage().getPayload().getValue();
-    assertThat(value, is(IsMapContaining.hasEntry(is("SomeName"), is(instanceOf(Ricin.class)))));
+    assertThat(value, is(hasEntry(is("SomeName"), is(instanceOf(Ricin.class)))));
   }
 
   @Test

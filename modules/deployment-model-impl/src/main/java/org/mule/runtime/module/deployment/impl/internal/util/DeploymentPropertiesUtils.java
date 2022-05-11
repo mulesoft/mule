@@ -32,15 +32,17 @@ public class DeploymentPropertiesUtils {
 
   private static final String DEPLOYMENT_PROPERTIES_DIRECTORY = "deployment-properties";
 
+  private static final String ARTIFACT_STATUS_DEPLOYMENT_PROPERTIES_FILE_NAME = "artifact.status.deployment.properties";
+
   /**
    * This method resolves the deploymentProperties for a new deploy/redeploy considering the new deployment properties passed by
    * the user as parameter and the deployment properties persisted in a previous deploy. In case no new deployment properties are
    * passed, the previous persisted properties are returned. Otherwise, the new deployment properties are used and persisted in
    * .mule/app/deployment-properties/<fileName>.
    *
-   * @param artifactName name of the artifact.
+   * @param artifactName         name of the artifact.
    * @param deploymentProperties deployment properties set in the new deploy/redeploy as parameters.
-   * @param fileName name of the file where the deployment properties are persisted.
+   * @param fileName             name of the file where the deployment properties are persisted.
    *
    * @return deployment properties
    * @throws IOException
@@ -122,7 +124,8 @@ public class DeploymentPropertiesUtils {
   }
 
   /**
-   * This method resolves the deploymentProperties for a certain artifact. There is one deployment.properties file for each artifact (domain/app).
+   * This method resolves the deploymentProperties for a certain artifact. There is one deployment.properties file for each
+   * artifact (domain/app).
    *
    * @param artifactName         name of the artifact.
    * @param deploymentProperties deployment properties set in the new deploy/redeploy as parameters.
@@ -135,9 +138,10 @@ public class DeploymentPropertiesUtils {
   }
 
   /**
-   * This method resolves the deploymentProperties for a flow of a certain app. There is one flow.deployment.properties file for all flows of an app.
+   * This method resolves the deploymentProperties for a flow of a certain app. There is one flow.deployment.properties file for
+   * all flows of an app.
    *
-   * @param appName         name of the application that contains the flows.
+   * @param appName              name of the application that contains the flows.
    * @param deploymentProperties deployment properties set in the new deploy/redeploy as parameters.
    * @return deployment properties
    * @throws IOException
@@ -145,5 +149,19 @@ public class DeploymentPropertiesUtils {
   public static Properties resolveFlowDeploymentProperties(String appName, Optional<Properties> deploymentProperties)
       throws IOException {
     return resolveDeploymentProperties(appName, deploymentProperties, FLOWS_DEPLOYMENT_PROPERTIES_FILE_NAME);
+  }
+
+  /**
+   * This method resolves the statusProperties for the status (started, stopped) of a certain artifact. There is one
+   * artifact.status.deployment.properties file for each artifact (domain/app).
+   *
+   * @param artifactName     name of the artifact.
+   * @param statusProperties status deployment properties set in the new deploy/redeploy as parameters.
+   * @return deployment properties
+   * @throws IOException
+   */
+  public static Properties resolveArtifactStatusDeploymentProperties(String artifactName, Optional<Properties> statusProperties)
+      throws IOException {
+    return resolveDeploymentProperties(artifactName, statusProperties, ARTIFACT_STATUS_DEPLOYMENT_PROPERTIES_FILE_NAME);
   }
 }

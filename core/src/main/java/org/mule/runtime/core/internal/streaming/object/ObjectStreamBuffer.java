@@ -9,21 +9,18 @@ package org.mule.runtime.core.internal.streaming.object;
 import org.mule.runtime.api.streaming.HasSize;
 
 /**
- * A buffer which provides concurrent random access to the entirety
- * of a stream of objects.
+ * A buffer which provides concurrent random access to the entirety of a stream of objects.
  * <p>
- * It works with the concept of a zero-base position. Each position
- * represents one byte in the stream. Although this buffer tracks the
- * position of each byte, it doesn't have a position itself. That means
- * that pulling data from this buffer does not make any current position
- * to be moved.
+ * It works with the concept of a zero-base position. Each position represents one byte in the stream. Although this buffer tracks
+ * the position of each byte, it doesn't have a position itself. That means that pulling data from this buffer does not make any
+ * current position to be moved.
  *
- * It uses the concept of {@link Bucket} to store and return items. Because this buffer needs to provide
- * random access, array based lists are optimal for obtaining the item in a particular position.
- * However, expanding the capacity of an array based list is very expensive.
+ * It uses the concept of {@link Bucket} to store and return items. Because this buffer needs to provide random access, array
+ * based lists are optimal for obtaining the item in a particular position. However, expanding the capacity of an array based list
+ * is very expensive.
  * <p>
- * This buffer works by partitioning the items into buckets of array based lists, so that we never need to expand
- * a list, we simply add a new bucket.
+ * This buffer works by partitioning the items into buckets of array based lists, so that we never need to expand a list, we
+ * simply add a new bucket.
  *
  * @since 4.0
  */
@@ -38,8 +35,7 @@ public interface ObjectStreamBuffer<T> extends HasSize {
   Bucket<T> getBucketFor(Position position);
 
   /**
-   * Transforms the given index based {@code position} to a {@link Position}
-   * object
+   * Transforms the given index based {@code position} to a {@link Position} object
    *
    * @param position a zero based index position
    * @return a {@link Position}
@@ -53,8 +49,7 @@ public interface ObjectStreamBuffer<T> extends HasSize {
   boolean hasNext(long position);
 
   /**
-   * Initialises this buffer. Should be invoked on every instance in order to
-   * make it functional
+   * Initialises this buffer. Should be invoked on every instance in order to make it functional
    */
   void initialise();
 

@@ -16,19 +16,18 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MAX_ONE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_ABSTRACT_SHARED_EXTENSION;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.UNBOUNDED;
+import static org.mule.runtime.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getBaseType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getLayoutModel;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
-import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MAX_ONE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_ABSTRACT_SHARED_EXTENSION;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.UNBOUNDED;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
@@ -37,12 +36,20 @@ import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
-import org.mule.runtime.module.extension.internal.capability.xml.schema.model.*;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexType;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExtensionType;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.LocalComplexType;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelComplexType;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
 import java.math.BigInteger;
 import java.util.Collection;
@@ -78,12 +85,13 @@ final class ObjectTypeSchemaDelegate {
    * vary depending on the properties of the type itself along with the properties associated to the parameter.
    * <p>
    * This method serves as a resolver for all that logic, creating the required element for the parameter with complex type.
-   *  @param type the {@link ObjectType} of the parameter for which the element is being created
+   * 
+   * @param type        the {@link ObjectType} of the parameter for which the element is being created
    * @param paramSyntax the {@link DslElementSyntax} of the parameter for which the element is being created
-   * @param paramDsl the {@link ParameterDslConfiguration} associated to the parameter, if any is present.
+   * @param paramDsl    the {@link ParameterDslConfiguration} associated to the parameter, if any is present.
    * @param description the documentation associated to the parameter
-   * @param all the {@link ExplicitGroup group} the generated element should belong to
-   * @param required whether or not the element should be required
+   * @param all         the {@link ExplicitGroup group} the generated element should belong to
+   * @param required    whether or not the element should be required
    */
   void generatePojoElement(ObjectType type, DslElementSyntax paramSyntax, ParameterDslConfiguration paramDsl,
                            String description, List<TopLevelElement> all, boolean required) {
@@ -225,8 +233,8 @@ final class ObjectTypeSchemaDelegate {
    * If an abstract or concrete {@link TopLevelElement} declaration are required for this type, then they will also be registered.
    * This method is idempotent for any given {@code type}
    *
-   * @param type a {@link MetadataType} describing a pojo type
-   * @param baseType a {@link MetadataType} describing a pojo's base type
+   * @param type        a {@link MetadataType} describing a pojo type
+   * @param baseType    a {@link MetadataType} describing a pojo's base type
    * @param description the type's description
    * @return the reference name of the complexType
    */
@@ -254,8 +262,8 @@ final class ObjectTypeSchemaDelegate {
   /**
    * Registers the {@link TopLevelComplexType} associated to the given {@link ObjectType} in the current namespace
    *
-   * @param type the {@link ObjectType} that will be represented by the registered {@link ComplexType}
-   * @param baseType the {@code base} for the {@link ComplexType} {@code extension} declaration
+   * @param type        the {@link ObjectType} that will be represented by the registered {@link ComplexType}
+   * @param baseType    the {@code base} for the {@link ComplexType} {@code extension} declaration
    * @param description
    * @return a new {@link ComplexType} declaration for the given {@link ObjectType}
    */
@@ -290,7 +298,7 @@ final class ObjectTypeSchemaDelegate {
         .map(customDsl -> new QName(builder.getNamespaceUri(customDsl.getPrefix()), customDsl.getType(), customDsl.getPrefix()));
 
     if (customBaseQName.isPresent()) {
-      //baseType was redefined by the user
+      // baseType was redefined by the user
       return customBaseQName.get();
     }
 
@@ -368,7 +376,7 @@ final class ObjectTypeSchemaDelegate {
       return;
     }
 
-    if (id.equals(SchedulingStrategy.class.getName())) {
+    if (id.equals(SchedulingStrategy.class.getName()) || id.equals(Scheduler.class.getName())) {
       builder.addSchedulerSupport(all);
       return;
     }
@@ -425,7 +433,7 @@ final class ObjectTypeSchemaDelegate {
       QName substitutionGroup = getAbstractElementSubstitutionGroup(typeDsl, baseDsl);
       abstractElement.setSubstitutionGroup(substitutionGroup);
     }
-    //If user defined, substitutionGroup will be overridden
+    // If user defined, substitutionGroup will be overridden
     getSubstitutionGroup(type)
         .ifPresent((substitutionGroup) -> abstractElement
             .setSubstitutionGroup(builder.resolveSubstitutionGroup(substitutionGroup)));

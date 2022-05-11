@@ -6,34 +6,26 @@
  */
 package org.mule.runtime.core.internal.el;
 
-import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.ValidationResult.failure;
 import static org.mule.runtime.api.el.ValidationResult.success;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
-import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
-import static org.mule.runtime.core.api.config.MuleProperties.isMelDefault;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.isLazyInitMode;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
+
+import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
-import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.DefaultValidationResult;
 import org.mule.runtime.api.el.ExpressionCompilationException;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ValidationResult;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -46,11 +38,8 @@ import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.el.dataweave.DataWeaveExpressionLanguageAdaptor;
-import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.util.OneTimeWarning;
-import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
+import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 import org.mule.runtime.core.privileged.util.TemplateParser;
 
 import java.util.Iterator;
@@ -60,7 +49,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
-public class DefaultExpressionManager implements ExtendedExpressionManager, Initialisable {
+public class DefaultExpressionManager implements ExtendedExpressionManager {
 
   public static final String DW_PREFIX = "dw";
   public static final String MEL_PREFIX = "mel";
@@ -68,81 +57,16 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   public static final int DW_PREFIX_LENGTH = (DW_PREFIX + PREFIX_EXPR_SEPARATOR).length();
   private static final Logger LOGGER = getLogger(DefaultExpressionManager.class);
 
-  @Inject
-  private ConfigurationProperties properties;
-
-  @Inject
-  private FeatureFlaggingService featureFlaggingService;
-
   private final OneTimeWarning parseWarning = new OneTimeWarning(LOGGER,
                                                                  "Expression parsing is deprecated, regular expressions should be used instead.");
 
-  private final AtomicBoolean initialized = new AtomicBoolean();
-
   private MuleContext muleContext;
-  private StreamingManager streamingManager;
-  private Registry registry;
+  private TransformersRegistry transformersRegistry;
 
   private ExtendedExpressionLanguageAdaptor expressionLanguage;
   // Default style parser
   private final TemplateParser parser = TemplateParser.createMuleStyleParser();
   private boolean melDefault;
-
-  @Override
-  public void initialise() throws InitialisationException {
-    if (!initialized.compareAndSet(false, true)) {
-      return;
-    }
-
-    final ExtendedExpressionLanguageAdaptor dwExpressionLanguage =
-        registry.lookupByType(DefaultExpressionLanguageFactoryService.class)
-            .map(this::createExpressionLanguageAdaptor)
-            .orElse(null);
-
-    if (isMelDefault() || registry.lookupByName(COMPATIBILITY_PLUGIN_INSTALLED).isPresent()) {
-      MVELExpressionLanguage mvelExpressionLanguage =
-          registry.<MVELExpressionLanguage>lookupByName(OBJECT_EXPRESSION_LANGUAGE).get();
-
-      ExtendedExpressionLanguageAdaptor exprLangAdaptorHandler = dwExpressionLanguage != null
-          ? new ExpressionLanguageAdaptorHandler(dwExpressionLanguage, mvelExpressionLanguage)
-          : mvelExpressionLanguage;
-
-      this.melDefault = dwExpressionLanguage == null || isMelDefault();
-      this.expressionLanguage = exprLangAdaptorHandler;
-    } else {
-      if (dwExpressionLanguage == null) {
-        throw new IllegalStateException("No expression language installed");
-      }
-      this.expressionLanguage = dwExpressionLanguage;
-    }
-
-    BindingContext.Builder contextBuilder = BindingContext.builder();
-
-    registry.lookupAllByType(GlobalBindingContextProvider.class).stream()
-        .map(GlobalBindingContextProvider::getBindingContext)
-        .forEach(contextBuilder::addAll);
-
-    expressionLanguage.addGlobalBindings(contextBuilder instanceof DefaultBindingContextBuilder
-        ? ((DefaultBindingContextBuilder) contextBuilder).flattenAndBuild()
-        : contextBuilder.build());
-
-    if (melDefault) {
-      LOGGER.warn("Using MEL as the default expression language.");
-    }
-  }
-
-  private ExtendedExpressionLanguageAdaptor createExpressionLanguageAdaptor(DefaultExpressionLanguageFactoryService service) {
-    if (isLazyInitMode(properties)) {
-      return new LazyExpressionLanguageAdaptor(() -> createWeaveExpressionLanguageAdaptor(service));
-    }
-
-    return createWeaveExpressionLanguageAdaptor(service);
-  }
-
-  private DataWeaveExpressionLanguageAdaptor createWeaveExpressionLanguageAdaptor(
-                                                                                  DefaultExpressionLanguageFactoryService service) {
-    return new DataWeaveExpressionLanguageAdaptor(muleContext, registry, service, featureFlaggingService);
-  }
 
   @Override
   public void addGlobalBindings(BindingContext bindingContext) {
@@ -190,7 +114,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
                                  ComponentLocation componentLocation,
                                  BindingContext context) {
     return updateTypedValueForStreaming(expressionLanguage.evaluate(expression, event, eventBuilder, componentLocation, context),
-                                        event, streamingManager);
+                                        event, getStreamingManager());
   }
 
   @Override
@@ -219,13 +143,12 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
       throws ExpressionRuntimeException {
     return updateTypedValueForStreaming(expressionLanguage.evaluate(expression, outputType, event, componentLocation, context,
                                                                     failOnNull),
-                                        event, streamingManager);
+                                        event, getStreamingManager());
   }
 
   private TypedValue<?> transform(TypedValue<?> target, DataType sourceType, DataType outputType) throws TransformerException {
     if (target.getValue() != null && !isInstance(outputType.getType(), target.getValue())) {
-      Object result = ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(sourceType, outputType)
-          .transform(target);
+      Object result = transformersRegistry.lookupTransformer(sourceType, outputType).transform(target);
       return new TypedValue<>(result, outputType);
     } else {
       return target;
@@ -449,13 +372,20 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   }
 
   @Inject
-  public void setStreamingManager(StreamingManager streamingManager) {
-    this.streamingManager = streamingManager;
+  public void setTransformersRegistry(TransformersRegistry transformersRegistry) {
+    this.transformersRegistry = transformersRegistry;
   }
 
-  @Inject
-  public void setRegistry(Registry registry) {
-    this.registry = registry;
+  public StreamingManager getStreamingManager() {
+    return muleContext.getStreamingManager();
+  }
+
+  public void setExpressionLanguage(ExtendedExpressionLanguageAdaptor expressionLanguage) {
+    this.expressionLanguage = expressionLanguage;
+  }
+
+  public void setMelDefault(boolean melDefault) {
+    this.melDefault = melDefault;
   }
 
   @Override

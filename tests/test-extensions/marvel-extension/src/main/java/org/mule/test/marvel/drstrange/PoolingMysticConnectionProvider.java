@@ -6,8 +6,8 @@
  */
 package org.mule.test.marvel.drstrange;
 
-import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.sdk.api.connectivity.PoolingConnectionProvider;
 
 @Alias("pooling-mystic")
 public class PoolingMysticConnectionProvider extends MysticConnectionProvider

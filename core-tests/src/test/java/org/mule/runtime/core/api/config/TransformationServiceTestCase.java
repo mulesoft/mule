@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.core.api.config;
 
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.TransfromersStory.TRANSFORMERS;
+
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -18,7 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.message.Message.of;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -38,7 +42,12 @@ import java.io.ByteArrayInputStream;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
 @SmallTest
+@Feature(REGISTRY)
+@Story(TRANSFORMERS)
 public class TransformationServiceTestCase extends AbstractMuleTestCase {
 
   private class A {
@@ -57,14 +66,15 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
 
   }
 
-  private MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-  private DataTypeConversionResolver conversionResolver = mock(DataTypeConversionResolver.class);
+  private final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+  private final DataTypeConversionResolver conversionResolver = mock(DataTypeConversionResolver.class);
   private ExtendedTransformationService transformationService;
 
   @Before
   public void setUp() throws Exception {
     when(muleContext.getDataTypeConverterResolver()).thenReturn(conversionResolver);
     this.transformationService = new ExtendedTransformationService(muleContext);
+    transformationService.setDataTypeConversionResolver(conversionResolver);
   }
 
   private static final DataType dataTypeB = DataType.fromType(B.class);

@@ -14,11 +14,11 @@ import java.io.Serializable;
 import java.util.function.Supplier;
 
 /**
- * An {@link ObjectStoreToMapAdapter} which delays effectively obtaining the {@link ObjectStore}
- * to be bridged until it's absolutely necessary.
+ * An {@link ObjectStoreToMapAdapter} which delays effectively obtaining the {@link ObjectStore} to be bridged until it's
+ * absolutely necessary.
  * <p>
- * This is useful for cases in which the adapter is to be created at a time in which the
- * object store may not be already available.
+ * This is useful for cases in which the adapter is to be created at a time in which the object store may not be already
+ * available.
  *
  * @param <T> the generic type of the instances contained in the {@link ObjectStore}
  * @since 4.0

@@ -28,7 +28,7 @@ public final class MuleContextException extends MuleException {
 
   /**
    * @param message the exception message
-   * @param cause the exception that cause this exception to be thrown
+   * @param cause   the exception that cause this exception to be thrown
    */
   public MuleContextException(I18nMessage message, Throwable cause) {
     super(message, cause);

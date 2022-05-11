@@ -19,7 +19,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
@@ -33,7 +32,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -100,9 +98,6 @@ public class NonCompletableMethodOperationExecutorTestCase extends AbstractMuleC
   private CursorProviderFactory cursorProviderFactory;
 
   @Mock
-  private CursorComponentDecoratorFactory componentDecoratorFactory;
-
-  @Mock
   private StreamingManager streamingManager;
 
   @Mock
@@ -136,7 +131,7 @@ public class NonCompletableMethodOperationExecutorTestCase extends AbstractMuleC
     when(operationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     operationContext =
         new DefaultExecutionContext<>(extensionModel, of(configurationInstance), parameters.asMap(), operationModel,
-                                      muleEvent, cursorProviderFactory, componentDecoratorFactory,
+                                      muleEvent, cursorProviderFactory,
                                       streamingManager, component,
                                       retryPolicyTemplate, IMMEDIATE_SCHEDULER, empty(), muleContext);
     operationContext = spy(operationContext);
@@ -145,7 +140,7 @@ public class NonCompletableMethodOperationExecutorTestCase extends AbstractMuleC
   @Test
   public void operationWithReturnValueAndWithoutParameters() throws Exception {
     Method method = ClassUtils.getMethod(HeisenbergOperations.class, "sayMyName", new Class<?>[] {HeisenbergExtension.class});
-    executor = new ReactiveMethodOperationExecutor(operationModel, method, operations, NO_OP_INSTANCE);
+    executor = new ReactiveMethodOperationExecutor(operationModel, method, operations);
     initialiseIfNeeded(executor, true, muleContext);
     assertResult(execute(), HEISENBERG);
   }
@@ -164,7 +159,7 @@ public class NonCompletableMethodOperationExecutorTestCase extends AbstractMuleC
   @Test
   public void voidOperationWithoutParameters() throws Exception {
     Method method = ClassUtils.getMethod(HeisenbergOperations.class, "die", new Class<?>[] {HeisenbergExtension.class});
-    executor = new ReactiveMethodOperationExecutor(operationModel, method, operations, NO_OP_INSTANCE);
+    executor = new ReactiveMethodOperationExecutor(operationModel, method, operations);
     initialiseIfNeeded(executor, true, muleContext);
     assertThat(execute(), is(nullValue()));
     assertThat(config.getEndingHealth(), is(DEAD));
@@ -179,7 +174,7 @@ public class NonCompletableMethodOperationExecutorTestCase extends AbstractMuleC
 
     Method method =
         ClassUtils.getMethod(HeisenbergOperations.class, "getEnemy", new Class<?>[] {HeisenbergExtension.class, int.class});
-    executor = new ReactiveMethodOperationExecutor(operationModel, method, operations, NO_OP_INSTANCE);
+    executor = new ReactiveMethodOperationExecutor(operationModel, method, operations);
     initialiseIfNeeded(executor, true, muleContext);
 
     assertResult(((Result) execute()).getOutput(), "Hank");
@@ -188,7 +183,7 @@ public class NonCompletableMethodOperationExecutorTestCase extends AbstractMuleC
   @Test
   public void voidWithArguments() throws Exception {
     Method method = ClassUtils.getMethod(HeisenbergOperations.class, "die", new Class<?>[] {HeisenbergExtension.class});
-    executor = new ReactiveMethodOperationExecutor(operationModel, method, operations, NO_OP_INSTANCE);
+    executor = new ReactiveMethodOperationExecutor(operationModel, method, operations);
     initialiseIfNeeded(executor, true, muleContext);
     assertThat(execute(), is(nullValue()));
   }
@@ -201,7 +196,7 @@ public class NonCompletableMethodOperationExecutorTestCase extends AbstractMuleC
     for (Object[] primitiveOperation : primitiveOperations) {
       Method method = ClassUtils.getMethod(PrimitiveTypesTestOperations.class, (String) primitiveOperation[0],
                                            new Class<?>[] {(Class<?>) primitiveOperation[1]});
-      executor = new ReactiveMethodOperationExecutor(operationModel, method, primitiveTypesTestOperations, NO_OP_INSTANCE);
+      executor = new ReactiveMethodOperationExecutor(operationModel, method, primitiveTypesTestOperations);
       initialiseIfNeeded(executor, true, muleContext);
       execute();
     }
@@ -212,7 +207,7 @@ public class NonCompletableMethodOperationExecutorTestCase extends AbstractMuleC
     Class<?>[] parameterTypes =
         {char.class, byte.class, short.class, int.class, long.class, float.class, double.class, boolean.class};
     Method method = ClassUtils.getMethod(PrimitiveTypesTestOperations.class, "allCombined", parameterTypes);
-    executor = new ReactiveMethodOperationExecutor(operationModel, method, primitiveTypesTestOperations, NO_OP_INSTANCE);
+    executor = new ReactiveMethodOperationExecutor(operationModel, method, primitiveTypesTestOperations);
     initialiseIfNeeded(executor, true, muleContext);
     execute();
   }

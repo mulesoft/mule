@@ -7,12 +7,12 @@
 package org.mule.runtime.module.extension.internal.resources;
 
 import static javax.lang.model.SourceVersion.RELEASE_8;
+import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.getLoaderById;
 import static org.mule.runtime.module.extension.internal.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
 
-import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.capability.xml.description.DescriptionDeclarationEnricher;
-import org.mule.runtime.module.extension.soap.api.loader.SoapExtensionModelLoader;
 
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedOptions;
@@ -20,8 +20,8 @@ import javax.annotation.processing.SupportedSourceVersion;
 
 
 /**
- * {@link BaseExtensionResourcesGeneratorAnnotationProcessor} implementation for SOAP BASED Extensions that use the
- * soap extensions api classes and annotations.
+ * {@link BaseExtensionResourcesGeneratorAnnotationProcessor} implementation for SOAP BASED Extensions that use the soap
+ * extensions api classes and annotations.
  *
  * @since 4.0.0
  */
@@ -31,16 +31,13 @@ import javax.annotation.processing.SupportedSourceVersion;
 public class SoapExtensionResourcesGeneratorAnnotationProcessor extends ClassExtensionResourcesGeneratorAnnotationProcessor {
 
   @Override
-  protected ExtensionModelLoader getExtensionModelLoader() {
-    return new SoapExtensionModelLoader() {
-
-      @Override
-      protected void configureContextBeforeDeclaration(ExtensionLoadingContext context) {
-        super.configureContextBeforeDeclaration(context);
-        context.addCustomDeclarationEnricher(new DescriptionDeclarationEnricher());
-      }
-    };
+  protected void configureLoadingRequest(ExtensionModelLoadingRequest.Builder requestBuilder) {
+    super.configureLoadingRequest(requestBuilder);
+    requestBuilder.addEnricher(new DescriptionDeclarationEnricher());
   }
 
-
+  @Override
+  protected ExtensionModelLoader getExtensionModelLoader() {
+    return getLoaderById("soap");
+  }
 }

@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.function.Predicate;
 
 /**
- * Filters found converters returning the ones that match the source or result {@link DataType} exactly or all of them
- * if none match.
+ * Filters found converters returning the ones that match the source or result {@link DataType} exactly or all of them if none
+ * match.
  *
  * @since 4.0
  */

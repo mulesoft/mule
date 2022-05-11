@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Long.MIN_VALUE;
+import static java.lang.Math.min;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
 import static java.lang.System.nanoTime;
@@ -19,13 +20,14 @@ import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL
 import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY;
 import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.PipelineProcessingStrategyReactiveProcessorBuilder.pipelineProcessingStrategyReactiveProcessorFrom;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactType;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.FluxSink.OverflowStrategy.BUFFER;
-import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.util.LazyValue;
@@ -103,7 +105,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
   }
 
 
-  static class StreamEmitterProcessingStrategy extends AbstractReactorStreamProcessingStrategy implements Stoppable {
+  static class StreamEmitterProcessingStrategy extends AbstractReactorStreamProcessingStrategy {
 
     private static final Logger LOGGER = getLogger(StreamEmitterProcessingStrategy.class);
     private static final String NO_SUBSCRIPTIONS_ACTIVE_FOR_PROCESSOR = "No subscriptions active for processor.";
@@ -147,6 +149,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
       if (allSchedulersStopped()) {
         stopSchedulersIfNeeded();
       }
+      super.stop();
     }
 
     @Override
@@ -187,7 +190,8 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
       }
       if (activeSinksCount.get() >= -pendingSinks) {
         if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) != null) {
-          throw new IllegalStateException("Completion of ProcessingStrategy sinks not complete/cancelled before shutdown timeout.");
+          throw new IllegalStateException(
+                                          "Completion of ProcessingStrategy sinks not complete/cancelled before shutdown timeout.");
         } else {
           LOGGER.warn("Completion of ProcessingStrategy sinks not complete/cancelled before shutdown timeout.");
         }
@@ -294,7 +298,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
     protected int getSinksCount() {
       int coresLoad = CORES * 2;
-      return maxConcurrency < coresLoad ? maxConcurrency : coresLoad;
+      return min(maxConcurrency, coresLoad);
     }
 
     protected MuleRuntimeException resolveSubscriptionErrorCause(AtomicReference<Throwable> failedSubscriptionCause) {
@@ -320,10 +324,11 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
     @Override
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
-      reactor.core.scheduler.Scheduler scheduler = fromExecutorService(decorateScheduler(getFlowDispatcherScheduler()));
-      return publisher -> from(publisher).publishOn(scheduler)
-          .doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
-          .transform(pipeline);
+      return pipelineProcessingStrategyReactiveProcessorFrom(pipeline, executionClassloader, getArtifactId(muleContext),
+                                                             getArtifactType(muleContext))
+                                                                 .withScheduler(decorateScheduler(getFlowDispatcherScheduler()))
+                                                                 .withProfilingService(getProfilingService())
+                                                                 .build();
     }
 
     @Override
@@ -340,7 +345,8 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
               return REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER;
             }
 
-            // onResponse doesn't wait for child contexts to be terminated, which is handy when a child context is created (like in
+            // onResponse doesn't wait for child contexts to be terminated, which is handy when a child context is created (like
+            // in
             // an async, for instance)
             ((BaseEventContext) event.getContext()).onResponse(queuedDecrementCallback);
           } else {

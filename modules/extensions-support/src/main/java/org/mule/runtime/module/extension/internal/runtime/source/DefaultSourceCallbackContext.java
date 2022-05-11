@@ -9,8 +9,10 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.core.api.transaction.TransactionUtils.profileTransactionAction;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -19,18 +21,22 @@ import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.notification.Notification;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.internal.execution.NotificationFunction;
-import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.tx.TransactionHandle;
 import org.mule.runtime.module.extension.internal.runtime.notification.DefaultExtensionNotification;
 import org.mule.runtime.module.extension.internal.runtime.transaction.DefaultTransactionHandle;
 import org.mule.runtime.module.extension.internal.runtime.transaction.NullTransactionHandle;
+import org.mule.sdk.api.connectivity.TransactionalConnection;
 import org.mule.sdk.api.notification.NotificationActionDefinition;
 import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 
+import javax.inject.Inject;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +59,11 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
   private TransactionHandle transactionHandle = NULL_TRANSACTION_HANDLE;
   private boolean dispatched = false;
   private final List<NotificationFunction> notificationFunctions = new LinkedList<>();
+
+  @Inject
+  private ProfilingService profilingService;
+
+  private ProfilingDataProducer<TransactionProfilingEventContext, Object> startProducer;
 
   /**
    * Creates a new instance
@@ -85,6 +96,10 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
                                                                       sourceCallback.getSourceLocation(),
                                                                       connectionHandler, sourceCallback.getTransactionManager(),
                                                                       sourceCallback.getTimeout());
+        if (sourceCallback.getTransactionConfig().isTransacted()) {
+          initialiseProfilingDataProducerIfNeeded();
+          profileTransactionAction(startProducer, TX_START, sourceCallback.getSourceLocation());
+        }
         transactionHandle = DEFAULT_TRANSACTION_HANDLE;
       }
     } catch (Exception e) {
@@ -93,6 +108,12 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
     }
 
     return transactionHandle;
+  }
+
+  private void initialiseProfilingDataProducerIfNeeded() {
+    if (startProducer == null) {
+      startProducer = profilingService.getProfilingDataProducer(TX_START);
+    }
   }
 
   /**

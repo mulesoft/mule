@@ -11,10 +11,6 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
@@ -26,7 +22,6 @@ import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -39,9 +34,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Test;
@@ -66,14 +59,8 @@ public class DefaultStreamingHelperTestCase extends AbstractMuleContextTestCase 
 
     final Pair<CursorStreamProviderFactory, CursorIteratorProviderFactory> cursorProviderFactories =
         streamingManager.getPairFor(cursorProviderFactory);
-    final CursorComponentDecoratorFactory componentDecoratorFactory = mock(CursorComponentDecoratorFactory.class);
-    when(componentDecoratorFactory.decorateOutput(any(InputStream.class), anyString()))
-        .then(inv -> inv.getArgument(0));
-    when(componentDecoratorFactory.decorateOutput(any(Iterator.class), anyString()))
-        .then(inv -> inv.getArgument(0));
 
     streamingHelper = new DefaultStreamingHelper(cursorProviderFactories.getFirst(), cursorProviderFactories.getSecond(),
-                                                 componentDecoratorFactory,
                                                  event, from("log"));
   }
 

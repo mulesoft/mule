@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
-import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
+import org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration;
 
 import java.util.Map;
 
@@ -30,16 +32,22 @@ public class ApplicationMuleContextBuilder extends SupportsPropertiesMuleContext
 
   @Override
   protected DefaultMuleConfiguration createMuleConfiguration() {
-    final DefaultMuleConfiguration configuration = new DefaultMuleConfiguration(true);
+    final DefaultMuleConfiguration configuration;
+    if (Boolean.valueOf(getArtifactProperties().get(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY))) {
+      configuration = new ReconfigurableMuleConfiguration(true);
+    } else {
+      configuration = new DefaultMuleConfiguration(true);
+    }
+
     initializeFromProperties(configuration);
     configuration.setId(appName);
     final String encoding = defaultEncoding;
     if (!isBlank(encoding)) {
       configuration.setDefaultEncoding(encoding);
     }
-    if (executionClassLoader instanceof MuleApplicationClassLoader) {
+    if (executionClassLoader instanceof MuleArtifactClassLoader) {
       configuration
-          .setMinMuleVersion(((MuleApplicationClassLoader) executionClassLoader).getArtifactDescriptor().getMinMuleVersion());
+          .setMinMuleVersion(((MuleArtifactClassLoader) executionClassLoader).getArtifactDescriptor().getMinMuleVersion());
     }
     return configuration;
   }

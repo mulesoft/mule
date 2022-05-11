@@ -7,14 +7,14 @@
 package org.mule.runtime.config.internal.artifact;
 
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.config.internal.MuleArtifactContext;
+import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.config.internal.context.MuleArtifactContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.module.artifact.api.Artifact;
 
 /**
- * An artifact context contains all the information related to an {@link Artifact} that contains
- * configuration.
+ * An artifact context contains all the information related to an {@link Artifact} that contains configuration.
  * <p/>
  * This object holds the created {@link MuleContext} and the {@link MuleArtifactContext} which holds the information related to
  * the application configuration and resources.
@@ -23,7 +23,7 @@ import org.mule.runtime.module.artifact.api.Artifact;
  */
 public class SpringArtifactContext implements ArtifactContext {
 
-  private MuleArtifactContext muleArtifactContext;
+  private final MuleArtifactContext muleArtifactContext;
 
   /**
    * Creates an {@link ArtifactContext}.
@@ -47,4 +47,8 @@ public class SpringArtifactContext implements ArtifactContext {
     return this.muleArtifactContext.getRegistry();
   }
 
+  @Override
+  public ArtifactAst getArtifactAst() {
+    return this.muleArtifactContext.getApplicationModel();
+  }
 }

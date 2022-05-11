@@ -19,14 +19,12 @@ import java.io.IOException;
  * 
  * <p>
  * The information specified in this interface is used to configure a key store indirectly. For more information see the
- * documentation for the connector or protocol in question. The comments in
- * {@link TlsConfiguration} may also be useful.
+ * documentation for the connector or protocol in question. The comments in {@link TlsConfiguration} may also be useful.
  * </p>
  * 
  * <p>
- * <em>Programmers:</em> this information, once stored in and retrieved from properties via
- * {@link TlsPropertiesMapper}, will provide a key manager factory via the
- * {@link TlsDirectKeyStore} interface implemented by {@link TlsConfiguration}. This can be
+ * <em>Programmers:</em> this information, once stored in and retrieved from properties via {@link TlsPropertiesMapper}, will
+ * provide a key manager factory via the {@link TlsDirectKeyStore} interface implemented by {@link TlsConfiguration}. This can be
  * associated with a socket factory via {@link TlsPropertiesSocketFactory}.
  * </p>
  */

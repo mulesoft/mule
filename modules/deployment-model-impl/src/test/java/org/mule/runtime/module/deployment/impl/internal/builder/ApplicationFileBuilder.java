@@ -7,11 +7,6 @@
 
 package org.mule.runtime.module.deployment.impl.internal.builder;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.Arrays.asList;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_REDEPLOYMENT_ENABLED;
@@ -21,6 +16,13 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
+
+import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
@@ -164,7 +166,7 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
                                                                          ? empty()
                                                                          : ofNullable(Boolean
                                                                              .valueOf((String) redeploymentEnabled)),
-                                                                     Optional.ofNullable((String) configResources),
+                                                                     ofNullable((String) configResources),
                                                                      ofNullable((String) properties.get(EXPORTED_PACKAGES)),
                                                                      ofNullable((String) properties.get(EXPORTED_RESOURCES)));
     customResources.add(new ZipResource(applicationDescriptor.getAbsolutePath(), MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION));

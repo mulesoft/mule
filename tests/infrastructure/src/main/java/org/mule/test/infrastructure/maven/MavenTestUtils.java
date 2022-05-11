@@ -75,7 +75,7 @@ public class MavenTestUtils {
    * the artifact has been installed, performs the Maven clean goal to delete the intermediate resources.
    *
    * @param baseDirectory directory on which the POM resides.
-   * @param descriptor the artifact descriptor for the project being built.
+   * @param descriptor    the artifact descriptor for the project being built.
    * @return the installed artifact on the Maven repository.
    */
   public static File installMavenArtifact(String baseDirectory, BundleDescriptor descriptor) {
@@ -87,8 +87,8 @@ public class MavenTestUtils {
    * the artifact has been installed, performs the Maven clean goal to delete the intermediate resources.
    *
    * @param baseDirectory directory on which the POM resides.
-   * @param descriptor the artifact descriptor for the project being built.
-   * @param props the system properties to pass the Maven jobs
+   * @param descriptor    the artifact descriptor for the project being built.
+   * @param props         the system properties to pass the Maven jobs
    * @return the installed artifact on the Maven repository.
    */
   public static File installMavenArtifact(String baseDirectory, BundleDescriptor descriptor, Properties props) {

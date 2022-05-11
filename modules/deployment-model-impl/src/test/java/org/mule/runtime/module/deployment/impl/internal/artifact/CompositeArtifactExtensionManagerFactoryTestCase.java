@@ -15,13 +15,16 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
+
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.module.deployment.impl.internal.policy.CompositeArtifactExtensionManager;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
+import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
+import org.mule.runtime.module.extension.internal.manager.CompositeArtifactExtensionManager;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -34,8 +37,15 @@ public class CompositeArtifactExtensionManagerFactoryTestCase extends AbstractMu
   public void createsCompositeExtensionManager() throws Exception {
 
     Application application = mock(Application.class, RETURNS_DEEP_STUBS);
+
+    final Registry registry = mock(Registry.class);
+    when(application.getRegistry()).thenReturn(registry);
+    final ArtifactContext artifactContext = mock(ArtifactContext.class);
+    when(artifactContext.getRegistry()).thenReturn(registry);
+    when(application.getArtifactContext()).thenReturn(artifactContext);
+
     ExtensionManager applicationExtensionManager = mock(ExtensionManager.class);
-    when(application.getRegistry().lookupByName(MuleProperties.OBJECT_EXTENSION_MANAGER))
+    when(registry.lookupByName(OBJECT_EXTENSION_MANAGER))
         .thenReturn(of(applicationExtensionManager));
 
     ExtensionModelLoaderRepository extensionModelLoaderRepository = mock(ExtensionModelLoaderRepository.class);

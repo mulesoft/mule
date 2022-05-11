@@ -8,7 +8,7 @@ package org.mule.runtime.extension.internal.loader;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static java.util.Collections.EMPTY_SET;
+import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -19,7 +19,8 @@ import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.NUMBER;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.STRING;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
+import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.test.allure.AllureConstants.XmlSdk.Declaration.DECLARATION_DATASENSE;
 import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -28,15 +29,15 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
-import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.xml.declaration.DeclarationOperation;
+import org.mule.runtime.extension.internal.ast.property.GlobalElementComponentModelModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -70,7 +71,7 @@ public class XmlExtensionLoaderWithDeclarationTestCase extends AbstractMuleTestC
 
   /**
    * @param validateXml whether the XML must be valid while loading the extension model or not. Useful to determine if the default
-   *        values are properly feed when reading the document.
+   *                    values are properly feed when reading the document.
    */
   public XmlExtensionLoaderWithDeclarationTestCase(boolean validateXml) {
     this.validateXml = validateXml;
@@ -184,7 +185,11 @@ public class XmlExtensionLoaderWithDeclarationTestCase extends AbstractMuleTestC
     parameters.put("COMPILATION_MODE", true);
     declarationPath.ifPresent(path -> parameters.put(XmlExtensionModelLoader.RESOURCE_DECLARATION, path));
     return new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(),
-                                                            getDefault(EMPTY_SET),
+                                                            getDefault(getDependencyExtensions()),
                                                             parameters);
+  }
+
+  private static Set<ExtensionModel> getDependencyExtensions() {
+    return singleton(getExtensionModel());
   }
 }

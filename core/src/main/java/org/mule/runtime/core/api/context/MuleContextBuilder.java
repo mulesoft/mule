@@ -10,6 +10,7 @@ import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
@@ -52,7 +53,9 @@ public interface MuleContextBuilder {
 
   /**
    * @param errorTypeRepository error type repository to be used in the context, is not configured a default one will be used.
+   * @deprecated error type repo is determined from the application, it may not be set. This is a no-op since 4.4.
    */
+  @Deprecated
   void setErrorTypeRepository(ErrorTypeRepository errorTypeRepository);
 
 
@@ -69,4 +72,12 @@ public interface MuleContextBuilder {
   void setDeploymentProperties(Optional<Properties> properties);
 
   void setListeners(List<MuleContextListener> listeners);
+
+  /**
+   * Sets the {@link ArtifactCoordinates} for the deployed app
+   *
+   * @param artifactCoordinates the app's {@link ArtifactCoordinates}
+   * @since 4.5.0
+   */
+  void setArtifactCoordinates(ArtifactCoordinates artifactCoordinates);
 }

@@ -6,7 +6,15 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.CRITICAL_ERROR_TYPE;
+import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
+
+import static java.util.Arrays.asList;
 import static java.util.function.Function.identity;
+
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -16,46 +24,73 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.internal.exception.DefaultErrorTypeRepository.CRITICAL_ERROR_TYPE;
-import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 
+import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.exception.MuleExceptionInfo;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.VerboseExceptions;
 
+import java.util.Collection;
 import java.util.function.Consumer;
 
+import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 
 @Feature(ERROR_HANDLING)
-public class OnCriticalErrorHandlerTestCase extends AbstractErrorHandlerTestCase {
+@RunWith(Parameterized.class)
+public class OnCriticalErrorHandlerTestCase extends AbstractMuleContextTestCase {
 
   private final OnCriticalErrorHandler handler = spy(new OnCriticalErrorHandler(mock(ErrorTypeMatcher.class)));
 
   private Error error;
 
+  @Rule
+  public VerboseExceptions verbose;
+
+  protected MessagingException mockException = mock(MessagingException.class);
+
+  protected Flow flow;
+
+  protected EventContext context;
+
+  protected CoreEvent muleEvent;
 
   public OnCriticalErrorHandlerTestCase(VerboseExceptions verbose) {
-    super(verbose);
+    this.verbose = verbose;
   }
 
-  @Override
-  protected AbstractExceptionListener getErrorHandler() {
+  @Parameters(name = "{0}")
+  public static Collection<Object> data() {
+    return asList(new VerboseExceptions(true),
+                  new VerboseExceptions(false));
+  }
+
+  protected OnCriticalErrorHandler getErrorHandler() {
     return handler;
   }
 
-  @Override
   @Before
   public void before() throws Exception {
-    super.before();
+    flow = getTestFlow(muleContext);
+
+    context = create(flow, TEST_CONNECTOR_LOCATION);
+    muleEvent = InternalEvent.builder(context).message(of("")).build();
+
+    when(mockException.getExceptionInfo()).thenReturn(new MuleExceptionInfo());
 
     error = mock(Error.class, RETURNS_DEEP_STUBS);
 

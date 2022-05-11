@@ -7,25 +7,26 @@
 
 package org.mule.runtime.module.extension.internal.capability.xml.schema.model;
 
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.EXPRESSION_BOOLEAN;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.EXPRESSION_DATE_TIME;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.EXPRESSION_DECIMAL;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.EXPRESSION_DOUBLE;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.EXPRESSION_INTEGER;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.EXPRESSION_LIST;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.EXPRESSION_LONG;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.EXPRESSION_MAP;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.EXPRESSION_STRING;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.STRING;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.SUBSTITUTABLE_BOOLEAN;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.SUBSTITUTABLE_DATE_TIME;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.SUBSTITUTABLE_DECIMAL;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.SUBSTITUTABLE_INT;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.SUBSTITUTABLE_LONG;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.SUBSTITUTABLE_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.acceptsExpressions;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.EXPRESSION_BOOLEAN;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.EXPRESSION_DATE_TIME;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.EXPRESSION_DECIMAL;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.EXPRESSION_DOUBLE;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.EXPRESSION_INTEGER;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.EXPRESSION_LIST;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.EXPRESSION_LONG;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.EXPRESSION_MAP;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.EXPRESSION_STRING;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.STRING;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.SUBSTITUTABLE_BOOLEAN;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.SUBSTITUTABLE_DATE_TIME;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.SUBSTITUTABLE_DECIMAL;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.SUBSTITUTABLE_INT;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.SUBSTITUTABLE_LONG;
+import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.SUBSTITUTABLE_NAME;
+
 import org.mule.metadata.api.annotation.IntAnnotation;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BooleanType;

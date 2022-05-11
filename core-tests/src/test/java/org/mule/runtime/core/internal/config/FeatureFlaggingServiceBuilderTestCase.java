@@ -4,7 +4,6 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.core.internal.config;
 
 import static java.util.Arrays.asList;
@@ -21,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
@@ -33,6 +33,7 @@ import org.mockito.junit.MockitoRule;
 import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.core.api.config.FeatureContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -51,12 +52,16 @@ public class FeatureFlaggingServiceBuilderTestCase extends AbstractMuleTestCase 
   private MuleContext muleContext;
 
   @Mock
+  private FeatureContext featureContext;
+
+  @Mock
   private MuleConfiguration muleConfiguration;
 
   @Rule
   public SystemProperty systemProperty;
 
-  private final Map<Feature, Predicate<MuleContext>> configs;
+  private final Map<Feature, Predicate<MuleContext>> muleContextConfigs;
+  private final Map<Feature, Predicate<FeatureContext>> featureContextConfigs;
 
   private final boolean expected;
 
@@ -81,14 +86,17 @@ public class FeatureFlaggingServiceBuilderTestCase extends AbstractMuleTestCase 
   public void configureContext() {
     when(muleConfiguration.getId()).thenReturn("fake-id");
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
+    when(featureContext.getArtifactName()).thenReturn("fake-name");
   }
 
   public FeatureFlaggingServiceBuilderTestCase(Feature feature, boolean enabled, String systemPropertyValue, boolean expected) {
-    Map<Feature, Predicate<MuleContext>> configs = new HashMap<>();
-    configs.put(feature, c -> enabled);
+    muleContextConfigs = new HashMap<>();
+    muleContextConfigs.put(feature, muleContext -> enabled);
+
+    featureContextConfigs = new HashMap<>();
+    featureContextConfigs.put(feature, featureContext -> enabled);
 
     this.feature = feature;
-    this.configs = configs;
     this.expected = expected;
 
     if (systemPropertyValue != null) {
@@ -97,14 +105,23 @@ public class FeatureFlaggingServiceBuilderTestCase extends AbstractMuleTestCase 
   }
 
   @Test
-  public void testBuild() {
+  @Issue("MULE-19402")
+  public void testBuildUsingMuleContextConfigs() {
     FeatureFlaggingService featureFlaggingService = new FeatureFlaggingServiceBuilder()
-        .configurations(configs)
-        .context(muleContext)
+        .withContext(muleContext)
+        .withMuleContextFlags(muleContextConfigs)
         .build();
-
     assertThat(featureFlaggingService.isEnabled(feature), is(expected));
+  }
 
+  @Test
+  @Issue("MULE-19402")
+  public void testBuildUsingFeatureContextConfigs() {
+    FeatureFlaggingService featureFlaggingService = new FeatureFlaggingServiceBuilder()
+        .withContext(featureContext)
+        .withFeatureContextFlags(featureContextConfigs)
+        .build();
+    assertThat(featureFlaggingService.isEnabled(feature), is(expected));
   }
 
 }

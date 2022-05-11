@@ -32,7 +32,7 @@ public interface ProcessingStrategy {
    * used independent streams that implement the {@link Pipeline}.
    *
    * @param flowConstruct pipeline instance.
-   * @param pipeline function representing the pipeline.
+   * @param pipeline      function representing the pipeline.
    * @return new sink instance
    */
   Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline);
@@ -40,7 +40,7 @@ public interface ProcessingStrategy {
   /**
    * For sinks created internally by the components in a flow, have them accounted for in the processing strategy.
    *
-   * @param publisher the publisher whose sink will be registered
+   * @param publisher          the publisher whose sink will be registered
    * @param sinkRepresentation a representation of the chain for it to appear in log entries.
    */
   default void registerInternalSink(Publisher<CoreEvent> publisher, String sinkRepresentation) {

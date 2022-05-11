@@ -6,59 +6,46 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static java.util.stream.Collectors.toSet;
-import static java.util.stream.Stream.of;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_GENERATE;
 import static org.mule.runtime.extension.api.runtime.source.SourceResult.invocationError;
 import static org.mule.runtime.extension.api.runtime.source.SourceResult.responseError;
 import static org.mule.runtime.extension.api.runtime.source.SourceResult.success;
 
-import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.runtime.source.SourceResult;
-
-import java.util.Set;
 
 /**
  * {@link ArgumentResolver} implementation which create instances of {@link SourceResult}
  *
  * @since 4.0
  */
-public class SourceResultArgumentResolver implements ArgumentResolver<SourceResult> {
+public class SourceResultArgumentResolver extends AbstractSourceResultArgumentResolver<SourceResult> {
 
-  private ArgumentResolver<Error> errorArgumentResolver;
-  private ArgumentResolver<SourceCallbackContext> callbackContextArgumentResolver;
-
-  private static final Set<String> GENERATE_ERRORS = of(SOURCE_RESPONSE_GENERATE,
-                                                        SOURCE_ERROR_RESPONSE_GENERATE)
-                                                            .map(ComponentIdentifier::getName)
-                                                            .collect(toSet());
+  private final ArgumentResolver<Error> errorArgumentResolver;
+  private final ArgumentResolver<SourceCallbackContext> callbackContextArgumentResolver;
 
   public SourceResultArgumentResolver(ArgumentResolver<Error> errorArgumentResolver,
                                       ArgumentResolver<SourceCallbackContext> callbackContextArgumentResolver) {
+    super(errorArgumentResolver);
     this.errorArgumentResolver = errorArgumentResolver;
     this.callbackContextArgumentResolver = callbackContextArgumentResolver;
   }
 
   @Override
-  public SourceResult resolve(ExecutionContext executionContext) {
-    Error error = errorArgumentResolver.resolve(executionContext);
-    SourceCallbackContext callbackContext = callbackContextArgumentResolver.resolve(executionContext);
-
-    if (error == null) {
-      return success(callbackContext);
-    } else {
-      String errorIdentifier = error.getErrorType().getIdentifier();
-      return isErrorGeneratingErrorResponse(errorIdentifier)
-          ? invocationError(error, callbackContext)
-          : responseError(error, callbackContext);
-    }
+  protected SourceResult resolveSuccess(ExecutionContext executionContext) {
+    return success(callbackContextArgumentResolver.resolve(executionContext));
   }
 
-  private boolean isErrorGeneratingErrorResponse(String identifier) {
-    return GENERATE_ERRORS.contains(identifier);
+  @Override
+  protected SourceResult resolveInvocationError(ExecutionContext executionContext) {
+    return invocationError(errorArgumentResolver.resolve(executionContext),
+                           callbackContextArgumentResolver.resolve(executionContext));
+  }
+
+  @Override
+  protected SourceResult resolveResponseError(ExecutionContext executionContext) {
+    return responseError(errorArgumentResolver.resolve(executionContext),
+                         callbackContextArgumentResolver.resolve(executionContext));
   }
 }

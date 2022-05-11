@@ -6,19 +6,27 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static java.util.Collections.emptyList;
+import static org.mule.runtime.core.internal.connection.ConnectionUtils.getInjectionTarget;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.connection.SdkConnectionProviderAdapter.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConnectionProviderFactory;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.module.extension.internal.loader.parser.java.connection.SdkConnectionProviderAdapter;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.internal.util.ValueSetter;
+
+import java.util.List;
 
 /**
  * Implementation of {@link ResolverSetBasedObjectBuilder} which produces instances of {@link ConnectionProviderModel}
@@ -33,13 +41,15 @@ public abstract class ConnectionProviderObjectBuilder<C>
   protected final PoolingProfile poolingProfile;
   protected final ExtensionModel extensionModel;
   protected final MuleContext muleContext;
+
+  private volatile boolean firstBuild = true;
   protected String ownerConfigName;
 
   /**
    * Creates a new instances which produces instances based on the given {@code providerModel} and {@code resolverSet}
    *
-   * @param providerModel     the {@link ConnectionProviderModel} which describes the instances to be produced
-   * @param resolverSet       a {@link ResolverSet} to populate the values
+   * @param providerModel the {@link ConnectionProviderModel} which describes the instances to be produced
+   * @param resolverSet   a {@link ResolverSet} to populate the values
    */
   public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel,
                                          ResolverSet resolverSet,
@@ -105,9 +115,32 @@ public abstract class ConnectionProviderObjectBuilder<C>
 
   @Override
   public Pair<ConnectionProvider<C>, ResolverSetResult> build(ResolverSetResult result) throws MuleException {
-    ConnectionProvider<C> value = instantiateObject().getFirst();
-    populate(result, value);
+    final ConnectionProvider<C> value = from(instantiateObject().getFirst());
+    Object injectionTarget = getInjectionTarget(value);
+
+    if (firstBuild) {
+      synchronized (this) {
+        if (firstBuild) {
+          singleValueSetters = super.createSingleValueSetters(injectionTarget.getClass(), resolverSet);
+          firstBuild = false;
+        }
+      }
+    }
+
+    populate(result, injectionTarget);
     return new Pair<>(value, result);
+  }
+
+  /**
+   * In order to support {@link org.mule.sdk.api.connectivity.ConnectionProvider} instances, introspection needs to be deferred to
+   * the actual instantiation process so that {@link SdkConnectionProviderAdapter} can be unwrapped.
+   * <p>
+   * Therefore, this method always returns an empty list so that no introspection happens on the setup of this builder but
+   * deferred to the first execution of the {@link #build(ResolverSetResult)} method.
+   */
+  @Override
+  protected List<ValueSetter> createSingleValueSetters(Class<?> prototypeClass, ResolverSet resolverSet) {
+    return emptyList();
   }
 
   /**

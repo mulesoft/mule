@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
+import static java.util.stream.Collectors.toList;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.api.util.Pair;
@@ -14,12 +16,11 @@ import org.mule.runtime.config.api.dsl.model.ConfigurationParameters;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class DefaultConfigurationParameters implements ConfigurationParameters {
 
-  private Map<String, Object> simpleConfigurationParameters;
-  private MultiMap<ComponentIdentifier, ConfigurationParameters> complexConfigurationParameters;
+  private final Map<String, Object> simpleConfigurationParameters;
+  private final MultiMap<ComponentIdentifier, ConfigurationParameters> complexConfigurationParameters;
 
   private DefaultConfigurationParameters(Map<String, Object> simpleConfigurationParameters,
                                          MultiMap<ComponentIdentifier, ConfigurationParameters> complexConfigurationParameters) {
@@ -45,13 +46,13 @@ public class DefaultConfigurationParameters implements ConfigurationParameters {
   @Override
   public List<Pair<ComponentIdentifier, ConfigurationParameters>> getComplexConfigurationParameters() {
     return complexConfigurationParameters.entryList().stream().map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
-        .collect(Collectors.toList());
+        .collect(toList());
   }
 
   public static class Builder {
 
-    private Map<String, Object> simpleConfigurationParameters = new HashMap<>();
-    private MultiMap<ComponentIdentifier, ConfigurationParameters> complexConfigurationParameters = new MultiMap<>();
+    private final Map<String, Object> simpleConfigurationParameters = new HashMap<>();
+    private final MultiMap<ComponentIdentifier, ConfigurationParameters> complexConfigurationParameters = new MultiMap<>();
 
     private Builder() {}
 

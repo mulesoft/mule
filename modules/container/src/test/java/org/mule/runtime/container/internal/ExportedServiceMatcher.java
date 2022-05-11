@@ -12,7 +12,6 @@ import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 import java.net.URL;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
@@ -53,12 +52,10 @@ public class ExportedServiceMatcher extends TypeSafeMatcher<ExportedService> {
 
   }
 
-  @Factory
   public static Matcher<ExportedService> like(String serviceInterface, URL resource) {
     return new ExportedServiceMatcher(serviceInterface, resource);
   }
 
-  @Factory
   public static Matcher<ExportedService> like(ExportedService exportedService) {
     return new ExportedServiceMatcher(exportedService.getServiceInterface(), exportedService.getResource());
   }

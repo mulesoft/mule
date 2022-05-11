@@ -36,6 +36,11 @@ public interface FlowConstructStatistics extends Statistics {
   void incFatalError();
 
   /**
+   * Indicates that a connection error has occurred.
+   */
+  default void incConnectionErrors() {}
+
+  /**
    * Adds the execution time of a processed event
    */
   void addCompleteFlowExecutionTime(long time);
@@ -88,4 +93,11 @@ public interface FlowConstructStatistics extends Statistics {
    * Resets all the statistic state
    */
   void clear();
+
+  /**
+   * @return gets the connection errors.
+   */
+  default long getConnectionErrors() {
+    return 0;
+  }
 }

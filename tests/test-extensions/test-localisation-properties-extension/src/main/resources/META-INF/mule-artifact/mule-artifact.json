@@ -1,0 +1,28 @@
+{
+  "minMuleVersion": "4.0.0",
+  "requiredProduct": "MULE",
+  "extensionModelLoaderDescriptor": {
+    "id": "crafted",
+    "attributes": {
+      "type": "org.mule.test.crafted.localisation.properties.extension.TestLocalisationPropertiesExtensionLoadingDelegate",
+      "version": "4.0.0"
+    }
+  },
+  "name": "crafted-localisation-properties",
+  "minMuleVersion": "4.0.0",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [
+        "org.mule.test.crafted.localisation.properties.extension"
+      ],
+      "exportedResources": [
+        "META-INF/services/org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

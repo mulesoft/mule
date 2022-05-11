@@ -12,9 +12,8 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 
 /**
- * A {@link ModelProperty} intended to be used on {@link ParameterModel parameters}
- * to signal that if the parameter is resolved to {@code null}, then the runtime should
- * create a default instance, such as described in {@link NullSafe}
+ * A {@link ModelProperty} intended to be used on {@link ParameterModel parameters} to signal that if the parameter is resolved to
+ * {@code null}, then the runtime should create a default instance, such as described in {@link NullSafe}
  *
  * @since 4.0
  */

@@ -7,22 +7,26 @@
 
 package org.mule.runtime.module.deployment.internal;
 
-import static java.util.Optional.empty;
-import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.collections.CollectionUtils.find;
-import static org.apache.commons.io.FilenameUtils.getBaseName;
-import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
-import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
+
+import static java.nio.file.Files.createTempDirectory;
+import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toSet;
+
+import static org.apache.commons.io.FilenameUtils.getBaseName;
+import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
+
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
@@ -35,7 +39,6 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,9 +51,9 @@ public class DomainBundleArchiveDeployer {
   protected static Logger LOGGER = LoggerFactory.getLogger(DomainBundleArchiveDeployer.class);
 
   private final DeploymentListener deploymentListener;
-  private final ArchiveDeployer<Domain> domainDeployer;
+  private final ArchiveDeployer<DomainDescriptor, Domain> domainDeployer;
   private final ObservableList<Domain> domains;
-  private final ArchiveDeployer<Application> applicationDeployer;
+  private final ArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer;
   private final ObservableList<Application> applications;
   private final DeploymentListener domainDeploymentListener;
   private final CompositeDeploymentListener applicationDeploymentListener;
@@ -59,18 +62,19 @@ public class DomainBundleArchiveDeployer {
   /**
    * Creates a new deployer
    *
-   * @param deploymentListener listener to notify the deployment steps
-   * @param domainDeployer deploys the domains artifacts contained on the domain bundles
-   * @param domains maintains the deployed domain artifacts
-   * @param applicationDeployer deploys the application artifact contained on the domain bundles
-   * @param applications maintains the deployed application artifacts
+   * @param deploymentListener            listener to notify the deployment steps
+   * @param domainDeployer                deploys the domains artifacts contained on the domain bundles
+   * @param domains                       maintains the deployed domain artifacts
+   * @param applicationDeployer           deploys the application artifact contained on the domain bundles
+   * @param applications                  maintains the deployed application artifacts
    * @param domainDeploymentListener
    * @param applicationDeploymentListener
    * @param deploymentService
    */
-  public DomainBundleArchiveDeployer(DeploymentListener deploymentListener, ArchiveDeployer<Domain> domainDeployer,
+  public DomainBundleArchiveDeployer(DeploymentListener deploymentListener,
+                                     ArchiveDeployer<DomainDescriptor, Domain> domainDeployer,
                                      ObservableList<Domain> domains,
-                                     ArchiveDeployer<Application> applicationDeployer,
+                                     ArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer,
                                      ObservableList<Application> applications,
                                      DeploymentListener domainDeploymentListener,
                                      CompositeDeploymentListener applicationDeploymentListener,
@@ -232,7 +236,7 @@ public class DomainBundleArchiveDeployer {
   }
 
   private File unzipDomainBundle(File bundleFile) throws IOException {
-    File tempFolder = File.createTempFile(bundleFile.getName(), "tmp");
+    File tempFolder = createTempDirectory(bundleFile.getName()).toFile();
     tempFolder.delete();
     tempFolder.mkdirs();
     FileUtils.unzip(bundleFile, tempFolder);
@@ -241,6 +245,9 @@ public class DomainBundleArchiveDeployer {
   }
 
   private Domain findDomain(String domainName) {
-    return (Domain) find(domains, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, domainName));
+    return domains.stream()
+        .filter(domain -> domain.getArtifactName().equals(domainName))
+        .findAny()
+        .orElse(null);
   }
 }

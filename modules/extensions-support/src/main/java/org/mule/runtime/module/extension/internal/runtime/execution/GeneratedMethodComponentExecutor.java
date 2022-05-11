@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -24,7 +25,6 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.exception.SdkMethodInvocationException;
@@ -73,7 +73,6 @@ public class GeneratedMethodComponentExecutor<M extends ComponentModel>
   private final List<ParameterGroupModel> groups;
   private final Method method;
   private final Object componentInstance;
-  private final CursorComponentDecoratorFactory componentDecoratorFactory;
   private final ClassLoader extensionClassLoader;
 
   @Inject
@@ -83,12 +82,10 @@ public class GeneratedMethodComponentExecutor<M extends ComponentModel>
   private MethodExecutor methodExecutor;
   private MuleContext muleContext;
 
-  public GeneratedMethodComponentExecutor(List<ParameterGroupModel> groups, Method method, Object componentInstance,
-                                          CursorComponentDecoratorFactory componentDecoratorFactory) {
+  public GeneratedMethodComponentExecutor(List<ParameterGroupModel> groups, Method method, Object componentInstance) {
     this.groups = groups;
     this.method = method;
     this.componentInstance = componentInstance;
-    this.componentDecoratorFactory = componentDecoratorFactory;
     extensionClassLoader = method.getDeclaringClass().getClassLoader();
   }
 
@@ -122,7 +119,7 @@ public class GeneratedMethodComponentExecutor<M extends ComponentModel>
 
   private ArgumentResolverDelegate getMethodArgumentResolver(List<ParameterGroupModel> groups, Method method) {
     try {
-      MethodArgumentResolverDelegate resolver = new MethodArgumentResolverDelegate(groups, method, componentDecoratorFactory);
+      MethodArgumentResolverDelegate resolver = new MethodArgumentResolverDelegate(groups, method);
       initialiseIfNeeded(resolver, muleContext);
       return resolver;
     } catch (Exception e) {
@@ -158,7 +155,7 @@ public class GeneratedMethodComponentExecutor<M extends ComponentModel>
     return ec -> {
       Thread thread = Thread.currentThread();
       ClassLoader currentClassLoader = thread.getContextClassLoader();
-      final CompositeClassLoader compositeClassLoader = new CompositeClassLoader(extensionClassLoader, currentClassLoader);
+      final CompositeClassLoader compositeClassLoader = from(extensionClassLoader, currentClassLoader);
       setContextClassLoader(thread, currentClassLoader, compositeClassLoader);
       try {
         final Object[] resolved = getParameterValues(ec, method.getParameterTypes());

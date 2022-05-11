@@ -8,16 +8,21 @@
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static java.nio.file.Files.newBufferedWriter;
+import static java.util.Collections.singleton;
+
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.deployment.model.api.plugin.LoaderDescriber;
+import org.mule.runtime.deployment.model.internal.artifact.extension.MuleExtensionModelLoaderManager;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.plugin.LoaderDescriber;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -27,21 +32,27 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
+// TODO W-10928152: remove this test case when migrating to use the new extension model loading API.
 public class MuleExtensionModelLoaderManagerTestCase extends AbstractMuleTestCase {
 
   private static final String ID = "ID";
-  private LoaderDescriber loaderDescriber = new LoaderDescriber(ID);
+
+  @Rule
+  public MockitoRule mockitorule = MockitoJUnit.rule();
+
+  private final LoaderDescriber loaderDescriber = new LoaderDescriber(ID);
   @Mock
   private ArtifactClassLoader containerClassLoader;
   @Rule
@@ -68,9 +79,9 @@ public class MuleExtensionModelLoaderManagerTestCase extends AbstractMuleTestCas
   public void getExtensionModelLoaderRegistered() throws Exception {
     File serviceFolder = new File(temporaryFolder.newFolder("META-INF"), "services");
     assertThat(serviceFolder.mkdirs(), is(true));
-    File serviceFile = new File(serviceFolder, ExtensionModelLoader.class.getCanonicalName());
+    File serviceFile = new File(serviceFolder, ExtensionModelLoaderProvider.class.getCanonicalName());
     try (BufferedWriter writer = newBufferedWriter(Paths.get(serviceFile.toURI()))) {
-      writer.write(TestExtensionModelLoader.class.getName());
+      writer.write(TestExtensionModelLoaderProvider.class.getName());
       writer.newLine();
     }
     when(containerClassLoader.getClassLoader())
@@ -103,6 +114,14 @@ public class MuleExtensionModelLoaderManagerTestCase extends AbstractMuleTestCas
     @Override
     protected void declareExtension(ExtensionLoadingContext extensionLoadingContext) {}
 
+  }
+
+  public static class TestExtensionModelLoaderProvider implements ExtensionModelLoaderProvider {
+
+    @Override
+    public Set<ExtensionModelLoader> getExtensionModelLoaders() {
+      return singleton(new TestExtensionModelLoader());
+    }
   }
 
 }

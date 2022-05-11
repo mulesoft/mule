@@ -12,6 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
@@ -23,6 +24,7 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -36,15 +38,18 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import reactor.core.publisher.Mono;
 
-@RunWith(MockitoJUnitRunner.class)
 public class ProcessorChainExecutorTestCase extends AbstractMuleContextTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock(lenient = true)
   private MessageProcessorChain chain;
@@ -71,7 +76,8 @@ public class ProcessorChainExecutorTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void testDoProcessSuccessOnce() throws InterruptedException {
-    ImmutableProcessorChainExecutor chainExecutor = new ImmutableProcessorChainExecutor(coreEvent, chain);
+    ImmutableProcessorChainExecutor chainExecutor =
+        new ImmutableProcessorChainExecutor(mock(StreamingManager.class), coreEvent, chain);
 
     AtomicInteger successCalls = new AtomicInteger(0);
     AtomicInteger errorCalls = new AtomicInteger(0);
@@ -87,7 +93,8 @@ public class ProcessorChainExecutorTestCase extends AbstractMuleContextTestCase 
     final String ERROR_PAYLOAD = "ERROR_PAYLOAD";
     doReturn(error(new MessagingException(createStaticMessage(""),
                                           getEventBuilder().message(of(ERROR_PAYLOAD)).build()))).when(chain).apply(any());
-    ImmutableProcessorChainExecutor chainExecutor = new ImmutableProcessorChainExecutor(coreEvent, chain);
+    ImmutableProcessorChainExecutor chainExecutor =
+        new ImmutableProcessorChainExecutor(mock(StreamingManager.class), coreEvent, chain);
 
     AtomicInteger successCalls = new AtomicInteger(0);
     AtomicInteger errorCalls = new AtomicInteger(0);
@@ -108,7 +115,8 @@ public class ProcessorChainExecutorTestCase extends AbstractMuleContextTestCase 
   @Test
   public void testDoProcessOnErrorGenericException() throws InterruptedException {
     doReturn(error(new RuntimeException())).when(chain).apply(any());
-    ImmutableProcessorChainExecutor chainExecutor = new ImmutableProcessorChainExecutor(coreEvent, chain);
+    ImmutableProcessorChainExecutor chainExecutor =
+        new ImmutableProcessorChainExecutor(mock(StreamingManager.class), coreEvent, chain);
 
     AtomicInteger successCalls = new AtomicInteger(0);
     AtomicInteger errorCalls = new AtomicInteger(0);

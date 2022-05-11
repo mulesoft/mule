@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -30,7 +29,6 @@ public interface ImplicitConfigurationProviderFactory {
    * @param muleEvent                  the current {@link CoreEvent}
    * @param reflectionCache            the {@link ReflectionCache} used to improve reflection lookups performance
    * @param expressionManager          the {@link ExpressionManager} used to create a session used to evaluate the attributes.
-   * @param muleContext                the Mule node.
    *
    * @return a {@link ConfigurationProvider}
    * @throws IllegalStateException if it's not possible to create an implicit configuration automatically
@@ -39,6 +37,5 @@ public interface ImplicitConfigurationProviderFactory {
                                                             ConfigurationModel implicitConfigurationModel,
                                                             CoreEvent muleEvent,
                                                             ReflectionCache reflectionCache,
-                                                            ExpressionManager expressionManager,
-                                                            MuleContext muleContext);
+                                                            ExpressionManager expressionManager);
 }

@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.execution.deprecated;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -65,6 +64,6 @@ public final class ReactiveOperationExecutorFactory<T, M extends ComponentModel>
       }
     }
 
-    return new ReactiveMethodOperationExecutor(operationModel, operationMethod, delegate, NO_OP_INSTANCE);
+    return new ReactiveMethodOperationExecutor(operationModel, operationMethod, delegate);
   }
 }

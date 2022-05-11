@@ -117,8 +117,8 @@ public class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializable {
   }
 
   /**
-   * Creates a shallow copy of this instance. This is the recommended way of creating copy instances as this is optimized
-   * and usually much faster than using the {@link CaseInsensitiveHashMap#CaseInsensitiveHashMap(Map)} constructor.
+   * Creates a shallow copy of this instance. This is the recommended way of creating copy instances as this is optimized and
+   * usually much faster than using the {@link CaseInsensitiveHashMap#CaseInsensitiveHashMap(Map)} constructor.
    *
    * @return a shallow copy of {@code this} instance
    * @since 4.3.0

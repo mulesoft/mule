@@ -6,30 +6,12 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
-import org.apache.commons.lang3.NotImplementedException;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.mockito.stubbing.Answer;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.api.context.MuleContextBuilder;
-import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
-import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
-import org.mule.runtime.core.api.util.queue.QueueConfiguration;
-import org.mule.runtime.core.internal.util.journal.queue.MuleXid;
-import org.mule.runtime.core.internal.util.journal.queue.XaTxQueueTransactionJournal;
-import org.mule.runtime.core.internal.util.xa.XaTransactionRecoverer;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import javax.transaction.xa.XAResource;
-import javax.transaction.xa.Xid;
-import java.io.Serializable;
-import java.util.concurrent.locks.Lock;
+import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.sleep;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
@@ -41,6 +23,33 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
+import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
+import org.mule.runtime.core.api.util.queue.QueueConfiguration;
+import org.mule.runtime.core.internal.util.journal.queue.MuleXid;
+import org.mule.runtime.core.internal.util.journal.queue.XaTxQueueTransactionJournal;
+import org.mule.runtime.core.internal.util.xa.XaTransactionRecoverer;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.io.Serializable;
+import java.util.concurrent.locks.Lock;
+
+import javax.transaction.xa.XAResource;
+import javax.transaction.xa.Xid;
+
+import org.apache.commons.lang3.NotImplementedException;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
+import org.mockito.stubbing.Answer;
 
 public class XaQueueTransactionTestCase extends AbstractMuleContextTestCase {
 
@@ -60,6 +69,16 @@ public class XaQueueTransactionTestCase extends AbstractMuleContextTestCase {
   private PersistentXaTransactionContext persistentTransactionContext;
   private XaTransactionRecoverer xaTransactionRecoverer;
   private XaQueueTransactionContext localTxTransactionContext;
+
+  @Before
+  public void setUp() {
+    currentMuleContext.set(muleContext);
+  }
+
+  @After
+  public void teardown() {
+    currentMuleContext.set(null);
+  }
 
   @Override
   protected void doSetUp() throws Exception {

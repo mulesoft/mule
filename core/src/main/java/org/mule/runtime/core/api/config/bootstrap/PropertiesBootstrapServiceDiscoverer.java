@@ -7,12 +7,12 @@
 
 package org.mule.runtime.core.api.config.bootstrap;
 
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+
 import org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,17 +42,13 @@ public final class PropertiesBootstrapServiceDiscoverer implements BootstrapServ
 
   @Override
   public List<BootstrapService> discover() {
-    List<BootstrapService> propertiesServices = new LinkedList<>();
     try {
-      final List<Properties> discoveredProperties = registryBootstrapDiscoverer.discover();
-
-      propertiesServices.addAll(discoveredProperties.stream()
+      return registryBootstrapDiscoverer.discover().stream()
           .map(discoveredProperty -> new PropertiesBootstrapService(classLoader, discoveredProperty))
-          .collect(Collectors.toList()));
+          .collect(toList());
     } catch (BootstrapException e) {
       logger.error("Unable to discover bootstrap properties", e);
+      return emptyList();
     }
-
-    return propertiesServices;
   }
 }

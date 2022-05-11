@@ -2,7 +2,6 @@
 
 <xs:schema xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mulesoft.org/schema/mule/values" attributeFormDefault="unqualified" elementFormDefault="qualified">
   <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
-  <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"></xs:import>
   <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
   <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="value-with-required-param-config">
     <xs:complexType>
@@ -85,10 +84,72 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="chat-config">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractExtensionType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:string" use="required" name="name">
+            <xs:annotation>
+              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="chat-connection">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractConnectionProviderType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithJsonBodyParameterWithFieldType" substitutionGroup="mule:abstract-operator" name="with-json-body-parameter-with-field"></xs:element>
+  <xs:complexType name="WithJsonBodyParameterWithFieldType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="body"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithJsonBodyParameterWithMultiLevelFieldType" substitutionGroup="mule:abstract-operator" name="with-json-body-parameter-with-multi-level-field"></xs:element>
+  <xs:complexType name="WithJsonBodyParameterWithMultiLevelFieldType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="body"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="optional" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="config">
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="mule:abstractExtensionType">
+          <xs:annotation>
+            <xs:documentation>Default configuration</xs:documentation>
+          </xs:annotation>
           <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
@@ -179,6 +240,18 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="with-parameter-with-field-values-connection">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractConnectionProviderType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+          </xs:sequence>
+          <xs:attribute type="mule:expressionString" use="required" name="urlFormat"></xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
   <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="with-value-parameter-connection">
     <xs:complexType>
       <xs:complexContent>
@@ -187,6 +260,22 @@
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
           </xs:sequence>
           <xs:attribute type="mule:expressionString" use="required" name="channel"></xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="with-value-four-bound-acting-parameters-connection">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractConnectionProviderType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+          </xs:sequence>
+          <xs:attribute type="mule:expressionString" use="required" name="parameterWithValue"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="parameterOne"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="parameterTwo"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="parameterThree"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="parameterFour"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -266,6 +355,24 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="config-with-parameter-with-field-values-config">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractExtensionType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
+          </xs:sequence>
+          <xs:attribute type="mule:expressionString" use="required" name="securityHeaders"></xs:attribute>
+          <xs:attribute type="xs:string" use="required" name="name">
+            <xs:annotation>
+              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
   <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="config-with-value-config">
     <xs:complexType>
       <xs:complexContent>
@@ -302,8 +409,56 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="with-bound-value-parameter-config">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractExtensionType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
+          </xs:sequence>
+          <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="actingParameter"></xs:attribute>
+          <xs:attribute type="xs:string" use="required" name="name">
+            <xs:annotation>
+              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="xml-config">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractExtensionType">
+          <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+          <xs:attribute type="xs:string" use="required" name="name">
+            <xs:annotation>
+              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SimpleSourceType" substitutionGroup="mule:abstract-message-source" name="simple-source"></xs:element>
   <xs:complexType name="SimpleSourceType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="channel"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SimpleSourceWithParameterWithFieldValuesType" substitutionGroup="mule:abstract-message-source" name="simple-source-with-parameter-with-field-values"></xs:element>
+  <xs:complexType name="SimpleSourceWithParameterWithFieldValuesType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
         <xs:sequence minOccurs="0" maxOccurs="1">
@@ -326,6 +481,22 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="required" name="hasBeenStarted"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SourceWithMultiLevelFieldValuesType" substitutionGroup="mule:abstract-message-source" name="source-with-multi-level-field-values"></xs:element>
+  <xs:complexType name="SourceWithMultiLevelFieldValuesType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="xmlBodyTemplate"></xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
           <xs:annotation>
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
@@ -397,6 +568,24 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SourceWithTwoBoundActingParametersType" substitutionGroup="mule:abstract-message-source" name="source-with-two-bound-acting-parameters"></xs:element>
+  <xs:complexType name="SourceWithTwoBoundActingParametersType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="parameterWithValue"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="oneParameter"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="someParameter"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SourceWithValuesWithRequiredParameterInsideParamGroupType" substitutionGroup="mule:abstract-message-source" name="source-with-values-with-required-parameter-inside-param-group"></xs:element>
   <xs:complexType name="SourceWithValuesWithRequiredParameterInsideParamGroupType">
     <xs:complexContent>
@@ -445,6 +634,66 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ActingParameterWithReservedNameType" substitutionGroup="mule:abstract-operator" name="acting-parameter-with-reserved-name"></xs:element>
+  <xs:complexType name="ActingParameterWithReservedNameType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="AttributeAsActingForTagContentValueType" substitutionGroup="mule:abstract-operator" name="attribute-as-acting-for-tag-content-value"></xs:element>
+  <xs:complexType name="AttributeAsActingForTagContentValueType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="xml-body"></xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentTypedValuesInsideShowInDslGroupType" substitutionGroup="mule:abstract-operator" name="content-typed-values-inside-show-in-dsl-group"></xs:element>
+  <xs:complexType name="ContentTypedValuesInsideShowInDslGroupType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="content-typed-values-group">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                  <xs:sequence>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="typed-body"></xs:element>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+          <xs:annotation>
+            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
+          <xs:annotation>
+            <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MultiLevelValueType" substitutionGroup="mule:abstract-operator" name="multi-level-value"></xs:element>
   <xs:complexType name="MultiLevelValueType">
     <xs:complexContent>
@@ -454,6 +703,36 @@
         <xs:attribute type="mule:expressionString" use="optional" default="AMERICA" name="continent"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" default="USA" name="country"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" default="SFO" name="city"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ParameterWithMultilevelFieldValueType" substitutionGroup="mule:abstract-operator" name="parameter-with-multilevel-field-value"></xs:element>
+  <xs:complexType name="ParameterWithMultilevelFieldValueType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="body"></xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ParameterWithMultipleMultilevelFieldValueUsingSameProviderType" substitutionGroup="mule:abstract-operator" name="parameter-with-multiple-multilevel-field-value-using-same-provider"></xs:element>
+  <xs:complexType name="ParameterWithMultipleMultilevelFieldValueUsingSameProviderType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="body"></xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ParameterWithTwoFieldWithSameValuesType" substitutionGroup="mule:abstract-operator" name="parameter-with-two-field-with-same-values"></xs:element>
+  <xs:complexType name="ParameterWithTwoFieldWithSameValuesType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="body"></xs:element>
+        </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -496,6 +775,26 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SingleValuesEnabledParameterWithMoreThanOneFieldValuesType" substitutionGroup="mule:abstract-operator" name="single-values-enabled-parameter-with-more-than-one-field-values"></xs:element>
+  <xs:complexType name="SingleValuesEnabledParameterWithMoreThanOneFieldValuesType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="body"></xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SingleValuesEnabledParameterWithOneFieldValuesType" substitutionGroup="mule:abstract-operator" name="single-values-enabled-parameter-with-one-field-values"></xs:element>
+  <xs:complexType name="SingleValuesEnabledParameterWithOneFieldValuesType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="body"></xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SingleValuesEnabledParameterWithRequiredParametersType" substitutionGroup="mule:abstract-operator" name="single-values-enabled-parameter-with-required-parameters"></xs:element>
   <xs:complexType name="SingleValuesEnabledParameterWithRequiredParametersType">
     <xs:complexContent>
@@ -531,6 +830,26 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TagContentAsActingForAttributeValueType" substitutionGroup="mule:abstract-operator" name="tag-content-as-acting-for-attribute-value"></xs:element>
+  <xs:complexType name="TagContentAsActingForAttributeValueType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="xml-body"></xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TextAsActingForAttributeValueType" substitutionGroup="mule:abstract-operator" name="text-as-acting-for-attribute-value"></xs:element>
+  <xs:complexType name="TextAsActingForAttributeValueType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="xml-body"></xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ValuesInsideShowInDslGroupType" substitutionGroup="mule:abstract-operator" name="values-inside-show-in-dsl-group"></xs:element>
   <xs:complexType name="ValuesInsideShowInDslGroupType">
     <xs:complexContent>
@@ -549,6 +868,128 @@
           </xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="values"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithBoundActingParameterType" substitutionGroup="mule:abstract-operator" name="with-bound-acting-parameter"></xs:element>
+  <xs:complexType name="WithBoundActingParameterType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="actingParameter"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithBoundActingParameterArrayType" substitutionGroup="mule:abstract-operator" name="with-bound-acting-parameter-array"></xs:element>
+  <xs:complexType name="WithBoundActingParameterArrayType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="actingParameter"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithBoundActingParameterEnumType" substitutionGroup="mule:abstract-operator" name="with-bound-acting-parameter-enum"></xs:element>
+  <xs:complexType name="WithBoundActingParameterEnumType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="actingParameter"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithBoundActingParameterFieldType" substitutionGroup="mule:abstract-operator" name="with-bound-acting-parameter-field"></xs:element>
+  <xs:complexType name="WithBoundActingParameterFieldType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="actingParameter"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithBoundActingParameterFieldWithDotType" substitutionGroup="mule:abstract-operator" name="with-bound-acting-parameter-field-with-dot"></xs:element>
+  <xs:complexType name="WithBoundActingParameterFieldWithDotType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="actingParameter"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithBoundActingParameterFromContentFieldType" substitutionGroup="mule:abstract-operator" name="with-bound-acting-parameter-from-content-field"></xs:element>
+  <xs:complexType name="WithBoundActingParameterFromContentFieldType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="body"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithBoundActingParameterFromXmlContentFieldType" substitutionGroup="mule:abstract-operator" name="with-bound-acting-parameter-from-xml-content-field"></xs:element>
+  <xs:complexType name="WithBoundActingParameterFromXmlContentFieldType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="xml-body"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithBoundActingParameterToXmlTagAttributeType" substitutionGroup="mule:abstract-operator" name="with-bound-acting-parameter-to-xml-tag-attribute"></xs:element>
+  <xs:complexType name="WithBoundActingParameterToXmlTagAttributeType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="actingParameter"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithBoundActingParameterToXmlTagContentType" substitutionGroup="mule:abstract-operator" name="with-bound-acting-parameter-to-xml-tag-content"></xs:element>
+  <xs:complexType name="WithBoundActingParameterToXmlTagContentType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="actingParameter"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithBoundActingParameterWithAliasType" substitutionGroup="mule:abstract-operator" name="with-bound-acting-parameter-with-alias"></xs:element>
+  <xs:complexType name="WithBoundActingParameterWithAliasType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterAlias"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithBoundOptionalActingParameterType" substitutionGroup="mule:abstract-operator" name="with-bound-optional-acting-parameter"></xs:element>
+  <xs:complexType name="WithBoundOptionalActingParameterType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="actingParameter"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithBoundOptionalActingParameterFieldType" substitutionGroup="mule:abstract-operator" name="with-bound-optional-acting-parameter-field"></xs:element>
+  <xs:complexType name="WithBoundOptionalActingParameterFieldType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="actingParameter"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -690,6 +1131,26 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithFourBoundActingParametersType" substitutionGroup="mule:abstract-operator" name="with-four-bound-acting-parameters"></xs:element>
+  <xs:complexType name="WithFourBoundActingParametersType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="actingParameter"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithMapBoundActingParameterType" substitutionGroup="mule:abstract-operator" name="with-map-bound-acting-parameter"></xs:element>
+  <xs:complexType name="WithMapBoundActingParameterType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="actingParameter"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithOptionalParameterType" substitutionGroup="mule:abstract-operator" name="with-optional-parameter"></xs:element>
   <xs:complexType name="WithOptionalParameterType">
     <xs:complexContent>
@@ -717,6 +1178,44 @@
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="providedParameters"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" default="OPERATION_DEFAULT_VALUE" name="optionalValue"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithPojoBoundActingParameterType" substitutionGroup="mule:abstract-operator" name="with-pojo-bound-acting-parameter"></xs:element>
+  <xs:complexType name="WithPojoBoundActingParameterType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="actingParameter"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithPojoFieldBoundActingParameterFieldType" substitutionGroup="mule:abstract-operator" name="with-pojo-field-bound-acting-parameter-field"></xs:element>
+  <xs:complexType name="WithPojoFieldBoundActingParameterFieldType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="acting-parameter">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="actingParameter"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="org.mule.test.values.extension.MyPojo">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+        <xs:attribute type="mule:expressionBoolean" use="optional" name="pojoBoolean"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="pojoId"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="pojoName"></xs:attribute>
+        <xs:attribute type="mule:expressionInt" use="optional" name="pojoNumber"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -760,6 +1259,28 @@
         <xs:attribute type="mule:expressionString" use="required" name="providedParameters"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="required" name="requiredValue"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="required" name="optionalValue"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithTwoActingParametersType" substitutionGroup="mule:abstract-operator" name="with-two-acting-parameters"></xs:element>
+  <xs:complexType name="WithTwoActingParametersType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="scalarActingParameter"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="actingParameter"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithTwoBoundActingParametersType" substitutionGroup="mule:abstract-operator" name="with-two-bound-acting-parameters"></xs:element>
+  <xs:complexType name="WithTwoBoundActingParametersType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="parameterWithValues"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="anotherParameter"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="actingParameter"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

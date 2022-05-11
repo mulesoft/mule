@@ -26,8 +26,8 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * {@link ParameterValueResolver} implementation for Object based components, like {@link Source sources}, configurations
- * and {@link ConnectionProvider connection providers}
+ * {@link ParameterValueResolver} implementation for Object based components, like {@link Source sources}, configurations and
+ * {@link ConnectionProvider connection providers}
  *
  * @since 4.0
  */
@@ -65,7 +65,7 @@ public class ObjectBasedParameterValueResolver implements ParameterValueResolver
             if (desiredField.isPresent()) {
               return getFieldValue(parameterGroup, parameterName, reflectionCache);
             }
-            if (parameterGroupModel.isShowInDsl() && parameterGroupModel.getName().equals(parameterName)) {
+            if (parameterGroupModel.getName().equals(parameterName)) {
               returnValue = parameterGroup;
             }
           }

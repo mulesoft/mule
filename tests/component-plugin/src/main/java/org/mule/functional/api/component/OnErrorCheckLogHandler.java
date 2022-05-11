@@ -6,13 +6,16 @@
  */
 package org.mule.functional.api.component;
 
-import static java.util.Collections.singletonList;
-import static org.junit.Assert.fail;
 import static org.mule.tck.processor.FlowAssert.addAssertion;
+
+import static java.util.Collections.singletonList;
+
+import static org.junit.Assert.fail;
+
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
@@ -23,28 +26,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Flux;
 
 public class OnErrorCheckLogHandler extends TemplateOnErrorHandler
     implements MessagingExceptionHandlerAcceptor, FlowAssertion {
 
-  private List<LogChecker> checkers = new ArrayList<>();
+  private final List<LogChecker> checkers = new ArrayList<>();
   private StringBuilder errors;
   private boolean propagate = false;
   private boolean succeedIfNoLog = false;
 
-  //Flag to check if doLogException() was actually called. Since all the logic of the checkers is executed in that method,
-  //if it's not called, we will never fail, even if we should've.
+  // Flag to check if doLogException() was actually called. Since all the logic of the checkers is executed in that method,
+  // if it's not called, we will never fail, even if we should've.
   private boolean exceptionLogged = false;
 
-  //Flag to check if there was actually and exception handled.
+  // Flag to check if there was actually and exception handled.
   private boolean handledException = false;
 
   @Override
-  protected void doInitialise(MuleContext muleContext) throws InitialisationException {
+  protected void doInitialise() throws InitialisationException {
     // Add a dummy processor to force the routing logic into the execution chain
     setMessageProcessors(singletonList(event -> event));
-    super.doInitialise(muleContext);
+    super.doInitialise();
   }
 
   @Override
@@ -75,22 +79,27 @@ public class OnErrorCheckLogHandler extends TemplateOnErrorHandler
     cpy.setHandleException(this.handleException);
     cpy.setErrorType(this.errorType);
     cpy.setMessageProcessors(this.getMessageProcessors());
-    cpy.setEnableNotifications(this.isEnableNotifications());
-    cpy.setLogException(this.logException);
-    cpy.setNotificationFirer(this.notificationFirer);
+    cpy.setExceptionListener(this.getExceptionListener());
     cpy.setAnnotations(this.getAnnotations());
     return cpy;
   }
 
   @Override
-  protected void doLogException(String message, Throwable t) {
-    exceptionLogged = true;
+  protected boolean logException(Throwable t, CoreEvent event) {
+    Pair<MuleException, String> resolvedException = getExceptionListener().resolveExceptionAndMessageToLog(t);
     for (LogChecker checker : this.checkers) {
       try {
-        checker.check(message);
+        checker.check(resolvedException.getSecond());
       } catch (AssertionError e) {
         errors.append(e.getMessage());
       }
+    }
+
+    if (super.logException(t, event)) {
+      exceptionLogged = true;
+      return true;
+    } else {
+      return false;
     }
   }
 

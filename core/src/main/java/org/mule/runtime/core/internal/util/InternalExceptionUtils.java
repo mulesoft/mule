@@ -38,9 +38,9 @@ public final class InternalExceptionUtils {
    * Create new {@link CoreEvent} with {@link org.mule.runtime.api.message.Error} instance set.
    *
    * @param currentEvent event when error occurred.
-   * @param obj message processor/source.
-   * @param me messaging exception.
-   * @param locator the mule context.
+   * @param obj          message processor/source.
+   * @param me           messaging exception.
+   * @param locator      the mule context.
    * @return new {@link CoreEvent} with relevant {@link org.mule.runtime.api.message.Error} set.
    */
   public static CoreEvent createErrorEvent(CoreEvent currentEvent, Component obj,
@@ -73,8 +73,8 @@ public final class InternalExceptionUtils {
    * Determine the {@link ErrorType} of a given exception thrown by a given message processor.
    *
    * @param currentError the currently resolved error type.
-   * @param cause the exception thrown.
-   * @param locator the {@link ErrorTypeLocator}.
+   * @param cause        the exception thrown.
+   * @param locator      the {@link ErrorTypeLocator}.
    * @return the resolved {@link ErrorType}
    */
   public static Error getErrorFromFailingProcessor(ErrorType currentError,

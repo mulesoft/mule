@@ -36,8 +36,8 @@ public final class ResolverSupplier<T extends NamedTypeResolver> implements Supp
   /**
    * Creates a new {@link Supplier} instance, which will return instances of the given {@link Class}.
    * </p>
-   * If the given {@link Class} is a {@link NullMetadataResolver}, the supplier will return
-   * a {@link NullMetadataResolverSupplier}.
+   * If the given {@link Class} is a {@link NullMetadataResolver}, the supplier will return a
+   * {@link NullMetadataResolverSupplier}.
    *
    * @param aClass The from which the {@link Supplier} will create instances
    * @param <T>    The {@link Class} type

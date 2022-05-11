@@ -14,8 +14,8 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import java.util.Properties;
 
 /**
- * Extends deployment properties to provide more context when resolving the {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel} for
- * plugins.
+ * Extends deployment properties to provide more context when resolving the
+ * {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel} for plugins.
  *
  * @since 4.2.0
  */
@@ -25,11 +25,11 @@ public class PluginExtendedDeploymentProperties extends ExtendedDeploymentProper
   private final ArtifactDescriptor deployableArtifactDescriptor;
 
   /**
-   * Plugin extended deployment properties which also provides the {@link ArtifactDescriptor} where the plugin has
-   * been declared as dependency.
+   * Plugin extended deployment properties which also provides the {@link ArtifactDescriptor} where the plugin has been declared
+   * as dependency.
    *
-   * @param deploymentProperties the original properties passed from deployment service. Can be null.
-   * @param pluginBundleDescriptor the plugin bundle descriptor resolved from the deployable artifact descriptor. Not null.
+   * @param deploymentProperties         the original properties passed from deployment service. Can be null.
+   * @param pluginBundleDescriptor       the plugin bundle descriptor resolved from the deployable artifact descriptor. Not null.
    * @param deployableArtifactDescriptor the container in which the plugin is declared as dependency. Not null.
    */
   public PluginExtendedDeploymentProperties(Properties deploymentProperties,

@@ -6,6 +6,7 @@
  */
 package org.mule.tck.testmodels.mule;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
@@ -50,7 +51,8 @@ public class TestExceptionStrategy implements FlowExceptionHandler, SystemExcept
     this.testProperty = testProperty;
   }
 
-  public CoreEvent handleException(Exception exception, CoreEvent event, RollbackSourceCallback rollbackMethod) {
+  public CoreEvent handleException(Exception exception, CoreEvent event, RollbackSourceCallback rollbackMethod,
+                                   ComponentLocation componentLocation) {
     ExceptionCallback callback = null;
     synchronized (callbackLock) {
       if (this.callback != null) {
@@ -74,17 +76,17 @@ public class TestExceptionStrategy implements FlowExceptionHandler, SystemExcept
 
   @Override
   public CoreEvent handleException(Exception exception, CoreEvent event) {
-    return handleException(exception, event, null);
+    return handleException(exception, event, null, null);
   }
 
   @Override
   public void handleException(Exception exception, RollbackSourceCallback rollbackMethod) {
-    handleException(exception, null, rollbackMethod);
+    handleException(exception, null, rollbackMethod, null);
   }
 
   @Override
   public void handleException(Exception exception) {
-    handleException(exception, null, null);
+    handleException(exception, null, null, null);
   }
 
   public interface ExceptionCallback {

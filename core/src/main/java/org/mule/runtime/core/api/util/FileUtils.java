@@ -6,12 +6,17 @@
  */
 package org.mule.runtime.core.api.util;
 
-import static java.lang.System.getProperty;
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.internal.util.FilenameUtils.normalizeDecodedPath;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Collections.emptyList;
+
+import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.io.IOUtils.copy;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.compression.InvalidZipFileException;
 
@@ -33,15 +38,18 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.channels.Channel;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.Random;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -57,19 +65,7 @@ import org.slf4j.LoggerFactory;
 public class FileUtils {
 
   private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
-  private static final String TEMP_DIR_SYSTEM_PROPERTY = "java.io.tmpdir";
-  private static final File TEMP_DIR = new File(getProperty(TEMP_DIR_SYSTEM_PROPERTY));
-  private static final Random random = new Random();
-
-  public static String DEFAULT_ENCODING = "UTF-8";
-
-  static {
-    if (!TEMP_DIR.exists()) {
-      throw new MuleRuntimeException(createStaticMessage("Temp directory '" + TEMP_DIR.getAbsolutePath() + "' does not exist. "
-          + "Please check the value of the '" + TEMP_DIR_SYSTEM_PROPERTY
-          + "' system property."));
-    }
-  }
+  public static String DEFAULT_ENCODING = UTF_8.name();
 
   public static synchronized void copyStreamToFile(InputStream input, File destination) throws IOException {
     if (destination.exists() && !destination.canWrite()) {
@@ -138,7 +134,7 @@ public class FileUtils {
    * Reads the incoming String into a file at at the given destination.
    *
    * @param filename name and path of the file to create
-   * @param data the contents of the file
+   * @param data     the contents of the file
    * @return the new file.
    * @throws IOException If the creating or writing to the file stream fails
    */
@@ -154,16 +150,10 @@ public class FileUtils {
   // TODO Document me!
   public static synchronized File stringToFile(String filename, String data, boolean append, boolean newLine) throws IOException {
     File f = createFile(filename);
-    BufferedWriter writer = null;
-    try {
-      writer = new BufferedWriter(new FileWriter(f, append));
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(f, append))) {
       writer.write(data);
       if (newLine) {
         writer.newLine();
-      }
-    } finally {
-      if (writer != null) {
-        writer.close();
       }
     }
     return f;
@@ -192,25 +182,18 @@ public class FileUtils {
   /**
    * Remove from uri to file prefix file:/ Add if need file separator to begin
    *
-   * @param url file uri to resource
+   * @param url      file uri to resource
    * @param encoding - Java encoding names
    * @return normalized file path
    * @throws UnsupportedEncodingException if encoding is unknown
    */
   public static String normalizeFilePath(URL url, String encoding) throws UnsupportedEncodingException {
     String resource = URLDecoder.decode(url.toExternalForm(), encoding);
-    if (resource != null) {
-      if (resource.startsWith("file:/")) {
-        resource = resource.substring(6);
-
-        if (!IS_OS_WINDOWS && !resource.startsWith(File.separator)) {
-          resource = File.separator + resource;
-        }
-      }
+    if (logger.isDebugEnabled()) {
+      logger.debug("Decoded URL: '{}'", resource);
     }
-    return resource;
+    return normalizeDecodedPath(resource, IS_OS_WINDOWS);
   }
-
 
   /**
    * Delete a file tree recursively.
@@ -227,7 +210,7 @@ public class FileUtils {
    * case when a transaction manager asynchronously handles the recovery log, and the test wipes out everything, leaving the
    * transaction manager puzzled.
    *
-   * @param dir dir to wipe out
+   * @param dir                  dir to wipe out
    * @param topLevelDirsToIgnore which top-level directories to ignore, if null or empty then ignored
    * @return false when the first unsuccessful attempt encountered
    */
@@ -264,7 +247,7 @@ public class FileUtils {
    * Unzip the specified archive to the given directory. Equivalent to invoking {@link #unzip(File, File, boolean)} with a
    * {@code true} value for the {@code verify} parameter
    *
-   * @param archive the archive to be unzipped
+   * @param archive   the archive to be unzipped
    * @param directory the target directory
    */
   public static void unzip(File archive, File directory) throws IOException {
@@ -274,9 +257,9 @@ public class FileUtils {
   /**
    * Unzip the specified {@code archive} to the given {@code directory}.
    *
-   * @param archive the archive to be unzipped
+   * @param archive   the archive to be unzipped
    * @param directory the target directory
-   * @param verify whether to verify all entries before extractions
+   * @param verify    whether to verify all entries before extractions
    */
   public static void unzip(File archive, File directory, boolean verify) throws IOException {
     ZipFile zip = null;
@@ -298,8 +281,8 @@ public class FileUtils {
         verifyZipFilePaths(zip);
       }
 
-      for (Enumeration entries = zip.entries(); entries.hasMoreElements();) {
-        ZipEntry entry = (ZipEntry) entries.nextElement();
+      for (Enumeration<? extends ZipEntry> entries = zip.entries(); entries.hasMoreElements();) {
+        ZipEntry entry = entries.nextElement();
         File f = FileUtils.newFile(directory, entry.getName());
         if (entry.isDirectory()) {
           if (!f.exists() && !f.mkdirs()) {
@@ -326,17 +309,108 @@ public class FileUtils {
   }
 
   public static void verifyZipFilePaths(ZipFile zip) throws InvalidZipFileException {
-    for (Enumeration entries = zip.entries(); entries.hasMoreElements();) {
-      ZipEntry entry = (ZipEntry) entries.nextElement();
+    for (Enumeration<? extends ZipEntry> entries = zip.entries(); entries.hasMoreElements();) {
+      verifyZipEntryPath(entries.nextElement());
+    }
+  }
 
-      Path namePath = Paths.get(entry.getName());
-      if (namePath.getRoot() != null) {
-        // According to .ZIP File Format Specification (Section 4.4.17), the path can not be absolute
-        throw new InvalidZipFileException("Absolute paths are not allowed: " + namePath.toString());
-      } else if (namePath.normalize().toString().startsWith("..")) {
-        // Not specified, but presents a security risk (allows overwriting external files)
-        throw new InvalidZipFileException("External paths are not allowed: " + namePath.toString());
+  public static void verifyZipEntryPath(ZipEntry entry) throws InvalidZipFileException {
+    Path namePath = Paths.get(entry.getName());
+    if (namePath.getRoot() != null) {
+      // According to .ZIP File Format Specification (Section 4.4.17), the path can not be absolute
+      throw new InvalidZipFileException("Absolute paths are not allowed: " + namePath.toString());
+    } else if (namePath.normalize().toString().startsWith("..")) {
+      // Not specified, but presents a security risk (allows overwriting external files)
+      throw new InvalidZipFileException("External paths are not allowed: " + namePath.toString());
+    }
+  }
+
+  /**
+   * Unzip the specified archive to the given directory. Equivalent to invoking {@link #unzip(InputStream, File, boolean)} with a
+   * {@code true} value for the {@code verify} parameter
+   *
+   * @param archive   the contents of the archive to be unzipped
+   * @param directory the target directory
+   */
+  public static void unzip(InputStream archive, File directory) throws IOException {
+    unzip(archive, directory, true);
+  }
+
+  /**
+   * Unzip the specified {@code archive} to the given {@code directory}.
+   *
+   * @param archive   the contents of the archive to be unzipped
+   * @param directory the target directory
+   * @param verify    whether to verify all entries before extractions
+   */
+  public static void unzip(InputStream archive, File directory, boolean verify) throws IOException {
+    unzip(archive, directory, verify, true);
+  }
+
+  /**
+   * Unzip the specified {@code archive} to the given {@code directory}.
+   *
+   * @param archive          the contents of the archive to be unzipped
+   * @param directory        the target directory
+   * @param verify           whether to verify all entries before extractions
+   * @param cleanUpOnFailure whether to remove all generated files on an error. Only use this if {@code directory} is a temporary
+   *                         folder.
+   */
+  public static void unzip(InputStream archive, File directory, boolean verify, boolean cleanUpOnFailure) throws IOException {
+    if (directory.exists()) {
+      if (!directory.isDirectory()) {
+        throw new IOException("Directory is not a directory: " + directory);
       }
+    } else {
+      if (!directory.mkdirs()) {
+        throw new IOException("Could not create directory: " + directory);
+      }
+    }
+
+    List<File> createdFiles;
+    if (cleanUpOnFailure) {
+      createdFiles = new ArrayList<>();
+    } else {
+      createdFiles = emptyList();
+    }
+    try (ZipInputStream zis = new ZipInputStream(archive)) {
+      ZipEntry entry;
+      while ((entry = zis.getNextEntry()) != null) {
+        if (verify) {
+          verifyZipEntryPath(entry);
+        }
+
+        File file = newFile(directory, entry.getName());
+
+        if (entry.isDirectory()) {
+          if (!file.exists() && !file.mkdirs()) {
+            throw new IOException("Could not create directory: " + file);
+          }
+        } else {
+          if (!file.getParentFile().exists() && !file.getParentFile().mkdirs()) {
+            throw new IOException("Unable to create folders for zip entry: " + entry.getName());
+          }
+
+          OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
+          try {
+            copy(zis, os);
+          } finally {
+            IOUtils.closeQuietly(os);
+          }
+        }
+
+        if (cleanUpOnFailure) {
+          createdFiles.add(file);
+        }
+      }
+    } catch (Exception e) {
+      // Remove everything that was created in the file system before failing, then rethrow.
+      for (File createdFile : createdFiles) {
+        deleteQuietly(createdFile);
+      }
+
+      throw e;
+
     }
   }
 
@@ -409,11 +483,11 @@ public class FileUtils {
   /**
    * Extract the specified resource to the given directory for remain all directory struct
    *
-   * @param resourceName - full resource name
-   * @param callingClass - classloader for this class is used
-   * @param outputDir - extract to this directory
+   * @param resourceName        - full resource name
+   * @param callingClass        - classloader for this class is used
+   * @param outputDir           - extract to this directory
    * @param keepParentDirectory true - full structure of directories is kept; false - file - removed all directories, directory -
-   *        started from resource point
+   *                            started from resource point
    * @throws IOException if any errors
    */
   public static void extractResources(String resourceName, Class callingClass, File outputDir, boolean keepParentDirectory)
@@ -430,11 +504,11 @@ public class FileUtils {
   /**
    * Extract resources contain in file
    *
-   * @param path - path to file
-   * @param outputDir Directory for unpack resources
+   * @param path                - path to file
+   * @param outputDir           Directory for unpack resources
    * @param resourceName
    * @param keepParentDirectory true - full structure of directories is kept; false - file - removed all directories, directory -
-   *        started from resource point
+   *                            started from resource point
    * @throws IOException if any error
    */
   private static void extractFileResources(String path, File outputDir, String resourceName, boolean keepParentDirectory)
@@ -467,22 +541,22 @@ public class FileUtils {
   /**
    * Extract recources contain if jar (have to in classpath)
    *
-   * @param connection JarURLConnection to jar library
-   * @param outputDir Directory for unpack recources
+   * @param connection          JarURLConnection to jar library
+   * @param outputDir           Directory for unpack recources
    * @param keepParentDirectory true - full structure of directories is kept; false - file - removed all directories, directory -
-   *        started from resource point
+   *                            started from resource point
    * @throws IOException if any error
    */
   private static void extractJarResources(JarURLConnection connection, File outputDir, boolean keepParentDirectory)
       throws IOException {
     try (JarFile jarFile = connection.getJarFile()) {
       JarEntry jarResource = connection.getJarEntry();
-      Enumeration entries = jarFile.entries();
+      Enumeration<JarEntry> entries = jarFile.entries();
       InputStream inputStream = null;
       OutputStream outputStream = null;
       int jarResourceNameLenght = jarResource.getName().length();
       for (; entries.hasMoreElements();) {
-        JarEntry entry = (JarEntry) entries.nextElement();
+        JarEntry entry = entries.nextElement();
         if (entry.getName().startsWith(jarResource.getName())) {
 
           String path = outputDir.getPath() + File.separator + entry.getName();
@@ -679,12 +753,12 @@ public class FileUtils {
    * This method copies the contents of the specified source file to the specified destination file. The directory holding the
    * destination file is created if it does not exist. If the destination file exists, then this method will overwrite it.
    *
-   * @param srcFile an existing file to copy, must not be <code>null</code>
-   * @param destFile the new file, must not be <code>null</code>
+   * @param srcFile          an existing file to copy, must not be <code>null</code>
+   * @param destFile         the new file, must not be <code>null</code>
    * @param preserveFileDate true if the file date of the copy should be the same as the original
    * @throws NullPointerException if source or destination is <code>null</code>
-   * @throws IOException if source or destination is invalid
-   * @throws IOException if an IO error occurs during copying
+   * @throws IOException          if source or destination is invalid
+   * @throws IOException          if an IO error occurs during copying
    * @see org.apache.commons.io.FileUtils#copyFileToDirectory(File, File, boolean)
    */
   public static void copyFile(File srcFile, File destFile, boolean preserveFileDate) throws IOException {
@@ -717,8 +791,8 @@ public class FileUtils {
   /**
    * Internal copy file method.
    *
-   * @param srcFile the validated source file, must not be <code>null</code>
-   * @param destFile the validated destination file, must not be <code>null</code>
+   * @param srcFile          the validated source file, must not be <code>null</code>
+   * @param destFile         the validated destination file, must not be <code>null</code>
    * @param preserveFileDate whether to preserve the file date
    * @throws IOException if an error occurs
    */
@@ -727,16 +801,12 @@ public class FileUtils {
       throw new IOException("Destination '" + destFile + "' exists but is a directory");
     }
 
-    FileChannel input = new FileInputStream(srcFile).getChannel();
-    try {
-      FileChannel output = new FileOutputStream(destFile).getChannel();
-      try {
+    try (FileInputStream fileInputStream = new FileInputStream(srcFile);
+        FileChannel input = fileInputStream.getChannel()) {
+      try (FileOutputStream fileOutputStream = new FileOutputStream(destFile);
+          FileChannel output = fileOutputStream.getChannel()) {
         output.transferFrom(input, 0, input.size());
-      } finally {
-        closeQuietly(output);
       }
-    } finally {
-      closeQuietly(input);
     }
 
     if (srcFile.length() != destFile.length()) {
@@ -787,7 +857,7 @@ public class FileUtils {
       }
     }, true);
 
-    return isEmpty(files) ? null : files.iterator().next();
+    return files.isEmpty() ? null : files.iterator().next();
   }
 
   /**
@@ -797,9 +867,16 @@ public class FileUtils {
    * @param suffix the file's suffix
    * @return a {@link File}
    * @throws RuntimeException
+   * 
+   * @deprecated Use {@link Files#createTempFile(String, String, java.nio.file.attribute.FileAttribute...)} instead.
    */
+  @Deprecated
   public static File createTempFile(String prefix, String suffix) {
-    return new File(TEMP_DIR, prefix + random.nextLong() + suffix);
+    try {
+      return Files.createTempFile(prefix, suffix).toFile();
+    } catch (IOException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
   private FileUtils() {}

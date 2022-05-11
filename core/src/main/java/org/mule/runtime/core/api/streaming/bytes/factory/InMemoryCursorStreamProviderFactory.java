@@ -19,8 +19,8 @@ import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider;
 import java.io.InputStream;
 
 /**
- * An implementation of {@link AbstractCursorStreamProviderFactory} which always
- * generates instances of {@link InMemoryCursorStreamProvider}
+ * An implementation of {@link AbstractCursorStreamProviderFactory} which always generates instances of
+ * {@link InMemoryCursorStreamProvider}
  *
  * @see InMemoryCursorStreamProvider
  * @since 4.0
@@ -33,8 +33,8 @@ public class InMemoryCursorStreamProviderFactory extends AbstractCursorStreamPro
   /**
    * Creates a new instance
    *
-   * @param config           the config for the generated providers
-   * @param bufferManager    the {@link ByteBufferManager} that will be used to allocate all buffers
+   * @param config        the config for the generated providers
+   * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
    */
   public InMemoryCursorStreamProviderFactory(ByteBufferManager bufferManager,
                                              InMemoryCursorStreamConfig config,

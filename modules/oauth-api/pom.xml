@@ -4,13 +4,13 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.4.0-SNAPSHOT</version>
+        <version>4.5.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-service-oauth-api</artifactId>
     
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <muleOAuthClientVersion>1.0.0-SNAPSHOT</muleOAuthClientVersion>
+        <muleOAuthClientVersion>1.1.0-SNAPSHOT</muleOAuthClientVersion>
     </properties>
 
     <dependencies>

@@ -47,12 +47,16 @@ import org.mule.runtime.api.notification.SecurityNotificationListener;
 import org.mule.runtime.api.notification.TransactionNotification;
 import org.mule.runtime.api.notification.TransactionNotificationListener;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.context.notification.Configuration;
 import org.mule.runtime.core.internal.context.notification.Policy;
+import org.mule.runtime.core.internal.profiling.notification.ProfilingNotificationListener;
+import org.mule.runtime.core.internal.profiling.notification.ProfilingNotification;
 import org.mule.runtime.core.privileged.context.notification.OptimisedNotificationHandler;
 
 import java.util.Collection;
@@ -100,18 +104,22 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
   private final AtomicInteger activeFires = new AtomicInteger();
   private final AtomicBoolean disposed = new AtomicBoolean(false);
   private final Latch disposeLatch = new Latch();
-  private MuleContext muleContext;
   private Scheduler notificationsLiteScheduler;
   private Scheduler notificationsIoScheduler;
+  private MuleContext muleContext;
+  private LazyValue<String> serverId = new LazyValue<>(() -> muleContext.getId());
+  private LazyValue<SchedulerService> schedulerService = new LazyValue<>(() -> muleContext.getSchedulerService());
+
+  public ServerNotificationManager() {}
+
+  public ServerNotificationManager(LazyValue<SchedulerService> schedulerService, LazyValue<String> serverId) {
+    this.schedulerService = schedulerService;
+    this.serverId = serverId;
+  }
 
   @Override
   public boolean isNotificationDynamic() {
     return dynamic;
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    muleContext = context;
   }
 
   public void setNotificationDynamic(boolean dynamic) {
@@ -123,8 +131,8 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
    * object to send notifications.
    */
   public void initialise() throws InitialisationException {
-    notificationsLiteScheduler = muleContext.getSchedulerService().cpuLightScheduler();
-    notificationsIoScheduler = muleContext.getSchedulerService().ioScheduler();
+    notificationsLiteScheduler = schedulerService.get().cpuLightScheduler();
+    notificationsIoScheduler = schedulerService.get().ioScheduler();
   }
 
   public void addInterfaceToType(Class<? extends NotificationListener> iface,
@@ -190,7 +198,7 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
     activeFires.incrementAndGet();
     try {
       if (notification instanceof AbstractServerNotification) {
-        ((AbstractServerNotification) notification).setServerId(muleContext.getId());
+        ((AbstractServerNotification) notification).setServerId(serverId.get());
       }
       if (notification.isSynchronous()) {
         notifyListeners(notification, (listener, nfn) -> listener.onNotification(nfn));
@@ -292,7 +300,15 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
    * @return a {@link ServerNotificationManager} with the default configuration for Mule notifications
    */
   public static ServerNotificationManager createDefaultNotificationManager() {
-    ServerNotificationManager manager = new ServerNotificationManager();
+    return registerNotifications(new ServerNotificationManager());
+  }
+
+  public static ServerNotificationManager createDefaultNotificationManager(LazyValue<SchedulerService> schedulerService,
+                                                                           LazyValue<String> serverId) {
+    return registerNotifications(new ServerNotificationManager(schedulerService, serverId));
+  }
+
+  private static ServerNotificationManager registerNotifications(ServerNotificationManager manager) {
     manager.addInterfaceToType(MuleContextNotificationListener.class, MuleContextNotification.class);
     manager.addInterfaceToType(RoutingNotificationListener.class, RoutingNotification.class);
     manager.addInterfaceToType(SecurityNotificationListener.class, SecurityNotification.class);
@@ -309,7 +325,12 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
     manager.addInterfaceToType(ConnectorMessageNotificationListener.class, ConnectorMessageNotification.class);
     manager.addInterfaceToType(FlowConstructNotificationListener.class, FlowConstructNotification.class);
     manager.addInterfaceToType(ExtensionNotificationListener.class, ExtensionNotification.class);
-
+    manager.addInterfaceToType(ProfilingNotificationListener.class, ProfilingNotification.class);
     return manager;
+  }
+
+  @Override
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
   }
 }

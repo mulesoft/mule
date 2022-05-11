@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.config;
 
+import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 
@@ -17,6 +18,6 @@ public interface ParentMuleContextAwareConfigurationBuilder extends Configuratio
   /**
    * @param parentContext MuleContext of the domain.
    */
-  void setParentContext(MuleContext parentContext);
+  void setParentContext(MuleContext parentContext, ArtifactAst parentAst);
 
 }

@@ -11,17 +11,19 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.container.internal.JreExplorer.exploreJdk;
+import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
+
+import org.slf4j.Logger;
 
 /**
  * Discovers the module corresponding to the JRE by creating a new {@link MuleModule} with the Java packages, resources and
@@ -31,12 +33,11 @@ import java.util.Set;
  */
 public class JreModuleDiscoverer implements ModuleDiscoverer {
 
-  protected static final Logger logger = LoggerFactory.getLogger(JreModuleDiscoverer.class);
+  private static final Logger logger = getLogger(JreModuleDiscoverer.class);
 
   protected static final String JRE_MODULE_NAME = "jre";
 
-  @Override
-  public List<MuleModule> discover() {
+  private static final Supplier<List<MuleModule>> jreModulesSupplier = new LazyValue<>(() -> {
     Set<String> packages = new HashSet<>(1024);
     Set<String> resources = new HashSet<>(1024);
     List<ExportedService> services = new ArrayList<>(128);
@@ -51,5 +52,10 @@ public class JreModuleDiscoverer implements ModuleDiscoverer {
     MuleModule jdkModule = new MuleModule(JRE_MODULE_NAME, packages, resources, emptySet(), emptySet(), services);
 
     return singletonList(jdkModule);
+  });
+
+  @Override
+  public List<MuleModule> discover() {
+    return jreModulesSupplier.get();
   }
 }

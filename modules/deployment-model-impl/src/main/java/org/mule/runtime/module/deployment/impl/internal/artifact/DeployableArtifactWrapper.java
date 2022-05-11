@@ -12,14 +12,14 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.value.ValueProviderService;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.InstallException;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +33,7 @@ import java.util.List;
 public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extends DeployableArtifactDescriptor>
     implements DeployableArtifact<D> {
 
-  private T delegate;
+  private final T delegate;
 
   protected DeployableArtifactWrapper(T artifact) throws IOException {
     this.delegate = artifact;
@@ -49,8 +49,14 @@ public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extend
     return delegate.getArtifactClassLoader();
   }
 
+  @Override
   public Registry getRegistry() {
-    return delegate.getRegistry();
+    return delegate.getArtifactContext() == null ? null : delegate.getArtifactContext().getRegistry();
+  }
+
+  @Override
+  public ArtifactContext getArtifactContext() {
+    return delegate.getArtifactContext();
   }
 
   @Override

@@ -103,9 +103,18 @@ public interface PrivilegedEvent extends CoreEvent {
     if (event == null) {
       MDC.remove(CORRELATION_ID_MDC_KEY);
     } else {
+      event.getLoggingVariables().ifPresent(variables -> variables.forEach(MDC::put));
       MDC.put(CORRELATION_ID_MDC_KEY, event.getCorrelationId());
     }
   }
+
+  /**
+   * Gets the logging variables from the event. These variables are going to be added to the log4j MDC when
+   * {@link PrivilegedEvent#setCurrentEvent} is called with this event.
+   *
+   * @return A dictionary with the logging variables.
+   */
+  Optional<Map<String, String>> getLoggingVariables();
 
   /**
    * Returns the contents of the message as a byte array.
@@ -122,7 +131,7 @@ public interface PrivilegedEvent extends CoreEvent {
    * Transforms the message into the requested format. The transformer used is the one configured on the endpoint through which
    * this event was received.
    *
-   * @param outputType The requested output type.
+   * @param outputType  The requested output type.
    * @param muleContext the Mule node.
    * @return the message transformed into it's recognized or expected format.
    * @throws MessageTransformerException if a failure occurs in the transformer
@@ -146,7 +155,7 @@ public interface PrivilegedEvent extends CoreEvent {
   /**
    * Returns the message contents as a string
    *
-   * @param encoding the encoding to use when converting the message to string
+   * @param encoding    the encoding to use when converting the message to string
    * @param muleContext the Mule node.
    * @return the message contents as a string
    * @throws MuleException if the message cannot be converted into a string
@@ -188,7 +197,7 @@ public interface PrivilegedEvent extends CoreEvent {
    * should only be used in some specific scenarios like {@code flow-ref} where a new Flow executing the same {@link CoreEvent}
    * needs a new context.
    *
-   * @param event existing event to use as a template to create builder instance
+   * @param event   existing event to use as a template to create builder instance
    * @param context the context to create event instance with.
    * @return new builder instance.
    */
@@ -282,6 +291,30 @@ public interface PrivilegedEvent extends CoreEvent {
 
     @Override
     Builder clearVariables();
+
+    /**
+     * Adds a logging variable to the event. See also {@link PrivilegedEvent#getLoggingVariables()}.
+     *
+     * @param key   The variable name.
+     * @param value The variable value.
+     * @return This builder.
+     */
+    Builder addLoggingVariable(String key, String value);
+
+    /**
+     * Removes a logging variable from the event. See also {@link PrivilegedEvent#getLoggingVariables()}.
+     *
+     * @param key The variable name.
+     * @return This builder.
+     */
+    Builder removeLoggingVariable(String key);
+
+    /**
+     * Removes all logging variables from the event. See also {@link PrivilegedEvent#getLoggingVariables()}.
+     *
+     * @return This builder.
+     */
+    Builder clearLoggingVariables();
 
     @Override
     @Deprecated

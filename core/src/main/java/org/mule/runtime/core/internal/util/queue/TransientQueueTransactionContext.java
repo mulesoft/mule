@@ -15,8 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.CollectionUtils;
-
 /**
  * Transaction context for transient queues
  */
@@ -27,6 +25,7 @@ public class TransientQueueTransactionContext implements LocalQueueTransactionCo
   private Map<QueueStore, List<Serializable>> added;
   private Map<QueueStore, List<Serializable>> removed;
 
+  @Override
   public boolean offer(QueueStore queue, Serializable item, long offerTimeout) throws InterruptedException {
     initializeAdded();
 
@@ -40,6 +39,7 @@ public class TransientQueueTransactionContext implements LocalQueueTransactionCo
     }
   }
 
+  @Override
   public void untake(QueueStore queue, Serializable item) throws InterruptedException {
     initializeAdded();
 
@@ -47,6 +47,7 @@ public class TransientQueueTransactionContext implements LocalQueueTransactionCo
     queueAdded.add(item);
   }
 
+  @Override
   public void clear(QueueStore queue) throws InterruptedException {
     this.initializeRemoved();
     List<Serializable> queueRemoved = this.lookupRemovedQueue(queue);
@@ -57,7 +58,7 @@ public class TransientQueueTransactionContext implements LocalQueueTransactionCo
 
     if (this.added != null) {
       List<Serializable> queueAdded = this.lookupAddedQueue(queue);
-      if (!CollectionUtils.isEmpty(queueAdded)) {
+      if (!queueAdded.isEmpty()) {
         queueRemoved.addAll(queueAdded);
         queueAdded.clear();
       }
@@ -65,6 +66,7 @@ public class TransientQueueTransactionContext implements LocalQueueTransactionCo
 
   }
 
+  @Override
   public Serializable poll(QueueStore queue, long pollTimeout) throws InterruptedException {
     Serializable value = queue.poll(pollTimeout);
     if (value != null) {
@@ -81,10 +83,12 @@ public class TransientQueueTransactionContext implements LocalQueueTransactionCo
     return value;
   }
 
+  @Override
   public Serializable peek(QueueStore queue) throws InterruptedException {
     return queue.peek();
   }
 
+  @Override
   public int size(QueueStore queue) {
     int sz = queue.getSize();
     if (added != null) {

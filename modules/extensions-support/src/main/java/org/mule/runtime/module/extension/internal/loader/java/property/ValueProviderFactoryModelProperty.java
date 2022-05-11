@@ -11,6 +11,7 @@ import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.MuleContext;
@@ -26,8 +27,8 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 /**
- * Private {@link ModelProperty} which communicates the {@link ValueProvider} of a parameter or parameter
- * model which contains a {@link ValueProviderModel} indicating that provides a {@link Set} of {@link Value values}
+ * Private {@link ModelProperty} which communicates the {@link ValueProvider} of a parameter or parameter model which contains a
+ * {@link ValueProviderModel} indicating that provides a {@link Set} of {@link Value values}
  *
  * @since 4.0
  */
@@ -35,17 +36,17 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
 
   private final Field connectionField;
   private final Field configField;
-  private final Class<? extends ValueProvider> valuesProvider;
+  private final Class<?> valuesProvider;
   private final List<InjectableParameterInfo> injectableParameters;
 
   /**
    * @param valueProvider        the {@link ValueProvider} class.
-   * @param injectableParameters the parameters that should be injected inside the {@link ValueProvider} to be able
-   *                             to resolve the {@link Value values}
+   * @param injectableParameters the parameters that should be injected inside the {@link ValueProvider} to be able to resolve the
+   *                             {@link Value values}
    * @param connectionField      the field inside the {@link ValueProvider} which is considered as a connection
    * @param configField          the field inside the {@link ValueProvider} which is considered as a configuration
    */
-  private ValueProviderFactoryModelProperty(Class<? extends ValueProvider> valueProvider,
+  private ValueProviderFactoryModelProperty(Class<?> valueProvider,
                                             List<InjectableParameterInfo> injectableParameters,
                                             Field connectionField,
                                             Field configField) {
@@ -60,11 +61,12 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
 
   /**
    * Creates a new builder to be able to easily build a {@link ValueProviderFactoryModelProperty}
+   * 
    * @param valuesProvider the {@link Class} of a {@link ValueProvider} implementation
    *
    * @return a new {@link ValueProviderFactoryModelPropertyBuilder}
    */
-  public static ValueProviderFactoryModelPropertyBuilder builder(Class<? extends ValueProvider> valuesProvider) {
+  public static ValueProviderFactoryModelPropertyBuilder builder(Class valuesProvider) {
     return new ValueProviderFactoryModelPropertyBuilder(valuesProvider);
   }
 
@@ -87,7 +89,7 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
   /**
    * @return the class of the {@link ValueProvider} implementation
    */
-  public Class<? extends ValueProvider> getValueProvider() {
+  public Class<?> getValueProvider() {
     return valuesProvider;
   }
 
@@ -124,9 +126,10 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
 
   public ValueProviderFactory createFactory(ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
                                             Supplier<Object> configurationSupplier, ReflectionCache reflectionCache,
-                                            MuleContext muleContext) {
+                                            MuleContext muleContext,
+                                            ParameterizedModel parameterizedModel) {
     return new ValueProviderFactory(this, parameterValueResolver, connectionSupplier, configurationSupplier, connectionField,
-                                    configField, reflectionCache, muleContext);
+                                    configField, reflectionCache, muleContext, parameterizedModel);
   }
 
   /**
@@ -136,19 +139,24 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
    */
   public static class ValueProviderFactoryModelPropertyBuilder {
 
-    private final Class<? extends ValueProvider> dynamicOptionsResolver;
+    private final Class<?> dynamicOptionsResolver;
     private final List<InjectableParameterInfo> injectableParameters;
     private Field connectionField;
     private Field configField;
 
-    ValueProviderFactoryModelPropertyBuilder(Class<? extends ValueProvider> dynamicOptionsResolver) {
+    ValueProviderFactoryModelPropertyBuilder(Class<?> dynamicOptionsResolver) {
       this.dynamicOptionsResolver = dynamicOptionsResolver;
       this.injectableParameters = new ArrayList<>();
     }
 
     public ValueProviderFactoryModelPropertyBuilder withInjectableParameter(String name, MetadataType metadataType,
                                                                             boolean isRequired) {
-      injectableParameters.add(new InjectableParameterInfo(name, metadataType, isRequired));
+      return withInjectableParameter(name, metadataType, isRequired, name);
+    }
+
+    public ValueProviderFactoryModelPropertyBuilder withInjectableParameter(String name, MetadataType metadataType,
+                                                                            boolean isRequired, String extractionExpression) {
+      injectableParameters.add(new InjectableParameterInfo(name, metadataType, isRequired, extractionExpression));
       return this;
     }
 

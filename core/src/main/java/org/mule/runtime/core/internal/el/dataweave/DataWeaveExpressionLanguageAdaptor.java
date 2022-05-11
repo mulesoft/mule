@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.el.dataweave;
 
-import static java.lang.System.getProperty;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBuindingsToBuilder;
 import static org.mule.runtime.api.el.BindingContextUtils.addFlowNameBindingsToBuilder;
@@ -16,6 +15,8 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionEvalu
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSanitizedPayload;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize;
+
+import static java.lang.System.getProperty;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -71,11 +72,14 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   private void registerGlobalBindings(Registry registry) {
     BindingContext.Builder contextBuilder = BindingContext.builder();
     contextBuilder.addBinding(MULE,
-                              new TypedValue<>(new MuleInstanceContext(muleContext), fromType(MuleInstanceContext.class)));
-    contextBuilder.addBinding(SERVER, new TypedValue<>(new ServerContext(), fromType(ServerContext.class)));
-    contextBuilder
-        .addBinding(APP, new TypedValue<>(new DataWeaveArtifactContext(muleContext, registry),
-                                          fromType(DataWeaveArtifactContext.class)));
+                              new TypedValue<>(new MuleInstanceContext(muleContext),
+                                               fromType(MuleInstanceContext.class)));
+    contextBuilder.addBinding(SERVER,
+                              new TypedValue<>(new ServerContext(),
+                                               fromType(ServerContext.class)));
+    contextBuilder.addBinding(APP,
+                              new TypedValue<>(new DataWeaveArtifactContext(muleContext, registry),
+                                               fromType(DataWeaveArtifactContext.class)));
     addGlobalBindings(contextBuilder instanceof DefaultBindingContextBuilder
         ? ((DefaultBindingContextBuilder) contextBuilder).flattenAndBuild()
         : contextBuilder.build());
@@ -202,7 +206,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
    *
    * @param expression the expression to sanitize before running
    * @param evaluation the function to evaluate the expression with
-   * @param <T> the type that the function returns
+   * @param <T>        the type that the function returns
    * @return the result of the evaluation
    */
   private <T> T sanitizeAndEvaluate(String expression, Function<String, T> evaluation) {

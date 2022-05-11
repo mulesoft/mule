@@ -6,6 +6,22 @@
  */
 package org.mule.runtime.core.privileged.exception;
 
+import static java.util.Optional.of;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.REUSE_GLOBAL_ERROR_HANDLER;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
+import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
+import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_START;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LAX_ERROR_TYPES;
+import static org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher.WILDCARD_TOKEN;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
+import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.addContext;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
+
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.getBoolean;
@@ -17,29 +33,16 @@ import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static java.util.regex.Pattern.compile;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
-import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
-import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_START;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LAX_ERROR_TYPES;
-import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher.WILDCARD_TOKEN;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
-import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
-import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.addContext;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -47,6 +50,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.ErrorHandlerNotification;
+import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.DisjunctiveErrorTypeMatcher;
@@ -88,15 +92,14 @@ import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
 @NoExtend
-public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
+public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionListener
     implements MessagingExceptionHandlerAcceptor {
 
   private static final Logger LOGGER = getLogger(TemplateOnErrorHandler.class);
 
-  private static final Pattern ERROR_HANDLER_LOCATION_PATTERN = compile(".*/.*/.*");
+  private static final Pattern ERROR_HANDLER_LOCATION_PATTERN = compile("[^/]*/[^/]*/[^/]*");
 
-  @Inject
-  protected ConfigurationComponentLocator locator;
+  private boolean fromGlobalErrorHandler = false;
 
   @Inject
   private ExpressionManager expressionManager;
@@ -106,6 +109,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   @Inject
   private ConfigurationProperties configurationProperties;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   protected Optional<Location> flowLocation = empty();
   private MessageProcessorChain configuredMessageProcessors;
@@ -118,7 +124,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   private String errorHandlerLocation;
   private boolean isLocalErrorHandlerLocation;
-  private ComponentLocation location;
 
   private Function<Function<Publisher<CoreEvent>, Publisher<CoreEvent>>, FluxSink<CoreEvent>> fluxFactory;
 
@@ -155,7 +160,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
           .doAfterTerminate(() -> fluxSinks.remove(sinkRef.getFluxSink()));
 
       if (processingStrategy.isPresent()) {
-        processingStrategy.get().registerInternalSink(onErrorFlux, "error handler '" + getLocation().getLocation() + "'");
+        String location = getLocation() != null ? getLocation().getLocation() : flowLocation.map(Object::toString).orElse("");
+        processingStrategy.get().registerInternalSink(onErrorFlux, "error handler '" + location + "'");
       } else {
         onErrorFlux.subscribe();
       }
@@ -224,8 +230,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     return (me, event) -> {
       try {
         logger.error("Exception during exception strategy execution");
-        resolveAndLogException(me);
-        if (isOwnedTransaction()) {
+        getExceptionListener().resolveAndLogException(me);
+        if (isOwnedTransaction(getException((CoreEvent) event))) {
           TransactionCoordination.getInstance().rollbackCurrentTransaction();
         }
       } catch (Exception ex) {
@@ -240,10 +246,10 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   private void fireEndNotification(CoreEvent event, CoreEvent result, Throwable throwable) {
-    notificationFirer.dispatch(new ErrorHandlerNotification(createInfo(result != null ? result
+    getNotificationFirer().dispatch(new ErrorHandlerNotification(createInfo(result != null ? result
         : event, throwable instanceof MessagingException ? (MessagingException) throwable : null,
-                                                                       configuredMessageProcessors),
-                                                            location, PROCESS_END));
+                                                                            configuredMessageProcessors),
+                                                                 getLocation(), PROCESS_END));
   }
 
   protected Publisher<CoreEvent> route(Publisher<CoreEvent> eventPublisher) {
@@ -281,21 +287,16 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     }
   }
 
-  private void processStatistics() {
-    if (statistics != null && statistics.isEnabled()) {
-      statistics.incExecutionError();
-    }
-  }
-
   @Override
   protected void doInitialise() throws InitialisationException {
     super.doInitialise();
-    this.location = this.getLocation();
-    Optional<ProcessingStrategy> processingStrategy = empty();
-    if (flowLocation.isPresent()) {
+    Optional<ProcessingStrategy> processingStrategy;
+    if (fromGlobalErrorHandler && featureFlaggingService.isEnabled(REUSE_GLOBAL_ERROR_HANDLER)) {
+      processingStrategy = getProcessingStrategyFromGlobalErrorHandler(locator);
+    } else if (flowLocation.isPresent()) {
       processingStrategy = getProcessingStrategy(locator, flowLocation.get());
-    } else if (location != null) {
-      processingStrategy = getProcessingStrategy(locator, getRootContainerLocation());
+    } else {
+      processingStrategy = getProcessingStrategy(locator, this);
     }
     configuredMessageProcessors =
         buildNewChainWithListOfProcessors(processingStrategy, getMessageProcessors(), NullExceptionHandler.getInstance());
@@ -304,7 +305,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
     errorTypeMatcher = createErrorType(errorTypeRepository, errorType, configurationProperties);
     if (!inDefaultErrorHandler()) {
-      errorHandlerLocation = this.location.getLocation();
+      errorHandlerLocation = getLocation().getLocation();
       isLocalErrorHandlerLocation = ERROR_HANDLER_LOCATION_PATTERN.matcher(errorHandlerLocation).find();
       if (isLocalErrorHandlerLocation) {
         errorHandlerLocation = errorHandlerLocation.substring(0, errorHandlerLocation.lastIndexOf('/'));
@@ -313,14 +314,26 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     }
   }
 
+  private Optional<ProcessingStrategy> getProcessingStrategyFromGlobalErrorHandler(ConfigurationComponentLocator locator) {
+    return of(new OnRuntimeProcessingStrategy(locator));
+  }
+
   @Override
   public void dispose() {
     disposeIfNeeded(fluxFactory, LOGGER);
     super.dispose();
   }
 
+  /**
+   * @deprecated Use {@link #createErrorType(ErrorTypeRepository, String)} instead.
+   */
+  @Deprecated
   public static ErrorTypeMatcher createErrorType(ErrorTypeRepository errorTypeRepository, String errorTypeNames,
                                                  ConfigurationProperties configurationProperties) {
+    return createErrorType(errorTypeRepository, errorTypeNames);
+  }
+
+  public static ErrorTypeMatcher createErrorType(ErrorTypeRepository errorTypeRepository, String errorTypeNames) {
     if (errorTypeNames == null) {
       return null;
     }
@@ -334,14 +347,13 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       } else {
         return new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(errorTypeComponentIdentifier)
             .orElseGet(() -> {
-              // When lazy init deployment is used an error-mapping may not be initialized due to the component that declares it
-              // could not be part of the minimal application model. So, whenever we found that scenario we have to create the
-              // errorType if not present in the repository already.
-              if (configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false)) {
-                return errorTypeRepository.addErrorType(errorTypeComponentIdentifier, errorTypeRepository.getAnyErrorType());
-              } else if (getBoolean(MULE_LAX_ERROR_TYPES)) {
+              if (getBoolean(MULE_LAX_ERROR_TYPES)) {
                 LOGGER.warn("Could not find ErrorType for the given identifier: {}", parsedIdentifier);
-                return errorTypeRepository.addErrorType(errorTypeComponentIdentifier, errorTypeRepository.getAnyErrorType());
+                return ErrorTypeBuilder.builder()
+                    .namespace(errorTypeComponentIdentifier.getNamespace())
+                    .identifier(errorTypeComponentIdentifier.getName())
+                    .parentErrorType(errorTypeRepository.getAnyErrorType())
+                    .build();
               } else {
                 throw new MuleRuntimeException(createStaticMessage("Could not find ErrorType for the given identifier: '%s'",
                                                                    parsedIdentifier));
@@ -362,32 +374,11 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       return true;
     }
 
-    return Objects.equals(WILDCARD_TOKEN, errorTypeIdentifier.getNamespace());
-  }
+    if (Objects.equals(WILDCARD_TOKEN, errorTypeIdentifier.getNamespace())) {
+      return true;
+    }
 
-  /**
-   * @deprecated Use {@link #createErrorType(ErrorTypeRepository, String, ConfigurationProperties)} which handles correctly lazy
-   *             mule artifact contexts.
-   */
-  @Deprecated
-  public static ErrorTypeMatcher createErrorType(ErrorTypeRepository errorTypeRepository, String errorTypeNames) {
-    return createErrorType(errorTypeRepository, errorTypeNames, new ConfigurationProperties() {
-
-      @Override
-      public <T> Optional<T> resolveProperty(String propertyKey) {
-        return Optional.empty();
-      }
-
-      @Override
-      public Optional<Boolean> resolveBooleanProperty(String property) {
-        return Optional.empty();
-      }
-
-      @Override
-      public Optional<String> resolveStringProperty(String property) {
-        return Optional.empty();
-      }
-    });
+    return false;
   }
 
   public void setWhen(String when) {
@@ -406,7 +397,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   /**
-   * Evaluates if the {@link #errorTypeMatcher} matches against any of the provided {@link PrivilegedError#getSuppressedErrors()} error types.
+   * Evaluates if the {@link #errorTypeMatcher} matches against any of the provided {@link PrivilegedError#getSuppressedErrors()}
+   * error types.
+   *
    * @param error {@link Error} that will be evaluated.
    * @return True if at least one match is found.
    */
@@ -423,7 +416,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   /**
    * If it was not previously logged, logs a warning about a suppressed {@link ErrorType} match.
-   * @param eventErrorType Unsuppressed {@link ErrorType} (recommended match).
+   *
+   * @param eventErrorType      Unsuppressed {@link ErrorType} (recommended match).
    * @param suppressedErrorType Suppressed {@link ErrorType} that has been matched.
    */
   private void warnAboutSuppressedErrorTypeMatch(ErrorType eventErrorType, ErrorType suppressedErrorType) {
@@ -436,7 +430,11 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   private boolean acceptsExpression(CoreEvent event) {
-    return !when.isPresent() || when.map(expr -> expressionManager.evaluateBoolean(expr, event, getLocation())).orElse(true);
+    return !hasWhenExpression() || when.map(expr -> expressionManager.evaluateBoolean(expr, event, getLocation())).orElse(true);
+  }
+
+  public boolean hasWhenExpression() {
+    return when.isPresent();
   }
 
   protected Function<CoreEvent, CoreEvent> afterRouting() {
@@ -452,11 +450,12 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     return event -> {
       Exception exception = getException(event);
 
-      notificationFirer.dispatch(new ErrorHandlerNotification(createInfo(event, exception, configuredMessageProcessors),
-                                                              location, PROCESS_START));
-      fireNotification(exception, event);
+      getNotificationFirer().dispatch(new ErrorHandlerNotification(createInfo(event, exception, configuredMessageProcessors),
+
+                                                                   getLocation(), PROCESS_START));
+      getExceptionListener().fireNotification(exception, event);
       logException(exception, event);
-      processStatistics();
+      getExceptionListener().processStatistics();
       markExceptionAsHandledIfRequired(exception);
       return event;
     };
@@ -471,11 +470,13 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
    *
    * @param t the exception thrown
    */
-  protected void logException(Throwable t, CoreEvent event) {
-    if (TRUE.toString().equals(logException)
-        || (!FALSE.toString().equals(logException)
-            && expressionManager.evaluateBoolean(logException, event, location, true, true))) {
-      resolveAndLogException(t);
+  protected boolean logException(Throwable t, CoreEvent event) {
+    if (TRUE.toString().equals(getLogException())
+        || (!FALSE.toString().equals(getLogException())
+            && expressionManager.evaluateBoolean(getLogException(), event, getLocation(), true, true))) {
+      return getExceptionListener().resolveAndLogException(t);
+    } else {
+      return false;
     }
   }
 
@@ -491,7 +492,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     updateRootContainerName(rootContainerName, this);
   }
 
-  protected void setFlowLocation(Location location) {
+  public void setFlowLocation(Location location) {
     this.flowLocation = ofNullable(location);
   }
 
@@ -509,13 +510,12 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
    */
   public abstract TemplateOnErrorHandler duplicateFor(Location location);
 
-
   private boolean isTransactionInGlobalErrorHandler(TransactionAdapter transaction) {
     String transactionContainerName = transaction.getComponentLocation().get().getRootContainerName();
     return flowLocation.isPresent() && transactionContainerName.equals(flowLocation.get().getGlobalName());
   }
 
-  protected boolean isOwnedTransaction() {
+  protected boolean isOwnedTransaction(Exception exception) {
     TransactionAdapter transaction = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
     if (transaction == null || !transaction.getComponentLocation().isPresent()) {
       return false;
@@ -523,23 +523,28 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
     if (inDefaultErrorHandler()) {
       return defaultErrorHandlerOwnsTransaction(transaction);
-    } else if (isTransactionInGlobalErrorHandler((transaction))) {
-      // We are in a GlobalErrorHandler that is defined for the container (Flow or TryScope) that created the tx
-      return true;
-    } else if (flowLocation.isPresent()) {
-      // We are in a Global Error Handler, which is not the one that created the Tx
-      return false;
-    } else {
-      // We are in a simple scenario where the error handler's location ends with "/error-handler/1".
-      // We cannot use the RootContainerLocation, since in case of nested TryScopes (the outer one creating the tx)
-      // the RootContainerLocation will be the same for both, and we don't want the inner TryScope's OnErrorPropagate
-      // to rollback the tx.
-      if (!isLocalErrorHandlerLocation) {
-        return sameRootContainerLocation(transaction);
-      }
-      String transactionLocation = transaction.getComponentLocation().get().getLocation();
-      return (sameRootContainerLocation(transaction) && errorHandlerLocation.equals(transactionLocation));
     }
+
+    if (featureFlaggingService.isEnabled(REUSE_GLOBAL_ERROR_HANDLER)) {
+      if (fromGlobalErrorHandler) {
+        String location = ((MessagingException) exception).getFailingComponent().getRootContainerLocation().getGlobalName();
+        return transaction.getComponentLocation().get().getRootContainerName().equals(location);
+      }
+    } else {
+      if (flowLocation.isPresent()) {
+        return isTransactionInGlobalErrorHandler(transaction);
+      }
+    }
+
+    // We are in a simple scenario where the error handler's location ends with "/error-handler/1".
+    // We cannot use the RootContainerLocation, since in case of nested TryScopes (the outer one creating the tx)
+    // the RootContainerLocation will be the same for both, and we don't want the inner TryScope's OnErrorPropagate
+    // to rollback the tx.
+    if (!isLocalErrorHandlerLocation) {
+      return sameRootContainerLocation(transaction);
+    }
+    String transactionLocation = transaction.getComponentLocation().get().getLocation();
+    return (sameRootContainerLocation(transaction) && errorHandlerLocation.equals(transactionLocation));
   }
 
   private boolean sameRootContainerLocation(TransactionAdapter transaction) {
@@ -548,7 +553,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   private boolean inDefaultErrorHandler() {
-    return location == null;
+    return getLocation() == null;
   }
 
   private boolean defaultErrorHandlerOwnsTransaction(TransactionAdapter transaction) {
@@ -565,5 +570,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   protected ErrorTypeRepository getErrorTypeRepository() {
     return errorTypeRepository;
+  }
+
+  public void setFromGlobalErrorHandler(boolean fromGlobalErrorHandler) {
+    this.fromGlobalErrorHandler = fromGlobalErrorHandler;
   }
 }

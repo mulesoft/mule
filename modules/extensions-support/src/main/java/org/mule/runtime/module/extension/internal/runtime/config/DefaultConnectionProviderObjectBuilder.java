@@ -8,6 +8,9 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
+import static org.mule.runtime.core.internal.connection.ConnectionUtils.getInjectionTarget;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getMuleVersion;
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
 
 import org.mule.runtime.api.config.PoolingProfile;
@@ -20,16 +23,14 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
+import org.mule.runtime.core.internal.connection.ConfigNameResolverConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ErrorTypeHandlerConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.PoolingConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
-import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
-
 
 /**
  * Implementation of {@link ResolverSetBasedObjectBuilder} which produces instances of {@link ConnectionProviderModel}
@@ -38,9 +39,9 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
  */
 public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProviderObjectBuilder<C> {
 
-  DefaultConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet,
-                                         ExtensionModel extensionModel, ExpressionManager expressionManager,
-                                         MuleContext muleContext) {
+  public DefaultConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet,
+                                                ExtensionModel extensionModel, ExpressionManager expressionManager,
+                                                MuleContext muleContext) {
     super(providerModel, resolverSet, extensionModel, expressionManager, muleContext);
   }
 
@@ -72,21 +73,26 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
     provider = applyConnectionProviderClassLoaderProxy(provider);
     provider = applyConnectionManagement(provider);
     provider = applyErrorHandling(provider);
+    provider = applyOwnerConfigNameResolver(provider);
 
     return new Pair<>(provider, result);
   }
 
   protected ConnectionProvider<C> doBuild(ResolverSetResult result) throws MuleException {
     ConnectionProvider<C> provider = super.build(result).getFirst();
-    String muleversion = MuleExtensionModelProvider.MULE_VERSION;
-    MuleVersion muleVersion = new MuleVersion(muleversion);
-    injectFields(providerModel, provider, ownerConfigName, muleContext.getConfiguration().getDefaultEncoding(), muleVersion);
+    MuleVersion muleVersion = getMuleVersion();
+    injectFields(providerModel, getInjectionTarget(provider), ownerConfigName,
+                 muleContext.getConfiguration().getDefaultEncoding(), muleVersion);
     return provider;
   }
 
   private ConnectionProvider<C> applyErrorHandling(ConnectionProvider<C> provider) {
     return new ErrorTypeHandlerConnectionProviderWrapper<>(provider, extensionModel, reconnectionConfig,
                                                            muleContext.getErrorTypeRepository());
+  }
+
+  private ConnectionProvider<C> applyOwnerConfigNameResolver(ConnectionProvider<C> provider) {
+    return new ConfigNameResolverConnectionProviderWrapper<>(provider, reconnectionConfig, ownerConfigName);
   }
 
   private ConnectionProvider<C> applyConnectionManagement(ConnectionProvider<C> provider) {
@@ -117,7 +123,7 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
     final ClassLoader appRegionClassLoader = muleContext.getExecutionClassLoader().getParent();
 
     return ClassLoaderConnectionProviderWrapper
-        .newInstance(provider, new CompositeClassLoader(extensionClassLoader, appRegionClassLoader));
+        .newInstance(provider, from(extensionClassLoader, appRegionClassLoader));
   }
 
 }

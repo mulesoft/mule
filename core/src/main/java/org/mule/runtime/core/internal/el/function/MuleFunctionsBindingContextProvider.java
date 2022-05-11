@@ -28,8 +28,8 @@ import javax.inject.Named;
  */
 public class MuleFunctionsBindingContextProvider implements GlobalBindingContextProvider {
 
-  @Inject
-  @Named(OBJECT_CONFIGURATION_PROPERTIES)
+  public static final String CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY = "core.global.binding.provider";
+
   private ConfigurationProperties configurationProperties;
 
   @Inject
@@ -42,20 +42,31 @@ public class MuleFunctionsBindingContextProvider implements GlobalBindingContext
   @Inject
   private SchedulerService schedulerService;
 
+  private PropertyAccessFunction propertyFunction;
+
   @Override
   public BindingContext getBindingContext() {
     BindingContext.Builder builder = BindingContext.builder();
 
-    PropertyAccessFunction propertyFunction = new PropertyAccessFunction(configurationProperties);
-    builder.addBinding("p", new TypedValue(propertyFunction, fromFunction(propertyFunction)));
+    propertyFunction = new PropertyAccessFunction();
+    propertyFunction.setConfigurationProperties(configurationProperties);
+    builder.addBinding("p", new TypedValue<>(propertyFunction, fromFunction(propertyFunction)));
 
     ExpressionFunction lookupFunction = new LookupFunction(componentLocator, schedulerService);
-    builder.addBinding("lookup", new TypedValue(lookupFunction, fromFunction(lookupFunction)));
+    builder.addBinding("lookup", new TypedValue<>(lookupFunction, fromFunction(lookupFunction)));
 
     ExpressionFunction causedByFunction = new CausedByFunction(errorTypeRepository);
-    builder.addBinding("causedBy", new TypedValue(causedByFunction, fromFunction(causedByFunction)));
+    builder.addBinding("causedBy", new TypedValue<>(causedByFunction, fromFunction(causedByFunction)));
 
     return builder.build();
   }
 
+  @Inject
+  @Named(OBJECT_CONFIGURATION_PROPERTIES)
+  public void setConfigurationProperties(ConfigurationProperties configurationProperties) {
+    this.configurationProperties = configurationProperties;
+    if (propertyFunction != null) {
+      propertyFunction.setConfigurationProperties(configurationProperties);
+    }
+  }
 }

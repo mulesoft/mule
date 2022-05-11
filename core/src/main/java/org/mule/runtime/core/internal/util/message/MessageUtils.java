@@ -17,13 +17,8 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.api.streaming.bytes.CursorStream;
-import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
-import org.mule.runtime.core.api.management.stats.PayloadStatistics;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.core.internal.management.stats.InputDecoratedCursorStreamProvider;
 import org.mule.runtime.core.internal.util.collection.TransformingIterator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.sdk.api.runtime.operation.Result;
@@ -44,7 +39,6 @@ import java.util.function.Function;
  */
 public final class MessageUtils {
 
-
   private MessageUtils() {}
 
   /**
@@ -61,7 +55,7 @@ public final class MessageUtils {
   /**
    * Transforms the given {@code result} into a {@link Message}
    *
-   * @param result a {@link Result} object
+   * @param result    a {@link Result} object
    * @param mediaType the {@link MediaType} for the message payload, overrides the described in the {@code result}
    * @return a {@link Message}
    * @since 4.4.0
@@ -73,10 +67,10 @@ public final class MessageUtils {
   /**
    * Transforms the given {@code result} into a {@link Message}.
    *
-   * @param result a {@link Result} object
+   * @param result                a {@link Result} object
    * @param cursorProviderFactory Factory that in case of finding a value which can create a cursor (eg.: {@link InputStream} or
-   *        {@link Iterator}), will create a {@link CursorProvider}
-   * @param eventContext Used for the case where a {@link CursorProvider} is created, register the one in it.
+   *                              {@link Iterator}), will create a {@link CursorProvider}
+   * @param eventContext          Used for the case where a {@link CursorProvider} is created, register the one in it.
    * @return a {@link Message}
    * @since 4.4.0
    */
@@ -89,10 +83,10 @@ public final class MessageUtils {
   /**
    * Transforms the given {@code result} into a {@link Message}.
    *
-   * @param result a {@link Result} object
+   * @param result                a {@link Result} object
    * @param cursorProviderFactory Factory that in case of finding a value which can create a cursor (eg.: {@link InputStream} or
-   *        {@link Iterator}), will create a {@link CursorProvider}
-   * @param event Used for the case where a {@link CursorProvider} is created, register the one in it.
+   *                              {@link Iterator}), will create a {@link CursorProvider}
+   * @param event                 Used for the case where a {@link CursorProvider} is created, register the one in it.
    * @return a {@link Message}
    * @since 4.4.0
    */
@@ -105,47 +99,11 @@ public final class MessageUtils {
   /**
    * Transforms the given {@code result} into a {@link Message}.
    *
-   * @param result a {@link Result} object
-   * @param mediaType the {@link MediaType} for the message payload, overrides the described in the {@code result}
-   * @param componentDecoratorFactory the factory for payload decorators to accumulate {@link PayloadStatistics}.
+   * @param result                a {@link Result} object
+   * @param mediaType             the {@link MediaType} for the message payload, overrides the described in the {@code result}
    * @param cursorProviderFactory Factory that in case of finding a value which can create a cursor (eg.: {@link InputStream} or
-   *        {@link Iterator}), will create a {@link CursorProvider}
-   * @param eventContext Used for the case where a {@link CursorProvider} is created, register the one in it.
-   * @param correlationId id of the event to be propagated to the {@link CursorComponentDecoratorFactory}.
-   *
-   * @return a {@link Message}
-   * @since 4.4, 4.3.1
-   */
-  public static Message toMessage(Result<?, ?> result,
-                                  MediaType mediaType,
-                                  CursorComponentDecoratorFactory componentDecoratorFactory,
-                                  CursorProviderFactory cursorProviderFactory,
-                                  BaseEventContext eventContext,
-                                  ComponentLocation originatingLocation,
-                                  String correlationId) {
-    final Object output;
-    if (result.getOutput() instanceof InputStream) {
-      output = componentDecoratorFactory.decorateOutput((InputStream) result.getOutput(), correlationId);
-    } else if (result.getOutput() instanceof Collection) {
-      output = componentDecoratorFactory.decorateOutputCollection((Collection) result.getOutput(), correlationId);
-    } else if (result.getOutput() instanceof Iterator) {
-      output = componentDecoratorFactory.decorateOutput((Iterator) result.getOutput(), correlationId);
-    } else {
-      output = result.getOutput();
-    }
-
-    Object value = streamingContent(output, cursorProviderFactory, eventContext, originatingLocation);
-    return toMessage(result, builder().fromObject(value).mediaType(mediaType).build(), value);
-  }
-
-  /**
-   * Transforms the given {@code result} into a {@link Message}.
-   *
-   * @param result a {@link Result} object
-   * @param mediaType the {@link MediaType} for the message payload, overrides the described in the {@code result}
-   * @param cursorProviderFactory Factory that in case of finding a value which can create a cursor (eg.: {@link InputStream} or
-   *        {@link Iterator}), will create a {@link CursorProvider}
-   * @param eventContext Used for the case where a {@link CursorProvider} is created, register the one in it.
+   *                              {@link Iterator}), will create a {@link CursorProvider}
+   * @param eventContext          Used for the case where a {@link CursorProvider} is created, register the one in it.
    *
    * @return a {@link Message}
    * @since 4.4.0
@@ -162,11 +120,11 @@ public final class MessageUtils {
   /**
    * Transforms the given {@code result} into a {@link Message}.
    *
-   * @param result a {@link Result} object
-   * @param mediaType the {@link MediaType} for the message payload, overrides the described in the {@code result}
+   * @param result                a {@link Result} object
+   * @param mediaType             the {@link MediaType} for the message payload, overrides the described in the {@code result}
    * @param cursorProviderFactory Factory that in case of finding a value which can create a cursor (eg.: {@link InputStream} or
-   *        {@link Iterator}), will create a {@link CursorProvider}
-   * @param eventContext Used for the case where a {@link CursorProvider} is created, register the one in it.
+   *                              {@link Iterator}), will create a {@link CursorProvider}
+   * @param eventContext          Used for the case where a {@link CursorProvider} is created, register the one in it.
    *
    * @return a {@link Message}
    * @since 4.4.0
@@ -185,11 +143,11 @@ public final class MessageUtils {
   /**
    * Transforms the given {@code result} into a {@link Message}.
    *
-   * @param result a {@link Result} object
-   * @param mediaType the {@link MediaType} for the message payload, overrides the described in the {@code result}
+   * @param result                a {@link Result} object
+   * @param mediaType             the {@link MediaType} for the message payload, overrides the described in the {@code result}
    * @param cursorProviderFactory Factory that in case of finding a value which can create a cursor (eg.: {@link InputStream} or
-   *        {@link Iterator}), will create a {@link CursorProvider}
-   * @param event Used for the case where a {@link CursorProvider} is created, register the one in it.
+   *                              {@link Iterator}), will create a {@link CursorProvider}
+   * @param event                 Used for the case where a {@link CursorProvider} is created, register the one in it.
    *
    * @return a {@link Message}
    * @since 4.4.0
@@ -206,11 +164,11 @@ public final class MessageUtils {
   /**
    * Transforms the given {@code result} into a {@link Message}.
    *
-   * @param result a {@link Result} object
-   * @param mediaType the {@link MediaType} for the message payload, overrides the described in the {@code result}
+   * @param result                a {@link Result} object
+   * @param mediaType             the {@link MediaType} for the message payload, overrides the described in the {@code result}
    * @param cursorProviderFactory Factory that in case of finding a value which can create a cursor (eg.: {@link InputStream} or
-   *        {@link Iterator}), will create a {@link CursorProvider}
-   * @param event Used for the case where a {@link CursorProvider} is created, register the one in it.
+   *                              {@link Iterator}), will create a {@link CursorProvider}
+   * @param event                 Used for the case where a {@link CursorProvider} is created, register the one in it.
    *
    * @return a {@link Message}
    * @since 4.4.0
@@ -228,9 +186,9 @@ public final class MessageUtils {
   /**
    * Transforms the given {@code results} into a list of {@link Message} objects
    *
-   * @param results a collection of {@link Result} items
+   * @param results               a collection of {@link Result} items
    * @param cursorProviderFactory the {@link CursorProviderFactory} used to handle streaming cursors
-   * @param eventContext the toot context of the {@link CoreEvent} which originated the results being transformed
+   * @param eventContext          the toot context of the {@link CoreEvent} which originated the results being transformed
    * @return a {@link List} of {@link Message}
    * @since 4.4.0
    */
@@ -248,9 +206,9 @@ public final class MessageUtils {
   /**
    * Transforms the given {@code results} into a similar collection of {@link Message} objects
    *
-   * @param results a collection of {@link Result} items
+   * @param results               a collection of {@link Result} items
    * @param cursorProviderFactory the {@link CursorProviderFactory} used to handle streaming cursors
-   * @param eventContext the root context of the {@link CoreEvent} which originated the results being transformed
+   * @param eventContext          the root context of the {@link CoreEvent} which originated the results being transformed
    * @return a similar collection of {@link Message}
    * @since 4.4.0
    */
@@ -277,7 +235,7 @@ public final class MessageUtils {
   /**
    * Transforms the given {@code result} into a {@link Message}
    *
-   * @param result a {@link Result} object
+   * @param result    a {@link Result} object
    * @param mediaType the {@link MediaType} for the message payload, overrides the described in the {@code result}
    * @return a {@link Message}
    * @deprecated since 4.4.0. Use {@link #toMessage(Result, MediaType)} instead
@@ -291,10 +249,10 @@ public final class MessageUtils {
   /**
    * Transforms the given {@code result} into a {@link Message}.
    *
-   * @param result a {@link Result} object
+   * @param result                a {@link Result} object
    * @param cursorProviderFactory Factory that in case of finding a value which can create a cursor (eg.: {@link InputStream} or
-   *        {@link Iterator}), will create a {@link CursorProvider}
-   * @param eventContext Used for the case where a {@link CursorProvider} is created, register the one in it.
+   *                              {@link Iterator}), will create a {@link CursorProvider}
+   * @param eventContext          Used for the case where a {@link CursorProvider} is created, register the one in it.
    * @return a {@link Message}
    * @deprecated since 4.4.0. Use {@link #toMessage(Result, CursorProviderFactory, BaseEventContext, ComponentLocation)} instead
    */
@@ -310,10 +268,10 @@ public final class MessageUtils {
   /**
    * Transforms the given {@code result} into a {@link Message}.
    *
-   * @param result a {@link Result} object
+   * @param result                a {@link Result} object
    * @param cursorProviderFactory Factory that in case of finding a value which can create a cursor (eg.: {@link InputStream} or
-   *        {@link Iterator}), will create a {@link CursorProvider}
-   * @param event Used for the case where a {@link CursorProvider} is created, register the one in it.
+   *                              {@link Iterator}), will create a {@link CursorProvider}
+   * @param event                 Used for the case where a {@link CursorProvider} is created, register the one in it.
    * @return a {@link Message}
    * @deprecated since 4.4.0. Use {@link #toMessage(Result, CursorProviderFactory, CoreEvent, ComponentLocation)} instead
    */
@@ -329,14 +287,15 @@ public final class MessageUtils {
   /**
    * Transforms the given {@code result} into a {@link Message}.
    *
-   * @param result a {@link Result} object
-   * @param mediaType the {@link MediaType} for the message payload, overrides the described in the {@code result}
+   * @param result                a {@link Result} object
+   * @param mediaType             the {@link MediaType} for the message payload, overrides the described in the {@code result}
    * @param cursorProviderFactory Factory that in case of finding a value which can create a cursor (eg.: {@link InputStream} or
-   *        {@link Iterator}), will create a {@link CursorProvider}
-   * @param eventContext Used for the case where a {@link CursorProvider} is created, register the one in it.
+   *                              {@link Iterator}), will create a {@link CursorProvider}
+   * @param eventContext          Used for the case where a {@link CursorProvider} is created, register the one in it.
    *
    * @return a {@link Message}
-   * @deprecated since 4.4.0. Use {@link #toMessage(Result, MediaType, CursorProviderFactory, BaseEventContext, ComponentLocation)} instead
+   * @deprecated since 4.4.0. Use
+   *             {@link #toMessage(Result, MediaType, CursorProviderFactory, BaseEventContext, ComponentLocation)} instead
    */
   @Deprecated
   public static Message toMessage(org.mule.runtime.extension.api.runtime.operation.Result<?, ?> result,
@@ -351,14 +310,16 @@ public final class MessageUtils {
   /**
    * Transforms the given {@code result} into a {@link Message}.
    *
-   * @param result a {@link Result} object
-   * @param mediaType the {@link MediaType} for the message payload, overrides the described in the {@code result}
+   * @param result                a {@link Result} object
+   * @param mediaType             the {@link MediaType} for the message payload, overrides the described in the {@code result}
    * @param cursorProviderFactory Factory that in case of finding a value which can create a cursor (eg.: {@link InputStream} or
-   *        {@link Iterator}), will create a {@link CursorProvider}
-   * @param eventContext Used for the case where a {@link CursorProvider} is created, register the one in it.
+   *                              {@link Iterator}), will create a {@link CursorProvider}
+   * @param eventContext          Used for the case where a {@link CursorProvider} is created, register the one in it.
    *
    * @return a {@link Message}
-   * @deprecated since 4.4.0. Use {@link #toMessage(Result, MediaType, CursorProviderFactory, BaseEventContext, DataType, ComponentLocation)} instead
+   * @deprecated since 4.4.0. Use
+   *             {@link #toMessage(Result, MediaType, CursorProviderFactory, BaseEventContext, DataType, ComponentLocation)}
+   *             instead
    */
   @Deprecated
   public static Message toMessage(org.mule.runtime.extension.api.runtime.operation.Result<?, ?> result,
@@ -375,14 +336,15 @@ public final class MessageUtils {
   /**
    * Transforms the given {@code result} into a {@link Message}.
    *
-   * @param result a {@link Result} object
-   * @param mediaType the {@link MediaType} for the message payload, overrides the described in the {@code result}
+   * @param result                a {@link Result} object
+   * @param mediaType             the {@link MediaType} for the message payload, overrides the described in the {@code result}
    * @param cursorProviderFactory Factory that in case of finding a value which can create a cursor (eg.: {@link InputStream} or
-   *        {@link Iterator}), will create a {@link CursorProvider}
-   * @param event Used for the case where a {@link CursorProvider} is created, register the one in it.
+   *                              {@link Iterator}), will create a {@link CursorProvider}
+   * @param event                 Used for the case where a {@link CursorProvider} is created, register the one in it.
    *
    * @return a {@link Message}
-   * @deprecated since 4.4.0. Use {@link #toMessage(Result, MediaType, CursorProviderFactory, CoreEvent, ComponentLocation)} instead
+   * @deprecated since 4.4.0. Use {@link #toMessage(Result, MediaType, CursorProviderFactory, CoreEvent, ComponentLocation)}
+   *             instead
    */
   @Deprecated
   public static Message toMessage(org.mule.runtime.extension.api.runtime.operation.Result<?, ?> result,
@@ -397,14 +359,15 @@ public final class MessageUtils {
   /**
    * Transforms the given {@code result} into a {@link Message}.
    *
-   * @param result a {@link Result} object
-   * @param mediaType the {@link MediaType} for the message payload, overrides the described in the {@code result}
+   * @param result                a {@link Result} object
+   * @param mediaType             the {@link MediaType} for the message payload, overrides the described in the {@code result}
    * @param cursorProviderFactory Factory that in case of finding a value which can create a cursor (eg.: {@link InputStream} or
-   *        {@link Iterator}), will create a {@link CursorProvider}
-   * @param event Used for the case where a {@link CursorProvider} is created, register the one in it.
+   *                              {@link Iterator}), will create a {@link CursorProvider}
+   * @param event                 Used for the case where a {@link CursorProvider} is created, register the one in it.
    *
    * @return a {@link Message}
-   * @deprecated since 4.4.0. Use {@link #toMessage(Result, MediaType, CursorProviderFactory, CoreEvent, DataType, ComponentLocation)} instead
+   * @deprecated since 4.4.0. Use
+   *             {@link #toMessage(Result, MediaType, CursorProviderFactory, CoreEvent, DataType, ComponentLocation)} instead
    */
   @Deprecated
   public static Message toMessage(org.mule.runtime.extension.api.runtime.operation.Result<?, ?> result,
@@ -420,11 +383,12 @@ public final class MessageUtils {
   /**
    * Transforms the given {@code results} into a list of {@link Message} objects
    *
-   * @param results a collection of {@link Result} items
+   * @param results               a collection of {@link Result} items
    * @param cursorProviderFactory the {@link CursorProviderFactory} used to handle streaming cursors
-   * @param eventContext the toot context of the {@link CoreEvent} which originated the results being transformed
+   * @param eventContext          the toot context of the {@link CoreEvent} which originated the results being transformed
    * @return a {@link List} of {@link Message}
-   * @deprecated since 4.4.0. Use {@link #messageCollection(Collection, CursorProviderFactory, BaseEventContext, ComponentLocation)}
+   * @deprecated since 4.4.0. Use
+   *             {@link #messageCollection(Collection, CursorProviderFactory, BaseEventContext, ComponentLocation)}
    */
   public static List<Message> toMessageCollection(Collection<org.mule.runtime.extension.api.runtime.operation.Result> results,
                                                   CursorProviderFactory cursorProviderFactory,
@@ -440,12 +404,11 @@ public final class MessageUtils {
 
   /**
    * Returns a {@link Function} which receives a value expected to be a legacy
-   * {@link org.mule.runtime.extension.api.runtime.operation.Result} and transforms it to a
-   * {@link Message}
+   * {@link org.mule.runtime.extension.api.runtime.operation.Result} and transforms it to a {@link Message}
    *
    * @param cursorProviderFactory a {@link CursorProviderFactory} in case the value is streaming
-   * @param eventContext the current {@link EventContext}
-   * @param originatingLocation the location of the component that generated the {@link Result}
+   * @param eventContext          the current {@link EventContext}
+   * @param originatingLocation   the location of the component that generated the {@link Result}
    * @return a {@link Function}
    * @since 4.4.0
    */
@@ -457,12 +420,11 @@ public final class MessageUtils {
   }
 
   /**
-   * Returns a {@link Function} which receives a value expected to be {@link Result} and transforms it to a
-   * {@link Message}
+   * Returns a {@link Function} which receives a value expected to be {@link Result} and transforms it to a {@link Message}
    *
    * @param cursorProviderFactory a {@link CursorProviderFactory} in case the value is streaming
-   * @param eventContext the current {@link EventContext}
-   * @param originatingLocation the location of the component that generated the {@link Result}
+   * @param eventContext          the current {@link EventContext}
+   * @param originatingLocation   the location of the component that generated the {@link Result}
    * @return a {@link Function}
    * @since 4.4.0
    */
@@ -476,11 +438,12 @@ public final class MessageUtils {
   /**
    * Transforms the given {@code results} into a similar collection of {@link Message} objects
    *
-   * @param results a collection of {@link Result} items
+   * @param results               a collection of {@link Result} items
    * @param cursorProviderFactory the {@link CursorProviderFactory} used to handle streaming cursors
-   * @param eventContext the root context of the {@link CoreEvent} which originated the results being transformed
+   * @param eventContext          the root context of the {@link CoreEvent} which originated the results being transformed
    * @return a similar collection of {@link Message}
-   * @deprecated since 4.4.0. Use {@link #messageIterator(Iterator, CursorProviderFactory, BaseEventContext, ComponentLocation)} instead
+   * @deprecated since 4.4.0. Use {@link #messageIterator(Iterator, CursorProviderFactory, BaseEventContext, ComponentLocation)}
+   *             instead
    */
   @Deprecated
   public static Iterator<Message> toMessageIterator(Iterator<org.mule.runtime.extension.api.runtime.operation.Result> results,
@@ -507,34 +470,5 @@ public final class MessageUtils {
     }
 
     return builder.build();
-  }
-
-  /**
-   * Decorates input value.
-   * 
-   * @param v value to be decorated
-   * @param eventCorrelationId the correlationId of the context involved
-   * @param componentDecoratorFactory the component decorator factory
-   * 
-   * @return decorated value
-   */
-  public static Object decorateInput(Object v, String eventCorrelationId,
-                                     CursorComponentDecoratorFactory componentDecoratorFactory) {
-    if (v instanceof byte[]) {
-      componentDecoratorFactory.computeInputByteCount((byte[]) v);
-      return v;
-    } else if (v instanceof InputStream) {
-      return componentDecoratorFactory.decorateInput((InputStream) v, eventCorrelationId);
-    } else if (v instanceof Collection) {
-      return componentDecoratorFactory.decorateInput((Collection) v, eventCorrelationId);
-    } else if (v instanceof Iterator) {
-      return componentDecoratorFactory.decorateInput((Iterator) v, eventCorrelationId);
-    } else if (v instanceof CursorStreamProvider) {
-      return new InputDecoratedCursorStreamProvider((CursorStreamProvider) v,
-                                                    componentDecoratorFactory,
-                                                    eventCorrelationId);
-    } else {
-      return v;
-    }
   }
 }

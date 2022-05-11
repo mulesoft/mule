@@ -11,7 +11,6 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
-import static org.mule.runtime.core.internal.management.stats.NoOpCursorComponentDecoratorFactory.NO_OP_INSTANCE;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.withRefreshToken;
 import static org.mule.sdk.api.data.sample.SampleDataException.NOT_SUPPORTED;
@@ -43,8 +42,8 @@ import org.mule.sdk.api.runtime.operation.Result;
 import java.util.function.Supplier;
 
 /**
- * Coordinates all the moving parts necessary to provision and execute a {@link SampleDataProvider},
- * handling possible errors and transforming the output into a {@link Message}
+ * Coordinates all the moving parts necessary to provision and execute a {@link SampleDataProvider}, handling possible errors and
+ * transforming the output into a {@link Message}
  *
  * @since 4.4.0
  */
@@ -79,14 +78,14 @@ public class SampleDataProviderMediator {
     this.reflectionCache = reflectionCache;
     this.streamingManager = streamingManager;
     sampleDataProperty = componentModel.getModelProperty(SampleDataProviderFactoryModelProperty.class).orElse(null);
-    returnDelegate = new ValueReturnDelegate(componentModel, NO_OP_INSTANCE, cursorProviderFactory, muleContext);
+    returnDelegate = new ValueReturnDelegate(componentModel, cursorProviderFactory, muleContext);
   }
 
   /**
    * Resolves the sample data
    *
-   * @param parameterValueResolver parameter resolver required if the associated {@link SampleDataProvider} requires
-   *                               the value of parameters from the same parameter container.
+   * @param parameterValueResolver parameter resolver required if the associated {@link SampleDataProvider} requires the value of
+   *                               parameters from the same parameter container.
    * @param connectionSupplier     supplier of connection instances related to the container and used, if necessary, by the
    *                               {@link SampleDataProvider}
    * @param configurationSupplier  supplier of configuration instance related to the container and used, if necessary, by the
@@ -104,14 +103,14 @@ public class SampleDataProviderMediator {
   /**
    * Resolves the sample data
    *
-   * @param parameterValueResolver       parameter resolver required if the associated {@link SampleDataProvider} requires
-   *                                     the value of parameters from the same parameter container.
-   * @param connectionSupplier           supplier of connection instances related to the container and used, if necessary,
-   *                                     by the {@link SampleDataProvider}
-   * @param configurationSupplier        supplier of configuration instance related to the container and used, if necessary,
-   *                                     by the  {@link SampleDataProvider}
-   * @param connectionProviderSupplier   the connection provider in charge of providing the connection given by the
-   *                                     connection supplier.
+   * @param parameterValueResolver     parameter resolver required if the associated {@link SampleDataProvider} requires the value
+   *                                   of parameters from the same parameter container.
+   * @param connectionSupplier         supplier of connection instances related to the container and used, if necessary, by the
+   *                                   {@link SampleDataProvider}
+   * @param configurationSupplier      supplier of configuration instance related to the container and used, if necessary, by the
+   *                                   {@link SampleDataProvider}
+   * @param connectionProviderSupplier the connection provider in charge of providing the connection given by the connection
+   *                                   supplier.
    *
    * @return a {@link Message} carrying the sample data
    * @throws SampleDataException if an error occurs resolving the sample data
@@ -133,7 +132,8 @@ public class SampleDataProviderMediator {
                                                                            connectionSupplier,
                                                                            configurationSupplier,
                                                                            reflectionCache,
-                                                                           muleContext);
+                                                                           muleContext,
+                                                                           componentModel);
 
       SampleDataProvider provider = factory.createSampleDataProvider();
       Result result = withRefreshToken(connectionProviderSupplier, () -> provider.getSample());
@@ -155,7 +155,6 @@ public class SampleDataProviderMediator {
                                        componentModel,
                                        getNullEvent(muleContext),
                                        cursorProviderFactory,
-                                       NO_OP_INSTANCE,
                                        streamingManager,
                                        component,
                                        new NoRetryPolicyTemplate(),

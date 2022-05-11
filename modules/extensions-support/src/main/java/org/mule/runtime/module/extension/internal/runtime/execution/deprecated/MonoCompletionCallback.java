@@ -12,8 +12,7 @@ import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import reactor.core.publisher.MonoSink;
 
 /**
- * Implementation of {@link CompletionCallback} which works using
- * project Reactor.
+ * Implementation of {@link CompletionCallback} which works using project Reactor.
  *
  * @since 4.0
  * @deprecated since 4.3

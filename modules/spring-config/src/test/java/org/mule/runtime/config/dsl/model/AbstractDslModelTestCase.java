@@ -24,6 +24,7 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
+import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
@@ -82,7 +83,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import org.junit.After;
 import org.junit.Before;
@@ -97,6 +97,8 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
   protected static final String NAMESPACE_URI = "http://www.mulesoft.org/schema/mule/mockns";
   protected static final String SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/mockns/current/mule-mockns.xsd";
   protected static final String KEY_NAME = "metadataKeyParameter";
+  protected static final String CONFIG_REF_NAME = "config-ref";
+  protected static final String NAME_PARAM_NAME = "name";
   protected static final String CONTENT_NAME = "myCamelCaseName";
   protected static final String BEHAVIOUR_NAME = "otherName";
   protected static final String LIST_NAME = "listName";
@@ -148,6 +150,9 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
   @Mock(lenient = true)
   protected ParameterGroupModel anotherParameterGroupModel;
 
+  @Mock(lenient = true)
+  protected ParameterGroupModel configParameterGroupModel;
+
   protected ParameterModel errorMappingsParameter;
 
   protected ParameterGroupModel errorMappingsParameterGroup;
@@ -163,8 +168,9 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
   protected ObjectType complexType;
 
   protected ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-  protected List<ParameterModel> defaultGroupParameterModels;
-  protected List<ParameterModel> anotherDefaultGroupParameterModels;
+  protected List<ParameterModel> componentParameterModels;
+  protected List<ParameterModel> anotherComponentParameterModels;
+  protected List<ParameterModel> configParameterModels;
 
   @Before
   public void before() {
@@ -210,15 +216,16 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
                                                    SUPPORTED, CONTENT, null,
                                                    emptyList(), emptySet());
 
-    this.defaultGroupParameterModels =
-        asList(nameParameter, configRefParameter, contentParameter, behaviourParameter, listParameter, keyParameter);
+    this.componentParameterModels = asList(configRefParameter, contentParameter, behaviourParameter, listParameter, keyParameter);
     when(parameterGroupModel.getName()).thenReturn(DEFAULT_GROUP_NAME);
     when(parameterGroupModel.isShowInDsl()).thenReturn(false);
-    when(parameterGroupModel.getParameterModels()).thenReturn(defaultGroupParameterModels);
+    when(parameterGroupModel.getParameterModels()).thenReturn(componentParameterModels);
     when(parameterGroupModel.getParameter(anyString()))
         .then(invocation -> {
           String paramName = invocation.getArgument(0);
           switch (paramName) {
+            case CONFIG_REF_NAME:
+              return of(configRefParameter);
             case KEY_NAME:
               return of(keyParameter);
             case CONTENT_NAME:
@@ -231,20 +238,44 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
           return Optional.empty();
         });
 
-    this.anotherDefaultGroupParameterModels = asList(anotherContentParameter, listParameter, configRefParameter, keyParameter);
+    this.anotherComponentParameterModels = asList(configRefParameter, anotherContentParameter, listParameter, keyParameter);
     when(anotherParameterGroupModel.getName()).thenReturn(DEFAULT_GROUP_NAME);
     when(anotherParameterGroupModel.isShowInDsl()).thenReturn(false);
-    when(anotherParameterGroupModel.getParameterModels()).thenReturn(anotherDefaultGroupParameterModels);
+    when(anotherParameterGroupModel.getParameterModels()).thenReturn(anotherComponentParameterModels);
     when(anotherParameterGroupModel.getParameter(anyString()))
         .then(invocation -> {
           String paramName = invocation.getArgument(0);
           switch (paramName) {
+            case CONFIG_REF_NAME:
+              return of(configRefParameter);
             case KEY_NAME:
               return of(keyParameter);
             case ANOTHER_CONTENT_NAME:
               return of(anotherContentParameter);
             case LIST_NAME:
               return of(listParameter);
+          }
+          return Optional.empty();
+        });
+
+    this.configParameterModels = asList(nameParameter, contentParameter, behaviourParameter, listParameter, keyParameter);
+    when(configParameterGroupModel.getName()).thenReturn(DEFAULT_GROUP_NAME);
+    when(configParameterGroupModel.isShowInDsl()).thenReturn(false);
+    when(configParameterGroupModel.getParameterModels()).thenReturn(configParameterModels);
+    when(configParameterGroupModel.getParameter(anyString()))
+        .then(invocation -> {
+          String paramName = invocation.getArgument(0);
+          switch (paramName) {
+            case NAME_PARAM_NAME:
+              return of(nameParameter);
+            case KEY_NAME:
+              return of(keyParameter);
+            case CONTENT_NAME:
+              return of(contentParameter);
+            case LIST_NAME:
+              return of(listParameter);
+            case BEHAVIOUR_NAME:
+              return of(behaviourParameter);
           }
           return Optional.empty();
         });
@@ -262,7 +293,7 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
 
     source =
         new ImmutableSourceModel(SOURCE_NAME, "", false, false, asList(parameterGroupModel), emptyList(), null, null, empty(),
-                                 empty(), empty(), false, false, false, null, SOURCE, emptySet(),
+                                 empty(), empty(), false, false, false, null, SOURCE, emptySet(), PUBLIC,
                                  singleton(createTypeResolversInformationModelProperty("category", "outputResolverName",
                                                                                        "attributesResolverName",
                                                                                        parameterResolversNames,
@@ -293,7 +324,7 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
     when(connectionProvider.getStereotype()).thenReturn(CONNECTION);
 
     when(configuration.getName()).thenReturn(CONFIGURATION_NAME);
-    when(configuration.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
+    when(configuration.getParameterGroupModels()).thenReturn(asList(configParameterGroupModel));
     when(configuration.getOperationModels()).thenReturn(asList(operation));
     when(configuration.getSourceModels()).thenReturn(asList(source));
     when(configuration.getConnectionProviders()).thenReturn(asList(connectionProvider));
@@ -326,8 +357,8 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
     when(dslContext.getExtensions()).thenReturn(singleton(mockExtension));
     when(dslContext.getTypeCatalog()).thenReturn(typeCatalog);
 
-    Stream.of(configuration, connectionProvider)
-        .forEach(model -> when(model.getAllParameterModels()).thenReturn(defaultGroupParameterModels));
+    when(configuration.getAllParameterModels()).thenReturn(configParameterModels);
+    when(connectionProvider.getAllParameterModels()).thenReturn(componentParameterModels);
   }
 
   private ImmutableParameterModel createParameterModel(String paramName, boolean isComponentId, MetadataType type,
@@ -347,7 +378,7 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
     return new ImmutableOperationModel(operationName, "",
                                        paramGroups,
                                        emptyList(), null, null, true, ExecutionType.BLOCKING, false, false, false, null,
-                                       emptySet(), PROCESSOR, modelProperties, emptySet());
+                                       emptySet(), PROCESSOR, PUBLIC, modelProperties, emptySet());
   }
 
   @After

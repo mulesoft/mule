@@ -33,9 +33,9 @@ public class DatePropertyEditor extends PropertyEditorSupport {
    * The "allowEmpty" parameter states if an empty String should be allowed for parsing, i.e. get interpreted as null value.
    * Otherwise, an IllegalArgumentException gets thrown in that case.
    * 
-   * @param longDateFormat DateFormat to use for parsing and rendering
+   * @param longDateFormat  DateFormat to use for parsing and rendering
    * @param shortDateFormat a short form of DateFormat to use for parsing and rendering
-   * @param allowEmpty if empty strings should be allowed
+   * @param allowEmpty      if empty strings should be allowed
    */
   public DatePropertyEditor(DateFormat longDateFormat, DateFormat shortDateFormat, boolean allowEmpty) {
     this.dateFormat = longDateFormat;
@@ -54,8 +54,8 @@ public class DatePropertyEditor extends PropertyEditorSupport {
    * length specified. This is useful because SimpleDateFormat does not enforce strict parsing of the year part, not even with
    * <code>setLenient(false)</code>. Without an "exactDateLength" specified, the "01/01/05" would get parsed to "01/01/0005".
    * 
-   * @param longDateFormat DateFormat to use for parsing and rendering
-   * @param allowEmpty if empty strings should be allowed
+   * @param longDateFormat  DateFormat to use for parsing and rendering
+   * @param allowEmpty      if empty strings should be allowed
    * @param exactDateLength the exact expected length of the date String
    */
   public DatePropertyEditor(DateFormat longDateFormat, boolean allowEmpty, int exactDateLength) {

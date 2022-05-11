@@ -18,12 +18,14 @@ import java.util.Set;
  * @since 3.7.0
  */
 public enum ArtifactType {
+
   APP("app"), DOMAIN("domain"), PLUGIN("plugin"), POLICY("policy"), SERVICE("service"), SERVER_PLUGIN("serverPlugin"),
 
   /**
    * @deprecated Use a {@link Set} of applicable {@link ArtifactType}s where possible.
    */
-  @Deprecated ALL("app/domain");
+  @Deprecated
+  ALL("app/domain");
 
   public static final String APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY = "applyToArtifactType";
   private final String artifactTypeAsString;

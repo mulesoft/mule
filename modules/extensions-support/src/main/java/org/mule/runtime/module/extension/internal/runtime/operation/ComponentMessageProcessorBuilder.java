@@ -56,7 +56,6 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   protected CursorProviderFactory cursorProviderFactory;
   protected RetryPolicyTemplate retryPolicyTemplate;
   protected MessageProcessorChain nestedChain;
-  protected boolean lazyModeEnabled;
 
   public ComponentMessageProcessorBuilder(ExtensionModel extensionModel,
                                           M operationModel,
@@ -102,12 +101,12 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   protected ResolverSet getArgumentsResolverSet() throws ConfigurationException {
     final ResolverSet parametersResolverSet =
         ParametersResolver
-            .fromValues(parameters, muleContext, lazyModeEnabled, reflectionCache, expressionManager, operationModel.getName())
+            .fromValues(parameters, muleContext, reflectionCache, expressionManager, operationModel.getName())
             .getParametersAsResolverSet(operationModel, muleContext);
 
     final ResolverSet childsResolverSet =
         ParametersResolver
-            .fromValues(parameters, muleContext, lazyModeEnabled, reflectionCache, expressionManager, operationModel.getName())
+            .fromValues(parameters, muleContext, reflectionCache, expressionManager, operationModel.getName())
             .getNestedComponentsAsResolverSet(operationModel);
 
     return parametersResolverSet.merge(childsResolverSet);
@@ -135,11 +134,6 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
 
   public ComponentMessageProcessorBuilder<M, P> setCursorProviderFactory(CursorProviderFactory cursorProviderFactory) {
     this.cursorProviderFactory = cursorProviderFactory;
-    return this;
-  }
-
-  public ComponentMessageProcessorBuilder<M, P> setLazyMode(boolean lazyModeEnabled) {
-    this.lazyModeEnabled = lazyModeEnabled;
     return this;
   }
 

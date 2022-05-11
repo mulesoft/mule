@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
+import io.qameta.allure.Issue;
 
 public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase {
 
@@ -225,6 +226,29 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
     assertThat(payload, hasKey(instanceOf(HouseDoor.class)));
     assertThat(payload, hasValue(allOf(hasKey(is("leftDoor")), hasValue(instanceOf(CarDoor.class)))));
     assertThat(payload, hasValue(allOf(hasKey(is("rightDoor")), hasValue(instanceOf(CarDoor.class)))));
+  }
+
+  @Test
+  public void valuesAreCorrectlyParsedForPojosWithCommonNameInnerField() throws Exception {
+    final Object payload = flowRunner("pojosWithCommonNameInnerField").run().getMessage().getPayload().getValue();
+
+    assertThat(payload, is("pull2"));
+  }
+
+  @Test
+  @Issue("SDK-26")
+  public void killWithRevolver() throws Exception {
+    final Object payload = flowRunner("killWithRevolver").run().getMessage().getPayload().getValue();
+
+    assertThat(payload, is("BANG"));
+  }
+
+  @Test
+  @Issue("SDK-26")
+  public void killWithRicin() throws Exception {
+    final Object payload = flowRunner("killWithRicin").run().getMessage().getPayload().getValue();
+
+    assertThat(payload, is("You have been killed with Ricin"));
   }
 
   private void assertRicin(Object payload, Long micrograms, String victim) {

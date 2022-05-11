@@ -6,15 +6,6 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static java.lang.Boolean.valueOf;
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Arrays.stream;
-import static java.util.Optional.ofNullable;
-import static org.apache.commons.collections.CollectionUtils.collect;
-import static org.apache.commons.collections.CollectionUtils.find;
-import static org.apache.commons.io.FileUtils.deleteDirectory;
-import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
@@ -22,11 +13,22 @@ import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 
+import static java.lang.Boolean.valueOf;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+
+import static org.apache.commons.io.FileUtils.deleteDirectory;
+import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
+
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.module.artifact.api.Artifact;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
@@ -37,15 +39,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
-import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
-import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +52,8 @@ import org.slf4j.LoggerFactory;
  * Deployer of an artifact within mule container. - Keeps track of deployed artifacts - Avoid already deployed artifacts to be
  * redeployed - Deploys, undeploys, redeploys packaged and exploded artifacts
  */
-public class DefaultArchiveDeployer<T extends DeployableArtifact> implements ArchiveDeployer<T> {
+public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T extends DeployableArtifact<D>>
+    implements ArchiveDeployer<D, T> {
 
   public static final String ARTIFACT_NAME_PROPERTY = "artifactName";
   public static final String JAR_FILE_SUFFIX = ".jar";
@@ -67,13 +67,13 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   private final File artifactDir;
   private final ObservableList<T> artifacts;
   private final ArtifactDeploymentTemplate deploymentTemplate;
-  private AbstractDeployableArtifactFactory<T> artifactFactory;
+  private AbstractDeployableArtifactFactory<D, T> artifactFactory;
   private DeploymentListener deploymentListener = new NullDeploymentListener();
   private final MuleContextListenerFactory muleContextListenerFactory;
 
 
-  public DefaultArchiveDeployer(final ArtifactDeployer deployer,
-                                final AbstractDeployableArtifactFactory artifactFactory,
+  public DefaultArchiveDeployer(final ArtifactDeployer<T> deployer,
+                                final AbstractDeployableArtifactFactory<D, T> artifactFactory,
                                 final ObservableList<T> artifacts,
                                 ArtifactDeploymentTemplate deploymentTemplate,
                                 MuleContextListenerFactory muleContextListenerFactory) {
@@ -88,10 +88,10 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   @Override
   public boolean isUpdatedZombieArtifact(String artifactName) {
-    @SuppressWarnings("rawtypes")
-    Collection<String> deployedAppNames = collect(artifacts, new BeanToPropertyValueTransformer(ARTIFACT_NAME_PROPERTY));
-
-    if (deployedAppNames.contains(artifactName) && (!artifactZombieMap.containsKey(artifactName))) {
+    if (!artifactZombieMap.containsKey(artifactName)
+        && artifacts.stream()
+            .map(Artifact::getArtifactName)
+            .anyMatch(deployedAppName -> deployedAppName.equals(artifactName))) {
       return false;
     }
 
@@ -175,12 +175,12 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   @Override
-  public void setArtifactFactory(final ArtifactFactory<T> artifactFactory) {
+  public void setArtifactFactory(final ArtifactFactory<D, T> artifactFactory) {
     if (!(artifactFactory instanceof AbstractDeployableArtifactFactory)) {
       throw new IllegalArgumentException("artifactFactory is expected to be of type "
           + AbstractDeployableArtifactFactory.class.getName());
     }
-    this.artifactFactory = (AbstractDeployableArtifactFactory<T>) artifactFactory;
+    this.artifactFactory = (AbstractDeployableArtifactFactory<D, T>) artifactFactory;
   }
 
   @Override
@@ -206,6 +206,12 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   private T deployExplodedApp(String addedApp, Optional<Properties> deploymentProperties) throws DeploymentException {
+    return deployExplodedApp(addedApp, deploymentProperties, empty());
+  }
+
+  private T deployExplodedApp(String addedApp, Optional<Properties> deploymentProperties,
+                              Optional<Properties> artifactStatusProperties)
+      throws DeploymentException {
     if (logger.isDebugEnabled()) {
       logger.debug("================== New Exploded Artifact: " + addedApp);
     }
@@ -240,7 +246,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       }
     }
 
-    deployArtifact(artifact, deploymentProperties);
+    deployArtifact(artifact, deploymentProperties, artifactStatusProperties);
     return artifact;
   }
 
@@ -277,7 +283,10 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   private T findArtifact(String artifactName) {
-    return (T) find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactName));
+    return artifacts.stream()
+        .filter(artifact -> artifact.getArtifactName().equals(artifactName))
+        .findAny()
+        .orElse(null);
   }
 
   private void trackArtifact(T artifact) {
@@ -461,12 +470,19 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   @Override
   public void deployArtifact(T artifact, Optional<Properties> deploymentProperties) throws DeploymentException {
+    deployArtifact(artifact, deploymentProperties, empty());
+  }
+
+  public void deployArtifact(T artifact, Optional<Properties> deploymentProperties, Optional<Properties> artifactStatusProperties)
+      throws DeploymentException {
     try {
       // add to the list of known artifacts first to avoid deployment loop on failure
       trackArtifact(artifact);
 
       deploymentListener.onDeploymentStart(artifact.getArtifactName());
-      deployer.deploy(artifact, shouldStartArtifact(artifact, deploymentProperties.orElse(null)));
+      deployer
+          .deploy(artifact,
+                  shouldStartArtifactAccordingToStatusBeforeDomainRedeployment(artifact, artifactStatusProperties.orElse(null)));
 
       artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
       deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
@@ -493,12 +509,17 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     }
   }
 
-  private boolean shouldStartArtifact(T artifact, Properties deploymentProperties) {
-    if (!(artifact instanceof Application) || deploymentProperties == null) {
+  /**
+   * Checks the stored but not persisted property START_ARTIFACT_ON_DEPLOYMENT_PROPERTY to know if the artifact should be started
+   * or not. If the artifact was purposely stopped and then its domain was redeployed, the artifact should maintain its status and
+   * not start on deployment.
+   */
+  private boolean shouldStartArtifactAccordingToStatusBeforeDomainRedeployment(T artifact, Properties artifactStatusProperties) {
+    if (!(artifact instanceof Application) || artifactStatusProperties == null) {
       return true;
     }
 
-    return valueOf(deploymentProperties.getProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, "true"));
+    return valueOf(artifactStatusProperties.getProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, "true"));
   }
 
   private T deployOrRedeployPackagedArtifact(final URI artifactUri, String artifactName,
@@ -573,18 +594,21 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   @Override
   public T deployExplodedArtifact(String artifactDir, Optional<Properties> deploymentProperties) {
+    return deployExplodedArtifact(artifactDir, deploymentProperties, empty());
+  }
+
+  public T deployExplodedArtifact(String artifactDir, Optional<Properties> deploymentProperties,
+                                  Optional<Properties> artifactStatusProperties) {
     if (!isUpdatedZombieArtifact(artifactDir)) {
       return null;
     }
 
-    return deployExplodedApp(artifactDir, deploymentProperties);
+    return deployExplodedApp(artifactDir, deploymentProperties, artifactStatusProperties);
   }
 
+  @Override
   public void doNotPersistArtifactStop(T artifact) {
     deployer.doNotPersistArtifactStop(artifact);
   }
 
-  public void doNotPersistFlowsStop(String artifactName) {
-    deployer.doNotPersistFlowsStop(artifactName);
-  }
 }

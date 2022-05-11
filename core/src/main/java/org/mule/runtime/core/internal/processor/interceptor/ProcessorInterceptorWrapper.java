@@ -74,6 +74,11 @@ class ProcessorInterceptorWrapper implements ComponentInterceptorAdapter {
   }
 
   @Override
+  public boolean isErrorMappingRequired(ComponentLocation location) {
+    return processorInterceptor.isErrorMappingRequired(location);
+  }
+
+  @Override
   public ClassLoader getClassLoader() {
     return processorInterceptor.getClass().getClassLoader();
   }

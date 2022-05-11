@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.util;
 
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.springframework.util.ReflectionUtils.setField;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.EnrichableModel;
@@ -19,11 +18,11 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ParameterGroupObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 
-import com.google.common.collect.ImmutableList;
-
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.function.Supplier;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * An implementation of {@link ValueSetter} for parameter groups. Parameter groups are a set of parameters defined inside a Pojo
@@ -39,7 +38,7 @@ public final class GroupValueSetter implements ValueSetter {
    * {@link ParameterGroupModelProperty} extracted from the given {@code model}. If {@code model} does not contain such model
    * property then an empty {@link List} is returned
    *
-   * @param model a {@link EnrichableModel} instance presumed to have the {@link ParameterGroupModelProperty}
+   * @param model           a {@link EnrichableModel} instance presumed to have the {@link ParameterGroupModelProperty}
    * @param reflectionCache the cache for expensive reflection lookups
    * @return a {@link List} with {@link ValueSetter} instances. May be empty but will never be {@code null}
    */
@@ -67,8 +66,8 @@ public final class GroupValueSetter implements ValueSetter {
   /**
    * Creates a new instance that can set values defined in the given {@code group}
    *
-   * @param groupDescriptor a {@link ParameterGroupDescriptor}
-   * @param reflectionCache the cache for expensive reflection lookups
+   * @param groupDescriptor   a {@link ParameterGroupDescriptor}
+   * @param reflectionCache   the cache for expensive reflection lookups
    * @param expressionManager the {@link ExpressionManager} used to create a session used to evaluate the attributes.
    */
   public GroupValueSetter(ParameterGroupDescriptor groupDescriptor,
@@ -87,6 +86,11 @@ public final class GroupValueSetter implements ValueSetter {
     ParameterGroupObjectBuilder<?> parameterGroupObjectBuilder = new ParameterGroupObjectBuilder<>(groupDescriptor,
                                                                                                    reflectionCache.get(),
                                                                                                    expressionManager.get());
-    setField(container, target, parameterGroupObjectBuilder.build(result));
+    Object value = parameterGroupObjectBuilder.build(result);
+    try {
+      container.set(target, value);
+    } catch (IllegalAccessException ex) {
+      throw new IllegalStateException("Unexpected reflection exception - " + ex.getClass().getName() + ": " + ex.getMessage());
+    }
   }
 }

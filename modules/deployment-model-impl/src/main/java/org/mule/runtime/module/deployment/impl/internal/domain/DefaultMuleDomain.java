@@ -6,11 +6,6 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
-import static java.lang.Boolean.TRUE;
-import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
@@ -23,11 +18,18 @@ import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 
+import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
+
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.api.value.ValueProviderService;
@@ -35,14 +37,15 @@ import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.InstallException;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
+import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
+import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifact;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -64,15 +67,20 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
   private final ExtensionModelLoaderManager extensionModelLoaderManager;
   private final ClassLoaderRepository classLoaderRepository;
   private final LockFactory runtimeLockFactory;
+  private final MemoryManagementService memoryManagementService;
+  private final ArtifactConfigurationProcessor artifactConfigurationProcessor;
 
   private MuleContextListener muleContextListener;
 
-  public DefaultMuleDomain(DomainDescriptor descriptor, ArtifactClassLoader deploymentClassLoader,
+  public DefaultMuleDomain(DomainDescriptor descriptor,
+                           ArtifactClassLoader deploymentClassLoader,
                            ClassLoaderRepository classLoaderRepository,
                            ServiceRepository serviceRepository,
                            List<ArtifactPlugin> artifactPlugins,
                            ExtensionModelLoaderManager extensionModelLoaderManager,
-                           LockFactory runtimeLockFactory) {
+                           LockFactory runtimeLockFactory,
+                           MemoryManagementService memoryManagementService,
+                           ArtifactConfigurationProcessor artifactConfigurationProcessor) {
     super("domain", "domain", deploymentClassLoader);
     this.classLoaderRepository = classLoaderRepository;
     this.descriptor = descriptor;
@@ -80,6 +88,8 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
     this.artifactPlugins = artifactPlugins;
     this.extensionModelLoaderManager = extensionModelLoaderManager;
     this.runtimeLockFactory = runtimeLockFactory;
+    this.memoryManagementService = memoryManagementService;
+    this.artifactConfigurationProcessor = artifactConfigurationProcessor;
   }
 
   @Override
@@ -171,6 +181,7 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
           .setArtifactPlugins(artifactPlugins)
           .setExecutionClassloader(deploymentClassLoader.getClassLoader())
           .setArtifactInstallationDirectory(getArtifactInstallationDirectory())
+          .setArtifactConfigurationProcessor(artifactConfigurationProcessor)
           .setExtensionModelLoaderRepository(extensionModelLoaderManager)
           .setArtifactType(DOMAIN)
           .setEnableLazyInit(lazy)
@@ -179,7 +190,9 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
           .setProperties(ofNullable(resolveDeploymentProperties(descriptor.getDataFolderName(),
                                                                 descriptor.getDeploymentProperties())))
           .setServiceRepository(serviceRepository)
-          .setRuntimeLockFactory(runtimeLockFactory);
+          .setRuntimeLockFactory(runtimeLockFactory)
+          .setMemoryManagementService(memoryManagementService)
+          .setArtifactCoordinates(descriptor.getBundleDescriptor());
 
       if (!descriptor.getConfigResources().isEmpty()) {
         validateConfigurationFileDoNotUsesCoreNamespace();

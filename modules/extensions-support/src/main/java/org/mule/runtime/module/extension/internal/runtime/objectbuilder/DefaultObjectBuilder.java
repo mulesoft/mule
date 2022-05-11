@@ -8,19 +8,16 @@ package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
-import static java.util.function.UnaryOperator.identity;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getMuleVersion;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.internal.util.message.MessageUtils.decorateInput;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
-import static org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor.COMPONENT_DECORATOR_FACTORY_KEY;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.mapTypeValue;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursorAsUnclosable;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.typedValueAsUnclosable;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
@@ -29,9 +26,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -78,7 +73,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
    * Adds a property which value is to be obtained from a {@link ValueResolver}
    *
    * @param propertyName the name of the property in which the value is to be assigned
-   * @param resolver a {@link ValueResolver} used to provide the actual value
+   * @param resolver     a {@link ValueResolver} used to provide the actual value
    * @return this builder
    * @throws {@link java.lang.IllegalArgumentException} if method or resolver are {@code null}
    */
@@ -95,7 +90,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
   /**
    * Adds a property which value is to be obtained from a {@link ValueResolver}
    *
-   * @param field the property in which the value is to be assigned
+   * @param field    the property in which the value is to be assigned
    * @param resolver a {@link ValueResolver} used to provide the actual value
    * @return this builder
    * @throws {@link java.lang.IllegalArgumentException} if method or resolver are {@code null}
@@ -121,31 +116,15 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
   public T build(ValueResolvingContext context) throws MuleException {
     T object = createInstance(prototypeClass);
 
-    final CursorComponentDecoratorFactory componentDecoratorFactory =
-        context != null
-            ? (CursorComponentDecoratorFactory) context.getProperty(COMPONENT_DECORATOR_FACTORY_KEY)
-            : null;
-
     for (Map.Entry<FieldSetter, ValueResolver<Object>> entry : resolvers.entrySet()) {
       final Object resolvedValue = resolveValue(entry.getValue(), context);
 
       entry.getKey().set(object,
-                         context == null || context.resolveCursors()
-                             ? resolveCursor(resolvedValue,
-                                             entry.getValue().isContent() && componentDecoratorFactory != null
-                                                 ? v -> decorateInput(v, context.getEvent()
-                                                     .getCorrelationId(),
-                                                                      componentDecoratorFactory)
-                                                 : identity())
-                             : entry.getValue().isContent() && componentDecoratorFactory != null
-                                 ? mapTypeValue(resolvedValue,
-                                                v -> decorateInput(v, context.getEvent()
-                                                    .getCorrelationId(),
-                                                                   componentDecoratorFactory))
-                                 : resolvedValue);
+                         context == null || context.resolveCursors() ? resolveCursorAsUnclosable(resolvedValue)
+                             : typedValueAsUnclosable(resolvedValue));
     }
 
-    injectFields(object, name, encoding, new MuleVersion(MULE_VERSION), reflectionCache);
+    injectFields(object, name, encoding, getMuleVersion(), reflectionCache);
 
     return object;
   }

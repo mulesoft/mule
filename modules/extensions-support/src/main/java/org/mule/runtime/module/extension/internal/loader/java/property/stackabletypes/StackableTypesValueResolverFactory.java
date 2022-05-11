@@ -36,18 +36,14 @@ public class StackableTypesValueResolverFactory {
   }
 
   /**
-   * Given a expression value, the expected type and the stack of {@link StackableType wrapper types}, iterates it and
-   * creates all the required {@link ValueResolver} and stacks them is necessary.
+   * Given a expression value, the expected type and the stack of {@link StackableType wrapper types}, iterates it and creates all
+   * the required {@link ValueResolver} and stacks them is necessary.
    *
    * @param expression   Expression value for the expression based value resolver.
    * @param expectedType The expected type of the expression resolution
    * @return The expression based {@link ValueResolver}
    */
   public ValueResolver getExpressionBasedValueResolver(String expression, Class expectedType) {
-    return getExpressionBasedValueResolver(expression, expectedType, false);
-  }
-
-  public ValueResolver getExpressionBasedValueResolver(String expression, Class expectedType, boolean content) {
     Stack<StackableType> stackableTypes = types.get();
     StackableType stackableType = stackableTypes.pop();
     StackableType.ExpressionBasedResolverFactory resolverFactory = stackableType
@@ -55,7 +51,7 @@ public class StackableTypesValueResolverFactory {
         .orElseThrow(() -> new IllegalStateException(format("Unable to create an Expression Based ValueResolver of '%s' type. No ExpressionBasedResolverFactory was registered for this type.",
                                                             stackableType.getType().getTypeName())));
 
-    ValueResolver resolver = resolverFactory.getResolver(expression, expectedType, content);
+    ValueResolver resolver = resolverFactory.getResolver(expression, expectedType);
     resolver = getWrapperValueResolver(resolver, stackableTypes);
     return resolver;
   }
@@ -82,9 +78,9 @@ public class StackableTypesValueResolverFactory {
   }
 
   /**
-   * Given a static value, the stack of {@link StackableType stacked types} and the desired class for the static resolver, if
-   * the class is not found as the root of the parameter type, an {@link Optional#empty()} will be returned.
-   * Also, iterates it and creates all the required {@link ValueResolver} and stacks them is necessary.
+   * Given a static value, the stack of {@link StackableType stacked types} and the desired class for the static resolver, if the
+   * class is not found as the root of the parameter type, an {@link Optional#empty()} will be returned. Also, iterates it and
+   * creates all the required {@link ValueResolver} and stacks them is necessary.
    *
    * @param value The static value
    * @return The static {@link ValueResolver}
@@ -92,7 +88,7 @@ public class StackableTypesValueResolverFactory {
   public Optional<ValueResolver> getStaticValueResolver(Object value, Class clazz) {
     Stack<StackableType> stackableTypes = types.get();
     StackableType stackableType = stackableTypes.get(stackableTypes.size() - 1);
-    if (stackableType.getType().isSameType(clazz)) {
+    if (stackableType.getType().isAssignableTo(clazz)) {
       return of(getStaticValueResolver(value));
     }
     return empty();

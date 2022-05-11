@@ -37,7 +37,7 @@ public class TestPolicyBuildingDefinitionProvider implements ComponentBuildingDe
 
   @Override
   public List<ComponentBuildingDefinition> getComponentBuildingDefinitions() {
-    ArrayList<ComponentBuildingDefinition> definitions = new ArrayList<>();
+    List<ComponentBuildingDefinition> definitions = new ArrayList<>();
 
     definitions.add(baseDefinition.withIdentifier("proxy")
         .withTypeDefinition(fromType(DefaultPolicyInstance.class))

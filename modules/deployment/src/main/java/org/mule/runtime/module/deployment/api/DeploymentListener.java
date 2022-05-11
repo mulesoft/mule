@@ -36,7 +36,7 @@ public interface DeploymentListener {
    * Notifies that a deploy for a given application has finished with a failure.
    *
    * @param artifactName the name of the application being deployed
-   * @param cause the cause of the failure
+   * @param cause        the cause of the failure
    */
   default void onDeploymentFailure(String artifactName, Throwable cause) {
 
@@ -64,7 +64,7 @@ public interface DeploymentListener {
    * Notifies that an un-deployment for a given application has finished with a failure.
    *
    * @param artifactName the name of the application being un-deployed
-   * @param cause the cause of the failure
+   * @param cause        the cause of the failure
    */
   default void onUndeploymentFailure(String artifactName, Throwable cause) {
 
@@ -74,7 +74,8 @@ public interface DeploymentListener {
    * Notifies that a redeploy for a given artifact has started.
    * <p/>
    * After this notification is sent, the artifact will be redeployed along with any child artifact. If all the artifacts has been
-   * redeployed successfully, then {@link #onRedeploymentSuccess(String)} will be invoked. Otherwise {@link #onRedeploymentFailure(String, Throwable)} will be invoked. Same notifications will be fired for child artifacts.
+   * redeployed successfully, then {@link #onRedeploymentSuccess(String)} will be invoked. Otherwise
+   * {@link #onRedeploymentFailure(String, Throwable)} will be invoked. Same notifications will be fired for child artifacts.
    * <p/>
    * A special scenario is when redeploying a domain bundle, an application existing in the old version of the bundle is not
    * available anymore. In that case, the redeployment of the mentioned application will fail, but the redeployment of the domain
@@ -101,7 +102,7 @@ public interface DeploymentListener {
    * Notifies that a redeploy for a given artifact has finished with a failure.
    *
    * @param artifactName the name of the artifact being deployed
-   * @param cause the cause of the failure
+   * @param cause        the cause of the failure
    * @since 4.1
    */
   default void onRedeploymentFailure(String artifactName, Throwable cause) {
@@ -111,7 +112,7 @@ public interface DeploymentListener {
   /**
    * Notifies the artifact creation for a given app.
    *
-   * @param artifactName name of the application that owns the mule context
+   * @param artifactName         name of the application that owns the mule context
    * @param customizationService customization service for server plugins
    */
   default void onArtifactCreated(String artifactName, CustomizationService customizationService) {
@@ -122,7 +123,7 @@ public interface DeploymentListener {
    * Notifies the artifact initialisation for a given app.
    *
    * @param artifactName name of the application that owns the mule context
-   * @param registry mule registry for the application being deployed
+   * @param registry     mule registry for the application being deployed
    */
   default void onArtifactInitialised(String artifactName, Registry registry) {
 
@@ -132,7 +133,7 @@ public interface DeploymentListener {
    * Notifies artifact start for a given app.
    *
    * @param artifactName name of the application that owns the mule context
-   * @param registry mule registry for the application being deployed
+   * @param registry     mule registry for the application being deployed
    */
   default void onArtifactStarted(String artifactName, Registry registry) {
 
@@ -142,7 +143,7 @@ public interface DeploymentListener {
    * Notifies artifact stop for a given app.
    *
    * @param artifactName name of the application that owns the mule context
-   * @param registry mule registry for the application being deployed
+   * @param registry     mule registry for the application being deployed
    */
   default void onArtifactStopped(String artifactName, Registry registry) {
 

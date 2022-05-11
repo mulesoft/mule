@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getMuleVersion;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.supportsConnectivity;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONFIGURATION_MODEL_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
@@ -184,7 +185,7 @@ public final class ConfigurationInstanceFactory<T> {
   private Pair<T, ResolverSetResult> createConfigurationInstance(String name, ResolverSetResult resolverSetResult)
       throws MuleException {
     Pair<T, ResolverSetResult> config = configurationObjectBuilder.build(resolverSetResult);
-    MuleVersion muleVersion = new MuleVersion(MuleExtensionModelProvider.MULE_VERSION);
+    MuleVersion muleVersion = getMuleVersion();
     injectFields(configurationModel, config.getFirst(), name, muleContext.getConfiguration().getDefaultEncoding(), muleVersion);
 
 
@@ -194,8 +195,7 @@ public final class ConfigurationInstanceFactory<T> {
   private Pair<T, ResolverSetResult> createConfigurationInstance(String name, CoreEvent event) throws MuleException {
     try (ValueResolvingContext context = ValueResolvingContext.builder(event).withExpressionManager(expressionManager).build()) {
       Pair<T, ResolverSetResult> config = configurationObjectBuilder.build(context);
-      String muleversion = MuleExtensionModelProvider.MULE_VERSION;
-      MuleVersion muleVersion = new MuleVersion(muleversion);
+      MuleVersion muleVersion = getMuleVersion();
       injectFields(configurationModel, config.getFirst(), name, muleContext.getConfiguration().getDefaultEncoding(), muleVersion);
       return config;
     }

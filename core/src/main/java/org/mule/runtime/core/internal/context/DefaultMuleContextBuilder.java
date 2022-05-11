@@ -8,8 +8,6 @@ package org.mule.runtime.core.internal.context;
 
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.context.notification.ServerNotificationManager.createDefaultNotificationManager;
-import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -17,6 +15,7 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -62,11 +61,12 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
 
   protected ObjectSerializer objectSerializer;
 
-  private ErrorTypeRepository errorTypeRepository;
-
   private Optional<Properties> deploymentProperties = empty();
 
   private List<MuleContextListener> listeners = new ArrayList<>();
+
+  private ArtifactCoordinates artifactCoordinates;
+
 
   /**
    * Creates a new builder
@@ -89,13 +89,6 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContext));
     muleContext.setArtifactType(artifactType);
 
-    if (errorTypeRepository == null) {
-      errorTypeRepository = createDefaultErrorTypeRepository();
-    }
-
-    muleContext.setErrorTypeRepository(errorTypeRepository);
-    muleContext.setErrorTypeLocator(createDefaultErrorTypeLocator(errorTypeRepository));
-
     final SimpleRegistry registry = new SimpleRegistry(muleContext, muleContext.getLifecycleInterceptor());
     muleContext.setRegistry(registry);
     muleContext.setInjector(registry);
@@ -107,6 +100,10 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     muleContext.setDeploymentProperties(getDeploymentProperties());
     muleContext.setListeners(listeners);
     getObjectSerializer(muleContext);
+
+    if (artifactCoordinates != null) {
+      ((DefaultMuleConfiguration) muleContext.getConfiguration()).setArtifactCoordinates(artifactCoordinates);
+    }
 
     return muleContext;
   }
@@ -184,7 +181,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
    */
   @Override
   public void setErrorTypeRepository(ErrorTypeRepository errorTypeRepository) {
-    this.errorTypeRepository = errorTypeRepository;
+    // Nothing to do
   }
 
   private <T> T injectMuleContextIfRequired(T object, MuleContext muleContext) {
@@ -251,5 +248,10 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
   @Override
   public void setListeners(List<MuleContextListener> listeners) {
     this.listeners = listeners;
+  }
+
+  @Override
+  public void setArtifactCoordinates(ArtifactCoordinates artifactCoordinates) {
+    this.artifactCoordinates = artifactCoordinates;
   }
 }

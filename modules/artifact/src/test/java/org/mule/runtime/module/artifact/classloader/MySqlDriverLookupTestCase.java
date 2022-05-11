@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.artifact.classloader;
 
+import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
+
 import static java.lang.Thread.currentThread;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
@@ -22,6 +24,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -68,7 +71,17 @@ public class MySqlDriverLookupTestCase extends AbstractMuleTestCase {
       }
 
       @Override
+      public ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy) {
+        return null;
+      }
+
+      @Override
       public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies, boolean overwrite) {
+        return null;
+      }
+
+      @Override
+      public ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy, boolean overwrite) {
         return null;
       }
     };

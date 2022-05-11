@@ -10,13 +10,14 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.either;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperties;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
-import static org.mule.test.allure.AllureConstants.RuntimeGlobalConfiguration.MavenGlobalConfiguration.MAVEN_GLOBAL_CONFIGURATION_STORY;
 import static org.mule.test.allure.AllureConstants.RuntimeGlobalConfiguration.RUNTIME_GLOBAL_CONFIGURATION;
+import static org.mule.test.allure.AllureConstants.RuntimeGlobalConfiguration.MavenGlobalConfiguration.MAVEN_GLOBAL_CONFIGURATION_STORY;
 
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.api.model.RemoteRepository;
@@ -30,14 +31,17 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 
 @Feature(RUNTIME_GLOBAL_CONFIGURATION)
 @Story(MAVEN_GLOBAL_CONFIGURATION_STORY)
@@ -53,7 +57,7 @@ public class MavenConfigTestCase extends AbstractMuleTestCase {
 
   @Description("Test a single file loaded from the classpath and verifies that the mule.conf and mule.properties json are not taken into account.")
   @Test
-  public void loadFromFileOnly() throws MalformedURLException {
+  public void loadRemoteRepositoriesFromFileOnly() throws MalformedURLException {
     GlobalConfigLoader.reset();
     MavenConfiguration mavenConfig = getMavenConfig();
     List<RemoteRepository> remoteRepositories = mavenConfig.getMavenRemoteRepositories();
@@ -74,6 +78,19 @@ public class MavenConfigTestCase extends AbstractMuleTestCase {
     assertThat(remoteRepository.getReleasePolicy().get().isEnabled(), is(false));
     assertThat(remoteRepository.getReleasePolicy().get().getUpdatePolicy(), equalTo("always"));
     assertThat(remoteRepository.getReleasePolicy().get().getChecksumPolicy(), equalTo("ignore"));
+  }
+
+  @Description("Test a single file loaded from the classpath and verifies that the mule.conf and mule.properties json are not taken into account.")
+  @Test
+  @Issue("MULE-19282")
+  public void loadProfilesFromFileOnly() throws MalformedURLException {
+    GlobalConfigLoader.reset();
+    MavenConfiguration mavenConfig = getMavenConfig();
+    final Optional<List<String>> activeProfiles = mavenConfig.getActiveProfiles();
+    final Optional<List<String>> inactiveProfiles = mavenConfig.getInactiveProfiles();
+
+    assertThat(activeProfiles.get(), hasItem("development"));
+    assertThat(inactiveProfiles.get(), hasItem("staging"));
   }
 
   @Description("Loads the configuration from mule-config.json and overrides the maven repository location using a system property")

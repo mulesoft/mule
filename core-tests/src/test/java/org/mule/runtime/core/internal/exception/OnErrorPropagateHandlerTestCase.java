@@ -6,10 +6,22 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
+import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_PROPAGATE;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
@@ -23,15 +35,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
-import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
-import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
-import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_PROPAGATE;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -46,8 +50,9 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener;
+import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.rule.VerboseExceptions;
 import org.mule.tck.processor.ContextPropagationChecker;
@@ -59,6 +64,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.reactivestreams.Publisher;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -66,7 +73,7 @@ import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Flux;
 
 //TODO: MULE-9307 re-write junits for rollback exception strategy
@@ -94,7 +101,7 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
   }
 
   @Override
-  protected AbstractExceptionListener getErrorHandler() {
+  protected AbstractDeclaredExceptionListener getErrorHandler() {
     return onErrorPropagateHandler;
   }
 
@@ -111,7 +118,7 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
     onErrorPropagateHandler = new TestOnErrorPropagateHandler();
     onErrorPropagateHandler.setAnnotations(getFlowComponentLocationAnnotations(flow.getName()));
     onErrorPropagateHandler.setMuleContext(muleContext);
-    onErrorPropagateHandler.setNotificationFirer(mock(NotificationDispatcher.class));
+    onErrorPropagateHandler.setExceptionListener(new DefaultExceptionListener());
   }
 
   @Test
@@ -291,12 +298,14 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
     MessageProcessorChain chain =
         buildNewChainWithListOfProcessors(empty(), singletonList(createFailingEventMessageProcessor(mockException)),
                                           onErrorPropagateHandler);
+    initialiseIfNeeded(chain, muleContext);
     expectedException.expect(hasRootCause(sameInstance(mockException)));
     try {
       just(testEvent()).transform(chain).block();
       fail("Expected exception");
     } finally {
       onErrorPropagateHandler.assertAllRoutersWereDisposed();
+      disposeIfNeeded(chain, getLogger(getClass()));
     }
   }
 
@@ -326,7 +335,7 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
 
   private static class TestOnErrorPropagateHandler extends OnErrorPropagateHandler {
 
-    private Set<ExceptionRouter> allRouters = new HashSet<>();
+    private final Set<ExceptionRouter> allRouters = new HashSet<>();
 
     @Override
     public Consumer<Exception> router(Function<Publisher<CoreEvent>, Publisher<CoreEvent>> publisherPostProcessor,

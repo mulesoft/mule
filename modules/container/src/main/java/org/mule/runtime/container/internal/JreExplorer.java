@@ -69,9 +69,9 @@ public final class JreExplorer {
   /**
    * Explores the content of the JRE being used
    *
-   * @param packages will store the Java packages found on the environment. Non null.
+   * @param packages  will store the Java packages found on the environment. Non null.
    * @param resources will store the resources found on the environment. Non null.
-   * @param services will store the services defined via SPI found on the environment. Non null.
+   * @param services  will store the services defined via SPI found on the environment. Non null.
    */
   public static void exploreJdk(final Set<String> packages, Set<String> resources, List<ExportedService> services) {
     List<String> jdkPaths = new ArrayList<>();
@@ -102,10 +102,10 @@ public final class JreExplorer {
   /**
    * Explores the provided paths searching for Java packages, resources and SPI service definitions
    *
-   * @param jdkPaths paths to explore. Non null.
-   * @param packages will store the Java packages found on the environment. Non null.
+   * @param jdkPaths  paths to explore. Non null.
+   * @param packages  will store the Java packages found on the environment. Non null.
    * @param resources will store the resources found on the environment. Non null.
-   * @param services will store the services defined via SPI found on the environment. Non null.
+   * @param services  will store the services defined via SPI found on the environment. Non null.
    */
   static void explorePaths(final List<String> jdkPaths, final Set<String> packages, Set<String> resources,
                            List<ExportedService> services) {

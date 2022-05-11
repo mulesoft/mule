@@ -11,8 +11,8 @@ import org.mule.runtime.core.internal.registry.Registry;
 import java.util.List;
 
 /**
- * A non reusable object which determines the correct order in which a particular {@link LifecyclePhase}
- * should be applied to a provided list of objects.
+ * A non reusable object which determines the correct order in which a particular {@link LifecyclePhase} should be applied to a
+ * provided list of objects.
  *
  * @since 4.2.0
  */
@@ -30,4 +30,11 @@ public interface LifecycleObjectSorter {
    * @return The sorted list of objects previously added through {@link #addObject(String, Object)}
    */
   List<Object> getSortedObjects();
+
+  /**
+   * Provides the order of objects as reference for initialise/dispose phases
+   *
+   * @param lookupObjects lifecycle object list which is ordered based on the type
+   */
+  default void setLifeCycleObjectNameOrder(List<String> lookupObjects) {};
 }

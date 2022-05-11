@@ -14,12 +14,11 @@ import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.extension.api.annotation.error.Throws;
-import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Validator;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.sdk.api.annotation.error.Throws;
 import org.mule.test.heisenberg.extension.exception.ValidationErrorTypeProvider;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.stereotypes.EmpireStereotype;
@@ -51,7 +50,7 @@ public class MoneyLaunderingOperation {
 
   private long totalLaunderedAmount = 0;
 
-  public synchronized Long launder(@Config HeisenbergExtension config, long amount) {
+  public synchronized Long launder(@org.mule.sdk.api.annotation.param.Config HeisenbergExtension config, long amount) {
     config.setMoney(config.getMoney().subtract(BigDecimal.valueOf(amount)));
     totalLaunderedAmount += amount;
     return totalLaunderedAmount;

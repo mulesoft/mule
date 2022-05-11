@@ -6,6 +6,14 @@
  */
 package org.mule.runtime.core.internal.context;
 
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_CONFIGURATION;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -19,28 +27,23 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_CONFIGURATION;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.internal.config.ClusterConfiguration;
-import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuilder;
+import org.mule.runtime.core.internal.config.builders.MinimalConfigurationBuilder;
 import org.mule.runtime.core.internal.connector.SchedulerController;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
@@ -51,18 +54,19 @@ import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import org.slf4j.Logger;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
 
 public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
 
   private static final Logger LOGGER = getLogger(DefaultMuleContextTestCase.class);
 
-  private SystemExceptionHandler mockSystemExceptionHandler = mock(SystemExceptionHandler.class);
-  private MessagingException mockMessagingException = mock(MessagingException.class);
+  private final SystemExceptionHandler mockSystemExceptionHandler = mock(SystemExceptionHandler.class);
+  private final MessagingException mockMessagingException = mock(MessagingException.class);
   @Rule
   public TestServicesConfigurationBuilder testServicesConfigurationBuilder = new TestServicesConfigurationBuilder();
   private MuleContextFactory muleContextFactory;
@@ -108,13 +112,13 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
     disposeIfNeeded(context.getExceptionListener(), LOGGER);
     context.setExceptionListener(mockSystemExceptionHandler);
     context.handleException(mockMessagingException);
-    verify(mockSystemExceptionHandler, times(1)).handleException(mockMessagingException, null);
+    verify(mockSystemExceptionHandler, times(1)).handleException(mockMessagingException, (RollbackSourceCallback) null);
   }
 
   @Test
   public void getObjectStoreManager() throws Exception {
     createMuleContext();
-    Object osManager = context.getObjectStoreManager();
+    Object osManager = ((MuleContextWithRegistry) context).getRegistry().lookupObject(ObjectStoreManager.class);
     assertThat(osManager, instanceOf(MuleObjectStoreManager.class));
   }
 
@@ -188,8 +192,7 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
   @Test
   public void cachesDataTypeConversionResolver() throws Exception {
     createMuleContext();
-    disposeIfNeeded(((MuleContextWithRegistry) context).getRegistry(), LOGGER);
-    final MuleRegistryHelper muleRegistry = mock(MuleRegistryHelper.class);
+    MuleRegistryHelper muleRegistry = spy((MuleRegistryHelper) ((MuleContextWithRegistry) context).getRegistry());
     ((DefaultMuleContext) context).setRegistry(muleRegistry);
 
     DataTypeConversionResolver dataTypeConverterResolver1 = context.getDataTypeConverterResolver();
@@ -220,7 +223,7 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
   public void securityManagerIsRegisteredAndCached() throws Exception {
     SecurityManager securityManager = mock(SecurityManager.class);
     context = muleContextFactory.createMuleContext(testServicesConfigurationBuilder,
-                                                   new DefaultsConfigurationBuilder(),
+                                                   new MinimalConfigurationBuilder(),
                                                    new AbstractConfigurationBuilder() {
 
                                                      @Override
@@ -237,6 +240,6 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
   }
 
   protected void createMuleContext() throws MuleException {
-    context = muleContextFactory.createMuleContext(testServicesConfigurationBuilder, new DefaultsConfigurationBuilder());
+    context = muleContextFactory.createMuleContext(testServicesConfigurationBuilder, new MinimalConfigurationBuilder());
   }
 }

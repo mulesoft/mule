@@ -8,6 +8,7 @@ package org.mule.test.heisenberg.extension;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -19,6 +20,10 @@ import org.mule.runtime.extension.api.annotation.param.MediaType;
 public class HeisenbergOperationLifecycleValidator implements Initialisable, Startable, Stoppable, Disposable {
 
   public static final String NOT_INITIALISED = "not_initialised";
+  public static int INITIALIZE_CALL_COUNT = 0;
+  public static int START_CALL_COUNT = 0;
+  public static int STOP_CALL_COUNT = 0;
+  public static int DISPOSE_CALL_COUNT = 0;
 
   private String state = NOT_INITIALISED;
 
@@ -33,18 +38,21 @@ public class HeisenbergOperationLifecycleValidator implements Initialisable, Sta
   public void initialise() throws InitialisationException {
     checkState(NOT_INITIALISED);
     state = Initialisable.PHASE_NAME;
+    INITIALIZE_CALL_COUNT++;
   }
 
   @Override
   public void start() throws MuleException {
     checkState(Initialisable.PHASE_NAME);
     state = Startable.PHASE_NAME;
+    START_CALL_COUNT++;
   }
 
   @Override
   public void stop() throws MuleException {
     checkState(Startable.PHASE_NAME);
     state = Stoppable.PHASE_NAME;
+    STOP_CALL_COUNT++;
   }
 
   @Override
@@ -55,6 +63,7 @@ public class HeisenbergOperationLifecycleValidator implements Initialisable, Sta
       throw new RuntimeException(e);
     }
     state = Disposable.PHASE_NAME;
+    DISPOSE_CALL_COUNT++;
   }
 
   private void checkState(String expected) throws InitialisationException {

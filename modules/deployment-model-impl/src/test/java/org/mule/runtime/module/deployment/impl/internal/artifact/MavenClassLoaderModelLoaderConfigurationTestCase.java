@@ -59,7 +59,7 @@ public class MavenClassLoaderModelLoaderConfigurationTestCase extends MavenClass
     expectedException.expect(RuntimeException.class);
     expectedException.expectCause(instanceOf(DependencyResolutionException.class));
     testWithSystemProperties(properties, () -> {
-      GlobalConfigLoader.reset(); //Change local repository path
+      GlobalConfigLoader.reset(); // Change local repository path
       mavenClassLoaderModelLoader.load(artifactFile, emptyMap(), APP);
     });
   }
@@ -70,7 +70,7 @@ public class MavenClassLoaderModelLoaderConfigurationTestCase extends MavenClass
     properties.put(repositoryLocation.getName(), repositoryLocation.getValue());
     try {
       testWithSystemProperties(properties, () -> {
-        GlobalConfigLoader.reset(); //Change local repository path
+        GlobalConfigLoader.reset(); // Change local repository path
         mavenClassLoaderModelLoader.load(artifactFile, emptyMap(), APP);
       });
       fail();

@@ -19,8 +19,8 @@ public interface PolicyInstanceProviderFactory {
   /**
    * Creates a new policy
    *
-   * @param application application when the policy is applied. Non null
-   * @param policyTemplate template of the policy being applied. Non null.
+   * @param application     application when the policy is applied. Non null
+   * @param policyTemplate  template of the policy being applied. Non null.
    * @param parametrization parameters used to configure the template. Non null/
    * @return
    */

@@ -6,10 +6,12 @@
  */
 package org.mule.test.module.extension.config;
 
+import static java.util.Collections.singleton;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.meta.Category.SELECT;
 import static org.mule.runtime.api.meta.ExternalLibraryType.NATIVE;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
 
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
@@ -28,7 +30,7 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
-import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
+import org.mule.sdk.api.annotation.error.ErrorTypes;
 import org.mule.test.heisenberg.extension.AsyncHeisenbergSource;
 import org.mule.test.heisenberg.extension.DEARadioSource;
 import org.mule.test.heisenberg.extension.HeisenbergConnectionProvider;
@@ -77,7 +79,7 @@ public class ConfigurationInjectionLifecycleTestCase extends ExtensionFunctional
         muleContext.getCustomizationService().registerCustomServiceClass("lifecycleTracker", LifecycleTracker.class);
       }
     });
-    builders.add(extensionManagerWithMuleExtModelBuilder());
+    builders.add(extensionManagerWithMuleExtModelBuilder(singleton(getExtensionModel())));
     super.addBuilders(builders);
   }
 

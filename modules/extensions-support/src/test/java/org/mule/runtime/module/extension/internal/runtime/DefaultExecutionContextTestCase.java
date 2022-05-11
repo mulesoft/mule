@@ -23,7 +23,6 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -80,9 +79,6 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
   private CursorProviderFactory<Object> cursorProviderFactory;
 
   @Mock
-  private CursorComponentDecoratorFactory componentDecoratorFactory;
-
-  @Mock
   private Component component;
 
   @Mock
@@ -114,7 +110,7 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
 
     operationContext =
         new DefaultExecutionContext<>(extensionModel, of(configuration), resolverSetResult.asMap(), operationModel,
-                                      event, cursorProviderFactory, componentDecoratorFactory, streamingManager, component,
+                                      event, cursorProviderFactory, streamingManager, component,
                                       retryPolicyTemplate, IMMEDIATE_SCHEDULER, empty(), muleContext);
   }
 

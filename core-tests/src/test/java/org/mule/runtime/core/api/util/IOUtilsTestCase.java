@@ -33,14 +33,6 @@ import static org.mule.tck.mockito.plugins.ConfigurableMockitoPluginSwitch.disab
 import static org.mule.tck.mockito.plugins.ConfigurableMockitoPluginSwitch.enablePlugins;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.mockito.internal.creation.bytebuddy.InlineByteBuddyMockMaker;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -61,11 +53,23 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
-import org.junit.Test;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+
+import org.mockito.internal.creation.bytebuddy.InlineByteBuddyMockMaker;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
+
 import sun.misc.Unsafe;
 
 @SmallTest

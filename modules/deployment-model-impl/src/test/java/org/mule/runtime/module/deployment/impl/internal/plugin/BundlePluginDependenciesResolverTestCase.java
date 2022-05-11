@@ -7,10 +7,16 @@
 
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.deployment.impl.internal.plugin.BundlePluginDependenciesResolver.MULE_HTTP_CONNECTOR_ARTIFACT_ID;
+import static org.mule.runtime.module.deployment.impl.internal.plugin.BundlePluginDependenciesResolver.MULE_HTTP_CONNECTOR_GROUP_ID;
+
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -22,21 +28,18 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.module.deployment.impl.internal.plugin.BundlePluginDependenciesResolver.MULE_HTTP_CONNECTOR_ARTIFACT_ID;
-import static org.mule.runtime.module.deployment.impl.internal.plugin.BundlePluginDependenciesResolver.MULE_HTTP_CONNECTOR_GROUP_ID;
 
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.deployment.model.internal.plugin.DuplicateExportedPackageException;
-import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
-import org.mule.runtime.deployment.model.internal.plugin.PluginResolutionError;
+import org.mule.runtime.deployment.model.api.plugin.resolver.DuplicateExportedPackageException;
+import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
+import org.mule.runtime.deployment.model.api.plugin.resolver.PluginResolutionError;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
+import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultArtifactDescriptorFactoryProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
@@ -51,6 +54,7 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -148,7 +152,8 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
     latestEchoPlugin.setBundleDescriptor(LATEST_ECHO_BUNDLE_DESCRIPTOR);
 
     artifactDescriptorFactory = mock(ArtifactDescriptorFactory.class);
-    dependenciesResolver = new BundlePluginDependenciesResolver(artifactDescriptorFactory);
+    dependenciesResolver =
+        new DefaultArtifactDescriptorFactoryProvider().createBundlePluginDependenciesResolver(artifactDescriptorFactory);
   }
 
   private static ArtifactPluginDescriptor newArtifactPluginDescriptor(String name) {

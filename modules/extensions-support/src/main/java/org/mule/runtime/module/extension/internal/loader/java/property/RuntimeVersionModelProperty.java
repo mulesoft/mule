@@ -13,8 +13,8 @@ import org.mule.sdk.api.annotation.param.RuntimeVersion;
 import java.lang.reflect.Field;
 
 /**
- * {@link ModelProperty} used to indicate that the class implementing a {@link ConfigurationModel} has a {@link Field}
- * on which the {@link org.mule.runtime.api.meta.MuleVersion} should be injected.
+ * {@link ModelProperty} used to indicate that the class implementing a {@link ConfigurationModel} has a {@link Field} on which
+ * the {@link org.mule.runtime.api.meta.MuleVersion} should be injected.
  *
  * @see RuntimeVersion
  * @since 4.4

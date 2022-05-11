@@ -8,20 +8,14 @@ package org.mule.runtime.deployment.model.api.domain;
 
 import java.util.Optional;
 import java.util.Properties;
-import java.util.Set;
-
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Represents the description of a domain.
+ * 
+ * @deprecated since 4.5. use org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor instead.
  */
-public class DomainDescriptor extends DeployableArtifactDescriptor {
-
-  public static final String DEFAULT_DOMAIN_NAME = "default";
-  public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-domain-config.xml";
-  public static final String MULE_DOMAIN_CLASSIFIER = "mule-domain";
+@Deprecated
+public class DomainDescriptor extends org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor {
 
   /**
    * Creates a new domain descriptor
@@ -35,15 +29,11 @@ public class DomainDescriptor extends DeployableArtifactDescriptor {
   /**
    * Creates a new domain descriptor
    *
-   * @param name domain name. Non empty.
+   * @param name                 domain name. Non empty.
    * @param deploymentProperties deploymentProperties
    */
   public DomainDescriptor(String name, Optional<Properties> deploymentProperties) {
     super(name, deploymentProperties);
   }
 
-  @Override
-  protected Set<String> getDefaultConfigResources() {
-    return ImmutableSet.<String>builder().add(DEFAULT_CONFIGURATION_RESOURCE).build();
-  }
 }

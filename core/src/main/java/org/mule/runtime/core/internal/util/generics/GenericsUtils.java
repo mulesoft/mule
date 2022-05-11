@@ -74,8 +74,8 @@ public class GenericsUtils {
    * Determine the generic element type of the given Collection field.
    *
    * @param collectionField the collection field to introspect
-   * @param nestingLevel the nesting level of the target type (typically 1; e.g. in case of a List of Lists, 1 would indicate the
-   *        nested List, whereas 2 would indicate the element of the nested List)
+   * @param nestingLevel    the nesting level of the target type (typically 1; e.g. in case of a List of Lists, 1 would indicate
+   *                        the nested List, whereas 2 would indicate the element of the nested List)
    * @return the generic type, or <code>null</code> if none
    */
   public static Class<?> getCollectionFieldType(Field collectionField, int nestingLevel) {
@@ -95,9 +95,9 @@ public class GenericsUtils {
   /**
    * Determine the generic key type of the given Map field.
    *
-   * @param mapField the map field to introspect
+   * @param mapField     the map field to introspect
    * @param nestingLevel the nesting level of the target type (typically 1; e.g. in case of a List of Lists, 1 would indicate the
-   *        nested List, whereas 2 would indicate the element of the nested List)
+   *                     nested List, whereas 2 would indicate the element of the nested List)
    * @return the generic type, or <code>null</code> if none
    */
   public static Class<?> getMapKeyFieldType(Field mapField, int nestingLevel) {
@@ -117,9 +117,9 @@ public class GenericsUtils {
   /**
    * Determine the generic value type of the given Map field.
    *
-   * @param mapField the map field to introspect
+   * @param mapField     the map field to introspect
    * @param nestingLevel the nesting level of the target type (typically 1; e.g. in case of a List of Lists, 1 would indicate the
-   *        nested List, whereas 2 would indicate the element of the nested List)
+   *                     nested List, whereas 2 would indicate the element of the nested List)
    * @return the generic type, or <code>null</code> if none
    */
   public static Class<?> getMapValueFieldType(Field mapField, int nestingLevel) {
@@ -171,9 +171,9 @@ public class GenericsUtils {
    * <p>
    * If the specified nesting level is higher than 1, the element type of a nested Collection/Map will be analyzed.
    *
-   * @param method the method to check the return type for
+   * @param method       the method to check the return type for
    * @param nestingLevel the nesting level of the target type (typically 1; e.g. in case of a List of Lists, 1 would indicate the
-   *        nested List, whereas 2 would indicate the element of the nested List)
+   *                     nested List, whereas 2 would indicate the element of the nested List)
    * @return the generic type, or <code>null</code> if none
    */
   public static Class<?> getCollectionReturnType(Method method, int nestingLevel) {
@@ -193,9 +193,9 @@ public class GenericsUtils {
   /**
    * Determine the generic key type of the given Map return type.
    *
-   * @param method the method to check the return type for
+   * @param method       the method to check the return type for
    * @param nestingLevel the nesting level of the target type (typically 1; e.g. in case of a List of Lists, 1 would indicate the
-   *        nested List, whereas 2 would indicate the element of the nested List)
+   *                     nested List, whereas 2 would indicate the element of the nested List)
    * @return the generic type, or <code>null</code> if none
    */
   public static Class<?> getMapKeyReturnType(Method method, int nestingLevel) {
@@ -215,9 +215,9 @@ public class GenericsUtils {
   /**
    * Determine the generic value type of the given Map return type.
    *
-   * @param method the method to check the return type for
+   * @param method       the method to check the return type for
    * @param nestingLevel the nesting level of the target type (typically 1; e.g. in case of a List of Lists, 1 would indicate the
-   *        nested List, whereas 2 would indicate the element of the nested List)
+   *                     nested List, whereas 2 would indicate the element of the nested List)
    * @return the generic type, or <code>null</code> if none
    */
   public static Class<?> getMapValueReturnType(Method method, int nestingLevel) {
@@ -229,8 +229,8 @@ public class GenericsUtils {
    * Extract the generic parameter type from the given method or constructor.
    *
    * @param methodParam the method parameter specification
-   * @param source the source class/interface defining the generic parameter types
-   * @param typeIndex the index of the type (e.g. 0 for Collections, 0 for Map keys, 1 for Map values)
+   * @param source      the source class/interface defining the generic parameter types
+   * @param typeIndex   the index of the type (e.g. 0 for Collections, 0 for Map keys, 1 for Map values)
    * @return the generic type, or <code>null</code> if none
    */
   private static Class<?> getGenericParameterType(MethodParameter methodParam, Class<?> source, int typeIndex) {
@@ -241,9 +241,9 @@ public class GenericsUtils {
   /**
    * Extract the generic type from the given field.
    *
-   * @param field the field to check the type for
-   * @param source the source class/interface defining the generic parameter types
-   * @param typeIndex the index of the type (e.g. 0 for Collections, 0 for Map keys, 1 for Map values)
+   * @param field        the field to check the type for
+   * @param source       the source class/interface defining the generic parameter types
+   * @param typeIndex    the index of the type (e.g. 0 for Collections, 0 for Map keys, 1 for Map values)
    * @param nestingLevel the nesting level of the target type
    * @return the generic type, or <code>null</code> if none
    */
@@ -254,9 +254,9 @@ public class GenericsUtils {
   /**
    * Extract the generic return type from the given method.
    *
-   * @param method the method to check the return type for
-   * @param source the source class/interface defining the generic parameter types
-   * @param typeIndex the index of the type (e.g. 0 for Collections, 0 for Map keys, 1 for Map values)
+   * @param method       the method to check the return type for
+   * @param source       the source class/interface defining the generic parameter types
+   * @param typeIndex    the index of the type (e.g. 0 for Collections, 0 for Map keys, 1 for Map values)
    * @param nestingLevel the nesting level of the target type
    * @return the generic type, or <code>null</code> if none
    */
@@ -267,10 +267,10 @@ public class GenericsUtils {
   /**
    * Extract the generic type from the given Type object.
    *
-   * @param methodParam the method parameter specification
-   * @param type the Type to check
-   * @param source the source collection/map Class<?> that we check
-   * @param typeIndex the index of the actual type argument
+   * @param methodParam  the method parameter specification
+   * @param type         the Type to check
+   * @param source       the source collection/map Class<?> that we check
+   * @param typeIndex    the index of the actual type argument
    * @param nestingLevel the nesting level of the target type
    * @param currentLevel the current nested level
    * @return the generic type as Class, or <code>null</code> if none
@@ -298,10 +298,10 @@ public class GenericsUtils {
   /**
    * Extract the generic type from the given ParameterizedType object.
    *
-   * @param methodParam the method parameter specification
-   * @param ptype the ParameterizedType to check
-   * @param source the expected raw source type (can be <code>null</code>)
-   * @param typeIndex the index of the actual type argument
+   * @param methodParam  the method parameter specification
+   * @param ptype        the ParameterizedType to check
+   * @param source       the expected raw source type (can be <code>null</code>)
+   * @param typeIndex    the index of the actual type argument
    * @param nestingLevel the nesting level of the target type
    * @param currentLevel the current nested level
    * @return the generic type as Class, or <code>null</code> if none
@@ -373,8 +373,8 @@ public class GenericsUtils {
   /**
    * Extract the generic type from the given Class<?> object.
    *
-   * @param clazz the Class<?> to check
-   * @param source the expected raw source type (can be <code>null</code>)
+   * @param clazz     the Class<?> to check
+   * @param source    the expected raw source type (can be <code>null</code>)
    * @param typeIndex the index of the actual type argument
    * @return the generic type as Class, or <code>null</code> if none
    */
@@ -385,10 +385,10 @@ public class GenericsUtils {
   /**
    * Extract the generic type from the given Class<?> object.
    *
-   * @param methodParam the method parameter specification
-   * @param clazz the Class<?> to check
-   * @param source the expected raw source type (can be <code>null</code>)
-   * @param typeIndex the index of the actual type argument
+   * @param methodParam  the method parameter specification
+   * @param clazz        the Class<?> to check
+   * @param source       the expected raw source type (can be <code>null</code>)
+   * @param typeIndex    the index of the actual type argument
    * @param nestingLevel the nesting level of the target type
    * @param currentLevel the current nested level
    * @return the generic type as Class, or <code>null</code> if none

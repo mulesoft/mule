@@ -36,7 +36,7 @@ public interface ConfigurationPropertiesProviderFactory
   /**
    * Builds a properties provider for each matching configuration element.
    *
-   * @param parameters the configuration parameters, after resolving property placeholders
+   * @param parameters               the configuration parameters, after resolving property placeholders
    * @param externalResourceProvider the resource provider for locating files (such as .properties and .yaml)
    * @return the properties provider
    */
@@ -47,8 +47,8 @@ public interface ConfigurationPropertiesProviderFactory
    * Builds a properties provider for the provided {@code providerElementDeclaration}.
    *
    * @param providerElementDeclaration the configuration parameters, after resolving property placeholders
-   * @param localResolver the resolver of property placeholders found in the provided declaration
-   * @param externalResourceProvider the resource provider for locating files (such as .properties and .yaml)
+   * @param localResolver              the resolver of property placeholders found in the provided declaration
+   * @param externalResourceProvider   the resource provider for locating files (such as .properties and .yaml)
    * @return the properties provider
    */
   @Override

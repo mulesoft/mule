@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:marvel="http://www.mulesoft.org/schema/mule/marvel"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/marvel http://www.mulesoft.org/schema/mule/marvel/current/mule-marvel.xsd">
+
+    <object name="assertPayloadIsStreamProvider" class="org.mule.test.module.extension.streaming.AbstractBytesStreamingExtensionTestCase$AssertPayloadIsStreamProvider"/>
+    <object name="assertPayloadIsNotStreamProvider" class="org.mule.test.module.extension.streaming.AbstractBytesStreamingExtensionTestCase$AssertPayloadIsNotStreamProvider"/>
+    <object name="assertVariableStreamProviderIsOpen" class="org.mule.test.module.extension.streaming.AbstractBytesStreamingExtensionTestCase$AssertVariableStreamProviderIsOpen"/>
+
+    <marvel:dr-strange-config name="drStrange" />
+
+    <marvel:dr-strange-config name="pollingDrStrange">
+        <marvel:pooling-mystic-connection>
+            <pooling-profile maxActive="4" exhaustedAction="WHEN_EXHAUSTED_WAIT" maxWait="1000"/>
+        </marvel:pooling-mystic-connection>
+    </marvel:dr-strange-config>
+
+    <flow name="readStream">
+        <marvel:read-stream config-ref="${configName}"/>
+    </flow>
+
+    <flow name="rewind">
+        <flow-ref name="toStream" />
+        <marvel:read-stream target="firstRead" targetValue="#[message]" config-ref="${configName}"/>
+        <marvel:seek-stream position="0" config-ref="${configName}"/>
+        <marvel:read-stream target="secondRead" targetValue="#[message]" config-ref="${configName}"/>
+    </flow>
+
+    <flow name="consumeGeneratedStream">
+        <!-- flow refs are intentional to force a flow.process() -->
+        <flow-ref name="toStream" />
+        <flow-ref name="assertPayloadIsStreamProvider" />
+        <set-variable variableName="provider" value="#[payload]" />
+
+        <flow-ref name="readStream" />
+        <flow-ref name="assertVariableStreamProviderIsOpen" />
+    </flow>
+    
+    <flow name="seekStream">
+        <flow-ref name="toStream" />
+        <marvel:seek-stream position="#[vars.position]" config-ref="${configName}"/>
+    </flow>
+    
+    <flow name="seekStreamTx">
+        <try transactionalAction="BEGIN_OR_JOIN">
+            <flow-ref name="toStream" />
+            <marvel:seek-stream position="#[vars.position]" config-ref="${configName}"/>
+        </try>
+    </flow>
+
+    <flow name="toStream">
+        <marvel:to-stream config-ref="${configName}"/>
+    </flow>
+
+    <flow name="objectToStream">
+        <marvel:object-to-stream config-ref="${configName}" />
+    </flow>
+
+    <flow name="toNonRepeatableStream">
+        <marvel:to-stream config-ref="${configName}">
+            <non-repeatable-stream />
+        </marvel:to-stream>
+    </flow>
+
+    <flow name="bufferExceeded">
+        <try>
+            <marvel:to-stream config-ref="${configName}">
+                <repeatable-in-memory-stream initialBufferSize="10" bufferSizeIncrement="5" maxBufferSize="50" bufferUnit="KB" />
+            </marvel:to-stream>
+            <flow-ref name="readStream" />
+            <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+            <error-handler>
+                <on-error-continue type="STREAM_MAXIMUM_SIZE_EXCEEDED">
+                    <set-payload value="Too big!" />
+                </on-error-continue>
+            </error-handler>
+        </try>
+    </flow>
+
+    <flow name="toSimpleStream">
+        <marvel:to-stream config-ref="${configName}">
+            <non-repeatable-stream />
+        </marvel:to-stream>
+    </flow>
+
+    <flow name="toStreamMultipleTimes">
+        <set-variable variableName="data" value="#[payload]"/>
+        <foreach collection="#[1 to 10]">
+            <marvel:to-stream config-ref="${configName}" data="#[vars.data]"/>
+            <logger level="ERROR" message="#[payload]"/>
+        </foreach>
+        <marvel:to-stream config-ref="${configName}" data="#[vars.data]">
+            <non-repeatable-stream />
+        </marvel:to-stream>
+    </flow>
+
+    <flow name="bytesCaster" initialState="stopped">
+        <marvel:bytes-caster castFrequencyInMillis="5000" spell="dormammu i've come to bargain" config-ref="${configName}"
+                             listenerId="bytesCaster"/>
+        <flow-ref name="assertPayloadIsStreamProvider" />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+        <flow-ref name="castSpell" />
+    </flow>
+
+    <flow name="sourceWithExceededBuffer" initialState="stopped">
+        <marvel:bytes-caster castFrequencyInMillis="5000"
+                             spell="dormammu i've come to bargain" spellSize="65536"
+                             config-ref="${configName}"
+                             listenerId="sourceWithExceededBuffer">
+            <repeatable-in-memory-stream initialBufferSize="10" bufferSizeIncrement="5" maxBufferSize="50" bufferUnit="KB" />
+        </marvel:bytes-caster>
+        <logger message="#[payload]" level="ERROR"/>
+        <flow-ref name="castSpell" />
+        <error-handler>
+            <on-error-continue type="STREAM_MAXIMUM_SIZE_EXCEEDED">
+                <set-payload value="Too big!" />
+                <flow-ref name="castSpell" />
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <flow name="bytesCasterInTx" initialState="stopped">
+        <marvel:bytes-caster castFrequencyInMillis="5000" spell="dormammu i've come to bargain" config-ref="${configName}"
+                             listenerId="bytesCasterInTx"/>
+        <try transactionalAction="BEGIN_OR_JOIN">
+            <flow-ref name="assertPayloadIsStreamProvider" />
+            <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+            <flow-ref name="castSpell" />
+        </try>
+    </flow>
+
+    <flow name="bytesCasterInSdkScopeInside" initialState="stopped">
+        <marvel:bytes-caster castFrequencyInMillis="5000" spell="dormammu i've come to bargain" config-ref="${configName}"
+                             listenerId="bytesCasterInSdkScopeInside"/>
+                             
+        <marvel:scopeverse>
+            <flow-ref name="assertPayloadIsStreamProvider" />
+            <set-variable variableName="raw" value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+            <flow-ref name="castSpell" />
+        </marvel:scopeverse>                             
+    </flow>
+
+    <flow name="bytesCasterInSdkScopeAfter" initialState="stopped">
+        <marvel:bytes-caster castFrequencyInMillis="5000" spell="dormammu i've come to bargain" config-ref="${configName}"
+                             listenerId="bytesCasterInSdkScopeAfter"/>
+                             
+        <marvel:scopeverse>
+            <flow-ref name="assertPayloadIsStreamProvider" />
+            <set-variable variableName="raw" value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+        </marvel:scopeverse>                             
+
+        <flow-ref name="castSpell" />
+    </flow>
+
+    <flow name="bytesCasterWithoutStreaming" initialState="stopped">
+        <marvel:bytes-caster castFrequencyInMillis="5000" spell="dormammu i've come to bargain" config-ref="${configName}"
+                             listenerId="bytesCasterWithoutStreaming">
+            <non-repeatable-stream />
+        </marvel:bytes-caster>
+        <flow-ref name="assertPayloadIsNotStreamProvider" />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+        <flow-ref name="castSpell" />
+    </flow>
+
+    <flow name="crashCar">
+        <marvel:to-stream config-ref="${configName}"/>
+        <flow-ref name="doCrash" />
+    </flow>
+
+    <flow name="handledCrashCar">
+        <try>
+            <marvel:to-stream config-ref="${configName}"/>
+            <flow-ref name="doCrash" />
+            <error-handler>
+                <on-error-continue>
+                    <logger message="Good thing I have airbags..." />
+                </on-error-continue>
+            </error-handler>
+        </try>
+    </flow>
+
+    <flow name="nonRepeatableHandledCrashCar">
+        <try>
+            <marvel:to-stream config-ref="${configName}">
+                <non-repeatable-stream />
+            </marvel:to-stream>
+            <flow-ref name="doCrash" />
+            <error-handler>
+                <on-error-continue>
+                    <logger message="Good thing I have airbags..." />
+                </on-error-continue>
+            </error-handler>
+        </try>
+    </flow>
+
+    <flow name="nonRepeatableCrashCar">
+        <marvel:to-stream config-ref="${configName}">
+            <non-repeatable-stream />
+        </marvel:to-stream>
+        <flow-ref name="doCrash" />
+    </flow>
+
+    <flow name="crashCarTx">
+        <try transactionalAction="BEGIN_OR_JOIN">
+            <flow-ref name="crashCar" />
+        </try>
+    </flow>
+
+    <flow name="doCrash">
+        <marvel:crash-car config-ref="${configName}"/>
+    </flow>
+
+    <sub-flow name="castSpell">
+        <set-payload value="#[java!org::mule::test::module::extension::streaming::AbstractBytesStreamingExtensionTestCase::addSpell(payload)]"/>
+    </sub-flow>
+
+</mule>

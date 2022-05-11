@@ -31,7 +31,7 @@ public final class TypeAwareConfigurationFactory implements ConfigurationFactory
   /**
    * Creates an instance of a given {@code configurationType} on each invocation to {@link #newInstance()}.
    *
-   * @param configurationType the type to be instantiated. Must be not {@code null}, and have a public default constructor
+   * @param configurationType    the type to be instantiated. Must be not {@code null}, and have a public default constructor
    * @param extensionClassLoader the {@link ClassLoader} on which the extension is loaded
    * @throws IllegalArgumentException if the type is {@code null} or doesn't have a default public constructor
    */

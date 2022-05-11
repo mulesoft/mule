@@ -10,6 +10,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.test.allure.AllureConstants.ConfigurationComponentLocatorFeature.ConfigurationComponentLocationStory.COMPONENT_LOCATION;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -18,11 +21,16 @@ import org.mule.test.petstore.extension.SentientSource;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(SOURCES)
+@Story(COMPONENT_LOCATION)
 public class SourceWithComponentLocationTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "source-with-component-location-config.xml";
+    return "source/source-with-component-location-config.xml";
   }
 
   @Override

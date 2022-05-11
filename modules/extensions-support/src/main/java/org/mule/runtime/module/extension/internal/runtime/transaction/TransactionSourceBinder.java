@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.transaction;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -20,16 +21,15 @@ import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
-import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.sdk.api.connectivity.TransactionalConnection;
 
 import java.util.Optional;
 
 import javax.transaction.TransactionManager;
 
 /**
- * Helper class in charge of bind the Source connection to the current Transaction, if one is available.
- * Also, if the Transaction
+ * Helper class in charge of bind the Source connection to the current Transaction, if one is available. Also, if the Transaction
  *
  * @since 4.0
  */
@@ -78,6 +78,6 @@ public class TransactionSourceBinder {
                                                             extensionModel.getName())));
 
     final ExtensionTransactionKey txKey = new ExtensionTransactionKey(configuration);
-    return Optional.of(transactionBindingDelegate.getBoundResource(transactionConfig, txKey, () -> connectionHandler));
+    return Optional.of(transactionBindingDelegate.getBoundResource(false, txKey, () -> connectionHandler));
   }
 }

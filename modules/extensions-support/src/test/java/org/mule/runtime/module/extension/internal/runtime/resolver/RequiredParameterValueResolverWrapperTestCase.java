@@ -19,6 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
+
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.tck.size.SmallTest;
@@ -29,16 +30,18 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class RequiredParameterValueResolverWrapperTestCase extends LifecycleAwareValueResolverWrapperTestCase<Object> {
 
   private static final String PARAMETER_NAME = "requiredParam";
   private static final String EXPRESSION = "#[someExpression]";
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Rule
   public ExpectedException expectedException = none();
@@ -47,7 +50,7 @@ public class RequiredParameterValueResolverWrapperTestCase extends LifecycleAwar
   private ValueResolvingContext context;
 
   @Mock
-  ConfigurationProperties configProperties;
+  private ConfigurationProperties configProperties;
 
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
@@ -79,6 +82,7 @@ public class RequiredParameterValueResolverWrapperTestCase extends LifecycleAwar
 
   @Test
   public void resolveNullValue() throws Exception {
+    // This cannot be validated at the AST because the exception results of a provided expression evaluating to null
     when(delegate.resolve(context)).thenReturn(null);
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage(allOf(containsString(PARAMETER_NAME), containsString(EXPRESSION)));

@@ -9,6 +9,8 @@ package org.mule.test.module.extension.source;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.isA;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories.POLLING;
 
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.component.location.Location;
@@ -24,6 +26,11 @@ import javax.inject.Named;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(SOURCES)
+@Story(POLLING)
 public class LazyPollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Override
@@ -42,7 +49,7 @@ public class LazyPollingSourceTestCase extends AbstractExtensionFunctionalTestCa
 
   @Override
   protected String getConfigFile() {
-    return "polling-source-config-without-scheduling-strategy.xml";
+    return "source/polling-source-config-without-scheduling-strategy.xml";
   }
 
   @Test

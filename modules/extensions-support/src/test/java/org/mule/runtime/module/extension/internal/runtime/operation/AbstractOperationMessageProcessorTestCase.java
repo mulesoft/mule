@@ -97,7 +97,7 @@ import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
+import org.mule.runtime.extension.api.runtime.exception.SdkExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
@@ -130,13 +130,11 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractOperationMessageProcessorTestCase extends AbstractMuleContextTestCase {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractOperationMessageProcessorTestCase.class);
-
   protected static final String EXTENSION_NAMESPACE = "extension_namespace";
   protected static final String CONFIG_NAME = "config";
   protected static final String OPERATION_NAME = "operation";
   protected static final String TARGET_VAR = "myFlowVar";
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractOperationMessageProcessorTestCase.class);
   @Rule
   public MockitoRule rule = MockitoJUnit.rule().silent();
 
@@ -185,7 +183,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   protected Object configuration;
 
   @Mock(lenient = true)
-  protected ExceptionHandlerFactory exceptionHandlerFactory;
+  protected SdkExceptionHandlerFactory exceptionHandlerFactory;
 
   @Mock(lenient = true)
   protected MetadataResolverFactory metadataResolverFactory;
@@ -212,28 +210,21 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
   @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   protected PolicyManager mockPolicyManager;
-
-  @Mock(lenient = true)
-  private ExecutionContextAdapter<OperationModel> executionContext;
-
-  @Mock(lenient = true)
-  private MetadataCacheIdGeneratorFactory<ComponentAst> cacheIdGeneratorFactory;
-
-  @Mock(lenient = true)
-  private MetadataCacheIdGenerator<ComponentAst> cacheIdGenerator;
-
-  @Mock(lenient = true)
-  private MetadataCacheManager metadataCacheManager;
-
   protected OperationMessageProcessor messageProcessor;
   protected CursorStreamProviderFactory cursorStreamProviderFactory;
   protected String configurationName = CONFIG_NAME;
   protected String target = EMPTY;
   protected String targetValue = "#[message]";
-
   protected OperationPolicy mockOperationPolicy;
-
   protected StreamingManager streamingManager = spy(new DefaultStreamingManager());
+  @Mock(lenient = true)
+  private ExecutionContextAdapter<OperationModel> executionContext;
+  @Mock(lenient = true)
+  private MetadataCacheIdGeneratorFactory<ComponentAst> cacheIdGeneratorFactory;
+  @Mock(lenient = true)
+  private MetadataCacheIdGenerator<ComponentAst> cacheIdGenerator;
+  @Mock(lenient = true)
+  private MetadataCacheManager metadataCacheManager;
 
   @Before
   public void before() throws Exception {
@@ -329,6 +320,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(METADATA_CACHE_MANAGER_KEY,
                                                                          metadataCacheManager);
 
+    when(resolverSet.getResolvers()).thenReturn(Collections.emptyMap());
     when(resolverSet.resolve(argThat(new BaseMatcher<ValueResolvingContext>() {
 
       @Override

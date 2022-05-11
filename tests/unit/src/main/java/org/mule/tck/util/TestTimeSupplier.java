@@ -53,7 +53,7 @@ public class TestTimeSupplier implements TimeSupplier {
    * <p/>
    *
    * @param timeOffset the offset to be applied on {@link #timeInMillis}
-   * @param unit a {@link TimeUnit} which qualifies the {@code timeOffset}
+   * @param unit       a {@link TimeUnit} which qualifies the {@code timeOffset}
    * @return the updated {@link #timeInMillis}
    * @throws IllegalArgumentException if {@code timeOffset} is negative
    */

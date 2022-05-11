@@ -65,9 +65,10 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
 
   /**
    * Includes a new header to be sent in the desired {@link HttpMessage}. Since HTTP headers are case insensitive and can have
-   * several values, multiple calls to this method using the same header name will accumulate the values and all of them will be sent.
+   * several values, multiple calls to this method using the same header name will accumulate the values and all of them will be
+   * sent.
    *
-   * @param name the name of the HTTP header
+   * @param name  the name of the HTTP header
    * @param value the value of the HTTP header
    * @return this builder
    */
@@ -79,7 +80,7 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
   /**
    * Includes a new header with multiple values to be sent in the desired {@link HttpMessage}.
    *
-   * @param name the name of the HTTP header
+   * @param name   the name of the HTTP header
    * @param values the values of the HTTP header
    * @return this builder
    */
@@ -100,8 +101,8 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
   }
 
   /**
-   * Returns the value of a given HTTP request. If there are several then the first will be return.
-   * Use {@link #getHeaderValues(String)} instead if all values are required.
+   * Returns the value of a given HTTP request. If there are several then the first will be return. Use
+   * {@link #getHeaderValues(String)} instead if all values are required.
    *
    * @param name the name of the desired HTTP header
    * @return the value of the header or {@code null} if there isn't one

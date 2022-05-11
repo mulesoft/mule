@@ -7,9 +7,9 @@
 
 package org.mule.test.runner.api;
 
-import static org.mule.test.runner.utils.ExtensionLoaderUtils.getLoaderById;
+import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.getLoaderById;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.test.runner.maven.MavenModelFactory;
 
 import java.io.File;
@@ -55,7 +55,7 @@ class ExtensionModelLoaderFinder {
       String id = mavenProject.getProperties().getProperty("testExtensionModelLoaderId");
       return id != null ? Optional.ofNullable(getLoaderById(id)) : Optional.empty();
     } catch (ArtifactResolutionException e) {
-      throw new RuntimeException("Cannot load extension, the artifact: [" + plugin.toString() + "] cannot be resolved", e);
+      throw new RuntimeException("Cannot load extension, the artifact: [" + plugin + "] cannot be resolved", e);
     }
   }
 }

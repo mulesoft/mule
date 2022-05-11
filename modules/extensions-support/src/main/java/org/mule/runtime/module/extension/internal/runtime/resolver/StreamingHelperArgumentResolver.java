@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
@@ -29,7 +28,6 @@ public class StreamingHelperArgumentResolver implements ArgumentResolver<Streami
 
   private CursorStreamProviderFactory cursorStreamProviderFactory;
   private CursorIteratorProviderFactory cursorIteratorProviderFactory;
-  private CursorComponentDecoratorFactory componentDecoratorFactory;
 
   /**
    * {@inheritDoc}
@@ -38,9 +36,7 @@ public class StreamingHelperArgumentResolver implements ArgumentResolver<Streami
   public StreamingHelper resolve(ExecutionContext executionContext) {
     initializeCursorProviderFactoriesIfNeeded(executionContext);
     ExecutionContextAdapter<OperationModel> context = (ExecutionContextAdapter<OperationModel>) executionContext;
-    return new DefaultStreamingHelper(cursorStreamProviderFactory, cursorIteratorProviderFactory,
-                                      componentDecoratorFactory,
-                                      context.getEvent(),
+    return new DefaultStreamingHelper(cursorStreamProviderFactory, cursorIteratorProviderFactory, context.getEvent(),
                                       context.getComponent().getLocation());
   }
 
@@ -63,7 +59,6 @@ public class StreamingHelperArgumentResolver implements ArgumentResolver<Streami
         streamingManager.getPairFor(cursorProviderFactory);
     cursorStreamProviderFactory = cursorProviderFactories.getFirst();
     cursorIteratorProviderFactory = cursorProviderFactories.getSecond();
-    componentDecoratorFactory = context.getComponentDecoratorFactory();
   }
 
 }

@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/operation"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            targetNamespace="http://www.mulesoft.org/schema/mule/operation"
+            elementFormDefault="qualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"/>
+
+    <xsd:element name="parameter" type="parameterType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Defines an operation parameter
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="parameterType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Defines an operation parameter
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="mule:annotatedType">
+                <xsd:sequence>
+                    <xsd:element name="description" type="xsd:string" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Detailed description of the parameter, it's semantics, usage and effects
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="optional" minOccurs="0" type="optionalParameterType">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Indicates that the parameter is optional
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="name" use="required" type="mule:nonBlankString">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The parameter's name
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="type" use="required" type="type">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The parameter's type. Can be either a standard type, a custom defined complex type or a reference to
+                            a top level element defined in another extension or application.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="expressionSupport" default="SUPPORTED" type="expressionSupportType">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The support level this parameter offers regarding expressions
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="summary" type="mule:nonBlankString">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A very brief overview about the parameter.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="configOverride" type="xsd:boolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether the parameter should act as a Config Override.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="optionalParameterType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Defines an optional operation parameter
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="parameterType">
+                <xsd:attribute name="defaultValue" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The parameter's default value if not provided.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="exclusiveOptionalsType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Defines a set of mutually exclusive parameters
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute name="exclusiveOptionals" type="mule:nonBlankString" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Comma separated list of parameters that are mutually exclusive
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="oneRequired" default="false" type="xsd:boolean">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Enforces that one of the parameters must be set at any given time
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:element name="def" type="operationDefType" substitutionGroup="mule:abstract-extension">
+        <xsd:annotation>
+            <xsd:documentation>
+                Defines an operation
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="outputType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Defines a single output type. A component's output will typically be comprised of two of these definitions,
+                one for the output payload and another one for the attributes (see: ResultType)
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="mule:annotatedType">
+                <xsd:attribute name="type" type="type" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The output payload's type.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="resultType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Defines a component's result. A Result is comprised of an output payload and an associated attributes
+                object which contains metadata about it.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="payload-type" type="outputType">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Type definition for the component's output payload
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="attributes-type" type="outputType" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Type definition for the component's output attributes
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="operationDefType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:sequence>
+                    <xsd:sequence>
+                        <xsd:element name="description" type="xsd:string" minOccurs="0">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    The operation's description
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                    </xsd:sequence>
+                    <xsd:element name="parameters" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The operation's input parameters.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="parameter" type="parameterType" maxOccurs="unbounded"/>
+                                <xsd:element name="optional-parameter" type="optionalParameterType" minOccurs="0" maxOccurs="unbounded"/>
+                                <xsd:element name="exclusive-optionals" type="exclusiveOptionalsType" minOccurs="0" maxOccurs="1"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="deprecated" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Defines a operation's deprecation.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:complexType>
+                            <xsd:attribute name="message" use="required" type="mule:nonBlankString">
+                                <xsd:annotation>
+                                    <xsd:documentation>
+                                        Describes why something was deprecated, what can be used as substitute, or both.
+                                    </xsd:documentation>
+                                </xsd:annotation>
+                            </xsd:attribute>
+                            <xsd:attribute name="since" use="required" type="mule:nonBlankString">
+                                <xsd:annotation>
+                                    <xsd:documentation>
+                                        The version of the extension in which the annotated member was deprecated.
+                                    </xsd:documentation>
+                                </xsd:annotation>
+                            </xsd:attribute>
+                            <xsd:attribute name="toRemoveIn" type="mule:nonBlankString">
+                                <xsd:annotation>
+                                    <xsd:documentation>
+                                        The version of the extension in which the annotated member will be removed or was removed.
+                                    </xsd:documentation>
+                                </xsd:annotation>
+                            </xsd:attribute>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="output" type="resultType"/>
+                    <xsd:element name="body">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The operations that makes for the operation's implementation
+                            </xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:group ref="mule:messageProcessorOrMixedContentMessageProcessor" maxOccurs="unbounded"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="name" use="required" type="mule:nonBlankString">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The operation's name. It must be unique in the context of the owning artifact.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="displayName" type="mule:nonBlankString">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The operation's name in the GUI
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="summary" type="mule:nonBlankString">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A very brief overview about the operation.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="visibility" type="visibilityType" default="PUBLIC">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The operation's accessing visibility
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:simpleType name="type">
+        <xsd:union memberTypes="basicTypes mule:nonBlankString"/>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="basicTypes">
+        <xsd:annotation>
+            <xsd:documentation>
+                The basic types for input parameters or component's output
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <!--            TODO: HOW TO REPRESENT ARRAYS?-->
+            <xsd:enumeration value="string"/>
+            <xsd:enumeration value="number"/>
+            <xsd:enumeration value="binary"/>
+            <xsd:enumeration value="date"/>
+            <xsd:enumeration value="datetime"/>
+            <xsd:enumeration value="time"/>
+            <xsd:enumeration value="boolean"/>
+            <xsd:enumeration value="binary"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="expressionSupportType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Enumerates the different types of support that a given component can provide regarding expressions
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="SUPPORTED"/>
+            <xsd:enumeration value="NOT_SUPPORTED"/>
+            <xsd:enumeration value="REQUIRED"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="visibilityType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Whether the operation is public and should be usable by third party components
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="PUBLIC"/>
+            <xsd:enumeration value="PRIVATE"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+</xsd:schema>

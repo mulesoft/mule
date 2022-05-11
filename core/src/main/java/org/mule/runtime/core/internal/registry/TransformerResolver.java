@@ -51,7 +51,7 @@ public interface TransformerResolver {
    * A callback that is called when a transformer is registered or unregistered from the registry. This is used in situations
    * where the resolver caches transformers and the cache needs to be updated.
    *
-   * @param transformer the transformer that has changed
+   * @param transformer    the transformer that has changed
    * @param registryAction whether the transformer was added or removed
    */
   void transformerChange(Transformer transformer, RegistryAction registryAction);

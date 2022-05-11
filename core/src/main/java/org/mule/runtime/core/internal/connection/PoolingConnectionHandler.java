@@ -7,6 +7,8 @@
 package org.mule.runtime.core.internal.connection;
 
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.core.internal.connection.ConnectionUtils.logPoolStatus;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.PoolingListener;
@@ -14,7 +16,7 @@ import org.mule.runtime.api.exception.MuleException;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.pool.ObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +31,8 @@ final class PoolingConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
   private static final Logger LOGGER = LoggerFactory.getLogger(PoolingConnectionHandler.class);
 
   private C connection;
-  private final ObjectPool<C> pool;
+  private final GenericObjectPool<C> pool;
+  private final String poolId;
   private final PoolingListener poolingListener;
   private final ConnectionProvider connectionProvider;
   private final AtomicBoolean released = new AtomicBoolean(false);
@@ -40,10 +43,11 @@ final class PoolingConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
    * @param connection the connection to be wrapped
    * @param pool       the pool from which the {@code connection} was obtained and to which it has to be returned
    */
-  PoolingConnectionHandler(C connection, ObjectPool<C> pool, PoolingListener poolingListener,
+  PoolingConnectionHandler(C connection, GenericObjectPool<C> pool, String poolId, PoolingListener poolingListener,
                            ConnectionProvider connectionProvider) {
     this.connection = connection;
     this.pool = pool;
+    this.poolId = poolId;
     this.poolingListener = poolingListener;
     this.connectionProvider = connectionProvider;
   }
@@ -68,12 +72,14 @@ final class PoolingConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
 
     boolean returnAttempted = false;
     try {
+      LOGGER.debug("Returning back connection {} to pool {}", connection.toString(), poolId);
       poolingListener.onReturn(connection);
 
       pool.returnObject(connection);
+      logPoolStatus(LOGGER, pool, poolId);
       returnAttempted = true;
     } catch (Exception e) {
-      LOGGER.warn("Could not return connection to the pool. Connection will be destroyed", e);
+      LOGGER.warn("Could not return connection to the pool. Connection will be terminated", e);
     } finally {
       try {
         if (!returnAttempted) {
@@ -91,9 +97,11 @@ final class PoolingConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
   @Override
   public void invalidate() {
     try {
+      LOGGER.debug("Invalidating connection {} from pool {}", connection.toString(), poolId);
       pool.invalidateObject(connection);
+      logPoolStatus(LOGGER, pool, poolId);
     } catch (Exception e) {
-      LOGGER.warn("Exception was found trying to invalidate connection of type " + connection.getClass().getName(), e);
+      LOGGER.warn("Exception was thrown trying to invalidate connection of type " + connection.getClass().getName(), e);
     } finally {
       connection = null;
     }

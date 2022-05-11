@@ -80,7 +80,7 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
                                String initialState, FlowConstructStatistics statistics) {
     this.muleContext = muleContext;
     this.name = name;
-    this.exceptionListener = exceptionListener.orElse(muleContext.getDefaultErrorHandler(of(name)));
+    this.exceptionListener = exceptionListener.orElseGet(() -> muleContext.getDefaultErrorHandler(of(name)));
     this.initialState = initialState;
     try {
       this.lifecycleManager = new FlowConstructLifecycleManager(this, ((MuleContextWithRegistry) muleContext).getRegistry()
@@ -110,15 +110,14 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
 
   @Override
   public final void start() throws MuleException {
-    if (flowStoppedPersistenceListener != null && !flowStoppedPersistenceListener.shouldStart()) {
-      return;
-    }
     // Check if Initial State is Stopped
-    if (muleContext.isStarting() && initialState.equals(INITIAL_STATE_STOPPED)) {
+    if (muleContext.isStarting() &&
+        (initialState.equals(INITIAL_STATE_STOPPED)
+            || flowStoppedPersistenceListener != null && !flowStoppedPersistenceListener.shouldStart())) {
       lifecycleManager.fireStartPhase(new EmptyLifecycleCallback<>());
       lifecycleManager.fireStopPhase(new EmptyLifecycleCallback<>());
 
-      LOGGER.info("Flow " + name + " has not been started (initial state = 'stopped')");
+      LOGGER.info("Flow " + name + " has not been started");
       return;
     }
 
@@ -218,6 +217,10 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
     // Empty template method
   }
 
+  protected void doInitialiseProcessingStrategy() throws MuleException {
+    // Empty template method
+  }
+
   protected void doStart() throws MuleException {
     // Empty template method
   }
@@ -281,7 +284,9 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
     this.flowStoppedPersistenceListener = flowStoppedPersistenceListener;
   }
 
-  public void checkIfFlowShouldStart() {
-    flowStoppedPersistenceListener.checkIfFlowShouldStart();
+  public void doNotPersist() {
+    if (flowStoppedPersistenceListener != null) {
+      flowStoppedPersistenceListener.doNotPersist();
+    }
   }
 }

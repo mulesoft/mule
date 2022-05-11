@@ -14,8 +14,8 @@ import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
-import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.DROP;
-import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAIL;
+import static org.mule.sdk.api.runtime.source.BackPressureMode.DROP;
+import static org.mule.sdk.api.runtime.source.BackPressureMode.FAIL;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.RICIN_GROUP_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.BATCH_DELIVERED;
@@ -44,9 +44,7 @@ import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
-import org.mule.runtime.extension.api.annotation.notification.Fires;
 import org.mule.runtime.extension.api.annotation.param.Config;
-import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -54,16 +52,17 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.annotation.source.BackPressure;
+import org.mule.sdk.api.annotation.source.BackPressure;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.annotation.source.OnBackPressure;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.api.runtime.source.BackPressureContext;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.runtime.source.SourceResult;
+import org.mule.sdk.api.annotation.notification.Fires;
+import org.mule.sdk.api.runtime.source.BackPressureContext;
 import org.mule.test.heisenberg.extension.model.Methylamine;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.Weapon;
@@ -75,7 +74,7 @@ import javax.inject.Inject;
 
 @Alias("ListenPayments")
 @EmitsResponse
-@Fires(SourceNotificationProvider.class)
+@Fires(SdkSourceNotificationProvider.class)
 @Streaming
 @MediaType(TEXT_PLAIN)
 @BackPressure(defaultMode = FAIL, supportedModes = {FAIL, DROP})
@@ -113,7 +112,7 @@ public class HeisenbergSource extends Source<String, Object> {
   @Config
   private HeisenbergExtension heisenberg;
 
-  @Connection
+  @org.mule.sdk.api.annotation.param.Connection
   private ConnectionProvider<HeisenbergConnection> connectionProvider;
 
   @Parameter
@@ -123,7 +122,7 @@ public class HeisenbergSource extends Source<String, Object> {
   @Optional(defaultValue = "1")
   private int corePoolSize;
 
-  //Using this annotation in order to mix the legacy and the new api and test all code flows.
+  // Using this annotation in order to mix the legacy and the new api and test all code flows.
   @org.mule.sdk.api.annotation.param.Parameter
   @Optional(defaultValue = "500")
   private long frequency;
@@ -136,7 +135,7 @@ public class HeisenbergSource extends Source<String, Object> {
   @NullSafe
   private Map<String, Object> debtProperties;
 
-  //Using this annotation in order to mix the legacy and the new api and test all code flows.
+  // Using this annotation in order to mix the legacy and the new api and test all code flows.
   @org.mule.sdk.api.annotation.param.Parameter
   @Optional
   @NullSafe
@@ -202,7 +201,9 @@ public class HeisenbergSource extends Source<String, Object> {
   @OnError
   public synchronized void onError(Error error, @Optional String sameNameParameter, @Optional Methylamine methylamine,
                                    @ParameterGroup(name = RICIN_GROUP_NAME) RicinGroup ricin,
-                                   @ParameterGroup(name = "Error Info", showInDsl = true) PersonalInfo infoError,
+
+                                   @org.mule.sdk.api.annotation.param.ParameterGroup(name = "Error Info",
+                                       showInDsl = true) PersonalInfo infoError,
                                    @org.mule.sdk.api.annotation.param.Optional boolean propagateError,
                                    NotificationEmitter notificationEmitter) {
     gatheredMoney = -1;
@@ -238,7 +239,7 @@ public class HeisenbergSource extends Source<String, Object> {
   }
 
   @OnBackPressure
-  public void onBackPressure(BackPressureContext ctx, NotificationEmitter notificationEmitter) {
+  public void onBackPressure(BackPressureContext ctx, org.mule.sdk.api.notification.NotificationEmitter notificationEmitter) {
     notificationEmitter.fireLazy(BATCH_FAILED, () -> ctx.getSourceCallbackContext().getVariable(BATCH_NUMBER).get(),
                                  fromType(Integer.class));
     heisenberg.onBackPressure(ctx);

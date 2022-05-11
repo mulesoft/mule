@@ -11,17 +11,18 @@ import static java.util.Collections.singletonList;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_SCHEMA_LOCATION;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
+
+import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.config.api.dsl.ArtifactDeclarationXmlSerializer;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.config.api.dsl.model.XmlDslElementModelConverter;
-import org.mule.runtime.api.dsl.DslResolvingContext;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.InputStream;
@@ -124,7 +125,7 @@ public class DefaultArtifactDeclarationXmlSerializer implements ArtifactDeclarat
     artifact.getCustomConfigurationParameters().forEach(p -> mule.setAttribute(p.getName(), p.getValue().toString()));
     if (isBlank(mule.getAttribute(XSI_SCHEMA_LOCATION))) {
       mule.setAttributeNS(XMLNS_W3_URL, XMLNS, CORE_NAMESPACE);
-      mule.setAttributeNS(XSI_W3_URL, XSI_SCHEMA_LOCATION, CORE_NAMESPACE + " " + MULE_SCHEMA_LOCATION);
+      mule.setAttributeNS(XSI_W3_URL, XSI_SCHEMA_LOCATION, CORE_NAMESPACE + " " + CORE_SCHEMA_LOCATION);
     }
     return doc;
   }

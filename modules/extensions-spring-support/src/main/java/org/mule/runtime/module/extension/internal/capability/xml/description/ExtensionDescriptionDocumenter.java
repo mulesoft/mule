@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.description;
 
+import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.extension.internal.loader.util.JavaParserUtils.mapReduceAnnotation;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
@@ -24,8 +27,8 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.TypeElement;
 
 /**
- * {@link AbstractDescriptionDocumenter} implementation that picks a {@link ExtensionDeclaration} on which a {@link ExtensionModel}
- * has already been described.
+ * {@link AbstractDescriptionDocumenter} implementation that picks a {@link ExtensionDeclaration} on which a
+ * {@link ExtensionModel} has already been described.
  *
  * @since 4.0
  */
@@ -60,6 +63,7 @@ final class ExtensionDescriptionDocumenter extends AbstractDescriptionDocumenter
 
   private void documentConfigurations(ExtensionDeclaration extensionDeclaration, TypeElement extensionElement) {
     Set<TypeElement> configurations = processor.getTypeElementsAnnotatedWith(Configuration.class, roundEnv);
+    configurations.addAll(processor.getTypeElementsAnnotatedWith(org.mule.sdk.api.annotation.Configuration.class, roundEnv));
     if (!configurations.isEmpty()) {
       configurations
           .forEach(config -> findMatchingConfiguration(extensionDeclaration, config)
@@ -79,9 +83,13 @@ final class ExtensionDescriptionDocumenter extends AbstractDescriptionDocumenter
     }
     return configurations.stream()
         .filter(config -> {
-          Configuration configurationAnnotation = element.getAnnotation(Configuration.class);
+          String annotationName = mapReduceAnnotation(element,
+                                                      Configuration.class,
+                                                      org.mule.sdk.api.annotation.Configuration.class,
+                                                      Configuration::name,
+                                                      org.mule.sdk.api.annotation.Configuration::name)
+                                                          .orElse(EMPTY);
           String name = config.getName();
-          String annotationName = configurationAnnotation != null ? configurationAnnotation.name() : "";
           String defaultNaming = hyphenize(element.getSimpleName().toString());
           return name.equals(defaultNaming) || name.equals(annotationName) || name.equals(DEFAULT_CONFIG_NAME);
         })

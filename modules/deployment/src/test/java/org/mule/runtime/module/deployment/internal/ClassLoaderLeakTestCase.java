@@ -7,20 +7,24 @@
 
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.runtime.api.deployment.meta.Product.MULE;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
+import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
+import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
+import static org.mule.tck.junit4.rule.LogCleanup.clearAllLogs;
+
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.api.deployment.meta.Product.MULE;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
-import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
-import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
@@ -66,7 +70,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
   private static final String FOO_POLICY_NAME = "fooPolicy";
 
   private static final int PROBER_POLLING_INTERVAL = 100;
-  private static final int PROBER_POLIING_TIMEOUT = 5000;
+  private static final int PROBER_POLLING_TIMEOUT = 5000;
 
   private final String appName;
 
@@ -107,7 +111,6 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
   @Test
   public void undeploysApplicationDoesNotLeakClassloader() throws Exception {
-
     ApplicationFileBuilder applicationFileBuilder = getApplicationFileBuilder();
 
     addPackedAppFromBuilder(applicationFileBuilder);
@@ -118,12 +121,13 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
     assertThat(removeAppAnchorFile(appName), is(true));
 
-    new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       assertThat(getDeploymentListener().isAppUndeployed(), is(true));
       return true;
     }));
 
-    new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+      clearAllLogs();
       System.gc();
       assertThat(getDeploymentListener().getPhantomReference().isEnqueued(), is(true));
       return true;
@@ -150,12 +154,13 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
     assertThat(removeAppAnchorFile(appName), is(true));
 
-    new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       assertThat(getDeploymentListener().isAppUndeployed(), is(true));
       return true;
     }));
 
-    new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+      clearAllLogs();
       System.gc();
       assertThat(getDeploymentListener().getPhantomReference().isEnqueued(), is(true));
       return true;
@@ -228,7 +233,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
     doAnswer(invocation -> {
       try {
-        new PollingProber(PROBER_POLIING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+        new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
           System.gc();
           assertThat(firstAppRef.isEnqueued(), is(true));
           return true;
@@ -245,7 +250,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
   private void assertRededeployment(DeploymentListener mockDeploymentListener,
                                     AtomicReference<Throwable> redeploymentSuccessThrown) {
-    new PollingProber(PROBER_POLIING_TIMEOUT + 1000, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+    new PollingProber(PROBER_POLLING_TIMEOUT + 1000, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       if (redeploymentSuccessThrown.get() != null) {
         throw new MuleRuntimeException(redeploymentSuccessThrown.get());
       }
@@ -268,7 +273,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
   private ArtifactPluginFileBuilder createSingleExtensionPlugin() {
     MulePluginModel.MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModel.MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName("simpleExtensionPlugin").setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("simpleExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("simpleExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
         .build());
@@ -336,5 +341,5 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
     public boolean isAppUndeployed() {
       return appUndeployed;
     }
-  };
+  }
 }

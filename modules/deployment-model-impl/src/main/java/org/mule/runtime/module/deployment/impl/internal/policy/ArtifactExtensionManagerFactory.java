@@ -9,16 +9,17 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toSet;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelDiscoverer;
+import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ExtensionModelDiscoverer;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -38,9 +39,9 @@ public class ArtifactExtensionManagerFactory implements ExtensionManagerFactory 
   /**
    * Creates a extensionManager factory
    *
-   * @param artifactPlugins artifact plugins deployed inside the artifact. Non null.
+   * @param artifactPlugins                artifact plugins deployed inside the artifact. Non null.
    * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
-   * @param extensionManagerFactory creates the {@link ExtensionManager} for the artifact. Non null
+   * @param extensionManagerFactory        creates the {@link ExtensionManager} for the artifact. Non null
    */
   public ArtifactExtensionManagerFactory(List<ArtifactPlugin> artifactPlugins,
                                          ExtensionModelLoaderRepository extensionModelLoaderRepository,

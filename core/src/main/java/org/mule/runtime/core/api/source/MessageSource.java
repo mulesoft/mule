@@ -49,14 +49,13 @@ public interface MessageSource extends Component {
     FAIL,
 
     /**
-     * On back-pressure block the current thread and wait until the {@link CoreEvent} can be
-     * accepted.
+     * On back-pressure block the current thread and wait until the {@link CoreEvent} can be accepted.
      */
     WAIT,
 
     /**
-     * On back-pressure drop the {@link CoreEvent} by immediately completing
-     * {@link EventContext} with no result without performing any processing.
+     * On back-pressure drop the {@link CoreEvent} by immediately completing {@link EventContext} with no result without
+     * performing any processing.
      */
     DROP
   }

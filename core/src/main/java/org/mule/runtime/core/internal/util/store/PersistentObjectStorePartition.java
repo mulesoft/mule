@@ -47,6 +47,9 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.commons.collections.BidiMap;
 import org.apache.commons.collections.bidimap.TreeBidiMap;
@@ -70,6 +73,12 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
   private File partitionDirectory;
   private String partitionName;
   private final BidiMap realKeyToUUIDIndex = new TreeBidiMap();
+
+  // The purpose of this lock is to ensure consistency between the realKeyToUUIDIndex above and the file system, not the
+  // consistency of the store itself.
+  private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
+  private final Lock rLock = rwLock.readLock();
+  private final Lock wLock = rwLock.writeLock();
 
   public PersistentObjectStorePartition(MuleContext muleContext, String partitionName, File partitionDirectory) {
     this.muleContext = muleContext;
@@ -108,7 +117,8 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
 
   @Override
   public void close() throws ObjectStoreException {
-    synchronized (realKeyToUUIDIndex) {
+    wLock.lock();
+    try {
       try {
         cleanDirectory(this.partitionDirectory);
         partitionDirectory.delete();
@@ -117,6 +127,8 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
       }
 
       realKeyToUUIDIndex.clear();
+    } finally {
+      wLock.unlock();
     }
   }
 
@@ -124,8 +136,11 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
   public List<String> allKeys() throws ObjectStoreException {
     assureLoaded();
 
-    synchronized (realKeyToUUIDIndex) {
+    rLock.lock();
+    try {
       return unmodifiableList(new ArrayList<String>(realKeyToUUIDIndex.keySet()));
+    } finally {
+      rLock.unlock();
     }
   }
 
@@ -133,8 +148,11 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
   protected boolean doContains(String key) throws ObjectStoreException {
     assureLoaded();
 
-    synchronized (realKeyToUUIDIndex) {
+    rLock.lock();
+    try {
       return realKeyToUUIDIndex.containsKey(key);
+    } finally {
+      rLock.unlock();
     }
   }
 
@@ -142,19 +160,23 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
   protected void doStore(String key, T value) throws ObjectStoreException {
     assureLoaded();
 
-    synchronized (realKeyToUUIDIndex) {
+    wLock.lock();
+    try {
       if (realKeyToUUIDIndex.containsKey(key)) {
         throw new ObjectAlreadyExistsException();
       }
       File newFile = createFileToStoreObject();
       realKeyToUUIDIndex.put(key, newFile.getName());
-      serialize(newFile, new StoreValue<T>(key, value));
+      serialize(newFile, new StoreValue<>(key, value));
+    } finally {
+      wLock.unlock();
     }
   }
 
   @Override
   public void clear() throws ObjectStoreException {
-    synchronized (realKeyToUUIDIndex) {
+    wLock.lock();
+    try {
       try {
         cleanDirectory(this.partitionDirectory);
         createOrRetrievePartitionDescriptorFile();
@@ -163,6 +185,8 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
       }
 
       realKeyToUUIDIndex.clear();
+    } finally {
+      wLock.unlock();
     }
   }
 
@@ -170,11 +194,14 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
   protected T doRetrieve(String key) throws ObjectStoreException {
     assureLoaded();
 
-    synchronized (realKeyToUUIDIndex) {
+    rLock.lock();
+    try {
       if (!realKeyToUUIDIndex.containsKey(key)) {
         throw new ObjectDoesNotExistException(createStaticMessage("Key does not exist: " + key));
       }
       return load(key);
+    } finally {
+      rLock.unlock();
     }
   }
 
@@ -182,7 +209,8 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
   public Map<String, T> retrieveAll() throws ObjectStoreException {
     assureLoaded();
 
-    synchronized (realKeyToUUIDIndex) {
+    rLock.lock();
+    try {
       Map<String, T> values = new LinkedHashMap<>(realKeyToUUIDIndex.size());
       for (Object k : realKeyToUUIDIndex.keySet()) {
         String key = (String) k;
@@ -190,6 +218,8 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
       }
 
       return values;
+    } finally {
+      rLock.unlock();
     }
   }
 
@@ -203,10 +233,13 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
   protected T doRemove(String key) throws ObjectStoreException {
     assureLoaded();
 
-    synchronized (realKeyToUUIDIndex) {
+    wLock.lock();
+    try {
       T value = retrieve(key);
       deleteStoreFile(getValueFile((String) realKeyToUUIDIndex.get(key)));
       return value;
+    } finally {
+      wLock.unlock();
     }
   }
 
@@ -219,7 +252,8 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
   public void expire(long entryTTL, int maxEntries) throws ObjectStoreException {
     assureLoaded();
 
-    synchronized (realKeyToUUIDIndex) {
+    wLock.lock();
+    try {
       File[] files = listValuesFiles();
       Arrays.sort(files, (f1, f2) -> {
         int result = Long.valueOf(f1.lastModified()).compareTo(f2.lastModified());
@@ -243,6 +277,8 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
           break;
         }
       }
+    } finally {
+      wLock.unlock();
     }
   }
 
@@ -276,7 +312,8 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
   }
 
   private void loadStoredKeysAndFileNames() throws ObjectStoreException {
-    synchronized (realKeyToUUIDIndex) {
+    wLock.lock();
+    try {
       /*
        * by re-checking this condition here we can avoid contention in {@link #assureLoaded}. The amount of times that this
        * condition should evaluate to {@code true} is really limited, which provides better performance in the long run
@@ -306,6 +343,8 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
         throw new ObjectStoreException(createStaticMessage(format("Could not restore object store data from %1s",
                                                                   partitionDirectory.getAbsolutePath())));
       }
+    } finally {
+      wLock.unlock();
     }
   }
 
@@ -425,8 +464,8 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
 
   public static class StoreValue<T> implements Serializable {
 
-    private Serializable key;
-    private T value;
+    private final Serializable key;
+    private final T value;
 
     public StoreValue(Serializable key, T value) {
       this.key = key;

@@ -19,9 +19,9 @@ public interface MessageProcessingManager {
    * Process a message by routing it through a flow.
    *
    * @param messageProcessTemplate contains template methods that will be executed by each phase in specific parts of the phase so
-   *        the {@link MessageSource} can apply custom logic during message processing. The
-   *        message will participate only on those phases were the template defines the required template methods
-   * @param messageProcessContext defines the context of execution of the message
+   *                               the {@link MessageSource} can apply custom logic during message processing. The message will
+   *                               participate only on those phases were the template defines the required template methods
+   * @param messageProcessContext  defines the context of execution of the message
    */
   void processMessage(FlowProcessTemplate messageProcessTemplate, MessageProcessContext messageProcessContext);
 

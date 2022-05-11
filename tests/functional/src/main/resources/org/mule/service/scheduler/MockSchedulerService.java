@@ -40,42 +40,42 @@ public class MockSchedulerService implements SchedulerService {
   
   @Override
   public Scheduler cpuLightScheduler(SchedulerConfig config) {
-    return new MockScheduler();
+    return new MockScheduler(config.getSchedulerName());
   }
 
   @Override
   public Scheduler ioScheduler(SchedulerConfig config) {
-    return new MockScheduler();
+    return new MockScheduler(config.getSchedulerName());
   }
 
   @Override
   public Scheduler cpuIntensiveScheduler(SchedulerConfig config) {
-    return new MockScheduler();
+    return new MockScheduler(config.getSchedulerName());
   }
   
   @Override
   public Scheduler cpuLightScheduler(SchedulerConfig config, SchedulerPoolsConfigFactory poolsConfigFactory) {
-    return new MockScheduler();
+    return new MockScheduler(config.getSchedulerName());
   }
   
   @Override
   public Scheduler ioScheduler(SchedulerConfig config, SchedulerPoolsConfigFactory poolsConfigFactory) {
-    return new MockScheduler();
+    return new MockScheduler(config.getSchedulerName());
   }
   
   @Override
   public Scheduler cpuIntensiveScheduler(SchedulerConfig config, SchedulerPoolsConfigFactory poolsConfigFactory) {
-    return new MockScheduler();
+    return new MockScheduler(config.getSchedulerName());
   }
   
   @Override
   public Scheduler customScheduler(SchedulerConfig config) {
-    return new MockScheduler();
+    return new MockScheduler(config.getSchedulerName());
   }
   
   @Override
   public Scheduler customScheduler(SchedulerConfig config, int queueSize) {
-    return new MockScheduler();
+    return new MockScheduler(config.getSchedulerName());
   }
 
   @Override

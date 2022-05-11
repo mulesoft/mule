@@ -48,7 +48,7 @@ public class SourcePolicyProcessor implements ReactiveProcessor {
   /**
    * Creates a new {@code DefaultSourcePolicy}.
    *
-   * @param policy the policy to execute before and after the source.
+   * @param policy        the policy to execute before and after the source.
    * @param nextProcessor the next-operation processor implementation, it may be another policy or the flow execution.
    */
   public SourcePolicyProcessor(Policy policy, ReactiveProcessor nextProcessor) {

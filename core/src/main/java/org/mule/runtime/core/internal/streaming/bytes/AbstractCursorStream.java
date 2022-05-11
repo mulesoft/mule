@@ -130,15 +130,14 @@ abstract class AbstractCursorStream extends CursorStream {
    * @param b   the buffer into which the data is read.
    * @param off the start offset in array <code>b</code> at which the data is written.
    * @param len the maximum number of bytes to read.
-   * @return the total number of bytes read into the buffer, or {@code -1} if there is no more data because the end of
-   * the stream has been reached.
+   * @return the total number of bytes read into the buffer, or {@code -1} if there is no more data because the end of the stream
+   *         has been reached.
    * @throws IOException
    */
   protected abstract int doRead(byte[] b, int off, int len) throws IOException;
 
   /**
-   * {@inheritDoc}
-   * Equivalent to {@code this.seek(this.getPosition() + n)}
+   * {@inheritDoc} Equivalent to {@code this.seek(this.getPosition() + n)}
    */
   @Override
   public final long skip(long n) throws IOException {

@@ -10,7 +10,7 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLA
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.values.OfValues;
+import org.mule.sdk.api.annotation.values.OfValues;
 import org.mule.test.values.extension.config.SimpleConfig;
 import org.mule.test.values.extension.resolver.WithConfigValueProvider;
 
@@ -21,7 +21,7 @@ public class SourceWithConfiguration extends AbstractSource {
   @Parameter
   String channel;
 
-  @Config
+  @org.mule.sdk.api.annotation.param.Config
   SimpleConfig simpleConfig;
 
 }

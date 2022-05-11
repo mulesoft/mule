@@ -9,10 +9,12 @@ package org.mule.runtime.core.internal.construct;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
+import static java.util.Arrays.stream;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
@@ -20,14 +22,11 @@ import static org.mule.runtime.api.notification.PipelineMessageNotification.PROC
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
-import static org.mule.runtime.core.api.construct.BackPressureReason.EVENTS_ACCUMULATED;
-import static org.mule.runtime.core.api.construct.BackPressureReason.MAX_CONCURRENCY_EXCEEDED;
-import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY;
-import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
+import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createFlowBackPressureException;
 import static org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter.createInterceptors;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.KEY_ON_NEXT_ERROR_STRATEGY;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.ON_NEXT_FAILURE_STRATEGY;
@@ -86,7 +85,6 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -182,6 +180,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
     configureMessageProcessors(builder);
     builder.setMessagingExceptionHandler(getExceptionListener());
+    builder.setPipelineLocation(getLocation());
     return builder.build();
   }
 
@@ -226,18 +225,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doInitialise() throws MuleException {
-    final Map<BackPressureReason, FlowBackPressureException> backPressureExceptions = new HashMap<>();
-
-    backPressureExceptions.put(EVENTS_ACCUMULATED,
-                               new FlowBackPressureEventsAccumulatedException(this, EVENTS_ACCUMULATED));
-    backPressureExceptions.put(MAX_CONCURRENCY_EXCEEDED,
-                               new FlowBackPressureMaxConcurrencyExceededException(this, EVENTS_ACCUMULATED));
-    backPressureExceptions.put(REQUIRED_SCHEDULER_BUSY,
-                               new FlowBackPressureRequiredSchedulerBusyException(this, EVENTS_ACCUMULATED));
-    backPressureExceptions.put(REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER,
-                               new FlowBackPressureRequiredSchedulerBusyWithFullBufferException(this, EVENTS_ACCUMULATED));
-
-    this.backPressureExceptions = unmodifiableMap(backPressureExceptions);
+    this.backPressureExceptions = unmodifiableMap(stream(BackPressureReason.values())
+        .collect(toMap(identity(), backPressureReason -> createFlowBackPressureException(this, backPressureReason))));
 
     super.doInitialise();
 
@@ -270,6 +259,15 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         .stream()
         .map(FlowInterceptorFactoryAdapter::new)
         .collect(toList()), muleContext.getInjector()));
+
+    doInitialiseProcessingStrategy();
+  }
+
+  @Override
+  protected void doInitialiseProcessingStrategy() throws MuleException {
+    LOGGER.debug("Initialising processing strategy ({}) of flow '{}'...", processingStrategy, getName());
+    super.doInitialiseProcessingStrategy();
+    initialiseIfNeeded(processingStrategy, muleContext);
   }
 
   /**
@@ -358,7 +356,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                 sinkRecorder.next(right(Throwable.class, e));
               }
               if (isWithinProcessToApply) {
-                // When the event that entered the pipeline has been emitted by a Mono, the pipeline downstream can be safely completed,
+                // When the event that entered the pipeline has been emitted by a Mono, the pipeline downstream can be safely
+                // completed,
                 // in order to cover the case of both error and event being null (see BaseEventContext.success()).
                 sinkRecorder.complete();
               }
@@ -393,7 +392,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   /**
    * Builds an error event and communicates it through the {@link BaseEventContext}
    *
-   * @param event the event for which an error was caused
+   * @param event            the event for which an error was caused
    * @param wrappedException the wrapped inside a {@link FlowBackPressureException} cause exception
    */
   private void notifyBackpressureException(CoreEvent event, FlowBackPressureException wrappedException) {
@@ -502,6 +501,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doStartProcessingStrategy() throws MuleException {
+    LOGGER.debug("Starting processing strategy ({}) of flow '{}'...", processingStrategy, getName());
     super.doStartProcessingStrategy();
     startIfStartable(processingStrategy);
   }
@@ -511,6 +511,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     super.doStart();
 
     try {
+      LOGGER.debug("Starting pipeline of flow '{}'...", getName());
       // Each component in the chain must be started before `apply` is called on them, ...
       startIfStartable(pipeline);
       // ... which happens when the sink is created
@@ -521,9 +522,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
 
     canProcessMessage = true;
-    if (getMuleContext().isStarted()) {
+    if (source != null && getMuleContext().isStarted()) {
       try {
         if (componentInitialStateManager.mustStartMessageSource(source)) {
+          LOGGER.debug("Starting source of flow '{}'...", getName());
           startIfStartable(source);
         } else {
           LOGGER.info("Not starting source for '{}' because of {}", getName(), componentInitialStateManager);
@@ -579,15 +581,19 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doStop() throws MuleException {
-    stopSafely(() -> {
-      if (componentInitialStateManager.mustStartMessageSource(source)) {
-        stopIfStoppable(source);
-      } else {
-        LOGGER.info("Not stopping source for '{}', it was not started because of {}", getName(), componentInitialStateManager);
-      }
-    });
+    if (source != null) {
+      stopSafely(() -> {
+        if (componentInitialStateManager.mustStartMessageSource(source)) {
+          LOGGER.debug("Stopping source of flow '{}'...", getName());
+          stopIfStoppable(source);
+        } else {
+          LOGGER.info("Not stopping source for '{}', it was not started because of {}", getName(), componentInitialStateManager);
+        }
+      });
+    }
     canProcessMessage = false;
 
+    LOGGER.debug("Stopping pipeline of flow '{}'...", getName());
     stopSafely(() -> disposeIfDisposable(sink));
     sink = null;
     stopIfStoppable(pipeline);
@@ -596,6 +602,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doStopProcessingStrategy() throws MuleException {
+    LOGGER.debug("Stopping processing strategy ({}) of flow '{}'...", processingStrategy, getName());
     stopIfStoppable(processingStrategy);
 
     super.doStopProcessingStrategy();

@@ -6,30 +6,35 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptySet;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleDomainsDir;
 
+import static java.lang.String.format;
+import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toList;
+
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.service.ServiceRepository;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
+import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilder;
+import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderBuilder;
-import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
+import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
+import org.mule.runtime.deployment.model.internal.artifact.extension.ExtensionModelLoaderManager;
+import org.mule.runtime.internal.memory.management.ArtifactMemoryManagementService;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.File;
@@ -38,7 +43,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
-public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Domain> {
+public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<DomainDescriptor, Domain> {
 
   private final DomainManager domainManager;
   private final DomainDescriptorFactory domainDescriptorFactory;
@@ -52,14 +57,15 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
   /**
    * Creates a new domain factory
    *
-   * @param domainDescriptorFactory creates descriptors for the new domains. Non null.
-   * @param domainManager tracks the domains deployed on the container. Non null.
-   * @param classLoaderRepository contains all the class loaders in the container. Non null.
-   * @param serviceRepository repository of available services. Non null.
-   * @param pluginDependenciesResolver resolver for the plugins on which the {@code artifactPluginDescriptor} declares it depends.
-   *        Non null.
+   * @param domainDescriptorFactory         creates descriptors for the new domains. Non null.
+   * @param domainManager                   tracks the domains deployed on the container. Non null.
+   * @param classLoaderRepository           contains all the class loaders in the container. Non null.
+   * @param serviceRepository               repository of available services. Non null.
+   * @param pluginDependenciesResolver      resolver for the plugins on which the {@code artifactPluginDescriptor} declares it
+   *                                        depends. Non null.
    * @param domainClassLoaderBuilderFactory creates builders to build the classloaders for each domain. Non null.
-   * @param extensionModelLoaderManager manager capable of resolve {@link ExtensionModel extension models}. Non null.
+   * @param extensionModelLoaderManager     manager capable of resolve {@link ExtensionModel extension models}. Non null.
+   * @param artifactConfigurationProcessor  the processor to use for building the application model. Non null.
    */
   public DefaultDomainFactory(DomainDescriptorFactory domainDescriptorFactory,
                               DomainManager domainManager,
@@ -69,9 +75,11 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
                               DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory,
                               ExtensionModelLoaderManager extensionModelLoaderManager,
                               LicenseValidator licenseValidator,
-                              LockFactory runtimeLockFactory) {
+                              LockFactory runtimeLockFactory,
+                              MemoryManagementService memoryManagementService,
+                              ArtifactConfigurationProcessor artifactConfigurationProcessor) {
 
-    super(licenseValidator, runtimeLockFactory);
+    super(licenseValidator, runtimeLockFactory, memoryManagementService, artifactConfigurationProcessor);
 
     checkArgument(domainDescriptorFactory != null, "domainDescriptorFactory cannot be null");
     checkArgument(domainManager != null, "Domain manager cannot be null");
@@ -79,6 +87,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
     checkArgument(pluginDependenciesResolver != null, "pluginDependenciesResolver cannot be null");
     checkArgument(domainClassLoaderBuilderFactory != null, "domainClassLoaderBuilderFactory cannot be null");
     checkArgument(extensionModelLoaderManager != null, "extensionModelLoaderManager cannot be null");
+    checkArgument(artifactConfigurationProcessor != null, "artifactConfigurationProcessor cannot be null");
 
     this.classLoaderRepository = classLoaderRepository;
     this.domainDescriptorFactory = domainDescriptorFactory;
@@ -151,16 +160,16 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
         domainClassLoaderBuilderFactory.createArtifactClassLoaderBuilder();
     MuleDeployableArtifactClassLoader domainClassLoader =
         artifactClassLoaderBuilder
-            .addArtifactPluginDescriptors(resolvedArtifactPluginDescriptors
-                .toArray(new ArtifactPluginDescriptor[resolvedArtifactPluginDescriptors.size()]))
-            .setArtifactId(domainDescriptor.getName()).setArtifactDescriptor(domainDescriptor).build();
+            .setArtifactDescriptor(domainDescriptor).build();
 
     List<ArtifactPlugin> artifactPlugins =
         createArtifactPluginList(domainClassLoader, resolvedArtifactPluginDescriptors);
 
     DefaultMuleDomain defaultMuleDomain =
         new DefaultMuleDomain(domainDescriptor, domainClassLoader, classLoaderRepository, serviceRepository, artifactPlugins,
-                              extensionModelLoaderManager, getRuntimeLockFactory());
+                              extensionModelLoaderManager, getRuntimeLockFactory(),
+                              new ArtifactMemoryManagementService(getMemoryManagementService()),
+                              getArtifactConfigurationProcessor());
 
     DomainWrapper domainWrapper = new DomainWrapper(defaultMuleDomain, this);
     domainManager.addDomain(domainWrapper);

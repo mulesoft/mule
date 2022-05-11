@@ -15,8 +15,7 @@ import java.util.List;
 /**
  * Default implementation of {@link LifecycleObjectSorter}.
  * <p>
- * It works by classifying objects into buckets depending their type, to finally
- * merge all the buckets together
+ * It works by classifying objects into buckets depending their type, to finally merge all the buckets together
  *
  * @since 4.2
  */
@@ -57,8 +56,8 @@ public class DefaultLifecycleObjectSorter implements LifecycleObjectSorter {
   /**
    * Actually adds the given {@code object} to the given {@code bucket}.
    * <p>
-   * Implementors are free to add additional objects to the bucket, in any particular position. This default
-   * implementation however only adds the given one at the end of the list
+   * Implementors are free to add additional objects to the bucket, in any particular position. This default implementation
+   * however only adds the given one at the end of the list
    *
    * @param name   the name under which the object is registered in the {@link Registry}
    * @param object the object
@@ -84,4 +83,5 @@ public class DefaultLifecycleObjectSorter implements LifecycleObjectSorter {
 
     return sorted;
   }
+
 }

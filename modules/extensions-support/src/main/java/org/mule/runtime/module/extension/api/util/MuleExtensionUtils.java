@@ -11,8 +11,8 @@ import static java.util.Collections.singleton;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
-import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_COMPONENT_IGNORE;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENABLE_POLLING_SOURCE_LIMIT_PARAMETER;
 
@@ -26,7 +26,7 @@ import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 
 import java.util.Map;
@@ -46,7 +46,7 @@ public class MuleExtensionUtils {
    * @param clazz fully qualified name of the class to load.
    * @return an {@link ExtensionModel} that represents the class being loaded
    * @throws IllegalArgumentException if there are missing entries in {@code attributes} or the type of any of them does not apply
-   *         to the expected one.
+   *                                  to the expected one.
    */
   public static ExtensionModel loadExtension(Class<?> clazz) {
     return loadExtension(clazz, new SmallMap<>());
@@ -55,12 +55,12 @@ public class MuleExtensionUtils {
   /**
    * Loads a extension model
    *
-   * @param clazz fully qualified name of the class to load.
+   * @param clazz  fully qualified name of the class to load.
    * @param params a set of attributes to work with in each concrete implementation of {@link ExtensionModelLoader}, which will be
-   *        responsible of extracting the mandatory parameters (while casting, if needed).
+   *               responsible of extracting the mandatory parameters (while casting, if needed).
    * @return an {@link ExtensionModel} that represents the class being loaded
    * @throws IllegalArgumentException if there are missing entries in {@code attributes} or the type of any of them does not apply
-   *         to the expected one.
+   *                                  to the expected one.
    */
   public static ExtensionModel loadExtension(Class<?> clazz, Map<String, Object> params) {
     params.put(TYPE_PROPERTY_NAME, clazz.getName());

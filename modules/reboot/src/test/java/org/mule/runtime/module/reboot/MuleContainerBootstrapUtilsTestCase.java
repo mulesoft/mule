@@ -75,8 +75,7 @@ public class MuleContainerBootstrapUtilsTestCase {
   }
 
   /**
-   * Test method for
-   * {@link MuleContainerBootstrapUtils#getResource(java.lang.String, java.lang.Class)}.
+   * Test method for {@link MuleContainerBootstrapUtils#getResource(java.lang.String, java.lang.Class)}.
    * 
    * @throws IOException
    */

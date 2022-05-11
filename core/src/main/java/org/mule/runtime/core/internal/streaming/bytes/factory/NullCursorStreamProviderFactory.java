@@ -20,16 +20,16 @@ import java.io.Closeable;
 import java.io.InputStream;
 
 /**
- * Implementation of {@link AbstractCursorStreamProviderFactory} which always returns
- * the original stream without creating any provider
+ * Implementation of {@link AbstractCursorStreamProviderFactory} which always returns the original stream without creating any
+ * provider
  *
  * @since 4.0
  */
 public class NullCursorStreamProviderFactory extends AbstractCursorStreamProviderFactory {
 
   /**
-   * Implementation of {@link AbstractCursorStreamProviderFactory} which always returns
-   * the original stream without creating any provider
+   * Implementation of {@link AbstractCursorStreamProviderFactory} which always returns the original stream without creating any
+   * provider
    */
   public NullCursorStreamProviderFactory(ByteBufferManager bufferManager, StreamingManager streamingManager) {
     super(bufferManager, streamingManager);

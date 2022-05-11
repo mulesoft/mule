@@ -7,8 +7,10 @@
 package org.mule.test.module.extension.source;
 
 import static org.mule.tck.probe.PollingProber.probe;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
 import static org.mule.test.module.extension.source.HeisenbergMessageSourceTestCase.POLL_DELAY_MILLIS;
 import static org.mule.test.module.extension.source.HeisenbergMessageSourceTestCase.TIMEOUT_MILLIS;
+
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.test.heisenberg.extension.HeisenbergSource;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
@@ -18,11 +20,14 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+
+@Feature(SOURCES)
 public class ParameterInjectionSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "map-parameter-injection-config.xml";
+    return "source/map-parameter-injection-config.xml";
   }
 
   @Override

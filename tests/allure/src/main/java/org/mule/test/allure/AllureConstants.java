@@ -68,6 +68,32 @@ public interface AllureConstants {
     }
   }
 
+  interface ArtifactDeploymentFeature {
+
+    String APP_DEPLOYMENT = "Application Deployment";
+    String DOMAIN_DEPLOYMENT = "Domain Deployment";
+    String POLICY_DEPLOYMENT = "Policy Deployment";
+    String POLICY_REORDER = "Policy Reorder";
+
+    interface DeploymentSuccessfulStory {
+
+      String DEPLOYMENT_SUCCESS = "Deployment Success";
+
+    }
+
+    interface DeploymentFailureStory {
+
+      String DEPLOYMENT_FAILURE = "Deployment Failure";
+
+    }
+
+    interface UndeploymentFailureStory {
+
+      String UNDEPLOYMENT = "Undeployment";
+
+    }
+  }
+
   interface DeploymentTypeFeature {
 
     String DEPLOYMENT_TYPE = "Deployment type";
@@ -83,7 +109,7 @@ public interface AllureConstants {
     interface RedeploymentStory {
 
       String APPLICATION_REDEPLOYMENT = "Application Redeployment";
-      String APPLICATION_PATCHING = "Application Redeployment";
+      String APPLICATION_PATCHING = "Application Patching";
 
     }
   }
@@ -91,6 +117,13 @@ public interface AllureConstants {
   interface ClassloadingIsolationFeature {
 
     String CLASSLOADING_ISOLATION = "Classloading Isolation";
+
+    interface ClassloadingIsolationStory {
+
+      String ARTIFACT_DESCRIPTORS = "Artifact descriptors";
+      String CLASSLOADER_MODEL = "ClassLoader model";
+      String CLASSLOADER_GENERATION = "ClassLoader generation";
+    }
 
   }
 
@@ -100,9 +133,20 @@ public interface AllureConstants {
 
   }
 
+  interface LazyInitializationFeature {
+
+    String LAZY_INITIALIZATION = "Lazy Initialization";
+  }
+
   interface DeploymentConfiguration {
 
     String DEPLOYMENT_CONFIGURATION = "Deployment Configuration";
+
+    interface ApplicationConfiguration {
+
+      String APPLICATION_CONFIGURATION = "Application Configuration";
+
+    }
 
     interface LazyConnectionsStory {
 
@@ -183,6 +227,18 @@ public interface AllureConstants {
       String SUPPORT_DW = "Support DW";
       String SUPPORT_FUNCTIONS = "Support Functions";
       String SUPPORT_MVEL_DW = "Support both MVEL and DW";
+      String SUPPORT_MVEL_COMPATIBILITY = "Support MVEL compatibility mode";
+      String SUPPORT_EXPRESSION_BINDINGS = "Support expression bindings";
+    }
+  }
+
+  interface ExtensionModelDiscoveryFeature {
+
+    String EXTENSION_MODEL_DISCOVERY = "Extension Model Discovery";
+
+    interface ExtensionModelDiscoveryStory {
+
+      String EXTENSION_MODEL_LOADER_REPOSITORY = "Extension model loader repository";
     }
   }
 
@@ -210,6 +266,24 @@ public interface AllureConstants {
 
     String CORE_COMPONENTS = "Core Components";
 
+    interface SetPayloadStory {
+
+      String SET_PAYLOAD = "Set Payload";
+
+    }
+
+    interface AddVariableStory {
+
+      String ADD_VARIABLE = "Add Variable";
+
+    }
+
+    interface RemoveVariableStory {
+
+      String REMOVE_VARIABLE = "Remove Variable";
+
+    }
+
     interface FlowReferenceStory {
 
       String FLOW_REFERENCE = "Flow Reference";
@@ -221,6 +295,19 @@ public interface AllureConstants {
       String LOGGER = "Logger";
 
     }
+
+    interface ParseTemplateStory {
+
+      String PARSE_TEMPLATE = "Parse Template";
+
+    }
+
+    interface IdempotentMessageValidator {
+
+      String IDEMPOTENT_MESSAGE_VALIDATOR = "Idempotent Message Validator";
+
+    }
+
   }
 
   interface FtpFeature {
@@ -229,6 +316,17 @@ public interface AllureConstants {
 
     interface FtpStory {
 
+    }
+  }
+
+  interface ReuseFeature {
+
+    String REUSE = "Reuse";
+
+    interface ReuseStory {
+
+      String APPLICATION_EXTENSION_MODEL = "Application Extension Model";
+      String OPERATIONS = "Operations";
     }
   }
 
@@ -271,8 +369,15 @@ public interface AllureConstants {
   interface OauthFeature {
 
     String OAUTH_EXTENSION = "OAuth Extension";
+    String OCS_SUPPORT = "OCS Support";
 
     interface OauthStory {
+
+    }
+
+    interface OcsStory {
+
+      String OCS_CONNECTION_VALIDATION = "Validation of OCS data provided by the platform";
 
     }
 
@@ -284,11 +389,23 @@ public interface AllureConstants {
 
     interface ObjectStoreStory {
 
+      String OBJECT_STORE_DATA_STORAGE = "ObjectStore data storage";
+
       String PERSISTENT_DATA_REDEPLOYMENT = "Persistent data redeployment";
 
       String OBJECT_STORE_AS_OPERATION_PARAMETER = "ObjectStore is used as an operation parameter";
     }
 
+  }
+
+  interface ReconnectionPolicyFeature {
+
+    String RECONNECTION_POLICIES = "Reconnection Policies";
+
+    interface RetryTemplateStory {
+
+      String RETRY_TEMPLATE = "Blocking";
+    }
   }
 
   interface ProcessingStrategiesFeature {
@@ -303,13 +420,14 @@ public interface AllureConstants {
       String REACTOR = "Reactor";
       String DIRECT = "Direct";
       String WORK_QUEUE = "Work Queue";
+      String ENRICHER = "Enricher";
     }
 
   }
 
   interface ForkJoinStrategiesFeature {
 
-    String FORK_JOIN_STRATEGIES = "Fork/Join Strategies used by scatter-gather and foreach routers";
+    String FORK_JOIN_STRATEGIES = "Fork/Join Strategies used by scatter-gather and parallel-foreach routers";
 
     interface ForkJoinStrategiesStory {
 
@@ -356,6 +474,7 @@ public interface AllureConstants {
 
     interface VMStory {
 
+      String VM_QUEUES = "VM Queues";
       String PERSISTENT_DATA_REDEPLOYMENT = "Persistent data redeployment";
 
     }
@@ -410,6 +529,7 @@ public interface AllureConstants {
     interface ExecutionEngineStory {
 
       String BACKPRESSURE = "Backpressure";
+      String REACTOR = "Reactor";
     }
 
   }
@@ -418,6 +538,10 @@ public interface AllureConstants {
 
     String SCHEDULER = "Scheduler";
 
+    interface SchedulerStories {
+
+      String SCHEDULED_FLOW_EXECUTION = "Scheduled flow execution";
+    }
   }
 
   interface StreamingFeature {
@@ -430,7 +554,6 @@ public interface AllureConstants {
       String OBJECT_STREAMING = "Object Streaming";
       String STREAM_MANAGEMENT = "Management of Streams";
       String TROUBLESHOOTING = "Streaming troubleshooting";
-      String STATISTICS = "Payload statistics";
     }
 
   }
@@ -441,6 +564,7 @@ public interface AllureConstants {
 
     interface SerializationStory {
 
+      String MESSAGE_SERIALIZATION = "Message Serialization";
       String STATISTICS = "Payload statistics";
     }
 
@@ -450,6 +574,10 @@ public interface AllureConstants {
 
     String ROUTERS = "Routers";
 
+    /**
+     * @deprecated {@code foreach} is a scope.
+     */
+    @Deprecated
     interface ForeachStory {
 
       String FOR_EACH = "Foreach";
@@ -470,11 +598,19 @@ public interface AllureConstants {
       String FIRST_SUCCESSFUL = "First Successful";
     }
 
+    /**
+     * @deprecated {@code until-successful} is a scope.
+     */
+    @Deprecated
     interface UntilSuccessfulStory {
 
       String UNTIL_SUCCESSFUL = "Until Successful";
     }
 
+    /**
+     * @deprecated {@code async} is a scope.
+     */
+    @Deprecated
     interface AsyncStory {
 
       String ASYNC = "Async";
@@ -485,9 +621,18 @@ public interface AllureConstants {
       String PROCESSOR_CHAIN_ROUTER = "Processor Chain Router";
     }
 
+    /**
+     * @deprecated {@code parallel-foreach} is a scope.
+     */
+    @Deprecated
     interface ParallelForEachStory {
 
       String PARALLEL_FOR_EACH = "Parallel For Each";
+    }
+
+    interface ChoiceStory {
+
+      String CHOICE = "Choice";
     }
 
   }
@@ -502,15 +647,52 @@ public interface AllureConstants {
 
   }
 
+  interface SourcesFeature {
+
+    String SOURCES = "Sources";
+
+    interface SourcesStories {
+
+      String FLOW_DISPATCH = "Dispatch to flow";
+      String POLLING = "Polling";
+      String REDELIVERY = "Redelivery";
+      String WATERMARK = "Watermark";
+    }
+
+  }
+
   interface ScopeFeature {
 
     String SCOPE = "Scope";
 
+    /**
+     * @deprecated {@code choice} is a router.
+     */
+    @Deprecated
     interface ChoiceStory {
 
       String CHOICE = "Choice";
     }
 
+    interface ForeachStory {
+
+      String FOR_EACH = "Foreach";
+    }
+
+    interface UntilSuccessfulStory {
+
+      String UNTIL_SUCCESSFUL = "Until Successful";
+    }
+
+    interface AsyncStory {
+
+      String ASYNC = "Async";
+    }
+
+    interface ParallelForEachStory {
+
+      String PARALLEL_FOR_EACH = "Parallel For Each";
+    }
   }
 
   interface LifecycleAndDependencyInjectionFeature {
@@ -558,6 +740,11 @@ public interface AllureConstants {
       String LOCAL_TRANSACTION = "Local Transaction";
     }
 
+    interface XaStory {
+
+      String XA_TRANSACTION = "XA Transaction";
+    }
+
   }
 
   interface MuleDsl {
@@ -573,6 +760,12 @@ public interface AllureConstants {
     interface DslValidationStory {
 
       String DSL_VALIDATION_STORY = "Mule DSL Validations";
+
+    }
+
+    interface DslAnnotationsStory {
+
+      String DSL_ANNOTATIONS_STORY = "Mule DSL Annotations";
 
     }
 
@@ -665,6 +858,12 @@ public interface AllureConstants {
 
     }
 
+    interface TransfromersStory {
+
+      String TRANSFORMERS = "Transformers";
+
+    }
+
     interface DomainObjectRegistrationStory {
 
       String OBJECT_REGISTRATION = "Object Registration";
@@ -692,6 +891,31 @@ public interface AllureConstants {
     interface ParameterAst {
 
       String PARAMETER_AST = "Parameter AST resolution";
+    }
+
+    interface ArtifactAstSerialization {
+
+      String AST_SERIALIZATION = "AST serialization";
+      String AST_SERIALIZER_METADATA_SERIALIZATION = "AST metadata serialization";
+      String AST_DTO = "AST serializable representation";
+      String AST_JSON_SERIALIZER = "AST Json serialization";
+      String AST_JSON_DESERIALIZER = "AST Json deserialization";
+      String AST_SERIALIZATION_VERSIONING = "AST serialization versioning";
+      String AST_SERIALIZATION_END_TO_END = "AST serialization end to end tests";
+      String AST_SERIALIZATION_ENRICH = "AST serialization enrichment";
+
+    }
+
+  }
+
+  interface JavaSdk {
+
+    String JAVA_SDK = "Java SDK";
+
+    interface Parameters {
+
+      String PARAMETERS = "Parameters definitions in Java SDK";
+
     }
 
   }
@@ -723,4 +947,84 @@ public interface AllureConstants {
     }
   }
 
+  interface CorrelationIdFeature {
+
+    String CORRELATION_ID = "Correlation ID";
+
+    interface CorrelationIdOnSourcesStory {
+
+      String CORRELATION_ID_ON_SOURCES = "Sources' correlation id generation";
+
+      String CORRELATION_ID_MODIFICATION = "Correlation id modification in child context in chains";
+
+    }
+  }
+
+  interface NotificationsFeature {
+
+    String NOTIFICATIONS = "Notifications";
+  }
+
+  interface ClusteringFeature {
+
+    String CLUSTERING = "Clustering";
+
+  }
+
+  interface ArtifactPatchingFeature {
+
+    String ARTIFACT_PATCHING = "Artifact Patching";
+
+    interface ArtifactPatchingStory {
+
+    }
+  }
+  interface VariablesValues {
+
+    String VARIABLES_VALUES = "Variables";
+
+    interface NullValue {
+
+      String NULL_VALUE = "Null value";
+    }
+
+  }
+
+  interface Profiling {
+
+    String PROFILING = "Profiling";
+
+
+    interface ProfilingServiceStory {
+
+      String DEFAULT_PROFILING_SERVICE = "Default Profiling Service";
+    }
+  }
+
+  interface MemoryManagement {
+
+    String MEMORY_MANAGEMENT = "Memory Management";
+
+    interface MemoryManagementServiceStory {
+
+      String DEFAULT_MEMORY_MANAGEMENT_SERVICE = "Default Memory Management Service";
+
+      String BYTE_BUFFER_PROVIDER = "Byte Buffer Provider";
+    }
+  }
+
+  interface ObjectTag {
+
+    String OBJECT_TAG_FEATURE = "Object";
+
+    interface ObjectPropertiesStory {
+
+      String OBJECT_PROPERTIES = "Object properties";
+    }
+  }
+
+  interface ObjectSerializer {
+
+    String CUSTOM_OBJECT_SERIALIZER = "Custom object serializer";
+  }
 }

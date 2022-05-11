@@ -7,16 +7,17 @@
 
 package org.mule.runtime.module.artifact.api.classloader;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS;
+
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
-import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+
 import static org.apache.commons.io.FilenameUtils.normalize;
 import static org.apache.commons.lang3.ClassUtils.getPackageName;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
@@ -82,10 +83,11 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   private final Map<BundleDescriptor, URLClassLoader> descriptorMapping = new HashMap<>();
 
   private ArtifactClassLoader ownerClassLoader;
+  private ArtifactClassLoaderFilter ownerFilter;
 
   /**
-   * Region specific {@link ResourceReleaser} to add behaviour in the {@link RegionClassLoader#dispose()} execution.
-   * By default it will prompt a gc in the JVM if possible to release the softkeys cleared in the caches.
+   * Region specific {@link ResourceReleaser} to add behaviour in the {@link RegionClassLoader#dispose()} execution. By default it
+   * will prompt a gc in the JVM if possible to release the softkeys cleared in the caches.
    *
    * This behaviour can be changed by extending {@link RegionClassLoader} and calling the provided protected constructor
    */
@@ -94,33 +96,33 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   /**
    * Creates a new region.
    *
-   * @param artifactId artifact unique ID for the artifact owning the created class loader instance. Non empty.
+   * @param artifactId         artifact unique ID for the artifact owning the created class loader instance. Non empty.
    * @param artifactDescriptor descriptor for the artifact owning the created class loader instance. Non null.
-   * @param parent parent classloader for the region. Non null
-   * @param lookupPolicy lookup policy to use on the region
+   * @param parent             parent classloader for the region. Non null
+   * @param lookupPolicy       lookup policy to use on the region
    */
   public RegionClassLoader(String artifactId,
                            ArtifactDescriptor artifactDescriptor,
                            ClassLoader parent,
                            ClassLoaderLookupPolicy lookupPolicy) {
-    super(artifactId, artifactDescriptor, new URL[0], parent, lookupPolicy, emptyList());
+    super(artifactId, artifactDescriptor, new URL[0], parent, lookupPolicy);
   }
 
   /**
    * Constructor to be called by extending classes and override the {@link ClassLoaderResourceReleaser} resourceReleaser.
    *
-   * @param artifactId artifact unique ID for the artifact owning the created class loader instance. Non empty.
-   * @param artifactDescriptor descriptor for the artifact owning the created class loader instance. Non null.
-   * @param parent parent classloader for the region. Non null
-   * @param lookupPolicy lookup policy to use on the region
+   * @param artifactId             artifact unique ID for the artifact owning the created class loader instance. Non empty.
+   * @param artifactDescriptor     descriptor for the artifact owning the created class loader instance. Non null.
+   * @param parent                 parent classloader for the region. Non null
+   * @param lookupPolicy           lookup policy to use on the region
    * @param regionResourceReleaser {@link ResourceReleaser} to be called after invocating {@link RegionClassLoader#dispose()}
-   * */
+   */
   protected RegionClassLoader(String artifactId,
                               ArtifactDescriptor artifactDescriptor,
                               ClassLoader parent,
                               ClassLoaderLookupPolicy lookupPolicy,
                               ResourceReleaser regionResourceReleaser) {
-    super(artifactId, artifactDescriptor, new URL[0], parent, lookupPolicy, emptyList());
+    super(artifactId, artifactDescriptor, new URL[0], parent, lookupPolicy);
     this.regionResourceReleaser = regionResourceReleaser;
   }
 
@@ -133,7 +135,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
    * Adds a class loader to the region.
    *
    * @param artifactClassLoader classloader to add. Non null.
-   * @param filter filter used to provide access to the added classloader. Non null
+   * @param filter              filter used to provide access to the added classloader. Non null
    * @throws IllegalArgumentException if the class loader is already a region member.
    */
   public void addClassLoader(ArtifactClassLoader artifactClassLoader, ArtifactClassLoaderFilter filter) {
@@ -149,6 +151,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
       if (ownerClassLoader == null) {
         ownerClassLoader = artifactClassLoader;
+        ownerFilter = filter;
       } else {
         registeredClassLoaders.add(new RegionMemberClassLoader(artifactClassLoader, filter));
       }
@@ -187,6 +190,20 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
     }
   }
 
+  /**
+   * Retrieves the nearest {@link RegionClassLoader} in the ancestors chain of the given class loader (including itself).
+   * 
+   * @param classLoader A class loader.
+   * @return The nearest {@link RegionClassLoader} in the ancestors chain of the given class loader. Will be null if not found.
+   */
+  public static RegionClassLoader getNearestRegion(ClassLoader classLoader) {
+    while (classLoader != null && !(classLoader instanceof RegionClassLoader)) {
+      classLoader = classLoader.getParent();
+    }
+
+    return (RegionClassLoader) classLoader;
+  }
+
   static String illegalPackageMappingError(String p, LookupStrategy packageLookupStrategy) {
     return format("Attempt to map package '%s' which was already defined on the region lookup policy with '%s'",
                   p, packageLookupStrategy.getClass().getName());
@@ -196,6 +213,14 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
                                              ArtifactClassLoader overridingDefinitionClassLoader) {
     return format("Attempt to redefine mapping for package: '%s'. Original definition classloader is %s, Overriding definition classloader is %s",
                   packageName, originalDefinitionClassLoader.toString(), overridingDefinitionClassLoader.toString());
+  }
+
+  public ArtifactClassLoaderFilter filterForClassLoader(ArtifactClassLoader artifactClassLoader) {
+    if (ownerClassLoader == artifactClassLoader) {
+      return ownerFilter;
+    } else {
+      return findRegisteredClassLoader(artifactClassLoader).filter;
+    }
   }
 
   private RegionMemberClassLoader findRegisteredClassLoader(ArtifactClassLoader artifactClassLoader) {
@@ -217,7 +242,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
    * @param artifactClassLoader class loader to remove. Non null
    * @return true if the class loader is a region member and was removed, false if it is not a region member.
    * @throws IllegalArgumentException if the class loader is the region owner or is a regiion member that exports packages or
-   *         resources.
+   *                                  resources.
    */
   public boolean removeClassLoader(ArtifactClassLoader artifactClassLoader) {
     checkArgument(artifactClassLoader != null, "artifactClassLoader cannot be null");
@@ -414,7 +439,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
     disposeClassLoader(ownerClassLoader);
     super.dispose();
 
-    //System.gc() by default
+    // System.gc() by default
     regionResourceReleaser.release();
   }
 

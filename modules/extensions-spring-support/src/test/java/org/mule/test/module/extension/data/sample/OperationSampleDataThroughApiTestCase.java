@@ -109,4 +109,123 @@ public class OperationSampleDataThroughApiTestCase extends AbstractSampleDataTes
 
     assertMessage(getSampleByComponentName("complexActingParameter", params, null), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
+
+  @Test
+  public void connectionLessTwoWithBoundActingParameter() throws Exception {
+    assertMessage(getSampleByComponentName("connectionLessWithTwoBoundActingParameter", getDefaultParameters(), null),
+                  EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void connectionLessWithTwoBoundActingParameterOneWithAnAlias() throws Exception {
+    assertMessage(getSampleByComponentName("connectionLessWithTwoBoundActingParameterOneWithAnAlias", getDefaultParameters(),
+                                           null),
+                  EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void connectionLessWithTwoBoundActingParameterFromContentField() throws Exception {
+    Map<String, Object> params = new HashMap<>();
+    params.put("message", "{ \"payload\": \"my payload\", \"attributes\": \"my attributes\" }");
+    assertMessage(getSampleByComponentName("connectionLessWithTwoBoundActingParameterFromContentField", params,
+                                           null),
+                  EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void connectionLessWithTwoBoundActingParameterFromXMLContentTag() throws Exception {
+    Map<String, Object> params = new HashMap<>();
+    params
+        .put("message", "<nested>\n" +
+            "  <payloadXmlTag>my payload</payloadXmlTag>\n" +
+            "  <attributesXmlTag>my attributes</attributesXmlTag>\n" +
+            "</nested>");
+    assertMessage(getSampleByComponentName("connectionLessWithTwoBoundActingParameterFromXMLContentTag", params, null),
+                  EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void connectionLessWithTwoBoundActingParameterFromXMLContentTagAttribute() throws Exception {
+    Map<String, Object> params = new HashMap<>();
+    params
+        .put("message", "<nested>\n" +
+            "  <xmlTag payloadXmlAttribute=\"my payload\" attributesXmlAttribute=\"my attributes\">This is content</xmlTag>\n" +
+            "</nested>");
+    assertMessage(getSampleByComponentName("connectionLessWithTwoBoundActingParameterFromXMLContentTagAttribute", params, null),
+                  EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void useConnectionWithTwoBoundActingParameter() throws Exception {
+    assertMessage(getSampleByComponentName("useConnectionWithTwoBoundActingParameter", getDefaultParameters(), "config"),
+                  EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void missingBoundActingParameter() throws Exception {
+    expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
+    expectedException
+        .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
+
+    Map<String, Object> params = getDefaultParameters();
+    params.remove("attributes");
+
+    assertMessage(getSampleByComponentName("useConnectionWithTwoBoundActingParameter", params, "config"), EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void missingBoundActingParameterFromContentField() throws Exception {
+    Map<String, Object> params = new HashMap<>();
+    params.put("message", "{ \"payload\" : \"my payload\" }");
+
+    expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
+    expectedException
+        .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
+    assertMessage(getSampleByComponentName("connectionLessWithTwoBoundActingParameterFromContentField", params, "config"),
+                  EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void complexBoundActingParameter() throws Exception {
+    ComplexActingParameter complexActingParameter = new ComplexActingParameter();
+    complexActingParameter.setPayload(EXPECTED_PAYLOAD);
+    complexActingParameter.setAttributes(EXPECTED_ATTRIBUTES);
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("complex", complexActingParameter);
+
+    assertMessage(getSampleByComponentName("complexBoundActingParameter", params, null), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void pojoBoundActingParameter() throws Exception {
+    Map<String, Object> params = new HashMap<>();
+    params.put("actingParameter", "{ \"pojoFields\" : {\n" +
+        " \"payload\" : \"my payload\" , \"attributes\" : \"my attributes\" } }");
+
+    assertMessage(getSampleByComponentName("pojoBoundActingParameter", params, "config"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+  }
+
+  @Test
+  public void boundActingParameterFromPojoField() throws Exception {
+    ComplexActingParameter complexActingParameter = new ComplexActingParameter();
+    complexActingParameter.setPayload(EXPECTED_PAYLOAD);
+    complexActingParameter.setAttributes(EXPECTED_ATTRIBUTES);
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("complex", complexActingParameter);
+
+    assertMessage(getSampleByComponentName("boundActingParameterFromPojoField", params, "config"), EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
+  }
+
+
 }

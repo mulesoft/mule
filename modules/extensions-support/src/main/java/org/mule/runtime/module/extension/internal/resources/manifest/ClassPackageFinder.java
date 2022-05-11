@@ -17,7 +17,7 @@ import java.util.Optional;
 public interface ClassPackageFinder {
 
   /**
-   *  Given a {@link Class} name returns the given package where the class belongs.
+   * Given a {@link Class} name returns the given package where the class belongs.
    *
    * @param className The class from which obtain their package.
    * @return An {@link Optional} {@link String} with the package value. Is empty if the package doesn't exist.

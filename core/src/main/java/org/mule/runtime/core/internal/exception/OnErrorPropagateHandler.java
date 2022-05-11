@@ -6,15 +6,29 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_ROLLBACK;
+import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
+import static org.mule.runtime.core.api.transaction.TransactionUtils.profileTransactionAction;
+
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.privileged.exception.MessageRedeliveredException;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -23,6 +37,28 @@ import java.util.function.Function;
  * @since 4.0
  */
 public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
+
+  private final SingleErrorTypeMatcher redeliveryExhaustedMatcher;
+
+  @Inject
+  private ProfilingService profilingService;
+
+  private ProfilingDataProducer<TransactionProfilingEventContext, Object> continueProducer;
+  private ProfilingDataProducer<TransactionProfilingEventContext, Object> rollbackProducer;
+
+  public OnErrorPropagateHandler() {
+    ErrorType redeliveryExhaustedErrorType = MULE_CORE_ERROR_TYPE_REPOSITORY.getErrorType(REDELIVERY_EXHAUSTED)
+        .orElseThrow(() -> new IllegalStateException("REDELIVERY_EXHAUSTED error type not found"));
+
+    redeliveryExhaustedMatcher = new SingleErrorTypeMatcher(redeliveryExhaustedErrorType);
+  }
+
+  @Override
+  protected void doInitialise() throws InitialisationException {
+    super.doInitialise();
+    this.continueProducer = profilingService.getProfilingDataProducer(TX_CONTINUE);
+    this.rollbackProducer = profilingService.getProfilingDataProducer(TX_ROLLBACK);
+  }
 
   @Override
   public boolean acceptsAll() {
@@ -42,11 +78,19 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     return event -> {
       Exception exception = getException(event);
       event = super.beforeRouting().apply(event);
-      if (!isRedeliveryExhausted(exception) && isOwnedTransaction()) {
+      if (!isRedeliveryExhausted(exception)
+          && isOwnedTransaction(exception)) {
+        profileTransactionAction(rollbackProducer, TX_ROLLBACK, getLocation());
         rollback(exception);
+      } else {
+        profileTransactionAction(continueProducer, TX_CONTINUE, getLocation());
       }
       return event;
     };
+  }
+
+  public void rollback(Exception ex) {
+    TransactionCoordination.getInstance().rollbackCurrentTransaction();
   }
 
   /**
@@ -60,9 +104,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     cpy.setHandleException(this.handleException);
     cpy.setErrorType(this.errorType);
     cpy.setMessageProcessors(this.getMessageProcessors());
-    cpy.setEnableNotifications(this.isEnableNotifications());
-    cpy.setLogException(this.logException);
-    cpy.setNotificationFirer(this.notificationFirer);
+    cpy.setExceptionListener(this.getExceptionListener());
     cpy.setAnnotations(this.getAnnotations());
     return cpy;
   }
@@ -73,7 +115,12 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   private boolean isRedeliveryExhausted(Exception exception) {
-    return (exception instanceof MessageRedeliveredException);
+    if (exception instanceof MessagingException) {
+      Optional<Error> error = ((MessagingException) exception).getEvent().getError();
+      return error.map(e -> redeliveryExhaustedMatcher.match(e.getErrorType()))
+          .orElse(false);
+    }
+    return false;
   }
 
 }

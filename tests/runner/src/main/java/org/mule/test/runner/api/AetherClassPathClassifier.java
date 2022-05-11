@@ -7,15 +7,27 @@
 
 package org.mule.test.runner.api;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
-import static com.google.common.collect.Maps.newLinkedHashMap;
+import static org.mule.maven.client.internal.util.VersionChecker.areCompatibleVersions;
+import static org.mule.maven.client.internal.util.VersionChecker.isHighestVersion;
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
+import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
+import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
+import static org.mule.test.runner.api.ArtifactClassificationType.SERVICE;
+import static org.mule.test.runner.utils.RunnerModuleUtils.JAR_EXTENSION;
+import static org.mule.test.runner.utils.RunnerModuleUtils.getDefaultSdkApiArtifact;
+
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Maps.newLinkedHashMap;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
@@ -26,18 +38,12 @@ import static org.eclipse.aether.util.artifact.JavaScopes.TEST;
 import static org.eclipse.aether.util.filter.DependencyFilterUtils.andFilter;
 import static org.eclipse.aether.util.filter.DependencyFilterUtils.classpathFilter;
 import static org.eclipse.aether.util.filter.DependencyFilterUtils.orFilter;
-import static org.mule.maven.client.internal.util.VersionChecker.areCompatibleVersions;
-import static org.mule.maven.client.internal.util.VersionChecker.isHighestVersion;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
-import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
-import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
-import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
-import static org.mule.test.runner.api.ArtifactClassificationType.SERVICE;
 
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.test.runner.classification.PatternExclusionsDependencyFilter;
 import org.mule.test.runner.classification.PatternInclusionsDependencyFilter;
+import org.mule.test.runner.utils.RunnerModuleUtils;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -60,6 +66,7 @@ import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
+
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -100,11 +107,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   private static final String ZIP_EXTENSION = ".zip";
 
   private static final String MAVEN_COORDINATES_SEPARATOR = ":";
-  private static final String JAR_EXTENSION = "jar";
   private static final String SNAPSHOT_WILCARD_FILE_FILTER = "*-SNAPSHOT*.*";
   private static final String TESTS_CLASSIFIER = "tests";
   private static final String TESTS_JAR = "-tests.jar";
-  private static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
   private static final String MULE_SERVICE_CLASSIFIER = "mule-service";
 
   private static final String RUNTIME_GROUP_ID = "org.mule.runtime";
@@ -114,14 +119,14 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  private VersionScheme versionScheme = new GenericVersionScheme();
+  private final VersionScheme versionScheme = new GenericVersionScheme();
 
   private final String muleVersion;
 
-  private DependencyResolver dependencyResolver;
-  private ArtifactClassificationTypeResolver artifactClassificationTypeResolver;
-  private PluginResourcesResolver pluginResourcesResolver = new PluginResourcesResolver();
-  private ServiceResourcesResolver serviceResourcesResolver = new ServiceResourcesResolver();
+  private final DependencyResolver dependencyResolver;
+  private final ArtifactClassificationTypeResolver artifactClassificationTypeResolver;
+  private final PluginResourcesResolver pluginResourcesResolver = new PluginResourcesResolver();
+  private final ServiceResourcesResolver serviceResourcesResolver = new ServiceResourcesResolver();
 
   static String getMuleVersion() {
     try {
@@ -294,11 +299,13 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         .map(pluginSharedLibDependency -> {
           try {
             return new ArtifactUrlClassification(ArtifactIdUtils
-                .toId(pluginSharedLibDependency.getArtifact()), pluginSharedLibDependency.getArtifact()
-                    .getArtifactId(), Lists.newArrayList(dependencyResolver
-                        .resolveArtifact(pluginSharedLibDependency.getArtifact(),
-                                         rootArtifactRemoteRepositories)
-                        .getArtifact().getFile().toURI().toURL()));
+                .toId(pluginSharedLibDependency.getArtifact()),
+                                                 pluginSharedLibDependency.getArtifact()
+                                                     .getArtifactId(),
+                                                 Lists.newArrayList(dependencyResolver
+                                                     .resolveArtifact(pluginSharedLibDependency.getArtifact(),
+                                                                      rootArtifactRemoteRepositories)
+                                                     .getArtifact().getFile().toURI().toURL()));
           } catch (Exception e) {
             throw new IllegalStateException("Error while resolving dependency '" + pluginSharedLibDependency
                 + "' as application shared lib", e);
@@ -401,11 +408,13 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
           Artifact artifact = dependency.getArtifact();
           String artifactId = toId(artifact);
           return (!serviceUrlClassifications.stream()
-              // Services may have ended up with a highest version due to transitive dependencies... therefore comparing without version
+              // Services may have ended up with a highest version due to transitive dependencies... therefore comparing without
+              // version
               .anyMatch(artifactUrlClassification -> artifactUrlClassification.getArtifactId()
                   .equals(toVersionlessId(artifact)))
               && !pluginUrlClassifications.stream()
-                  // Plugins may have ended up with a highest version due to transitive dependencies... therefore comparing without version
+                  // Plugins may have ended up with a highest version due to transitive dependencies... therefore comparing
+                  // without version
                   .anyMatch(artifactUrlClassification -> artifactUrlClassification.getArtifactId()
                       .equals(toVersionlessId(artifact)))
               && !applicationSharedLibUrls.stream()
@@ -419,6 +428,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     // TODO MULE-10837 Externalize this dependency along with the other commonly used container dependencies.
     directDependencies
         .add(new Dependency(new DefaultArtifact(RUNTIME_GROUP_ID, LOGGING_ARTIFACT_ID, JAR_EXTENSION, muleVersion), COMPILE));
+
+    // TODO: MULE-19762 remove once forward compatiblity is finished
+    directDependencies.add(new Dependency(getDefaultSdkApiArtifact(), COMPILE));
 
     logger.debug("Selected direct dependencies to be used for resolving container dependency graph (changed to compile in " +
         "order to resolve the graph): {}", directDependencies);
@@ -597,7 +609,6 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     if (context.isExtensionMetadataGenerationEnabled()) {
       ExtensionPluginMetadataGenerator extensionPluginMetadataGenerator =
           new ExtensionPluginMetadataGenerator(context.getPluginResourcesFolder());
-
 
       for (ArtifactClassificationNode pluginClassifiedNode : resolvedPluginsClassified) {
         File pluginClassifiedFile = toFile(pluginClassifiedNode.getUrls().get(0));
@@ -864,7 +875,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @param classifier         of the artifact to be found
    * @param directDependencies the rootArtifact direct {@link Dependency}s
    * @return {@link Optional} {@link Dependency} to the dependency. Could be empty it if not present in the list of direct
-   * dependencies
+   *         dependencies
    */
   private Optional<Dependency> findDirectDependency(String groupId, String artifactId, Optional<String> classifier,
                                                     List<Dependency> directDependencies) {
@@ -934,7 +945,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @param rootArtifact       {@link Artifact} that defines the current artifact that requested to build this class loaders
    * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
    * @return {@link Dependency} representing the artifact if declared as direct dependency or rootArtifact if they match it or
-   * {@link Optional#EMPTY} if couldn't found the dependency.
+   *         {@link Optional#EMPTY} if couldn't found the dependency.
    * @throws {@link IllegalArgumentException} if artifactCoords are not in the expected format
    */
   private Optional<Dependency> discoverDependency(String artifactCoords, Artifact rootArtifact,
@@ -977,12 +988,13 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * {@link ClassPathClassifierContext#getTestInclusions()}. It also excludes
    * {@link ClassPathClassifierContext#getExcludedArtifacts()}, {@link ClassPathClassifierContext#getTestExclusions()}.
    * <p/>
-   * If the application artifact has not been classified as plugin its going to be resolved as {@value #JAR_EXTENSION} in order to
-   * include this its compiled classes classification.
+   * If the application artifact has not been classified as plugin its going to be resolved as
+   * {@link RunnerModuleUtils#JAR_EXTENSION} in order to include this its compiled classes classification.
    *
    * @param context                        {@link ClassPathClassifierContext} with settings for the classification process
    * @param directDependencies             {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
-   * @param rootArtifactType               {@link ArtifactClassificationType} for rootArtifact @return {@link URL}s for application class loader
+   * @param rootArtifactType               {@link ArtifactClassificationType} for rootArtifact @return {@link URL}s for
+   *                                       application class loader
    * @param rootArtifactRemoteRepositories remote repositories defined at the rootArtifact
    */
   private List<URL> buildTestRunnerUrlClassification(ClassPathClassifierContext context,
@@ -1085,7 +1097,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   }
 
   /**
-   * Resolves the rootArtifact {@value #JAR_EXTENSION} output {@link File}s to be added to class loader.
+   * Resolves the rootArtifact {@link RunnerModuleUtils#JAR_EXTENSION} output {@link File}s to be added to class loader.
    *
    * @param rootArtifact {@link Artifact} being classified
    * @return {@link File} to be added to class loader
@@ -1202,8 +1214,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   /**
    * Finds the corresponding {@link URL} in class path grouped by folder {@link Map} for the given artifact {@link File}.
    *
-   * @param classpathFolders     a {@link Map} that has as entry the folder of the artifacts from class path and value a {@link List}
-   *                             with the artifacts (jar, tests.jar, etc).
+   * @param classpathFolders     a {@link Map} that has as entry the folder of the artifacts from class path and value a
+   *                             {@link List} with the artifacts (jar, tests.jar, etc).
    * @param artifactResolvedFile the {@link Artifact} resolved from the Maven dependencies and resolved as SNAPSHOT
    * @return {@link URL} for the artifact found in the class path or {@code null}
    */

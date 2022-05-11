@@ -28,10 +28,10 @@ public interface PolicyManager {
    * specific policies applied to that source and also the {@code sourceEvent} which will be used to extract data to match against
    * the policies pointcuts.
    *
-   * @param source the source where the policy is being applied.
-   * @param sourceEvent the event generated from the source.
+   * @param source                                   the source where the policy is being applied.
+   * @param sourceEvent                              the event generated from the source.
    * @param messageSourceResponseParametersProcessor processor to generate the response and error response parameters of the
-   *        source.
+   *                                                 source.
    * @return a {@link SourcePolicy} associated to that source.
    */
   SourcePolicy createSourcePolicyInstance(Component source, CoreEvent sourceEvent,
@@ -52,8 +52,8 @@ public interface PolicyManager {
    * find specific policies applied to that operation and also the {@code operationParameters} which will be used to extract data
    * to match against the policies pointcuts.
    *
-   * @param operation the operation where the policy is being applied.
-   * @param operationEvent the event used to execute the operation.
+   * @param operation           the operation where the policy is being applied.
+   * @param operationEvent      the event used to execute the operation.
    * @param operationParameters the set of parameters to use to execute the operation.
    * @return a {@link OperationPolicy} associated to that source.
    */

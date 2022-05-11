@@ -6,21 +6,24 @@
  */
 package org.mule.runtime.deployment.model.internal.tooling;
 
-import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.internal.tooling.ToolingRegionClassLoader.newToolingRegionClassLoader;
+
+import static java.lang.String.format;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
 import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
-import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
 import java.io.IOException;
 
@@ -37,9 +40,9 @@ public class ToolingDomainClassLoaderBuilder extends AbstractArtifactClassLoader
   /**
    * Creates a new builder for creating {@link Domain} artifacts.
    *
-   * @param parentClassLoader classloader that will be the parent of the created classloaders. Non null
+   * @param parentClassLoader          classloader that will be the parent of the created classloaders. Non null
    * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes
-   * @param pluginClassLoadersFactory creates the class loaders for the plugins included in the domain's region. Non null
+   * @param pluginClassLoadersFactory  creates the class loaders for the plugins included in the domain's region. Non null
    */
   public ToolingDomainClassLoaderBuilder(ArtifactClassLoader parentClassLoader,
                                          DeployableArtifactClassLoaderFactory<DomainDescriptor> artifactClassLoaderFactory,
@@ -51,7 +54,7 @@ public class ToolingDomainClassLoaderBuilder extends AbstractArtifactClassLoader
 
   @Override
   protected ArtifactClassLoader createArtifactClassLoader(String artifactId, RegionClassLoader regionClassLoader) {
-    return artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor, artifactPluginClassLoaders);
+    return artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor);
   }
 
   /**
@@ -61,7 +64,8 @@ public class ToolingDomainClassLoaderBuilder extends AbstractArtifactClassLoader
    * @return a {@code MuleDeployableArtifactClassLoader} created from the provided configuration.
    * @throws IOException exception cause when it was not possible to access the file provided as dependencies
    */
-  public ToolingArtifactClassLoader build() throws IOException {
+  @Override
+  public ToolingArtifactClassLoader build() {
     ArtifactClassLoader domainClassLoader = super.build();
 
     ClassLoader parent = domainClassLoader.getClassLoader().getParent();

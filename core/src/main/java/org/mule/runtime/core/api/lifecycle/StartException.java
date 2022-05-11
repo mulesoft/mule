@@ -18,7 +18,7 @@ public final class StartException extends LifecycleException {
   private static final long serialVersionUID = 1714192220605243680L;
 
   /**
-   * @param message the exception message
+   * @param message   the exception message
    * @param component the object that failed during a lifecycle method call
    */
   public StartException(I18nMessage message, Startable component) {
@@ -26,8 +26,8 @@ public final class StartException extends LifecycleException {
   }
 
   /**
-   * @param message the exception message
-   * @param cause the exception that cause this exception to be thrown
+   * @param message   the exception message
+   * @param cause     the exception that cause this exception to be thrown
    * @param component the object that failed during a lifecycle method call
    */
   public StartException(I18nMessage message, Throwable cause, Startable component) {
@@ -35,7 +35,7 @@ public final class StartException extends LifecycleException {
   }
 
   /**
-   * @param cause the exception that cause this exception to be thrown
+   * @param cause     the exception that cause this exception to be thrown
    * @param component the object that failed during a lifecycle method call
    */
   public StartException(Throwable cause, Startable component) {

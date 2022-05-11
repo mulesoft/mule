@@ -31,7 +31,7 @@ public class SimpleLoggingTable {
    * Adds a new column to the table.
    *
    * @param title column title that will be displayed in the table header
-   * @param size the size of the column
+   * @param size  the size of the column
    */
   public void addColumn(String title, int size) {
     columns.add(new TableColumn(title, size));

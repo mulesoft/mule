@@ -24,7 +24,8 @@ import org.slf4j.Logger;
 /**
  * Default implementation of {@link FlowListener}.
  * <p>
- * It uses an {@link CoreEvent}'s response {@link Publisher} to subscribe to the event termination and execute the necessary logic.
+ * It uses an {@link CoreEvent}'s response {@link Publisher} to subscribe to the event termination and execute the necessary
+ * logic.
  *
  * @since 4.0
  */

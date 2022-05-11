@@ -66,7 +66,8 @@ public class TypedValueParameterOperations {
     return extension;
   }
 
-  public VeganProductInformation typedValueOperationPojoWithNullsafeAndContent(@ParameterGroup(name = "param",
+  public VeganProductInformation typedValueOperationPojoWithNullsafeAndContent(@org.mule.sdk.api.annotation.param.ParameterGroup(
+      name = "param",
       showInDsl = true) VeganProductInformation param) {
     return param;
   }

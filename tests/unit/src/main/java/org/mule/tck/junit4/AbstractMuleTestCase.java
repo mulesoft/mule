@@ -22,6 +22,7 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STREAMING_STATISTICS;
 import static org.mule.runtime.api.util.MuleSystemProperties.TESTING_MODE_PROPERTY_NAME;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.api.util.SystemUtils.parsePropertyDefinitions;
@@ -32,11 +33,16 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.SystemUtils;
+import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.rule.LogCleanup;
 import org.mule.tck.junit4.rule.WarningTimeout;
 import org.mule.tck.report.ThreadDumpOnTimeOut;
 
@@ -56,7 +62,6 @@ import org.junit.rules.DisableOnDebug;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestName;
 import org.junit.rules.TestRule;
-import org.junit.rules.Timeout;
 import org.slf4j.Logger;
 
 /**
@@ -107,7 +112,8 @@ public abstract class AbstractMuleTestCase {
 
   @Rule
   public final TestRule chain = RuleChain
-      .outerRule(new ThreadDumpOnTimeOut())
+      .outerRule(new LogCleanup())
+      .around(new ThreadDumpOnTimeOut())
       .around(createTestTimeoutRule());
 
   /**
@@ -239,6 +245,30 @@ public abstract class AbstractMuleTestCase {
     return true;
   }
 
+  /**
+   * @return A dummy instance of {@link ArtifactCoordinates} for the purpose of running tests
+   * @since 4.5.0
+   */
+  protected ArtifactCoordinates getTestArtifactCoordinates() {
+    return new ArtifactCoordinates() {
+
+      @Override
+      public String getGroupId() {
+        return "org.mule.tests";
+      }
+
+      @Override
+      public String getArtifactId() {
+        return "mule-test";
+      }
+
+      @Override
+      public String getVersion() {
+        return "1.0.0";
+      }
+    };
+  }
+
   @After
   public void clearRequestContext() {
     setCurrentEvent(null);
@@ -268,6 +298,22 @@ public abstract class AbstractMuleTestCase {
   public void takeTestCaseName() {
     if (testCaseName == null) {
       testCaseName = this.getClass().getName();
+    }
+  }
+
+  private static final List<Flow> testFlows = new ArrayList<>();
+
+  protected static Flow getTestFlow(MuleContext context) throws MuleException {
+    Flow flow = MuleTestUtils.getTestFlow(context);
+    testFlows.add(flow);
+    return flow;
+  }
+
+  @AfterClass
+  public static void clearTestFlows() {
+    if (!testFlows.isEmpty()) {
+      disposeIfNeeded(testFlows, LOGGER);
+      testFlows.clear();
     }
   }
 

@@ -6,23 +6,26 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsComponentId;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.topLevelElement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
+
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -84,7 +87,7 @@ public class NameIsNotRepeated implements Validation {
   }
 
   @Override
-  public Optional<String> validate(ComponentAst component, ArtifactAst artifact) {
+  public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
     final List<ComponentAst> repeated = artifact.topLevelComponentsStream()
         .filter(comp -> !comp.equals(component))
         .filter(equalsComponentId(component.getComponentId().get()))
@@ -94,16 +97,13 @@ public class NameIsNotRepeated implements Validation {
       return empty();
     }
 
-    return of("Two configuration elements have been defined with the same global name. Global name ["
-        + component.getComponentId().get() + "] must be unique. Clashing components are " +
-        repeated.stream()
-            .map(this::compToLoc)
-            .collect(joining(", ")));
-  }
+    final List<ComponentAst> allRepeated = new ArrayList<>();
+    allRepeated.add(component);
+    allRepeated.addAll(repeated);
 
-  private String compToLoc(ComponentAst component) {
-    return "[" + component.getMetadata().getFileName().orElse("unknown") + ":"
-        + component.getMetadata().getStartLine().orElse(-1) + "]";
+    return of(create(allRepeated, this,
+                     "Two (or more) configuration elements have been defined with the same global name. Global name '"
+                         + component.getComponentId().get() + "' must be unique."));
   }
 
 }

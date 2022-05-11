@@ -17,10 +17,9 @@ import java.io.IOException;
 /**
  * A {@link CursorStream} which is backed by a fixed {@code byte[]}.
  * <p>
- * Notice that since the {@link #content} data is already fully loaded into memory, this kind of
- * defeats the purpose of the cursor provider. The purpose of this method is to provide a way to
- * bridge the given data with the {@link CursorStream} abstraction. Possible use cases are
- * mainly deserialization and testing. <b>Think twice</b> before using this method. Most likely you're
+ * Notice that since the {@link #content} data is already fully loaded into memory, this kind of defeats the purpose of the cursor
+ * provider. The purpose of this method is to provide a way to bridge the given data with the {@link CursorStream} abstraction.
+ * Possible use cases are mainly deserialization and testing. <b>Think twice</b> before using this method. Most likely you're
  * doing something wrong.
  * <p>
  * Also consider that because the data is already in memory, the cursors will never buffer into disk.

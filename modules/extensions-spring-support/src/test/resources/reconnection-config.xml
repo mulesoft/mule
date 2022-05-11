@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <mule xmlns:reconnection="http://www.mulesoft.org/schema/mule/reconnection"
-      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-      http://www.mulesoft.org/schema/mule/reconnection http://www.mulesoft.org/schema/mule/reconnection/current/mule-reconnection.xsd
-      http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+      http://www.mulesoft.org/schema/mule/reconnection http://www.mulesoft.org/schema/mule/reconnection/current/mule-reconnection.xsd">
 
-    <object name="capture" class="org.mule.test.module.extension.reconnection.ReconnectionTestCase$CaptureProcessor" />
+    <object name="capture" class="org.mule.test.module.extension.reconnection.ReconnectionTestCase$CaptureProcessor"/>
 
-    <reconnection:config name="reconnection_Config" configId="dsa" >
+    <reconnection:config name="reconnection_Config" configId="dsa">
         <reconnection:connection>
-            <reconnection >
+            <reconnection>
                 <reconnect count="3" frequency="1000"/>
             </reconnection>
         </reconnection:connection>
@@ -21,34 +19,42 @@
     <reconnection:sync-config name="sync_Config">
         <reconnection:long-disconnection>
             <reconnection>
-                <reconnect-forever />
+                <reconnect-forever/>
             </reconnection>
         </reconnection:long-disconnection>
     </reconnection:sync-config>
 
+    <reconnection:failing-connection-config name="failing-connection-config">
+        <reconnection:failing-connection>
+            <reconnection>
+                <reconnect count="3" frequency="500"/>
+            </reconnection>
+        </reconnection:failing-connection>
+    </reconnection:failing-connection-config>
+
     <flow name="reconnectForever" initialState="stopped">
         <reconnection:reconection-source config-ref="reconnection_Config">
-            <reconnect-forever />
+            <reconnect-forever/>
         </reconnection:reconection-source>
         <flow-ref name="capture"/>
     </flow>
 
     <flow name="reconnectAfterFailure" initialState="stopped">
         <reconnection:fallible-reconnectable-source config-ref="reconnection_Config">
-            <reconnect-forever frequency="2000" />
+            <reconnect-forever frequency="2000"/>
         </reconnection:fallible-reconnectable-source>
         <flow-ref name="capture"/>
     </flow>
 
     <flow name="noReconnect" initialState="stopped">
         <reconnection:non-reconnectable-source config-ref="reconnection_Config">
-            <reconnect count="5" frequency="200" />
+            <reconnect count="5" frequency="200"/>
         </reconnection:non-reconnectable-source>
         <flow-ref name="capture"/>
     </flow>
 
     <flow name="switchConnection">
-        <reconnection:switch-connection />
+        <reconnection:switch-connection/>
     </flow>
 
     <flow name="pagedOperation">
@@ -56,7 +62,8 @@
     </flow>
 
     <flow name="stickyPagedOperation">
-        <reconnection:sticky-paged-operation failOn="#[payload]" withErrorType="#[vars.errorType]" config-ref="reconnection_Config"/>
+        <reconnection:sticky-paged-operation failOn="#[payload]" withErrorType="#[vars.errorType]"
+                                             config-ref="reconnection_Config"/>
     </flow>
 
     <flow name="getReconnectionFromConfig">
@@ -69,13 +76,26 @@
         </reconnection:get-retry-policy-template>
     </flow>
 
+    <flow name="getInlineReconnectionBlocking">
+        <reconnection:get-retry-policy-template config-ref="reconnection_Config">
+            <reconnect count="30" frequency="50"/>
+        </reconnection:get-retry-policy-template>
+    </flow>
+
     <flow name="synchronizableSource" initialState="stopped">
         <reconnection:sync-source config-ref="sync_Config">
-            <scheduling-strategy >
-                <fixed-frequency />
+            <scheduling-strategy>
+                <fixed-frequency/>
             </scheduling-strategy>
         </reconnection:sync-source>
-        <logger message="#[payload]" />
+        <logger message="#[payload]"/>
     </flow>
-    
+
+    <flow name="invalidateConnectionIfConnectionExceptionOnStart" initialState="stopped">
+        <reconnection:failing-connection-source config-ref="failing-connection-config">
+            <reconnect count="5" frequency="200"/>
+        </reconnection:failing-connection-source>
+        <flow-ref name="capture"/>
+    </flow>
+
 </mule>

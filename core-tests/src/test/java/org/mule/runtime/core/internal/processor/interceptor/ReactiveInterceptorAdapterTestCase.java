@@ -14,15 +14,17 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static java.util.stream.Collectors.toList;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsSame.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -40,7 +42,7 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.construct.Flow.builder;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
@@ -52,15 +54,16 @@ import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorTypeThat;
 import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventThat;
 import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withFailingComponent;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+import static reactor.core.Exceptions.errorCallbackNotImplemented;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
-import io.qameta.allure.Issue;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.interception.InterceptionAction;
 import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.interception.ProcessorInterceptor;
@@ -123,6 +126,7 @@ import org.reactivestreams.Publisher;
 
 import com.google.common.collect.ImmutableMap;
 
+import io.qameta.allure.Issue;
 import reactor.core.publisher.Mono;
 
 @SmallTest
@@ -792,7 +796,17 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   @Test
   public void interceptedThrowsException() throws Exception {
     RuntimeException expectedException = new RuntimeException("Some Error");
-    ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {});
+    ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
+
+      @Override
+      public void before(ComponentLocation location,
+                         Map<String, ProcessorParameterValue> parameters,
+                         InterceptionEvent event) {
+        // If we don't include either a before or after method override, then the interceptor is not applied and the
+        // test is not as useful
+        ProcessorInterceptor.super.before(location, parameters, event);
+      }
+    });
     startFlowWithInterceptors(interceptor);
 
     when(processor.process(any())).thenThrow(expectedException);
@@ -810,6 +824,48 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         inOrder.verify(interceptor).around(any(), any(), any(), any());
         inOrder.verify(processor).process(any());
         inOrder.verify(interceptor).after(any(), any(), eq(of(expectedException)));
+
+        verifyParametersResolvedAndDisposed(times(1));
+      }
+    }
+  }
+
+  @Test
+  @Issue("MULE-19593")
+  public void interceptedThrowsErrorCallbackNotImplemented() throws Exception {
+    UnsupportedOperationException expectedException = errorCallbackNotImplemented(new RuntimeException("Some Error"));
+    ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
+
+      @Override
+      public void before(ComponentLocation location,
+                         Map<String, ProcessorParameterValue> parameters,
+                         InterceptionEvent event) {
+        // If we don't include either a before or after method override, then the interceptor is not applied and the
+        // test is not as useful
+        ProcessorInterceptor.super.before(location, parameters, event);
+      }
+    });
+    startFlowWithInterceptors(interceptor);
+
+    when(processor.process(any())).thenThrow(expectedException);
+
+    expected.expect(MessagingException.class);
+    expected.expect(withEventThat(hasErrorType(UNKNOWN.getNamespace(), UNKNOWN.getName())));
+    expected.expectCause(instanceOf(MuleRuntimeException.class));
+    expected.expectCause(hasCause(sameInstance(expectedException)));
+    try {
+      process(flow, eventBuilder(muleContext).message(Message.of("")).build());
+    } finally {
+      if (useMockInterceptor) {
+        InOrder inOrder = inOrder(processor, interceptor);
+
+        inOrder.verify(interceptor).before(any(), any(), any());
+        inOrder.verify(interceptor).around(any(), any(), any(), any());
+        inOrder.verify(processor).process(any());
+        inOrder.verify(interceptor).after(any(),
+                                          any(),
+                                          argThat(optionalWithValue(allOf(instanceOf(RuntimeException.class),
+                                                                          hasCause(sameInstance(expectedException))))));
 
         verifyParametersResolvedAndDisposed(times(1));
       }
@@ -2118,5 +2174,36 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       return "TestProcessorInterceptor: " + name;
     }
 
+  }
+
+  private static final class OptionalMatcher<T> extends TypeSafeMatcher<Optional<T>> {
+
+    private final Matcher<?> matcher;
+
+    public OptionalMatcher(Matcher<?> valueMatcher) {
+      this.matcher = valueMatcher;
+    }
+
+    public void describeTo(Description description) {
+      description.appendText("optional with value ");
+      description.appendDescriptionOf(this.matcher);
+    }
+
+    protected boolean matchesSafely(Optional<T> item) {
+      return item.isPresent() && this.matcher.matches(item.get());
+    }
+
+    protected void describeMismatchSafely(Optional<T> item, Description description) {
+      description.appendText("optional ");
+      if (!item.isPresent()) {
+        description.appendText("value is not present");
+      } else {
+        this.matcher.describeMismatch(item.get(), description);
+      }
+    }
+  }
+
+  private static <T> Matcher<Optional<T>> optionalWithValue(Matcher<?> matcher) {
+    return new OptionalMatcher<>(matcher);
   }
 }

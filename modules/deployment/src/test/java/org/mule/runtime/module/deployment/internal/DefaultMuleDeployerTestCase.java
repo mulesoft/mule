@@ -12,8 +12,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -24,7 +25,7 @@ public class DefaultMuleDeployerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void disposesAppOnDeployFailure() throws Exception {
-    DefaultArtifactDeployer deployer = new DefaultArtifactDeployer();
+    DefaultArtifactDeployer deployer = new DefaultArtifactDeployer(() -> mock(SchedulerService.class));
     Application app = mock(Application.class);
     doThrow(new IllegalStateException()).when(app).init();
 

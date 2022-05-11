@@ -15,9 +15,8 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Test;
 
 /**
- * This unit test only tests the default priority of the {@link ObjectToByteArray}
- * transformer. Actual transformation logic is tested in the
- * {@link ObjectByteArrayTransformersWithObjectsTestCase} test and its subclasses.
+ * This unit test only tests the default priority of the {@link ObjectToByteArray} transformer. Actual transformation logic is
+ * tested in the {@link ObjectByteArrayTransformersWithObjectsTestCase} test and its subclasses.
  */
 @SmallTest
 public class ObjectToByteArrayTestCase extends AbstractMuleTestCase {

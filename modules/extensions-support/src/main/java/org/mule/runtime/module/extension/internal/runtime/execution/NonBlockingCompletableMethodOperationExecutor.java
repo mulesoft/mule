@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 import static org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextProperties.COMPLETION_CALLBACK_CONTEXT_PARAM;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
@@ -24,9 +23,8 @@ import java.lang.reflect.Method;
 public class NonBlockingCompletableMethodOperationExecutor<M extends ComponentModel>
     extends AbstractCompletableMethodOperationExecutor<M> {
 
-  public NonBlockingCompletableMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance,
-                                                       CursorComponentDecoratorFactory componentDecoratorFactory) {
-    super(operationModel, operationMethod, operationInstance, componentDecoratorFactory);
+  public NonBlockingCompletableMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
+    super(operationModel, operationMethod, operationInstance);
   }
 
   @Override

@@ -97,16 +97,16 @@ public class TransformationGraph extends DirectedMultigraph<DataType, Transforma
 
 
 
-  //Checks the graph and returns vertexes that are compatible with the one given
+  // Checks the graph and returns vertexes that are compatible with the one given
   List<DataType> getSuperVertexes(DataType vertex) {
-    //Use the parent's method to check if the actual vertex exists
+    // Use the parent's method to check if the actual vertex exists
     if (super.containsVertex(vertex)) {
       return asList(vertex);
     }
     return vertexSet().stream().filter(graphVertex -> graphVertex.isCompatibleWith(vertex)).collect(toList());
   }
 
-  //Checks the graph and returns vertexes which vertex is compatible with.
+  // Checks the graph and returns vertexes which vertex is compatible with.
   List<DataType> getSubVertexes(DataType vertex) {
     if (super.containsVertex(vertex)) {
       return asList(vertex);

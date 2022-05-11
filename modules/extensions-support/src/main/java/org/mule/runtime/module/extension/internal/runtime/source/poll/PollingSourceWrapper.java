@@ -88,6 +88,18 @@ import org.slf4j.Logger;
  */
 public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements Restartable {
 
+  public static final String REJECTED_ITEM_MESSAGE = "Item with id:[%s] is rejected with status:[%s]";
+  public static final String ACCEPTED_ITEM_MESSAGE = "Item with id:[%s] is accepted";
+  public static final String WATERMARK_SAVED_MESSAGE =
+      "Watermark with key:[{}] and value:[{}] saved to the ObjectStore for flow:[{}]";
+  public static final String WATERMARK_RETURNED_MESSAGE =
+      "Watermark with key:[{}] and value:[{}] returned from the ObjectStore for flow:[{}]";
+  public static final String WATERMARK_NOT_RETURNED_MESSAGE =
+      "Watermark with key:[{}] not found on the ObjectStore for flow:[{}]";
+  public static final String WATERMARK_REMOVED_MESSAGE = "Watermark with key:[{}] removed from the ObjectStore for flow:[{}]";
+  public static final String WATERMARK_COMPARISON_MESSAGE =
+      "Watermark comparison of {}:[{}] with {}:[{}] for flow:[{}] returns:[{}]";
+
   private static final Logger LOGGER = getLogger(PollingSourceWrapper.class);
   private static final String ITEM_RELEASER_CTX_VAR = "itemReleaser";
   private static final String UPDATE_PROCESSED_LOCK = "OSClearing";
@@ -215,7 +227,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
         LOGGER.error(format("Found exception trying to process item on source at flow '%s'. %s",
                             flowName, e.getMessage()),
                      e);
-        systemExceptionHandler.handleException(e);
+        systemExceptionHandler.handleException(e, componentLocation);
         return;
       }
 
@@ -233,7 +245,8 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
     });
   }
 
-  private int compareWatermarks(Serializable w1, Serializable w2, Comparator comparator) throws IllegalArgumentException {
+  private int compareWatermarks(String w1Label, Serializable w1, String w2Label, Serializable w2, Comparator comparator)
+      throws IllegalArgumentException {
     if (comparator == null) {
       if (w1 instanceof Serializable && w2 instanceof Serializable) {
         comparator = naturalOrder();
@@ -244,8 +257,9 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
 
       }
     }
-
-    return comparator.compare(w1, w2);
+    int result = comparator.compare(w1, w2);
+    LOGGER.trace(WATERMARK_COMPARISON_MESSAGE, w1Label, w1, w2Label, w2, flowName, result);
+    return result;
   }
 
   @Override
@@ -314,10 +328,13 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
         }
       }
 
+      String itemId = getItemId(pollItem);
       if (status != ACCEPTED || currentPollItemLimitApplied) {
-        // TODO: match notification action to status.
+        LOGGER.debug(REJECTED_ITEM_MESSAGE, itemId, status);        // TODO: match notification action to status.
         notificationDispatcher.dispatch(new PollingSourceNotification(new PollingSourceNotificationInfo(this.pollId), ITEM_REJECTED_WATERMARK, componentLocation.getLocation()));
         rejectItem(pollItem.getResult(), callbackContext);
+      } else {
+        LOGGER.debug(ACCEPTED_ITEM_MESSAGE, itemId);
       }
 
       return status;
@@ -329,7 +346,8 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
         return;
       }
       if (minimumRejectedByLimitPassingWatermark == null ||
-          compareWatermarks(itemWatermark, minimumRejectedByLimitPassingWatermark, watermarkComparator) < 0) {
+          compareWatermarks("itemWatermark", itemWatermark, "minimumRejectedByLimitPassingWatermark",
+                            minimumRejectedByLimitPassingWatermark, watermarkComparator) < 0) {
         LOGGER.debug("An item that passed all previous validations is being rejected by the poll limit and its watermark" +
             "value will be stored so that is processed on future polls if sent for processing.");
         minimumRejectedByLimitPassingWatermark = itemWatermark;
@@ -363,10 +381,8 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
       try {
         idsOnUpdatedWatermark.clear();
         this.updatedWatermark = itemWatermark;
-        if (watermarkObjectStore.contains(UPDATED_WATERMARK_ITEM_OS_KEY)) {
-          watermarkObjectStore.remove(UPDATED_WATERMARK_ITEM_OS_KEY);
-        }
-        watermarkObjectStore.store(UPDATED_WATERMARK_ITEM_OS_KEY, updatedWatermark);
+        removeWatermark(UPDATED_WATERMARK_ITEM_OS_KEY);
+        saveWatermark(UPDATED_WATERMARK_ITEM_OS_KEY, updatedWatermark);
       } catch (ObjectStoreException e) {
         throw new MuleRuntimeException(
                                        createStaticMessage("An error occurred while trying to update the updatedWatermark in the the object store"),
@@ -448,18 +464,24 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
       if (currentWatermark == null && updatedWatermark == null) {
         status = ON_NEW_HIGH;
       } else {
-        compare = currentWatermark != null ? compareWatermarks(currentWatermark, itemWatermark, watermarkComparator) : -1;
+        compare = currentWatermark != null
+            ? compareWatermarks("currentWatermark", currentWatermark, "itemWatermark", itemWatermark, watermarkComparator)
+            : -1;
         if (compare < 0) {
           try {
             if (itemId != null && recentlyProcessedIds.contains(itemId)) {
               Serializable previousItemWatermark = recentlyProcessedIds.retrieve(itemId);
-              if (compareWatermarks(itemWatermark, previousItemWatermark, watermarkComparator) <= 0) {
+              if (compareWatermarks("itemWatermark", itemWatermark, "previousItemWatermark", previousItemWatermark,
+                                    watermarkComparator) <= 0) {
                 status = REJECT;
               }
             }
             if (status != REJECT) {
               int updatedWatermarkCompare =
-                  updatedWatermark != null ? compareWatermarks(updatedWatermark, itemWatermark, watermarkComparator) : -1;
+                  updatedWatermark != null
+                      ? compareWatermarks("updatedWatermark", updatedWatermark, "itemWatermark", itemWatermark,
+                                          watermarkComparator)
+                      : -1;
               if (updatedWatermarkCompare == 0) {
                 status = ON_HIGH;
               } else if (updatedWatermarkCompare < 0) {
@@ -489,13 +511,17 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
 
       if (status == REJECT) {
         if (LOGGER.isDebugEnabled()) {
-          itemId = pollItem.getItemId().orElseGet(() -> pollItem.getResult().getAttributes().map(Object::toString).orElse(""));
+          itemId = getItemId(pollItem);
           LOGGER.debug("Source in flow '{}' is skipping item '{}' because it was rejected by the watermark", flowName, itemId);
         }
       }
 
       return status;
     }
+  }
+
+  private String getItemId(DefaultPollItem pollItem) {
+    return pollItem.getItemId().orElseGet(() -> pollItem.getResult().getAttributes().map(Object::toString).orElse(""));
   }
 
   private class DefaultPollItem implements PollItem<T, A> {
@@ -612,22 +638,20 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
   private void updateWatermark(Serializable value, Comparator comparator) throws ObjectStoreException {
     if (watermarkObjectStore.contains(WATERMARK_ITEM_OS_KEY)) {
       Serializable currentValue = watermarkObjectStore.retrieve(WATERMARK_ITEM_OS_KEY);
-      if (compareWatermarks(currentValue, value, comparator) >= 0) {
+      if (compareWatermarks("currentValue", currentValue, "value", value, comparator) >= 0) {
         return;
       }
       watermarkObjectStore.remove(WATERMARK_ITEM_OS_KEY);
     }
 
     updateRecentlyProcessedIds();
-    watermarkObjectStore.store(WATERMARK_ITEM_OS_KEY, value);
+    saveWatermark(WATERMARK_ITEM_OS_KEY, value);
   }
 
   private void setCurrentWatermarkAsMinimumRejectWatermark(Serializable minimumRejectedByLimitPassingWatermark)
       throws ObjectStoreException {
-    if (watermarkObjectStore.contains(WATERMARK_ITEM_OS_KEY)) {
-      watermarkObjectStore.remove(WATERMARK_ITEM_OS_KEY);
-    }
-    watermarkObjectStore.store(WATERMARK_ITEM_OS_KEY, minimumRejectedByLimitPassingWatermark);
+    removeWatermark(WATERMARK_ITEM_OS_KEY);
+    saveWatermark(WATERMARK_ITEM_OS_KEY, minimumRejectedByLimitPassingWatermark);
   }
 
   private void updateRecentlyProcessedIds() throws ObjectStoreException {
@@ -651,11 +675,14 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
     }
   }
 
-  private Serializable getCurrentWatermark() {
+  private Serializable getWatermark(String watermarkKey) {
     try {
-      if (watermarkObjectStore.contains(WATERMARK_ITEM_OS_KEY)) {
-        return watermarkObjectStore.retrieve(WATERMARK_ITEM_OS_KEY);
+      if (watermarkObjectStore.contains(watermarkKey)) {
+        Serializable watermark = watermarkObjectStore.retrieve(watermarkKey);
+        LOGGER.trace(WATERMARK_RETURNED_MESSAGE, watermarkKey, watermark, flowName);
+        return watermark;
       } else {
+        LOGGER.trace(WATERMARK_NOT_RETURNED_MESSAGE, watermarkKey, flowName);
         return null;
       }
     } catch (ObjectStoreException e) {
@@ -666,19 +693,24 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
     }
   }
 
-  private Serializable getUpdatedWatermark() {
-    try {
-      if (watermarkObjectStore.contains(UPDATED_WATERMARK_ITEM_OS_KEY)) {
-        return watermarkObjectStore.retrieve(UPDATED_WATERMARK_ITEM_OS_KEY);
-      } else {
-        return null;
-      }
-    } catch (ObjectStoreException e) {
-      throw new MuleRuntimeException(
-                                     createStaticMessage(format("Failed to fetch watermark for Message source at location '%s'. %s",
-                                                                flowName, e.getMessage())),
-                                     e);
+  private void saveWatermark(String watermarkKey, Serializable watermarkValue) throws ObjectStoreException {
+    watermarkObjectStore.store(watermarkKey, watermarkValue);
+    LOGGER.trace(WATERMARK_SAVED_MESSAGE, watermarkKey, watermarkValue, flowName);
+  }
+
+  private void removeWatermark(String watermarkKey) throws ObjectStoreException {
+    if (watermarkObjectStore.contains(watermarkKey)) {
+      watermarkObjectStore.remove(watermarkKey);
+      LOGGER.trace(WATERMARK_REMOVED_MESSAGE, watermarkKey, flowName);
     }
+  }
+
+  private Serializable getCurrentWatermark() {
+    return getWatermark(WATERMARK_ITEM_OS_KEY);
+  }
+
+  private Serializable getUpdatedWatermark() {
+    return getWatermark(UPDATED_WATERMARK_ITEM_OS_KEY);
   }
 
   private boolean acquireItem(DefaultPollItem pollItem, SourceCallbackContext callbackContext) {

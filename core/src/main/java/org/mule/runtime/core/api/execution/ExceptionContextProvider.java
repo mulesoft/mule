@@ -34,7 +34,7 @@ public interface ExceptionContextProvider {
   Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Component lastProcessed);
 
   /**
-   * @param info the map to put the entries to be added to the logged exception message into
+   * @param info             the map to put the entries to be added to the logged exception message into
    * @param notificationInfo
    * @param lastProcessed
    *

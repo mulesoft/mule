@@ -39,8 +39,8 @@ import org.vibur.objectpool.util.MultithreadConcurrentQueueCollection;
  * <p>
  * Idle capacity pools are automatically expired, but items in each pool are never reclaimed.
  * <p>
- * Unlike traditional pools, if a pool is exhausted then an ephemeral {@link ByteBuffer} will be produced. That instance
- * must still be returned through the {@link #deallocate(ByteBuffer)} method.
+ * Unlike traditional pools, if a pool is exhausted then an ephemeral {@link ByteBuffer} will be produced. That instance must
+ * still be returned through the {@link #deallocate(ByteBuffer)} method.
  *
  * @since 4.0
  */
@@ -53,10 +53,9 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
   private BufferPool defaultSizePool;
 
   /**
-   * Using a cache of pools instead of a {@link KeyedObjectPool} because performance tests indicates that this
-   * option is slightly faster, plus it gives us the ability to expire unfrequent capacity buffers without the use
-   * of a reaper thread (those performance test did not include such a reaper, so it's very possible that this is more
-   * than just slightly faster)
+   * Using a cache of pools instead of a {@link KeyedObjectPool} because performance tests indicates that this option is slightly
+   * faster, plus it gives us the ability to expire unfrequent capacity buffers without the use of a reaper thread (those
+   * performance test did not include such a reaper, so it's very possible that this is more than just slightly faster)
    */
   private final LoadingCache<Integer, BufferPool> customSizePools = Caffeine.newBuilder()
       .expireAfterAccess(5, MINUTES)

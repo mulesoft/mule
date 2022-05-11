@@ -5,7 +5,7 @@
     <groupId>org.mule.runtime</groupId>
     <artifactId>mule</artifactId>
     <packaging>pom</packaging>
-    <version>4.4.0-SNAPSHOT</version>
+    <version>4.5.0-SNAPSHOT</version>
 
     <!-- Organization -->
     <organization>
@@ -152,108 +152,36 @@
         -->
         <jdk8Name>JavaSE-${javaVersion}</jdk8Name>
 
+        <muleBomVersion>4.5.0-SNAPSHOT</muleBomVersion>
+
         <activemqVersion>5.15.12</activemqVersion>
-        <antVersion>1.9.15</antVersion>
-        <assertJVersion>3.5.2</assertJVersion>
         <aspectjVersion>1.9.2</aspectjVersion>
-        <apacheHttpClientVersion>4.5.13</apacheHttpClientVersion>
-        <awaitilityVersion>1.7.0</awaitilityVersion>
-        <bouncycastleVersion>1.67</bouncycastleVersion>
-        <c3p0Version>0.9.5.4</c3p0Version>
-        <caffeineVersion>2.8.0</caffeineVersion>
-        <cglibVersion>3.2.10</cglibVersion>
-        <cometdVersion>6.1.26</cometdVersion>
-        <commonsBeanUtilsVersion>1.9.4</commonsBeanUtilsVersion>
-        <commonsExecVersion>1.2</commonsExecVersion>
-        <commonsCliVersion>1.2</commonsCliVersion>
-        <commonsCodecVersion>1.15</commonsCodecVersion>
-        <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
-        <commonsDbcpVersion>1.4</commonsDbcpVersion>
-        <commonsDbUtilsVersion>1.7</commonsDbUtilsVersion>
-        <commonsHttpClientVersion>3.1-14-MULE-001</commonsHttpClientVersion>
-        <commonsIoVersion>2.8.0</commonsIoVersion>
-        <commonsTextVersion>1.3</commonsTextVersion>
-        <commonsLangVersion>3.8.1</commonsLangVersion>
-        <commonsNetVersion>3.6</commonsNetVersion>
-        <commonsPoolVersion>1.6</commonsPoolVersion>
-        <commonsPool2Version>2.6.2</commonsPool2Version>
-        <commonsMath3Version>3.6.1</commonsMath3Version>
         <derbyVersion>10.14.2.0</derbyVersion>
-        <dom4jVersion>2.1.3</dom4jVersion>
-        <eaioUuidVersion>3.4.2-MULE-001</eaioUuidVersion>
-        <fastUtilVersion>8.1.1</fastUtilVersion>
-        <everitJsonSchemaVersion>1.5.1</everitJsonSchemaVersion>
-        <geronimoSpecsJ2eeVersion>2.0.0</geronimoSpecsJ2eeVersion>
         <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
-        <greenmailVersion>1.5.0</greenmailVersion>
-        <groovyVersion>3.0.2</groovyVersion>
-        <guavaVersion>25.1-jre</guavaVersion>
-        <hamcrestVersion>1.3</hamcrestVersion>
-        <jacksonVersion>1.9.14-MULE-002</jacksonVersion>
-        <jackson2Version>2.11.3</jackson2Version>
-        <javax.annotation.version>1.3.2</javax.annotation.version>
-        <javax.inject.version>1</javax.inject.version>
-        <javax.transaction.version>1.3</javax.transaction.version>
-        <jerseyVersion>2.11</jerseyVersion>
-        <javassistVersion>3.7.ga</javassistVersion>
-        <javaMailVersion>1.6.2</javaMailVersion>
-        <javaXmlBindVersion>2.3.1-MULE-001</javaXmlBindVersion>
-        <jdomVersion>1.1.3</jdomVersion>
-        <jettyVersion>9.0.7.v20131107</jettyVersion>
-        <jgraphtVersion>1.3.1</jgraphtVersion>
-        <jodaTimeVersion>2.9.1</jodaTimeVersion>
-        <jsonVersion>20140107</jsonVersion>
-        <junitVersion>4.12</junitVersion>
-        <log4jVersion>2.13.3</log4jVersion>
-        <disruptorVersion>3.3.7</disruptorVersion>
-        <mockitoVersion>2.26.0</mockitoVersion>
-        <byteBuddyVersion>1.10.7</byteBuddyVersion>
-        <multithreadedtcVersion>1.01</multithreadedtcVersion>
-        <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
-        <projectReactorVersion>3.2.12.RELEASE</projectReactorVersion>
-        <projectReactorExtraVersion>3.2.3.RELEASE</projectReactorExtraVersion>
-        <reflectionsVersion>0.9.10</reflectionsVersion>
-        <typesafeConfigVersion>1.3.1</typesafeConfigVersion>
-        <saxonVersion>9.9.1-1</saxonVersion>
-        <slf4jVersion>1.7.30</slf4jVersion>
-        <snakeYamlVersion>1.26</snakeYamlVersion>
-        <springVersion>5.1.6.RELEASE</springVersion>
-        <sshCoreVersion>1.4.0</sshCoreVersion>
-        <staxUtilsVersion>20080702</staxUtilsVersion>
-        <testFtpServerVersion>1.0.6</testFtpServerVersion>
-        <unirestVersion>1.4.9</unirestVersion>
-        <weaveVersion>2.4.0-SNAPSHOT</weaveVersion>
-        <woodstoxVersion>4.4.1</woodstoxVersion>
-        <wrapperVersion>3.2.3</wrapperVersion>
-        <xaPoolVersion>1.5.0</xaPoolVersion>
-        <allureJunitVersion>2.8.1</allureJunitVersion>
-        <allureReportVersion>2.8.1</allureReportVersion>
-        <tikaVersion>1.24.1</tikaVersion>
-        <muleMvelVersion>2.1.9-MULE-020</muleMvelVersion>
+        <weaveVersion>2.5.0-SNAPSHOT</weaveVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <muleDslApiVersion>1.4.0-SNAPSHOT</muleDslApiVersion>
-        <muleAstVersion>1.0.0-SNAPSHOT</muleAstVersion>
-        <mulePropertiesApiVersion>1.0.0-SNAPSHOT</mulePropertiesApiVersion>
-        <muleExtensionsApiVersion>1.4.0-SNAPSHOT</muleExtensionsApiVersion>
-        <muleHttpPolicyApiVersion>1.4.0-SNAPSHOT</muleHttpPolicyApiVersion>
-        <muleMavenClientApi>1.6.0-SNAPSHOT</muleMavenClientApi>
-        <muleMavenClientImpl>1.6.0-SNAPSHOT</muleMavenClientImpl>
-        <muleMavenClientTest>1.6.0-SNAPSHOT</muleMavenClientTest>
-        <mulePolicyApiVersion>1.4.0-SNAPSHOT</mulePolicyApiVersion>
-        <muleApiVersion>1.4.0-SNAPSHOT</muleApiVersion>
-        <muleMetadataModelVersion>1.4.0-SNAPSHOT</muleMetadataModelVersion>
+        <mulePropertiesApiVersion>1.1.0-SNAPSHOT</mulePropertiesApiVersion>
+        <muleExtensionsApiVersion>1.5.0-SNAPSHOT</muleExtensionsApiVersion>
+        <muleConnectivityApiVersion>1.1.0-SNAPSHOT</muleConnectivityApiVersion>
+        <muleHttpPolicyApiVersion>1.5.0-SNAPSHOT</muleHttpPolicyApiVersion>
+        <muleMavenClientApi>1.7.0-SNAPSHOT</muleMavenClientApi>
+        <muleMavenClientImpl>1.7.0-SNAPSHOT</muleMavenClientImpl>
+        <muleMavenClientTest>1.7.0-SNAPSHOT</muleMavenClientTest>
+        <mulePolicyApiVersion>1.5.0-SNAPSHOT</mulePolicyApiVersion>
+        <muleApiVersion>1.5.0-SNAPSHOT</muleApiVersion>
+        <muleMetadataModelVersion>1.5.0-SNAPSHOT</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
         <!-- The tests/test-components artifacts is in the mule repo but as has the mule-modules-parent as parent
          its version is not changed by the versions:set plugin -->
-        <muleTestComponentsVersion>4.4.0-SNAPSHOT</muleTestComponentsVersion>
+        <muleTestComponentsVersion>4.5.0-SNAPSHOT</muleTestComponentsVersion>
 
         <!-- Test Extensions -->
 
         <!--Maven plugins versions-->
-        <dependency.plugin.version>3.0.2</dependency.plugin.version>
+        <dependency.plugin.version>3.1.2</dependency.plugin.version>
         <deploy.plugin.version>2.8.2</deploy.plugin.version>
         <assembly.plugin.version>3.3.0</assembly.plugin.version>
         <jar.plugin.version>3.0.2</jar.plugin.version>
@@ -268,52 +196,53 @@
         <shade.plugin.version>3.1.0</shade.plugin.version>
         <build.helper.maven.plugin.version>3.0.0</build.helper.maven.plugin.version>
         <maven.help.plugin.version>2.2</maven.help.plugin.version>
-        <assembly.verifier.version>1.4</assembly.verifier.version>
         <antrun.plugin.version>1.8</antrun.plugin.version>
         <install.plugin.version>2.5.2</install.plugin.version>
         <checkstyle.plugin.version>2.17</checkstyle.plugin.version>
-        <javaFormatter.plugin.version>2.0.1</javaFormatter.plugin.version>
+        <javaFormatter.plugin.version>2.14.0</javaFormatter.plugin.version>
         <license.maven.plugin.version>2.11</license.maven.plugin.version>
         <gpg.plugin.version>1.6</gpg.plugin.version>
         <gmavenPluginVersion>1.5</gmavenPluginVersion>
         <javadocPluginVersion>3.2.0</javadocPluginVersion>
-        <mavenCompilerVersion>3.7.0</mavenCompilerVersion>
+        <mavenCompilerVersion>3.8.1</mavenCompilerVersion>
         <eclipsePluginVersion>2.10</eclipsePluginVersion>
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
 
-        <mule.module.maven.plugin.version>1.3.0-SNAPSHOT</mule.module.maven.plugin.version>
+        <mule.module.maven.plugin.version>1.4.0-SNAPSHOT</mule.module.maven.plugin.version>
         <revapi-maven-plugin.version>0.9.5</revapi-maven-plugin.version>
-        <muleRevapiExtensionVersion>1.4.0-SNAPSHOT</muleRevapiExtensionVersion>
-        <mule.extensions.maven.plugin.version>1.4.0-SNAPSHOT</mule.extensions.maven.plugin.version>
-        <mule.app.plugins.maven.plugin.version>1.4.0-SNAPSHOT</mule.app.plugins.maven.plugin.version>
+        <muleRevapiExtensionVersion>1.5.0-SNAPSHOT</muleRevapiExtensionVersion>
+        <mule.extensions.maven.plugin.version>1.5.0-SNAPSHOT</mule.extensions.maven.plugin.version>
+        <mule.app.plugins.maven.plugin.version>1.5.0-SNAPSHOT</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
-        <mule.classloader.model.version>3.6.0-SNAPSHOT</mule.classloader.model.version>
         <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
 
-        <!-- v1.1.0 has an issue with Optional dependencies, whenjbpmVersion resolving the graph it overrides the optionality of a transitive
-             dependency with the one define in the dependency management (which is mostly in all the cases "false")
-             https://bugs.eclipse.org/bugs/show_bug.cgi?id=501019 -->
-        <aetherVersion>1.0.2.v20150114</aetherVersion>
-        <aetherProviderVersion>3.3.9</aetherProviderVersion>
-        <plexusUtilsVersion>3.0.24</plexusUtilsVersion>
-        <semver4jVersion>3.1.0</semver4jVersion>
         <powermockVersion>2.0.0</powermockVersion>
+        <allureReportVersion>2.8.1</allureReportVersion>
         <allure.maven.plugin.version>2.9</allure.maven.plugin.version>
         <jacoco.version>0.8.6</jacoco.version>
-        <javaxJmsApiVersion>2.0.1</javaxJmsApiVersion>
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <formatterGoal>validate</formatterGoal>
-        <oldMuleArtifactVersion>4.3.0</oldMuleArtifactVersion>
+        <oldMuleArtifactVersion>4.4.0</oldMuleArtifactVersion>
+        <revapi.failOnUnresolvedArtifacts>true</revapi.failOnUnresolvedArtifacts>
         
-        <surefire.args.base>-Dfile.encoding=UTF-8 -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'</surefire.args.base>
+        <surefire.args.base>-XX:+TieredCompilation -Dfile.encoding=UTF-8 -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'</surefire.args.base>
         <surefire.args>${surefire.args.base}</surefire.args>
+
+        <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
+        <groovyVersion>3.0.7</groovyVersion>
+        <assembly.verifier.version>2.0.0</assembly.verifier.version>
+
+        <allureJunitVersion>2.8.1</allureJunitVersion>
+        <multithreadedtcVersion>1.01</multithreadedtcVersion>
+        <tikaVersion>1.24.1</tikaVersion>
     </properties>
 
     <dependencies>
         <dependency>
+            <!-- More info: http://www.cs.umd.edu/projects/PL/multithreadedtc/overview.html  -->
             <groupId>com.googlecode.multithreadedtc</groupId>
             <artifactId>multithreadedtc</artifactId>
             <scope>test</scope>
@@ -337,413 +266,20 @@
 
     </dependencies>
 
-    <!-- Declare all dependencies that are used in more than one module here. -->
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.mule.runtime</groupId>
-                <artifactId>mule-api</artifactId>
-                <version>${muleApiVersion}</version>
+                <groupId>org.mule</groupId>
+                <artifactId>mule-runtime-bom</artifactId>
+                <version>${muleBomVersion}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>org.mule.runtime</groupId>
-                <artifactId>mule-metadata-model-xml</artifactId>
-                <version>${muleMetadataModelVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.runtime</groupId>
-                <artifactId>mule-metadata-model-java</artifactId>
-                <version>${muleMetadataModelVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.runtime</groupId>
-                <artifactId>mule-message-metadata-model</artifactId>
-                <version>${muleMetadataModelVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.runtime</groupId>
-                <artifactId>mule-metadata-model-json</artifactId>
-                <version>${muleMetadataModelVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.runtime</groupId>
-                <artifactId>mule-metadata-model-catalog</artifactId>
-                <version>${muleMetadataModelVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.annotation</groupId>
-                <artifactId>javax.annotation-api</artifactId>
-                <version>1.2</version>
-            </dependency>
-
-            <dependency>
-                <groupId>javax.jms</groupId>
-                <artifactId>javax.jms-api</artifactId>
-                <version>${javaxJmsApiVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-beans</artifactId>
-                <version>${springVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-context</artifactId>
-                <version>${springVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>aopalliance</groupId>
-                        <artifactId>aopalliance</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.aopalliance</groupId>
-                        <artifactId>com.springsource.org.aopalliance</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-core</artifactId>
-                <version>${springVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>aopalliance</groupId>
-                        <artifactId>aopalliance</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.aopalliance</groupId>
-                        <artifactId>com.springsource.org.aopalliance</artifactId>
-                    </exclusion>
-
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-jdbc</artifactId>
-                <version>${springVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>aopalliance</groupId>
-                        <artifactId>aopalliance</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.aopalliance</groupId>
-                        <artifactId>com.springsource.org.aopalliance</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>commons-logging</artifactId>
-                        <groupId>commons-logging</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-support</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-jms</artifactId>
-                <version>${springVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>aopalliance</groupId>
-                        <artifactId>aopalliance</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.aopalliance</groupId>
-                        <artifactId>com.springsource.org.aopalliance</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>commons-logging</artifactId>
-                        <groupId>commons-logging</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>commons-pool</artifactId>
-                        <groupId>commons-pool</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-support</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-orm</artifactId>
-                <version>${springVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>aopalliance</groupId>
-                        <artifactId>aopalliance</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.aopalliance</groupId>
-                        <artifactId>com.springsource.org.aopalliance</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>commons-logging</artifactId>
-                        <groupId>commons-logging</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-aop</artifactId>
-                <version>${springVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>commons-logging</artifactId>
-                        <groupId>commons-logging</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>${jackson2Version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jgrapht</groupId>
-                <artifactId>jgrapht-core</artifactId>
-                <version>${jgraphtVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-server</artifactId>
-                <version>${jettyVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.eclipse.jetty.orbit</groupId>
-                        <artifactId>javax.servlet</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-util</artifactId>
-                <version>${jettyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-continuation</artifactId>
-                <version>${jettyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-deploy</artifactId>
-                <version>${jettyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-servlet</artifactId>
-                <version>${jettyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-webapp</artifactId>
-                <version>${jettyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-client</artifactId>
-                <version>${jettyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-security</artifactId>
-                <version>${jettyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-servlet_3.0_spec</artifactId>
-                <!--servlet api jar is versioned differently-->
-                <version>${geronimoSpecsServletApiVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-annotations</artifactId>
-                <version>${jettyVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.eclipse.jetty.orbit</groupId>
-                        <artifactId>javax.activation</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.eclipse.jetty.orbit</groupId>
-                        <artifactId>javax.annotation</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.eclipse.jetty.orbit</groupId>
-                        <artifactId>javax.mail.glassfish</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.eclipse.jetty.orbit</groupId>
-                        <artifactId>javax.transaction</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.eclipse.jetty.orbit</groupId>
-                        <artifactId>org.objectweb.asm</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>cometd-server</artifactId>
-                <version>${cometdVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>cometd-client</artifactId>
-                <version>${cometdVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.mortbay.jetty</groupId>
-                        <artifactId>servlet-api</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.btm</groupId>
-                <artifactId>btm</artifactId>
-                <version>${bitronixTMVersion}</version>
-            </dependency>
-            <!-- For unit tests only -->
-            <dependency>
-                <groupId>org.apache.derby</groupId>
-                <artifactId>derby</artifactId>
-                <version>${derbyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junitVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.hamcrest</groupId>
-                        <artifactId>hamcrest-core</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.jayway.awaitility</groupId>
-                <artifactId>awaitility</artifactId>
-                <version>${awaitilityVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest-library</artifactId>
-                <version>${hamcrestVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>xmlunit</groupId>
-                <artifactId>xmlunit</artifactId>
-                <version>1.6</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.activemq</groupId>
-                <artifactId>activemq-broker</artifactId>
-                <version>${activemqVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.geronimo.specs</groupId>
-                        <artifactId>geronimo-jms_1.1_spec</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.activemq</groupId>
-                        <artifactId>activemq-jaas</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-pool</groupId>
-                        <artifactId>commons-pool</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.derby</groupId>
-                        <artifactId>derby</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>activemq</groupId>
-                        <artifactId>jmdns</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>xalan</groupId>
-                        <artifactId>xalan</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.xbean</groupId>
-                        <artifactId>xbean-spring</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.geronimo.specs</groupId>
-                        <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.geronimo.specs</groupId>
-                        <artifactId>geronimo-j2ee-jacc_1.0_spec</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>backport-util-concurrent</groupId>
-                        <artifactId>backport-util-concurrent</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>howl</groupId>
-                        <artifactId>howl-logger</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>geronimo</groupId>
-                        <artifactId>geronimo-kernel</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>geronimo</groupId>
-                        <artifactId>geronimo-j2ee</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>activesoap</groupId>
-                        <artifactId>jaxp-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>mx4j</groupId>
-                        <artifactId>mx4j-jmx</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>mx4j</groupId>
-                        <artifactId>mx4j-remote</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>mx4j</groupId>
-                        <artifactId>mx4j-tools</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>mx4j</groupId>
-                        <artifactId>mx4j-impl</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.fasterxml.jackson.core</groupId>
-                        <artifactId>jackson-databind</artifactId>
-                    </exclusion>
-                </exclusions>
+                <!-- More info: http://www.cs.umd.edu/projects/PL/multithreadedtc/overview.html  -->
+                <groupId>com.googlecode.multithreadedtc</groupId>
+                <artifactId>multithreadedtc</artifactId>
+                <version>${multithreadedtcVersion}</version>
             </dependency>
             <dependency>
                 <groupId>io.qameta.allure</groupId>
@@ -754,535 +290,6 @@
                 <groupId>org.apache.tika</groupId>
                 <artifactId>tika-core</artifactId>
                 <version>${tikaVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.assertj</groupId>
-                <artifactId>assertj-core</artifactId>
-                <version>${assertJVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.services</groupId>
-                <artifactId>mule-service-weave</artifactId>
-                <classifier>mule-service</classifier>
-                <version>${weaveVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mule.runtime</groupId>
-                <artifactId>mule-dwb-api</artifactId>                
-                <version>${weaveVersion}</version>
-            </dependency>
-
-            <!--Logging-->
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4jVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-ext</artifactId>
-                <version>${slf4jVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-api</artifactId>
-                <version>${log4jVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-core</artifactId>
-                <version>${log4jVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-slf4j-impl</artifactId>
-                <version>${log4jVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-1.2-api</artifactId>
-                <version>${log4jVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>jcl-over-slf4j</artifactId>
-                <version>${slf4jVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>jul-to-slf4j</artifactId>
-                <version>${slf4jVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>${mockitoVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.hamcrest</groupId>
-                        <artifactId>hamcrest-core</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <!-- Added to avoid conflicting transitive versions from Mockito and PowerMock -->
-            <dependency>
-                <groupId>net.bytebuddy</groupId>
-                <artifactId>byte-buddy</artifactId>
-                <version>${byteBuddyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.bytebuddy</groupId>
-                <artifactId>byte-buddy-agent</artifactId>
-                <version>${byteBuddyVersion}</version>
-            </dependency>
-
-            <dependency>
-                <!-- More info: http://www.cs.umd.edu/projects/PL/multithreadedtc/overview.html  -->
-                <groupId>com.googlecode.multithreadedtc</groupId>
-                <artifactId>multithreadedtc</artifactId>
-                <version>${multithreadedtcVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
-                <version>${geronimoSpecsJ2eeVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-jms_1.1_spec</artifactId>
-                <version>${geronimoSpecsJmsVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.transaction</groupId>
-                <artifactId>javax.transaction-api</artifactId>
-                <version>${javax.transaction.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.mail</groupId>
-                <artifactId>javax.mail-api</artifactId>
-                <version>${javaMailVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.glassfish.jaxb</groupId>
-                <artifactId>jaxb-xjc</artifactId>
-                <version>${javaXmlBindVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.glassfish.jaxb</groupId>
-                <artifactId>jaxb-runtime</artifactId>
-                <version>${javaXmlBindVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.java.dev.stax-utils</groupId>
-                <artifactId>stax-utils</artifactId>
-                <version>${staxUtilsVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.bea.xml</groupId>
-                        <artifactId>jsr173-ri</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>commons-beanutils</groupId>
-                <artifactId>commons-beanutils</artifactId>
-                <version>${commonsBeanUtilsVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>commons-logging</artifactId>
-                        <groupId>commons-logging</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>commons-collections</groupId>
-                <artifactId>commons-collections</artifactId>
-                <version>${commonsCollectionsVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-net</groupId>
-                <artifactId>commons-net</artifactId>
-                <version>${commonsNetVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-codec</groupId>
-                <artifactId>commons-codec</artifactId>
-                <version>${commonsCodecVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>commons-logging</artifactId>
-                        <groupId>commons-logging</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>${commonsIoVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.apache.commons-httpclient</groupId>
-                <artifactId>commons-httpclient</artifactId>
-                <version>${commonsHttpClientVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>commons-logging</artifactId>
-                        <groupId>commons-logging</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-codec</groupId>
-                        <artifactId>commons-codec</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>commons-pool</groupId>
-                <artifactId>commons-pool</artifactId>
-                <version>${commonsPoolVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-lang3</artifactId>
-                <version>${commonsLangVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-text</artifactId>
-                <version>${commonsTextVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-exec</artifactId>
-                <version>${commonsExecVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-cli</groupId>
-                <artifactId>commons-cli</artifactId>
-                <version>${commonsCliVersion}</version>
-                <exclusions>
-                    <!-- we like slf4j -->
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>tanukisoft</groupId>
-                <artifactId>wrapper</artifactId>
-                <version>${wrapperVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.woodstox</groupId>
-                <artifactId>woodstox-core-asl</artifactId>
-                <version>${woodstoxVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>javax.xml.stream</groupId>
-                        <artifactId>stax-api</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.ant</groupId>
-                <artifactId>ant</artifactId>
-                <version>${antVersion}</version>
-            </dependency>
-            <dependency>
-                <!-- this really should be the org.jdom groupId but all the other modules use the jdom groupId -->
-                <groupId>org.jdom</groupId>
-                <artifactId>jdom</artifactId>
-                <version>${jdomVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.dom4j</groupId>
-                <artifactId>dom4j</artifactId>
-                <version>${dom4jVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>jboss</groupId>
-                <artifactId>javassist</artifactId>
-                <version>${javassistVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.glassfish.jersey.core</groupId>
-                <artifactId>jersey-common</artifactId>
-                <version>${jerseyVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.javassist</groupId>
-                        <artifactId>javassist</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.glassfish.hk2.external</groupId>
-                        <artifactId>aopalliance-repackaged</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.glassfish.hk2.external</groupId>
-                        <artifactId>javax.inject</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>javax.annotation</groupId>
-                        <artifactId>javax.annotation-api</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.runtime</groupId>
-                <artifactId>mule-module-dsl-api</artifactId>
-                <version>${muleDslApiVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.runtime</groupId>
-                <artifactId>mule-artifact-ast</artifactId>
-                <version>${muleAstVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.runtime</groupId>
-                <artifactId>mule-artifact-ast-dependency-graph</artifactId>
-                <version>${muleAstVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.runtime</groupId>
-                <artifactId>mule-artifact-ast-xml-parser</artifactId>
-                <version>${muleAstVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.runtime</groupId>
-                <artifactId>mule-properties-api</artifactId>
-                <version>${mulePropertiesApiVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.runtime</groupId>
-                <artifactId>mule-extensions-api</artifactId>
-                <version>${muleExtensionsApiVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.runtime</groupId>
-                <artifactId>mule-extensions-soap-api</artifactId>
-                <version>${muleExtensionsApiVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.runtime</groupId>
-                <artifactId>mule-extensions-api-persistence</artifactId>
-                <version>${muleExtensionsApiVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.runtime</groupId>
-                <artifactId>mule-module-policy-api</artifactId>
-                <version>${mulePolicyApiVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.runtime</groupId>
-                <artifactId>mule-module-http-policy-api</artifactId>
-                <version>${muleHttpPolicyApiVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.runtime</groupId>
-                <artifactId>mule-metadata-model-persistence</artifactId>
-                <version>${metadataModelApiVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mule.mvel</groupId>
-                <artifactId>mule-mvel2</artifactId>
-                <version>${muleMvelVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.aspectj</groupId>
-                <artifactId>aspectjrt</artifactId>
-                <version>${aspectjVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.aspectj</groupId>
-                <artifactId>aspectjweaver</artifactId>
-                <version>${aspectjVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>${guavaVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-dbcp</groupId>
-                <artifactId>commons-dbcp</artifactId>
-                <version>${commonsDbcpVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>xerces</groupId>
-                        <artifactId>xerces</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>com.lmax</groupId>
-                <artifactId>disruptor</artifactId>
-                <version>${disruptorVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.sf.saxon</groupId>
-                <artifactId>Saxon-HE</artifactId>
-                <version>${saxonVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>dom4j</groupId>
-                        <artifactId>dom4j</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.jdom</groupId>
-                        <artifactId>jdom</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-io</groupId>
-                        <artifactId>commons-io</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>org.reflections</groupId>
-                <artifactId>reflections</artifactId>
-                <version>${reflectionsVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.google.code.findbugs</groupId>
-                        <artifactId>annotations</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>dom4j</groupId>
-                        <artifactId>dom4j</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.javassist</groupId>
-                        <artifactId>javassist</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>javax.inject</groupId>
-                <artifactId>javax.inject</artifactId>
-                <version>${javax.inject.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.mchange</groupId>
-                <artifactId>c3p0</artifactId>
-                <version>${c3p0Version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.yaml</groupId>
-                <artifactId>snakeyaml</artifactId>
-                <version>${snakeYamlVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mule</groupId>
-                <artifactId>mule-maven-client-api</artifactId>
-                <version>${muleMavenClientApi}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mule</groupId>
-                <artifactId>mule-maven-client-impl</artifactId>
-                <version>${muleMavenClientImpl}</version>
-            </dependency>
-
-            <!-- Eclipse Aether -->
-            <dependency>
-                <groupId>org.eclipse.aether</groupId>
-                <artifactId>aether-api</artifactId>
-                <version>${aetherVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.aether</groupId>
-                <artifactId>aether-spi</artifactId>
-                <version>${aetherVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.aether</groupId>
-                <artifactId>aether-impl</artifactId>
-                <version>${aetherVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.aether</groupId>
-                <artifactId>aether-connector-basic</artifactId>
-                <version>${aetherVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.aether</groupId>
-                <artifactId>aether-transport-file</artifactId>
-                <version>${aetherVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.aether</groupId>
-                <artifactId>aether-transport-http</artifactId>
-                <version>${aetherVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.maven</groupId>
-                <artifactId>maven-aether-provider</artifactId>
-                <version>${aetherProviderVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.projectreactor</groupId>
-                <artifactId>reactor-core</artifactId>
-                <version>${projectReactorVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.projectreactor.addons</groupId>
-                <artifactId>reactor-extra</artifactId>
-                <version>${projectReactorExtraVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <!-- TODO MULE-14667 Upgrade to reactor 3.2.0 -->
-                        <groupId>io.projectreactor</groupId>
-                        <artifactId>reactor-core</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.powermock</groupId>
-                <artifactId>powermock-core</artifactId>
-                <version>${powermockVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.powermock</groupId>
-                <artifactId>powermock-api-mockito2</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.mockito</groupId>
-                        <artifactId>mockito-all</artifactId>
-                    </exclusion>
-                </exclusions>
-                <version>${powermockVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.powermock</groupId>
-                <artifactId>powermock-module-junit4</artifactId>
-                <version>${powermockVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.tools.maven</groupId>
-                <artifactId>mule-classloader-model</artifactId>
-                <version>${mule.classloader.model.version}</version>
             </dependency>
         </dependencies>
 
@@ -1400,17 +407,10 @@
                     <version>${mavenCompilerVersion}</version>
                     <configuration>
                         <encoding>ISO-8859-1</encoding>
-                        <fork>true</fork>
-                        <maxmem>512m</maxmem>
                         <source>${javaVersion}</source>
                         <target>${javaVersion}</target>
                         <proc>none</proc>
-                        <!-- Slightly faster builds, see https://jira.codehaus.org/browse/MCOMPILER-209 -->
-                        <useIncrementalCompilation>false</useIncrementalCompilation>
-                        <compilerArgs>
-                            <arg>-parameters</arg>
-                        </compilerArgs>
-                        <testCompilerArgument>-parameters</testCompilerArgument>
+                        <parameters>true</parameters>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -1589,29 +589,6 @@
                     <groupId>org.mule.tools</groupId>
                     <artifactId>mule-assembly-verifier</artifactId>
                     <version>${assembly.verifier.version}</version>
-                    <configuration>
-                        <skip>${skipVerifications}</skip>
-                    </configuration>
-                    <dependencies>
-                        <!--
-                            Groovy dependency is handled by Mule differently,
-                            declare the compatible one explicitly for the plugin.
-                        -->
-                        <dependency>
-                            <groupId>org.codehaus.groovy</groupId>
-                            <artifactId>groovy</artifactId>
-                            <version>${groovyVersion}</version>
-                        </dependency>
-                    </dependencies>
-
-                    <executions>
-                        <execution>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>verify</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>com.mycila</groupId>
@@ -1873,7 +850,7 @@
             <plugin>
                 <groupId>pl.project13.maven</groupId>
                 <artifactId>git-commit-id-plugin</artifactId>
-                <version>4.0.0</version>
+                <version>4.0.4</version>
                 <executions>
                     <execution>
                         <id>get-the-git-infos</id>
@@ -1883,6 +860,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <useNativeGit>true</useNativeGit>
                     <injectAllReactorProjects>true</injectAllReactorProjects>
                 </configuration>
             </plugin>
@@ -2137,7 +1115,7 @@
                         </dependencies>
                         <configuration>
                             <oldVersion>${oldMuleArtifactVersion}</oldVersion>
-                            <failOnUnresolvedArtifacts>true</failOnUnresolvedArtifacts>
+                            <failOnUnresolvedArtifacts>{revapi.failOnUnresolvedArtifacts}</failOnUnresolvedArtifacts>
                             <failOnMissingConfigurationFiles>false</failOnMissingConfigurationFiles>
                             <analysisConfiguration><![CDATA[
                                 {

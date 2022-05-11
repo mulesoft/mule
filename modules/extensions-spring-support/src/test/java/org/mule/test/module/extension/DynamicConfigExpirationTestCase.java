@@ -98,7 +98,7 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
       assertExpired(config, 1500, 100);
       throw new IllegalStateException("Config should not have been expired");
     } catch (AssertionError e) {
-      //all good
+      // all good
     }
 
     assertExpired(config, 5000, 1000);
@@ -114,7 +114,7 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
       assertExpired(config, 10000, 1000);
       throw new IllegalStateException("Config should not have been expired");
     } catch (AssertionError e) {
-      //all good
+      // all good
     }
 
     assertInitialised(config);

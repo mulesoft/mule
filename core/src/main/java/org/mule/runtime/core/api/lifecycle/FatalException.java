@@ -21,7 +21,7 @@ public class FatalException extends LifecycleException {
   private static final long serialVersionUID = -330442983239074935L;
 
   /**
-   * @param message the exception message
+   * @param message   the exception message
    * @param component the object that failed during a lifecycle method call
    */
   public FatalException(I18nMessage message, Object component) {
@@ -29,8 +29,8 @@ public class FatalException extends LifecycleException {
   }
 
   /**
-   * @param message the exception message
-   * @param cause the exception that cause this exception to be thrown
+   * @param message   the exception message
+   * @param cause     the exception that cause this exception to be thrown
    * @param component the object that failed during a lifecycle method call
    */
   public FatalException(I18nMessage message, Throwable cause, Object component) {
@@ -38,7 +38,7 @@ public class FatalException extends LifecycleException {
   }
 
   /**
-   * @param cause the exception that cause this exception to be thrown
+   * @param cause     the exception that cause this exception to be thrown
    * @param component the object that failed during a lifecycle method call
    */
   public FatalException(Throwable cause, Object component) {

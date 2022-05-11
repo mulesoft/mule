@@ -7,35 +7,23 @@
 
 package org.mule.runtime.deployment.model.internal;
 
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.module.artifact.api.classloader.ChildOnlyLookupStrategy.CHILD_ONLY;
-import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 
-import org.mule.runtime.container.api.ModuleRepository;
-import org.mule.runtime.container.api.MuleModule;
-import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.of;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
+import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
+import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.api.classloader.DelegateOnlyLookupStrategy;
-import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
-import org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Creates the class loaders for plugins that are contained in a given region
@@ -44,26 +32,17 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClassLoadersFactory {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultRegionPluginClassLoadersFactory.class);
-
   public static final String PLUGIN_CLASSLOADER_IDENTIFIER = "/plugin/";
 
-  private final ArtifactClassLoaderFactory artifactPluginClassLoaderFactory;
-  private final ModuleRepository moduleRepository;
+  private final ArtifactClassLoaderResolver artifactClassLoaderResolver;
 
   /**
    * Creates a new factory
    *
-   * @param artifactPluginClassLoaderFactory factory to create class loaders for each used plugin. Non be not null.
-   * @param moduleRepository provides access to the modules available on the container. Non null.
+   * @param artifactClassLoaderResolver resolver that will be used to create the class loader. Non-null
    */
-  public DefaultRegionPluginClassLoadersFactory(ArtifactClassLoaderFactory artifactPluginClassLoaderFactory,
-                                                ModuleRepository moduleRepository) {
-    checkArgument(artifactPluginClassLoaderFactory != null, "artifactPluginClassLoaderFactory cannot be null");
-    checkArgument(moduleRepository != null, "moduleRepository cannot be null");
-
-    this.artifactPluginClassLoaderFactory = artifactPluginClassLoaderFactory;
-    this.moduleRepository = moduleRepository;
+  public DefaultRegionPluginClassLoadersFactory(ArtifactClassLoaderResolver artifactClassLoaderResolver) {
+    this.artifactClassLoaderResolver = requireNonNull(artifactClassLoaderResolver);
   }
 
   @Override
@@ -73,13 +52,29 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
     List<ArtifactClassLoader> classLoaders = new LinkedList<>();
 
     for (ArtifactPluginDescriptor artifactPluginDescriptor : artifactPluginDescriptors) {
-      final String pluginArtifactId = getArtifactPluginId(regionClassLoader.getArtifactId(), artifactPluginDescriptor.getName());
-
-      ClassLoaderLookupPolicy pluginLookupPolicy = createPluginLookupPolicy(classLoaders, artifactPluginDescriptor,
-                                                                            regionOwnerLookupPolicy, artifactPluginDescriptors);
       final ArtifactClassLoader artifactClassLoader =
-          artifactPluginClassLoaderFactory.create(pluginArtifactId, artifactPluginDescriptor, regionClassLoader.getClassLoader(),
-                                                  pluginLookupPolicy);
+          artifactClassLoaderResolver
+              .createMulePluginClassLoader((MuleDeployableArtifactClassLoader) ((RegionClassLoader) regionClassLoader)
+                  .getOwnerClassLoader(),
+                                           artifactPluginDescriptor,
+                                           bundleDescriptor -> artifactPluginDescriptors
+                                               .stream()
+                                               .filter(apd -> apd.getBundleDescriptor()
+                                                   .getArtifactId()
+                                                   .equals(bundleDescriptor.getArtifactId())
+                                                   && apd.getBundleDescriptor().getGroupId()
+                                                       .equals(bundleDescriptor.getGroupId()))
+                                               .findAny(),
+                                           (ownerArtifactClassLoader, dependencyPluginDescriptor) -> of(() -> classLoaders
+                                               .stream().filter(
+                                                                c -> c
+                                                                    .getArtifactDescriptor()
+                                                                    .getBundleDescriptor()
+                                                                    .getArtifactId()
+                                                                    .equals(dependencyPluginDescriptor
+                                                                        .getBundleDescriptor()
+                                                                        .getArtifactId()))
+                                               .findAny().get()));
 
       classLoaders.add(artifactClassLoader);
     }
@@ -88,7 +83,7 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
 
   /**
    * @param parentArtifactId identifier of the artifact that owns the plugin. Non empty.
-   * @param pluginName name of the plugin. Non empty.
+   * @param pluginName       name of the plugin. Non empty.
    * @return the unique identifier for the plugin inside the parent artifact.
    */
   public static String getArtifactPluginId(String parentArtifactId, String pluginName) {
@@ -97,124 +92,4 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
 
     return parentArtifactId + PLUGIN_CLASSLOADER_IDENTIFIER + pluginName;
   }
-
-  private ClassLoaderLookupPolicy createPluginLookupPolicy(List<ArtifactClassLoader> classLoaders,
-                                                           ArtifactPluginDescriptor descriptor,
-                                                           ClassLoaderLookupPolicy baseLookupPolicy,
-                                                           List<ArtifactPluginDescriptor> artifactPluginDescriptors) {
-    Map<String, LookupStrategy> pluginsLookupPolicies = new HashMap<>();
-    List<ArtifactPluginDescriptor> pluginDescriptors = getPluginDescriptors(descriptor, artifactPluginDescriptors);
-    for (ArtifactPluginDescriptor dependencyPluginDescriptor : pluginDescriptors) {
-      if (dependencyPluginDescriptor.getName().equals(descriptor.getName())) {
-        continue;
-      }
-
-      LookupStrategy lookupStrategy = getClassLoaderLookupStrategy(descriptor, dependencyPluginDescriptor);
-
-      for (String exportedPackage : dependencyPluginDescriptor.getClassLoaderModel().getExportedPackages()) {
-        pluginsLookupPolicies.put(exportedPackage, lookupStrategy);
-      }
-
-
-      if (isPrivilegedPluginDependency(descriptor, dependencyPluginDescriptor)) {
-        Optional<ArtifactClassLoader> pluginClassLoader = classLoaders.stream().filter(
-                                                                                       c -> c.getArtifactDescriptor()
-                                                                                           .getBundleDescriptor().getArtifactId()
-                                                                                           .equals(dependencyPluginDescriptor
-                                                                                               .getBundleDescriptor()
-                                                                                               .getArtifactId()))
-            .findFirst();
-        if (!pluginClassLoader.isPresent()) {
-          throw new IllegalStateException("Cannot find classloader for plugin: "
-              + dependencyPluginDescriptor.getBundleDescriptor().getArtifactId());
-        }
-        lookupStrategy = new DelegateOnlyLookupStrategy(pluginClassLoader.get().getClassLoader());
-
-        for (String exportedPackage : dependencyPluginDescriptor.getClassLoaderModel().getPrivilegedExportedPackages()) {
-          pluginsLookupPolicies.put(exportedPackage, lookupStrategy);
-        }
-      }
-
-    }
-
-    ContainerOnlyLookupStrategy containerOnlyLookupStrategy = new ContainerOnlyLookupStrategy(this.getClass().getClassLoader());
-    Set<String> muleModulesExportedPackages = new HashSet<>();
-
-    for (MuleModule module : moduleRepository.getModules()) {
-      if (module.getPrivilegedArtifacts()
-          .contains(descriptor.getBundleDescriptor().getGroupId() + ":" + descriptor.getBundleDescriptor().getArtifactId())) {
-        for (String packageName : module.getPrivilegedExportedPackages()) {
-          pluginsLookupPolicies.put(packageName, containerOnlyLookupStrategy);
-        }
-      }
-
-      muleModulesExportedPackages.addAll(module.getExportedPackages());
-    }
-
-    Map<String, LookupStrategy> pluginLocalPolicies = new HashMap<>();
-    for (String localPackage : descriptor.getClassLoaderModel().getLocalPackages()) {
-      // packages exported from another artifact in the region will be ParentFirst,
-      // even if they are also exported by the container.
-      if (baseLookupPolicy.getPackageLookupStrategy(localPackage) instanceof ContainerOnlyLookupStrategy
-          || (baseLookupPolicy.getPackageLookupStrategy(localPackage) instanceof ParentFirstLookupStrategy
-              && muleModulesExportedPackages.contains(localPackage))) {
-        LOGGER.warn("Plugin '" + descriptor.getName() + "' contains a local package '" + localPackage
-            + "', but it will be ignored since it is already available from the container.");
-      } else {
-        pluginLocalPolicies.put(localPackage, CHILD_ONLY);
-      }
-    }
-
-    return baseLookupPolicy.extend(pluginsLookupPolicies).extend(pluginLocalPolicies, true);
-  }
-
-  private List<ArtifactPluginDescriptor> getPluginDescriptors(ArtifactPluginDescriptor descriptor,
-                                                              List<ArtifactPluginDescriptor> artifactPluginDescriptors) {
-    return artifactPluginDescriptors.stream()
-        .filter(d -> isDependencyPlugin(descriptor.getClassLoaderModel().getDependencies(), d)).collect(toList());
-  }
-
-  private boolean isPrivilegedPluginDependency(ArtifactPluginDescriptor descriptor,
-                                               ArtifactPluginDescriptor dependencyPluginDescriptor) {
-    if (dependencyPluginDescriptor.getClassLoaderModel().getPrivilegedExportedPackages().isEmpty()) {
-      return false;
-    }
-
-    return dependencyPluginDescriptor.getClassLoaderModel().getPrivilegedArtifacts().stream().filter(
-                                                                                                     a -> a.startsWith(descriptor
-                                                                                                         .getBundleDescriptor()
-                                                                                                         .getGroupId()
-                                                                                                         + ":"
-                                                                                                         + descriptor
-                                                                                                             .getBundleDescriptor()
-                                                                                                             .getArtifactId()))
-        .findFirst().isPresent();
-  }
-
-  private LookupStrategy getClassLoaderLookupStrategy(ArtifactPluginDescriptor descriptor,
-                                                      ArtifactPluginDescriptor dependencyPluginDescriptor) {
-    final LookupStrategy lookupStrategy;
-    if (isDependencyPlugin(descriptor.getClassLoaderModel().getDependencies(), dependencyPluginDescriptor)) {
-      lookupStrategy = PARENT_FIRST;
-    } else {
-      lookupStrategy = CHILD_ONLY;
-    }
-    return lookupStrategy;
-  }
-
-  private boolean isDependencyPlugin(Set<BundleDependency> dependencies,
-                                     ArtifactPluginDescriptor dependencyPluginDescriptor) {
-    for (BundleDependency pluginDependency : dependencies) {
-      if (pluginDependency.getDescriptor().getArtifactId()
-          .equals(dependencyPluginDescriptor.getBundleDescriptor().getArtifactId())
-          && pluginDependency.getDescriptor().getGroupId()
-              .equals(dependencyPluginDescriptor.getBundleDescriptor().getGroupId())
-          && MULE_PLUGIN_CLASSIFIER.equals(pluginDependency.getDescriptor().getClassifier().orElse(null))) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
 }

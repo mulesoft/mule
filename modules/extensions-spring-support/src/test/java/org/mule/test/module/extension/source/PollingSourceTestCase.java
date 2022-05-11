@@ -16,6 +16,8 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
+import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories.POLLING;
 import static org.mule.test.petstore.extension.NumberPetAdoptionSource.ALL_NUMBERS;
 import static org.mule.test.petstore.extension.PetAdoptionSource.ALL_PETS;
 import static org.mule.test.petstore.extension.PetAdoptionSource.FAILED_ADOPTION_COUNT;
@@ -40,10 +42,15 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import io.qameta.allure.Description;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(SOURCES)
+@Story(POLLING)
 public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static final int TIMEOUT = 5000;
@@ -68,7 +75,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "polling-source-config.xml";
+    return "source/polling-source-config.xml";
   }
 
   @Before
@@ -140,10 +147,12 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
     assertAllNumbersAdoptedExactlyOnce();
   }
 
-  /* This test checks that when a polling source with a fixed frequency scheduler with start delay is restarted, the
-  start delay is not applied again. The polling source of this test is set to fail midway through populating the pet
-  adoption list, which will provoke a restart. Without the changes made in MULE-16974, this test would fail, because the
-  start delay would be re-applied on the restart and the probe would timeout. */
+  /*
+   * This test checks that when a polling source with a fixed frequency scheduler with start delay is restarted, the start delay
+   * is not applied again. The polling source of this test is set to fail midway through populating the pet adoption list, which
+   * will provoke a restart. Without the changes made in MULE-16974, this test would fail, because the start delay would be
+   * re-applied on the restart and the probe would timeout.
+   */
   @Test
   public void whenReconnectingAfterConnectionExceptionSchedulerRunsWithoutStartDelay() throws Exception {
     startFlow("fixedFrequencyReconnectingPoll");
@@ -185,6 +194,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
       assertThat(notifications.get(0).getInfo().getException(), instanceOf(RuntimeException.class));
       assertThat(notifications.get(0).getInfo().getException().getCause(), instanceOf(ConnectionException.class));
       assertThat(notifications.get(0).getInfo().getException().getCause().getMessage(), is("A tiger cannot be petted."));
+      assertThat(notifications.get(0).getResourceIdentifier(), is("pet-tiger"));
     } finally {
       notificationListenerRegistry.unregisterListener(listener);
     }
@@ -207,6 +217,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
       assertThat(notifications.get(0).getInfo().getException(), notNullValue());
       assertThat(notifications.get(0).getInfo().getException(), instanceOf(RuntimeException.class));
       assertThat(notifications.get(0).getInfo().getException().getMessage(), is("Why do you want to pet a whale?"));
+      assertThat(notifications.get(0).getResourceIdentifier(), is("pet-whale"));
     } finally {
       notificationListenerRegistry.unregisterListener(listener);
     }
@@ -229,6 +240,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
       assertThat(notifications.get(0).getInfo().getException(), notNullValue());
       assertThat(notifications.get(0).getInfo().getException(), instanceOf(ConnectionException.class));
       assertThat(notifications.get(0).getInfo().getException().getMessage(), is("Dinosaurs no longer exist."));
+      assertThat(notifications.get(0).getResourceIdentifier(), is("pet-dinosaur"));
     } finally {
       notificationListenerRegistry.unregisterListener(listener);
     }

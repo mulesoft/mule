@@ -46,7 +46,7 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
      * Creates a new builder instance
      *
      * @param extensionRegistry the {@link ExtensionRegistry} instance used to obtain the configuration instances
-     * @param muleContext the {@link MuleContext} which owns the configuration instances
+     * @param muleContext       the {@link MuleContext} which owns the configuration instances
      * @return a new {@link Builder}
      */
     public static Builder newBuilder(ExtensionRegistry extensionRegistry, MuleContext muleContext) {
@@ -65,7 +65,7 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
      * Specifies how often should this instance check for expired config instances
      *
      * @param frequency a scalar time value
-     * @param timeUnit a {@link TimeUnit} which qualifies the {@code frequency}
+     * @param timeUnit  a {@link TimeUnit} which qualifies the {@code frequency}
      * @return {@code this} instance
      */
     public Builder runEvery(long frequency, TimeUnit timeUnit) {

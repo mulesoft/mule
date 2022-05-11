@@ -10,9 +10,9 @@ import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 
 /**
- * Builder of {@link HttpRequestOptions}. Instances can only be obtained through {@link HttpRequestOptions#builder()}.
- * By default, a 30 seconds timeout is set with follows redirect and no authentication, streaming or proxy settings. The last
- * two can be configured at the {@link HttpClient} level as well, so if not set, the client's configuration will be used.
+ * Builder of {@link HttpRequestOptions}. Instances can only be obtained through {@link HttpRequestOptions#builder()}. By default,
+ * a 30 seconds timeout is set with follows redirect and no authentication, streaming or proxy settings. The last two can be
+ * configured at the {@link HttpClient} level as well, so if not set, the client's configuration will be used.
  *
  * @since 4.2
  */

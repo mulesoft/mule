@@ -10,12 +10,13 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.value.ValueProviderService;
+import org.mule.runtime.core.api.data.sample.SampleDataService;
 import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationPolicyManager;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DeployableArtifactWrapper;
 
 import java.io.File;
@@ -39,7 +40,7 @@ public class ApplicationWrapper extends DeployableArtifactWrapper<Application, A
 
   @Override
   public Registry getRegistry() {
-    return getDelegate().getRegistry();
+    return getDelegate().getArtifactContext() != null ? getDelegate().getArtifactContext().getRegistry() : null;
   }
 
   @Override
@@ -90,5 +91,10 @@ public class ApplicationWrapper extends DeployableArtifactWrapper<Application, A
   @Override
   public ValueProviderService getValueProviderService() {
     return getDelegate().getValueProviderService();
+  }
+
+  @Override
+  public SampleDataService getSampleDataService() {
+    return getDelegate().getSampleDataService();
   }
 }

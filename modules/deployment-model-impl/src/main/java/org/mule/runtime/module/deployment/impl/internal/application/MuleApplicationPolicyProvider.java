@@ -38,6 +38,8 @@ import java.util.Optional;
  */
 public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider, PolicyProvider, Disposable {
 
+  public static final String IS_POLICY_REORDER = "isPolicyReorder";
+
   private final PolicyTemplateFactory policyTemplateFactory;
   private final PolicyInstanceProviderFactory policyInstanceProviderFactory;
   private final List<RegisteredPolicyTemplate> registeredPolicyTemplates = new LinkedList<>();
@@ -51,7 +53,7 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
   /**
    * Creates a new provider
    *
-   * @param policyTemplateFactory used to create the policy templates for the application. Non null.
+   * @param policyTemplateFactory         used to create the policy templates for the application. Non null.
    * @param policyInstanceProviderFactory used to create the policy instances for the application. Non null.
    */
   public MuleApplicationPolicyProvider(PolicyTemplateFactory policyTemplateFactory,
@@ -68,8 +70,17 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
 
       Optional<RegisteredPolicyInstanceProvider> registeredPolicyInstanceProvider = registeredPolicyInstanceProviders.stream()
           .filter(p -> p.getPolicyId().equals(parametrization.getId())).findFirst();
+
+      // Check if policy is already applied.
       if (registeredPolicyInstanceProvider.isPresent()) {
-        throw new IllegalArgumentException(createPolicyAlreadyRegisteredError(parametrization.getId()));
+        // TODO MULE-19415 - Expose Api For policy reordering.
+        // Check if incoming parameters indicate that the operation is a policy reorder.
+        if (isPolicyReorder(parametrization)) {
+          reorderPolicy(registeredPolicyInstanceProvider.get(), parametrization);
+          return;
+        } else {
+          throw new IllegalArgumentException(createPolicyAlreadyRegisteredError(parametrization.getId()));
+        }
       }
 
       Optional<RegisteredPolicyTemplate> registeredPolicyTemplate = registeredPolicyTemplates.stream()
@@ -95,14 +106,35 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
 
       registeredPolicyInstanceProviders
           .add(new RegisteredPolicyInstanceProvider(applicationPolicyInstance, parametrization.getId()));
-      registeredPolicyInstanceProviders.sort(null);
       registeredPolicyTemplate.get().count++;
-
-      policiesChangedCallback.run();
+      sortPolicies();
 
     } catch (Exception e) {
       throw new PolicyRegistrationException(createPolicyRegistrationError(parametrization.getId()), e);
     }
+  }
+
+  /**
+   * Check if ApiGateway sent
+   *
+   * @param parametrization
+   * @return true if the parametrization corresponds to a policy reorder. false otherwise.
+   */
+  private boolean isPolicyReorder(PolicyParametrization parametrization) {
+    return parametrization.getParameters().getOrDefault(IS_POLICY_REORDER, "false").equalsIgnoreCase("true");
+  }
+
+  private void reorderPolicy(RegisteredPolicyInstanceProvider provider, PolicyParametrization parametrization) {
+    provider.updateOrder(parametrization.getOrder());
+    sortPolicies();
+  }
+
+  /**
+   * Sorts internal policy list.
+   */
+  private void sortPolicies() {
+    registeredPolicyInstanceProviders.sort(null);
+    policiesChangedCallback.run();
   }
 
   @Override
@@ -258,15 +290,21 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
 
     private final ApplicationPolicyInstance applicationPolicyInstance;
     private final String policyId;
+    private int order;
 
     public RegisteredPolicyInstanceProvider(ApplicationPolicyInstance applicationPolicyInstance, String policyId) {
       this.applicationPolicyInstance = applicationPolicyInstance;
       this.policyId = policyId;
+      this.order = applicationPolicyInstance.getOrder();
+    }
+
+    public void updateOrder(int newOrder) {
+      this.order = newOrder;
     }
 
     @Override
     public int compareTo(RegisteredPolicyInstanceProvider registeredPolicyInstanceProvider) {
-      return compare(applicationPolicyInstance.getOrder(), registeredPolicyInstanceProvider.applicationPolicyInstance.getOrder());
+      return compare(order, registeredPolicyInstanceProvider.order);
     }
 
     public ApplicationPolicyInstance getApplicationPolicyInstance() {

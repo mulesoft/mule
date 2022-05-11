@@ -7,7 +7,9 @@
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.api.MuleContext;
@@ -52,8 +54,8 @@ public class ArtifactFactoryUtils {
    * Validates plugin licenses within the artifact.
    *
    * @param artifactClassLoader the classloader of the artifact
-   * @param artifactPlugins the list of plugins
-   * @param licenseValidator the license validator to use for validating the license
+   * @param artifactPlugins     the list of plugins
+   * @param licenseValidator    the license validator to use for validating the license
    */
   public static void validateArtifactLicense(ClassLoader artifactClassLoader, List<ArtifactPlugin> artifactPlugins,
                                              LicenseValidator licenseValidator) {
@@ -77,8 +79,8 @@ public class ArtifactFactoryUtils {
   }
 
   /**
-   * If the output of {@link #getMuleContext(DeployableArtifact)} over the given {@code artifact} is present, then consume it
-   * with the given {@code consumer}
+   * If the output of {@link #getMuleContext(DeployableArtifact)} over the given {@code artifact} is present, then consume it with
+   * the given {@code consumer}
    *
    * @param artifact an artifact
    * @param consumer a {@link MuleContext} {@link CheckedConsumer}
@@ -96,7 +98,7 @@ public class ArtifactFactoryUtils {
    * @since 4.2
    */
   public static Optional<MuleContext> getMuleContext(DeployableArtifact artifact) {
-    return artifact != null && artifact.getRegistry() != null ? artifact.getRegistry().lookupByType(MuleContext.class) : empty();
+    return artifact == null ? empty() : ofNullable(artifact.getArtifactContext().getMuleContext());
   }
 
   /**

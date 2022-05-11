@@ -6,18 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
-import static java.lang.Thread.currentThread;
-import static java.util.Arrays.asList;
-import static java.util.Optional.of;
-import static java.util.concurrent.Executors.newFixedThreadPool;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
+import static org.mule.runtime.api.component.AbstractComponent.ANNOTATION_NAME;
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
+import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -27,15 +21,36 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.internal.policy.DefaultPolicyManager.noPolicyOperation;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.probe.PollingProber.probe;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
+import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.of;
+import static java.util.concurrent.Executors.newFixedThreadPool;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertThat;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
+
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -45,9 +60,12 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
 import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
+import org.mule.runtime.feature.internal.config.DefaultFeatureFlaggingService;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor;
@@ -57,9 +75,15 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
+
+import javax.xml.namespace.QName;
 
 import org.junit.After;
 import org.junit.Before;
@@ -77,6 +101,7 @@ import reactor.core.publisher.Mono;
 public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends AbstractMuleContextTestCase {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ComponentMessageProcessorPolicyProcessingStrategyTestCase.class);
+  public static final String TEST_ARTIFACT_ID = "artifactId";
 
   @Parameters(name = "async: {0}, processingType: {1}")
   public static List<Object[]> parameters() {
@@ -108,6 +133,20 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
     this.processingType = processingType;
   }
 
+  @Override
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    super.addBuilders(builders);
+    builders.add(new AbstractConfigurationBuilder() {
+
+      @Override
+      protected void doConfigure(MuleContext muleContext) throws Exception {
+        muleContext.getCustomizationService().overrideDefaultServiceImpl(FEATURE_FLAGGING_SERVICE_KEY,
+                                                                         new DefaultFeatureFlaggingService(TEST_ARTIFACT_ID,
+                                                                                                           emptyMap()));
+      }
+    });
+  }
+
   @Before
   public void before() throws MuleException {
     CoreEvent response = testEvent();
@@ -126,12 +165,12 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
     extensionManager = mock(ExtensionManager.class);
     policyManager = mock(PolicyManager.class);
 
-    processor = new ComponentMessageProcessor<ComponentModel>(extensionModel,
-                                                              componentModel, null, null, null,
-                                                              resolverSet, null, null, null,
-                                                              extensionManager,
-                                                              policyManager, null, null,
-                                                              muleContext.getConfiguration().getShutdownTimeout()) {
+    processor = new TestComponentMessageProcessor(extensionModel,
+                                                  componentModel, null, null, null,
+                                                  resolverSet, null, null, null,
+                                                  extensionManager,
+                                                  policyManager, null, null,
+                                                  muleContext.getConfiguration().getShutdownTimeout()) {
 
       @Override
       protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {}
@@ -168,7 +207,21 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
 
     processor.setComponentLocator(componentLocator);
     processor.setCacheIdGeneratorFactory(mock(MetadataCacheIdGeneratorFactory.class));
-    processor.setAnnotations(getAppleFlowComponentLocationAnnotations());
+
+    final Map<QName, Object> annotations = new HashMap<>();
+    final ComponentIdentifier opIdentifier = buildFromStringRepresentation("ns:op");
+    annotations.put(LOCATION_KEY, new DefaultComponentLocation(of(APPLE_FLOW),
+                                                               asList(new DefaultLocationPart(APPLE_FLOW,
+                                                                                              of(TypedComponentIdentifier
+                                                                                                  .builder()
+                                                                                                  .identifier(opIdentifier)
+                                                                                                  .type(FLOW).build()),
+                                                                                              Optional.empty(),
+                                                                                              OptionalInt.empty(),
+                                                                                              OptionalInt.empty()))));
+    annotations.put(ROOT_CONTAINER_NAME_KEY, APPLE_FLOW);
+    annotations.put(ANNOTATION_NAME, opIdentifier);
+    processor.setAnnotations(annotations);
 
     initialiseIfNeeded(processor, muleContext);
     startIfNeeded(processor);
@@ -387,4 +440,5 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
       return true;
     });
   }
+
 }

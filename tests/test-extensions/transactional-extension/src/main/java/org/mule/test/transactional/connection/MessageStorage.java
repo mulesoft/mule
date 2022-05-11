@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class MessageStorage extends AbstractComponent implements Processor {
 
-  public static Queue<TestTransactionalConnection> messages = new ConcurrentLinkedQueue<>();
+  public static Queue<Object> messages = new ConcurrentLinkedQueue<>();
 
   public static Throwable exception;
 
@@ -26,7 +26,7 @@ public class MessageStorage extends AbstractComponent implements Processor {
     event.getError().ifPresent(theError -> exception = theError.getCause());
     TypedValue<Object> payload = event.getMessage().getPayload();
     if (payload.getValue() != null) {
-      messages.add((TestTransactionalConnection) payload.getValue());
+      messages.add(payload.getValue());
     }
     return event;
   }

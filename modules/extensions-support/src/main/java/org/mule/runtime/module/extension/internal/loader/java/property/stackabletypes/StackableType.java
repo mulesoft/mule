@@ -28,12 +28,12 @@ public class StackableType {
   private final DelegateResolverFactory delegateResolverFactory;
 
   /**
-   * Creates a new instance.
-   * If a factory is not provided it will be considered that the correspondent type doesn't support {@link ValueResolver}
-   * of the factory type.
+   * Creates a new instance. If a factory is not provided it will be considered that the correspondent type doesn't support
+   * {@link ValueResolver} of the factory type.
    *
    * @param type                           The represented type
-   * @param expressionBasedResolverFactory A factory that creates instances of expression based {@link ValueResolver value resolvers}
+   * @param expressionBasedResolverFactory A factory that creates instances of expression based {@link ValueResolver value
+   *                                       resolvers}
    * @param staticResolverFactory          A factory that creates instances of static {@link ValueResolver value resolvers}
    * @param delegateResolverFactory        A factory that create instances of {@link ValueResolver value resolver} wrappers
    */
@@ -53,24 +53,24 @@ public class StackableType {
   }
 
   /**
-   * @return An {@link Optional} {@link ExpressionBasedResolverFactory}, if {@link Optional#empty()} it means that
-   * the current type doesn't support this kind of {@link ValueResolver}
+   * @return An {@link Optional} {@link ExpressionBasedResolverFactory}, if {@link Optional#empty()} it means that the current
+   *         type doesn't support this kind of {@link ValueResolver}
    */
   Optional<ExpressionBasedResolverFactory> getExpressionBasedResolverFactory() {
     return ofNullable(expressionBasedResolverFactory);
   }
 
   /**
-   * @return An {@link Optional} {@link StaticResolverFactory}, if {@link Optional#empty()} it means that
-   * the current type doesn't support this kind of {@link ValueResolver}
+   * @return An {@link Optional} {@link StaticResolverFactory}, if {@link Optional#empty()} it means that the current type doesn't
+   *         support this kind of {@link ValueResolver}
    */
   Optional<StaticResolverFactory> getStaticResolverFactory() {
     return ofNullable(staticResolverFactory);
   }
 
   /**
-   * @return An {@link Optional} {@link DelegateResolverFactory}, if {@link Optional#empty()} it means that
-   * the current type doesn't support this kind of {@link ValueResolver}
+   * @return An {@link Optional} {@link DelegateResolverFactory}, if {@link Optional#empty()} it means that the current type
+   *         doesn't support this kind of {@link ValueResolver}
    */
   Optional<DelegateResolverFactory> getDelegateResolverFactory() {
     return ofNullable(delegateResolverFactory);
@@ -126,7 +126,7 @@ public class StackableType {
   @FunctionalInterface
   public interface ExpressionBasedResolverFactory<T> {
 
-    ValueResolver<T> getResolver(String value, Class<T> expectedType, boolean content);
+    ValueResolver<T> getResolver(String value, Class<T> expectedType);
   }
 
   /**

@@ -82,7 +82,7 @@ public class ExtensionResolvingContext {
    *
    * @param <C> Connection type
    * @return A connection instance of {@param <C>} type for the component. If the related configuration does not require a
-   * connection {@link Optional#empty()} will be returned
+   *         connection {@link Optional#empty()} will be returned
    * @throws ConnectionException when no valid connection is found for the related component and configuration
    */
   public <C> Optional<C> getConnection() throws ConnectionException {

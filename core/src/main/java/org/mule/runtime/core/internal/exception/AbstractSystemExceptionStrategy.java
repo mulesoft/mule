@@ -10,6 +10,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -35,7 +36,28 @@ public abstract class AbstractSystemExceptionStrategy extends AbstractExceptionL
 
   @Override
   public void handleException(Exception ex, RollbackSourceCallback rollbackMethod) {
-    fireNotification(ex, getCurrentEvent());
+    doHandleException(ex, rollbackMethod, null);
+  }
+
+  private void rollback(Exception ex, RollbackSourceCallback rollbackMethod) {
+    rollback(ex);
+    if (rollbackMethod != null) {
+      rollbackMethod.rollback();
+    }
+  }
+
+  @Override
+  public void handleException(Exception ex) {
+    doHandleException(ex, null, null);
+  }
+
+  @Override
+  public void handleException(Exception ex, ComponentLocation componentLocation) {
+    doHandleException(ex, null, componentLocation);
+  }
+
+  private void doHandleException(Exception ex, RollbackSourceCallback rollbackMethod, ComponentLocation componentLocation) {
+    fireNotification(ex, getCurrentEvent(), componentLocation);
 
     resolveAndLogException(ex);
 
@@ -52,18 +74,6 @@ public abstract class AbstractSystemExceptionStrategy extends AbstractExceptionL
     if (ex instanceof ConnectException) {
       ((ConnectException) ex).handleReconnection(retryScheduler);
     }
-  }
-
-  private void rollback(Exception ex, RollbackSourceCallback rollbackMethod) {
-    rollback(ex);
-    if (rollbackMethod != null) {
-      rollbackMethod.rollback();
-    }
-  }
-
-  @Override
-  public void handleException(Exception ex) {
-    handleException(ex, null);
   }
 
   @Override

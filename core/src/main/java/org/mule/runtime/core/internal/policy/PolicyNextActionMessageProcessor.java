@@ -8,19 +8,26 @@ package org.mule.runtime.core.internal.policy;
 
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
+import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
@@ -29,9 +36,12 @@ import org.mule.runtime.core.api.exception.BaseExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.lang.ref.Reference;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
@@ -46,9 +56,10 @@ import org.reactivestreams.Publisher;
  *
  * @since 4.0
  */
-public class PolicyNextActionMessageProcessor extends AbstractComponent implements Processor, Initialisable {
+public class PolicyNextActionMessageProcessor extends AbstractComponent implements Processor, Initialisable, Disposable {
 
   static final String SOURCE_POLICY_PART_IDENTIFIER = "source";
+  static final String SUBFLOW_POLICY_PART_IDENTIFIER = "sub-flow";
 
   public static final String POLICY_NEXT_OPERATION = "policy.nextOperation";
   public static final String POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS = "policy.isPropagateMessageTransformations";
@@ -66,6 +77,9 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   private OnExecuteNextErrorConsumer onExecuteNextErrorConsumer;
 
   private MessageProcessorChain nextDispatchAsChain;
+
+  private Map<ComponentLocation, Boolean> locationsCache = new SmallMap<>();
+  private Map<Pair<ComponentLocation, String>, Boolean> subFlowLocationsCache = new SmallMap<>();
 
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
@@ -103,30 +117,51 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   private OnExecuteNextErrorConsumer errorConsumer(PolicyEventMapper policyEventMapper,
                                                    PolicyNotificationHelper notificationHelper) {
 
-    if (isWithinSourcePolicy(getLocation())) {
-      return new OnExecuteNextErrorConsumer(me -> {
-        final CoreEvent event = me.getEvent();
+    return new OnExecuteNextErrorConsumer(me -> {
+      if (!isWithinSourcePolicy(getLocation()) && !isWithingSubflowInSourcePolicy(getLocation(), me)) {
+        return policyEventMapper.fromPolicyNext(me.getEvent());
+      }
+      final CoreEvent event = me.getEvent();
 
-        if (me.getFailingComponent() != null &&
-            isWithinSourcePolicy(me.getFailingComponent().getLocation())) {
-          return policyEventMapper.fromPolicyNext(event);
-        } else {
-          return policyEventMapper.fromPolicyNext(policyEventMapper.onFlowError(event, getPolicyId(),
-                                                                                SourcePolicyContext.from(event)
-                                                                                    .getParametersTransformer()));
-        }
-      }, notificationHelper, getLocation());
-    } else {
-      return new OnExecuteNextErrorConsumer(me -> policyEventMapper.fromPolicyNext(me.getEvent()), notificationHelper,
-                                            getLocation());
-    }
+      if (me.getFailingComponent() != null && (isWithinSourcePolicy(me.getFailingComponent().getLocation())
+          || isWithingSubflowInSourcePolicy(me.getFailingComponent().getLocation(), me))) {
+        return policyEventMapper.fromPolicyNext(event);
+      } else {
+        return policyEventMapper.fromPolicyNext(policyEventMapper
+            .onFlowError(event, getPolicyId(), SourcePolicyContext.from(event).getParametersTransformer()));
+      }
+
+    }, notificationHelper, getLocation());
   }
 
-  private Boolean isWithinSourcePolicy(final ComponentLocation loc) {
-    return loc.getParts().size() >= 2
-        && loc.getParts().get(1).getPartIdentifier()
-            .map(tci -> tci.getIdentifier().getName().equals(SOURCE_POLICY_PART_IDENTIFIER))
-            .orElse(false);
+  private Boolean isWithinSourcePolicy(final ComponentLocation location) {
+    return locationsCache.computeIfAbsent(location, loc -> loc.getParts().size() >= 2 && loc.getParts().get(1).getPartIdentifier()
+        .map(tci -> tci.getIdentifier().getName().equals(SOURCE_POLICY_PART_IDENTIFIER)).orElse(false));
+  }
+
+  private Boolean isWithingSubflowInSourcePolicy(ComponentLocation loc, MessagingException me) {
+    List<FlowStackElement> elements = me.getEvent().getFlowCallStack().getElements();
+    if (elements.size() == 0) {
+      return false;
+    }
+    return subFlowLocationsCache.computeIfAbsent(new Pair<>(loc, elements.get(0).getProcessorPath()), pair -> {
+      if (pair.getFirst().getParts().size() < 1) {
+        return false;
+      }
+      boolean isWithinSubflow = pair.getFirst().getParts().get(0).getPartIdentifier()
+          .map(tci -> tci.getIdentifier().getName().equals(SUBFLOW_POLICY_PART_IDENTIFIER)).orElse(false);
+      if (!isWithinSubflow) {
+        return false;
+      }
+
+      return isSubflowWithinASoucePolicy(builderFromStringRepresentation(pair.getSecond().split(" ")[0]).build());
+    });
+  }
+
+  private boolean isSubflowWithinASoucePolicy(Location loc) {
+    List<String> parts = loc.getParts();
+    return loc.getGlobalName().equals(getRootContainerLocation().toString()) && parts.size() >= 1
+        && parts.get(0).equals(SOURCE_POLICY_PART_IDENTIFIER);
   }
 
   @Override
@@ -179,4 +214,8 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
     return muleContext.getConfiguration().getId();
   }
 
+  @Override
+  public void dispose() {
+    disposeIfNeeded(nextDispatchAsChain, getLogger(getClass()));
+  }
 }

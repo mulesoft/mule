@@ -6,8 +6,8 @@
  */
 package org.mule.test.heisenberg.extension.model;
 
-import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.sdk.api.annotation.Alias;
 
 public class Attribute {
 

@@ -1,1 +1,2 @@
 org.mule.runtime.config.internal.dsl.processor.xml.CoreXmlNamespaceInfoProvider
+org.mule.runtime.config.internal.dsl.processor.xml.OperationDslNamespaceInfoProvider

@@ -6,26 +6,47 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import static java.util.Collections.emptyList;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_OPERATION_EXECUTED;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_FLOW_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
+import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.ReactorPublisherBuilder.buildFlux;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactType;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getLocation;
+import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.isTxActiveByContext;
+import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.popTxFromSubscriberContext;
+import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.pushTxToSubscriberContext;
+import static java.lang.System.currentTimeMillis;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
+import org.mule.runtime.core.internal.profiling.tracing.DefaultComponentMetadata;
+import org.mule.runtime.core.internal.profiling.tracing.DefaultExecutionContext;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import reactor.util.context.Context;
+import javax.inject.Inject;
 
 /**
  * Decorates a {@link ProcessingStrategy} so that processing takes place on the current thread in the event of a transaction being
@@ -35,10 +56,14 @@ import reactor.util.context.Context;
  */
 public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends ProcessingStrategyDecorator {
 
-  private static final String TX_SCOPES_KEY = "mule.tx.activeTransactionsInReactorChain";
-
   private static final Consumer<CoreEvent> NULL_EVENT_CONSUMER = event -> {
   };
+
+  @Inject
+  private InternalProfilingService profilingService;
+
+  @Inject
+  private MuleContext muleContext;
 
   public TransactionAwareStreamEmitterProcessingStrategyDecorator(ProcessingStrategy delegate) {
     super(delegate);
@@ -55,65 +80,96 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
   @Override
   public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
     Sink delegateSink = delegate.createSink(flowConstruct, pipeline);
-    Sink syncSink = new StreamPerThreadSink(p -> from(p)
+    Sink syncSink = new ReactorSinkProviderBasedSink(new DefaultCachedThreadReactorSinkProvider(flowConstruct, p -> from(p)
         .subscriberContext(popTxFromSubscriberContext())
         .transform(pipeline)
-        .subscriberContext(pushTxToSubscriberContext("source")), NULL_EVENT_CONSUMER, flowConstruct);
+        .subscriberContext(pushTxToSubscriberContext("source")), NULL_EVENT_CONSUMER));
     return new TransactionalDelegateSink(syncSink, delegateSink);
   }
 
   @Override
   public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
+    ComponentLocation location = getLocation(pipeline);
+    String artifactId = getArtifactId(muleContext);
+    String artifactType = getArtifactType(muleContext);
+
+    Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transformer =
+        coreEvent -> new DefaultComponentProcessingStrategyProfilingEventContext(coreEvent, location,
+                                                                                 Thread.currentThread().getName(), artifactId,
+                                                                                 artifactType, currentTimeMillis());
+
     return pub -> subscriberContext()
         .flatMapMany(ctx -> {
-          if (isTxActive(ctx)) {
-            return from(pub).transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onPipeline(pipeline));
+          if (isTxActiveByContext(ctx)) {
+            // The profiling events related to the processing strategy scheduling are triggered independently of this being
+            // a blocking processing strategy that does not involve a thread switch.
+            return buildFlux(pub)
+                .setTracingContext(profilingService,
+                                   coreEvent -> new DefaultExecutionContext(new DefaultComponentMetadata(coreEvent
+                                       .getCorrelationId(), artifactId, artifactType, location)))
+                .profileProcessingStrategyEvent(profilingService,
+                                                getDataProducer(PS_SCHEDULING_FLOW_EXECUTION),
+                                                transformer)
+                .profileProcessingStrategyEvent(profilingService,
+                                                getDataProducer(
+                                                                STARTING_FLOW_EXECUTION),
+                                                transformer)
+                .transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onPipeline(pipeline))
+                .profileProcessingStrategyEvent(profilingService,
+                                                getDataProducer(
+                                                                FLOW_EXECUTED),
+                                                transformer)
+                .build();
           } else {
             return from(pub).transform(delegate.onPipeline(pipeline));
           }
         });
   }
 
+  private ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> getDataProducer(
+                                                                                                             ProfilingEventType<ComponentProcessingStrategyProfilingEventContext> eventType) {
+    return profilingService.getProfilingDataProducer(eventType);
+  }
+
   @Override
   public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
+    ComponentLocation location = getLocation(processor);
+    String artifactId = muleContext.getConfiguration().getId();
+    String artifactType = muleContext.getArtifactType().getAsString();
+
+    Function<CoreEvent, ComponentProcessingStrategyProfilingEventContext> transformer =
+        coreEvent -> new DefaultComponentProcessingStrategyProfilingEventContext(coreEvent, location,
+                                                                                 Thread.currentThread().getName(), artifactId,
+                                                                                 artifactType, currentTimeMillis());
+
     return pub -> subscriberContext()
         .flatMapMany(ctx -> {
-          if (isTxActive(ctx)) {
-            return from(pub).transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onProcessor(processor));
+          if (isTxActiveByContext(ctx)) {
+            // The profiling events related to the processing strategy scheduling are triggered independently of this being
+            // a blocking processing strategy that does not involve a thread switch.
+            return buildFlux(pub)
+                .setTracingContext(profilingService,
+                                   coreEvent -> new DefaultExecutionContext(new DefaultComponentMetadata(coreEvent
+                                       .getCorrelationId(), artifactId, artifactType, location)))
+                .profileProcessingStrategyEvent(profilingService,
+                                                getDataProducer(PS_SCHEDULING_OPERATION_EXECUTION),
+                                                transformer)
+                .profileProcessingStrategyEvent(profilingService,
+                                                getDataProducer(PS_STARTING_OPERATION_EXECUTION),
+                                                transformer)
+                .transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onProcessor(processor))
+                .profileProcessingStrategyEvent(profilingService,
+                                                getDataProducer(
+                                                                PS_OPERATION_EXECUTED),
+                                                transformer)
+                .profileProcessingStrategyEvent(profilingService,
+                                                getDataProducer(
+                                                                PS_FLOW_MESSAGE_PASSING),
+                                                transformer)
+                .build();
           } else {
             return from(pub).transform(delegate.onProcessor(processor));
           }
         });
   }
-
-  private Boolean isTxActive(Context ctx) {
-    return ctx.<Deque<String>>getOrEmpty(TX_SCOPES_KEY).map(txScopes -> txScopes.size() > 0).orElse(false);
-  }
-
-  /**
-   * Cleanup the state set by {@link #pushTxToSubscriberContext(String)}.
-   *
-   * @since 4.3
-   */
-  public static Function<Context, Context> popTxFromSubscriberContext() {
-    return context -> {
-      Deque<String> currentTxChains = new ArrayDeque<>(context.getOrDefault(TX_SCOPES_KEY, emptyList()));
-      currentTxChains.pop();
-      return context.put(TX_SCOPES_KEY, currentTxChains);
-    };
-  }
-
-  /**
-   * Force the upstream publisher to behave as if a transaction were active, effectively avoiding thread switches.
-   *
-   * @since 4.3
-   */
-  public static Function<Context, Context> pushTxToSubscriberContext(String location) {
-    return context -> {
-      Deque<String> currentTxChains = new ArrayDeque<>(context.getOrDefault(TX_SCOPES_KEY, emptyList()));
-      currentTxChains.push(location);
-      return context.put(TX_SCOPES_KEY, currentTxChains);
-    };
-  }
-
 }

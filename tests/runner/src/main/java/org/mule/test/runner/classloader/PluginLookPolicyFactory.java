@@ -29,9 +29,9 @@ public class PluginLookPolicyFactory {
   /**
    * Creates a {@link ClassLoaderLookupPolicy} for plugins considering their dependencies.
    *
-   * @param pluginClassification the {@link PluginUrlClassification} to creates its {@link ClassLoaderLookupPolicy}
+   * @param pluginClassification  the {@link PluginUrlClassification} to creates its {@link ClassLoaderLookupPolicy}
    * @param pluginClassifications whole list of {@link PluginUrlClassification} for the current context
-   * @param parentLookupPolicies the {@link ClassLoaderLookupPolicy} for the parent {@link ClassLoader}
+   * @param parentLookupPolicies  the {@link ClassLoaderLookupPolicy} for the parent {@link ClassLoader}
    * @param classLoaders
    * @return {@link ClassLoaderLookupPolicy} for the plugin
    */

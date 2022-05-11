@@ -6,38 +6,49 @@
  */
 package org.mule.runtime.config;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonMap;
-import static java.util.concurrent.TimeUnit.DAYS;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.CONFIGURATION_PROPERTIES;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.ComponentConfigurationAttributesStory.COMPONENT_CONFIGURATION_PROPERTIES_STORY;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
+import static java.util.concurrent.TimeUnit.DAYS;
+
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.config.custom.ServiceConfigurator;
+import org.mule.runtime.api.time.TimeSupplier;
+import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.transformer.simple.ObjectToInputStream;
+import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.MockExtensionManagerConfigurationBuilder;
+
 import java.util.Calendar;
+
+import org.slf4j.Logger;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mule.runtime.api.time.TimeSupplier;
-import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
-import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
-import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
-import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
-import org.mule.tck.config.TestServicesConfigurationBuilder;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.MockExtensionManagerConfigurationBuilder;
-import org.slf4j.Logger;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
@@ -52,7 +63,7 @@ public class MuleConfigurationConfiguratorTestCase extends AbstractMuleTestCase 
   @Rule
   public TestServicesConfigurationBuilder testServicesConfigurationBuilder = new TestServicesConfigurationBuilder();
 
-  private TimeSupplier timeSupplier = mock(TimeSupplier.class);
+  private final TimeSupplier timeSupplier = mock(TimeSupplier.class);
 
   private MuleContextWithRegistry muleContext;
 
@@ -60,11 +71,19 @@ public class MuleConfigurationConfiguratorTestCase extends AbstractMuleTestCase 
   public void before() throws Exception {
     muleContext = (MuleContextWithRegistry) new DefaultMuleContextFactory()
         .createMuleContext(testServicesConfigurationBuilder,
-                           new SimpleConfigurationBuilder(singletonMap(OBJECT_TIME_SUPPLIER,
-                                                                       timeSupplier)),
+                           new ConfigurationBuilder() {
+
+                             @Override
+                             public void configure(MuleContext muleContext) throws ConfigurationException {
+                               muleContext.getCustomizationService().overrideDefaultServiceImpl(OBJECT_TIME_SUPPLIER,
+                                                                                                timeSupplier);
+                             }
+
+                             @Override
+                             public void addServiceConfigurator(ServiceConfigurator serviceConfigurator) {}
+                           },
                            new MockExtensionManagerConfigurationBuilder(),
-                           new SpringXmlConfigurationBuilder(new String[0],
-                                                             emptyMap()));
+                           new SpringXmlConfigurationBuilder(new String[0], emptyMap()));
     muleContext.start();
     muleContext.getRegistry().lookupByType(Calendar.class);
   }
@@ -86,5 +105,13 @@ public class MuleConfigurationConfiguratorTestCase extends AbstractMuleTestCase 
     // This is done so that the timeSupplier is invoked.
     configuration.getDynamicConfigExpiration().getExpirationPolicy().isExpired(0L, DAYS);
     verify(timeSupplier).getAsLong();
+  }
+
+  @Test
+  @Issue("MULE-20031")
+  public void muleContextInjectedIntoTransformers() throws Exception {
+    ObjectToInputStream o2isTransformer = muleContext.getRegistry().lookupObject(ObjectToInputStream.class);
+
+    assertThat(o2isTransformer.doTransform(singletonMap("key", "value"), UTF_8), not(nullValue()));
   }
 }

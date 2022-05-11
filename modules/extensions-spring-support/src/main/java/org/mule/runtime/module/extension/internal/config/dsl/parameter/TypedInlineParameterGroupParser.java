@@ -33,8 +33,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * A {@link ParameterGroupParser} which returns the values of the parameters in the group
- * in fields of an object of a given type
+ * A {@link ParameterGroupParser} which returns the values of the parameters in the group in fields of an object of a given type
  *
  * @since 4.0
  */

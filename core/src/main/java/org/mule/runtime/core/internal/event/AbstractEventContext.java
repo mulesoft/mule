@@ -63,6 +63,7 @@ abstract class AbstractEventContext implements BaseEventContext {
   private transient final List<BaseEventContext> childContexts = new ArrayList<>();
   private transient final FlowExceptionHandler exceptionHandler;
   private transient final CompletableFuture<Void> externalCompletion;
+  private transient List<BiConsumer<CoreEvent, Throwable>> onBeforeResponseConsumerList = new ArrayList<>();
   private transient List<BiConsumer<CoreEvent, Throwable>> onResponseConsumerList = new ArrayList<>();
   private transient List<BiConsumer<CoreEvent, Throwable>> onCompletionConsumerList = new ArrayList<>(2);
   private transient List<BiConsumer<CoreEvent, Throwable>> onTerminatedConsumerList = new ArrayList<>();
@@ -84,9 +85,9 @@ abstract class AbstractEventContext implements BaseEventContext {
 
   /**
    *
-   * @param exceptionHandler exception handler to to handle errors before propagation of errors to response listeners.
+   * @param exceptionHandler   exception handler to to handle errors before propagation of errors to response listeners.
    * @param externalCompletion optional future that allows an external entity (e.g. a source) to signal completion of response
-   *        processing and delay termination.
+   *                           processing and delay termination.
    */
   public AbstractEventContext(FlowExceptionHandler exceptionHandler, int depthLevel,
                               Optional<CompletableFuture<Void>> externalCompletion) {
@@ -97,7 +98,11 @@ abstract class AbstractEventContext implements BaseEventContext {
   }
 
   protected void initCompletionLists() {
-    if (onCompletionConsumerList == null) {
+    if (onBeforeResponseConsumerList == null) {
+      onBeforeResponseConsumerList = new ArrayList<>();
+    }
+
+    if (onResponseConsumerList == null) {
       onResponseConsumerList = new ArrayList<>();
     }
 
@@ -195,6 +200,12 @@ abstract class AbstractEventContext implements BaseEventContext {
     responsePublisher.ifComputed(rp -> rp.result = result);
 
     state = STATE_RESPONSE;
+
+    for (BiConsumer<CoreEvent, Throwable> onBeforeResponseConsumer : onBeforeResponseConsumerList) {
+      signalConsumerSilently(onBeforeResponseConsumer);
+    }
+    onBeforeResponseConsumerList.clear();
+
     for (BiConsumer<CoreEvent, Throwable> onResponseConsumer : onResponseConsumerList) {
       signalConsumerSilently(onResponseConsumer);
     }
@@ -317,6 +328,15 @@ abstract class AbstractEventContext implements BaseEventContext {
       signalConsumerSilently(consumer);
     } else {
       onCompletionConsumerList.add(requireNonNull(consumer));
+    }
+  }
+
+  @Override
+  public synchronized void onBeforeResponse(BiConsumer<CoreEvent, Throwable> consumer) {
+    if (state >= STATE_RESPONSE) {
+      signalConsumerSilently(consumer);
+    } else {
+      onBeforeResponseConsumerList.add(requireNonNull(consumer));
     }
   }
 

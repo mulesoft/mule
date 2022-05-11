@@ -6,27 +6,20 @@
  */
 package org.mule.runtime.core.internal.registry;
 
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.transformer.ResolverException;
 import org.mule.runtime.core.internal.transformer.graph.GraphTransformerResolver;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
 import org.mule.runtime.core.privileged.transformer.TransformerChain;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,55 +29,46 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Will discover transformers based on type information only. It looks for transformers that support the source and result types
  * passed into the method. This resolver only resolves on the first source type, which is the way transformer resolution working
  * in Mule 2.x.
  */
-public class TypeBasedTransformerResolver implements TransformerResolver, MuleContextAware, Disposable, Initialisable {
+public class TypeBasedTransformerResolver implements TransformerResolver, Disposable, Initialisable {
 
   /**
    * logger used by this class
    */
-  protected transient final Logger logger = LoggerFactory.getLogger(TypeBasedTransformerResolver.class);
+  private static final Logger logger = LoggerFactory.getLogger(TypeBasedTransformerResolver.class);
 
   private ObjectToString objectToString;
   private ObjectToByteArray objectToByteArray;
 
-  private MuleContext muleContext;
+  private TransformersRegistry transformersRegistry;
 
-  protected Map<String, Transformer> exactTransformerCache = new ConcurrentHashMap/* <String, Transformer> */(8);
+  protected Map<String, Transformer> exactTransformerCache = new ConcurrentHashMap<>(8);
 
   protected TransformerResolver graphTransformerResolver = new GraphTransformerResolver();
 
   @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
+  public void initialise() throws InitialisationException {
+    objectToString = new ObjectToString();
+    objectToByteArray = new ObjectToByteArray();
   }
 
   @Override
-  public void initialise() throws InitialisationException {
-    try {
-      objectToString = new ObjectToString();
-      objectToByteArray = new ObjectToByteArray();
-
-      // these are just fallbacks that are not to go
-      // into the mule registry
-      initialiseIfNeeded(objectToString, muleContext);
-      initialiseIfNeeded(objectToByteArray, muleContext);
-    } catch (MuleException e) {
-      throw new InitialisationException(e, this);
-    }
-  }
-
   public Transformer resolve(DataType source, DataType result) throws ResolverException {
     Transformer transformer = exactTransformerCache.get(source.toString() + result.toString());
     if (transformer != null) {
       return transformer;
     }
 
-    MuleRegistry registry = ((MuleContextWithRegistry) muleContext).getRegistry();
-    List<Transformer> trans = registry.lookupTransformers(source, result);
+    List<Transformer> trans = transformersRegistry.lookupTransformers(source, result);
 
     Transformer compositeTransformer = graphTransformerResolver.resolve(source, result);
     if (compositeTransformer != null) {
@@ -108,13 +92,13 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
         return null;
       }
       // Perform a more general search
-      trans = registry.lookupTransformers(source, DataType.OBJECT);
+      trans = transformersRegistry.lookupTransformers(source, DataType.OBJECT);
 
       transformer = getNearestTransformerMatch(trans, source.getType(), result.getType());
       if (transformer != null) {
         transformer = new TransformerChain(transformer, secondPass);
         try {
-          registry.registerTransformer(transformer);
+          transformersRegistry.registerTransformer(transformer);
         } catch (MuleException e) {
           throw new ResolverException(e.getI18nMessage(), e);
         }
@@ -179,5 +163,10 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
       graphTransformerResolver.transformerChange(transformer, registryAction);
       exactTransformerCache.clear();
     }
+  }
+
+  @Inject
+  public void setTransformersRegistry(TransformersRegistry transformersRegistry) {
+    this.transformersRegistry = transformersRegistry;
   }
 }

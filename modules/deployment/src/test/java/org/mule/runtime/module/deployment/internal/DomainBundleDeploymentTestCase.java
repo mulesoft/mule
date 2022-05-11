@@ -12,15 +12,20 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.mockito.Mockito.reset;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
+
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainBundleFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+
 /**
  * Contains test for domain bundle deployment
  */
+@Feature(DOMAIN_DEPLOYMENT)
 public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
 
   public DomainBundleDeploymentTestCase(boolean parallelDeployment) {
@@ -30,7 +35,7 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
   @Test
   public void deploysDomainBundle() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder(dummyAppDescriptorFileBuilder)
-        .dependingOn(dummyDomainFileBuilder);
+        .dependingOn(callbackExtensionPlugin).dependingOn(dummyDomainFileBuilder);
     DomainBundleFileBuilder domainBundleFileBuilder =
         new DomainBundleFileBuilder(dummyDomainFileBuilder).containing(applicationFileBuilder);
 
@@ -81,8 +86,8 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
 
   @Test
   public void redeploysDomainBundle() throws Exception {
-    ApplicationFileBuilder applicationFileBuilder =
-        new ApplicationFileBuilder(dummyAppDescriptorFileBuilder).dependingOn(dummyDomainFileBuilder);
+    ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder(dummyAppDescriptorFileBuilder)
+        .dependingOn(dummyDomainFileBuilder).dependingOn(callbackExtensionPlugin);
     DomainBundleFileBuilder domainBundleFileBuilder =
         new DomainBundleFileBuilder(dummyDomainFileBuilder).containing(applicationFileBuilder);
 
@@ -108,9 +113,9 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
   @Test
   public void redeploysDomainBundleCausesUndeployOfRemovedApps() throws Exception {
     ApplicationFileBuilder applicationFileBuilder1 = new ApplicationFileBuilder(dummyAppDescriptorFileBuilder)
-        .dependingOn(dummyDomainFileBuilder);
-    ApplicationFileBuilder applicationFileBuilder2 =
-        new ApplicationFileBuilder(emptyAppFileBuilder).dependingOn(dummyDomainFileBuilder);
+        .dependingOn(callbackExtensionPlugin).dependingOn(dummyDomainFileBuilder);
+    ApplicationFileBuilder applicationFileBuilder2 = new ApplicationFileBuilder(emptyAppFileBuilder)
+        .dependingOn(callbackExtensionPlugin).dependingOn(dummyDomainFileBuilder);
 
     DomainBundleFileBuilder domainBundleFileBuilder = new DomainBundleFileBuilder(dummyDomainFileBuilder)
         .containing(applicationFileBuilder1).containing(applicationFileBuilder2);
@@ -140,7 +145,7 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
   @Test
   public void redeploysDomainBundleWithBrokenDomain() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder(dummyAppDescriptorFileBuilder)
-        .dependingOn(dummyDomainFileBuilder);
+        .dependingOn(callbackExtensionPlugin).dependingOn(dummyDomainFileBuilder);
     DomainBundleFileBuilder domainBundleFileBuilder =
         new DomainBundleFileBuilder(dummyDomainFileBuilder).containing(applicationFileBuilder);
 

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
+import static org.mule.runtime.core.api.context.notification.AnySelector.ANY_SELECTOR;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.notification.NotificationListener;
@@ -28,12 +30,12 @@ public final class ListenerSubscriptionPair<N extends Notification> extends Abst
    */
   public ListenerSubscriptionPair() {
     listener = null;
-    selector = n -> true;
+    selector = (Predicate<N>) ANY_SELECTOR;
   }
 
   public ListenerSubscriptionPair(NotificationListener<N> listener) {
     this.listener = listener;
-    selector = n -> true;
+    selector = (Predicate<N>) ANY_SELECTOR;
   }
 
   public ListenerSubscriptionPair(NotificationListener<N> listener, Predicate<N> selector) {

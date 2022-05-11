@@ -26,22 +26,23 @@ public interface LazyComponentInitializer {
   String LAZY_COMPONENT_INITIALIZER_SERVICE_KEY = "_muleLazyComponentInitializer";
 
   /**
-   * Calling this method guarantees that the components accepted by the filter from the configuration will be created,
-   * initialized and started.
+   * Calling this method guarantees that the components accepted by the filter from the configuration will be created, initialized
+   * and started.
    * <p/>
-   * If there were any component already initialized it will be unregistered in order to initialize the ones selected by this filter.
+   * If there were any component already initialized it will be unregistered in order to initialize the ones selected by this
+   * filter.
    *
-   * @param componentLocationFilter {@link ComponentLocationFilter} to select the {@link Component} to be initialized and they dependent ones.
+   * @param componentLocationFilter {@link ComponentLocationFilter} to select the {@link Component} to be initialized and they
+   *                                dependent ones.
    * @throws MuleRuntimeException if there's a problem creating the component or the component does not exists.
    */
   void initializeComponents(ComponentLocationFilter componentLocationFilter);
 
   /**
-   * Calling this method guarantees that the requested component from the configuration will be created, initialized and
-   * started.
+   * Calling this method guarantees that the requested component from the configuration will be created, initialized and started.
    * <p/>
-   * The requested component must exists in the configuration. If there was a component already initialized it will be unregistered
-   * in order to initialize the requested component and its dependencies.
+   * The requested component must exists in the configuration. If there was a component already initialized it will be
+   * unregistered in order to initialize the requested component and its dependencies.
    *
    * @param location the location of the configuration component.
    * @throws MuleRuntimeException if there's a problem creating the component or the component does not exists.

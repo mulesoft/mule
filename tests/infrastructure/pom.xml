@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.mule.tests</groupId>
 		<artifactId>mule-tests</artifactId>
-		<version>4.4.0-SNAPSHOT</version>
+		<version>4.5.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>mule-tests-infrastructure</artifactId>
 	<name>Mule Tests Infrastructure</name>
@@ -72,7 +72,6 @@
         <dependency>
             <groupId>org.apache.ftpserver</groupId>
             <artifactId>ftpserver-core</artifactId>
-            <version>${testFtpServerVersion}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -83,13 +82,11 @@
         <dependency>
             <groupId>org.apache.sshd</groupId>
             <artifactId>sshd-core</artifactId>
-            <version>${sshCoreVersion}</version>
         </dependency>
 
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>${bouncycastleVersion}</version>
         </dependency>
         <dependency>
             <groupId>io.qameta.allure</groupId>
@@ -99,7 +96,6 @@
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy</artifactId>
             <classifier>indy</classifier>
-            <version>${groovyVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.shared</groupId>

@@ -20,6 +20,8 @@ import static org.mockito.Mockito.when;
 import static org.mule.test.petstore.extension.PetStoreOperations.operationExecutionCounter;
 import static org.mule.test.petstore.extension.PetStoreOperations.shouldFailWithConnectionException;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
@@ -37,23 +39,23 @@ public class ReconnectionWithStreamingTestCase extends AbstractExtensionFunction
 
   @Override
   protected String getConfigFile() {
-    return "reconnection-with-streaming-config.xml";
+    return "streaming/reconnection-with-streaming-config.xml";
   }
 
   @Test
   public void cursorComingFromProviderIsResetOnReconnection() throws Exception {
-    CursorStream cursorStream = createMockCursor();
+    CursorStream cursorStream = createMockCursor(ORIGINAL_POSITION, "hn");
 
     CursorStreamProvider provider = mock(CursorStreamProvider.class);
     when(provider.openCursor()).thenReturn(cursorStream);
 
-    assertReconnection(cursorStream, provider);
+    assertReconnection("streamingReconnect", cursorStream, provider);
   }
 
   @Test
   public void standaloneCursorIsResetOnReconnection() throws Exception {
-    CursorStream cursorStream = createMockCursor();
-    assertReconnection(cursorStream, cursorStream);
+    CursorStream cursorStream = createMockCursor(ORIGINAL_POSITION, "hn");
+    assertReconnection("streamingReconnect", cursorStream, cursorStream);
   }
 
   @Test
@@ -65,30 +67,125 @@ public class ReconnectionWithStreamingTestCase extends AbstractExtensionFunction
     assertThat(operationExecutionCounter.get(), greaterThanOrEqualTo(2));
   }
 
-  private void assertReconnection(CursorStream cursor, Object container) throws Exception {
-    CoreEvent response = flowRunner("streamingReconnect").withVariable("signature", container).run();
-    verify(cursor).seek(ORIGINAL_POSITION);
-    verify(cursor, times(3)).read(any(byte[].class), anyInt(), anyInt());
+  @Test
+  public void cursorWrappedInTypedValueIsNotAffectedIfCloseIsCalled() throws Exception {
+    shouldFailWithConnectionException = true;
+    operationExecutionCounter.set(0);
+    CoreEvent response = flowRunner("streamingTypedValueReconnectWithClosedStream").withVariable("signature", "hn").run();
+    assertThat(response.getMessage().getPayload().getValue(), is("SUCCESS"));
+    assertThat(operationExecutionCounter.get(), greaterThanOrEqualTo(2));
+  }
 
+  @Test
+  @Issue("W-10619668")
+  @Description("Checks that it is not possible for an operation to close a CursorStream that comes from a parameter inside a ParameterGroup")
+  public void cursorInParameterGroupIsNotAffectedIfCloseIsCalled() throws Exception {
+    shouldFailWithConnectionException = true;
+    operationExecutionCounter.set(0);
+    CoreEvent response = flowRunner("streamingReconnectWithClosedStreamInParameterGroup").withVariable("signature", "hn").run();
+    assertThat(response.getMessage().getPayload().getValue(), is("SUCCESS"));
+    assertThat(operationExecutionCounter.get(), greaterThanOrEqualTo(2));
+  }
+
+  @Test
+  @Issue("W-10619668")
+  @Description("Checks that it is not possible for an operation to close a CursorStream that comes from a parameter inside a ParameterGroup with showInDsl")
+  public void cursorInParameterGroupShownInDslIsNotAffectedIfCloseIsCalled() throws Exception {
+    shouldFailWithConnectionException = true;
+    operationExecutionCounter.set(0);
+    CoreEvent response =
+        flowRunner("streamingReconnectWithClosedStreamInParameterGroupShownInDsl").withVariable("signature", "hn").run();
+    assertThat(response.getMessage().getPayload().getValue(), is("SUCCESS"));
+    assertThat(operationExecutionCounter.get(), greaterThanOrEqualTo(2));
+  }
+
+  @Test
+  public void cursorInParameterGroupIsResetOnReconnection() throws Exception {
+    CursorStream cursor = createMockCursor(ORIGINAL_POSITION, "hn");
+    assertReconnection("streamingReconnectWithParameterGroup", cursor, cursor);
+  }
+
+  @Test
+  public void cursorInParameterGroupWithShowDslIsResetOnReconnection() throws Exception {
+    CursorStream cursor = createMockCursor(ORIGINAL_POSITION, "hn");
+    assertReconnection("streamingReconnectWithParameterGroupShowDsl", cursor, cursor);
+  }
+
+  @Test
+  public void cursorWithTypedValueInParameterGroupWithShowDslIsResetOnReconnection() throws Exception {
+    CursorStream signatureCursor = createMockCursor(ORIGINAL_POSITION, "hn");
+    CursorStream addressCursor = createMockCursorNotThrowingError(ORIGINAL_POSITION, "Juana Manso 999");
+
+    CoreEvent response = flowRunner("streamingReconnectWithParameterGroupShowDslWithTypedParameter")
+        .withVariable("signature", signatureCursor)
+        .withVariable("address", addressCursor)
+        .run();
+
+    assertCursor(signatureCursor, ORIGINAL_POSITION, 3);
+    assertCursor(addressCursor, ORIGINAL_POSITION, 3);
+    assertResponse(response);
+  }
+
+  @Test
+  public void cursorWithAliasInParameterGroupWithShowDslIsResetOnReconnection() throws Exception {
+    CursorStream signatureCursor = createMockCursor(ORIGINAL_POSITION, "hn");
+    CursorStream certificateCursor = createMockCursorNotThrowingError(ORIGINAL_POSITION, "ownership certificate");
+
+    CoreEvent response = flowRunner("streamingReconnectWithParameterGroupShowDslWithParameterWithAlias")
+        .withVariable("signature", signatureCursor)
+        .withVariable("certificate", certificateCursor)
+        .run();
+
+    assertCursor(signatureCursor, ORIGINAL_POSITION, 3);
+    assertCursor(certificateCursor, ORIGINAL_POSITION, 3);
+    assertResponse(response);
+  }
+
+  @Test
+  public void cursorWithTypedValueIsResetOnReconnection() throws Exception {
+    CursorStream cursor = createMockCursor(ORIGINAL_POSITION, "hn");
+    assertReconnection("streamingReconnectWithTypedParameter", cursor, cursor);
+  }
+
+  private void assertReconnection(String flowName, CursorStream cursor, Object container) throws Exception {
+    CoreEvent response = flowRunner(flowName).withVariable("signature", container).run();
+    assertCursor(cursor, ORIGINAL_POSITION, 3);
+    assertResponse(response);
+  }
+
+  private void assertCursor(CursorStream cursor, long position, int numberOfReads) throws IOException {
+    verify(cursor).seek(position);
+    verify(cursor, times(numberOfReads)).read(any(byte[].class), anyInt(), anyInt());
+  }
+
+  private void assertResponse(CoreEvent response) {
     final Object payload = response.getMessage().getPayload().getValue();
     assertThat(payload, is(instanceOf(List.class)));
     assertThat((List<String>) payload, hasSize(3));
   }
 
-  private CursorStream createMockCursor() throws IOException {
+  private CursorStream createMockCursor(long originalPosition, String data) throws IOException {
     CursorStream cursorStream = mock(CursorStream.class);
-    when(cursorStream.getPosition()).thenReturn(ORIGINAL_POSITION);
+    when(cursorStream.getPosition()).thenReturn(originalPosition);
     when(cursorStream.read(any(byte[].class), anyInt(), anyInt()))
         .thenThrow(new RuntimeException(new ConnectionException("kaboom")))
-        .thenAnswer(i -> {
-          byte[] buffer = (byte[]) i.getArguments()[0];
-          buffer[0] = 'h';
-          buffer[1] = 'n';
-
-          return 2;
-        })
+        .thenAnswer(i -> copyDataBytes(data, (byte[]) i.getArguments()[0]))
         .thenReturn(-1);
-
     return cursorStream;
+  }
+
+  private CursorStream createMockCursorNotThrowingError(long originalPosition, String data) throws IOException {
+    CursorStream cursorStream = mock(CursorStream.class);
+    when(cursorStream.getPosition()).thenReturn(originalPosition);
+    when(cursorStream.read(any(byte[].class), anyInt(), anyInt()))
+        .thenAnswer(i -> copyDataBytes(data, (byte[]) i.getArguments()[0]))
+        .thenReturn(-1);
+    return cursorStream;
+  }
+
+  private int copyDataBytes(String data, byte[] buffer) {
+    byte[] dataBuffer = data.getBytes();
+    System.arraycopy(dataBuffer, 0, buffer, 0, dataBuffer.length);
+    return dataBuffer.length;
   }
 }

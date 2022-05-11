@@ -6,38 +6,28 @@
  */
 package org.mule.runtime.extension.internal.loader;
 
-import static java.io.File.separator;
+import static java.lang.Boolean.getBoolean;
 import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toList;
-import static org.custommonkey.xmlunit.XMLUnit.setIgnoreAttributeOrder;
-import static org.custommonkey.xmlunit.XMLUnit.setIgnoreComments;
-import static org.custommonkey.xmlunit.XMLUnit.setIgnoreWhitespace;
-import static org.custommonkey.xmlunit.XMLUnit.setNormalizeWhitespace;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
-import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.XSD_SUFFIX;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
+import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.DefaultExtensionSchemaGenerator;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.Set;
 
-import org.custommonkey.xmlunit.DetailedDiff;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.Difference;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -47,41 +37,30 @@ import org.junit.runners.Parameterized;
  * @since 4.0
  */
 @RunWith(Parameterized.class)
-public class ModuleSchemaGeneratorTestCase extends AbstractMuleTestCase {
+public class ModuleSchemaGeneratorTestCase extends FileGenerationParameterizedExtensionModelTestCase {
 
-  @Parameterized.Parameter
-  public ExtensionModel extensionModel;
+  private static final String EXPECTED_FILES_DIR = "modules/schema/";
+  private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR =
+      getBoolean(SYSTEM_PROPERTY_PREFIX + "extensionSchemas.updateExpectedFilesOnError");
 
-  @Parameterized.Parameter(1)
-  public String expectedXSD;
-
-  @Parameterized.Parameter(2)
-  public String extensionName;
-
-  private DefaultExtensionSchemaGenerator extensionSchemaFactory;
+  private DefaultExtensionSchemaGenerator extensionSchemaFactory = new DefaultExtensionSchemaGenerator();
 
   @Parameterized.Parameters(name = "{index}: Validating xsd for {2}")
   public static Collection<Object[]> data() {
-    final Class classLoader = ModuleSchemaGeneratorTestCase.class;
-    final List<String> extensions = new ArrayList<String>() {
+    final List<String> extensions = asList(
+                                           "module-namespace-custom",
+                                           "module-param-default-types",
+                                           "module-param-custom-types",
+                                           "module-param-role",
+                                           "module-param-types",
+                                           "module-properties-default-types",
+                                           "module-properties-types",
+                                           "module-single-op-with-property",
+                                           "module-single-operation",
+                                           "module-single-operation-camelized");
 
-      {
-        add("module-namespace-custom");
-        add("module-param-default-types");
-        add("module-param-custom-types");
-        add("module-param-role");
-        add("module-param-types");
-        add("module-properties-default-types");
-        add("module-properties-types");
-        add("module-single-op-with-property");
-        add("module-single-operation");
-        add("module-single-operation-camelized");
-      }
-    };
-
-    Function<String, Object[]> stringFunction = moduleName -> {
-      String moduleNamePrefix = "modules/schema/" + moduleName;
-      String modulePath = moduleNamePrefix + ".xml";
+    return extensions.stream().map(moduleName -> {
+      String modulePath = EXPECTED_FILES_DIR + moduleName + ".xml";
 
       ClassLoader contextClassLoader = currentThread().getContextClassLoader();
       Map<String, Object> parameters = new HashMap<>();
@@ -89,48 +68,33 @@ public class ModuleSchemaGeneratorTestCase extends AbstractMuleTestCase {
       // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
       parameters.put("COMPILATION_MODE", true);
       ExtensionModel extensionModel =
-          new XmlExtensionModelLoader().loadExtensionModel(contextClassLoader, getDefault(emptySet()), parameters);
+          new XmlExtensionModelLoader().loadExtensionModel(contextClassLoader, getDefault(getDependencies()), parameters);
 
-      try {
-        return new Object[] {extensionModel,
-            IOUtils.getResourceAsString(moduleNamePrefix + XSD_SUFFIX, classLoader), extensionModel.getName()
-        };
-      } catch (IOException e) {
-        throw new IllegalArgumentException(String.format("Couldn't load .xsd for the [%s] module", moduleName));
-      }
-    };
-    return extensions.stream().map(stringFunction).collect(toList());
+      return new Object[] {extensionModel, moduleName + ".xsd"};
+    }).collect(toList());
   }
 
-  @Before
-  public void setUp() {
-    extensionSchemaFactory = new DefaultExtensionSchemaGenerator();
+  private static Set<ExtensionModel> getDependencies() {
+    return singleton(getExtensionModel());
   }
 
-  @Test
-  public void generateXsd() throws Exception {
-    String generatedSchema = extensionSchemaFactory.generate(extensionModel, getDefault(emptySet()));
-    compareXML(expectedXSD, generatedSchema);
+  @Override
+  protected boolean shouldUpdateExpectedFilesOnError() {
+    return UPDATE_EXPECTED_FILES_ON_ERROR;
   }
 
-  private void compareXML(String expected, String actual) throws Exception {
-    setNormalizeWhitespace(true);
-    setIgnoreWhitespace(true);
-    setIgnoreComments(true);
-    setIgnoreAttributeOrder(false);
+  @Override
+  protected String getExpectedFilesDir() {
+    return EXPECTED_FILES_DIR;
+  }
 
-    Diff diff = XMLUnit.compareXML(expected, actual);
-    if (!(diff.similar() && diff.identical())) {
-      System.out.println(actual);
-      DetailedDiff detDiff = new DetailedDiff(diff);
-      @SuppressWarnings("rawtypes")
-      List differences = detDiff.getAllDifferences();
-      StringBuilder diffLines = new StringBuilder();
-      for (Object object : differences) {
-        Difference difference = (Difference) object;
-        diffLines.append(difference.toString() + '\n');
-      }
-      throw new IllegalArgumentException("Actual XML differs from expected: \n" + diffLines.toString());
-    }
+  @Override
+  protected String doGenerate(ExtensionModel extensionUnderTest) {
+    return extensionSchemaFactory.generate(extensionUnderTest, getDefault(emptySet()));
+  }
+
+  @Override
+  protected void assertEquals(String expectedContent, String actualContent) throws Exception {
+    compareXML(expectedContent, actualContent);
   }
 }

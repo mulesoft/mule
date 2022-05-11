@@ -6,22 +6,29 @@
  */
 package org.mule.tck.util;
 
+import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
+import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
+import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
+import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
+
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
-import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
-import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withAnnotation;
@@ -30,36 +37,46 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.UUID;
+import org.mule.runtime.core.internal.config.CustomServiceRegistry;
+import org.mule.runtime.core.internal.config.DefaultCustomizationService;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
+import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
+import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -169,16 +186,20 @@ public class MuleContextUtils {
         mock(DefaultMuleContext.class,
              withSettings().defaultAnswer(RETURNS_DEEP_STUBS).extraInterfaces(PrivilegedMuleContext.class).lenient());
     when(muleContext.getUniqueIdString()).thenReturn(UUID.getUUID());
-    when(muleContext.getDefaultErrorHandler(empty())).thenReturn(new OnErrorPropagateHandler());
+    OnErrorPropagateHandler onError = new OnErrorPropagateHandler();
+    onError.setExceptionListener(new DefaultExceptionListener());
+    when(muleContext.getDefaultErrorHandler(empty())).thenReturn(onError);
 
     StreamingManager streamingManager = mock(StreamingManager.class, RETURNS_DEEP_STUBS);
     try {
-      MuleRegistry registry = mock(MuleRegistryHelper.class, withSettings().lenient());
+      MuleRegistryHelper registry = mock(MuleRegistryHelper.class, withSettings().lenient());
       when(muleContext.getRegistry()).thenReturn(registry);
       ComponentInitialStateManager componentInitialStateManager =
           mock(ComponentInitialStateManager.class, withSettings().lenient());
       when(componentInitialStateManager.mustStartMessageSource(any())).thenReturn(true);
+      when(registry.getDelegate()).thenReturn(registry);
       when(registry.lookupObject(ComponentInitialStateManager.SERVICE_ID)).thenReturn(componentInitialStateManager);
+      when(registry.lookupObject(FEATURE_FLAGGING_SERVICE_KEY)).thenReturn(mock(FeatureFlaggingService.class));
       doReturn(streamingManager).when(registry).lookupObject(StreamingManager.class);
       doReturn(mock(NotificationDispatcher.class)).when(registry).lookupObject(NotificationDispatcher.class);
       doReturn(mock(InterceptorManager.class)).when(registry).lookupObject(InterceptorManager.class);
@@ -197,21 +218,34 @@ public class MuleContextUtils {
   /**
    * Creates and configures a mock {@link MuleContext} to return testing services implementations.
    *
+   * @param coreProfilingService profiling service to use.
+   *
    * @return the created {@code muleContext}.
    */
-  public static MuleContextWithRegistry mockContextWithServices() {
+  public static MuleContextWithRegistry mockContextWithServicesWithProfilingService(
+                                                                                    InternalProfilingService coreProfilingService) {
     final MuleContextWithRegistry muleContext = mockMuleContext();
 
-    SchedulerService schedulerService = spy(new SimpleUnitTestSupportSchedulerService());
+    final ExtensionManager extensionManager = mock(ExtensionManager.class, withSettings().lenient());
+    when(extensionManager.getExtensions()).thenReturn(emptySet());
+    when(muleContext.getExtensionManager()).thenReturn(extensionManager);
 
+    CustomServiceRegistry customServices = new DefaultCustomizationService();
+    new TestServicesConfigurationBuilder(true, true).configure(customServices);
+    when(muleContext.getCustomizationService()).thenReturn(customServices);
+
+    SchedulerService schedulerService = spy(new SimpleUnitTestSupportSchedulerService());
     when(muleContext.getSchedulerService()).thenReturn(schedulerService);
 
-    ErrorTypeRepository errorTypeRepository = mock(ErrorTypeRepository.class, withSettings().lenient());
+    ContributedErrorTypeRepository errorTypeRepository = new ContributedErrorTypeRepository();
+    errorTypeRepository.setDelegate(MULE_CORE_ERROR_TYPE_REPOSITORY);
     when(muleContext.getErrorTypeRepository()).thenReturn(errorTypeRepository);
-    when(errorTypeRepository.getErrorType(any(ComponentIdentifier.class))).thenReturn(of(mock(ErrorType.class)));
 
-    ErrorTypeLocator typeLocator = mock(ErrorTypeLocator.class);
+    ErrorTypeLocator typeLocator = new ContributedErrorTypeLocator();
     when(((PrivilegedMuleContext) muleContext).getErrorTypeLocator()).thenReturn(typeLocator);
+
+    final MuleConfiguration configuration = muleContext.getConfiguration();
+    lenient().when(configuration.getMinMuleVersion()).thenReturn(of(new MuleVersion(getProductVersion())));
 
     final MuleRegistry registry = muleContext.getRegistry();
 
@@ -219,10 +253,13 @@ public class MuleContextUtils {
     ConfigurationProperties configProps = mock(ConfigurationProperties.class, withSettings().lenient());
     when(configProps.resolveBooleanProperty(any())).thenReturn(empty());
 
+    FeatureFlaggingService featureFlaggingService = mock(FeatureFlaggingService.class);
+
     ConfigurationComponentLocator configurationComponentLocator =
         mock(ConfigurationComponentLocator.class, withSettings().lenient());
     when(configurationComponentLocator.find(any(Location.class))).thenReturn(empty());
     when(configurationComponentLocator.find(any(ComponentIdentifier.class))).thenReturn(emptyList());
+    when(muleContext.getArtifactType()).thenReturn(APP);
 
     try {
       when(registry.lookupObject(NotificationListenerRegistry.class)).thenReturn(notificationListenerRegistry);
@@ -240,6 +277,9 @@ public class MuleContextUtils {
       injectableObjects.put(NotificationListenerRegistry.class, notificationListenerRegistry);
       injectableObjects.put(ConfigurationComponentLocator.class, configurationComponentLocator);
       injectableObjects.put(ConfigurationProperties.class, configProps);
+      injectableObjects.put(FeatureFlaggingService.class, featureFlaggingService);
+      injectableObjects.put(InternalProfilingService.class, coreProfilingService);
+      injectableObjects.put(ProfilingService.class, coreProfilingService);
 
       // Ensure injection of consistent mock objects
       when(muleContext.getInjector()).thenReturn(new MocksInjector(injectableObjects));
@@ -248,6 +288,17 @@ public class MuleContextUtils {
     }
 
     return muleContext;
+  }
+
+  /**
+   * Creates and configures a mock {@link MuleContext} to return testing services implementations.
+   *
+   * @return the created {@code muleContext}.
+   */
+  public static MuleContextWithRegistry mockContextWithServices() {
+    InternalProfilingService profilingService = mock(InternalProfilingService.class);
+    when(profilingService.getProfilingDataProducer(any(ProfilingEventType.class))).thenReturn(mock(ProfilingDataProducer.class));
+    return mockContextWithServicesWithProfilingService(profilingService);
   }
 
   /**
@@ -276,19 +327,6 @@ public class MuleContextUtils {
   }
 
   /**
-   * Will find a transformer that is the closest match to the desired input and output.
-   *
-   * @param source The desired input type for the transformer
-   * @param result the desired output type for the transformer
-   * @return A transformer that exactly matches or the will accept the input and output parameters
-   * @throws TransformerException will be thrown if there is more than one match
-   */
-  public static <T> Transformer lookupTransformer(MuleContextWithRegistry context, DataType source, DataType result)
-      throws TransformerException {
-    return context.getRegistry().lookupTransformer(source, result);
-  }
-
-  /**
    * Creates a basic event builder with its context already set.
    */
   public static <B extends CoreEvent.Builder> B eventBuilder() throws MuleException {
@@ -300,6 +338,7 @@ public class MuleContextUtils {
    */
   public static <B extends CoreEvent.Builder> B eventBuilder(MuleContext muleContext) throws MuleException {
     FlowConstruct flowConstruct = getTestFlow(muleContext);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerFlowConstruct(flowConstruct);
     return (B) InternalEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION));
   }
 

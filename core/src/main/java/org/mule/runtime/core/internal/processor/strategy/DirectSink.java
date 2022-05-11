@@ -33,8 +33,8 @@ class DirectSink implements Sink, Disposable {
   /**
    * Create new {@link DirectSink}.
    *
-   * @param function the processor to process events emitted onto stream, typically this processor will represent the flow
-   *        pipeline.
+   * @param function      the processor to process events emitted onto stream, typically this processor will represent the flow
+   *                      pipeline.
    * @param eventConsumer event consumer called just before {@link CoreEvent}'s emission.
    */
   public DirectSink(Function<Publisher<CoreEvent>, Publisher<CoreEvent>> function,

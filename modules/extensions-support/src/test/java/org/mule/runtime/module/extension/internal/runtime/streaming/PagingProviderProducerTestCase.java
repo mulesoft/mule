@@ -37,18 +37,21 @@ import org.mule.tck.size.SmallTest;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class PagingProviderProducerTestCase {
 
-  private ExtensionConnectionSupplier extensionConnectionSupplier = mock(ExtensionConnectionSupplier.class);
-  private ExecutionContextAdapter executionContext = mock(ExecutionContextAdapter.class);
-  private PagingProvider<Object, String> delegate = mock(PagingProvider.class);
-  private ConfigurationInstance config = mock(ConfigurationInstance.class);
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
+
+  private final ExtensionConnectionSupplier extensionConnectionSupplier = mock(ExtensionConnectionSupplier.class);
+  private final ExecutionContextAdapter executionContext = mock(ExecutionContextAdapter.class);
+  private final PagingProvider<Object, String> delegate = mock(PagingProvider.class);
+  private final ConfigurationInstance config = mock(ConfigurationInstance.class);
 
   private PagingProviderProducer<String> producer;
 

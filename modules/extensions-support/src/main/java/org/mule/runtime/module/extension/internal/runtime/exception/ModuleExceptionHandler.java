@@ -9,8 +9,9 @@ package org.mule.runtime.module.extension.internal.runtime.exception;
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
+import static org.mule.runtime.module.extension.internal.error.SdkErrorTypeDefinitionAdapter.from;
 import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsNamespace;
 
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -20,8 +21,8 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.exception.ModuleException;
+import org.mule.sdk.api.error.ErrorTypeDefinition;
 
 import java.util.Optional;
 import java.util.Set;
@@ -30,8 +31,8 @@ import java.util.function.Function;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 
 /**
- * Handler of {@link ModuleException ModuleExceptions}, which given a {@link Throwable} checks whether the exceptions is
- * {@link ModuleException}, and if is converts it to an {@link TypedException}.
+ * Handler of {@link ModuleException ModuleExceptions}, which given a {@link Throwable} checks whether the exceptions is a
+ * {@link ModuleException}, and in that case it's converted to a {@link TypedException}.
  *
  * @since 4.0
  */
@@ -91,11 +92,18 @@ public class ModuleExceptionHandler {
   public Throwable processException(Throwable throwable) {
     if (throwable instanceof ModuleException) {
       return handleTypedException(throwable, ((ModuleException) throwable).getType());
+    } else if (throwable instanceof org.mule.sdk.api.exception.ModuleException) {
+      return handleTypedException(throwable, ((org.mule.sdk.api.exception.ModuleException) throwable).getType());
     }
     return throwable;
   }
 
-  private Throwable handleTypedException(final Throwable exception, ErrorTypeDefinition errorDefinition) {
+  private Throwable handleTypedException(final Throwable exception,
+                                         org.mule.runtime.extension.api.error.ErrorTypeDefinition<?> errorDefinition) {
+    return new TypedException(getExceptionCause(exception), errorTypeCache.get(from(errorDefinition)).apply(exception));
+  }
+
+  private Throwable handleTypedException(final Throwable exception, ErrorTypeDefinition<?> errorDefinition) {
     return new TypedException(getExceptionCause(exception), errorTypeCache.get(errorDefinition).apply(exception));
   }
 
@@ -116,7 +124,8 @@ public class ModuleExceptionHandler {
 
   private Throwable getExceptionCause(Throwable throwable) {
     // For subclasses of ModuleException, we use it as it already contains additional information
-    if (throwable.getClass().equals(ModuleException.class)) {
+    if (throwable.getClass().equals(ModuleException.class) ||
+        throwable.getClass().equals(org.mule.sdk.api.exception.ModuleException.class)) {
       return throwable.getCause() != null
           ? suppressIfPresent(throwable.getCause(), MessagingException.class)
           : new MuleRuntimeException(createStaticMessage(throwable.getMessage()));

@@ -21,7 +21,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -51,10 +50,9 @@ abstract class AbstractCompletableMethodOperationExecutor<M extends ComponentMod
   @Inject
   private MuleContext muleContext;
 
-  public AbstractCompletableMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance,
-                                                    CursorComponentDecoratorFactory componentDecoratorFactory) {
+  public AbstractCompletableMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
     executor = new GeneratedMethodComponentExecutor<>(operationModel.getParameterGroupModels(),
-                                                      operationMethod, operationInstance, componentDecoratorFactory);
+                                                      operationMethod, operationInstance);
   }
 
   @Override

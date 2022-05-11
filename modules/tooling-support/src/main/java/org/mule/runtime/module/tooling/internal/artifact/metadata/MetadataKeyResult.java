@@ -9,8 +9,8 @@ package org.mule.runtime.module.tooling.internal.artifact.metadata;
 import org.mule.runtime.api.metadata.MetadataKey;
 
 /**
- * Adds information regarding a {@link MetadataKey} whether it is complete (has all required parts)
- * or not and in the case it is not complete, the reason why.
+ * Adds information regarding a {@link MetadataKey} whether it is complete (has all required parts) or not and in the case it is
+ * not complete, the reason why.
  */
 public class MetadataKeyResult {
 

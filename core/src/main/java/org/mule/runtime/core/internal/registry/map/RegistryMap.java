@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.internal.registry.map;
 
+import static java.util.stream.Collectors.toList;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 
 import java.util.Collection;
@@ -18,8 +20,8 @@ import java.util.TreeSet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Predicate;
 
-import org.apache.commons.collections.Predicate;
 import org.slf4j.Logger;
 
 /**
@@ -42,7 +44,7 @@ public class RegistryMap {
     }
   });
 
-  private Logger logger;
+  private final Logger logger;
 
   public RegistryMap(Logger log) {
     super();
@@ -53,7 +55,10 @@ public class RegistryMap {
     Lock readLock = registryLock.readLock();
     try {
       readLock.lock();
-      return org.apache.commons.collections.CollectionUtils.select(registry.values(), predicate);
+      return (Collection<?>) registry.values()
+          .stream()
+          .filter(predicate)
+          .collect(toList());
     } finally {
       readLock.unlock();
     }

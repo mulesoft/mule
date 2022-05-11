@@ -6,12 +6,16 @@
  */
 package org.mule.runtime.core.internal.registry;
 
+import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
+
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -19,6 +23,7 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.internal.registry.map.RegistryMap;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.feature.internal.config.DefaultFeatureFlaggingService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
@@ -44,6 +49,16 @@ public class SimpleRegistryTestCase extends AbstractMuleContextTestCase {
 
     muleContext.dispose();
     assertEquals(LIFECYCLE_PHASES, tracker.getTracker().toString());
+  }
+
+  @Test
+  public void featureFlaggingService() throws Exception {
+    muleContext.start();
+
+    DefaultFeatureFlaggingService featureFlaggingService =
+        (DefaultFeatureFlaggingService) getRegistry().get(FEATURE_FLAGGING_SERVICE_KEY);
+
+    assertThat(featureFlaggingService.getArtfactName(), equalTo("SimpleRegistryTestCase#featureFlaggingService"));
   }
 
   @Test

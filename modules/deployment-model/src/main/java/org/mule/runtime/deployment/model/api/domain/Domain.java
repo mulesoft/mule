@@ -17,7 +17,7 @@ import org.mule.runtime.deployment.model.api.application.Application;
  * resources such as connectors or other mule components.
  */
 @NoImplement
-public interface Domain extends DeployableArtifact<DomainDescriptor> {
+public interface Domain extends DeployableArtifact<org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor> {
 
   /**
    * @return true if this domain has shared mule components, false if it doesn't

@@ -6,7 +6,7 @@
  */
 package org.mule.test.heisenberg.extension.exception;
 
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
+import org.mule.sdk.api.runtime.exception.ExceptionHandler;
 
 public class NullExceptionEnricher extends ExceptionHandler {
 

@@ -230,7 +230,7 @@ final class LoggerContextConfigurer {
 
     String artifactName = context.getArtifactName();
 
-    String logName = format(logFileNameTemplate, (artifactName != null ? artifactName : ""));
+    String logName = format(logFileNameTemplate, (artifactName != null ? artifactName.replace(":", "-") : ""));
     File logDir = new File(getMuleBase(), "logs");
     File logFile = new File(logDir, logName);
 

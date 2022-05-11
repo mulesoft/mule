@@ -14,7 +14,7 @@ public class TestSingleConfigExtensionOperations {
   /**
    * Operation with description
    *
-   * @param friend This is one of my friends
+   * @param friend      This is one of my friends
    * @param otherFriend Some other friend
    */
   public void operation(@Connection String friend, String otherFriend) {}

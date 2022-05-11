@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.config.dsl.connection;
 
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -53,6 +55,9 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
 
   private PoolingProfile poolingProfile = null;
   private ReconnectionConfig reconnectionConfig = ReconnectionConfig.getDefault();
+
+  @Inject
+  private ConfigurationProperties properties;
 
   @Inject
   private MuleContext muleContext;

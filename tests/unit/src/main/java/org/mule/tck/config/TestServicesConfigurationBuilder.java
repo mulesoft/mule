@@ -4,20 +4,26 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.tck.config;
 
-import static org.hamcrest.collection.IsEmptyCollection.empty;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+
+import org.mule.runtime.api.config.custom.CustomizationService;
+import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
+import org.mule.runtime.api.el.DefaultValidationResult;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ExpressionLanguageConfiguration;
 import org.mule.runtime.api.exception.MuleException;
@@ -29,6 +35,9 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.http.api.HttpService;
+import org.mule.runtime.http.api.server.HttpServer;
+import org.mule.runtime.http.api.server.HttpServerFactory;
+import org.mule.runtime.http.api.server.ServerCreationException;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
@@ -47,8 +56,9 @@ import org.junit.runners.model.Statement;
  *
  * @since 4.0
  */
-public class TestServicesConfigurationBuilder extends AbstractConfigurationBuilder implements TestRule {
+public class TestServicesConfigurationBuilder extends AbstractConfigurationBuilder implements ServiceConfigurator, TestRule {
 
+  private static final DefaultValidationResult SUCCESS_VALIDATION_RESULT = new DefaultValidationResult(true, null);
   private static final String MOCK_HTTP_SERVICE = "mockHttpService";
   private static final String MOCK_EXPR_EXECUTOR = "mockExpressionExecutor";
 
@@ -78,62 +88,109 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
     withContextClassLoader(TestServicesConfigurationBuilder.class.getClassLoader(), () -> {
       try {
         MuleRegistry registry = ((MuleContextWithRegistry) muleContext).getRegistry();
-        registry.registerObject(schedulerService.getName(), spy(schedulerService));
-        registry.registerObject(OBJECT_SCHEDULER_BASE_CONFIG, config());
-
-        if (mockExpressionExecutor) {
-          DefaultExpressionLanguageFactoryService expressionExecutor =
-              mock(DefaultExpressionLanguageFactoryService.class, RETURNS_DEEP_STUBS);
-          registry.registerObject(MOCK_EXPR_EXECUTOR, expressionExecutor);
-        } else {
-          // Avoid doing the DW warm-up for every test, reusing the ExpressionLanguage implementation
-          // Still have to recreate ever once in a while so global bindings added for each test are accumulated.
-          if (cachedExprLanguageFactory == null || cachedExprLanguageFactoryCounter > 20) {
-            cachedExprLanguageFactoryCounter = 0;
-            final DefaultExpressionLanguageFactoryService exprExecutor = new WeaveDefaultExpressionLanguageFactoryService(null);
-            ExpressionLanguage exprLanguage = exprExecutor.create();
-            // Force initialization of internal DataWeave stuff
-            // This way we avoid doing some heavy initialization on the test itself,
-            // which may cause trouble when evaluation expressions in places with small timeouts
-            exprLanguage.evaluate("{dataWeave: 'is'} ++ {mule: 'default EL'}", NULL_BINDING_CONTEXT);
-
-            cachedExprLanguageFactory = new DefaultExpressionLanguageFactoryService() {
-
-              @Override
-              public ExpressionLanguage create() {
-                return exprLanguage;
-              }
-
-              @Override
-              public ExpressionLanguage create(ExpressionLanguageConfiguration configuration) {
-                return exprLanguage;
-              }
-
-              @Override
-              public String getName() {
-                return exprExecutor.getName();
-              }
-            };
-          } else {
-            cachedExprLanguageFactoryCounter++;
-          }
-
-          registry.registerObject(cachedExprLanguageFactory.getName(), cachedExprLanguageFactory);
-        }
-
-        if (mockHttpService) {
-          registry.registerObject(MOCK_HTTP_SERVICE, mock(HttpService.class));
-        }
-
-        overriddenDefaultServices.forEach((serviceId, serviceImpl) -> {
-          ((MuleContextWithRegistry) muleContext).getCustomizationService().overrideDefaultServiceImpl(serviceId, serviceImpl);
-        });
+        registerServices(muleContext, registry);
 
         registry.registerObjects(additionalMockedServices);
       } catch (RegistrationException e) {
         throw new MuleRuntimeException(e);
       }
     });
+  }
+
+  @Override
+  public void configure(CustomizationService customizationService) {
+    customizationService.registerCustomServiceImpl(schedulerService.getName(),
+                                                   spy(schedulerService));
+    if (mockExpressionExecutor) {
+      customizationService.registerCustomServiceImpl(MOCK_EXPR_EXECUTOR,
+                                                     createMockExpressionExecutor());
+    } else {
+      initCachedExprLanguageFactory();
+      customizationService.registerCustomServiceImpl(MOCK_EXPR_EXECUTOR,
+                                                     cachedExprLanguageFactory);
+    }
+    if (mockHttpService) {
+      customizationService.registerCustomServiceImpl(MOCK_HTTP_SERVICE, mockHttpService());
+    }
+  }
+
+  protected void registerServices(MuleContext muleContext, MuleRegistry registry) throws RegistrationException {
+    registry.registerObject(schedulerService.getName(), spy(schedulerService));
+    registry.registerObject(OBJECT_SCHEDULER_BASE_CONFIG, config());
+
+    if (mockExpressionExecutor) {
+      registry.registerObject(MOCK_EXPR_EXECUTOR, createMockExpressionExecutor());
+    } else {
+      initCachedExprLanguageFactory();
+      registry.registerObject(cachedExprLanguageFactory.getName(), cachedExprLanguageFactory);
+    }
+
+    if (mockHttpService) {
+      registry.registerObject(MOCK_HTTP_SERVICE, mockHttpService());
+    }
+
+    overriddenDefaultServices.forEach((serviceId, serviceImpl) -> {
+      ((MuleContextWithRegistry) muleContext).getCustomizationService().overrideDefaultServiceImpl(serviceId, serviceImpl);
+    });
+  }
+
+  protected void initCachedExprLanguageFactory() {
+    // Avoid doing the DW warm-up for every test, reusing the ExpressionLanguage implementation
+    // Still have to recreate ever once in a while so global bindings added for each test are accumulated.
+    if (cachedExprLanguageFactory == null || cachedExprLanguageFactoryCounter > 20) {
+      cachedExprLanguageFactoryCounter = 0;
+      final DefaultExpressionLanguageFactoryService exprExecutor = new WeaveDefaultExpressionLanguageFactoryService(null);
+      ExpressionLanguage exprLanguage = exprExecutor.create();
+      // Force initialization of internal DataWeave stuff
+      // This way we avoid doing some heavy initialization on the test itself,
+      // which may cause trouble when evaluation expressions in places with small timeouts
+      exprLanguage.evaluate("{dataWeave: 'is'} ++ {mule: 'default EL'}", NULL_BINDING_CONTEXT);
+
+      cachedExprLanguageFactory = new DefaultExpressionLanguageFactoryService() {
+
+        @Override
+        public ExpressionLanguage create() {
+          return exprLanguage;
+        }
+
+        @Override
+        public ExpressionLanguage create(ExpressionLanguageConfiguration configuration) {
+          return exprLanguage;
+        }
+
+        @Override
+        public String getName() {
+          return exprExecutor.getName();
+        }
+      };
+    } else {
+      cachedExprLanguageFactoryCounter++;
+    }
+  }
+
+  protected DefaultExpressionLanguageFactoryService createMockExpressionExecutor() {
+    ExpressionLanguage lang = mock(ExpressionLanguage.class, RETURNS_DEEP_STUBS);
+    when(lang.validate(anyString())).thenReturn(SUCCESS_VALIDATION_RESULT);
+
+    DefaultExpressionLanguageFactoryService languageFactoryService =
+        mock(DefaultExpressionLanguageFactoryService.class, RETURNS_DEEP_STUBS);
+    when(languageFactoryService.create()).thenReturn(lang);
+    when(languageFactoryService.create(any())).thenReturn(lang);
+
+    return languageFactoryService;
+  }
+
+  protected HttpService mockHttpService() {
+    try {
+      HttpServerFactory httpServerFactory = mock(HttpServerFactory.class);
+      HttpServer httpServer = mock(HttpServer.class);
+      when(httpServerFactory.create(any())).thenReturn(httpServer);
+      HttpService service = mock(HttpService.class);
+      when(service.getServerFactory()).thenReturn(httpServerFactory);
+      return service;
+    } catch (ServerCreationException e) {
+      return null;
+    }
   }
 
   public void stopServices() throws MuleException {

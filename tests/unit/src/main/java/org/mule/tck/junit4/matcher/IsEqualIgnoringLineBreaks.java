@@ -8,13 +8,12 @@
 package org.mule.tck.junit4.matcher;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
 /**
- * Tests if a {@link String} is equal to another string, regardless of the line breaks,helpful when dealing with
- * cross-platform tests
+ * Tests if a {@link String} is equal to another string, regardless of the line breaks,helpful when dealing with cross-platform
+ * tests
  *
  * @since 4.0
  */
@@ -44,7 +43,6 @@ public class IsEqualIgnoringLineBreaks extends TypeSafeMatcher<String> {
     description.appendText("equalToIgnoringLineBreaks(").appendValue(this.string).appendText(")");
   }
 
-  @Factory
   public static Matcher<String> equalToIgnoringLineBreaks(String expectedString) {
     return new IsEqualIgnoringLineBreaks(expectedString);
   }

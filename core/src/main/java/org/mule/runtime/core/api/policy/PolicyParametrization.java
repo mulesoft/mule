@@ -38,12 +38,13 @@ public final class PolicyParametrization {
   /**
    * Creates a new parametrization
    *
-   * @param id parametrization identifier. Non empty.
-   * @param pointcut used to determine if the policy must be applied on a given request. Non null.
-   * @param order indicates how this policy must be ordered related to other applied policies. A policy with a given order has to
-   *        be applied before polices with smaller order and after policies with bigger order. Must be positive
-   * @param parameters parameters for the policy template on which the parametrization is based on. Non null.
-   * @param config Mule XML configuration file for creating the policy. Non null.
+   * @param id                    parametrization identifier. Non empty.
+   * @param pointcut              used to determine if the policy must be applied on a given request. Non null.
+   * @param order                 indicates how this policy must be ordered related to other applied policies. A policy with a
+   *                              given order has to be applied before polices with smaller order and after policies with bigger
+   *                              order. Must be positive
+   * @param parameters            parameters for the policy template on which the parametrization is based on. Non null.
+   * @param config                Mule XML configuration file for creating the policy. Non null.
    * @param notificationListeners notifications listener to be added to policy's context. Non null.
    */
   public PolicyParametrization(String id, PolicyPointcut pointcut, int order, Map<String, String> parameters, File config,
@@ -66,12 +67,13 @@ public final class PolicyParametrization {
   /**
    * Creates a new parametrization
    *
-   * @param id parametrization identifier. Non empty.
-   * @param pointcut used to determine if the policy must be applied on a given request. Non null.
-   * @param order indicates how this policy must be ordered related to other applied policies. A policy with a given order has to
-   *        be applied before polices with smaller order and after policies with bigger order. Must be positive
-   * @param parameters parameters for the policy template on which the parametrization is based on. Non null.
-   * @param config Mule XML configuration file for creating the policy. Non null.
+   * @param id                    parametrization identifier. Non empty.
+   * @param pointcut              used to determine if the policy must be applied on a given request. Non null.
+   * @param order                 indicates how this policy must be ordered related to other applied policies. A policy with a
+   *                              given order has to be applied before polices with smaller order and after policies with bigger
+   *                              order. Must be positive
+   * @param parameters            parameters for the policy template on which the parametrization is based on. Non null.
+   * @param config                Mule XML configuration file for creating the policy. Non null.
    * @param notificationListeners notifications listener to be added to policy's context. Non null.
    *
    * @deprecated Use {@link #PolicyParametrization(String, PolicyPointcut, int, Map, File, List)} instead.

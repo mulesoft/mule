@@ -22,7 +22,7 @@ public interface ResponseCompletionCallback {
   /**
    * Notifies that the response writing failed
    *
-   * @param e the exception thrown during response writing
+   * @param e     the exception thrown during response writing
    * @param event the event that was the source for the response.
    * @return the event that is the result of the exception strategy.
    */

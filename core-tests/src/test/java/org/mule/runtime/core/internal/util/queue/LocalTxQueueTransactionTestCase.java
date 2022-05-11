@@ -6,9 +6,14 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.sleep;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
@@ -23,8 +28,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
@@ -41,9 +44,13 @@ import java.io.Serializable;
 import java.util.concurrent.locks.Lock;
 
 import org.apache.commons.lang3.NotImplementedException;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
 import org.mockito.stubbing.Answer;
 
 public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase {
@@ -63,6 +70,16 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
   private PersistentQueueTransactionContext persistentTransactionContext;
   private LocalTxQueueTransactionRecoverer queueTransactionRecoverer;
   private LocalTxQueueTransactionContext localTxTransactionContext;
+
+  @Before
+  public void setUp() {
+    currentMuleContext.set(muleContext);
+  }
+
+  @After
+  public void teardown() {
+    currentMuleContext.set(null);
+  }
 
   @Override
   protected void doSetUp() throws Exception {

@@ -8,9 +8,9 @@ package org.mule.runtime.core.internal.value.cache;
 
 import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
-import static java.util.Objects.hash;
 import static org.mule.runtime.app.declaration.internal.utils.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
+
 import org.mule.runtime.extension.api.values.ValueProvider;
 
 import java.util.ArrayList;
@@ -21,9 +21,9 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * A unique identifier for the values resolved by a {@link ValueProvider} associated with a given component.
- * The ValueProviderCacheId provides a unique hashed value for the resolved values of a value provider taking into consideration
- * all the relevant parts involved in the resolution mechanism.
+ * A unique identifier for the values resolved by a {@link ValueProvider} associated with a given component. The
+ * ValueProviderCacheId provides a unique hashed value for the resolved values of a value provider taking into consideration all
+ * the relevant parts involved in the resolution mechanism.
  *
  * A {@link ValueProviderCacheId} is expected to be immutable, except from it's attributes, which can be modified on any instance.
  * They are intended to add additional information regarding how the {@link ValueProviderCacheId} was generated, but will not
@@ -115,7 +115,7 @@ public class ValueProviderCacheId {
     }
 
     public ValueProviderCacheIdBuilder withHashValueFrom(Object hashedObject) {
-      this.hashValue = Integer.toString(hash(hashedObject));
+      this.hashValue = Integer.toString(Objects.hashCode((hashedObject)));
       return this;
     }
 
