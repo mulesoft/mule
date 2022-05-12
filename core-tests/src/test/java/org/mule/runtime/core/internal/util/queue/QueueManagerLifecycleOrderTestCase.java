@@ -39,7 +39,7 @@ import org.mule.runtime.core.api.util.queue.QueueSession;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
-import org.mule.runtime.core.internal.profiling.CoreProfilingService;
+import org.mule.runtime.core.internal.profiling.ReactorAwareProfilingService;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -74,7 +74,7 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
     objects.put(OBJECT_QUEUE_MANAGER, rtqm);
     objects.put(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager());
     objects.put(INTERCEPTOR_MANAGER_REGISTRY_KEY, mock(InterceptorManager.class));
-    CoreProfilingService coreProfilingService = mock(CoreProfilingService.class);
+    ReactorAwareProfilingService coreProfilingService = mock(ReactorAwareProfilingService.class);
     objects.put(MULE_PROFILING_SERVICE_KEY, coreProfilingService);
 
     mockProcessingStrategyProfilingChainWithoutTriggeringEvent(coreProfilingService);

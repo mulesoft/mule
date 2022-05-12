@@ -17,12 +17,14 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 
 import java.util.function.Function;
 
@@ -31,17 +33,17 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * A {@link CoreProfilingService} that may not produce profiling data if the profiling functionality is totally disabled.
+ * A {@link ReactorAwareProfilingService} that may not produce profiling data if the profiling functionality is totally disabled.
  *
  * @see DefaultProfilingService
  * @see NoOpProfilingService
  */
-public class ProfilingServiceWrapper implements CoreProfilingService, Lifecycle {
+public class ProfilingServiceWrapper implements ReactorAwareProfilingService, PrivilegedProfilingService, Lifecycle {
 
   @Inject
   MuleContext muleContext;
 
-  CoreProfilingService profilingService;
+  ReactorAwareProfilingService profilingService;
 
   @Inject
   FeatureFlaggingService featureFlaggingService;
@@ -49,35 +51,45 @@ public class ProfilingServiceWrapper implements CoreProfilingService, Lifecycle 
   @Override
   public <T extends ProfilingEventContext, S> ProfilingDataProducer<T, S> getProfilingDataProducer(
                                                                                                    ProfilingEventType<T> profilingEventType) {
-    return getProfilingDataProducer().getProfilingDataProducer(profilingEventType);
+    return getProfilingService().getProfilingDataProducer(profilingEventType);
   }
 
   @Override
   public <T extends ProfilingEventContext, S> ProfilingDataProducer<T, S> getProfilingDataProducer(
                                                                                                    ProfilingEventType<T> profilingEventType,
                                                                                                    ProfilingProducerScope producerScope) {
-    return getProfilingDataProducer().getProfilingDataProducer(profilingEventType, producerScope);
+    return getProfilingService().getProfilingDataProducer(profilingEventType, producerScope);
   }
 
   @Override
   public <T extends ProfilingEventContext, S> void registerProfilingDataProducer(ProfilingEventType<T> profilingEventType,
                                                                                  ProfilingDataProducer<T, S> profilingDataProducer) {
-    getProfilingDataProducer().registerProfilingDataProducer(profilingEventType, profilingDataProducer);
+    getProfilingService().registerProfilingDataProducer(profilingEventType, profilingDataProducer);
+  }
+
+  @Override
+  public <T extends ProfilingEventContext> void registerProfilingDataConsumer(ProfilingDataConsumer<T> profilingDataConsumer) {
+    // This is a privileged operation that has only to be invoked by a certain test connectors
+    // The API for this will not be generally available.
+    if (profilingService instanceof PrivilegedProfilingService) {
+      ((PrivilegedProfilingService) getProfilingService()).registerProfilingDataConsumer(profilingDataConsumer);
+    }
   }
 
   @Override
   public ThreadSnapshotCollector getThreadSnapshotCollector() {
-    return getProfilingDataProducer().getThreadSnapshotCollector();
+    return getProfilingService().getThreadSnapshotCollector();
   }
 
-  public CoreProfilingService getProfilingDataProducer() throws MuleRuntimeException {
+
+  public ReactorAwareProfilingService getProfilingService() throws MuleRuntimeException {
     if (profilingService != null) {
       return profilingService;
     }
     return initialiseProfilingService();
   }
 
-  private CoreProfilingService initialiseProfilingService() throws MuleRuntimeException {
+  private ReactorAwareProfilingService initialiseProfilingService() throws MuleRuntimeException {
     if (featureFlaggingService.isEnabled(ENABLE_PROFILING_SERVICE)) {
       profilingService = new DefaultProfilingService();
     } else {

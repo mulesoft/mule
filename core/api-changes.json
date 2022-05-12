@@ -166,6 +166,14 @@
           "classSimpleName": "TransactionUtils",
           "elementKind": "class",
           "justification": "W-10816523: Transaction event support"
+        },
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService",
+          "package": "org.mule.runtime.core.privileged.profiling",
+          "classSimpleName": "PrivilegedProfilingService",
+          "elementKind": "interface",
+          "justification": "W-10890449: export privileged profiling api"
         }
       ]
     }

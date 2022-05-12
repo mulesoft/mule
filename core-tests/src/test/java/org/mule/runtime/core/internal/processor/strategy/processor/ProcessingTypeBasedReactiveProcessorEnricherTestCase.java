@@ -10,6 +10,7 @@ package org.mule.runtime.core.internal.processor.strategy.processor;
 import static java.util.Arrays.asList;
 import static java.util.function.UnaryOperator.identity;
 import static org.junit.runners.Parameterized.Parameters;
+import static org.mockito.Answers.RETURNS_MOCKS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
@@ -30,8 +31,8 @@ import org.mule.runtime.core.internal.processor.strategy.enricher.CpuLiteNonBloc
 import org.mule.runtime.core.internal.processor.strategy.enricher.ProactorProcessingStrategyEnricher;
 import org.mule.runtime.core.internal.processor.strategy.enricher.ProcessingTypeBasedReactiveProcessorEnricher;
 import org.mule.runtime.core.internal.processor.strategy.enricher.ReactiveProcessorEnricher;
-import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.internal.util.rx.ImmediateScheduler;
+import org.mule.runtime.core.internal.profiling.ReactorAwareProfilingService;
 
 import java.util.Collection;
 import java.util.concurrent.Callable;
@@ -73,8 +74,8 @@ public class ProcessingTypeBasedReactiveProcessorEnricherTestCase extends Abstra
   @Spy
   private ImmediateScheduler cpuLiteAsyncScheduler;
 
-  @Mock
-  private CoreProfilingService profilingService;
+  @Mock(answer = RETURNS_MOCKS)
+  private ReactorAwareProfilingService profilingService;
 
   @Mock
   private CoreEvent coreEvent;

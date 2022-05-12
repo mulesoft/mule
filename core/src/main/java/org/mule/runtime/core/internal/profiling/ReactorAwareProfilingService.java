@@ -16,11 +16,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * A Profiling Service that adds some extra internal functionality. This is used only by the runtime core.
+ * A Profiling Service that adds some extra internal functionality related to reactor. This is used only by the runtime core.
  *
  * @since 4.5.0
  */
-public interface CoreProfilingService extends ProfilingService {
+public interface ReactorAwareProfilingService extends ProfilingService {
 
   /**
    * Enriches {@link Mono} with profiling event.

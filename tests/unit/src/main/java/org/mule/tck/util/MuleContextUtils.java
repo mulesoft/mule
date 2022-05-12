@@ -52,7 +52,6 @@ import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -71,6 +70,7 @@ import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.core.internal.profiling.ReactorAwareProfilingService;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
@@ -86,8 +86,6 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 import org.mockito.Mockito;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * Provides helper methods to handle mock {@link MuleContext}s in unit tests.
@@ -216,7 +214,8 @@ public class MuleContextUtils {
    *
    * @return the created {@code muleContext}.
    */
-  public static MuleContextWithRegistry mockContextWithServicesWithProfilingService(CoreProfilingService coreProfilingService) {
+  public static MuleContextWithRegistry mockContextWithServicesWithProfilingService(
+                                                                                    ReactorAwareProfilingService coreProfilingService) {
     final MuleContextWithRegistry muleContext = mockMuleContext();
 
     final ExtensionManager extensionManager = mock(ExtensionManager.class, withSettings().lenient());
@@ -268,7 +267,7 @@ public class MuleContextUtils {
       injectableObjects.put(ConfigurationComponentLocator.class, configurationComponentLocator);
       injectableObjects.put(ConfigurationProperties.class, configProps);
       injectableObjects.put(FeatureFlaggingService.class, featureFlaggingService);
-      injectableObjects.put(CoreProfilingService.class, coreProfilingService);
+      injectableObjects.put(ReactorAwareProfilingService.class, coreProfilingService);
       injectableObjects.put(ProfilingService.class, coreProfilingService);
 
       // Ensure injection of consistent mock objects
@@ -286,7 +285,7 @@ public class MuleContextUtils {
    * @return the created {@code muleContext}.
    */
   public static MuleContextWithRegistry mockContextWithServices() {
-    CoreProfilingService profilingService = mock(CoreProfilingService.class);
+    ReactorAwareProfilingService profilingService = mock(ReactorAwareProfilingService.class);
     lenient().when(profilingService.getProfilingDataProducer(any(ProfilingEventType.class)))
         .thenReturn(mock(ProfilingDataProducer.class));
     return mockContextWithServicesWithProfilingService(profilingService);

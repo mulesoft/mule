@@ -24,9 +24,9 @@ import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyPr
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
 import org.reactivestreams.Publisher;
+import org.mule.runtime.core.internal.profiling.ReactorAwareProfilingService;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
@@ -46,7 +46,7 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
   private final ReactiveProcessor pipeline;
   private final ClassLoader executionClassloader;
   private ScheduledExecutorService scheduler;
-  private CoreProfilingService profilingService;
+  private ReactorAwareProfilingService profilingService;
 
   private PipelineProcessingStrategyReactiveProcessorBuilder(ReactiveProcessor pipeline, ClassLoader executionClassloader,
                                                              String artifactId, String artifactType) {
@@ -83,7 +83,7 @@ public class PipelineProcessingStrategyReactiveProcessorBuilder {
    * @return the builder with decorator set.
    */
   public PipelineProcessingStrategyReactiveProcessorBuilder withProfilingService(
-                                                                                 CoreProfilingService profilingService) {
+                                                                                 ReactorAwareProfilingService profilingService) {
     this.profilingService = profilingService;
     return this;
   }

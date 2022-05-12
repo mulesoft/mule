@@ -21,8 +21,8 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.enricher.AbstractEnrichedReactiveProcessorTestCase;
 import org.mule.runtime.core.internal.processor.strategy.enricher.CpuLiteAsyncNonBlockingProcessingStrategyEnricher;
 import org.mule.runtime.core.internal.processor.strategy.enricher.CpuLiteNonBlockingProcessingStrategyEnricher;
-import org.mule.runtime.core.internal.profiling.CoreProfilingService;
 import org.mule.runtime.core.internal.util.rx.ImmediateScheduler;
+import org.mule.runtime.core.internal.profiling.ReactorAwareProfilingService;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -50,7 +50,7 @@ public class CpuLiteProcessingStrategyEnricherTestCase extends AbstractEnrichedR
   private CoreEvent coreEvent;
 
   @Mock
-  private CoreProfilingService profilingService;
+  private ReactorAwareProfilingService profilingService;
 
   @Before
   public void before() {
