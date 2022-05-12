@@ -28,11 +28,13 @@ public class DefaultLifecycleManagerTestCase extends AbstractMuleTestCase {
     Lifecycle configurationProviderToolingAdapter = mock(Lifecycle.class);
     LifecycleCallback lifecycleCallback = mock(LifecycleCallback.class);
     doThrow(new DefaultMuleException("Test exception")).when(lifecycleCallback).onTransition(any(), any());
-    
-    DefaultLifecycleManager defaultLifecycleManager = new DefaultLifecycleManager("org.mule.runtime.module.extension.internal.runtime.config.ConfigurationProviderToolingAdapter-lisConfig", configurationProviderToolingAdapter);
+
+    DefaultLifecycleManager defaultLifecycleManager =
+        new DefaultLifecycleManager("org.mule.runtime.module.extension.internal.runtime.config.ConfigurationProviderToolingAdapter-lisConfig",
+                                    configurationProviderToolingAdapter);
     DefaultLifecycleManager defaultLifecycleManagerSpy = spy(defaultLifecycleManager);
     doNothing().when(defaultLifecycleManagerSpy).checkPhase(any());
-    
+
     defaultLifecycleManagerSpy.fireStartPhase(lifecycleCallback);
   }
 }
