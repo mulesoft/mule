@@ -248,14 +248,14 @@ public class MuleContainer {
           Class.forName(System.getProperty(PROPERTY_FIPS_PROVIDER, "org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider"));
       Constructor<?> constructor = classDef.getConstructor();
       Provider fipsProvider = (Provider) constructor.newInstance();
-      java.security.Security.insertProviderAt(fipsProvider, 1);
+      Security.insertProviderAt(fipsProvider, 1);
 
       classDef =
           Class.forName(System.getProperty(PROPERTY_JSSE_PROVIDER, "org.bouncycastle.jsse.provider.BouncyCastleJsseProvider"));
       constructor = classDef.getConstructor();
       Provider jsseProvider = (Provider) constructor.newInstance();
       jsseProvider.setProperty(FIPS_KEY, FIPS_VALUE);
-      java.security.Security.insertProviderAt(jsseProvider, 2);
+      Security.insertProviderAt(jsseProvider, 2);
 
       Provider sunJsseProvider = Security.getProvider(SUN_JSSE_PROVIDER);
       // for java 8
