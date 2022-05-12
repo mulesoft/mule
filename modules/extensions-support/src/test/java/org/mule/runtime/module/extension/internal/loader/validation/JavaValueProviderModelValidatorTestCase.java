@@ -23,6 +23,7 @@ import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeAnnotation;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.impl.DefaultNumberType;
 import org.mule.metadata.api.model.impl.DefaultStringType;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
@@ -69,7 +70,8 @@ public class JavaValueProviderModelValidatorTestCase {
   private final MetadataType STRING_TYPE = loader.load(String.class);
   private final MetadataType NUMBER_TYPE = loader.load(Integer.class);
   private final MetadataType OBJECT_TYPE = loader.load(InputStream.class);
-  private final MetadataType STRING_TYPE_WITH_ANNOTATIONS = new DefaultStringType(MetadataFormat.JAVA, createAnnotations());
+  private final MetadataType STRING_TYPE_WITH_ANNOTATIONS = new DefaultStringType(MetadataFormat.JAVA, createStringAnnotations());
+  private final MetadataType NUMBER_TYPE_WITH_ANNOTATIONS = new DefaultNumberType(MetadataFormat.JAVA, createNumberAnnotations());
   private JavaValueProviderModelValidator valueProviderModelValidator;
 
   private ProblemsReporter problemsReporter;
@@ -290,7 +292,19 @@ public class JavaValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void valueProviderParameterTypeShouldBeCheckAgainstJavaType() {
+  public void stringTypeEnumParameterShouldBeCheckAgainstClassInformationAnnotation() {
+    mockParameter(operationParameter, operationParameterBuilder, "valueProviderId", "streamParameter",
+                  STRING_TYPE_WITH_ANNOTATIONS);
+    operationParameterBuilder.withInjectableParameter("streamParameter", OBJECT_TYPE, true);
+    when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
+        .thenReturn(Optional.of(operationParameterBuilder.build()));
+
+    validate();
+    assertNoErrors();
+  }
+
+  @Test
+  public void numberTypeEnumParameterShouldBeCheckAgainstClassInformationAnnotation() {
     mockParameter(operationParameter, operationParameterBuilder, "valueProviderId", "streamParameter",
                   STRING_TYPE_WITH_ANNOTATIONS);
     operationParameterBuilder.withInjectableParameter("streamParameter", OBJECT_TYPE, true);
@@ -390,11 +404,17 @@ public class JavaValueProviderModelValidatorTestCase {
     }
   }
 
-  private Map<Class<? extends TypeAnnotation>, TypeAnnotation> createAnnotations() {
+  private Map<Class<? extends TypeAnnotation>, TypeAnnotation> createStringAnnotations() {
     Map<Class<? extends TypeAnnotation>, TypeAnnotation> annotations = new HashMap<>();
     annotations.put(ClassInformationAnnotation.class, new ClassInformationAnnotation(InputStream.class));
-    annotations.put(CustomDefinedStaticTypeAnnotation.class, new CustomDefinedStaticTypeAnnotation());
     annotations.put(EnumAnnotation.class, new EnumAnnotation<>(new String[] {"value1", "value2"}));
+    return annotations;
+  }
+
+  private Map<Class<? extends TypeAnnotation>, TypeAnnotation> createNumberAnnotations() {
+    Map<Class<? extends TypeAnnotation>, TypeAnnotation> annotations = new HashMap<>();
+    annotations.put(ClassInformationAnnotation.class, new ClassInformationAnnotation(InputStream.class));
+    annotations.put(EnumAnnotation.class, new EnumAnnotation<>(new Number[] {1, 2}));
     return annotations;
   }
 }
