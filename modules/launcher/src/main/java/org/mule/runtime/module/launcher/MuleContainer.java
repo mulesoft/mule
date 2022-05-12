@@ -65,9 +65,7 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.Provider;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.spi.LoggerContextFactory;
@@ -79,6 +77,9 @@ public class MuleContainer {
   public static final String PROPERTY_FIPS_PROVIDER = SYSTEM_PROPERTY_PREFIX + "fips.provider";
   public static final String PROPERTY_JSSE_PROVIDER = SYSTEM_PROPERTY_PREFIX + "jsse.provider";
   public static final String SUN_JSSE_PROVIDER = "SunJSSE";
+  public static final String KEY_FACTORY_ALGORITHM = "ssl.KeyManagerFactory.algorithm";
+  public static final String TRUST_MANAGER_FACTORY_ALGORITHM = "ssl.TrustManagerFactory.algorithm";
+  public static final String KEYSTORE_TYPE = "keystore.type";
 
   public static final String CLI_OPTIONS[][] =
       {{"builder", "true", "Configuration Builder Type"}, {"config", "true", "Configuration File"},
@@ -234,9 +235,10 @@ public class MuleContainer {
     }
   }
 
-
   private void configureSecurityManager() {
     System.out.println("Entered configureSecurityManager()");
+    printDetails();
+    System.out.println("Finished Initial Print details");
     try {
       Class<?> classDef =
           Class.forName(System.getProperty(PROPERTY_FIPS_PROVIDER, "org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider"));
@@ -252,41 +254,45 @@ public class MuleContainer {
       java.security.Security.insertProviderAt(jsseProvider, 2);
 
       Provider sunJsseProvider = Security.getProvider("SunJSSE");
+      Provider sunJsseProviderLegacy = Security.getProvider("com.sun.net.ssl.internal.ssl.Provider");
+
       if (sunJsseProvider != null) {
         System.out.println("Remove SunJSSE");
         Security.removeProvider(SUN_JSSE_PROVIDER);
       }
-      System.out.println("Exit configureSecurityManager()");
+      if (sunJsseProviderLegacy != null) {
+        sunJsseProviderLegacy.setProperty("BCFIPS", "");
+      }
+      System.out.println("******* Starting Final Print details *******");
       printDetails();
+      System.out.println("Exit configureSecurityManager()");
     } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | InstantiationException
         | IllegalAccessException e) {
       System.out.println("Exception in configureSecurityManager");
       e.printStackTrace(System.out);
     }
-    /*
-     * System.setSecurityManager(new MySecurityManager());
-     * 
-     * try { java.security.Security.addProvider(new Provider("SomeName", 1d, "Some info") {});
-     * System.out.println("SECOND PROVIDER ADDED"); } catch (Exception e) { System.out.println("SECOND PROVIDER CANNOT BE ADDED");
-     * }
-     */
-
   }
 
   private void printDetails() {
     for (Provider provider : Security.getProviders()) {
-      System.out.println(provider.getName());
-      if (provider.getProperty("fips") != null) {
-        System.out.println("fips:" + provider.getProperty("fips"));
+      System.out.println("provider" + provider.getName());
+      Enumeration<?> enumObj = provider.propertyNames();
+      while (enumObj.hasMoreElements()) {
+        Object obj = enumObj.nextElement();
+        if (obj instanceof String) {
+          System.out.println(String.format("Property [%s] -> [%s]", obj, provider.getProperty((String) obj)));
+        }
       }
     }
   }
 
   private void setSecurityAlgorithm() {
     System.out.println("Setting algorrithm and keystore type");
-    Security.setProperty("ssl.KeyManagerFactory.algorithm", "PKIX");
-    Security.setProperty("ssl.TrustManagerFactory.algorithm", "PKIX");
-    Security.setProperty("keystore.type", "PKCS12");
+    Security.setProperty(KEY_FACTORY_ALGORITHM,
+                         System.getProperty(SYSTEM_PROPERTY_PREFIX + KEY_FACTORY_ALGORITHM, "PKIX"));
+    Security.setProperty(TRUST_MANAGER_FACTORY_ALGORITHM,
+                         System.getProperty(SYSTEM_PROPERTY_PREFIX + TRUST_MANAGER_FACTORY_ALGORITHM, "PKIX"));
+    Security.setProperty(KEYSTORE_TYPE, System.getProperty(SYSTEM_PROPERTY_PREFIX + KEYSTORE_TYPE, "PKCS12"));
   }
 
   /**
