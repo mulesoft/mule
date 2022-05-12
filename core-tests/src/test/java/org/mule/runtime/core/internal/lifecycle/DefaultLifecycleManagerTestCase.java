@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.lifecycle;
 
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -19,11 +21,20 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
+@Feature(ERROR_HANDLING)
+@Issue("W-11090837")
 public class DefaultLifecycleManagerTestCase extends AbstractMuleTestCase {
 
-  @Test(expected = LifecycleException.class)
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
+
+  @Test
   public void testDefaultLifecycleManagerTestCaseWrapsDefaultMuleExceptionIntoLifecycleException() throws MuleException {
     Lifecycle configurationProviderToolingAdapter = mock(Lifecycle.class);
     LifecycleCallback lifecycleCallback = mock(LifecycleCallback.class);
@@ -35,6 +46,7 @@ public class DefaultLifecycleManagerTestCase extends AbstractMuleTestCase {
     DefaultLifecycleManager defaultLifecycleManagerSpy = spy(defaultLifecycleManager);
     doNothing().when(defaultLifecycleManagerSpy).checkPhase(any());
 
+    expectedException.expect(LifecycleException.class);
     defaultLifecycleManagerSpy.fireStartPhase(lifecycleCallback);
   }
 }
