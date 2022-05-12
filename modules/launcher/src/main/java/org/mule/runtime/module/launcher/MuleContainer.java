@@ -22,8 +22,6 @@ import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
-import static com.mulesoft.mule.runtime.module.cluster.internal.security.NodeSecurityManager.PROPERTY_SECURITY_MODEL;
-import static com.mulesoft.mule.runtime.module.cluster.internal.security.NodeSecurityManager.FIPS_SECURITY_MODEL;
 
 import java.security.Security;
 import static java.lang.ClassLoader.getSystemClassLoader;
@@ -67,7 +65,9 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.Provider;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.spi.LoggerContextFactory;
@@ -77,12 +77,17 @@ import org.slf4j.LoggerFactory;
 public class MuleContainer {
 
   private static Logger LOGGER = LoggerFactory.getLogger(MuleContainer.class.getName());
-  public static final String PROPERTY_FIPS_PROVIDER = SYSTEM_PROPERTY_PREFIX + "fips.provider";
-  public static final String PROPERTY_JSSE_PROVIDER = SYSTEM_PROPERTY_PREFIX + "jsse.provider";
-  public static final String SUN_JSSE_PROVIDER = "SunJSSE";
-  public static final String PROPERTY_KEY_FACTORY_ALGORITHM = "ssl.KeyManagerFactory.algorithm";
-  public static final String PROPERTY_TRUST_MANAGER_FACTORY_ALGORITHM = "ssl.TrustManagerFactory.algorithm";
-  public static final String PROPERTY_KEYSTORE_TYPE = "keystore.type";
+
+  private static final String PROPERTY_SECURITY_MODEL = SYSTEM_PROPERTY_PREFIX + "security.model";
+  private static final String PROPERTY_FIPS_PROVIDER = SYSTEM_PROPERTY_PREFIX + "fips.provider";
+  private static final String PROPERTY_JSSE_PROVIDER = SYSTEM_PROPERTY_PREFIX + "jsse.provider";
+  private static final String PROPERTY_KEY_FACTORY_ALGORITHM = "ssl.KeyManagerFactory.algorithm";
+  private static final String PROPERTY_TRUST_MANAGER_FACTORY_ALGORITHM = "ssl.TrustManagerFactory.algorithm";
+  private static final String PROPERTY_KEYSTORE_TYPE = "keystore.type";
+  private static final String FIPS_SECURITY_MODEL = "fips140-2";
+  private static final String SUN_JSSE_PROVIDER = "SunJSSE";
+  private static final String FIPS_KEY = "fips";
+  private static final String FIPS_VALUE = "BCFIPS";
 
   public static final String CLI_OPTIONS[][] =
       {{"builder", "true", "Configuration Builder Type"}, {"config", "true", "Configuration File"},
@@ -249,10 +254,10 @@ public class MuleContainer {
           Class.forName(System.getProperty(PROPERTY_JSSE_PROVIDER, "org.bouncycastle.jsse.provider.BouncyCastleJsseProvider"));
       constructor = classDef.getConstructor();
       Provider jsseProvider = (Provider) constructor.newInstance();
-      jsseProvider.setProperty("fips", "BCFIPS");
+      jsseProvider.setProperty(FIPS_KEY, FIPS_VALUE);
       java.security.Security.insertProviderAt(jsseProvider, 2);
 
-      Provider sunJsseProvider = Security.getProvider("SunJSSE");
+      Provider sunJsseProvider = Security.getProvider(SUN_JSSE_PROVIDER);
       // for java 8
       Provider sunJsseProviderLegacy = Security.getProvider("com.sun.net.ssl.internal.ssl.Provider");
 
@@ -261,7 +266,7 @@ public class MuleContainer {
       }
 
       if (sunJsseProviderLegacy != null) {
-        sunJsseProviderLegacy.setProperty("BCFIPS", "");
+        sunJsseProviderLegacy.setProperty(FIPS_VALUE, "");
       }
     } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | InstantiationException
         | IllegalAccessException e) {
