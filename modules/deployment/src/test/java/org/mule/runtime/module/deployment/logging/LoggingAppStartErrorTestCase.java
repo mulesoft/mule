@@ -9,6 +9,10 @@ package org.mule.runtime.module.deployment.logging;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DEPLOYMENT_FAILED;
+import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
+import static org.mule.test.allure.AllureConstants.ComponentsFeature.LoggerStory.LOGGER;
+import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
+import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.ERROR_REPORTING;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -58,10 +62,18 @@ import java.util.List;
 import java.util.Optional;
 
 import com.github.valfirst.slf4jtest.TestLogger;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runners.Parameterized;
 
+@Feature(CORE_COMPONENTS)
+@Story(LOGGER)
+@Issue("W-11090837")
 public class LoggingAppStartErrorTestCase extends AbstractApplicationDeploymentTestCase {
 
   private static final int PROBER_TIMEOUT = 1000;
@@ -72,8 +84,11 @@ public class LoggingAppStartErrorTestCase extends AbstractApplicationDeploymentT
 
   private final File appLocation = new File("fakeLocation");
 
-  TestLogger loggerDefaultMuleApplication = getTestLogger(DefaultMuleApplication.class);
-  TestLogger loggerDefaultArtifactDeployer = getTestLogger(DefaultArtifactDeployer.class);
+  private TestLogger loggerDefaultMuleApplication = getTestLogger(DefaultMuleApplication.class);
+  private TestLogger loggerDefaultArtifactDeployer = getTestLogger(DefaultArtifactDeployer.class);
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @Parameterized.Parameters(name = "Parallel: {0}")
   public static List<Boolean> params() {
@@ -117,15 +132,15 @@ public class LoggingAppStartErrorTestCase extends AbstractApplicationDeploymentT
   public void whenAppThrowsLifecycleExceptionWhileStartingTheErrorShouldBeLogged() throws Exception {
     MuleContext mockedMuleContext = mock(MuleContext.class);
     when(mockArtifactContext.getMuleContext()).thenReturn(mockedMuleContext);
-    String expectedLogMessage = "Could not start HTTP server for 'lisConfig' on port 27664: Address already in use";
+    String expectedLogMessage = "Could not start Test App";
 
     MessageSource mockMessageSource = mock(MessageSource.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
     doThrow(new LifecycleException(createStaticMessage(expectedLogMessage), mockMessageSource)).when(mockedMuleContext).start();
 
     try {
+      expectedException.expect(DeploymentStartException.class);
       application.start();
-      fail("Was expecting start to fail");
-    } catch (DeploymentStartException e) {
+    } finally {
       assertStatus(DEPLOYMENT_FAILED);
       assertThat(loggerDefaultMuleApplication.getAllLoggingEvents().size(), is(1));
       assertThat(loggerDefaultMuleApplication.getAllLoggingEvents().get(0).getMessage(),
