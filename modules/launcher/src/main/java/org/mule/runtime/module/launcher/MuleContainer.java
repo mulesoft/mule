@@ -270,8 +270,8 @@ public class MuleContainer {
       }
     } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | InstantiationException
         | IllegalAccessException e) {
-      LOGGER.error("Critical error while enabling FIPS:" + e.getMessage());
-      throw new InitialisationException(createStaticMessage("Critical error while enabling FIPS:"), null);
+      LOGGER.error("Critical error while enabling FIPS", e);
+      throw new InitialisationException(createStaticMessage("Critical error while enabling FIPS:"), e, null);
     }
   }
 
