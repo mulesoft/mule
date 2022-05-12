@@ -9,7 +9,9 @@ package org.mule.runtime.module.launcher;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.MuleSystemProperties.*;
+import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorInShutdown;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorWhileRunning;
@@ -74,12 +76,13 @@ import org.slf4j.LoggerFactory;
 
 public class MuleContainer {
 
+  private static Logger LOGGER = LoggerFactory.getLogger(MuleContainer.class.getName());
   public static final String PROPERTY_FIPS_PROVIDER = SYSTEM_PROPERTY_PREFIX + "fips.provider";
   public static final String PROPERTY_JSSE_PROVIDER = SYSTEM_PROPERTY_PREFIX + "jsse.provider";
   public static final String SUN_JSSE_PROVIDER = "SunJSSE";
-  public static final String KEY_FACTORY_ALGORITHM = "ssl.KeyManagerFactory.algorithm";
-  public static final String TRUST_MANAGER_FACTORY_ALGORITHM = "ssl.TrustManagerFactory.algorithm";
-  public static final String KEYSTORE_TYPE = "keystore.type";
+  public static final String PROPERTY_KEY_FACTORY_ALGORITHM = "ssl.KeyManagerFactory.algorithm";
+  public static final String PROPERTY_TRUST_MANAGER_FACTORY_ALGORITHM = "ssl.TrustManagerFactory.algorithm";
+  public static final String PROPERTY_KEYSTORE_TYPE = "keystore.type";
 
   public static final String CLI_OPTIONS[][] =
       {{"builder", "true", "Configuration Builder Type"}, {"config", "true", "Configuration File"},
@@ -229,16 +232,12 @@ public class MuleContainer {
     initialiseIfNeeded(artifactResourcesRegistry.getContainerProfilingService());
 
     if (isFipsEnabled()) {
-      System.out.println("Detected FIPs mode");
       configureSecurityManager();
       setSecurityAlgorithm();
     }
   }
 
-  private void configureSecurityManager() {
-    System.out.println("Entered configureSecurityManager()");
-    printDetails();
-    System.out.println("Finished Initial Print details");
+  private void configureSecurityManager() throws InitialisationException {
     try {
       Class<?> classDef =
           Class.forName(System.getProperty(PROPERTY_FIPS_PROVIDER, "org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider"));
@@ -254,45 +253,29 @@ public class MuleContainer {
       java.security.Security.insertProviderAt(jsseProvider, 2);
 
       Provider sunJsseProvider = Security.getProvider("SunJSSE");
+      // for java 8
       Provider sunJsseProviderLegacy = Security.getProvider("com.sun.net.ssl.internal.ssl.Provider");
 
       if (sunJsseProvider != null) {
-        System.out.println("Remove SunJSSE");
         Security.removeProvider(SUN_JSSE_PROVIDER);
       }
+
       if (sunJsseProviderLegacy != null) {
         sunJsseProviderLegacy.setProperty("BCFIPS", "");
       }
-      System.out.println("******* Starting Final Print details *******");
-      printDetails();
-      System.out.println("Exit configureSecurityManager()");
     } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | InstantiationException
         | IllegalAccessException e) {
-      System.out.println("Exception in configureSecurityManager");
-      e.printStackTrace(System.out);
-    }
-  }
-
-  private void printDetails() {
-    for (Provider provider : Security.getProviders()) {
-      System.out.println("provider" + provider.getName());
-      Enumeration<?> enumObj = provider.propertyNames();
-      while (enumObj.hasMoreElements()) {
-        Object obj = enumObj.nextElement();
-        if (obj instanceof String) {
-          System.out.println(String.format("Property [%s] -> [%s]", obj, provider.getProperty((String) obj)));
-        }
-      }
+      LOGGER.error("Critical error while enabling FIPS:" + e.getMessage());
+      throw new InitialisationException(createStaticMessage("Critical error while enabling FIPS:"), null);
     }
   }
 
   private void setSecurityAlgorithm() {
-    System.out.println("Setting algorrithm and keystore type");
-    Security.setProperty(KEY_FACTORY_ALGORITHM,
-                         System.getProperty(SYSTEM_PROPERTY_PREFIX + KEY_FACTORY_ALGORITHM, "PKIX"));
-    Security.setProperty(TRUST_MANAGER_FACTORY_ALGORITHM,
-                         System.getProperty(SYSTEM_PROPERTY_PREFIX + TRUST_MANAGER_FACTORY_ALGORITHM, "PKIX"));
-    Security.setProperty(KEYSTORE_TYPE, System.getProperty(SYSTEM_PROPERTY_PREFIX + KEYSTORE_TYPE, "PKCS12"));
+    Security.setProperty(PROPERTY_KEY_FACTORY_ALGORITHM,
+                         System.getProperty(SYSTEM_PROPERTY_PREFIX + PROPERTY_KEY_FACTORY_ALGORITHM, "PKIX"));
+    Security.setProperty(PROPERTY_TRUST_MANAGER_FACTORY_ALGORITHM,
+                         System.getProperty(SYSTEM_PROPERTY_PREFIX + PROPERTY_TRUST_MANAGER_FACTORY_ALGORITHM, "PKIX"));
+    Security.setProperty(PROPERTY_KEYSTORE_TYPE, System.getProperty(SYSTEM_PROPERTY_PREFIX + PROPERTY_KEYSTORE_TYPE, "PKCS12"));
   }
 
   /**
@@ -542,7 +525,6 @@ public class MuleContainer {
   public ArtifactClassLoader getContainerClassLoader() {
     return artifactResourcesRegistry.getContainerClassLoader();
   }
-
 
   private boolean isFipsEnabled() {
     return FIPS_SECURITY_MODEL.equals(getProperty(PROPERTY_SECURITY_MODEL));
