@@ -49,8 +49,8 @@ public class JMSResourceReleaser implements ResourceReleaser {
   }
 
   /**
-   * Method for delete threads from active mq that still alive.
-   * The reason if because they have a reference to other classloader and cant be removed with the GC.
+   * Method for delete threads from active mq that still alive. The reason if because they have a reference to other classloader
+   * and cant be removed with the GC.
    */
   private void disposeJMSActiveMQThreads() {
     try {
@@ -81,9 +81,8 @@ public class JMSResourceReleaser implements ResourceReleaser {
   }
 
   /**
-   * Method that returns if the actual thread is the thread that we want to delete
-   * this name have to be -ActiveMQ InactivityMonitor ReadCheckTimer-
-   * And make other assertions to know is the thread belong to the current classloader.
+   * Method that returns if the actual thread is the thread that we want to delete this name have to be -ActiveMQ
+   * InactivityMonitor ReadCheckTimer- And make other assertions to know is the thread belong to the current classloader.
    */
   private boolean isActiveMQInactivityMonitorTimerThread(ClassLoader classLoader, Thread thread) {
 
@@ -112,6 +111,7 @@ public class JMSResourceReleaser implements ResourceReleaser {
         && thread.getContextClassLoader().getClass().getSimpleName().equals(CLASSLOADER_CLASS_TEST_CONTEXT)
         && thread.getName().equals(ACTIVEMQ_DRIVER_TIMER_THREAD_NAME);
   }
+
   /**
    * To ensure that tha thread belong to the current domain
    */
@@ -140,6 +140,7 @@ public class JMSResourceReleaser implements ResourceReleaser {
     }
     return false;
   }
+
   /**
    * To ensure that tha thread belong to the classloader that we are trying to dispose.
    */

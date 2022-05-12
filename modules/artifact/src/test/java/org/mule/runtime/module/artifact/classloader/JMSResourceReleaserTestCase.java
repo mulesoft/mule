@@ -59,7 +59,7 @@ public class JMSResourceReleaserTestCase extends AbstractMuleTestCase {
   static final String DRIVER_CLASS_NAME = "org.apache.activemq.ActiveMQConnectionFactory";
   private static final String ACTIVEMQ_DRIVER_TIMER_THREAD_NAME = "ActiveMQ InactivityMonitor ReadCheckTimer";
   private final static String ACTIVEMQ_URL_CONFIG =
-          "failover:(tcp://192.168.1.111:61616)?jms.useAsyncSend=true&initialReconnectDelay=1000&maxReconnectAttempts=-1";
+      "failover:(tcp://192.168.1.111:61616)?jms.useAsyncSend=true&initialReconnectDelay=1000&maxReconnectAttempts=-1";
 
   String driverVersion;
   private final ClassLoaderLookupPolicy testLookupPolicy;
