@@ -75,35 +75,16 @@ public class NoSourcePolicy implements SourcePolicy, Disposable, DeferredDisposa
                                                                .apply(flowExecutionResult),
                                                            parametersProcessor));
               })
-              .doOnNext(result -> result.apply(spfr -> {
-                CoreEvent event = spfr.getMessagingException().getEvent();
+              .doOnNext(result -> result.apply(sourcePolicyFailureResult -> {
+                CoreEvent event = sourcePolicyFailureResult.getMessagingException().getEvent();
                 SourcePolicyContext ctx = from(event);
-                // NoSourcePolicy strongReference = noSourcePolicy.get();
-                // if (strongReference != null) {
-                // strongReference.commonPolicy.finishFlowProcessing(event, result, spfr.getMessagingException(), ctx);
-                // }
-                noSourcePolicy.commonPolicy.finishFlowProcessing(event, result, spfr.getMessagingException(), ctx);
-              }, spsr -> {
-                // NoSourcePolicy strongReference = noSourcePolicy.get();
-                // if (strongReference != null) {
-                // strongReference.commonPolicy.finishFlowProcessing(spsr.getResult(), result);
-                // }
-                noSourcePolicy.commonPolicy.finishFlowProcessing(spsr.getResult(), result);
-              }))
+                noSourcePolicy.commonPolicy.finishFlowProcessing(event, result, sourcePolicyFailureResult.getMessagingException(),
+                                                                 ctx);
+              }, sourcePolicySuccessResult -> noSourcePolicy.commonPolicy
+                  .finishFlowProcessing(sourcePolicySuccessResult.getResult(), result)))
               .onErrorContinue(MessagingException.class, (t, e) -> {
                 final MessagingException me = (MessagingException) t;
                 final InternalEvent event = (InternalEvent) me.getEvent();
-
-                // NoSourcePolicy strongReference = noSourcePolicy.get();
-                // if (strongReference != null) {
-                // strongReference.commonPolicy.finishFlowProcessing(event,
-                // left(new SourcePolicyFailureResult(me, () -> from(event)
-                // .getResponseParametersProcessor()
-                // .getFailedExecutionResponseParametersFunction()
-                // .apply(me.getEvent()))),
-                // me,
-                // from(event));
-                // }
                 noSourcePolicy.commonPolicy.finishFlowProcessing(event,
                                                                  left(new SourcePolicyFailureResult(me, () -> from(event)
                                                                      .getResponseParametersProcessor()
