@@ -16,36 +16,32 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.CONFIG;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
-import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.ComponentGenerationInformation.EMPTY_GENERATION_INFO;
 import static org.mule.runtime.ast.api.ComponentMetadataAst.EMPTY_METADATA;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsNamespace;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyRecursively;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_ELEMENT;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.SUBFLOW_ELEMENT;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.runtime.extension.internal.ast.XmlSdkImplicitConfig.IMPLICIT_CONFIG_NAME_SUFFIX;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.LocationPart;
-import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentGenerationInformation;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.ast.api.ParameterResolutionException;
 import org.mule.runtime.ast.api.util.AstTraversalDirection;
 import org.mule.runtime.ast.api.util.BaseComponentAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
@@ -61,7 +57,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -111,8 +106,6 @@ public class MacroExpansionModuleModel {
 
   public static final String DEFAULT_GLOBAL_ELEMENTS = "_defaultGlobalElements";
 
-  public static final String IMPLICIT_CONFIG_NAME = "xml-sdk-implicit-config";
-
   /**
    * Used when the <module/> contains global elements without <property/>ies to be expanded, thus the macro expansion will take
    * care of the default global elements macro expanding them ONCE, and replacing the {@link #MODULE_OPERATION_CONFIG_REF} in the
@@ -148,86 +141,7 @@ public class MacroExpansionModuleModel {
 
   private ArtifactAst expand(List<ComponentAst> moduleComponentModels, Set<String> moduleGlobalElementsNames) {
     if (existOperationThatUsesImplicitConfiguration() && hasXmlSdkPropertiesWithDefaultValues()) {
-
-      ComponentAst componentAst = new BaseComponentAst() {
-
-        @Override
-        public ComponentIdentifier getIdentifier() {
-          return ComponentIdentifier.builder()
-              .namespaceUri(extensionModel.getXmlDslModel().getNamespace())
-              .namespace(extensionModel.getXmlDslModel().getPrefix())
-              .name(IMPLICIT_CONFIG_NAME).build();
-        }
-
-        @Override
-        public ComponentType getComponentType() {
-          return CONFIG;
-        }
-
-        @Override
-        public ComponentLocation getLocation() {
-          return from(IMPLICIT_CONFIG_NAME);
-        }
-
-        @Override
-        public ComponentMetadataAst getMetadata() {
-          return EMPTY_METADATA;
-        }
-
-        @Override
-        public ComponentGenerationInformation getGenerationInformation() {
-          return EMPTY_GENERATION_INFO;
-        }
-
-        @Override
-        public Optional<String> getComponentId() {
-          return of(IMPLICIT_CONFIG_NAME);
-        }
-
-        @Override
-        public Map<String, Object> getAnnotations() {
-          return emptyMap();
-        }
-
-        @Override
-        public ExtensionModel getExtensionModel() {
-          return extensionModel;
-        }
-
-        @Override
-        public <M> Optional<M> getModel(Class<M> modelClass) {
-          return (Optional<M>) extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME)
-              .filter(modelClass::isInstance);
-        }
-
-        @Override
-        public MetadataType getType() {
-          return null;
-        }
-
-        @Override
-        public Collection<ComponentParameterAst> getParameters() {
-
-          final List<ParameterModel> parameterModels = getModel(ParameterizedModel.class)
-              .map(ParameterizedModel::getAllParameterModels).orElse(emptyList());
-
-          Set<ComponentParameterAst> componentParameterAsts = new HashSet<>();
-          for (ParameterModel parameterModel : parameterModels) {
-            String rawValue = parameterModel.getName().equals("name") ? IMPLICIT_CONFIG_NAME : null;
-            ComponentParameterAst componentParameterAst = getComponentParameterAst(parameterModel, rawValue);
-            componentParameterAsts.add(componentParameterAst);
-          }
-
-          return componentParameterAsts;
-        }
-
-        @Override
-        public List<ComponentAst> directChildren() {
-          return emptyList();
-        }
-      };
-
-      applicationModel.topLevelComponents().add(componentAst);
+      applicationModel.topLevelComponents().add(new XmlSdkImplicitConfig(extensionModel));
     }
 
     return copyRecursively(applicationModel, comp -> {
@@ -255,13 +169,29 @@ public class MacroExpansionModuleModel {
 
   private boolean existOperationThatUsesImplicitConfiguration() {
     return applicationModel.topLevelComponentsStream()
-        .filter(componentAst -> componentAst.getIdentifier().getName().equals("flow")
-            || componentAst.getIdentifier().getName().equals("sub-flow"))
+        .filter(componentAst -> componentAst.getIdentifier().getName().equals(FLOW_ELEMENT)
+            || componentAst.getIdentifier().getName().equals(SUBFLOW_ELEMENT))
         .flatMap(ComponentAst::directChildrenStream)
-        .filter(componentModel -> componentModel.getIdentifier().getNamespace()
-            .equals(extensionModel.getXmlDslModel().getPrefix()))
-        .filter(componentModel -> componentModel.getModel(OperationModel.class).isPresent())
-        .anyMatch(componentModel -> !componentModel.getParameters().contains("config-ref"));
+        .anyMatch(this::existOperationThatUsesImplicitConfiguration);
+  }
+
+  private boolean existOperationThatUsesImplicitConfiguration(ComponentAst componentAst) {
+    if (componentAst.getIdentifier().getNamespace().equals(extensionModel.getXmlDslModel().getPrefix()) &&
+        componentAst.getModel(OperationModel.class).isPresent() &&
+        !componentAst.getParameters().contains(MODULE_OPERATION_CONFIG_REF)) {
+      return true;
+    }
+
+    if (componentAst.directChildren().isEmpty()) {
+      return false;
+    }
+
+    boolean exists = false;
+    for (ComponentAst childComponentAst : componentAst.directChildren()) {
+      exists = exists || existOperationThatUsesImplicitConfiguration(childComponentAst);
+    }
+
+    return exists;
   }
 
   private boolean hasXmlSdkPropertiesWithDefaultValues() {
@@ -495,7 +425,7 @@ public class MacroExpansionModuleModel {
 
     final Optional<String> configRef =
         !configRefName.isPresent() && extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).isPresent()
-            ? of(IMPLICIT_CONFIG_NAME)
+            ? of(format(IMPLICIT_CONFIG_NAME_SUFFIX, extensionModel.getName()))
             : configRefName;
 
     List<ComponentAst> processorChainChildren = operationModuleComponentModel.directChildrenStream()
@@ -668,54 +598,4 @@ public class MacroExpansionModuleModel {
     }
   }
 
-  private ComponentParameterAst getComponentParameterAst(ParameterModel parameterModel, String rawValue) {
-    return new ComponentParameterAst() {
-
-      @Override
-      public ParameterModel getModel() {
-        return parameterModel;
-      }
-
-      @Override
-      public ParameterGroupModel getGroupModel() {
-        return null;
-      }
-
-      @Override
-      public Either<String, Object> getValue() {
-        return right(getRawValue() != null ? getRawValue() : getModel().getDefaultValue());
-      }
-
-      @Override
-      public <T> Either<String, Either<ParameterResolutionException, T>> getValueOrResolutionError() {
-        return null;
-      }
-
-      @Override
-      public String getRawValue() {
-        return rawValue;
-      }
-
-      @Override
-      public String getResolvedRawValue() {
-        return null;
-      }
-
-      @Override
-      public Optional<ComponentMetadataAst> getMetadata() {
-        return empty();
-      }
-
-      @Override
-      public ComponentGenerationInformation getGenerationInformation() {
-        return EMPTY_GENERATION_INFO;
-      }
-
-      @Override
-      public boolean isDefaultValue() {
-        return true;
-      }
-    };
-
-  }
 }

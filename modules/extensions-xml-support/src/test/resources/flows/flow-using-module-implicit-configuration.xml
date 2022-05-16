@@ -6,10 +6,7 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/module-implicit-configuration http://www.mulesoft.org/schema/mule/module-implicit-configuration/current/mule-module-implicit-configuration.xsd">
 
-<!--    <module-implicit-configuration:config name="alpingoconfig" />-->
-
     <flow name="testSetPayloadConfigDefaultParamFlow">
-<!--    <module-implicit-configuration:set-payload-config-default-param-value config-ref="alpingoconfig"/>-->
         <module-implicit-configuration:set-payload-config-default-param-value />
     </flow>
 
