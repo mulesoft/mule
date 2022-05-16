@@ -46,13 +46,14 @@ public class NoSourcePolicy implements SourcePolicy, Disposable, DeferredDisposa
 
   private static final class SourceFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
 
-    private final Reference<NoSourcePolicy> noSourcePolicy;
+    // private final Reference<NoSourcePolicy> noSourcePolicy;
+    private final NoSourcePolicy noSourcePolicy;
     private final ReactiveProcessor flowExecutionProcessor;
 
     public SourceFluxObjectFactory(NoSourcePolicy noSourcePolicy, ReactiveProcessor flowExecutionProcessor) {
       // Avoid instances of this class from preventing the policy from being gc'd
       // Break the circular reference between policy-sinkFactory-flux that may cause memory leaks in the policies caches
-      this.noSourcePolicy = new WeakReference<>(noSourcePolicy);
+      this.noSourcePolicy = noSourcePolicy;
       this.flowExecutionProcessor = flowExecutionProcessor;
     }
 
@@ -77,30 +78,39 @@ public class NoSourcePolicy implements SourcePolicy, Disposable, DeferredDisposa
               .doOnNext(result -> result.apply(spfr -> {
                 CoreEvent event = spfr.getMessagingException().getEvent();
                 SourcePolicyContext ctx = from(event);
-                NoSourcePolicy strongReference = noSourcePolicy.get();
-                if (strongReference != null) {
-                  strongReference.commonPolicy.finishFlowProcessing(event, result, spfr.getMessagingException(), ctx);
-                }
+                // NoSourcePolicy strongReference = noSourcePolicy.get();
+                // if (strongReference != null) {
+                // strongReference.commonPolicy.finishFlowProcessing(event, result, spfr.getMessagingException(), ctx);
+                // }
+                noSourcePolicy.commonPolicy.finishFlowProcessing(event, result, spfr.getMessagingException(), ctx);
               }, spsr -> {
-                NoSourcePolicy strongReference = noSourcePolicy.get();
-                if (strongReference != null) {
-                  strongReference.commonPolicy.finishFlowProcessing(spsr.getResult(), result);
-                }
+                // NoSourcePolicy strongReference = noSourcePolicy.get();
+                // if (strongReference != null) {
+                // strongReference.commonPolicy.finishFlowProcessing(spsr.getResult(), result);
+                // }
+                noSourcePolicy.commonPolicy.finishFlowProcessing(spsr.getResult(), result);
               }))
               .onErrorContinue(MessagingException.class, (t, e) -> {
                 final MessagingException me = (MessagingException) t;
                 final InternalEvent event = (InternalEvent) me.getEvent();
 
-                NoSourcePolicy strongReference = noSourcePolicy.get();
-                if (strongReference != null) {
-                  strongReference.commonPolicy.finishFlowProcessing(event,
-                                                                    left(new SourcePolicyFailureResult(me, () -> from(event)
-                                                                        .getResponseParametersProcessor()
-                                                                        .getFailedExecutionResponseParametersFunction()
-                                                                        .apply(me.getEvent()))),
-                                                                    me,
-                                                                    from(event));
-                }
+                // NoSourcePolicy strongReference = noSourcePolicy.get();
+                // if (strongReference != null) {
+                // strongReference.commonPolicy.finishFlowProcessing(event,
+                // left(new SourcePolicyFailureResult(me, () -> from(event)
+                // .getResponseParametersProcessor()
+                // .getFailedExecutionResponseParametersFunction()
+                // .apply(me.getEvent()))),
+                // me,
+                // from(event));
+                // }
+                noSourcePolicy.commonPolicy.finishFlowProcessing(event,
+                                                                 left(new SourcePolicyFailureResult(me, () -> from(event)
+                                                                     .getResponseParametersProcessor()
+                                                                     .getFailedExecutionResponseParametersFunction()
+                                                                     .apply(me.getEvent()))),
+                                                                 me,
+                                                                 from(event));
               });
 
       policyFlux.subscribe(null, e -> LOGGER.error("Exception reached subscriber for {}", this, e));
