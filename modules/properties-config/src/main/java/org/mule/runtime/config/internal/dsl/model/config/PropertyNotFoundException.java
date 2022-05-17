@@ -13,7 +13,7 @@ import org.mule.runtime.api.util.Pair;
  *
  * @since 4.0
  */
-public class PropertyNotFoundException extends org.mule.runtime.properties.api.exception.PropertyNotFoundException {
+public class PropertyNotFoundException extends org.mule.runtime.ast.api.exception.PropertyNotFoundException {
 
   /**
    * Creates a new instance. This constructor must be used when the resolver has no parent and was not able to resolve a key
