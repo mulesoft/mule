@@ -282,7 +282,7 @@ public class MuleContainer {
     Security.setProperty(KEY_MANAGER_FACTORY_ALGORITHM_KEY, KEY_MANAGER_FACTORY_ALGORITHM_VALUE);
     Security.setProperty(TRUST_MANAGER_FACTORY_ALGORITHM_KEY,
                          KEY_MANAGER_FACTORY_ALGORITHM_VALUE);
-    Security.setProperty(KEYSTORE_TYPE_KEY, KEYSTORE_TYPE_KEY);
+    Security.setProperty(KEYSTORE_TYPE_KEY, KEYSTORE_TYPE_VALUE);
   }
 
   /**
