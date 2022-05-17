@@ -8,7 +8,6 @@ package org.mule.runtime.module.artifact.classloader;
 
 
 
-import static org.awaitility.Awaitility.await;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
@@ -20,6 +19,7 @@ import static java.lang.Thread.currentThread;
 import static org.mockito.Mockito.mock;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.junit.Assert.assertFalse;
+import static org.awaitility.Awaitility.await;
 
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
