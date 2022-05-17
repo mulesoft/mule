@@ -11,7 +11,7 @@ import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleExceptio
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
-import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SECURITY_SYSTEM_PROPERTY;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorInShutdown;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorWhileRunning;
@@ -78,7 +78,6 @@ public class MuleContainer {
 
   private static Logger LOGGER = LoggerFactory.getLogger(MuleContainer.class.getName());
 
-  private static final String PROPERTY_SECURITY_MODEL = SYSTEM_PROPERTY_PREFIX + "security.model";
   private static final String FIPS_PROVIDER = "org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider";
   private static final String JSSE_PROVIDER = "org.bouncycastle.jsse.provider.BouncyCastleJsseProvider";
   private static final String KEY_MANAGER_FACTORY_ALGORITHM_KEY = "ssl.KeyManagerFactory.algorithm";
@@ -534,7 +533,7 @@ public class MuleContainer {
   }
 
   private boolean isFipsEnabled() {
-    return FIPS_SECURITY_MODEL.equals(getProperty(PROPERTY_SECURITY_MODEL));
+    return FIPS_SECURITY_MODEL.equals(getProperty(MULE_SECURITY_SYSTEM_PROPERTY));
   }
 }
 
