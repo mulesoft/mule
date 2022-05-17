@@ -297,8 +297,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
     if (operationParser != null) {
       return operationParser.getOperationModelsRecursiveStream(operationModelParsersByName, visitedOperations);
     } else {
-      // Null here represents an empty stream, but it is more efficient because we avoid constructing one.
-      return null;
+      return Stream.empty();
     }
   }
 
@@ -321,8 +320,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
           } else if (componentAst.getComponentType().equals(UNKNOWN)) {
             return expandOperationWithoutModel(operationModelParsersByName, visitedOperations, componentAst);
           } else {
-            // Null here represents an empty stream, but it is more efficient because we avoid constructing one.
-            return null;
+            return Stream.empty();
           }
         });
   }
