@@ -64,15 +64,9 @@ public class JMSResourceReleaser implements ResourceReleaser {
 
       for (Thread thread : threads) {
         if (isActiveMQInactivityMonitorTimerThread(classLoader, thread)) {
-          try {
-            clearReferencesStopTimerThread(thread);
-            thread.interrupt();
-            thread.join();
-          } catch (Throwable e) {
-            logger
-                .warn("An error occurred trying to close the '" + thread.getName() + "' Thread. This might cause memory leaks.",
-                      e);
-          }
+          clearReferencesStopTimerThread(thread);
+          thread.interrupt();
+          thread.join();
         }
       }
     } catch (Exception e) {
@@ -86,7 +80,7 @@ public class JMSResourceReleaser implements ResourceReleaser {
    */
   private boolean isActiveMQInactivityMonitorTimerThread(ClassLoader classLoader, Thread thread) {
 
-    if (isActiveMQInactivityMonitorTimerThread_TestContext(classLoader, thread)) {
+    if (isActiveMQInactivityMonitorTimerThreadTestContext(classLoader, thread)) {
       return true;
     }
     if (!(classLoader instanceof ArtifactClassLoader)) {
@@ -104,7 +98,7 @@ public class JMSResourceReleaser implements ResourceReleaser {
   /**
    * Test Context: threads are loaded from a classloader type - AppClassLoader - Normal Context: loaded by - CompositeClassLoader
    */
-  private boolean isActiveMQInactivityMonitorTimerThread_TestContext(ClassLoader classLoader, Thread thread) {
+  private boolean isActiveMQInactivityMonitorTimerThreadTestContext(ClassLoader classLoader, Thread thread) {
 
     String artifactId = ((ArtifactClassLoader) classLoader).getArtifactId();
     return artifactId.equals(TEST_CLASSLOADER_ARTIFACT_ID)

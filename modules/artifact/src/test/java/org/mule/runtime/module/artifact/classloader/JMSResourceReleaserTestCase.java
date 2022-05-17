@@ -8,6 +8,7 @@ package org.mule.runtime.module.artifact.classloader;
 
 
 
+import static org.awaitility.Awaitility.await;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
@@ -17,7 +18,6 @@ import static java.lang.Thread.enumerate;
 import static java.lang.Thread.activeCount;
 import static java.lang.Thread.currentThread;
 import static org.mockito.Mockito.mock;
-import static org.junit.Assert.assertTrue;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.junit.Assert.assertFalse;
 
@@ -39,6 +39,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import io.qameta.allure.Feature;
@@ -150,15 +152,23 @@ public class JMSResourceReleaserTestCase extends AbstractMuleTestCase {
     Thread activeMQConnectionThread = new Thread(runnable, "ActiveMQConnectionThread");
     activeMQConnectionThread.start();
 
-    Thread.sleep(200);
-    assertTrue(getNameListOfActiveThreads().contains(ACTIVEMQ_DRIVER_TIMER_THREAD_NAME));
+    await().atMost(1, TimeUnit.SECONDS).until(listOfThreadsContainInactivityMonitorThread());
     artifactClassLoader.dispose();
     assertFalse(getNameListOfActiveThreads().contains(ACTIVEMQ_DRIVER_TIMER_THREAD_NAME));
   }
 
-  ///////////////////
-  // PRIVATE-METHODS//
-  ///////////////////
+  /////////////////////
+  // PRIVATE-METHODS //
+  /////////////////////
+
+  private Callable<Boolean> listOfThreadsContainInactivityMonitorThread() {
+    return new Callable<Boolean>() {
+
+      public Boolean call() throws Exception {
+        return getNameListOfActiveThreads().contains(ACTIVEMQ_DRIVER_TIMER_THREAD_NAME);
+      }
+    };
+  }
 
   private List<String> getNameListOfActiveThreads() {
     Thread[] threads = new Thread[activeCount()];
