@@ -79,13 +79,16 @@ public class MuleContainer {
   private static Logger LOGGER = LoggerFactory.getLogger(MuleContainer.class.getName());
 
   private static final String PROPERTY_SECURITY_MODEL = SYSTEM_PROPERTY_PREFIX + "security.model";
-  private static final String PROPERTY_FIPS_PROVIDER = SYSTEM_PROPERTY_PREFIX + "fips.provider";
-  private static final String PROPERTY_JSSE_PROVIDER = SYSTEM_PROPERTY_PREFIX + "jsse.provider";
-  private static final String PROPERTY_KEY_FACTORY_ALGORITHM = "ssl.KeyManagerFactory.algorithm";
-  private static final String PROPERTY_TRUST_MANAGER_FACTORY_ALGORITHM = "ssl.TrustManagerFactory.algorithm";
-  private static final String PROPERTY_KEYSTORE_TYPE = "keystore.type";
+  private static final String FIPS_PROVIDER = "org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider";
+  private static final String JSSE_PROVIDER = "org.bouncycastle.jsse.provider.BouncyCastleJsseProvider";
+  private static final String KEY_MANAGER_FACTORY_ALGORITHM_KEY = "ssl.KeyManagerFactory.algorithm";
+  private static final String TRUST_MANAGER_FACTORY_ALGORITHM_KEY = "ssl.KeyManagerFactory.algorithm";
+  private static final String KEY_MANAGER_FACTORY_ALGORITHM_VALUE = "PKIX";
+  private static final String KEYSTORE_TYPE_KEY = "keystore.type";
+  private static final String KEYSTORE_TYPE_VALUE = "PKCS12";
   private static final String FIPS_SECURITY_MODEL = "fips140-2";
   private static final String SUN_JSSE_PROVIDER = "SunJSSE";
+  private static final String LEGACY_SUN_JSSE_PROVIDER = "com.sun.net.ssl.internal.ssl.Provider";
   private static final String FIPS_KEY = "fips";
   private static final String FIPS_VALUE = "BCFIPS";
 
@@ -245,13 +248,13 @@ public class MuleContainer {
   private void configureSecurityManager() throws InitialisationException {
     try {
       Class<?> classDef =
-          Class.forName(System.getProperty(PROPERTY_FIPS_PROVIDER, "org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider"));
+          Class.forName(FIPS_PROVIDER);
       Constructor<?> constructor = classDef.getConstructor();
       Provider fipsProvider = (Provider) constructor.newInstance();
       Security.insertProviderAt(fipsProvider, 1);
 
       classDef =
-          Class.forName(System.getProperty(PROPERTY_JSSE_PROVIDER, "org.bouncycastle.jsse.provider.BouncyCastleJsseProvider"));
+          Class.forName(JSSE_PROVIDER);
       constructor = classDef.getConstructor();
       Provider jsseProvider = (Provider) constructor.newInstance();
       jsseProvider.setProperty(FIPS_KEY, FIPS_VALUE);
@@ -259,7 +262,7 @@ public class MuleContainer {
 
       Provider sunJsseProvider = Security.getProvider(SUN_JSSE_PROVIDER);
       // for java 8
-      Provider sunJsseProviderLegacy = Security.getProvider("com.sun.net.ssl.internal.ssl.Provider");
+      Provider sunJsseProviderLegacy = Security.getProvider(LEGACY_SUN_JSSE_PROVIDER);
 
       if (sunJsseProvider != null) {
         Security.removeProvider(SUN_JSSE_PROVIDER);
@@ -276,11 +279,10 @@ public class MuleContainer {
   }
 
   private void setSecurityAlgorithm() {
-    Security.setProperty(PROPERTY_KEY_FACTORY_ALGORITHM,
-                         System.getProperty(SYSTEM_PROPERTY_PREFIX + PROPERTY_KEY_FACTORY_ALGORITHM, "PKIX"));
-    Security.setProperty(PROPERTY_TRUST_MANAGER_FACTORY_ALGORITHM,
-                         System.getProperty(SYSTEM_PROPERTY_PREFIX + PROPERTY_TRUST_MANAGER_FACTORY_ALGORITHM, "PKIX"));
-    Security.setProperty(PROPERTY_KEYSTORE_TYPE, System.getProperty(SYSTEM_PROPERTY_PREFIX + PROPERTY_KEYSTORE_TYPE, "PKCS12"));
+    Security.setProperty(KEY_MANAGER_FACTORY_ALGORITHM_KEY, KEY_MANAGER_FACTORY_ALGORITHM_VALUE);
+    Security.setProperty(TRUST_MANAGER_FACTORY_ALGORITHM_KEY,
+                         KEY_MANAGER_FACTORY_ALGORITHM_VALUE);
+    Security.setProperty(KEYSTORE_TYPE_KEY, KEYSTORE_TYPE_KEY);
   }
 
   /**
