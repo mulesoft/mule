@@ -11,7 +11,6 @@ import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleExceptio
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SECURITY_SYSTEM_PROPERTY;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorInShutdown;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorWhileRunning;
@@ -23,7 +22,6 @@ import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
 
-import java.security.Security;
 import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
@@ -62,9 +60,6 @@ import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
 import org.mule.runtime.module.troubleshooting.internal.DefaultTroubleshootingService;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.security.Provider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -75,21 +70,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MuleContainer {
-
-  private static Logger LOGGER = LoggerFactory.getLogger(MuleContainer.class.getName());
-
-  private static final String FIPS_PROVIDER = "org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider";
-  private static final String JSSE_PROVIDER = "org.bouncycastle.jsse.provider.BouncyCastleJsseProvider";
-  private static final String KEY_MANAGER_FACTORY_ALGORITHM_KEY = "ssl.KeyManagerFactory.algorithm";
-  private static final String TRUST_MANAGER_FACTORY_ALGORITHM_KEY = "ssl.KeyManagerFactory.algorithm";
-  private static final String KEY_MANAGER_FACTORY_ALGORITHM_VALUE = "PKIX";
-  private static final String KEYSTORE_TYPE_KEY = "keystore.type";
-  private static final String KEYSTORE_TYPE_VALUE = "PKCS12";
-  private static final String FIPS_SECURITY_MODEL = "fips140-2";
-  private static final String SUN_JSSE_PROVIDER = "SunJSSE";
-  private static final String LEGACY_SUN_JSSE_PROVIDER = "com.sun.net.ssl.internal.ssl.Provider";
-  private static final String FIPS_KEY = "fips";
-  private static final String FIPS_VALUE = "BCFIPS";
 
   public static final String CLI_OPTIONS[][] =
       {{"builder", "true", "Configuration Builder Type"}, {"config", "true", "Configuration File"},
@@ -237,51 +217,6 @@ public class MuleContainer {
     artifactResourcesRegistry.getMemoryManagementService().initialise();
     artifactResourcesRegistry.inject(artifactResourcesRegistry.getContainerProfilingService());
     initialiseIfNeeded(artifactResourcesRegistry.getContainerProfilingService());
-
-    if (isFipsEnabled()) {
-      configureSecurityManager();
-      setSecurityAlgorithm();
-    }
-  }
-
-  private void configureSecurityManager() throws InitialisationException {
-    try {
-      Class<?> classDef =
-          Class.forName(FIPS_PROVIDER);
-      Constructor<?> constructor = classDef.getConstructor();
-      Provider fipsProvider = (Provider) constructor.newInstance();
-      Security.insertProviderAt(fipsProvider, 1);
-
-      classDef =
-          Class.forName(JSSE_PROVIDER);
-      constructor = classDef.getConstructor();
-      Provider jsseProvider = (Provider) constructor.newInstance();
-      jsseProvider.setProperty(FIPS_KEY, FIPS_VALUE);
-      Security.insertProviderAt(jsseProvider, 2);
-
-      Provider sunJsseProvider = Security.getProvider(SUN_JSSE_PROVIDER);
-      // for java 8
-      Provider sunJsseProviderLegacy = Security.getProvider(LEGACY_SUN_JSSE_PROVIDER);
-
-      if (sunJsseProvider != null) {
-        Security.removeProvider(SUN_JSSE_PROVIDER);
-      }
-
-      if (sunJsseProviderLegacy != null) {
-        sunJsseProviderLegacy.setProperty(FIPS_VALUE, "");
-      }
-    } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | InstantiationException
-        | IllegalAccessException e) {
-      LOGGER.error("Critical error while enabling FIPS", e);
-      throw new InitialisationException(createStaticMessage("Critical error while enabling FIPS:"), e, null);
-    }
-  }
-
-  private void setSecurityAlgorithm() {
-    Security.setProperty(KEY_MANAGER_FACTORY_ALGORITHM_KEY, KEY_MANAGER_FACTORY_ALGORITHM_VALUE);
-    Security.setProperty(TRUST_MANAGER_FACTORY_ALGORITHM_KEY,
-                         KEY_MANAGER_FACTORY_ALGORITHM_VALUE);
-    Security.setProperty(KEYSTORE_TYPE_KEY, KEYSTORE_TYPE_VALUE);
   }
 
   /**
@@ -530,10 +465,6 @@ public class MuleContainer {
    */
   public ArtifactClassLoader getContainerClassLoader() {
     return artifactResourcesRegistry.getContainerClassLoader();
-  }
-
-  private boolean isFipsEnabled() {
-    return FIPS_SECURITY_MODEL.equals(getProperty(MULE_SECURITY_SYSTEM_PROPERTY));
   }
 }
 
