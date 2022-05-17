@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.util.queue.QueueManager;
+import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.core.privileged.routing.OutboundRouter;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -48,7 +49,8 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase {
         InterceptingMessageProcessor.class,
         Component.class,
         OutboundRouter.class,
-        Service.class
+        Service.class,
+        GlobalErrorHandler.class
     });
   }
 

@@ -78,7 +78,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   private Collection<ExceptionContextProvider> exceptionContextProviders;
 
   @Inject
-  private FeatureFlaggingService featureFlaggingService;
+  protected FeatureFlaggingService featureFlaggingService;
 
   private final MessagingExceptionResolver messagingExceptionResolver = new MessagingExceptionResolver(this);
 
