@@ -51,9 +51,9 @@ public class MuleOperationProcessingStrategyTestCase extends MuleArtifactFunctio
   public void blockingOperationInsideBodyDoesNotJumpThreadAfterExecute() throws Exception {
     flowRunner("blockingFlow").run();
 
-    String blockingOpExecutionThread = getExecutionThreadName("Blocking child");
-    String nextOpExecutionThread = getExecutionThreadName("After operation with one blocking child");
-    assertThat(blockingOpExecutionThread, is(nextOpExecutionThread));
+    Integer blockingOpExecutionPhase = getExecutionThreadPhase("Blocking child");
+    Integer nextOpExecutionPhase = getExecutionThreadPhase("After operation with one blocking child");
+    assertThat(blockingOpExecutionPhase, is(nextOpExecutionPhase));
   }
 
   @Test
@@ -74,9 +74,9 @@ public class MuleOperationProcessingStrategyTestCase extends MuleArtifactFunctio
   public void blockingOperationInsideBodyJumpsThreadBeforeExecute() throws Exception {
     flowRunner("blockingFlow").run();
 
-    String previousOpExecutionThread = getExecutionThreadName("Before operation with one blocking child");
-    String blockingOpExecutionThread = getExecutionThreadName("Blocking child");
-    assertThat(blockingOpExecutionThread, is(not(previousOpExecutionThread)));
+    Integer previousOpExecutionPhase = getExecutionThreadPhase("Before operation with one blocking child");
+    Integer blockingOpExecutionPhase = getExecutionThreadPhase("Blocking child");
+    assertThat(blockingOpExecutionPhase, is(not(previousOpExecutionPhase)));
   }
 
   @Test
@@ -98,9 +98,9 @@ public class MuleOperationProcessingStrategyTestCase extends MuleArtifactFunctio
   public void operationAfterANonBlockingEndedComposedOperationRunsInDifferentThread() throws Exception {
     flowRunner("nonBlockingFlow").run();
 
-    String nonBlockingOpCompletionThread = getCompletionThreadName("Non-blocking child");
-    String nextOpExecutionThread = getExecutionThreadName("After operation with one non-blocking child");
-    assertThat(nextOpExecutionThread, is(not(nonBlockingOpCompletionThread)));
+    Integer nonBlockingOpCompletionPhase = getCompletionThreadPhase("Non-blocking child");
+    Integer nextOpExecutionPhase = getExecutionThreadPhase("After operation with one non-blocking child");
+    assertThat(nextOpExecutionPhase, is(not(nonBlockingOpCompletionPhase)));
   }
 
   @Test
@@ -110,7 +110,7 @@ public class MuleOperationProcessingStrategyTestCase extends MuleArtifactFunctio
   // .|.Operation..................|.......|....|.Operation...................|.|.
   // .|..-.ExecutionType=CPU_LITE..|.......|....|..-.ExecutionType=CPU_LITE...|.|.
   // .|..-.CompletionCallback=NO...|.====>.|....|..-.CompletionCallback=YES...|.|.
-  // .|..-.ExecutionThread=ThreadA.|.......|....|..-.CompletionThread=ThreadB.|.|.
+  // .|..-.ExecutionThread=ThreadA.|.......|....|..-.ExecutionThread=ThreadB..|.|.
   // .+============================+.......|....+=============================+.|.
   // ......................................+====================================+.
   //
@@ -122,16 +122,16 @@ public class MuleOperationProcessingStrategyTestCase extends MuleArtifactFunctio
   public void operationBeforeANonBlockingComposedOperationRunsInSameThread() throws Exception {
     flowRunner("blockingFlow").run();
 
-    String blockingOpExecutionThread = getExecutionThreadName("Blocking child");
-    String nextOpExecutionThread = getExecutionThreadName("After operation with one blocking child");
-    assertThat(blockingOpExecutionThread, is(nextOpExecutionThread));
+    Integer blockingOpExecutionPhase = getExecutionThreadPhase("Blocking child");
+    Integer nextOpExecutionPhase = getExecutionThreadPhase("After operation with one blocking child");
+    assertThat(blockingOpExecutionPhase, is(nextOpExecutionPhase));
   }
 
-  private String getCompletionThreadName(String key) {
-    return executionThreadTracker.getCompletionThreadName(key);
+  private Integer getCompletionThreadPhase(String key) {
+    return executionThreadTracker.getCompletionThreadPhase(key);
   }
 
-  private String getExecutionThreadName(String key) {
-    return executionThreadTracker.getExecutionThreadName(key);
+  private Integer getExecutionThreadPhase(String key) {
+    return executionThreadTracker.getExecutionThreadPhase(key);
   }
 }
