@@ -38,7 +38,7 @@ public class GlobalErrorHandlerTestCase extends AbstractMuleTestCase {
   private final TemplateOnErrorHandler onErrorHandler = mock(TemplateOnErrorHandler.class);
 
   private final DefaultMessagingExceptionHandlerAcceptor defaultMessagingExceptionHandler =
-          spy(new DefaultMessagingExceptionHandlerAcceptor());
+      spy(new DefaultMessagingExceptionHandlerAcceptor());
 
   private final MuleContextWithRegistry mockMuleContext = mockContextWithServices();
 
