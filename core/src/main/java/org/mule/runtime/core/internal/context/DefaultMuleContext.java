@@ -30,6 +30,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COM
 import static org.mule.runtime.api.config.MuleRuntimeFeature.VALIDATE_APPLICATION_MODEL_WITH_REGION_CLASSLOADER;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
+import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.getInstance;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_COMPONENT_INITIAL_STATE_MANAGER;
@@ -90,6 +91,7 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.notification.AbstractServerNotification;
 import org.mule.runtime.api.notification.CustomNotification;
 import org.mule.runtime.api.notification.CustomNotificationListener;
@@ -135,6 +137,7 @@ import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.config.ClusterConfiguration;
 import org.mule.runtime.core.internal.config.DefaultCustomizationService;
 import org.mule.runtime.core.internal.config.ExpressionCorrelationIdGenerator;
+import org.mule.runtime.core.internal.config.FeatureFlaggingServiceBuilder;
 import org.mule.runtime.core.internal.config.NullClusterConfiguration;
 import org.mule.runtime.core.internal.connector.DefaultSchedulerController;
 import org.mule.runtime.core.internal.connector.SchedulerController;
@@ -941,14 +944,17 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
                                                                   config.getDefaultErrorHandlerName())));
       }
 
-      if (rootContainerName.isPresent()) {
-        defaultErrorHandler = ((GlobalErrorHandler) defaultErrorHandler)
-            .createLocalErrorHandler(from(rootContainerName.get()));
-      } else {
-        try {
-          defaultErrorHandler = new ErrorHandlerFactory().createDefault(getRegistry().lookupObject(NotificationDispatcher.class));
-        } catch (RegistrationException e) {
-          throw new MuleRuntimeException(e);
+      if (!getFeatureFlaggingService().isEnabled(REUSE_GLOBAL_ERROR_HANDLER)) {
+        if (rootContainerName.isPresent()) {
+          defaultErrorHandler = ((GlobalErrorHandler) defaultErrorHandler)
+              .createLocalErrorHandler(from(rootContainerName.get()));
+        } else {
+          try {
+            defaultErrorHandler =
+                new ErrorHandlerFactory().createDefault(getRegistry().lookupObject(NotificationDispatcher.class));
+          } catch (RegistrationException e) {
+            throw new MuleRuntimeException(e);
+          }
         }
       }
     } else {
@@ -1474,4 +1480,14 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     return featureContext -> featureContext.getArtifactMinMuleVersion()
         .filter(muleVersion -> muleVersion.atLeast(version)).isPresent();
   }
+
+  public static FeatureFlaggingService getFeatureFlaggingService() {
+    FeatureFlaggingRegistry ffRegistry = getInstance();
+    return new FeatureFlaggingServiceBuilder()
+        .withContext(new FeatureContext(new MuleVersion("4.5.0"), ""))
+        .withMuleContextFlags(ffRegistry.getFeatureConfigurations())
+        .withFeatureContextFlags(ffRegistry.getFeatureFlagConfigurations())
+        .build();
+  }
+
 }

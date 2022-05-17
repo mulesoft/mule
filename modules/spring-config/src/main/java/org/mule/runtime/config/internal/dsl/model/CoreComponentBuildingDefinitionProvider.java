@@ -7,6 +7,8 @@
 
 package org.mule.runtime.config.internal.dsl.model;
 
+import static org.apache.commons.lang3.ArrayUtils.addAll;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.REUSE_GLOBAL_ERROR_HANDLER;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.PARALLEL_FOREACH_ELEMENT;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.SCATTER_GATHER_ELEMENT;
@@ -18,6 +20,7 @@ import static org.mule.runtime.core.api.context.notification.AnySelector.ANY_SEL
 import static org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair.ANY_SELECTOR_STRING;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
+import static org.mule.runtime.core.internal.context.DefaultMuleContext.getFeatureFlaggingService;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
@@ -53,6 +56,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELE
 
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.tx.TransactionType;
@@ -211,9 +215,11 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static ComponentBuildingDefinition.Builder baseDefinition =
       new ComponentBuildingDefinition.Builder().withNamespace(CORE_PREFIX);
 
+  FeatureFlaggingService featureFlaggingService;
+
   @Override
   public void init() {
-    // Nothing to do
+    featureFlaggingService = getFeatureFlaggingService();
   }
 
   @SuppressWarnings("unchecked")
@@ -239,15 +245,9 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(onErrorBaseBuilder.withIdentifier(ON_ERROR_PROPAGATE)
         .withTypeDefinition(fromType(OnErrorPropagateHandler.class))
         .asPrototype().build());
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier(ERROR_HANDLER)
-        .withTypeDefinition(fromType(ErrorHandler.class))
-        .withObjectFactoryType(ErrorHandlerFactoryBean.class)
-        .withSetterParameterDefinition("delegate", fromSimpleReferenceParameter("ref").build())
-        .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build())
-        .withSetterParameterDefinition("exceptionListeners",
-                                       fromChildCollectionConfiguration(FlowExceptionHandler.class).build())
-        .asPrototype()
-        .build());
+
+    Builder errorHandlerBuilder = getErrorHandlerBuilder();
+    componentBuildingDefinitions.add(errorHandlerBuilder.build());
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(SET_PAYLOAD).withTypeDefinition(fromType(SetPayloadMessageProcessor.class))
             .withSetterParameterDefinition("value", fromSimpleParameter("value").build())
@@ -605,6 +605,20 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return componentBuildingDefinitions;
   }
 
+  protected Builder getErrorHandlerBuilder() {
+    Builder errorHandlerBuilder = baseDefinition.withIdentifier(ERROR_HANDLER)
+        .withTypeDefinition(fromType(ErrorHandler.class))
+        .withObjectFactoryType(ErrorHandlerFactoryBean.class)
+        .withSetterParameterDefinition("delegate", fromSimpleReferenceParameter("ref").build())
+        .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build())
+        .withSetterParameterDefinition("exceptionListeners",
+                                       fromChildCollectionConfiguration(FlowExceptionHandler.class).build());
+    if (!featureFlaggingService.isEnabled(REUSE_GLOBAL_ERROR_HANDLER)) {
+      errorHandlerBuilder = errorHandlerBuilder.asPrototype();
+    }
+    return errorHandlerBuilder;
+  }
+
   private TypeConverter<String, TransactionType> getTransactionTypeConverter() {
     return TransactionType::valueOf;
   }
@@ -864,4 +878,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return getMuleMessageTransformerBaseBuilder().withNamespace(CORE_PREFIX);
   }
 
+  public void setFeatureFlaggingService(FeatureFlaggingService featureFlaggingService) {
+    this.featureFlaggingService = featureFlaggingService;
+  }
 }
