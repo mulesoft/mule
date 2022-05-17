@@ -12,6 +12,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_APPLY_OBJEC
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_HONOUR_MIXED_CONTENT_STRUCTURE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_BYTE_BUDDY_OBJECT_CREATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
@@ -322,6 +323,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureSetVariableWithNullVale();
       configureStartExtensionComponentsWithArtifactClassloader();
       configureRemoveShadowedImplicitInputs();
+      configureHonourMixedContentStructure();
       configureEnforceErrorTypesValidation();
       configureDisableAttributeParameterWhitespaceTrimming();
       configureDisablePojoTextCdataWhitespaceTrimming();
@@ -1328,6 +1330,17 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DW_REMOVE_SHADOWED_IMPLICIT_INPUTS,
                                                 minMuleVersion("4.4.0"));
+  }
+
+  /**
+   * Configures the {@link MuleRuntimeFeature#DW_HONOUR_MIXED_CONTENT_STRUCTURE} feature flag.
+   *
+   * @since 4.5.0
+   */
+  private static void configureHonourMixedContentStructure() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(DW_HONOUR_MIXED_CONTENT_STRUCTURE,
+                                                minMuleVersion("4.5.0"));
   }
 
   /**
