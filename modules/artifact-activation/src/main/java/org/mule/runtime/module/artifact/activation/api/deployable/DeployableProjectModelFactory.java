@@ -4,22 +4,26 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.artifact.activation.api.classloader;
+package org.mule.runtime.module.artifact.activation.api.deployable;
+
+import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 
 /**
  * Generic factory to create a {@link DeployableProjectModel} representing the structure of a project.
  * <p>
  * Implementations may be coupled to a specific build tool, dependency management system or project structure.
+ * 
+ * @param <M> type of the deployable model.
  *
  * @since 4.5
  */
-public interface DeployableProjectModelFactory {
+public interface DeployableProjectModelFactory<M extends MuleDeployableModel> {
 
   /**
    * Creates a {@link DeployableProjectModel}.
    *
    * @return a {@link DeployableProjectModel} representing the structure of a project.
    */
-  DeployableProjectModel createDeployableProjectModel();
+  DeployableProjectModel<M> createDeployableProjectModel();
 
 }

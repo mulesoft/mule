@@ -26,4 +26,12 @@ public class ArtifactActivationException extends MuleRuntimeException {
   public ArtifactActivationException(I18nMessage message) {
     super(message);
   }
+
+  /**
+   * @param message the exception message
+   * @param cause   the exception that triggered this exception
+   */
+  public ArtifactActivationException(I18nMessage message, Throwable cause) {
+    super(message, cause);
+  }
 }

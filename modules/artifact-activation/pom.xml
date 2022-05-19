@@ -27,6 +27,12 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-maven-client-impl</artifactId>
+            <version>${muleMavenClientApi}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-artifact</artifactId>
             <version>${project.version}</version>
@@ -44,6 +50,12 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-artifact-ast-xml-parser</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.skuzzle</groupId>
+            <artifactId>semantic-version</artifactId>
+            <version>1.2.0</version>
+            <scope>compile</scope>
         </dependency>
         
         <dependency>
