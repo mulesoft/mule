@@ -19,8 +19,16 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 
+import org.mule.metadata.api.annotation.EnumAnnotation;
+import org.mule.metadata.api.annotation.TypeAnnotation;
+import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.impl.DefaultArrayType;
+import org.mule.metadata.api.model.impl.DefaultNumberType;
+import org.mule.metadata.api.model.impl.DefaultObjectType;
+import org.mule.metadata.api.model.impl.DefaultStringType;
 import org.mule.metadata.java.api.JavaTypeLoader;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -63,6 +71,12 @@ public class ValueProviderModelValidatorTestCase {
   private final MetadataType NUMBER_TYPE = loader.load(Integer.class);
   private final MetadataType OBJECT_TYPE = loader.load(InputStream.class);
   private ValueProviderModelValidator valueProviderModelValidator;
+  private final MetadataType STRING_TYPE_WITH_ANNOTATIONS = new DefaultStringType(MetadataFormat.JAVA, createStringAnnotations());
+  private final MetadataType NUMBER_TYPE_WITH_ANNOTATIONS = new DefaultNumberType(MetadataFormat.JAVA, createNumberAnnotations());
+  private final MetadataType OBJECT_TYPE_WITH_ANNOTATIONS =
+      new DefaultObjectType(emptyList(), false, null, MetadataFormat.JSON, createObjectAnnotations());
+  private final MetadataType ARRAY_TYPE_WITH_ANNOTATIONS =
+      new DefaultArrayType(() -> STRING_TYPE, MetadataFormat.JAVA, createObjectAnnotations());
 
   private ProblemsReporter problemsReporter;
 
@@ -74,6 +88,9 @@ public class ValueProviderModelValidatorTestCase {
 
   @Mock(lenient = true)
   ParameterModel operationParameter;
+
+  @Mock(lenient = true)
+  ParameterModel anotherOperationParameter;
 
   @Mock(lenient = true)
   ParameterModel configrationParameter;
@@ -107,13 +124,14 @@ public class ValueProviderModelValidatorTestCase {
     when(configurationParameterGroupModel.getParameterModels()).thenReturn(asList(configrationParameter));
 
     when(extensionModel.getOperationModels()).thenReturn(singletonList(operationModel));
-    when(operationModel.getAllParameterModels()).thenReturn(asList(operationParameter));
+    when(operationModel.getAllParameterModels()).thenReturn(asList(operationParameter, anotherOperationParameter));
     when(operationModel.getName()).thenReturn("superOperation");
-    when(parameterGroupModel.getParameterModels()).thenReturn(asList(operationParameter));
+    when(parameterGroupModel.getParameterModels()).thenReturn(asList(operationParameter, anotherOperationParameter));
 
     when(operationModel.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
     mockParameter(configrationParameter, configrationParameterBuilder);
     mockParameter(operationParameter, operationParameterBuilder);
+    mockAnotherParameter(anotherOperationParameter, STRING_TYPE);
   }
 
   @Test
@@ -281,6 +299,46 @@ public class ValueProviderModelValidatorTestCase {
     assertNoErrors();
   }
 
+  @Test
+  public void modelTypeMatchesValueProviderTypeForStringParameter() {
+    mockAnotherParameter(anotherOperationParameter, STRING_TYPE_WITH_ANNOTATIONS);
+    operationParameterBuilder.withInjectableParameter("anotherParameter", OBJECT_TYPE, true);
+    when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
+        .thenReturn(Optional.of(operationParameterBuilder.build()));
+    validate();
+    assertNoErrors();
+  }
+
+  @Test
+  public void modelTypeMatchesValueProviderTypeForNumberParameter() {
+    mockAnotherParameter(anotherOperationParameter, NUMBER_TYPE_WITH_ANNOTATIONS);
+    operationParameterBuilder.withInjectableParameter("anotherParameter", OBJECT_TYPE, true);
+    when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
+        .thenReturn(Optional.of(operationParameterBuilder.build()));
+    validate();
+    assertNoErrors();
+  }
+
+  @Test
+  public void modelTypeMatchesValueProviderTypeForObjectParameter() {
+    mockAnotherParameter(anotherOperationParameter, OBJECT_TYPE_WITH_ANNOTATIONS);
+    operationParameterBuilder.withInjectableParameter("anotherParameter", OBJECT_TYPE, true);
+    when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
+        .thenReturn(Optional.of(operationParameterBuilder.build()));
+    validate();
+    assertNoErrors();
+  }
+
+  @Test
+  public void modelTypeMatchesValueProviderTypeForArrayParameter() {
+    mockAnotherParameter(anotherOperationParameter, ARRAY_TYPE_WITH_ANNOTATIONS);
+    operationParameterBuilder.withInjectableParameter("anotherParameter", OBJECT_TYPE, true);
+    when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
+        .thenReturn(Optional.of(operationParameterBuilder.build()));
+    validate();
+    assertNoErrors();
+  }
+
   private void assertProblems(String errorMessage) {
     List<Problem> errors = problemsReporter.getErrors();
     assertThat(errors, hasSize(1));
@@ -301,11 +359,16 @@ public class ValueProviderModelValidatorTestCase {
   }
 
   private void mockParameter(ParameterModel parameter, ValueProviderFactoryModelPropertyBuilder builder, String valueProviderId) {
+    mockParameter(parameter, builder, valueProviderId, "someName", STRING_TYPE);
+  }
+
+  private void mockParameter(ParameterModel parameter, ValueProviderFactoryModelPropertyBuilder builder, String valueProviderId,
+                             String paramName, MetadataType type) {
     when(parameter.getModelProperty(ValueProviderFactoryModelProperty.class)).thenReturn(Optional.of(builder.build()));
     when(parameter.getModelProperty(ImplementingParameterModelProperty.class)).thenReturn(empty());
     when(parameter.getModelProperty(DeclaringMemberModelProperty.class)).thenReturn(empty());
-    when(parameter.getName()).thenReturn("someName");
-    when(parameter.getType()).thenReturn(STRING_TYPE);
+    when(parameter.getName()).thenReturn(paramName);
+    when(parameter.getType()).thenReturn(type);
     when(parameter.getValueProviderModel())
         .thenReturn(of(new ValueProviderModel(emptyList(), false, false, true, 1, "name", valueProviderId)));
   }
@@ -331,6 +394,13 @@ public class ValueProviderModelValidatorTestCase {
     when(parameter.getName()).thenReturn("someName");
     when(parameter.getType()).thenReturn(OBJECT_TYPE);
     when(parameter.getFieldValueProviderModels()).thenReturn(fieldValueProviderModels);
+  }
+
+  private void mockAnotherParameter(ParameterModel parameter, MetadataType type) {
+    when(parameter.getModelProperty(ImplementingParameterModelProperty.class)).thenReturn(empty());
+    when(parameter.getModelProperty(DeclaringMemberModelProperty.class)).thenReturn(empty());
+    when(parameter.getName()).thenReturn("anotherParameter");
+    when(parameter.getType()).thenReturn(type);
   }
 
   public static class SomeValueProvider implements ValueProvider {
@@ -363,5 +433,25 @@ public class ValueProviderModelValidatorTestCase {
     public Set<Value> resolve() throws ValueResolvingException {
       return null;
     }
+  }
+
+  private Map<Class<? extends TypeAnnotation>, TypeAnnotation> createStringAnnotations() {
+    Map<Class<? extends TypeAnnotation>, TypeAnnotation> annotations = new HashMap<>();
+    annotations.put(ClassInformationAnnotation.class, new ClassInformationAnnotation(InputStream.class));
+    annotations.put(EnumAnnotation.class, new EnumAnnotation<>(new String[] {"value1", "value2"}));
+    return annotations;
+  }
+
+  private Map<Class<? extends TypeAnnotation>, TypeAnnotation> createNumberAnnotations() {
+    Map<Class<? extends TypeAnnotation>, TypeAnnotation> annotations = new HashMap<>();
+    annotations.put(ClassInformationAnnotation.class, new ClassInformationAnnotation(InputStream.class));
+    annotations.put(EnumAnnotation.class, new EnumAnnotation<>(new Number[] {1, 2}));
+    return annotations;
+  }
+
+  private Map<Class<? extends TypeAnnotation>, TypeAnnotation> createObjectAnnotations() {
+    Map<Class<? extends TypeAnnotation>, TypeAnnotation> annotations = new HashMap<>();
+    annotations.put(ClassInformationAnnotation.class, new ClassInformationAnnotation(InputStream.class));
+    return annotations;
   }
 }
