@@ -98,7 +98,7 @@ public class MuleOperationProcessingStrategyTestCase extends MuleArtifactFunctio
   @Description("Given a composed operation ended with a non-blocking operation that is completed in phase C and another" +
       "CPU_LITE operation without completion callback that executes in the phase B, when they are executed in that order" +
       "then the phases C and B are different")
-  public void operationAfterANonBlockingEndedComposedOperationRunsInDifferentPhases() throws Exception {
+  public void operationAfterANonBlockingOnlyComposedOperationRunsInDifferentPhases() throws Exception {
     flowRunner("nonBlockingFlow").run();
 
     Integer nonBlockingOpCompletionPhase = getCompletionThreadPhase("Non-blocking child");
@@ -129,6 +129,51 @@ public class MuleOperationProcessingStrategyTestCase extends MuleArtifactFunctio
     Integer blockingOpExecutionPhase = getExecutionThreadPhase("Blocking child");
     Integer nextOpExecutionPhase = getExecutionThreadPhase("After operation with one blocking child");
     assertThat(blockingOpExecutionPhase, is(nextOpExecutionPhase));
+  }
+
+
+  @Test
+  // .....................................+=====================================================================+.
+  // .....................................|.Composed.Operation..................................................|.
+  // .+===========================+.......|...+============================+.....+============================+.|.
+  // .|.Operation.................|.......|...|.Operation..................|.....|.Operation..................|.|.
+  // .|..-.ExecutionType=CPU_LITE.|.......|...|..-.ExecutionType=BLOCKING..|.....|..-.ExecutionType=CPU_LITE..|.|.
+  // .|..-.CompletionCallback=NO..|.====>.|...|..-.CompletionCallback=NO...|.==>.|..-.CompletionCallback=NO...|.|.
+  // .|..-.ExecutionPhase=PhaseA..|.......|...|..-.ExecutionPhase=PhaseB...|.....|..-.ExecutionPhase=PhaseC...|.|.
+  // .|..-.CompletionPhase=PhaseD.|.......|...|..-.CompletionPhase=PhaseE..|.....|..-.CompletionPhase=PhaseF..|.|.
+  // .+===========================+.......|...+============================+.....+============================+.|.
+  // .....................................+=====================================================================+.
+  //
+  // Assertion: PhaseA != PhaseB
+  //
+  public void blockingOperationInsideComposedBodyJumpsThreadBeforeExecute() throws Exception {
+    flowRunner("blockingComposedFlow").run();
+
+    Integer previousOpExecutionPhase = getExecutionThreadPhase("Before operationWithOneBlockingAndOneCpuLiteChildren operation");
+    Integer blockingOpExecutionPhase = getExecutionThreadPhase("Blocking child");
+    assertThat(blockingOpExecutionPhase, is(not(previousOpExecutionPhase)));
+  }
+
+  @Test
+  // .+=====================================================================+.....................................
+  // .|.Composed.Operation..................................................|.....................................
+  // .|...+============================+.....+============================+.|.......+===========================+.
+  // .|...|.Operation..................|.....|.Operation..................|.|.......|.Operation.................|.
+  // .|...|..-.ExecutionType=CPU_LITE..|.....|..-.ExecutionType=CPU_LITE..|.|.......|..-.ExecutionType=CPU_LITE.|.
+  // .|...|..-.CompletionCallback=NO...|.==>.|..-.CompletionCallback=YES..|.|.====>.|..-.CompletionCallback=NO..|.
+  // .|...|..-.ExecutionPhase=PhaseA...|.....|..-.ExecutionPhase=PhaseB...|.|.......|..-.ExecutionPhase=PhaseC..|.
+  // .|...|..-.CompletionPhase=PhaseD..|.....|..-.CompletionPhase=PhaseE..|.|.......|..-.CompletionPhase=PhaseF.|.
+  // .|...+============================+.....+============================+.|.......+===========================+.
+  // .+=====================================================================+.....................................
+  //
+  // Assertion: PhaseE != PhaseC
+  //
+  public void operationAfterANonBlockingEndedComposedOperationRunsInDifferentPhases() throws Exception {
+    flowRunner("nonBlockingComposedFlow").run();
+
+    Integer nonBlockingOpCompletionPhase = getCompletionThreadPhase("Non-blocking child");
+    Integer nextOpExecutionPhase = getExecutionThreadPhase("After operationWithOneCpuLiteAndOneNonBlockingChildren operation");
+    assertThat(nextOpExecutionPhase, is(not(nonBlockingOpCompletionPhase)));
   }
 
   private Integer getCompletionThreadPhase(String key) {
