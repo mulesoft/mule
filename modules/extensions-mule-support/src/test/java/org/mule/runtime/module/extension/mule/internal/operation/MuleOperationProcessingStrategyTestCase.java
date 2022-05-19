@@ -40,11 +40,12 @@ public class MuleOperationProcessingStrategyTestCase extends MuleArtifactFunctio
   // .|....|.Operation...................|.|.......|.Operation..................|.
   // .|....|..-.ExecutionType=BLOCKING...|.|.......|..-.ExecutionType=CPU_LITE..|.
   // .|....|..-.CompletionCallback=NO....|.|.====>.|..-.CompletionCallback=NO...|.
-  // .|....|..-.ExecutionThread=ThreadA..|.|.......|..-.ExecutionThread=ThreadB.|.
+  // .|....|..-.ExecutionPhase=PhaseA....|.|.......|..-.ExecutionPhase=PhaseB...|.
+  // .|....|..-.CompletionPhase=PhaseC...|.|.......|..-.CompletionPhase=PhaseD..|.
   // .|....+=============================+.|.......+============================+.
   // .+====================================+......................................
   //
-  // Assertion: ThreadA == ThreadB
+  // Assertion: PhaseA == PhaseB
   //
   @Description("Given a composed operation with only a BLOCKING child operation, and a CPU_LITE operation without callback, " +
       "when they are executed in that order, the BLOCKING child execution thread is the same as the CPU_LITE")
@@ -63,11 +64,12 @@ public class MuleOperationProcessingStrategyTestCase extends MuleArtifactFunctio
   // .|.Operation..................|.......|....|.Operation...................|.|.
   // .|..-.ExecutionType=CPU_LITE..|.......|....|..-.ExecutionType=BLOCKING...|.|.
   // .|..-.CompletionCallback=NO...|.====>.|....|..-.CompletionCallback=NO....|.|.
-  // .|..-.ExecutionThread=ThreadA.|.......|....|..-.ExecutionThread=ThreadB..|.|.
+  // .|..-.ExecutionPhase=PhaseA...|.......|....|..-.ExecutionPhase=PhaseB....|.|.
+  // .|..-.CompletionPhase=PhaseC..|.......|....|..-.CompletionPhase=PhaseD...|.|.
   // .+============================+.......|....+=============================+.|.
   // ......................................+====================================+.
   //
-  // Assertion: ThreadA != ThreadB
+  // Assertion: PhaseA != PhaseB
   //
   @Description("Given a CPU_LITE operation without callback, and a composed operation with only a BLOCKING child " +
       "operation, when they are executed in that order, the BLOCKING child execution thread is other than the CPU_LITE")
@@ -86,16 +88,17 @@ public class MuleOperationProcessingStrategyTestCase extends MuleArtifactFunctio
   // .|....|.Operation...................|.|.......|.Operation..................|.
   // .|....|..-.ExecutionType=CPU_LITE...|.|.......|..-.ExecutionType=CPU_LITE..|.
   // .|....|..-.CompletionCallback=YES...|.|.====>.|..-.CompletionCallback=NO...|.
-  // .|....|..-.CompletionThread=ThreadA.|.|.......|..-.ExecutionThread=ThreadB.|.
+  // .|....|..-.ExecutionPhase=PhaseA....|.|.......|..-.ExecutionPhase=PhaseB...|.
+  // .|....|..-.CompletionPhase=PhaseC...|.|.......|..-.CompletionPhase=PhaseD..|.
   // .|....+=============================+.|.......+============================+.
   // .+====================================+......................................
   //
-  // Assertion: ThreadA != ThreadB
+  // Assertion: PhaseC != PhaseB
   //
-  @Description("Given a composed operation ended with a non-blocking operation that is completed in thread A and another" +
-      "CPU_LITE operation without completion callback that executes in the thread B, when they are executed in that order" +
-      "then the threads A and B are different")
-  public void operationAfterANonBlockingEndedComposedOperationRunsInDifferentThread() throws Exception {
+  @Description("Given a composed operation ended with a non-blocking operation that is completed in phase C and another" +
+      "CPU_LITE operation without completion callback that executes in the phase B, when they are executed in that order" +
+      "then the phases C and B are different")
+  public void operationAfterANonBlockingEndedComposedOperationRunsInDifferentPhases() throws Exception {
     flowRunner("nonBlockingFlow").run();
 
     Integer nonBlockingOpCompletionPhase = getCompletionThreadPhase("Non-blocking child");
@@ -110,15 +113,16 @@ public class MuleOperationProcessingStrategyTestCase extends MuleArtifactFunctio
   // .|.Operation..................|.......|....|.Operation...................|.|.
   // .|..-.ExecutionType=CPU_LITE..|.......|....|..-.ExecutionType=CPU_LITE...|.|.
   // .|..-.CompletionCallback=NO...|.====>.|....|..-.CompletionCallback=YES...|.|.
-  // .|..-.ExecutionThread=ThreadA.|.......|....|..-.ExecutionThread=ThreadB..|.|.
+  // .|..-.ExecutionPhase=PhaseA...|.......|....|..-.ExecutionPhase=PhaseB....|.|.
+  // .|..-.CompletionPhase=PhaseC..|.......|....|..-.CompletionPhase=PhaseD...|.|.
   // .+============================+.......|....+=============================+.|.
   // ......................................+====================================+.
   //
-  // Assertion: ThreadA == ThreadB
+  // Assertion: PhaseA == PhaseB
   //
-  @Description("Given a CPU_LITE operation without completion callback that executes in the thread A, and a composed " +
-      "operation ended with a non-blocking operation that is completed in thread B, when they are executed in that order" +
-      "then the threads A and B are the same")
+  @Description("Given a CPU_LITE operation without completion callback that executes in the phase A, and a composed " +
+      "operation ended with a non-blocking operation that is executed in phase B, when they are executed in that order" +
+      "then the phases A and B are the same")
   public void operationBeforeANonBlockingComposedOperationRunsInSameThread() throws Exception {
     flowRunner("blockingFlow").run();
 
