@@ -7,9 +7,9 @@
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
-import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
@@ -43,6 +43,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupMo
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.mule.internal.execution.MuleOperationExecutor;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -328,7 +329,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   }
 
   public void computeCharacteristics(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
-    computeCharacteristics(singletonList(isBlocking), operationModelParsersByName);
+    computeCharacteristics(asList(isBlocking, notificationModels), operationModelParsersByName);
   }
 
   private void computeCharacteristics(List<Characteristic<?>> characteristics,
@@ -375,6 +376,9 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
     }
 
     public boolean hasDefinitiveValue() {
+      if (stopValue == null) {
+        return false;
+      }
       return stopValue.equals(value);
     }
 
@@ -411,6 +415,9 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
     }
 
     private static List<NotificationModel> aggregator(OperationModel operationModel, List<NotificationModel> notificationModels) {
+      if (notificationModels == null) {
+        notificationModels = new ArrayList<>();
+      }
       notificationModels.addAll(operationModel.getNotificationModels());
       return notificationModels;
     }
