@@ -8,11 +8,14 @@ package org.mule.test.functional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
 
 import org.mule.test.petstore.extension.PetStoreClient;
 
+import io.qameta.allure.Feature;
 import org.junit.Test;
 
+@Feature(XML_SDK)
 public class ModuleWithConfigurationAndWithImplicitConfigurationTestCase
     extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 

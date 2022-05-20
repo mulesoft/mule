@@ -9,10 +9,9 @@ package org.mule.runtime.extension.internal.ast;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
-import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.CONFIG;
-import static org.mule.runtime.api.functional.Either.right;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.ast.api.ComponentGenerationInformation.EMPTY_GENERATION_INFO;
 import static org.mule.runtime.ast.api.ComponentMetadataAst.EMPTY_METADATA;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
@@ -22,7 +21,6 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -31,7 +29,6 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentGenerationInformation;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.ast.api.ParameterResolutionException;
 import org.mule.runtime.ast.api.util.BaseComponentAst;
 
 import java.util.Collection;
@@ -58,12 +55,17 @@ public class XmlSdkImplicitConfig extends BaseComponentAst {
     this.configName = format(IMPLICIT_CONFIG_NAME_SUFFIX, extensionModel.getName());
 
     final List<ParameterModel> parameterModels = getModel(ParameterizedModel.class)
-        .map(ParameterizedModel::getAllParameterModels).orElse(emptyList());
+        .map(ParameterizedModel::getParameterGroupModels)
+        .orElse(emptyList())
+        .stream()
+        .filter(parameterGroupModel -> parameterGroupModel.getName().equals(DEFAULT_GROUP_NAME))
+        .findFirst()
+        .map(ParameterGroupModel::getParameterModels)
+        .orElse(emptyList());
 
     for (ParameterModel parameterModel : parameterModels) {
-      String rawValue = parameterModel.getName().equals("name") ? configName : null;
-      ComponentParameterAst componentParameterAst = getComponentParameterAst(parameterModel, rawValue);
-      componentParameterAsts.add(componentParameterAst);
+      Object value = parameterModel.getName().equals("name") ? configName : parameterModel.getDefaultValue();
+      componentParameterAsts.add(new XmlSdkImplicitConfigParameter(parameterModel, value));
     }
   }
 
@@ -129,57 +131,6 @@ public class XmlSdkImplicitConfig extends BaseComponentAst {
   @Override
   public List<ComponentAst> directChildren() {
     return emptyList();
-  }
-
-  private ComponentParameterAst getComponentParameterAst(ParameterModel parameterModel, String rawValue) {
-    return new ComponentParameterAst() {
-
-      @Override
-      public ParameterModel getModel() {
-        return parameterModel;
-      }
-
-      @Override
-      public ParameterGroupModel getGroupModel() {
-        return null;
-      }
-
-      @Override
-      public Either<String, Object> getValue() {
-        return right(getRawValue() != null ? getRawValue() : getModel().getDefaultValue());
-      }
-
-      @Override
-      public <T> Either<String, Either<ParameterResolutionException, T>> getValueOrResolutionError() {
-        return null;
-      }
-
-      @Override
-      public String getRawValue() {
-        return rawValue;
-      }
-
-      @Override
-      public String getResolvedRawValue() {
-        return null;
-      }
-
-      @Override
-      public Optional<ComponentMetadataAst> getMetadata() {
-        return empty();
-      }
-
-      @Override
-      public ComponentGenerationInformation getGenerationInformation() {
-        return EMPTY_GENERATION_INFO;
-      }
-
-      @Override
-      public boolean isDefaultValue() {
-        return true;
-      }
-    };
-
   }
 
 }

@@ -16,7 +16,7 @@ import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
 @Feature(XML_SDK)
-public class ModuleWithImplicitConfigurationTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
+public class ModuleWithImplicitConfigurationUsingScopesTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
   @Override
   protected String getModulePath() {
@@ -25,11 +25,11 @@ public class ModuleWithImplicitConfigurationTestCase extends AbstractCeXmlExtens
 
   @Override
   protected String getConfigFile() {
-    return "flows/flows-using-module-global-element-default-params-without-config.xml";
+    return "flows/flows-using-module-global-element-default-params-without-config-with-scope.xml";
   }
 
   @Test
-  public void testDoGetClient() throws java.lang.Exception {
+  public void testDoGetClient() throws Exception {
     assertGetClient("testDoGetClient");
   }
 
