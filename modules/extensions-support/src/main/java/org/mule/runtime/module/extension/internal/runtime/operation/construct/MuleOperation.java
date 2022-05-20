@@ -6,8 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation.construct;
 
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.getDefaultProcessingStrategyFactory;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.AbstractComponent;
@@ -18,11 +23,17 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
+import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.slf4j.Logger;
+import reactor.core.publisher.Flux;
 
 /**
  * Default {@link Operation} implementation
@@ -37,14 +48,17 @@ public class MuleOperation extends AbstractComponent implements Operation {
     return new DefaultOperationBuilder();
   }
 
-  private final MessageProcessorChain chain;
+  private final List<Processor> processors;
   private final OperationModel operationModel;
   private final MuleContext muleContext;
 
-  MuleOperation(MessageProcessorChain chain,
+  private MessageProcessorChain chain;
+  private ProcessingStrategy processingStrategy;
+
+  MuleOperation(List<Processor> processors,
                 OperationModel operationModel,
                 MuleContext muleContext) {
-    this.chain = chain;
+    this.processors = processors;
     this.operationModel = operationModel;
     this.muleContext = muleContext;
   }
@@ -61,22 +75,29 @@ public class MuleOperation extends AbstractComponent implements Operation {
 
   @Override
   public void initialise() throws InitialisationException {
+    processingStrategy = getDefaultProcessingStrategyFactory(muleContext).create(muleContext, operationModel.getName());
+    initialiseIfNeeded(processingStrategy);
+
+    chain = newChain(ofNullable(processingStrategy), processors);
     initialiseIfNeeded(chain, true, muleContext);
   }
 
   @Override
   public void start() throws MuleException {
-    chain.start();
+    startIfNeeded(processingStrategy);
+    startIfNeeded(chain);
   }
 
   @Override
   public void stop() throws MuleException {
-    chain.stop();
+    stopIfNeeded(chain);
+    stopIfNeeded(processingStrategy);
   }
 
   @Override
   public void dispose() {
     disposeIfNeeded(chain, LOGGER);
+    disposeIfNeeded(processingStrategy, LOGGER);
   }
 
   @Override

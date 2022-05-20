@@ -8,14 +8,17 @@ package org.mule.runtime.module.extension.internal.runtime.operation.construct;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.getDefaultProcessingStrategyFactory;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.module.extension.internal.runtime.operation.construct.Operation.Builder;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.module.extension.internal.runtime.operation.construct.Operation.Builder;
 
 import java.util.List;
 
@@ -80,11 +83,7 @@ class DefaultOperationBuilder implements Builder {
     checkInvoked(muleContext, "setMuleContext(MuleContext)");
     checkState(processors != null && !processors.isEmpty(), "Processors cannot be null nor empty");
 
-    DefaultMessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder();
-    chainBuilder.chain(processors);
-
-    product = new MuleOperation(
-                                chainBuilder.build(),
+    product = new MuleOperation(processors,
                                 operationModel,
                                 muleContext);
 
