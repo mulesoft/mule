@@ -8,6 +8,7 @@ package org.mule.module.artifact.classloader;
 
 import static java.lang.Thread.activeCount;
 import static java.lang.Thread.enumerate;
+import static org.mule.module.artifact.classloader.ThreadCommonMethodsUtil.*;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -27,7 +28,6 @@ public class JMSResourceReleaser implements ResourceReleaser {
   private static final String TEST_CLASSLOADER_ARTIFACT_ID = "test";
   private static final String CLASSLOADER_CLASS_TEST_CONTEXT = "AppClassLoader";
   public static final String ACTIVEMQ_DRIVER_TIMER_THREAD_CLASS_NAME = "TimerThread";
-  public static final String COMPOSITE_CLASS_LOADER_CLASS_NAME = "CompositeClassLoader";
   public static final String ACTIVEMQ_DRIVER_TIMER_THREAD_NAME = "ActiveMQ InactivityMonitor ReadCheckTimer";
 
   private final ClassLoader classLoader;
@@ -104,79 +104,5 @@ public class JMSResourceReleaser implements ResourceReleaser {
     return artifactId.equals(TEST_CLASSLOADER_ARTIFACT_ID)
         && thread.getContextClassLoader().getClass().getSimpleName().equals(CLASSLOADER_CLASS_TEST_CONTEXT)
         && thread.getName().equals(ACTIVEMQ_DRIVER_TIMER_THREAD_NAME);
-  }
-
-  /**
-   * To ensure that tha thread belong to the current domain
-   */
-  private boolean isThreadLoadedByDisposedDomain(String undeployedArtifactId, ClassLoader threadContextClassLoader) {
-    try {
-      Class threadContextClassLoaderClass = threadContextClassLoader.getClass();
-      if (!threadContextClassLoaderClass.getSimpleName().equals(COMPOSITE_CLASS_LOADER_CLASS_NAME)) {
-        return false;
-      }
-
-      Method getDelegateClassLoadersMethod = threadContextClassLoaderClass.getMethod("getDelegates");
-      List<ClassLoader> classLoaderList = (List<ClassLoader>) getDelegateClassLoadersMethod.invoke(threadContextClassLoader);
-
-      for (ClassLoader classLoaderDelegate : classLoaderList) {
-        if (classLoaderDelegate instanceof ArtifactClassLoader) {
-          ArtifactClassLoader artifactClassLoader = (ArtifactClassLoader) classLoaderDelegate;
-          if (artifactClassLoader.getArtifactId().contains(undeployedArtifactId)) {
-            return true;
-          }
-        }
-      }
-
-    } catch (Exception e) {
-      logger.warn("Exception occurred while attempting to compare {} and {} artifactId.", threadContextClassLoader,
-                  this.getClass().getClassLoader());
-    }
-    return false;
-  }
-
-  /**
-   * To ensure that tha thread belong to the classloader that we are trying to dispose.
-   */
-  private boolean isThreadLoadedByDisposedApplication(String undeployedArtifactId, ClassLoader threadContextClassLoader) {
-    try {
-      if (!(threadContextClassLoader instanceof MuleArtifactClassLoader)) {
-        return false;
-      }
-      String threadClassLoaderArtifactId = ((MuleArtifactClassLoader) threadContextClassLoader).getArtifactId();
-      return threadClassLoaderArtifactId != null && threadClassLoaderArtifactId.equals(undeployedArtifactId);
-    } catch (Exception e) {
-      logger.warn("Exception occurred while attempting to compare {} and {} artifact id.", threadContextClassLoader,
-                  this.getClass().getClassLoader());
-    }
-
-    return false;
-  }
-
-  /**
-   * Removing references to allow to delete the timer thread.
-   */
-  private void clearReferencesStopTimerThread(Thread thread)
-      throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-    try {
-      Field newTasksMayBeScheduledField =
-          thread.getClass().getDeclaredField("newTasksMayBeScheduled");
-      newTasksMayBeScheduledField.setAccessible(true);
-      Field queueField = thread.getClass().getDeclaredField("queue");
-      queueField.setAccessible(true);
-      Object queue = queueField.get(thread);
-      Method clearMethod = queue.getClass().getDeclaredMethod("clear");
-      clearMethod.setAccessible(true);
-      synchronized (queue) {
-        newTasksMayBeScheduledField.setBoolean(thread, false);
-        clearMethod.invoke(queue);
-        queue.notifyAll();
-      }
-    } catch (NoSuchFieldException noSuchFieldEx) {
-      logger.warn("Unable to clear timer references using 'clear' method. Attempting to use 'cancel' method.");
-      Method cancelMethod = thread.getClass().getDeclaredMethod("cancel");
-      cancelMethod.setAccessible(true);
-      cancelMethod.invoke(thread);
-    }
   }
 }
