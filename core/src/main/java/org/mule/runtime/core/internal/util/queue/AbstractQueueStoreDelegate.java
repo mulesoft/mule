@@ -54,7 +54,8 @@ public abstract class AbstractQueueStoreDelegate implements QueueStoreDelegate {
           } else {
             if (l2 <= 0L) {
               logger
-                  .warn(format("Timeout of %d milliseconds reached, object could not be queued. Queue capacity full.", timeout));
+                  .warn(format("Timeout of %d milliseconds reached, object could not be queued. Queue capacity of %d full.",
+                               timeout, capacity));
               return false;
             }
             this.wait(l2);
