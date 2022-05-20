@@ -135,7 +135,7 @@
         <dependency>
             <groupId>org.mule.extension</groupId>
             <artifactId>mule-testing-processing-strategies</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${muleTestingProcessingStrategiesExtensionVersion}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
             <exclusions>

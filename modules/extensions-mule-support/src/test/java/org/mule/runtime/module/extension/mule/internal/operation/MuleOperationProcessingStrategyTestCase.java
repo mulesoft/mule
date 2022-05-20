@@ -6,20 +6,21 @@
  */
 package org.mule.runtime.module.extension.mule.internal.operation;
 
+import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
+import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERATIONS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
-import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
-import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERATIONS;
+
+import org.mule.extension.mule.testing.processing.strategies.test.api.ExecutionThreadTracker;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+
+import javax.inject.Inject;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
-import org.mule.extension.mule.testing.processing.strategies.test.api.ExecutionThreadTracker;
-import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-
-import javax.inject.Inject;
 
 @Feature(REUSE)
 @Story(OPERATIONS)
@@ -51,10 +52,7 @@ public class MuleOperationProcessingStrategyTestCase extends MuleArtifactFunctio
       "when they are executed in that order, the BLOCKING child execution thread is the same as the CPU_LITE")
   public void blockingOperationInsideBodyDoesNotJumpThreadAfterExecute() throws Exception {
     flowRunner("blockingFlow").run();
-
-    Integer blockingOpExecutionPhase = getExecutionThreadPhase("Blocking child");
-    Integer nextOpExecutionPhase = getExecutionThreadPhase("After operation with one blocking child");
-    assertThat(blockingOpExecutionPhase, is(nextOpExecutionPhase));
+    assertThat(executionPhaseForKey("Blocking child"), is(executionPhaseForKey("After operation with one blocking child")));
   }
 
   @Test
@@ -75,10 +73,7 @@ public class MuleOperationProcessingStrategyTestCase extends MuleArtifactFunctio
       "operation, when they are executed in that order, the BLOCKING child execution thread is other than the CPU_LITE")
   public void blockingOperationInsideBodyJumpsThreadBeforeExecute() throws Exception {
     flowRunner("blockingFlow").run();
-
-    Integer previousOpExecutionPhase = getExecutionThreadPhase("Before operation with one blocking child");
-    Integer blockingOpExecutionPhase = getExecutionThreadPhase("Blocking child");
-    assertThat(blockingOpExecutionPhase, is(not(previousOpExecutionPhase)));
+    assertThat(executionPhaseForKey("Blocking child"), is(not(executionPhaseForKey("Before operation with one blocking child"))));
   }
 
   @Test
@@ -100,10 +95,8 @@ public class MuleOperationProcessingStrategyTestCase extends MuleArtifactFunctio
       "then the phases C and B are different")
   public void operationAfterANonBlockingOnlyComposedOperationRunsInDifferentPhases() throws Exception {
     flowRunner("nonBlockingFlow").run();
-
-    Integer nonBlockingOpCompletionPhase = getCompletionThreadPhase("Non-blocking child");
-    Integer nextOpExecutionPhase = getExecutionThreadPhase("After operation with one non-blocking child");
-    assertThat(nextOpExecutionPhase, is(not(nonBlockingOpCompletionPhase)));
+    assertThat(executionPhaseForKey("After operation with one non-blocking child"),
+               is(not(completionPhaseForKey("Non-blocking child"))));
   }
 
   @Test
@@ -125,10 +118,7 @@ public class MuleOperationProcessingStrategyTestCase extends MuleArtifactFunctio
       "then the phases A and B are the same")
   public void operationBeforeANonBlockingComposedOperationRunsInSameThread() throws Exception {
     flowRunner("blockingFlow").run();
-
-    Integer blockingOpExecutionPhase = getExecutionThreadPhase("Blocking child");
-    Integer nextOpExecutionPhase = getExecutionThreadPhase("After operation with one blocking child");
-    assertThat(blockingOpExecutionPhase, is(nextOpExecutionPhase));
+    assertThat(executionPhaseForKey("Blocking child"), is(executionPhaseForKey("After operation with one blocking child")));
   }
 
 
@@ -148,10 +138,8 @@ public class MuleOperationProcessingStrategyTestCase extends MuleArtifactFunctio
   //
   public void blockingOperationInsideComposedBodyJumpsThreadBeforeExecute() throws Exception {
     flowRunner("blockingComposedFlow").run();
-
-    Integer previousOpExecutionPhase = getExecutionThreadPhase("Before operationWithOneBlockingAndOneCpuLiteChildren operation");
-    Integer blockingOpExecutionPhase = getExecutionThreadPhase("Blocking child");
-    assertThat(blockingOpExecutionPhase, is(not(previousOpExecutionPhase)));
+    assertThat(executionPhaseForKey("Blocking child"),
+               is(not(executionPhaseForKey("Before operationWithOneBlockingAndOneCpuLiteChildren operation"))));
   }
 
   @Test
@@ -170,17 +158,15 @@ public class MuleOperationProcessingStrategyTestCase extends MuleArtifactFunctio
   //
   public void operationAfterANonBlockingEndedComposedOperationRunsInDifferentPhases() throws Exception {
     flowRunner("nonBlockingComposedFlow").run();
-
-    Integer nonBlockingOpCompletionPhase = getCompletionThreadPhase("Non-blocking child");
-    Integer nextOpExecutionPhase = getExecutionThreadPhase("After operationWithOneCpuLiteAndOneNonBlockingChildren operation");
-    assertThat(nextOpExecutionPhase, is(not(nonBlockingOpCompletionPhase)));
+    assertThat(executionPhaseForKey("After operationWithOneCpuLiteAndOneNonBlockingChildren operation"),
+               is(not(completionPhaseForKey("Non-blocking child"))));
   }
 
-  private Integer getCompletionThreadPhase(String key) {
+  private Integer completionPhaseForKey(String key) {
     return executionThreadTracker.getCompletionThreadPhase(key);
   }
 
-  private Integer getExecutionThreadPhase(String key) {
+  private Integer executionPhaseForKey(String key) {
     return executionThreadTracker.getExecutionThreadPhase(key);
   }
 }
