@@ -7,9 +7,9 @@
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
-import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
@@ -23,13 +23,13 @@ import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
+import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
-import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
@@ -43,6 +43,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupMo
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.mule.internal.execution.MuleOperationExecutor;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -50,6 +51,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -74,6 +76,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   private final TypeLoader typeLoader;
 
   private final Characteristic<Boolean> isBlocking = new AnyMatchCharacteristic(OperationModel::isBlocking);
+  private final Characteristic<List<NotificationModel>> notificationModels = new AggregatedNotificationsCharacteristic();
 
   private String name;
 
@@ -116,9 +119,9 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   }
 
   @Override
-  public List<String> getEmittedNotifications() {
-    // TODO: MULE-20075
-    return emptyList();
+  public Stream<NotificationModel> getEmittedNotificationsStream(Function<String, Optional<NotificationModel>> notificationMapper) {
+    // The mapper isn't needed at this implementation since we already have the operation models.
+    return notificationModels.getValue().stream();
   }
 
   @Override
@@ -326,7 +329,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   }
 
   public void computeCharacteristics(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
-    computeCharacteristics(singletonList(isBlocking), operationModelParsersByName);
+    computeCharacteristics(asList(isBlocking, notificationModels), operationModelParsersByName);
   }
 
   private void computeCharacteristics(List<Characteristic<?>> characteristics,
@@ -373,6 +376,9 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
     }
 
     public boolean hasDefinitiveValue() {
+      if (stopValue == null) {
+        return false;
+      }
       return stopValue.equals(value);
     }
 
@@ -399,6 +405,21 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
     private AnyMatchCharacteristic(Predicate<OperationModel> predicate) {
       super(predicate, false, true);
+    }
+  }
+
+  private static class AggregatedNotificationsCharacteristic extends Characteristic<List<NotificationModel>> {
+
+    private AggregatedNotificationsCharacteristic() {
+      super(AggregatedNotificationsCharacteristic::aggregator, emptyList(), null);
+    }
+
+    private static List<NotificationModel> aggregator(OperationModel operationModel, List<NotificationModel> notificationModels) {
+      if (notificationModels == null) {
+        notificationModels = new ArrayList<>();
+      }
+      notificationModels.addAll(operationModel.getNotificationModels());
+      return notificationModels;
     }
   }
 }
