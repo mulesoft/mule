@@ -6,38 +6,35 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader;
 
+import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.validateMuleRuntimeSharedLibrary;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 
 import static java.lang.String.format;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
-import com.google.common.collect.ImmutableSet;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
-import org.slf4j.Logger;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Assembles the class loader configuration for an artifact given all its pieces.
  */
 public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
 
-  private static final Logger LOGGER = getLogger(AbstractArtifactClassLoaderConfigurationAssembler.class);
-
-  protected org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel;
+  private final org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel;
 
   public AbstractArtifactClassLoaderConfigurationAssembler(org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel) {
     this.packagerClassLoaderModel = packagerClassLoaderModel;
@@ -52,20 +49,40 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
         .exportingResources(getExportedResources());
     // TODO: add privileged packages and resources
 
-    // TODO: analyze patched dependencies in classloader-model-patch.json
+    List<BundleDependency> bundleDependencies = getProcessedBundleDependencies();
 
     final List<URL> dependenciesArtifactsUrls =
-        loadUrls(getProjectFolder(), getBundleDependencies(), artifactClassLoaderConfigurationBuilder);
+        loadUrls(getProjectFolder(), bundleDependencies, artifactClassLoaderConfigurationBuilder);
     dependenciesArtifactsUrls.forEach(artifactClassLoaderConfigurationBuilder::containing);
 
-    // TODO: check if it belongs to the deny-list to decide whether local packages should be populated
-    populateLocalPackages(packagerClassLoaderModel, artifactClassLoaderConfigurationBuilder);
+    if (shouldPopulateLocalPackages()) {
+      populateLocalPackages(packagerClassLoaderModel, artifactClassLoaderConfigurationBuilder);
+    }
 
-    artifactClassLoaderConfigurationBuilder.dependingOn(new HashSet<>(getBundleDependencies()));
+    artifactClassLoaderConfigurationBuilder.dependingOn(new HashSet<>(bundleDependencies));
 
     return artifactClassLoaderConfigurationBuilder.build();
   }
 
+  protected boolean shouldPopulateLocalPackages() {
+    return true;
+  }
+
+  protected List<BundleDependency> getProcessedBundleDependencies() {
+    return getBundleDependencies();
+  }
+
+  /**
+   * Loads the URLs of the class loader for this artifact.
+   * <p>
+   * It lets implementations add artifact specific URLs by letting them override
+   * {@link #addArtifactSpecificClassLoaderConfiguration(ArtifactClassLoaderConfigurationBuilder)}
+   *
+   * @param artifactFile                            the artifact file for which the {@link ClassLoaderModel class loader
+   *                                                configuration} is being generated.
+   * @param dependencies                            the dependencies resolved for this artifact.
+   * @param artifactClassLoaderConfigurationBuilder the builder of the {@link ClassLoaderModel class loader configuration}
+   */
   private List<URL> loadUrls(File artifactFile,
                              List<BundleDependency> dependencies,
                              ArtifactClassLoaderConfigurationBuilder artifactClassLoaderConfigurationBuilder) {
@@ -82,12 +99,18 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
     return dependenciesArtifactsUrls;
   }
 
+  /**
+   * Template method to add artifact specific configuration to the {@link ArtifactClassLoaderConfigurationBuilder}.
+   *
+   * @param artifactClassLoaderConfigurationBuilder the builder used to generate {@link ClassLoaderModel class loader
+   *                                                configuration} of the artifact.
+   */
   protected Collection<URL> addArtifactSpecificClassLoaderConfiguration(ArtifactClassLoaderConfigurationBuilder artifactClassLoaderConfigurationBuilder) {
-    return Collections.emptyList();
+    return emptyList();
   }
 
-  private List<URL> addDependenciesToClasspathUrls(File artifactFile,
-                                                   List<BundleDependency> dependencies) {
+  private static List<URL> addDependenciesToClasspathUrls(File artifactFile,
+                                                          List<BundleDependency> dependencies) {
     final List<URL> dependenciesArtifactsUrls = new ArrayList<>();
 
     dependencies.stream()
@@ -119,18 +142,6 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
     }
   }
 
-  protected final boolean validateMuleRuntimeSharedLibrary(String groupId, String artifactId, String artifactFileName) {
-    if ("org.mule.runtime".equals(groupId)
-        || "com.mulesoft.mule.runtime.modules".equals(groupId)) {
-      LOGGER
-          .warn("Internal plugin library '{}:{}' is a Mule Runtime dependency. It will not be used by '{}' in order to avoid classloading issues. Please consider removing it, or at least not putting it with 'compile' scope.",
-                groupId, artifactId, artifactFileName);
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   private void populateLocalPackages(org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
                                      ArtifactClassLoaderConfigurationBuilder artifactClassLoaderConfigurationBuilder) {
     ImmutableSet.Builder<String> packagesSetBuilder = ImmutableSet.builder();
@@ -152,8 +163,8 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
       }
     });
 
-    artifactClassLoaderConfigurationBuilder.withLocalPackages(new HashSet<>(packagesSetBuilder.build()));
-    artifactClassLoaderConfigurationBuilder.withLocalResources(new HashSet<>(resourcesSetBuilder.build()));
+    artifactClassLoaderConfigurationBuilder.withLocalPackages(packagesSetBuilder.build());
+    artifactClassLoaderConfigurationBuilder.withLocalResources(resourcesSetBuilder.build());
   }
 
   protected abstract List<BundleDependency> getBundleDependencies();

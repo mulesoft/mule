@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader;
 
-import static java.util.Arrays.asList;
+import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.validateMuleRuntimeSharedLibrary;
+
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 
@@ -20,14 +21,16 @@ import org.mule.tools.api.classloader.model.AppClassLoaderModel;
 import org.mule.tools.api.classloader.model.Artifact;
 
 import java.io.File;
-import java.util.HashSet;
 import java.util.List;
+
+import com.google.common.collect.Sets;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 /**
- * ClassLoaderModelBuilder that adds the concept of Shared Library for the configured dependencies.
+ * {@link ClassLoaderModel.ClassLoaderModelBuilder ClassLoaderModelBuilder} that adds the concept of Shared Library for the
+ * configured dependencies.
  */
 public class ArtifactClassLoaderConfigurationBuilder extends ClassLoaderModel.ClassLoaderModelBuilder {
 
@@ -60,14 +63,9 @@ public class ArtifactClassLoaderConfigurationBuilder extends ClassLoaderModel.Cl
         .filter(sharedDep -> !validateMuleRuntimeSharedLibrary(sharedDep.getArtifactCoordinates().getGroupId(),
                                                                sharedDep.getArtifactCoordinates().getArtifactId()))
         .forEach(sharedDep -> {
-          // if (isSupportingPackagesResourcesInformation()) {
-          this.exportingPackages(sharedDep.getPackages() == null ? emptySet() : new HashSet<>(asList(sharedDep.getPackages())));
+          this.exportingPackages(sharedDep.getPackages() == null ? emptySet() : Sets.newHashSet(sharedDep.getPackages()));
           this.exportingResources(sharedDep.getResources() == null ? emptySet()
-              : new HashSet<>(asList(sharedDep.getResources())));
-          // } else {
-          // findAndExportSharedLibrary(sharedDep.getArtifactCoordinates().getGroupId(),
-          // sharedDep.getArtifactCoordinates().getArtifactId());
-          // }
+              : Sets.newHashSet(sharedDep.getResources()));
         });
   }
 
@@ -76,18 +74,6 @@ public class ArtifactClassLoaderConfigurationBuilder extends ClassLoaderModel.Cl
       AppClassLoaderModel appClassLoaderModel = (AppClassLoaderModel) packagerClassLoaderModel;
       appClassLoaderModel.getAdditionalPluginDependencies()
           .ifPresent(additionalDeps -> additionalDeps.forEach(this::updateDependency));
-    }
-  }
-
-  protected final boolean validateMuleRuntimeSharedLibrary(String groupId, String artifactId) {
-    if ("org.mule.runtime".equals(groupId)
-        || "com.mulesoft.mule.runtime.modules".equals(groupId)) {
-      LOGGER
-          .warn("Shared library '{}:{}' is a Mule Runtime dependency. It will not be shared by the app in order to avoid classloading issues. Please consider removing it, or at least not putting it as a sharedLibrary.",
-                groupId, artifactId);
-      return true;
-    } else {
-      return false;
     }
   }
 
@@ -140,9 +126,9 @@ public class ArtifactClassLoaderConfigurationBuilder extends ClassLoaderModel.Cl
             .build());
 
     bundleDependencyBuilder
-        .setPackages(artifact.getPackages() == null ? emptySet() : new HashSet<>(asList(artifact.getPackages())));
+        .setPackages(artifact.getPackages() == null ? emptySet() : Sets.newHashSet(artifact.getPackages()));
     bundleDependencyBuilder
-        .setResources(artifact.getResources() == null ? emptySet() : new HashSet<>(asList(artifact.getResources())));
+        .setResources(artifact.getResources() == null ? emptySet() : Sets.newHashSet(artifact.getResources()));
     return bundleDependencyBuilder.build();
   }
 

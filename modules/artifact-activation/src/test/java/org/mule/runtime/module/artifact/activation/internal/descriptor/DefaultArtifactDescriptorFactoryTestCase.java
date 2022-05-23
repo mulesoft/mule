@@ -6,17 +6,21 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
+import static org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver.pluginDescriptorResolver;
+import static org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver.mavenDeployablePluginModelResolver;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
+
+import static java.util.Collections.emptyMap;
+
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.junit.Test;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.module.artifact.activation.api.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
-import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
-import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
 import org.mule.runtime.module.artifact.activation.internal.maven.MavenApplicationProjectModelFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -24,24 +28,30 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+import org.junit.Test;
+
+@Feature(CLASSLOADING_ISOLATION)
+@Story(ARTIFACT_DESCRIPTORS)
 public class DefaultArtifactDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void createApplicationDescriptor() throws Exception {
     MavenApplicationProjectModelFactory modelFactory =
-        new MavenApplicationProjectModelFactory(getApplicationFolder("apps/shared-lib-addition-plugin-dependencies"));
+        new MavenApplicationProjectModelFactory(getApplicationFolder("apps/shared-lib-additional-plugin-dependencies"));
 
     DeployableProjectModel<MuleApplicationModel> model = modelFactory.createDeployableProjectModel();
 
     ArtifactDescriptorFactory artifactDescriptorFactory = new DefaultArtifactDescriptorFactory();
     ApplicationDescriptor applicationDescriptor =
-        artifactDescriptorFactory.createApplicationDescriptor(model, Collections.emptyMap(),
-                                                              PluginModelResolver.mavenDeployablePluginModelResolver(),
-                                                              PluginDescriptorResolver.pluginDescriptorResolver());
+        artifactDescriptorFactory.createApplicationDescriptor(model, emptyMap(),
+                                                              mavenDeployablePluginModelResolver(),
+                                                              pluginDescriptorResolver());
 
     assertThat(applicationDescriptor.getClassLoaderModel().getDependencies().stream()
         .filter(bundleDependency -> bundleDependency.getDescriptor().getArtifactId().equals("derby")).findAny(),

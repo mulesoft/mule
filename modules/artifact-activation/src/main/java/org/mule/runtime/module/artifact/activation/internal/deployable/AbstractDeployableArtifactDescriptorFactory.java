@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.of;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
@@ -27,17 +28,18 @@ import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescrip
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
-import com.google.common.collect.ImmutableSet;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class to create descriptors of artifacts that are deployable.
@@ -50,7 +52,7 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDeployableArtifactDescriptorFactory.class);
 
-  protected final DeployableProjectModel<M> deployableProjectModel;
+  private final DeployableProjectModel<M> deployableProjectModel;
   protected final Optional<Properties> deploymentProperties;
   private final PluginModelResolver pluginModelResolver;
   private final PluginDescriptorResolver pluginDescriptorResolver;
@@ -65,13 +67,13 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
     super(deployableProjectModel.getProjectFolder(), deployableProjectModel.getMuleDeployableModel(),
           artifactDescriptorValidatorBuilder);
     this.deployableProjectModel = deployableProjectModel;
-    this.deploymentProperties = getProperties(deploymentProperties);
+    this.deploymentProperties = asProperties(deploymentProperties);
     this.pluginModelResolver = pluginModelResolver;
     this.pluginDescriptorResolver = pluginDescriptorResolver;
     this.artifactDescriptorFactory = artifactDescriptorFactory;
   }
 
-  private Optional<Properties> getProperties(Map<String, String> deploymentProperties) {
+  private Optional<Properties> asProperties(Map<String, String> deploymentProperties) {
     Properties properties = new Properties();
     properties.putAll(deploymentProperties);
     return of(properties);

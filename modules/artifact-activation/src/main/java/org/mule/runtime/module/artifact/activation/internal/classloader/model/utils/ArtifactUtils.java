@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader.model.utils;
 
+import static java.util.Optional.ofNullable;
 import static org.mule.maven.client.internal.AetherMavenClient.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.Classifier.MULE_DOMAIN;
@@ -22,6 +23,7 @@ import static java.util.stream.Collectors.toList;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.maven.client.api.model.BundleDependency;
 import org.mule.maven.client.api.model.BundleDescriptor;
@@ -43,16 +45,21 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.slf4j.Logger;
 
 /**
  * Helper methods to convert artifact related classes and recognize mule plugin artifacts.
  */
 public class ArtifactUtils {
 
+  private static final Logger LOGGER = getLogger(ArtifactUtils.class);
+
   private static final String PACKAGE_TYPE = "jar";
   private static final String PROVIDED = "provided";
   private static final URI EMPTY_RESOURCE = URI.create("");
   private static final String POM_TYPE = "pom";
+  private static final String MULE_RUNTIME_GROUP_ID = "org.mule.runtime";
+  private static final String MULE_RUNTIME_MODULES_GROUP_ID = "com.mulesoft.mule.runtime.modules";
 
   /**
    * Convert a {@link BundleDescriptor} instance to {@link ArtifactCoordinates}.
@@ -61,11 +68,9 @@ public class ArtifactUtils {
    * @return the corresponding artifact coordinates with normalized version.
    */
   public static ArtifactCoordinates toArtifactCoordinates(BundleDescriptor bundleDescriptor) {
-    ArtifactCoordinates artifactCoordinates =
-        new ArtifactCoordinates(bundleDescriptor.getGroupId(), bundleDescriptor.getArtifactId(),
-                                bundleDescriptor.getBaseVersion(),
-                                bundleDescriptor.getType(), bundleDescriptor.getClassifier().orElse(null));
-    return artifactCoordinates;
+    return new ArtifactCoordinates(bundleDescriptor.getGroupId(), bundleDescriptor.getArtifactId(),
+                                   bundleDescriptor.getBaseVersion(),
+                                   bundleDescriptor.getType(), bundleDescriptor.getClassifier().orElse(null));
   }
 
   /**
@@ -90,15 +95,15 @@ public class ArtifactUtils {
   }
 
   /**
-   * Checks if a {@link Artifact} instance represents a mule-plugin.
+   * Checks if an {@link Artifact} instance represents a mule-plugin.
    *
    * @param artifact the artifact to be checked.
    * @return true if the artifact is a mule-plugin, false otherwise.
    */
   public static boolean isValidMulePlugin(Artifact artifact) {
     ArtifactCoordinates pluginCoordinates = artifact.getArtifactCoordinates();
-    Optional<String> pluginClassifier = Optional.ofNullable(pluginCoordinates.getClassifier());
-    return pluginClassifier.isPresent() && MULE_PLUGIN_CLASSIFIER.equals(pluginClassifier.get());
+    Optional<String> pluginClassifier = ofNullable(pluginCoordinates.getClassifier());
+    return pluginClassifier.map(MULE_PLUGIN_CLASSIFIER::equals).orElse(false);
   }
 
   /**
@@ -140,7 +145,7 @@ public class ArtifactUtils {
   }
 
   public static List<Artifact> updatePackagesResources(List<Artifact> artifacts) {
-    return artifacts.stream().map(artifact -> updatePackagesResources(artifact)).collect(toList());
+    return artifacts.stream().map(ArtifactUtils::updatePackagesResources).collect(toList());
   }
 
   public static Artifact updatePackagesResources(Artifact artifact) {
@@ -158,7 +163,7 @@ public class ArtifactUtils {
 
   public static List<Artifact> updateArtifactsSharedState(List<BundleDependency> appDependencies, List<Artifact> artifacts,
                                                           Model pomModel, List<String> activeProfiles) {
-    List<BuildBase> builds = new ArrayList<BuildBase>();
+    List<BuildBase> builds = new ArrayList<>();
     if (pomModel.getBuild() != null) {
       builds.add(pomModel.getBuild());
     }
@@ -167,7 +172,7 @@ public class ArtifactUtils {
         builds.add(p.getBuild());
     });
     if (!builds.isEmpty()) {
-      List<Plugin> plugins = new ArrayList<Plugin>();
+      List<Plugin> plugins = new ArrayList<>();
       builds.forEach(b -> {
         if (b != null) {
           plugins.addAll(b.getPlugins());
@@ -202,12 +207,9 @@ public class ArtifactUtils {
   private static void findAndExportSharedLibrary(String sharedLibraryGroupId, String sharedLibraryArtifactId,
                                                  List<Artifact> artifacts, List<BundleDependency> appDependencies) {
     appDependencies.stream()
-        .forEach(bundleDependency -> {
-          if (bundleDependency.getDescriptor().getGroupId().equals(sharedLibraryGroupId) &&
-              bundleDependency.getDescriptor().getArtifactId().equals(sharedLibraryArtifactId)) {
-            setArtifactTransitiveDependenciesAsShared(artifacts, bundleDependency);
-          }
-        });
+        .filter(bundleDependency -> bundleDependency.getDescriptor().getGroupId().equals(sharedLibraryGroupId) &&
+            bundleDependency.getDescriptor().getArtifactId().equals(sharedLibraryArtifactId))
+        .forEach(bundleDependency -> setArtifactTransitiveDependenciesAsShared(artifacts, bundleDependency));
 
   }
 
@@ -220,25 +222,20 @@ public class ArtifactUtils {
   }
 
   private static void setArtifactAsShared(String sharedLibraryGroupId, String sharedLibraryArtifactId, List<Artifact> artifacts) {
-    artifacts.stream()
-        .forEach(artifact -> {
-          if (artifact.getArtifactCoordinates().getGroupId().equals(sharedLibraryGroupId) &&
-              artifact.getArtifactCoordinates().getArtifactId().equals(sharedLibraryArtifactId)) {
-            artifact.setShared(true);
-
-          }
-        });
+    artifacts.stream().filter(artifact -> artifact.getArtifactCoordinates().getGroupId().equals(sharedLibraryGroupId) &&
+        artifact.getArtifactCoordinates().getArtifactId().equals(sharedLibraryArtifactId))
+        .forEach(artifact -> artifact.setShared(true));
   }
 
 
   protected static String getAttribute(org.codehaus.plexus.util.xml.Xpp3Dom tag, String attributeName) {
     org.codehaus.plexus.util.xml.Xpp3Dom attributeDom = tag.getChild(attributeName);
     checkState(attributeDom != null, format("'%s' element not declared at '%s' in the pom file",
-                                            attributeName, tag.toString()));
+                                            attributeName, tag));
     String attributeValue = attributeDom.getValue().trim();
     checkState(!isEmpty(attributeValue),
                format("'%s' was defined but has an empty value at '%s' declared in the pom file",
-                      attributeName, tag.toString()));
+                      attributeName, tag));
     return attributeValue;
 
   }
@@ -272,4 +269,21 @@ public class ArtifactUtils {
         .setType(POM_TYPE)
         .build();
   }
+
+  public static boolean validateMuleRuntimeSharedLibrary(String groupId, String artifactId) {
+    return validateMuleRuntimeSharedLibrary(groupId, artifactId, null);
+  }
+
+  public static boolean validateMuleRuntimeSharedLibrary(String groupId, String artifactId, String artifactFileName) {
+    if (MULE_RUNTIME_GROUP_ID.equals(groupId)
+        || MULE_RUNTIME_MODULES_GROUP_ID.equals(groupId)) {
+      LOGGER
+          .warn("Shared library '{}:{}' is a Mule Runtime dependency. It will not be used by '{}' in order to avoid classloading issues. Please consider removing it, or at least not putting it as a sharedLibrary.",
+                groupId, artifactId, artifactFileName != null ? artifactFileName : "the app");
+      return true;
+    } else {
+      return false;
+    }
+  }
+
 }

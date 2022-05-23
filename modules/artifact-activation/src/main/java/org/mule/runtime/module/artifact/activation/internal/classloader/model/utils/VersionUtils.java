@@ -6,21 +6,23 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader.model.utils;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
+import static java.util.Optional.ofNullable;
+import static java.util.regex.Pattern.matches;
+
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 
 import static de.skuzzle.semantic.Version.create;
 import static de.skuzzle.semantic.Version.isValidVersion;
 import static de.skuzzle.semantic.Version.parseVersion;
 
-import static java.util.regex.Pattern.matches;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import java.util.Optional;
 
 import com.vdurmont.semver4j.Semver;
 
 import org.apache.commons.lang3.StringUtils;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
-
-import java.util.Optional;
 
 /**
  * Helper methods to work with semantic versioning.
@@ -61,8 +63,8 @@ public class VersionUtils {
    */
   public static String completeIncremental(String version) throws RuntimeException {
     Semver semver = new Semver(version, LOOSE);
-    Optional<Integer> minor = Optional.ofNullable(semver.getMinor());
-    Optional<Integer> patch = Optional.ofNullable(semver.getPatch());
+    Optional<Integer> minor = ofNullable(semver.getMinor());
+    Optional<Integer> patch = ofNullable(semver.getPatch());
     if (!minor.isPresent() || !patch.isPresent()) {
       version = create(semver.getMajor(), minor.orElse(0), patch.orElse(0)).toString();
     }

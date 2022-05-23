@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.plugin;
 
+import static java.util.Optional.empty;
+
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.module.artifact.activation.internal.descriptor.AbstractArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
@@ -20,8 +22,6 @@ import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.File;
 import java.util.List;
-
-import static java.util.Optional.empty;
 
 /**
  * Creates an artifact descriptor for a plugin.

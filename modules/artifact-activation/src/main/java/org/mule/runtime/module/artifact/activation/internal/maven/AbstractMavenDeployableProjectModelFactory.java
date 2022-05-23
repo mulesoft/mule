@@ -31,6 +31,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
+
 import static org.codehaus.plexus.util.xml.Xpp3DomUtils.mergeXpp3Dom;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -54,14 +55,6 @@ import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 import org.mule.tools.api.classloader.model.Plugin;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.model.Build;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.slf4j.Logger;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -79,6 +72,16 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.model.Build;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
+
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+
+import org.slf4j.Logger;
 
 /**
  * Implementation of {@link DeployableProjectModelFactory} that uses Maven.
@@ -229,7 +232,7 @@ public abstract class AbstractMavenDeployableProjectModelFactory<M extends MuleD
 
   private List<Plugin> toPluginDependencies(Map<BundleDependency, List<BundleDependency>> pluginsAndDependencies) {
     return pluginsAndDependencies.entrySet().stream().map(
-                                                          (pluginEntry) -> {
+                                                          pluginEntry -> {
                                                             Plugin plugin = new Plugin();
                                                             plugin.setArtifactId(pluginEntry.getKey().getDescriptor()
                                                                 .getArtifactId());

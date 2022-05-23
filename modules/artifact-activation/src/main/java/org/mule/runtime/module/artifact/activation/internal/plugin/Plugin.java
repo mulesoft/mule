@@ -11,7 +11,7 @@ import java.util.List;
 import org.apache.maven.model.Dependency;
 
 /**
- * Mojo to model a plugin that will declare additional dependencies.
+ * Bean to model a plugin that will declare additional dependencies.
  */
 public class Plugin {
 

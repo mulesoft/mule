@@ -31,27 +31,6 @@ public class DeployableDependencyResolver {
   /**
    * Resolve the application dependencies, excluding mule domains.
    *
-   * @param pomFile pom file
-   */
-  @Deprecated
-  public List<BundleDependency> resolveApplicationDependencies(File pomFile) {
-    return resolveApplicationDependencies(pomFile, false, empty());
-  }
-
-  /**
-   * Resolve the application dependencies, excluding mule domains.
-   *
-   * @param pomFile                 pom file
-   * @param includeTestDependencies true if the test dependencies must be included, false otherwise.
-   */
-  @Deprecated
-  public List<BundleDependency> resolveApplicationDependencies(File pomFile, boolean includeTestDependencies) {
-    return resolveApplicationDependencies(pomFile, includeTestDependencies, empty());
-  }
-
-  /**
-   * Resolve the application dependencies, excluding mule domains.
-   *
    * @param pomFile                 pom file
    * @param includeTestDependencies true if the test dependencies must be included, false otherwise.
    * @param mavenReactorResolver    {@link MavenReactorResolver}

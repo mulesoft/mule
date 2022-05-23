@@ -129,4 +129,10 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
   protected File getProjectFolder() {
     return artifactLocation;
   }
+
+  @Override
+  protected boolean shouldPopulateLocalPackages() {
+    // TODO: check if it belongs to the deny-list to decide whether local packages should be populated
+    return true;
+  }
 }

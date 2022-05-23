@@ -51,5 +51,10 @@ public class DeployableClassLoaderConfigurationAssembler<M extends MuleDeployabl
     return deployableProjectModel.getProjectFolder();
   }
 
+  @Override
+  protected List<BundleDependency> getProcessedBundleDependencies() {
+    // TODO: analyze patched dependencies in classloader-model-patch.json
+    return super.getProcessedBundleDependencies();
+  }
 
 }

@@ -11,15 +11,17 @@ import static org.mule.runtime.module.artifact.activation.internal.classloader.m
 import static org.mule.runtime.module.artifact.activation.internal.classloader.Classifier.MULE_PLUGIN;
 import static org.mule.tools.api.classloader.model.ArtifactCoordinates.DEFAULT_ARTIFACT_TYPE;
 
-import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
+
+import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static org.apache.commons.io.FileUtils.toFile;
 
 import org.mule.maven.client.api.model.BundleDependency;
 import org.mule.maven.client.internal.AetherMavenClient;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils;
 import org.mule.runtime.module.artifact.activation.internal.plugin.Plugin;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
@@ -37,6 +39,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import com.vdurmont.semver4j.Semver;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Build;
@@ -61,9 +64,9 @@ public class AdditionalPluginDependenciesResolver {
   protected static final String VERSION_ELEMENT = "version";
   protected static final String PLUGIN_ELEMENT = "plugin";
   protected static final String DEPENDENCY_ELEMENT = "dependency";
-  private AetherMavenClient aetherMavenClient;
-  private List<Plugin> pluginsWithAdditionalDependencies;
-  private File temporaryFolder;
+  private final AetherMavenClient aetherMavenClient;
+  private final List<Plugin> pluginsWithAdditionalDependencies;
+  private final File temporaryFolder;
 
   public AdditionalPluginDependenciesResolver(AetherMavenClient muleMavenPluginClient,
                                               List<Plugin> additionalPluginDependencies,
@@ -97,7 +100,7 @@ public class AdditionalPluginDependenciesResolver {
 
   private List<BundleDependency> resolveDependencies(List<Dependency> additionalDependencies) {
     return aetherMavenClient.resolveArtifactDependencies(additionalDependencies.stream()
-        .map(additionalDependency -> toBundleDescriptor(additionalDependency))
+        .map(ArtifactUtils::toBundleDescriptor)
         .collect(toList()),
                                                          of(aetherMavenClient.getMavenConfiguration()
                                                              .getLocalMavenRepositoryLocation()),
@@ -220,11 +223,10 @@ public class AdditionalPluginDependenciesResolver {
                                 if (isNewerVersion(additionalDependenciesDependency.getVersion(),
                                                    effectiveDependency.getVersion())) {
                                   effectiveDependencies.remove(i);
-                                  break;
                                 } else {
                                   addDependency = false;
-                                  break;
                                 }
+                                break;
                               }
                             }
                             if (addDependency) {
