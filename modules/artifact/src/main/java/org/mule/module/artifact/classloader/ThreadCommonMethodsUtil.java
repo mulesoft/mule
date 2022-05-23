@@ -44,7 +44,6 @@ public class ThreadCommonMethodsUtil {
       logger.warn("Exception occurred while attempting to compare {} and {} artifactId.", threadContextClassLoader,
                   threadContextClassLoader.getClass().getClassLoader());
     }
-
     return false;
   }
 
@@ -59,7 +58,6 @@ public class ThreadCommonMethodsUtil {
       logger.warn("Exception occurred while attempting to compare {} and {} artifact id.", threadContextClassLoader,
                   threadContextClassLoader.getClass().getClassLoader());
     }
-
     return false;
   }
 
