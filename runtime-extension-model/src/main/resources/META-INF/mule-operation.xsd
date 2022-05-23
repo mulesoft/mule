@@ -296,7 +296,6 @@
             <xsd:enumeration value="datetime"/>
             <xsd:enumeration value="time"/>
             <xsd:enumeration value="boolean"/>
-            <xsd:enumeration value="binary"/>
         </xsd:restriction>
     </xsd:simpleType>
 

@@ -9,34 +9,9 @@
 
     <import file="salutation-operations-def.xml"/>
 
-    <flow name="salutationFlow">
-        <this:hello-world receiver="Malaga!"/>
-    </flow>
 
-    <flow name="composedOperation">
-        <this:hello-and-introduce greeting="good morning" receiver="Malaga!"
-                                  myName="Anthony Stark" myNationalID="5"/>
-    </flow>
-
-    <flow name="interceptAndDumpParameters">
-        <flow-ref name="composedOperation"/>
-        <test-components:dump-intercepted-values />
-    </flow>
-
-    <flow name="exclusiveOptionalsFlow">
-        <this:hello-place greeting="good morning" city="London"/>
-    </flow>
-
-    <flow name="nonBlockingOperationFlow">
-        <this:non-blocking-hello-world receiver="Malaga!"/>
-    </flow>
-
-    <flow name="blockingOperationFlow">
-        <this:blocking-hello-world receiver="Malaga!"/>
-    </flow>
-
-    <flow name="recursiveOperationFlow">
-        <this:repeated-hello-world receiver="Malaga!" count="3"/>
+    <flow name="transactionInFlow">
+        <this:operation-with-transaction/>
     </flow>
 
 </mule>
