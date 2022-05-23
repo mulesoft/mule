@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:operation="http://www.mulesoft.org/schema/mule/operation"
+      xmlns:this="http://www.mulesoft.org/schema/mule/this"
+      xmlns:test-components="http://www.mulesoft.org/schema/mule/test-components"
+      xmlns:tx="http://www.mulesoft.org/schema/mule/tx"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/test-components http://www.mulesoft.org/schema/mule/test-components/current/mule-test-components.xsd
+        http://www.mulesoft.org/schema/mule/operation http://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd
+        http://www.mulesoft.org/schema/mule/tx http://www.mulesoft.org/schema/mule/tx/current/mule-tx.xsd
+        http://www.mulesoft.org/schema/mule/this http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd">
+
+    <tx:config name="localTx1">
+        <tx:connection>
+            <pooling-profile maxActive="1" exhaustedAction="WHEN_EXHAUSTED_WAIT"/>
+        </tx:connection>
+    </tx:config>
+
+    <operation:def name="withoutTxAction">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <set-payload value="hello world!"/>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="withTxActionNotJoining">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <tx:verify-no-transaction transactionalAction="NOT_SUPPORTED"/>
+            <set-payload value="hello world!"/>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="withTxActionJoining">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <tx:verify-no-transaction transactionalAction="JOIN_IF_POSSIBLE"/>
+            <set-payload value="hello world!"/>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="withTxActionAlwaysJoining">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <tx:verify-no-transaction transactionalAction="ALWAYS_JOIN"/>
+            <set-payload value="hello world!"/>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="withTxActionJoiningWithinTryIndifferent">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <try transactionalAction="INDIFFERENT">
+                <tx:verify-no-transaction transactionalAction="JOIN_IF_POSSIBLE"/>
+                <set-payload value="hello world!"/>
+            </try>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="withTxActionNotJoiningWithinTryIndifferent">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <try transactionalAction="INDIFFERENT">
+                <tx:verify-no-transaction transactionalAction="NOT_SUPPORTED"/>
+                <set-payload value="hello world!"/>
+            </try>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="withTxActionAlwaysJoiningWithinTryJoining">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <try transactionalAction="BEGIN_OR_JOIN">
+                <tx:verify-no-transaction transactionalAction="ALWAYS_JOIN"/>
+                <set-payload value="hello world!"/>
+            </try>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="withTxActionNotJoiningWithinTryJoining">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <try transactionalAction="BEGIN_OR_JOIN">
+                <tx:verify-no-transaction transactionalAction="NOT_SUPPORTED"/>
+                <set-payload value="hello world!"/>
+            </try>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="withTxActionAlwaysJoiningWithinTryCreateTx">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <try transactionalAction="ALWAYS_BEGIN">
+                <tx:verify-transaction-begun transactionalAction="ALWAYS_JOIN"/>
+                <set-payload value="hello world!"/>
+            </try>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="withTxActionAlwaysNotJoiningWithinTryCreateTx">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <try transactionalAction="ALWAYS_BEGIN">
+                <tx:verify-transaction-begun transactionalAction="NOT_SUPPORTED"/>
+                <set-payload value="hello world!"/>
+            </try>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="withTxActionAlwaysJoiningWithinTryCreateTxFollowed">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <try transactionalAction="ALWAYS_BEGIN">
+                <tx:verify-transaction-begun transactionalAction="ALWAYS_JOIN"/>
+                <set-payload value="hello world!"/>
+            </try>
+            <tx:verify-no-transaction transactionalAction="JOIN_IF_POSSIBLE"/>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="withTxActionAlwaysJoiningWithinTryCreateTxFollowedNot">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <try transactionalAction="ALWAYS_BEGIN">
+                <tx:verify-transaction-begun transactionalAction="ALWAYS_JOIN"/>
+                <set-payload value="hello world!"/>
+            </try>
+            <tx:verify-no-transaction transactionalAction="NOT_SUPPORTED"/>
+        </operation:body>
+    </operation:def>
+
+
+    <!-- I should add tests with choice (as another scope) and async -->
+</mule>
