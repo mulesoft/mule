@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.processor;
 
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.REUSE_GLOBAL_ERROR_HANDLER;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_COMMIT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
@@ -37,6 +38,7 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.subscriberContext;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -82,6 +84,9 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
 
   @Inject
   private ProfilingService profilingService;
+
+  @Inject
+  protected FeatureFlaggingService featureFlaggingService;
 
   private ProfilingDataProducer<TransactionProfilingEventContext, Object> continueProducer;
   private ProfilingDataProducer<TransactionProfilingEventContext, Object> startProducer;
@@ -216,9 +221,11 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   public void initialise() throws InitialisationException {
     if (messagingExceptionHandler == null) {
       messagingExceptionHandler = muleContext.getDefaultErrorHandler(of(getRootContainerLocation().toString()));
-      if (messagingExceptionHandler instanceof ErrorHandler) {
-        ((ErrorHandler) messagingExceptionHandler)
-            .setExceptionListenersLocation(this.getLocation());
+      if (!featureFlaggingService.isEnabled(REUSE_GLOBAL_ERROR_HANDLER)) {
+        if (messagingExceptionHandler instanceof ErrorHandler) {
+          ((ErrorHandler) messagingExceptionHandler)
+                  .setExceptionListenersLocation(this.getLocation());
+        }
       }
     }
     this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, this), processors,

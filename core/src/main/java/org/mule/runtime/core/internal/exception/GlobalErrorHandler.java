@@ -34,8 +34,8 @@ public class GlobalErrorHandler extends ErrorHandler {
   public void initialise() throws InitialisationException {
     if (featureFlaggingService.isEnabled(REUSE_GLOBAL_ERROR_HANDLER)) {
       if (!initialised.getAndSet(true)) {
-        setFromGlobalErrorHandler();
         super.initialise();
+        setFromGlobalErrorHandler();
       }
     } else {
       super.initialise();
@@ -67,7 +67,7 @@ public class GlobalErrorHandler extends ErrorHandler {
   @Override
   public void dispose() {
     if (featureFlaggingService.isEnabled(REUSE_GLOBAL_ERROR_HANDLER)) {
-      if (!disposed.getAndSet(true)) {
+      if (started.get() == 0 && !disposed.getAndSet(true)) {
         super.dispose();
       }
     } else {

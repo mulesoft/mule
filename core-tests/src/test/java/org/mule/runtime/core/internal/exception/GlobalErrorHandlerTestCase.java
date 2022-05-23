@@ -6,18 +6,22 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static java.util.Arrays.asList;
-import static java.util.Optional.empty;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.GLOBAL_ERROR_HANDLER;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
+
+import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
@@ -26,11 +30,16 @@ import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
 import java.util.ArrayList;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
-
+@SmallTest
+@Feature(ERROR_HANDLING)
+@Story(GLOBAL_ERROR_HANDLER)
 public class GlobalErrorHandlerTestCase extends AbstractMuleTestCase {
 
   private GlobalErrorHandler globalErrorHandler;
