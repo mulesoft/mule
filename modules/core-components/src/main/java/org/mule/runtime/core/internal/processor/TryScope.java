@@ -224,7 +224,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
       if (!featureFlaggingService.isEnabled(REUSE_GLOBAL_ERROR_HANDLER)) {
         if (messagingExceptionHandler instanceof ErrorHandler) {
           ((ErrorHandler) messagingExceptionHandler)
-                  .setExceptionListenersLocation(this.getLocation());
+              .setExceptionListenersLocation(this.getLocation());
         }
       }
     }
