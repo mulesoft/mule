@@ -6,19 +6,17 @@
  */
 package org.mule.module.artifact.classloader;
 
+import static org.mule.module.artifact.classloader.ThreadCommonMethodsUtil.*;
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.Thread.activeCount;
 import static java.lang.Thread.enumerate;
 import static java.lang.Boolean.getBoolean;
-
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 import static java.sql.DriverManager.deregisterDriver;
 import static java.sql.DriverManager.getDrivers;
-import static org.mule.module.artifact.classloader.ThreadCommonMethodsUtil.*;
 
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 
 import java.util.regex.Matcher;

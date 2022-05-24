@@ -6,18 +6,14 @@
  */
 package org.mule.module.artifact.classloader;
 
+import static org.mule.module.artifact.classloader.ThreadCommonMethodsUtil.*;
 import static java.lang.Thread.activeCount;
 import static java.lang.Thread.enumerate;
-import static org.mule.module.artifact.classloader.ThreadCommonMethodsUtil.*;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
+
 import org.slf4j.Logger;
 
 /**
