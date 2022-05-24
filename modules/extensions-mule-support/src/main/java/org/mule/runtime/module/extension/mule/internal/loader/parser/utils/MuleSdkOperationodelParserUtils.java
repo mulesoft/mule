@@ -35,7 +35,7 @@ public class MuleSdkOperationodelParserUtils {
     if (isTry(componentAst)) {
       ComponentParameterAst transactionalAction =
           componentAst.getParameter(DEFAULT_GROUP_NAME, TRANSACTIONAL_ACTION_PARAMETER_NAME);
-      return transactionalAction != null && transactionalAction.getRawValue().equals(ACTION_ALWAYS_BEGIN_STRING);
+      return transactionalAction != null && transactionalAction.getValue().getValue().get().equals(ACTION_ALWAYS_BEGIN_STRING);
     }
     return false;
   }
@@ -44,7 +44,7 @@ public class MuleSdkOperationodelParserUtils {
     ComponentParameterAst transactionalAction =
         componentAst.getParameter(DEFAULT_GROUP_NAME, TRANSACTIONAL_ACTION_PARAMETER_NAME);
     return transactionalAction != null && !isTry(componentAst) && OperationTransactionalAction
-        .valueOf(transactionalAction.getRawValue()).equals(OperationTransactionalAction.NOT_SUPPORTED);
+        .valueOf(transactionalAction.getValue().getValue().get().toString()).equals(OperationTransactionalAction.NOT_SUPPORTED);
   }
 
   public static boolean areAllCharacteristicsWithDefinitiveValue(List<Characteristic<?>> characteristics) {

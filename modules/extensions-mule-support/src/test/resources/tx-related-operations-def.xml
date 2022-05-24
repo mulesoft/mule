@@ -154,6 +154,130 @@
         </operation:body>
     </operation:def>
 
+    <operation:def name="asyncWithNotSupported">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <async>
+                <tx:verify-no-transaction transactionalAction="NOT_SUPPORTED"/>
+            </async>
+            <set-payload value="hello world!"/>
+        </operation:body>
+    </operation:def>
 
-    <!-- I should add tests with choice (as another scope) and async -->
+    <operation:def name="asyncWithJoin">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <async>
+                <tx:verify-no-transaction transactionalAction="ALWAYS_JOIN"/>
+            </async>
+            <set-payload value="hello world!"/>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="asyncWithJoinIfPossible">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <async>
+                <tx:verify-no-transaction transactionalAction="JOIN_IF_POSSIBLE"/>
+            </async>
+            <set-payload value="hello world!"/>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="tryAndAsyncWithNotSupported">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <try>
+                <async>
+                    <tx:verify-no-transaction transactionalAction="NOT_SUPPORTED"/>
+                </async>
+                <set-payload value="hello world!"/>
+            </try>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="tryAndAsyncJoin">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <try transactionalAction="BEGIN_OR_JOIN">
+                <async>
+                    <tx:verify-no-transaction transactionalAction="ALWAYS_JOIN"/>
+                </async>
+                <set-payload value="hello world!"/>
+            </try>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="tryAndAsyncJoinFollowedByNotSupported">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <try transactionalAction="BEGIN_OR_JOIN">
+                <async>
+                    <tx:verify-no-transaction transactionalAction="ALWAYS_JOIN"/>
+                </async>
+                <set-payload value="hello world!"/>
+                <tx:verify-no-transaction transactionalAction="NOT_SUPPORTED"/>
+            </try>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="tryAndAsyncJoinFollowedByJoin">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <try transactionalAction="BEGIN_OR_JOIN">
+                <async>
+                    <tx:verify-no-transaction transactionalAction="ALWAYS_JOIN"/>
+                </async>
+                <set-payload value="hello world!"/>
+                <tx:verify-no-transaction transactionalAction="JOIN_IF_POSSIBLE"/>
+            </try>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="tryAlwaysJoinAndAsyncJoinFollowedByJoin">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <try transactionalAction="ALWAYS_BEGIN">
+                <async>
+                    <tx:verify-no-transaction transactionalAction="ALWAYS_JOIN"/>
+                </async>
+                <set-payload value="hello world!"/>
+                <tx:verify-no-transaction transactionalAction="JOIN_IF_POSSIBLE"/>
+            </try>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="choice">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <choice>
+                <when expression="#[true]">
+                    <tx:verify-no-transaction transactionalAction="ALWAYS_JOIN"/>
+                    <set-payload value="hello world!"/>
+                </when>
+                <otherwise>
+                    <set-payload value="oh no!"/>
+                </otherwise>
+            </choice>
+        </operation:body>
+    </operation:def>
+
 </mule>

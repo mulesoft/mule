@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.mule.internal.operation;
 
-
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 
@@ -15,10 +13,8 @@ import org.junit.Test;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.util.IOUtils;
 
 import javax.inject.Inject;
-import java.io.InputStream;
 import java.util.List;
 
 public class MuleOperationIsTransactionalTestCase extends MuleArtifactFunctionalTestCase {
@@ -93,6 +89,51 @@ public class MuleOperationIsTransactionalTestCase extends MuleArtifactFunctional
     assertThat(getOperationModel("withTxActionAlwaysJoiningWithinTryCreateTxFollowedNot").isTransactional(), is(false));
   }
 
+  @Test
+  public void asyncWithNotSupported() {
+    assertThat(getOperationModel("asyncWithNotSupported").isTransactional(), is(false));
+  }
+
+  @Test
+  public void asyncWithJoin() {
+    assertThat(getOperationModel("asyncWithJoin").isTransactional(), is(false));
+  }
+
+  @Test
+  public void asyncWithJoinIfPossible() {
+    assertThat(getOperationModel("asyncWithJoinIfPossible").isTransactional(), is(false));
+  }
+
+  @Test
+  public void tryAndAsyncWithNotSupported() {
+    assertThat(getOperationModel("tryAndAsyncWithNotSupported").isTransactional(), is(false));
+  }
+
+  @Test
+  public void tryAndAsyncJoin() {
+    assertThat(getOperationModel("tryAndAsyncJoin").isTransactional(), is(false));
+  }
+
+  @Test
+  public void tryAndAsyncJoinFollowedByNotSupported() {
+    assertThat(getOperationModel("tryAndAsyncJoinFollowedByNotSupported").isTransactional(), is(false));
+  }
+
+  @Test
+  public void tryAndAsyncJoinFollowedByJoin() {
+    assertThat(getOperationModel("tryAndAsyncJoinFollowedByJoin").isTransactional(), is(true));
+  }
+
+  @Test
+  public void tryAlwaysJoinAndAsyncJoinFollowedByJoin() {
+    assertThat(getOperationModel("tryAlwaysJoinAndAsyncJoinFollowedByJoin").isTransactional(), is(false));
+  }
+
+  @Test
+  public void choiceWithOneRouteJoining() {
+    assertThat(getOperationModel("choice").isTransactional(), is(true));
+  }
+
   private OperationModel getOperationModel(String name) {
     if (operationModels == null) {
       operationModels = extensionManager.getExtension(muleContext.getConfiguration().getId()).get().getOperationModels();
@@ -100,10 +141,4 @@ public class MuleOperationIsTransactionalTestCase extends MuleArtifactFunctional
     return operationModels.stream().filter(opModel -> opModel.getName().equals(name)).findFirst().get();
   }
 
-  private String getResource(String path) {
-    InputStream in = getClass().getResourceAsStream(path);
-    checkArgument(in != null, "Resource not found: " + path);
-
-    return IOUtils.toString(in);
-  }
 }
