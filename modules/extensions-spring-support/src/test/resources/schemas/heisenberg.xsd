@@ -3714,6 +3714,26 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="StoreMoneyUsingMuleObjectStoreManagerType" substitutionGroup="heisenberg-empire" name="store-money-using-mule-object-store-manager"></xs:element>
+  <xs:complexType name="StoreMoneyUsingMuleObjectStoreManagerType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="objectStoreName"></xs:attribute>
+        <xs:attribute type="mule:expressionLong" use="required" name="money"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="StoreMoneyUsingSDKObjectStoreManagerType" substitutionGroup="heisenberg-empire" name="store-money-using-sdk-object-store-manager"></xs:element>
+  <xs:complexType name="StoreMoneyUsingSDKObjectStoreManagerType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="objectStoreName"></xs:attribute>
+        <xs:attribute type="mule:expressionLong" use="required" name="money"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="TapPhonesType" substitutionGroup="heisenberg-empire" name="tap-phones"></xs:element>
   <xs:complexType name="TapPhonesType">
     <xs:complexContent>

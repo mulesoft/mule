@@ -6,30 +6,14 @@
  */
 package org.mule.runtime.config.internal.dsl.model.config;
 
-import static java.lang.String.format;
-import static java.util.Collections.singletonList;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver.PLACEHOLDER_PREFIX;
-import static org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver.PLACEHOLDER_SUFFIX;
-
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.util.Pair;
-
-import java.util.List;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * Exception thrown when a key could not be resolved.
  *
  * @since 4.0
  */
-public class PropertyNotFoundException extends MuleRuntimeException {
-
-  private static final long serialVersionUID = -3570854244058568638L;
-
-  private final List<Pair<String, String>> unresolvedKeys;
+public class PropertyNotFoundException extends org.mule.runtime.ast.api.exception.PropertyNotFoundException {
 
   /**
    * Creates a new instance. This constructor must be used when the resolver has no parent and was not able to resolve a key
@@ -37,18 +21,7 @@ public class PropertyNotFoundException extends MuleRuntimeException {
    * @param resolverKeyPair the resolver descriptor and the key that was not able to resolve.
    */
   public PropertyNotFoundException(Pair<String, String> resolverKeyPair) {
-    super(createFailureException(resolverKeyPair));
-    unresolvedKeys = singletonList(resolverKeyPair);
-  }
-
-  private static I18nMessage createFailureException(Pair<String, String> resolverKeyPair) {
-    return createStaticMessage(createMessageForLeakKey(resolverKeyPair));
-  }
-
-  private static String createMessageForLeakKey(Pair<String, String> resolverKeyPair) {
-    return format("Couldn't find configuration property value for key %s from properties provider %s",
-                  PLACEHOLDER_PREFIX + resolverKeyPair.getSecond() + PLACEHOLDER_SUFFIX,
-                  resolverKeyPair.getFirst());
+    super(resolverKeyPair);
   }
 
   /**
@@ -60,32 +33,6 @@ public class PropertyNotFoundException extends MuleRuntimeException {
    */
   public PropertyNotFoundException(PropertyNotFoundException propertyNotFoundException,
                                    Pair<String, String> resolverKeyPair) {
-    super(createFailureException(propertyNotFoundException, resolverKeyPair));
-    unresolvedKeys =
-        com.google.common.collect.ImmutableList.<Pair<String, String>>builder()
-            .addAll(propertyNotFoundException.getUnresolvedKeys())
-            .add(resolverKeyPair).build();
+    super(propertyNotFoundException, resolverKeyPair);
   }
-
-  private static I18nMessage createFailureException(PropertyNotFoundException propertyNotFoundException,
-                                                    Pair<String, String> resolverKeyPair) {
-    StringBuilder messageBuilder =
-        new StringBuilder(createMessageForLeakKey(propertyNotFoundException.getUnresolvedKeys().get(0)));
-    ImmutableList<Pair<String, String>> allPairs = ImmutableList.<Pair<String, String>>builder()
-        .addAll(propertyNotFoundException.getUnresolvedKeys()).add(resolverKeyPair).build();
-    allPairs.stream().skip(1).forEach(pair -> {
-      messageBuilder.append(format(" - within resolver %s trying to process key %s", pair.getFirst(), pair.getSecond()));
-    });
-    return createStaticMessage(messageBuilder.toString());
-  }
-
-  /**
-   * @return a list with the resolvers and the keys that were not resolved. The original key not found is the first element and
-   *         the last will be the main resolver.
-   */
-  public List<Pair<String, String>> getUnresolvedKeys() {
-    return unresolvedKeys;
-  }
-
-
 }

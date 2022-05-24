@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%-5p %d [%t] [processor: %X{processorPath}; event: %X{correlationId}] %c: %m%n"/>
+        </Console>
+        <Console name="ConsoleLogUtil" target="SYSTEM_OUT">
+            <PatternLayout pattern="%m%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+
+        <AsyncLogger name="org.mule.runtime.core.internal.processor.LoggerMessageProcessor" level="INFO"/>
+        <AsyncLogger name="org.mule.extension.mule.testing.processing.strategies.test" level="INFO"/>
+
+        <AsyncLogger name="org.mule.runtime.core.internal.logging" additivity="false" level="INFO">
+            <AppenderRef ref="ConsoleLogUtil"/>
+        </AsyncLogger>
+
+        <AsyncRoot level="WARN">
+            <AppenderRef ref="Console"/>
+        </AsyncRoot>
+
+    </Loggers>
+
+</Configuration>

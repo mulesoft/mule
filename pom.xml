@@ -179,6 +179,7 @@
         <muleTestComponentsVersion>4.5.0-SNAPSHOT</muleTestComponentsVersion>
 
         <!-- Test Extensions -->
+        <muleTestingProcessingStrategiesExtensionVersion>1.0.0-SNAPSHOT</muleTestingProcessingStrategiesExtensionVersion>
 
         <!--Maven plugins versions-->
         <dependency.plugin.version>3.1.2</dependency.plugin.version>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:operation="http://www.mulesoft.org/schema/mule/operation"
+      xmlns:this="http://www.mulesoft.org/schema/mule/this"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:ps-test="http://www.mulesoft.org/schema/mule/mule-ps-test"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/operation http://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd
+        http://www.mulesoft.org/schema/mule/mule-ps-test http://www.mulesoft.org/schema/mule/mule-ps-test/current/mule-mule-ps-test.xsd
+        http://www.mulesoft.org/schema/mule/this http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd">
+
+    <flow name="blockingFlow">
+        <ps-test:cpu-lite-without-callback key="Before operation with one blocking child" />
+        <this:operation-with-one-blocking-child blockingChildKey="Blocking child" />
+        <ps-test:cpu-lite-without-callback key="After operation with one blocking child" />
+    </flow>
+
+    <flow name="nonBlockingFlow">
+        <ps-test:cpu-lite-without-callback key="Before operation with one non-blocking child" />
+        <this:operation-with-one-non-blocking-child nonBlockingChildKey="Non-blocking child" />
+        <ps-test:cpu-lite-without-callback key="After operation with one non-blocking child" />
+    </flow>
+
+    <flow name="blockingComposedFlow">
+        <ps-test:cpu-lite-without-callback key="Before operationWithOneBlockingAndOneCpuLiteChildren operation" />
+        <this:operation-with-one-blocking-and-one-cpu-lite-children blockingChildKey="Blocking child" cpuLiteChildKey="CpuLite child" />
+    </flow>
+
+    <flow name="nonBlockingComposedFlow">
+        <this:operation-with-one-cpu-lite-and-one-non-blocking-children cpuLiteChildKey="CpuLite child" nonBlockingChildKey="Non-blocking child" />
+        <ps-test:cpu-lite-without-callback key="After operationWithOneCpuLiteAndOneNonBlockingChildren operation" />
+    </flow>
+
+    <operation:def name="operationWithOneBlockingChild" displayName="Operation with one BLOCKING child" summary="Operation with one BLOCKING child">
+        <operation:parameters>
+            <operation:parameter name="blockingChildKey" type="string" summary="One operation key to track threads where the BLOCKING child is executed"/>
+        </operation:parameters>
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <ps-test:blocking-without-callback key="#[params.blockingChildKey]" />
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="operationWithOneNonBlockingChild" displayName="Operation with one NON-BLOCKING child" summary="Operation with one NON-BLOCKING child">
+        <operation:parameters>
+            <operation:parameter name="nonBlockingChildKey" type="string" summary="One operation key to track threads where the NON-BLOCKING child is executed"/>
+        </operation:parameters>
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <ps-test:cpu-lite-with-callback key="#[params.nonBlockingChildKey]" />
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="operationWithOneBlockingAndOneCpuLiteChildren" displayName="Operation with one BLOCKING and one CPU_LITE children" summary="Operation with one BLOCKING and one CPU_LITE children">
+        <operation:parameters>
+            <operation:parameter name="blockingChildKey" type="string" summary="One operation key to track threads where the BLOCKING child is executed"/>
+            <operation:parameter name="cpuLiteChildKey" type="string" summary="One operation key to track threads where the CPU_LITE child is executed"/>
+        </operation:parameters>
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <ps-test:blocking-without-callback key="#[params.blockingChildKey]" />
+            <ps-test:cpu-lite-without-callback key="#[params.cpuLiteChildKey]" />
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="operationWithOneCpuLiteAndOneNonBlockingChildren" displayName="Operation with one CPU_LITE and one NON-BLOCKING children" summary="Operation with one CPU_LITE and one NON-BLOCKING children">
+        <operation:parameters>
+            <operation:parameter name="cpuLiteChildKey" type="string" summary="One operation key to track threads where the CPU_LITE child is executed"/>
+            <operation:parameter name="nonBlockingChildKey" type="string" summary="One operation key to track threads where the NON-BLOCKING child is executed"/>
+        </operation:parameters>
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <ps-test:cpu-lite-without-callback key="#[params.cpuLiteChildKey]" />
+            <ps-test:cpu-lite-with-callback key="#[params.nonBlockingChildKey]" />
+        </operation:body>
+    </operation:def>
+</mule>

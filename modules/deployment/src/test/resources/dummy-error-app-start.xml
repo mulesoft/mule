@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:callback="http://www.mulesoft.org/schema/mule/callback"
+      xsi:schemaLocation="
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/callback http://www.mulesoft.org/schema/mule/callback/current/mule-callback.xsd">
+
+    <description>Failing Mule Application</description>
+
+    <object class="org.mule.runtime.module.deployment.internal.ApplicationDeploymentTestCase.FailingProcessorTest" name="FailingProcessor">
+    </object>
+
+    <flow name="test2" >
+        <scheduler>
+            <scheduling-strategy >
+                <fixed-frequency timeUnit="DAYS" frequency="1"/>
+            </scheduling-strategy>
+        </scheduler>
+        <flow-ref name="FailingProcessor"/>
+    </flow>
+
+</mule>
