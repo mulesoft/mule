@@ -34,8 +34,8 @@ public class GlobalErrorHandler extends ErrorHandler {
   public void initialise() throws InitialisationException {
     if (featureFlaggingService.isEnabled(REUSE_GLOBAL_ERROR_HANDLER)) {
       if (!initialised.getAndSet(true)) {
-        super.initialise();
         setFromGlobalErrorHandler();
+        super.initialise();
       }
     } else {
       super.initialise();
@@ -83,8 +83,8 @@ public class GlobalErrorHandler extends ErrorHandler {
 
   public ErrorHandler createLocalErrorHandler(ComponentLocation flowLocation) {
     ErrorHandler local = new ErrorHandler();
-    local.setName(this.name);
-    local.setExceptionListeners(this.getExceptionListeners());
+    local.setName(name);
+    local.setExceptionListeners(getExceptionListeners());
     local.setExceptionListenersLocation(flowLocation);
     return local;
   }

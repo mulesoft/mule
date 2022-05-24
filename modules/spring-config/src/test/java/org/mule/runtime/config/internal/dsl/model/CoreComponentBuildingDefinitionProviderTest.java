@@ -6,11 +6,16 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.REUSE_GLOBAL_ERROR_HANDLER;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.GLOBAL_ERROR_HANDLER;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.REUSE_GLOBAL_ERROR_HANDLER;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -20,7 +25,11 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mule.tck.size.SmallTest;
 
+@SmallTest
+@Feature(ERROR_HANDLING)
+@Story(GLOBAL_ERROR_HANDLER)
 public class CoreComponentBuildingDefinitionProviderTest {
 
   @Rule
