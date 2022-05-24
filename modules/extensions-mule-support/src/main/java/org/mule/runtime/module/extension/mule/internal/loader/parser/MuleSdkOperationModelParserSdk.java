@@ -18,9 +18,10 @@ import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.AnyMatchCharacteristic;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.AnyMatchFilteringCharacteristic;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.AggregatedNotificationsCharacteristic;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.FilteringCharacteristic;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.MuleSdkOperationodelParserUtils.areAllCharacteristicsWithDefinitiveValue;
-import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.MuleSdkOperationodelParserUtils.setToDefaultIfNeeded;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.BinaryType;
@@ -82,9 +83,10 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   private final TypeLoader typeLoader;
 
   private final Characteristic<Boolean> isBlocking = new AnyMatchCharacteristic(OperationModel::isBlocking);
-  private final Characteristic<Boolean> isTransactional =
-      new AnyMatchCharacteristic(OperationModel::isTransactional, MuleSdkOperationodelParserUtils::isSkippedScopeForTx);
   private final Characteristic<List<NotificationModel>> notificationModels = new AggregatedNotificationsCharacteristic();
+  private final FilteringCharacteristic<Boolean> isTransactional =
+      new AnyMatchFilteringCharacteristic(OperationModel::isTransactional, MuleSdkOperationodelParserUtils::isSkippedScopeForTx,
+                                          MuleSdkOperationodelParserUtils::isIgnoredComponentForTx);
 
   private final List<ModelProperty> additionalModelProperties = asList(new NoStreamingConfigurationModelProperty(), new NoTransactionalActionModelProperty());
 
@@ -301,30 +303,34 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   private Stream<OperationModel> expandOperationWithoutModel(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName,
                                                              Set<String> visitedOperations, ComponentAst componentAst,
-                                                             Predicate<ComponentAst> filterCondition) {
+                                                             Predicate<ComponentAst> filterCondition,
+                                                             Predicate<ComponentAst> ignoreCondition) {
     final MuleSdkOperationModelParserSdk operationParser =
         operationModelParsersByName.get(componentAst.getIdentifier().getName());
 
     if (operationParser != null) {
-      return operationParser.getOperationModelsRecursiveStream(operationModelParsersByName, visitedOperations, filterCondition);
+      return operationParser.getOperationModelsRecursiveStream(operationModelParsersByName, visitedOperations, filterCondition,
+                                                               ignoreCondition);
     } else {
       return Stream.empty();
     }
   }
 
   private Stream<OperationModel> getOperationModelsRecursiveStream(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
-    return getOperationModelsRecursiveStream(operationModelParsersByName, componentAst -> false);
+    return getOperationModelsRecursiveStream(operationModelParsersByName, componentAst -> false, componentAst -> false);
   }
 
   private Stream<OperationModel> getOperationModelsRecursiveStream(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName,
-                                                                   Predicate<ComponentAst> filterCondition) {
+                                                                   Predicate<ComponentAst> filterCondition,
+                                                                   Predicate<ComponentAst> ignoreCondition) {
     final Set<String> visitedOperations = new HashSet<>();
-    return getOperationModelsRecursiveStream(operationModelParsersByName, visitedOperations, filterCondition);
+    return getOperationModelsRecursiveStream(operationModelParsersByName, visitedOperations, filterCondition, ignoreCondition);
   }
 
   private Stream<OperationModel> getOperationModelsRecursiveStream(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName,
                                                                    Set<String> visitedOperations,
-                                                                   Predicate<ComponentAst> filterCondition) {
+                                                                   Predicate<ComponentAst> filterCondition,
+                                                                   Predicate<ComponentAst> ignoreCondition) {
     if (!visitedOperations.add(this.getName())) {
       return Stream.empty();
     }
@@ -333,7 +339,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
     return getBody().recursiveStream()
         .flatMap(componentAst -> {
-          if (filtered.contains(componentAst)) {
+          if (filtered.contains(componentAst) || ignoreCondition.test(componentAst)) {
             return Stream.empty();
           }
           Optional<OperationModel> operationModel = componentAst.getModel(OperationModel.class);
@@ -343,7 +349,8 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
             recursiveAddToFiltered(componentAst, filtered);
             return Stream.empty();
           } else if (componentAst.getComponentType().equals(UNKNOWN)) {
-            return expandOperationWithoutModel(operationModelParsersByName, visitedOperations, componentAst, filterCondition);
+            return expandOperationWithoutModel(operationModelParsersByName, visitedOperations, componentAst, filterCondition,
+                                               ignoreCondition);
           } else {
             return Stream.empty();
           }
@@ -372,17 +379,18 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
       }
       return areAllCharacteristicsWithDefinitiveValue(characteristics);
     });
-    setToDefaultIfNeeded(characteristics);
+    characteristics.stream().filter(c -> !c.hasValue()).forEach(Characteristic::setWithDefault);
   }
 
-  private void computeCharacteristicsWithFiltering(List<Characteristic<?>> characteristics,
+  private void computeCharacteristicsWithFiltering(List<FilteringCharacteristic<?>> characteristics,
                                                    Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
-    for (Characteristic<?> characteristic : characteristics) {
-      getOperationModelsRecursiveStream(operationModelParsersByName, characteristic::filterComponent).anyMatch(operationModel -> {
-        characteristic.computeFrom(operationModel);
-        return characteristic.hasDefinitiveValue();
-      });
+    for (FilteringCharacteristic<?> characteristic : characteristics) {
+      getOperationModelsRecursiveStream(operationModelParsersByName, characteristic::filterComponent,
+                                        characteristic::ignoreComponent).anyMatch(operationModel -> {
+                                          characteristic.computeFrom(operationModel);
+                                          return characteristic.hasDefinitiveValue();
+                                        });
     }
-    setToDefaultIfNeeded(characteristics);
+    characteristics.stream().filter(c -> !c.hasValue()).forEach(Characteristic::setWithDefault);
   }
 }

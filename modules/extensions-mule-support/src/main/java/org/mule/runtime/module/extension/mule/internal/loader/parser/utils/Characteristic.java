@@ -25,19 +25,13 @@ public class Characteristic<T> {
   private final BiFunction<OperationModel, T, T> mapper;
   private final T defaultValue;
   private final T stopValue;
-  private final Predicate<ComponentAst> filterCondition;
 
   private T value;
 
   private Characteristic(BiFunction<OperationModel, T, T> mapper, T defaultValue, T stopValue) {
-    this(mapper, defaultValue, stopValue, ast -> false);
-  }
-
-  public Characteristic(BiFunction<OperationModel, T, T> mapper, T defaultValue, T stopValue, Predicate<ComponentAst> filter) {
     this.mapper = mapper;
     this.defaultValue = defaultValue;
     this.stopValue = stopValue;
-    this.filterCondition = filter;
   }
 
   public void computeFrom(OperationModel operationModel) {
@@ -64,10 +58,6 @@ public class Characteristic<T> {
     return value;
   }
 
-  public boolean filterComponent(ComponentAst componentAst) {
-    return this.filterCondition.test(componentAst);
-  }
-
   public static class BooleanCharacteristic extends Characteristic<Boolean> {
 
     private BooleanCharacteristic(Predicate<OperationModel> predicate, Boolean defaultValue, Boolean stopValue) {
@@ -76,12 +66,6 @@ public class Characteristic<T> {
             defaultValue, stopValue);
     }
 
-    private BooleanCharacteristic(Predicate<OperationModel> predicate, Boolean defaultValue, Boolean stopValue,
-                                  Predicate<ComponentAst> filterCondition) {
-      super(((operationModel,
-              curValue) -> (curValue != null && curValue == stopValue) ? curValue : predicate.test(operationModel)),
-            defaultValue, stopValue, filterCondition);
-    }
   }
 
   public static class AnyMatchCharacteristic extends BooleanCharacteristic {
@@ -90,9 +74,6 @@ public class Characteristic<T> {
       super(predicate, false, true);
     }
 
-    public AnyMatchCharacteristic(Predicate<OperationModel> predicate, Predicate<ComponentAst> filterCondition) {
-      super(predicate, false, true, filterCondition);
-    }
   }
 
   public static class AggregatedNotificationsCharacteristic extends Characteristic<List<NotificationModel>> {
@@ -107,6 +88,45 @@ public class Characteristic<T> {
       }
       notificationModels.addAll(operationModel.getNotificationModels());
       return notificationModels;
+    }
+  }
+
+  public static class FilteringCharacteristic<T> extends Characteristic<T> {
+
+    private final Predicate<ComponentAst> filterExpression;
+    private final Predicate<ComponentAst> ignoreExpression;
+
+    private FilteringCharacteristic(BiFunction<OperationModel, T, T> mapper, T defaultValue, T stopValue,
+                                    Predicate<ComponentAst> filter, Predicate<ComponentAst> ignore) {
+      super(mapper, defaultValue, stopValue);
+      this.filterExpression = filter;
+      this.ignoreExpression = ignore;
+    }
+
+    public boolean filterComponent(ComponentAst componentAst) {
+      return filterExpression.test(componentAst);
+    }
+
+    public boolean ignoreComponent(ComponentAst componentAst) {
+      return ignoreExpression.test(componentAst);
+    }
+  }
+
+  public static class BooleanFilteringCharacteristic extends FilteringCharacteristic<Boolean> {
+
+    private BooleanFilteringCharacteristic(Predicate<OperationModel> predicate, Boolean defaultValue, Boolean stopValue,
+                                           Predicate<ComponentAst> filter, Predicate<ComponentAst> ignore) {
+      super(((operationModel,
+              curValue) -> (curValue != null && curValue == stopValue) ? curValue : predicate.test(operationModel)),
+            defaultValue, stopValue, filter, ignore);
+    }
+  }
+
+  public static class AnyMatchFilteringCharacteristic extends BooleanFilteringCharacteristic {
+
+    public AnyMatchFilteringCharacteristic(Predicate<OperationModel> predicate, Predicate<ComponentAst> filterExpression,
+                                           Predicate<ComponentAst> ignoreExpression) {
+      super(predicate, false, true, filterExpression, ignoreExpression);
     }
   }
 }

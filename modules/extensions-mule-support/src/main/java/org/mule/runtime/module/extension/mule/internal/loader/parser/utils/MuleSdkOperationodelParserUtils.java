@@ -6,16 +6,24 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser.utils;
 
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.ASYNC_IDENTIFIER;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.TRY_IDENTIFIER;
+import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_ALWAYS_BEGIN_STRING;
+import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
+
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 
 import java.util.List;
 
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.ASYNC_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.TRY_IDENTIFIER;
-
 public class MuleSdkOperationodelParserUtils {
+
+  private static boolean isTry(ComponentAst componentAst) {
+    return componentAst.getIdentifier().equals(TRY_IDENTIFIER);
+  }
 
   public static boolean isSkippedScopeForTx(ComponentAst componentAst) {
     if (!componentAst.getComponentType().equals(SCOPE)) {
@@ -24,23 +32,23 @@ public class MuleSdkOperationodelParserUtils {
     if (componentAst.getIdentifier().equals(ASYNC_IDENTIFIER)) {
       return true;
     }
-    if (componentAst.getIdentifier().equals(TRY_IDENTIFIER)) {
-      ComponentParameterAst transactionalAction = componentAst.getParameter("General", "transactionalAction");
-      return transactionalAction != null && transactionalAction.getRawValue().equals("ALWAYS_BEGIN");
+    if (isTry(componentAst)) {
+      ComponentParameterAst transactionalAction =
+          componentAst.getParameter(DEFAULT_GROUP_NAME, TRANSACTIONAL_ACTION_PARAMETER_NAME);
+      return transactionalAction != null && transactionalAction.getRawValue().equals(ACTION_ALWAYS_BEGIN_STRING);
     }
     return false;
   }
 
-  public static boolean areAllCharacteristicsWithDefinitiveValue(List<Characteristic<?>> characteristics) {
-    return characteristics.stream().allMatch(Characteristic::hasDefinitiveValue);
+  public static boolean isIgnoredComponentForTx(ComponentAst componentAst) {
+    ComponentParameterAst transactionalAction =
+        componentAst.getParameter(DEFAULT_GROUP_NAME, TRANSACTIONAL_ACTION_PARAMETER_NAME);
+    return transactionalAction != null && !isTry(componentAst) && OperationTransactionalAction
+        .valueOf(transactionalAction.getRawValue()).equals(OperationTransactionalAction.NOT_SUPPORTED);
   }
 
-  public static void setToDefaultIfNeeded(List<Characteristic<?>> characteristics) {
-    for (Characteristic<?> characteristic : characteristics) {
-      if (!characteristic.hasValue()) {
-        characteristic.setWithDefault();
-      }
-    }
+  public static boolean areAllCharacteristicsWithDefinitiveValue(List<Characteristic<?>> characteristics) {
+    return characteristics.stream().allMatch(Characteristic::hasDefinitiveValue);
   }
 
 }
