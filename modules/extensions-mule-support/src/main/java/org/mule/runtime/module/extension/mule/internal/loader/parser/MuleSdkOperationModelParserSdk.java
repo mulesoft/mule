@@ -21,7 +21,6 @@ import static org.mule.runtime.module.extension.mule.internal.loader.parser.util
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.AnyMatchFilteringCharacteristic;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.AggregatedNotificationsCharacteristic;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.FilteringCharacteristic;
-import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.MuleSdkOperationodelParserUtils.areAllCharacteristicsWithDefinitiveValue;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.BinaryType;
@@ -392,5 +391,9 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
                                         });
     }
     characteristics.stream().filter(c -> !c.hasValue()).forEach(Characteristic::setWithDefault);
+  }
+
+  private boolean areAllCharacteristicsWithDefinitiveValue(List<Characteristic<?>> characteristics) {
+    return characteristics.stream().allMatch(Characteristic::hasDefinitiveValue);
   }
 }

@@ -18,6 +18,11 @@ import java.util.function.Predicate;
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 
+/**
+ * Utilitarian class to generalize parsing and calculation of different features of Mule Operations.
+ * 
+ * @since 4.5
+ */
 public class Characteristic<T> {
 
   private static final String CHARACTERISTICS_NOT_COMPUTED_MSG = "Characteristics have not been computed yet.";
@@ -34,14 +39,23 @@ public class Characteristic<T> {
     this.stopValue = stopValue;
   }
 
+  /**
+   * Use {@param operationModel} to map to the correct value for this Characteristic
+   */
   public void computeFrom(OperationModel operationModel) {
     value = mapper.apply(operationModel, value);
   }
 
+  /**
+   * Use default value as value for this Characteristic
+   */
   public void setWithDefault() {
     value = defaultValue;
   }
 
+  /**
+   * @return if there is a definitive (final) value for this Characteristic
+   */
   public boolean hasDefinitiveValue() {
     if (stopValue == null) {
       return false;
@@ -49,15 +63,24 @@ public class Characteristic<T> {
     return stopValue.equals(value);
   }
 
+  /**
+   * @return if this Characteristic has already a value calculated
+   */
   public boolean hasValue() {
     return value != null;
   }
 
+  /**
+   * @return the defined value (either calculated, or if using default value)
+   */
   public T getValue() {
     checkState(hasValue(), CHARACTERISTICS_NOT_COMPUTED_MSG);
     return value;
   }
 
+  /**
+   * Extension of {@link Characteristic} for Boolean features (such as isBlocking)
+   */
   public static class BooleanCharacteristic extends Characteristic<Boolean> {
 
     private BooleanCharacteristic(Predicate<OperationModel> predicate, Boolean defaultValue, Boolean stopValue) {
@@ -91,6 +114,10 @@ public class Characteristic<T> {
     }
   }
 
+  /**
+   * Extension of {@link Characteristic} that has also criteria for ignoring and skipping whole components (e.g. for
+   * isTransactional)
+   */
   public static class FilteringCharacteristic<T> extends Characteristic<T> {
 
     private final Predicate<ComponentAst> filterExpression;

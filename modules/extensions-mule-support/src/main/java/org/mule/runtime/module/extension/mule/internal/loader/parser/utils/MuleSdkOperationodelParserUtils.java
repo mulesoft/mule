@@ -17,14 +17,22 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 
-import java.util.List;
-
+/**
+ * Utils class to check on {@link ComponentAst} particularities for parsing different features (in
+ * {@link org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkOperationModelParserSdk})
+ *
+ * @since 4.5
+ */
 public class MuleSdkOperationodelParserUtils {
 
   private static boolean isTry(ComponentAst componentAst) {
     return componentAst.getIdentifier().equals(TRY_IDENTIFIER);
   }
 
+  /**
+   * @param componentAst
+   * @return if a component (and children) should be skipped for considered for isTransactional calculation
+   */
   public static boolean isSkippedScopeForTx(ComponentAst componentAst) {
     if (!componentAst.getComponentType().equals(SCOPE)) {
       return false;
@@ -40,15 +48,15 @@ public class MuleSdkOperationodelParserUtils {
     return false;
   }
 
+  /**
+   * @param componentAst
+   * @return if this particular component should be ignored for considered for isTransactional calculation
+   */
   public static boolean isIgnoredComponentForTx(ComponentAst componentAst) {
     ComponentParameterAst transactionalAction =
         componentAst.getParameter(DEFAULT_GROUP_NAME, TRANSACTIONAL_ACTION_PARAMETER_NAME);
     return transactionalAction != null && !isTry(componentAst) && OperationTransactionalAction
         .valueOf(transactionalAction.getValue().getValue().get().toString()).equals(OperationTransactionalAction.NOT_SUPPORTED);
-  }
-
-  public static boolean areAllCharacteristicsWithDefinitiveValue(List<Characteristic<?>> characteristics) {
-    return characteristics.stream().allMatch(Characteristic::hasDefinitiveValue);
   }
 
 }

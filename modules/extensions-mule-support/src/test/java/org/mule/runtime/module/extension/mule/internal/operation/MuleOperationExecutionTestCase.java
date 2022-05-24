@@ -136,15 +136,6 @@ public class MuleOperationExecutionTestCase extends MuleArtifactFunctionalTestCa
     assertHelloWorldResponse(result);
   }
 
-  @Test
-  public void transacitionTest() throws Exception {
-    CoreEvent result = flowRunner("transactionInFlow")
-        .withPayload("Hello!")
-        .run();
-
-    assertThat(result.getMessage().getPayload().getValue(), equalTo("world"));
-  }
-
   private void assertValue(TypedValue<?> typedValue, Object rawValue) {
     assertThat(typedValue.getValue(), equalTo(rawValue));
   }
