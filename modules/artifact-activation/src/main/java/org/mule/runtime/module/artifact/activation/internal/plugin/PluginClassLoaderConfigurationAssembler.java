@@ -18,9 +18,9 @@ import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.internal.classloader.AbstractArtifactClassLoaderConfigurationAssembler;
 import org.mule.runtime.module.artifact.activation.internal.classloader.model.ClassLoaderModelAssembler;
-import org.mule.runtime.module.artifact.activation.internal.classloader.ArtifactClassLoaderConfigurationBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
@@ -61,7 +61,7 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
   }
 
   @Override
-  protected List<URL> addArtifactSpecificClassLoaderConfiguration(ArtifactClassLoaderConfigurationBuilder artifactClassLoaderConfigurationBuilder) {
+  protected List<URL> addArtifactSpecificClassLoaderConfiguration(ClassLoaderModelBuilder classLoaderConfigurationBuilder) {
     final List<URL> dependenciesArtifactsUrls = new ArrayList<>();
 
     if (ownerDescriptor != null) {
@@ -73,7 +73,7 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
           .filter(bundleDependency -> bundleDependency.getAdditionalDependenciesList() != null
               && !bundleDependency.getAdditionalDependenciesList().isEmpty())
           .forEach(bundleDependency -> processPluginAdditionalDependenciesURIs(bundleDependency,
-                                                                               artifactClassLoaderConfigurationBuilder)
+                                                                               classLoaderConfigurationBuilder)
                                                                                    .forEach(uri -> {
                                                                                      final URL dependencyArtifactUrl;
                                                                                      try {
@@ -94,11 +94,11 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
   }
 
   private List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency,
-                                                            ArtifactClassLoaderConfigurationBuilder artifactClassLoaderConfigurationBuilder) {
+                                                            ClassLoaderModelBuilder classLoaderConfigurationBuilder) {
     return bundleDependency.getAdditionalDependenciesList().stream().map(additionalDependency -> {
       // TODO: check if the dependency belongs to the deny-list
-      artifactClassLoaderConfigurationBuilder.withLocalPackages(additionalDependency.getPackages());
-      artifactClassLoaderConfigurationBuilder.withLocalResources(additionalDependency.getResources());
+      classLoaderConfigurationBuilder.withLocalPackages(additionalDependency.getPackages());
+      classLoaderConfigurationBuilder.withLocalResources(additionalDependency.getResources());
       return additionalDependency.getBundleUri();
     }).collect(toList());
   }
@@ -128,6 +128,11 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
   @Override
   protected File getProjectFolder() {
     return artifactLocation;
+  }
+
+  @Override
+  protected ClassLoaderModelBuilder getClassLoaderConfigurationBuilder() {
+    return new ClassLoaderModelBuilder();
   }
 
   @Override

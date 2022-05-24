@@ -71,26 +71,4 @@ public interface ArtifactDescriptorFactory {
                                                     PluginModelResolver pluginModelResolver,
                                                     PluginDescriptorResolver pluginDescriptorResolver);
 
-  /**
-   * Creates a descriptor for a plugin.
-   *
-   * @param bundleDependency          description of the plugin on a bundle.
-   * @param pluginModel               description of the model of the plugin.
-   * @param ownerDescriptor           descriptor of the artifact that owns the plugin.
-   * @param bundleDependencies        plugin dependencies on a bundle.
-   * @param pluginArtifactCoordinates plugin coordinates.
-   * @param pluginDependencies        resolved plugin dependencies as artifacts.
-   * @param pluginExportedPackages    {@link List list} of the packages the plugin exports.
-   * @param pluginExportedResources   {@link List list} of the resources the plugin exports.
-   * @return a descriptor for a plugin.
-   */
-  ArtifactPluginDescriptor createPluginDescriptor(BundleDependency bundleDependency,
-                                                  MulePluginModel pluginModel,
-                                                  DeployableArtifactDescriptor ownerDescriptor,
-                                                  List<BundleDependency> bundleDependencies,
-                                                  ArtifactCoordinates pluginArtifactCoordinates,
-                                                  List<Artifact> pluginDependencies,
-                                                  List<String> pluginExportedPackages,
-                                                  List<String> pluginExportedResources);
-
 }

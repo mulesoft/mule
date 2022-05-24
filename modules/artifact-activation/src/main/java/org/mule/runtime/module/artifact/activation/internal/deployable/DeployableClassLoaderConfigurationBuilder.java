@@ -4,14 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.artifact.activation.internal.classloader;
-
-import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.validateMuleRuntimeSharedLibrary;
+package org.mule.runtime.module.artifact.activation.internal.deployable;
 
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
-
-import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -26,21 +22,18 @@ import java.util.List;
 import com.google.common.collect.Sets;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
 
 /**
  * {@link ClassLoaderModel.ClassLoaderModelBuilder ClassLoaderModelBuilder} that adds the concept of Shared Library for the
  * configured dependencies.
  */
-public class ArtifactClassLoaderConfigurationBuilder extends ClassLoaderModel.ClassLoaderModelBuilder {
-
-  private static final Logger LOGGER = getLogger(ArtifactClassLoaderConfigurationBuilder.class);
+public class DeployableClassLoaderConfigurationBuilder extends ClassLoaderModel.ClassLoaderModelBuilder {
 
   private final org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel;
   private final File artifactFolder;
 
-  public ArtifactClassLoaderConfigurationBuilder(org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
-                                                 File artifactFolder) {
+  public DeployableClassLoaderConfigurationBuilder(org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
+                                                   File artifactFolder) {
     this.packagerClassLoaderModel = packagerClassLoaderModel;
     this.artifactFolder = artifactFolder;
   }
@@ -60,8 +53,7 @@ public class ArtifactClassLoaderConfigurationBuilder extends ClassLoaderModel.Cl
   private void exportSharedLibrariesResourcesAndPackages() {
     packagerClassLoaderModel.getDependencies().stream()
         .filter(Artifact::isShared)
-        .filter(sharedDep -> !validateMuleRuntimeSharedLibrary(sharedDep.getArtifactCoordinates().getGroupId(),
-                                                               sharedDep.getArtifactCoordinates().getArtifactId()))
+        // No need to validate the shared dependency here, as it has already been done by now
         .forEach(sharedDep -> {
           this.exportingPackages(sharedDep.getPackages() == null ? emptySet() : Sets.newHashSet(sharedDep.getPackages()));
           this.exportingResources(sharedDep.getResources() == null ? emptySet()
@@ -69,7 +61,7 @@ public class ArtifactClassLoaderConfigurationBuilder extends ClassLoaderModel.Cl
         });
   }
 
-  protected void processAdditionalPluginLibraries() {
+  private void processAdditionalPluginLibraries() {
     if (packagerClassLoaderModel instanceof AppClassLoaderModel) {
       AppClassLoaderModel appClassLoaderModel = (AppClassLoaderModel) packagerClassLoaderModel;
       appClassLoaderModel.getAdditionalPluginDependencies()
@@ -97,7 +89,7 @@ public class ArtifactClassLoaderConfigurationBuilder extends ClassLoaderModel.Cl
     return new BundleDependency.Builder(original).setAdditionalDependencies(additionalPluginDependencies).build();
   }
 
-  protected void replaceBundleDependency(BundleDependency original, BundleDependency modified) {
+  private void replaceBundleDependency(BundleDependency original, BundleDependency modified) {
     this.dependencies.remove(original);
     this.dependencies.add(modified);
   }

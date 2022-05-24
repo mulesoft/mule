@@ -9,7 +9,6 @@ package org.mule.runtime.module.artifact.activation.internal.domain;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 
 import org.mule.runtime.api.deployment.meta.MuleDomainModel;
-import org.mule.runtime.module.artifact.activation.api.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
@@ -27,10 +26,9 @@ public class DomainDescriptorFactory extends AbstractDeployableArtifactDescripto
   public DomainDescriptorFactory(DeployableProjectModel<MuleDomainModel> deployableProjectModel,
                                  Map<String, String> deploymentProperties, PluginModelResolver pluginModelResolver,
                                  PluginDescriptorResolver pluginDescriptorResolver,
-                                 ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder,
-                                 ArtifactDescriptorFactory artifactDescriptorFactory) {
+                                 ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
     super(deployableProjectModel, deploymentProperties, pluginModelResolver, pluginDescriptorResolver,
-          artifactDescriptorValidatorBuilder, artifactDescriptorFactory);
+          artifactDescriptorValidatorBuilder);
   }
 
   @Override

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader.model.utils;
 
-import static java.util.Optional.ofNullable;
 import static org.mule.maven.client.internal.AetherMavenClient.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.Classifier.MULE_DOMAIN;
@@ -20,10 +19,10 @@ import static org.mule.tools.api.classloader.Constants.SHARED_LIBRARY_FIELD;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static java.util.Optional.ofNullable;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.maven.client.api.model.BundleDependency;
 import org.mule.maven.client.api.model.BundleDescriptor;
@@ -45,21 +44,16 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.slf4j.Logger;
 
 /**
  * Helper methods to convert artifact related classes and recognize mule plugin artifacts.
  */
 public class ArtifactUtils {
 
-  private static final Logger LOGGER = getLogger(ArtifactUtils.class);
-
   private static final String PACKAGE_TYPE = "jar";
   private static final String PROVIDED = "provided";
   private static final URI EMPTY_RESOURCE = URI.create("");
   private static final String POM_TYPE = "pom";
-  private static final String MULE_RUNTIME_GROUP_ID = "org.mule.runtime";
-  private static final String MULE_RUNTIME_MODULES_GROUP_ID = "com.mulesoft.mule.runtime.modules";
 
   /**
    * Convert a {@link BundleDescriptor} instance to {@link ArtifactCoordinates}.
@@ -205,8 +199,8 @@ public class ArtifactUtils {
   }
 
   private static void findAndExportSharedLibrary(String sharedLibraryGroupId, String sharedLibraryArtifactId,
-                                                 List<Artifact> artifacts, List<BundleDependency> appDependencies) {
-    appDependencies.stream()
+                                                 List<Artifact> artifacts, List<BundleDependency> deployableDependencies) {
+    deployableDependencies.stream()
         .filter(bundleDependency -> bundleDependency.getDescriptor().getGroupId().equals(sharedLibraryGroupId) &&
             bundleDependency.getDescriptor().getArtifactId().equals(sharedLibraryArtifactId))
         .forEach(bundleDependency -> setArtifactTransitiveDependenciesAsShared(artifacts, bundleDependency));
@@ -248,11 +242,11 @@ public class ArtifactUtils {
     }
   }
 
-  public static ArtifactCoordinates getApplicationArtifactCoordinates(Model pomModel, ApplicationGAVModel appGAVModel) {
-    ArtifactCoordinates appCoordinates = toArtifactCoordinates(getPomProjectBundleDescriptor(appGAVModel));
-    appCoordinates.setType(PACKAGE_TYPE);
-    appCoordinates.setClassifier(pomModel.getPackaging());
-    return appCoordinates;
+  public static ArtifactCoordinates getDeployableArtifactCoordinates(Model pomModel, ApplicationGAVModel appGAVModel) {
+    ArtifactCoordinates deployableCoordinates = toArtifactCoordinates(getPomProjectBundleDescriptor(appGAVModel));
+    deployableCoordinates.setType(PACKAGE_TYPE);
+    deployableCoordinates.setClassifier(pomModel.getPackaging());
+    return deployableCoordinates;
   }
 
   public static BundleDescriptor getPomProjectBundleDescriptor(ApplicationGAVModel appGAVModel) {
@@ -268,22 +262,6 @@ public class ArtifactUtils {
         .setBaseVersion(appGAVModel.getVersion())
         .setType(POM_TYPE)
         .build();
-  }
-
-  public static boolean validateMuleRuntimeSharedLibrary(String groupId, String artifactId) {
-    return validateMuleRuntimeSharedLibrary(groupId, artifactId, null);
-  }
-
-  public static boolean validateMuleRuntimeSharedLibrary(String groupId, String artifactId, String artifactFileName) {
-    if (MULE_RUNTIME_GROUP_ID.equals(groupId)
-        || MULE_RUNTIME_MODULES_GROUP_ID.equals(groupId)) {
-      LOGGER
-          .warn("Shared library '{}:{}' is a Mule Runtime dependency. It will not be used by '{}' in order to avoid classloading issues. Please consider removing it, or at least not putting it as a sharedLibrary.",
-                groupId, artifactId, artifactFileName != null ? artifactFileName : "the app");
-      return true;
-    } else {
-      return false;
-    }
   }
 
 }

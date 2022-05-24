@@ -13,12 +13,13 @@ import static java.util.Collections.emptySet;
 import static java.util.Optional.of;
 
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
+import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
-import org.mule.runtime.module.artifact.activation.api.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
 import org.mule.runtime.module.artifact.activation.internal.descriptor.AbstractArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.activation.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -56,21 +57,19 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
   protected final Optional<Properties> deploymentProperties;
   private final PluginModelResolver pluginModelResolver;
   private final PluginDescriptorResolver pluginDescriptorResolver;
-  private final ArtifactDescriptorFactory artifactDescriptorFactory;
 
   public AbstractDeployableArtifactDescriptorFactory(DeployableProjectModel<M> deployableProjectModel,
                                                      Map<String, String> deploymentProperties,
                                                      PluginModelResolver pluginModelResolver,
                                                      PluginDescriptorResolver pluginDescriptorResolver,
-                                                     ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder,
-                                                     ArtifactDescriptorFactory artifactDescriptorFactory) {
+                                                     ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
     super(deployableProjectModel.getProjectFolder(), deployableProjectModel.getMuleDeployableModel(),
           artifactDescriptorValidatorBuilder);
+    // TODO: validate model dependencies checking for incompatibilities
     this.deployableProjectModel = deployableProjectModel;
     this.deploymentProperties = asProperties(deploymentProperties);
     this.pluginModelResolver = pluginModelResolver;
     this.pluginDescriptorResolver = pluginDescriptorResolver;
-    this.artifactDescriptorFactory = artifactDescriptorFactory;
   }
 
   private Optional<Properties> asProperties(Map<String, String> deploymentProperties) {
@@ -129,12 +128,13 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
 
           List<BundleDependency> bundleDependencies = deployableProjectModel.getPluginsBundleDependencies().get(bundleDescriptor);
           pluginDescriptors
-              .add(pluginDescriptorResolver.resolve(emptySet(), bundleDescriptor).orElse(artifactDescriptorFactory
-                  .createPluginDescriptor(bundlePluginDependency,
-                                          pluginModelResolver.resolve(bundlePluginDependency), descriptor, bundleDependencies,
-                                          pluginDependencies.getKey(), pluginDependencies.getValue(),
-                                          deployableProjectModel.getPluginsExportedPackages().get(bundleDescriptor),
-                                          deployableProjectModel.getPluginsExportedResources().get(bundleDescriptor))));
+              .add(pluginDescriptorResolver.resolve(emptySet(), bundleDescriptor)
+                  .orElse(createPluginDescriptor(bundlePluginDependency,
+                                                 pluginModelResolver.resolve(bundlePluginDependency), descriptor,
+                                                 bundleDependencies,
+                                                 pluginDependencies.getKey(), pluginDependencies.getValue(),
+                                                 deployableProjectModel.getPluginsExportedPackages().get(bundleDescriptor),
+                                                 deployableProjectModel.getPluginsExportedResources().get(bundleDescriptor))));
         }
       }
     }
@@ -142,5 +142,32 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
   }
 
   protected abstract String getDefaultConfigurationResource();
+
+  /**
+   * Creates a descriptor for a plugin.
+   *
+   * @param bundleDependency          description of the plugin on a bundle.
+   * @param pluginModel               description of the model of the plugin.
+   * @param ownerDescriptor           descriptor of the artifact that owns the plugin.
+   * @param bundleDependencies        plugin dependencies on a bundle.
+   * @param pluginArtifactCoordinates plugin coordinates.
+   * @param pluginDependencies        resolved plugin dependencies as artifacts.
+   * @param pluginExportedPackages    {@link List list} of the packages the plugin exports.
+   * @param pluginExportedResources   {@link List list} of the resources the plugin exports.
+   * @return a descriptor for a plugin.
+   */
+  private ArtifactPluginDescriptor createPluginDescriptor(BundleDependency bundleDependency,
+                                                          MulePluginModel pluginModel,
+                                                          DeployableArtifactDescriptor ownerDescriptor,
+                                                          List<BundleDependency> bundleDependencies,
+                                                          ArtifactCoordinates pluginArtifactCoordinates,
+                                                          List<Artifact> pluginDependencies,
+                                                          List<String> pluginExportedPackages,
+                                                          List<String> pluginExportedResources) {
+    return new ArtifactPluginDescriptorFactory(bundleDependency, pluginModel, ownerDescriptor,
+                                               bundleDependencies, pluginArtifactCoordinates, pluginDependencies,
+                                               pluginExportedPackages, pluginExportedResources,
+                                               ArtifactDescriptorValidatorBuilder.builder()).createArtifactDescriptor();
+  }
 
 }

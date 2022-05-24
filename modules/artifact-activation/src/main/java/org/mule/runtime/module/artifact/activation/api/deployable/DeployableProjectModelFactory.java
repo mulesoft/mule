@@ -6,24 +6,30 @@
  */
 package org.mule.runtime.module.artifact.activation.api.deployable;
 
-import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
+import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
+import org.mule.runtime.api.deployment.meta.MuleDomainModel;
 
 /**
  * Generic factory to create a {@link DeployableProjectModel} representing the structure of a project.
  * <p>
  * Implementations may be coupled to a specific build tool, dependency management system or project structure.
- * 
- * @param <M> type of the deployable model.
  *
  * @since 4.5
  */
-public interface DeployableProjectModelFactory<M extends MuleDeployableModel> {
+public interface DeployableProjectModelFactory {
 
   /**
-   * Creates a {@link DeployableProjectModel}.
+   * Creates a {@link DeployableProjectModel} describing a domain.
    *
-   * @return a {@link DeployableProjectModel} representing the structure of a project.
+   * @return a {@link DeployableProjectModel} representing the structure of a domain.
    */
-  DeployableProjectModel<M> createDeployableProjectModel();
+  DeployableProjectModel<MuleDomainModel> createDomainProjectModel();
+
+  /**
+   * Creates a {@link DeployableProjectModel} describing an application.
+   *
+   * @return a {@link DeployableProjectModel} representing the structure of an application.
+   */
+  DeployableProjectModel<MuleApplicationModel> createApplicationProjectModel();
 
 }

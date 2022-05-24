@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 public class DeployableDependencyResolver {
 
-  protected static final String MULE_DOMAIN_CLASSIFIER = "mule-domain";
+  private static final String MULE_DOMAIN_CLASSIFIER = "mule-domain";
 
   private final AetherMavenClient muleMavenPluginClient;
 
@@ -29,20 +29,20 @@ public class DeployableDependencyResolver {
   }
 
   /**
-   * Resolve the application dependencies, excluding mule domains.
+   * Resolve the deployable dependencies, excluding mule domains.
    *
    * @param pomFile                 pom file
    * @param includeTestDependencies true if the test dependencies must be included, false otherwise.
    * @param mavenReactorResolver    {@link MavenReactorResolver}
    */
-  public List<BundleDependency> resolveApplicationDependencies(File pomFile, boolean includeTestDependencies,
-                                                               Optional<MavenReactorResolver> mavenReactorResolver) {
+  public List<BundleDependency> resolveDeployableDependencies(File pomFile, boolean includeTestDependencies,
+                                                              Optional<MavenReactorResolver> mavenReactorResolver) {
 
     return muleMavenPluginClient
         .resolveArtifactDependencies(pomFile, includeTestDependencies, true, empty(), mavenReactorResolver, empty())
         .stream()
-        .filter(d -> !(d.getScope() == BundleScope.PROVIDED) || (d.getDescriptor().getClassifier().isPresent()
-            && d.getDescriptor().getClassifier().get().equals(MULE_DOMAIN_CLASSIFIER)))
+        .filter(d -> !(d.getScope() == BundleScope.PROVIDED)
+            || d.getDescriptor().getClassifier().map(MULE_DOMAIN_CLASSIFIER::equals).orElse(false))
         .collect(Collectors.toList());
   }
 

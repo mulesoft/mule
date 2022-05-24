@@ -42,7 +42,7 @@ public class DefaultArtifactDescriptorFactory implements ArtifactDescriptorFacto
                                                            PluginDescriptorResolver pluginDescriptorResolver) {
 
     return new ApplicationDescriptorFactory(model, deploymentProperties, pluginModelResolver, pluginDescriptorResolver,
-                                            ArtifactDescriptorValidatorBuilder.builder(), this).createArtifactDescriptor();
+                                            ArtifactDescriptorValidatorBuilder.builder()).createArtifactDescriptor();
   }
 
   @Override
@@ -51,22 +51,7 @@ public class DefaultArtifactDescriptorFactory implements ArtifactDescriptorFacto
                                                  PluginModelResolver pluginModelResolver,
                                                  PluginDescriptorResolver pluginDescriptorResolver) {
     return new DomainDescriptorFactory(model, deploymentProperties, pluginModelResolver, pluginDescriptorResolver,
-                                       ArtifactDescriptorValidatorBuilder.builder(), this).createArtifactDescriptor();
-  }
-
-  @Override
-  public ArtifactPluginDescriptor createPluginDescriptor(BundleDependency bundleDependency,
-                                                         MulePluginModel pluginModel,
-                                                         DeployableArtifactDescriptor ownerDescriptor,
-                                                         List<BundleDependency> bundleDependencies,
-                                                         ArtifactCoordinates pluginArtifactCoordinates,
-                                                         List<Artifact> pluginDependencies,
-                                                         List<String> pluginExportedPackages,
-                                                         List<String> pluginExportedResources) {
-    return new ArtifactPluginDescriptorFactory(bundleDependency, pluginModel, ownerDescriptor,
-                                               bundleDependencies, pluginArtifactCoordinates, pluginDependencies,
-                                               pluginExportedPackages, pluginExportedResources,
-                                               ArtifactDescriptorValidatorBuilder.builder()).createArtifactDescriptor();
+                                       ArtifactDescriptorValidatorBuilder.builder()).createArtifactDescriptor();
   }
 
 }

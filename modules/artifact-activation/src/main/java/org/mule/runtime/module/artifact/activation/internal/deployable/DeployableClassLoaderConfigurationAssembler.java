@@ -10,6 +10,7 @@ import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.classloader.AbstractArtifactClassLoaderConfigurationAssembler;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 
 import java.io.File;
 import java.util.HashSet;
@@ -33,7 +34,7 @@ public class DeployableClassLoaderConfigurationAssembler<M extends MuleDeployabl
 
   @Override
   protected List<BundleDependency> getBundleDependencies() {
-    return deployableProjectModel.getAppBundleDependencies();
+    return deployableProjectModel.getDeployableBundleDependencies();
   }
 
   @Override
@@ -49,6 +50,11 @@ public class DeployableClassLoaderConfigurationAssembler<M extends MuleDeployabl
   @Override
   protected File getProjectFolder() {
     return deployableProjectModel.getProjectFolder();
+  }
+
+  @Override
+  protected ClassLoaderModel.ClassLoaderModelBuilder getClassLoaderConfigurationBuilder() {
+    return new DeployableClassLoaderConfigurationBuilder(packagerClassLoaderModel, getProjectFolder());
   }
 
   @Override

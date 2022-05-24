@@ -6,6 +6,14 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.everyItem;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.startsWith;
 import static org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver.pluginDescriptorResolver;
 import static org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver.mavenDeployablePluginModelResolver;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
@@ -13,15 +21,13 @@ import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.
 
 import static java.util.Collections.emptyMap;
 
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.module.artifact.activation.api.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
-import org.mule.runtime.module.artifact.activation.internal.maven.MavenApplicationProjectModelFactory;
+import org.mule.runtime.module.artifact.activation.internal.maven.MavenDeployableProjectModelFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -29,7 +35,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Optional;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -41,31 +46,55 @@ import org.junit.Test;
 public class DefaultArtifactDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
-  public void createApplicationDescriptor() throws Exception {
-    MavenApplicationProjectModelFactory modelFactory =
-        new MavenApplicationProjectModelFactory(getApplicationFolder("apps/shared-lib-additional-plugin-dependencies"));
+  public void createBasicApplicationDescriptor() throws Exception {
+    ApplicationDescriptor applicationDescriptor = createApplicationDescriptor("apps/basic");
 
-    DeployableProjectModel<MuleApplicationModel> model = modelFactory.createDeployableProjectModel();
+    assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), contains("org.test"));
+    assertThat(applicationDescriptor.getClassLoaderModel().getExportedResources(), contains("test-script.dwl"));
+
+    assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(), hasSize(3));
+  }
+
+  @Test
+  public void createApplicationDescriptorWithSharedLibrary() throws URISyntaxException {
+    ApplicationDescriptor applicationDescriptor = createApplicationDescriptor("apps/shared-lib");
+
+    assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), everyItem(startsWith("org.apache.derby")));
+    assertThat(applicationDescriptor.getClassLoaderModel().getExportedResources(), hasItems(startsWith("org/apache/derby")));
+  }
+
+  @Test
+  public void createApplicationDescriptorWithAdditionalPluginDependency() throws URISyntaxException {
+    ApplicationDescriptor applicationDescriptor = createApplicationDescriptor("apps/additional-plugin-dependency");
+
+    assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), hasSize(0));
+    assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(), hasSize(4));
+
+    assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(),
+               hasItem(hasProperty("descriptor", hasProperty("artifactId", equalTo("derby")))));
+
+    assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(),
+               hasItem(hasProperty("descriptor", hasProperty("artifactId", equalTo("mule-http-connector")))));
+
+    List<BundleDependency> additionalDependencies =
+        applicationDescriptor.getClassLoaderModel().getDependencies().stream()
+            .filter(bundleDependency -> bundleDependency.getDescriptor().getArtifactId().equals("mule-http-connector")).findAny()
+            .get().getAdditionalDependenciesList();
+
+    assertThat(additionalDependencies, hasSize(1));
+    assertThat(additionalDependencies.get(0).getDescriptor().getArtifactId(), is("derby"));
+  }
+
+  private ApplicationDescriptor createApplicationDescriptor(String appPath) throws URISyntaxException {
+    MavenDeployableProjectModelFactory modelFactory =
+        new MavenDeployableProjectModelFactory(getApplicationFolder(appPath));
+
+    DeployableProjectModel<MuleApplicationModel> model = modelFactory.createApplicationProjectModel();
 
     ArtifactDescriptorFactory artifactDescriptorFactory = new DefaultArtifactDescriptorFactory();
-    ApplicationDescriptor applicationDescriptor =
-        artifactDescriptorFactory.createApplicationDescriptor(model, emptyMap(),
-                                                              mavenDeployablePluginModelResolver(),
-                                                              pluginDescriptorResolver());
-
-    assertThat(applicationDescriptor.getClassLoaderModel().getDependencies().stream()
-        .filter(bundleDependency -> bundleDependency.getDescriptor().getArtifactId().equals("derby")).findAny(),
-               is(not(Optional.empty())));
-    Optional<BundleDependency> pluginWithAdditionalDependencies =
-        applicationDescriptor.getClassLoaderModel().getDependencies().stream()
-            .filter(bundleDependency -> bundleDependency.getDescriptor().getArtifactId().equals("mule-http-connector")).findAny();
-    assertThat(pluginWithAdditionalDependencies,
-               is(not(Optional.empty())));
-    List<BundleDependency> additionalDependencies = pluginWithAdditionalDependencies.get().getAdditionalDependenciesList();
-    assertThat(additionalDependencies.size(), is(1));
-    assertThat(additionalDependencies.get(0).getDescriptor().getArtifactId(), is("derby"));
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), hasItems("org.test"));
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedResources(), hasItems("test-script.dwl"));
+    return artifactDescriptorFactory.createApplicationDescriptor(model, emptyMap(),
+                                                                 mavenDeployablePluginModelResolver(),
+                                                                 pluginDescriptorResolver());
   }
 
   protected File getApplicationFolder(String appPath) throws URISyntaxException {

@@ -11,10 +11,7 @@ import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigu
 import static org.mule.maven.client.internal.util.MavenUtils.getPomModelFromFile;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.getApplicationArtifactCoordinates;
-import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.toApplicationModelArtifacts;
-import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updateArtifactsSharedState;
-import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updatePackagesResources;
+import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.*;
 import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMavenPlugin.MULE_EXTENSIONS_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMavenPlugin.MULE_EXTENSIONS_PLUGIN_GROUP_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
@@ -40,8 +37,12 @@ import org.mule.maven.client.api.SettingsSupplierFactory;
 import org.mule.maven.client.api.model.BundleDependency;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.internal.AetherMavenClient;
+import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
+import org.mule.runtime.api.deployment.meta.MuleDomainModel;
 import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
+import org.mule.runtime.api.deployment.persistence.MuleApplicationModelJsonSerializer;
+import org.mule.runtime.api.deployment.persistence.MuleDomainModelJsonSerializer;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
@@ -86,12 +87,10 @@ import org.slf4j.Logger;
 /**
  * Implementation of {@link DeployableProjectModelFactory} that uses Maven.
  *
- * @param <M> type of the project model.
- *
  * @since 4.5
  */
-public abstract class AbstractMavenDeployableProjectModelFactory<M extends MuleDeployableModel>
-    implements DeployableProjectModelFactory<M> {
+public class MavenDeployableProjectModelFactory
+    implements DeployableProjectModelFactory {
 
   private static final String DEFAULT_PACKAGE_EXPORT = "";
   private static final String JAVA_EXTENSION = "java";
@@ -103,25 +102,34 @@ public abstract class AbstractMavenDeployableProjectModelFactory<M extends MuleD
 
   private static final String CLASS_PATH_SEPARATOR = "/";
 
-  private static final Logger LOGGER = getLogger(AbstractMavenDeployableProjectModelFactory.class);
+  private static final Logger LOGGER = getLogger(MavenDeployableProjectModelFactory.class);
 
   private final File projectFolder;
   private final MavenConfiguration mavenConfiguration;
-  private List<String> exportedPackages = emptyList();
-  private List<String> exportedResources = emptyList();
+  private List<String> packages = emptyList();
+  private List<String> resources = emptyList();
+  private List<Artifact> deployableArtifactDependencies;
+  private List<BundleDependency> deployableMavenBundleDependencies;
+  private List<Plugin> additionalPluginDependencies;
+  private Map<ArtifactCoordinates, List<Artifact>> pluginsArtifactDependencies;
+  private ArtifactCoordinates deployableArtifactCoordinates;
+  private List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> deployableBundleDependencies;
+  private Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> pluginsBundleDependencies;
+  private Map<BundleDescriptor, List<String>> pluginsPackages;
+  private Map<BundleDescriptor, List<String>> pluginsResources;
 
-  public AbstractMavenDeployableProjectModelFactory(File projectFolder, MavenConfiguration mavenConfiguration) {
+  public MavenDeployableProjectModelFactory(File projectFolder, MavenConfiguration mavenConfiguration) {
     this.projectFolder = projectFolder;
     this.mavenConfiguration = mavenConfiguration;
   }
 
-  public AbstractMavenDeployableProjectModelFactory(File projectFolder) {
+  public MavenDeployableProjectModelFactory(File projectFolder) {
     this(projectFolder, getDefaultMavenConfiguration());
   }
 
   private static MavenConfiguration getDefaultMavenConfiguration() {
     final MavenClientProvider mavenClientProvider =
-        discoverProvider(AbstractMavenDeployableProjectModelFactory.class.getClassLoader());
+        discoverProvider(MavenDeployableProjectModelFactory.class.getClassLoader());
     final Supplier<File> localMavenRepository =
         mavenClientProvider.getLocalRepositorySuppliers().environmentMavenRepositorySupplier();
 
@@ -145,27 +153,93 @@ public abstract class AbstractMavenDeployableProjectModelFactory<M extends MuleD
   }
 
   @Override
-  public DeployableProjectModel<M> createDeployableProjectModel() {
+  public DeployableProjectModel<MuleDomainModel> createDomainProjectModel() {
+    processDeployableProjectModel();
+
+    MuleDomainModel domainModel = createArtifactModel(projectFolder, new MuleDomainModelJsonSerializer());
+
+    return new DeployableProjectModel<>(packages, resources, deployableArtifactDependencies,
+                                        additionalPluginDependencies, pluginsArtifactDependencies, deployableArtifactCoordinates,
+                                        projectFolder, deployableBundleDependencies,
+                                        buildBundleDescriptor(deployableArtifactCoordinates), pluginsBundleDependencies,
+                                        pluginsPackages, pluginsResources,
+                                        domainModel);
+  }
+
+  @Override
+  public DeployableProjectModel<MuleApplicationModel> createApplicationProjectModel() {
+    processDeployableProjectModel();
+
+    MuleApplicationModel applicationModel = createArtifactModel(projectFolder, new MuleApplicationModelJsonSerializer());
+
+    return new DeployableProjectModel<>(packages, resources, deployableArtifactDependencies,
+                                        additionalPluginDependencies, pluginsArtifactDependencies, deployableArtifactCoordinates,
+                                        projectFolder, deployableBundleDependencies,
+                                        buildBundleDescriptor(deployableArtifactCoordinates), pluginsBundleDependencies,
+                                        pluginsPackages, pluginsResources,
+                                        applicationModel);
+  }
+
+  private void processDeployableProjectModel() {
     File pom = getPomFromFolder(projectFolder);
     Model pomModel = getPomModelFromFile(pom);
 
-    ApplicationGAVModel appGAVModel =
-        new ApplicationGAVModel(pomModel.getGroupId(), pomModel.getArtifactId(), pomModel.getVersion());
-    ArtifactCoordinates artifactCoordinates = getApplicationArtifactCoordinates(pomModel, appGAVModel);
+    getDeployableProjectArtifactCoordinates(pomModel);
 
-    // Resolve dependencies
     AetherMavenClient aetherMavenClient = new AetherMavenClient(mavenConfiguration);
+    List<String> activeProfiles = mavenConfiguration.getActiveProfiles().orElse(emptyList());
+
+    resolveDeployableDependencies(aetherMavenClient, pom, pomModel, activeProfiles);
+
+    resolveDeployablePluginsData(deployableMavenBundleDependencies);
+
+    resolveAdditionalPluginDependencies(aetherMavenClient, pomModel, activeProfiles, pluginsArtifactDependencies);
+
+    // Get exported resources and packages
+    try {
+      getAvailablePackagesAndResources();
+    } catch (IOException e) {
+      throw new ArtifactActivationException(createStaticMessage("Couldn't search exported packages and resources"), e);
+    }
+  }
+
+  private void getDeployableProjectArtifactCoordinates(Model pomModel) {
+    ApplicationGAVModel deployableGAVModel =
+        new ApplicationGAVModel(pomModel.getGroupId(), pomModel.getArtifactId(), pomModel.getVersion());
+    deployableArtifactCoordinates = getDeployableArtifactCoordinates(pomModel, deployableGAVModel);
+  }
+
+  /**
+   * Resolves the dependencies of the deployable in the various forms needed to obtain the {@link DeployableProjectModel}.
+   * 
+   * @param aetherMavenClient the configured {@link AetherMavenClient}.
+   * @param pom               POM file.
+   * @param pomModel          parsed POM model.
+   * @param activeProfiles    active Maven profiles.
+   */
+  private void resolveDeployableDependencies(AetherMavenClient aetherMavenClient, File pom, Model pomModel,
+                                             List<String> activeProfiles) {
     DeployableDependencyResolver deployableDependencyResolver = new DeployableDependencyResolver(aetherMavenClient);
 
-    List<BundleDependency> dependencies = deployableDependencyResolver.resolveApplicationDependencies(pom, false, empty());
-    List<String> activeProfiles = mavenConfiguration.getActiveProfiles().orElse(emptyList());
-    List<Artifact> deployableDependencies =
-        updateArtifactsSharedState(dependencies, updatePackagesResources(toApplicationModelArtifacts(dependencies)),
+    // Resolve the Maven bundle dependencies
+    // TODO: determine the inclusion of test dependencies
+    deployableMavenBundleDependencies = deployableDependencyResolver.resolveDeployableDependencies(pom, false, empty());
+
+    // Get the dependencies as Artifacts, accounting for the shared libraries configuration
+    deployableArtifactDependencies =
+        updateArtifactsSharedState(deployableMavenBundleDependencies,
+                                   updatePackagesResources(toApplicationModelArtifacts(deployableMavenBundleDependencies)),
                                    pomModel, activeProfiles);
 
-    Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies =
-        new DeployablePluginsDependenciesResolver().resolve(dependencies);
+    // Prepare bundle dependencies as expected by the project model
+    deployableBundleDependencies =
+        deployableArtifactDependencies.stream()
+            .map(artifact -> createBundleDependencyFromPackagerDependency(uri -> uri).apply(artifact)).collect(toList());
+  }
 
+  private void resolveAdditionalPluginDependencies(AetherMavenClient aetherMavenClient, Model pomModel,
+                                                   List<String> activeProfiles,
+                                                   Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies) {
     // Parse additional plugin dependencies
     List<org.mule.runtime.module.artifact.activation.internal.plugin.Plugin> initialAdditionalPluginDependencies =
         findArtifactPackagerPlugin(pomModel, activeProfiles)
@@ -176,58 +250,35 @@ public abstract class AbstractMavenDeployableProjectModelFactory<M extends MuleD
                                                  initialAdditionalPluginDependencies,
                                                  new File("temp"));
 
-    List<Plugin> additionalPluginDependencies = toPluginDependencies(additionalPluginDependenciesResolver
-        .resolveDependencies(dependencies, pluginsDependencies));
+    additionalPluginDependencies = toPluginDependencies(additionalPluginDependenciesResolver
+        .resolveDependencies(deployableMavenBundleDependencies, this.pluginsArtifactDependencies));
+  }
 
-    // Prepare bundle dependencies expected by the class loader configuration
-    List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> trueAppBundleDependencies =
-        deployableDependencies.stream()
-            .map(artifact -> createBundleDependencyFromPackagerDependency(uri -> uri).apply(artifact)).collect(toList());
+  private void resolveDeployablePluginsData(List<BundleDependency> deployableMavenBundleDependencies) {
+    // Resolve the dependencies of each deployable's dependency
+    pluginsArtifactDependencies =
+        new DeployablePluginsDependenciesResolver().resolve(deployableMavenBundleDependencies);
 
-    // Get exported resources and packages
-    try {
-      getExportedPackagesAndResources();
-    } catch (IOException e) {
-      throw new ArtifactActivationException(createStaticMessage("Couldn't search exported packages and resources"), e);
-    }
-
-    // TODO: validate dependencies checking for incompatibilities
-
-    // TODO: consider artifact patches for the case this is run within a Runtime
-
-    // TODO: the model needs to be completed, when the app is packaged every field is present in the output mule-artifact.json,
-    // but here we don't have that
-    M deployableModel = createArtifactModel(projectFolder);
-
-    // TODO: wrap plugins data in an object
     Map<ArtifactCoordinates, BundleDescriptor> pluginsBundleDescriptors = new HashMap<>();
-    pluginsDependencies.keySet().forEach(pluginArtifactCoordinates -> pluginsBundleDescriptors
+    pluginsArtifactDependencies.keySet().forEach(pluginArtifactCoordinates -> pluginsBundleDescriptors
         .put(pluginArtifactCoordinates, buildBundleDescriptor(pluginArtifactCoordinates)));
 
-    Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> truePluginsBundleDependencies =
-        new HashMap<>();
-    pluginsDependencies
-        .forEach((pluginArtifactCoordinates, pluginDependencies) -> truePluginsBundleDependencies.put(pluginsBundleDescriptors
+    pluginsBundleDependencies = new HashMap<>();
+    pluginsArtifactDependencies
+        .forEach((pluginArtifactCoordinates, pluginDependencies) -> pluginsBundleDependencies.put(pluginsBundleDescriptors
             .get(pluginArtifactCoordinates), pluginDependencies.stream()
                 .map(artifact -> createBundleDependencyFromPackagerDependency(uri -> uri).apply(artifact)).collect(toList())));
 
-
-    Map<BundleDescriptor, List<String>> pluginsExportedPackages = new HashMap<>();
-    Map<BundleDescriptor, List<String>> pluginsExportedResources = new HashMap<>();
-    deployableDependencies.forEach(artifact -> {
+    // Resolve the plugins' associated packages and resources
+    pluginsPackages = new HashMap<>();
+    pluginsResources = new HashMap<>();
+    deployableArtifactDependencies.forEach(artifact -> {
       JarInfo jarInfo = new FileJarExplorer(false).explore(artifact.getUri());
-      pluginsExportedPackages.put(pluginsBundleDescriptors.get(artifact.getArtifactCoordinates()),
-                                  new ArrayList<>(jarInfo.getPackages()));
-      pluginsExportedResources.put(pluginsBundleDescriptors.get(artifact.getArtifactCoordinates()),
-                                   new ArrayList<>(jarInfo.getResources()));
+      pluginsPackages.put(pluginsBundleDescriptors.get(artifact.getArtifactCoordinates()),
+                          new ArrayList<>(jarInfo.getPackages()));
+      pluginsResources.put(pluginsBundleDescriptors.get(artifact.getArtifactCoordinates()),
+                           new ArrayList<>(jarInfo.getResources()));
     });
-
-    return new DeployableProjectModel<>(exportedPackages, exportedResources, deployableDependencies,
-                                        additionalPluginDependencies, pluginsDependencies, artifactCoordinates,
-                                        projectFolder, trueAppBundleDependencies,
-                                        buildBundleDescriptor(artifactCoordinates), truePluginsBundleDependencies,
-                                        pluginsExportedPackages, pluginsExportedResources,
-                                        deployableModel);
   }
 
   private List<Plugin> toPluginDependencies(Map<BundleDependency, List<BundleDependency>> pluginsAndDependencies) {
@@ -245,24 +296,17 @@ public abstract class AbstractMavenDeployableProjectModelFactory<M extends MuleD
         .collect(toList());
   }
 
-  private M createArtifactModel(File artifactFolder) {
+  private <M extends MuleDeployableModel> M createArtifactModel(File artifactFolder,
+                                                                AbstractMuleArtifactModelJsonSerializer<M> deserializer) {
+    // TODO: the model needs to be completed, when the app is packaged every field is present in the output mule-artifact.json,
+    // but here we don't have that
     final File artifactJsonFile = new File(artifactFolder, "mule-artifact.json");
     if (!artifactJsonFile.exists()) {
       throw new ArtifactActivationException(createStaticMessage("Couldn't find model file " + artifactJsonFile));
     }
 
-    return loadModelFromJson(getDescriptorContent(artifactJsonFile));
+    return deserializer.deserialize(getDescriptorContent(artifactJsonFile));
   }
-
-  private M loadModelFromJson(String jsonString) {
-    return deserializeArtifactModel(jsonString);
-  }
-
-  private M deserializeArtifactModel(String jsonString) {
-    return getMuleArtifactModelJsonSerializer().deserialize(jsonString);
-  }
-
-  protected abstract AbstractMuleArtifactModelJsonSerializer<M> getMuleArtifactModelJsonSerializer();
 
   private String getDescriptorContent(File jsonFile) {
     if (LOGGER.isDebugEnabled()) {
@@ -289,7 +333,7 @@ public abstract class AbstractMavenDeployableProjectModelFactory<M extends MuleD
         .build();
   }
 
-  private void getExportedPackagesAndResources() throws IOException {
+  private void getAvailablePackagesAndResources() throws IOException {
     // TODO: get these fields from mule-artifact.json if classLoaderModelDescriptor field is present there, and in that case check
     // that the packages and resources effectively exist
     // TODO: search the POM for a changed source directory under the tag <sourceDirectory>
@@ -299,7 +343,7 @@ public abstract class AbstractMavenDeployableProjectModelFactory<M extends MuleD
         .filter(Files::isRegularFile)
         .collect(toList());
     Predicate<Path> isJavaFile = path -> FilenameUtils.getExtension(path.toString()).endsWith(JAVA_EXTENSION);
-    exportedPackages = allJavaFiles.stream()
+    packages = allJavaFiles.stream()
         .filter(isJavaFile)
         .map(path -> {
           Path parent = javaDirectory.relativize(path).getParent();
@@ -318,7 +362,7 @@ public abstract class AbstractMavenDeployableProjectModelFactory<M extends MuleD
     List<Path> allResourcesFiles = Files.walk(resourcesDirectory)
         .filter(Files::isRegularFile)
         .collect(toList());
-    exportedResources = allResourcesFiles.stream()
+    resources = allResourcesFiles.stream()
         .map(resourcesDirectory::relativize)
         .map(Path::toString)
         .map(this::escapeSlashes)

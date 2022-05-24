@@ -32,13 +32,6 @@
                 <extensions>true</extensions>
                 <configuration>
                     <classifier>mule-application</classifier>
-                    <sharedLibraries>
-                        <sharedLibrary>
-                            <groupId>org.apache.derby</groupId>
-                            <artifactId>derby</artifactId>
-                        </sharedLibrary>
-                    </sharedLibraries>
-
                     <additionalPluginDependencies>
                         <plugin>
                             <groupId>org.mule.connectors</groupId>

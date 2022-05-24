@@ -27,36 +27,36 @@ import java.util.Map;
  */
 public final class DeployableProjectModel<T extends MuleDeployableModel> {
 
-  private final List<String> exportedPackages;
-  private final List<String> exportedResources;
+  private final List<String> packages;
+  private final List<String> resources;
   private final List<Artifact> dependencies;
   private final List<Plugin> additionalPluginDependencies;
   private final Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies;
   private final ArtifactCoordinates artifactCoordinates;
   private final File projectFolder;
-  private final List<BundleDependency> appBundleDependencies;
+  private final List<BundleDependency> deployableBundleDependencies;
   private final BundleDescriptor bundleDescriptor;
   private final Map<BundleDescriptor, List<BundleDependency>> pluginsBundleDependencies;
   private final Map<BundleDescriptor, List<String>> pluginsExportedPackages;
   private final Map<BundleDescriptor, List<String>> pluginsExportedResources;
   private final T muleDeployableModel;
 
-  public DeployableProjectModel(List<String> exportedPackages, List<String> exportedResources, List<Artifact> dependencies,
+  public DeployableProjectModel(List<String> packages, List<String> resources, List<Artifact> dependencies,
                                 List<Plugin> additionalPluginDependencies,
                                 Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies,
                                 ArtifactCoordinates artifactCoordinates, File projectFolder,
-                                List<BundleDependency> appBundleDependencies, BundleDescriptor bundleDescriptor,
+                                List<BundleDependency> deployableBundleDependencies, BundleDescriptor bundleDescriptor,
                                 Map<BundleDescriptor, List<BundleDependency>> pluginsBundleDependencies,
                                 Map<BundleDescriptor, List<String>> pluginsExportedPackages,
                                 Map<BundleDescriptor, List<String>> pluginsExportedResources, T muleDeployableModel) {
-    this.exportedPackages = exportedPackages;
-    this.exportedResources = exportedResources;
+    this.packages = packages;
+    this.resources = resources;
     this.dependencies = dependencies;
     this.additionalPluginDependencies = additionalPluginDependencies;
     this.pluginsDependencies = pluginsDependencies;
     this.artifactCoordinates = artifactCoordinates;
     this.projectFolder = projectFolder;
-    this.appBundleDependencies = appBundleDependencies;
+    this.deployableBundleDependencies = deployableBundleDependencies;
     this.bundleDescriptor = bundleDescriptor;
     this.pluginsBundleDependencies = pluginsBundleDependencies;
     this.pluginsExportedPackages = pluginsExportedPackages;
@@ -65,21 +65,25 @@ public final class DeployableProjectModel<T extends MuleDeployableModel> {
   }
 
   /**
-   * If an empty result is returned, it means that everything will be exported.
+   * Gets the packages configured by the project developer to be exported.
    * 
    * @return the packages configured by the project developer to be exported.
    */
   public List<String> getExportedPackages() {
-    return exportedPackages;
+    // TODO: check whether there are exported packages defined in the artifact model, in which case those should be the ones
+    // returned
+    return packages;
   }
 
   /**
-   * If an empty result is returned, it means that everything will be exported.
+   * Gets the resources configured by the project developer to be exported.
    * 
    * @return the resources configured by the project developer to be exported.
    */
   public List<String> getExportedResources() {
-    return exportedResources;
+    // TODO: check whether there are exported resources defined in the artifact model, in which case those should be the ones
+    // returned
+    return resources;
   }
 
   public List<Artifact> getProjectDependencies() {
@@ -102,8 +106,8 @@ public final class DeployableProjectModel<T extends MuleDeployableModel> {
     return projectFolder;
   }
 
-  public List<BundleDependency> getAppBundleDependencies() {
-    return appBundleDependencies;
+  public List<BundleDependency> getDeployableBundleDependencies() {
+    return deployableBundleDependencies;
   }
 
   public BundleDescriptor getBundleDescriptor() {

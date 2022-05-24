@@ -9,7 +9,6 @@ package org.mule.runtime.module.artifact.activation.internal.application;
 import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
-import org.mule.runtime.module.artifact.activation.api.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
@@ -28,10 +27,9 @@ public class ApplicationDescriptorFactory
   public ApplicationDescriptorFactory(DeployableProjectModel<MuleApplicationModel> deployableProjectModel,
                                       Map<String, String> deploymentProperties, PluginModelResolver pluginModelResolver,
                                       PluginDescriptorResolver pluginDescriptorResolver,
-                                      ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder,
-                                      ArtifactDescriptorFactory artifactDescriptorFactory) {
+                                      ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
     super(deployableProjectModel, deploymentProperties, pluginModelResolver, pluginDescriptorResolver,
-          artifactDescriptorValidatorBuilder, artifactDescriptorFactory);
+          artifactDescriptorValidatorBuilder);
   }
 
   @Override
