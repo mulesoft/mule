@@ -9,4 +9,20 @@
 
     <import file="streaming-operations-def.xml"/>
 
+    <flow name="flowRepeatable">
+        <this:with-repeatable-streaming/>
+    </flow>
+
+    <flow name="flowNonRepeatable">
+        <this:with-non-repeatable-streaming/>
+    </flow>
+
+    <flow name="flowRepeatableUsed">
+        <this:with-repeatable-streaming-used/>
+    </flow>
+
+    <flow name="flowNonRepeatableConsumed">
+        <this:with-non-repeatable-streaming-consumed/>
+    </flow>
+
 </mule>

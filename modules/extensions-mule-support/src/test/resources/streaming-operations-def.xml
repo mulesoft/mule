@@ -34,6 +34,17 @@
         </operation:body>
     </operation:def>
 
+    <operation:def name="withRepeatableStreamingUsed">
+        <operation:output>
+            <operation:payload-type type="binary"/>
+        </operation:output>
+        <operation:body>
+            <set-payload value="Hello world" />
+            <marvel:get-relics config-ref="drStrange"/>
+            <logger message="#[payload]"/>
+        </operation:body>
+    </operation:def>
+
     <operation:def name="withNonRepeatableStreaming">
         <operation:output>
             <operation:payload-type type="binary"/>
@@ -43,6 +54,21 @@
             <marvel:get-relics config-ref="drStrange">
                 <non-repeatable-iterable/>
             </marvel:get-relics>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="withNonRepeatableStreamingConsumed">
+        <operation:output>
+            <operation:payload-type type="binary"/>
+        </operation:output>
+        <operation:body>
+            <set-payload value="Hello world" />
+            <marvel:get-relics config-ref="drStrange">
+                <non-repeatable-iterable/>
+            </marvel:get-relics>
+            <foreach collection="#[payload]">
+                <logger message="#[payload]"/>
+            </foreach>
         </operation:body>
     </operation:def>
 
