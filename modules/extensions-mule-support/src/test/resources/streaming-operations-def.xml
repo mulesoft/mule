@@ -3,11 +3,17 @@
       xmlns:operation="http://www.mulesoft.org/schema/mule/operation"
       xmlns:this="http://www.mulesoft.org/schema/mule/this"
       xmlns:test-components="http://www.mulesoft.org/schema/mule/test-components"
+      xmlns:marvel="http://www.mulesoft.org/schema/mule/marvel"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/test-components http://www.mulesoft.org/schema/mule/test-components/current/mule-test-components.xsd
         http://www.mulesoft.org/schema/mule/operation http://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd
+        http://www.mulesoft.org/schema/mule/marvel http://www.mulesoft.org/schema/mule/marvel/current/mule-marvel.xsd
         http://www.mulesoft.org/schema/mule/this http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd">
+
+    <marvel:dr-strange-config name="drStrange">
+        <marvel:mystic-connection />
+    </marvel:dr-strange-config>
 
     <operation:def name="nonStreaming">
         <operation:output>
@@ -15,6 +21,28 @@
         </operation:output>
         <operation:body>
             <set-payload value="Hello world" />
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="withRepeatableStreaming">
+        <operation:output>
+            <operation:payload-type type="binary"/>
+        </operation:output>
+        <operation:body>
+            <set-payload value="Hello world" />
+            <marvel:get-relics config-ref="drStrange"/>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="withNonRepeatableStreaming">
+        <operation:output>
+            <operation:payload-type type="binary"/>
+        </operation:output>
+        <operation:body>
+            <set-payload value="Hello world" />
+            <marvel:get-relics config-ref="drStrange">
+                <non-repeatable-iterable/>
+            </marvel:get-relics>
         </operation:body>
     </operation:def>
 

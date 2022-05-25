@@ -35,6 +35,16 @@ public class MuleOperationSupportsStreamingTestCase extends MuleArtifactFunction
     assertForOpeartion("nonStreaming", false);
   }
 
+  @Test
+  public void withRepeatableStreaming() {
+    assertForOpeartion("withRepeatableStreaming", true);
+  }
+
+  @Test
+  public void withNonRepeatableStreaming() {
+    assertForOpeartion("withNonRepeatableStreaming", true);
+  }
+
   private void assertForOpeartion(String operation, boolean expectedSupportStreaming) {
     OperationModel model = getOperationModel(operation);
     assertThat(model.supportsStreaming(), is(expectedSupportStreaming));
