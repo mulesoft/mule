@@ -59,6 +59,7 @@ public class MuleSdkOperationodelParserUtils {
       return transactionalAction != null && !isTry(componentAst) && OperationTransactionalAction
           .valueOf(transactionalAction.getValue().getValue().get().toString()).equals(OperationTransactionalAction.NOT_SUPPORTED);
     } catch (IllegalStateException e) {
+      // For Mule Operations this will fail, but we already know they should not be ignored
       return false;
     }
   }
