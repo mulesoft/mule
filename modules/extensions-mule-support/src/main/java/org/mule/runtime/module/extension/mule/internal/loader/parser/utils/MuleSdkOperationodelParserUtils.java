@@ -53,10 +53,14 @@ public class MuleSdkOperationodelParserUtils {
    * @return if this particular component should be ignored for considered for isTransactional calculation
    */
   public static boolean isIgnoredComponentForTx(ComponentAst componentAst) {
-    ComponentParameterAst transactionalAction =
-        componentAst.getParameter(DEFAULT_GROUP_NAME, TRANSACTIONAL_ACTION_PARAMETER_NAME);
-    return transactionalAction != null && !isTry(componentAst) && OperationTransactionalAction
-        .valueOf(transactionalAction.getValue().getValue().get().toString()).equals(OperationTransactionalAction.NOT_SUPPORTED);
+    try {
+      ComponentParameterAst transactionalAction =
+          componentAst.getParameter(DEFAULT_GROUP_NAME, TRANSACTIONAL_ACTION_PARAMETER_NAME);
+      return transactionalAction != null && !isTry(componentAst) && OperationTransactionalAction
+          .valueOf(transactionalAction.getValue().getValue().get().toString()).equals(OperationTransactionalAction.NOT_SUPPORTED);
+    } catch (IllegalStateException e) {
+      return false;
+    }
   }
 
 }

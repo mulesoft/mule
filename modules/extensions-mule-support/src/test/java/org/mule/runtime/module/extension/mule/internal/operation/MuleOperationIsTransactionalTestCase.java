@@ -131,6 +131,21 @@ public class MuleOperationIsTransactionalTestCase extends MuleArtifactFunctional
   }
 
   @Test
+  public void callingOtherOp() {
+    assertForOpeartion("callingOtherOp", true);
+  }
+
+  @Test
+  public void callingOtherOpNonTx() {
+    assertForOpeartion("callingOtherOpNonTx", false);
+  }
+
+  @Test
+  public void callingOtherOpWithinTryWithTx() {
+    assertForOpeartion("callingOtherOpWithinTryWithTx", false);
+  }
+
+  @Test
   public void choiceWithOneRouteJoining() {
     assertForOpeartion("choice", true);
   }
