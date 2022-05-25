@@ -96,7 +96,7 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
                              ClassLoaderModelBuilder classLoaderConfigurationBuilder) {
     final List<URL> dependenciesArtifactsUrls = new ArrayList<>();
 
-    // TODO: consider artifact patches for the case this is run within a Runtime
+    // TODO W-11202141 - consider artifact patches for the case this is run within a Runtime
 
     final URL artifactFileUrl = getUrl(artifactFile, artifactFile);
     dependenciesArtifactsUrls.add(artifactFileUrl);

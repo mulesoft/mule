@@ -65,7 +65,7 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
                                                      ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
     super(deployableProjectModel.getProjectFolder(), deployableProjectModel.getMuleDeployableModel(),
           artifactDescriptorValidatorBuilder);
-    // TODO: validate model dependencies checking for incompatibilities
+    // TODO W-11202204 - validate model dependencies checking for incompatibilities
     this.deployableProjectModel = deployableProjectModel;
     this.deploymentProperties = asProperties(deploymentProperties);
     this.pluginModelResolver = pluginModelResolver;
@@ -103,7 +103,7 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
 
     descriptor.setPlugins(createArtifactPluginDescriptors(descriptor));
 
-    // TODO: add log config file to descriptor, which currently relies in the mule home folder
+    // TODO W-11202321 - add log config file to descriptor, which currently relies in the mule home folder
   }
 
   private Set<ArtifactPluginDescriptor> createArtifactPluginDescriptors(DeployableArtifactDescriptor descriptor) {

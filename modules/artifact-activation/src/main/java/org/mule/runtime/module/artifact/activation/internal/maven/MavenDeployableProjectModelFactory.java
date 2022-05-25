@@ -11,7 +11,10 @@ import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigu
 import static org.mule.maven.client.internal.util.MavenUtils.getPomModelFromFile;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.*;
+import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.getDeployableArtifactCoordinates;
+import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.toApplicationModelArtifacts;
+import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updateArtifactsSharedState;
+import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updatePackagesResources;
 import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMavenPlugin.MULE_EXTENSIONS_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMavenPlugin.MULE_EXTENSIONS_PLUGIN_GROUP_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
@@ -101,6 +104,10 @@ public class MavenDeployableProjectModelFactory
   private static final String VERSION = "version";
 
   private static final String CLASS_PATH_SEPARATOR = "/";
+
+  private static final String DEFAULT_SOURCES_DIRECTORY = "src/main/java";
+  private static final String DEFAULT_RESOURCES_DIRECTORY = "src/main/resources";
+  private static final String DEFAULT_MULE_DIRECTORY = "src/main/mule";
 
   private static final Logger LOGGER = getLogger(MavenDeployableProjectModelFactory.class);
 
@@ -222,7 +229,7 @@ public class MavenDeployableProjectModelFactory
     DeployableDependencyResolver deployableDependencyResolver = new DeployableDependencyResolver(aetherMavenClient);
 
     // Resolve the Maven bundle dependencies
-    // TODO: determine the inclusion of test dependencies
+    // TODO W-11203142 - determine the inclusion of test dependencies
     deployableMavenBundleDependencies = deployableDependencyResolver.resolveDeployableDependencies(pom, false, empty());
 
     // Get the dependencies as Artifacts, accounting for the shared libraries configuration
@@ -298,7 +305,8 @@ public class MavenDeployableProjectModelFactory
 
   private <M extends MuleDeployableModel> M createArtifactModel(File artifactFolder,
                                                                 AbstractMuleArtifactModelJsonSerializer<M> deserializer) {
-    // TODO: the model needs to be completed, when the app is packaged every field is present in the output mule-artifact.json,
+    // TODO W-11203071 - the model needs to be completed, when the app is packaged every field is present in the output
+    // mule-artifact.json,
     // but here we don't have that
     final File artifactJsonFile = new File(artifactFolder, "mule-artifact.json");
     if (!artifactJsonFile.exists()) {
@@ -334,10 +342,8 @@ public class MavenDeployableProjectModelFactory
   }
 
   private void getAvailablePackagesAndResources() throws IOException {
-    // TODO: get these fields from mule-artifact.json if classLoaderModelDescriptor field is present there, and in that case check
-    // that the packages and resources effectively exist
-    // TODO: search the POM for a changed source directory under the tag <sourceDirectory>
-    Path javaDirectory = get(projectFolder.getAbsolutePath(), "src/main/java");
+    // TODO W-11203279 - search the POM for a custom source directory under the tag <sourceDirectory>
+    Path javaDirectory = get(projectFolder.getAbsolutePath(), DEFAULT_SOURCES_DIRECTORY);
     // look for all the sources under the java directory
     List<Path> allJavaFiles = Files.walk(javaDirectory)
         .filter(Files::isRegularFile)
@@ -356,19 +362,25 @@ public class MavenDeployableProjectModelFactory
         .distinct()
         .collect(toList());
 
-    // TODO: search the POM for resource directories under <resources> tag and search in src/main/mule too
-    Path resourcesDirectory = get(projectFolder.getAbsolutePath(), "src/main/resources");
+    // TODO W-11203279 - search the POM for resource directories under <resources> tag
+    resources = getResourcesInFolder(DEFAULT_RESOURCES_DIRECTORY);
+    resources.addAll(getResourcesInFolder(DEFAULT_MULE_DIRECTORY));
+
+    // TODO W-11203142 - add test resources
+  }
+
+  private List<String> getResourcesInFolder(String resourcesDirectoryName) throws IOException {
+    Path resourcesDirectory = get(projectFolder.getAbsolutePath(), resourcesDirectoryName);
     // look for all the sources under the resources directory
     List<Path> allResourcesFiles = Files.walk(resourcesDirectory)
         .filter(Files::isRegularFile)
         .collect(toList());
-    resources = allResourcesFiles.stream()
+
+    return allResourcesFiles.stream()
         .map(resourcesDirectory::relativize)
         .map(Path::toString)
         .map(this::escapeSlashes)
         .collect(toList());
-
-    // TODO: add test resources
   }
 
   private String escapeSlashes(String p) {

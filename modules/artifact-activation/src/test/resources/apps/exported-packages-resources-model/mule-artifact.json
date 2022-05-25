@@ -1,0 +1,14 @@
+{
+  "minMuleVersion": "4.4.0",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [
+        "org.exported-test"
+      ],
+      "exportedResources": [
+        "exported-test-script.dwl"
+      ]
+    }
+  }
+}

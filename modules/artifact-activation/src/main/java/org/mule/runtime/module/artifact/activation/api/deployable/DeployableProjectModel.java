@@ -28,7 +28,9 @@ import java.util.Map;
 public final class DeployableProjectModel<T extends MuleDeployableModel> {
 
   private final List<String> packages;
+  private List<String> exportedPackages;
   private final List<String> resources;
+  private List<String> exportedResources;
   private final List<Artifact> dependencies;
   private final List<Plugin> additionalPluginDependencies;
   private final Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies;
@@ -70,9 +72,11 @@ public final class DeployableProjectModel<T extends MuleDeployableModel> {
    * @return the packages configured by the project developer to be exported.
    */
   public List<String> getExportedPackages() {
-    // TODO: check whether there are exported packages defined in the artifact model, in which case those should be the ones
-    // returned
-    return packages;
+    if (exportedPackages == null) {
+      exportedPackages = getExportedAttribute("exportedPackages", packages);
+    }
+
+    return exportedPackages;
   }
 
   /**
@@ -81,9 +85,28 @@ public final class DeployableProjectModel<T extends MuleDeployableModel> {
    * @return the resources configured by the project developer to be exported.
    */
   public List<String> getExportedResources() {
-    // TODO: check whether there are exported resources defined in the artifact model, in which case those should be the ones
-    // returned
-    return resources;
+    if (exportedResources == null) {
+      exportedResources = getExportedAttribute("exportedResources", resources);
+    }
+
+    return exportedResources;
+  }
+
+  private List<String> getExportedAttribute(String exportedAttributeName, List<String> available) {
+    if (muleDeployableModel.getClassLoaderModelLoaderDescriptor() != null) {
+      Map<String, Object> originalAttributes = muleDeployableModel.getClassLoaderModelLoaderDescriptor().getAttributes();
+      List<String> exportedAttribute;
+
+      if (originalAttributes != null && originalAttributes.get(exportedAttributeName) != null) {
+        exportedAttribute = (List<String>) originalAttributes.get(exportedAttributeName);
+      } else {
+        exportedAttribute = available;
+      }
+
+      return exportedAttribute;
+    } else {
+      return available;
+    }
   }
 
   public List<Artifact> getProjectDependencies() {

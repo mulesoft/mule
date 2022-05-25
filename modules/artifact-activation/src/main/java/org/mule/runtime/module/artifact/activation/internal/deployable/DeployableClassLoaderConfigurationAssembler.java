@@ -59,7 +59,7 @@ public class DeployableClassLoaderConfigurationAssembler<M extends MuleDeployabl
 
   @Override
   protected List<BundleDependency> getProcessedBundleDependencies() {
-    // TODO: analyze patched dependencies in classloader-model-patch.json
+    // TODO W-11202346 - analyze patched dependencies in classloader-model-patch.json
     return super.getProcessedBundleDependencies();
   }
 

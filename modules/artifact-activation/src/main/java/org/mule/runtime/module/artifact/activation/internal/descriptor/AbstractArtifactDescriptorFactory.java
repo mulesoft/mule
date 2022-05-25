@@ -57,7 +57,7 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
 
     doDescriptorConfig(descriptor);
 
-    // TODO: uncomment once the model is guaranteed to be completed with all the necessary information
+    // TODO W-11203071 - uncomment once the model is guaranteed to be completed with all the necessary information
     // artifactDescriptorValidator.validate(descriptor);
 
     return descriptor;

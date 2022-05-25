@@ -7,6 +7,7 @@
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasItem;
@@ -50,7 +51,8 @@ public class DefaultArtifactDescriptorFactoryTestCase extends AbstractMuleTestCa
     ApplicationDescriptor applicationDescriptor = createApplicationDescriptor("apps/basic");
 
     assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), contains("org.test"));
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedResources(), contains("test-script.dwl"));
+    assertThat(applicationDescriptor.getClassLoaderModel().getExportedResources(),
+               containsInAnyOrder("test-script.dwl", "app.xml"));
 
     assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(), hasSize(3));
   }
@@ -83,6 +85,14 @@ public class DefaultArtifactDescriptorFactoryTestCase extends AbstractMuleTestCa
 
     assertThat(additionalDependencies, hasSize(1));
     assertThat(additionalDependencies.get(0).getDescriptor().getArtifactId(), is("derby"));
+  }
+
+  @Test
+  public void createApplicationDescriptorWithExportedPackagesAndResourcesInMuleArtifactJson() throws URISyntaxException {
+    ApplicationDescriptor applicationDescriptor = createApplicationDescriptor("apps/exported-packages-resources-model");
+
+    assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), contains("org.exported-test"));
+    assertThat(applicationDescriptor.getClassLoaderModel().getExportedResources(), contains("exported-test-script.dwl"));
   }
 
   private ApplicationDescriptor createApplicationDescriptor(String appPath) throws URISyntaxException {
