@@ -1260,7 +1260,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private boolean requiresTransactionalActionConfiguration(T componentModel) {
-    return componentModel.getModelProperty(NoTransactionalActionModelProperty.class).isPresent();
+    return !componentModel.getModelProperty(NoTransactionalActionModelProperty.class).isPresent();
   }
 
   private boolean hasNestedChain(T componentModel) {
