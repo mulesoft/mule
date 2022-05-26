@@ -20,6 +20,7 @@ import org.mule.runtime.module.artifact.activation.api.ArtifactActivationExcepti
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ import java.util.stream.Stream;
 import org.jgrapht.alg.TransitiveReduction;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+
 import org.slf4j.Logger;
 
 /**
