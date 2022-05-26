@@ -6,25 +6,22 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
-import static org.mule.runtime.api.config.MuleRuntimeFeature.REUSE_GLOBAL_ERROR_HANDLER;
+import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_HANDLER_PROPERTY;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.GLOBAL_ERROR_HANDLER;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.when;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mule.tck.size.SmallTest;
 
 @SmallTest
@@ -37,30 +34,44 @@ public class CoreComponentBuildingDefinitionProviderTest {
 
   private CoreComponentBuildingDefinitionProvider provider;
 
-  @Mock
-  protected FeatureFlaggingService featureFlaggingService;
-
   @Before
   public void setUp() throws Exception {
     provider = new CoreComponentBuildingDefinitionProvider();
-    provider.setFeatureFlaggingService(featureFlaggingService);
   }
 
   @Test
-  public void isPrototypeWhenFeatureFlagIsDisabled() {
-    when(featureFlaggingService.isEnabled(REUSE_GLOBAL_ERROR_HANDLER)).thenReturn(false);
+  public void isPrototypeWhenSystemPropertyIsDisabled() {
+    String originalValue = System.clearProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY);
+    System.setProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY, "false");
 
-    ComponentBuildingDefinition buildingDefinition = provider.getErrorHandlerBuilder().build();
+    try {
+      ComponentBuildingDefinition buildingDefinition = provider.getErrorHandlerBuilder().build();
 
-    assertThat(buildingDefinition.isPrototype(), is(true));
+      assertThat(buildingDefinition.isPrototype(), is(true));
+    } finally {
+      restoreSystemProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY, originalValue);
+    }
   }
 
   @Test
-  public void isSingletonWhenFeatureFlagIsEnabled() {
-    when(featureFlaggingService.isEnabled(REUSE_GLOBAL_ERROR_HANDLER)).thenReturn(true);
+  public void isSingletonWhenSystemPropertyIsEnabled() {
+    String originalValue = System.clearProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY);
+    System.setProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY, "true");
 
-    ComponentBuildingDefinition buildingDefinition = provider.getErrorHandlerBuilder().build();
+    try {
+      ComponentBuildingDefinition buildingDefinition = provider.getErrorHandlerBuilder().build();
 
-    assertThat(buildingDefinition.isPrototype(), is(false));
+      assertThat(buildingDefinition.isPrototype(), is(false));
+    } finally {
+      restoreSystemProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY, originalValue);
+    }
+  }
+
+  private void restoreSystemProperty(String name, String originalValue) {
+    if (originalValue == null) {
+      System.clearProperty(name);
+    } else {
+      System.setProperty(name, originalValue);
+    }
   }
 }

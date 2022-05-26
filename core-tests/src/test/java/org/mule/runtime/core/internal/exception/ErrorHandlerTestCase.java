@@ -45,6 +45,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
+import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -152,6 +153,22 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
 
     assertThat(defaultHandler.getExceptionListeners(), hasSize(1));
     assertThat(defaultHandler.getExceptionListeners(), hasItem(instanceOf(OnErrorPropagateHandler.class)));
+  }
+
+  @Test
+  public void doNotSetFromGlobalErrorHandlerWhenSystemPropertyIsDisabled() throws InitialisationException {
+    GlobalErrorHandler globalErrorHandler = new GlobalErrorHandler();
+    TemplateOnErrorHandler onErrorHandler = mock(TemplateOnErrorHandler.class);
+    when(onErrorHandler.isInitialised()).thenReturn(true);
+    globalErrorHandler.setExceptionListeners(new ArrayList<>(asList(onErrorHandler)));
+    when(mockMuleContext.getDefaultErrorHandler(empty())).thenReturn(defaultMessagingExceptionHandler);
+    globalErrorHandler.setMuleContext(mockMuleContext);
+    globalErrorHandler.setRootContainerName("root");
+
+    initialiseIfNeeded(globalErrorHandler, mockMuleContext);
+
+    verify(onErrorHandler, times(0)).setFromGlobalErrorHandler(true);
+    verify(onErrorHandler, times(1)).initialise();
   }
 
   @Test

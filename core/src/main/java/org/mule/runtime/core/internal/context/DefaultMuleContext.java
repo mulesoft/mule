@@ -62,6 +62,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.management.stats.AllStatistics.configureComputeConnectionErrorsInStats;
 import static org.mule.runtime.core.api.util.UUID.getClusterUUID;
+import static org.mule.runtime.core.internal.exception.GlobalErrorHandler.REUSE_GLOBAL_ERROR_HANDLER;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.profiling.AbstractProfilingService.configureEnableProfilingService;
 import static org.mule.runtime.core.internal.transformer.simple.ObjectToString.configureToStringTransformerTransformIteratorElements;
@@ -942,7 +943,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
                                                                   config.getDefaultErrorHandlerName())));
       }
 
-      if (!getFeatureFlaggingService().isEnabled(REUSE_GLOBAL_ERROR_HANDLER)) {
+      if (!REUSE_GLOBAL_ERROR_HANDLER) {
         if (rootContainerName.isPresent()) {
           defaultErrorHandler = ((GlobalErrorHandler) defaultErrorHandler)
               .createLocalErrorHandler(from(rootContainerName.get()));
@@ -1467,14 +1468,4 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     return featureContext -> featureContext.getArtifactMinMuleVersion()
         .filter(muleVersion -> muleVersion.atLeast(version)).isPresent();
   }
-
-  public static FeatureFlaggingService getFeatureFlaggingService() {
-    FeatureFlaggingRegistry ffRegistry = getInstance();
-    return new FeatureFlaggingServiceBuilder()
-        .withContext(new FeatureContext(new MuleVersion("4.5.0"), ""))
-        .withMuleContextFlags(ffRegistry.getFeatureConfigurations())
-        .withFeatureContextFlags(ffRegistry.getFeatureFlagConfigurations())
-        .build();
-  }
-
 }

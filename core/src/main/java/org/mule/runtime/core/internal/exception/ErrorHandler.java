@@ -19,6 +19,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
+import static org.mule.runtime.core.internal.exception.GlobalErrorHandler.REUSE_GLOBAL_ERROR_HANDLER;
 import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -78,7 +79,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   private Collection<ExceptionContextProvider> exceptionContextProviders;
 
   @Inject
-  protected FeatureFlaggingService featureFlaggingService;
+  private FeatureFlaggingService featureFlaggingService;
 
   private final MessagingExceptionResolver messagingExceptionResolver = new MessagingExceptionResolver(this);
 
@@ -191,6 +192,9 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
     String defaultErrorHandlerName = getMuleContext().getConfiguration().getDefaultErrorHandlerName();
     if (defaultErrorHandlerName != null && defaultErrorHandlerName.equals(name)) {
+      if (REUSE_GLOBAL_ERROR_HANDLER) {
+        inDefaultErrorHandler = true;
+      }
       logger
           .warn("Default 'error-handler' should include a final \"catch-all\" 'on-error-propagate'. Attempting implicit injection.");
     }

@@ -377,9 +377,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
       stubbedSubFlowProcessors.add(stubbedProcessor);
       return stubbedProcessor;
     }).getBeanDefinition();
-    ComponentBuildingDefinitionProvider provider = new CoreComponentBuildingDefinitionProvider();
-    provider.init();
-    ComponentBuildingDefinition subFlowComponentBuildingDefinition = provider
+    ComponentBuildingDefinition subFlowComponentBuildingDefinition = new CoreComponentBuildingDefinitionProvider()
         .getComponentBuildingDefinitions()
         .stream()
         .filter(componentBuildingDefinition -> componentBuildingDefinition.getComponentIdentifier().getName().equals("sub-flow"))

@@ -18,6 +18,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.addContext;
+import static org.mule.runtime.core.internal.exception.GlobalErrorHandler.REUSE_GLOBAL_ERROR_HANDLER;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 
@@ -282,8 +283,10 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   @Override
   protected void doInitialise() throws InitialisationException {
     super.doInitialise();
-    Optional<ProcessingStrategy> processingStrategy = empty();
-    if (flowLocation.isPresent()) {
+    Optional<ProcessingStrategy> processingStrategy;
+    if (fromGlobalErrorHandler && REUSE_GLOBAL_ERROR_HANDLER) {
+      processingStrategy = getProcessingStrategyFromGlobalErrorHandler(locator);
+    } else if (flowLocation.isPresent()) {
       Location location = builderFromStringRepresentation(flowLocation.get()).build();
       processingStrategy = getProcessingStrategy(locator, location);
     } else if (getLocation() != null) {
@@ -521,12 +524,13 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       // This case is for an implicit error handler, if we are in a configured default error handler then
       // it will be the same as the global error handler case.
       return defaultErrorHandlerOwnsTransaction(transaction);
-    } else if (isTransactionInGlobalErrorHandler((transaction))) {
-      // We are in a GlobalErrorHandler that is defined for the container (Flow or TryScope) that created the tx
-      return true;
-    } else if (flowLocation.isPresent()) {
-      // We are in a Global Error Handler, which is not the one that created the Tx
-      return false;
+    }
+
+    if (REUSE_GLOBAL_ERROR_HANDLER) {
+      if (fromGlobalErrorHandler) {
+        String location = ((MessagingException) exception).getFailingComponent().getRootContainerLocation().getGlobalName();
+        return transaction.getComponentLocation().get().getRootContainerName().equals(location);
+      }
     } else {
       // We are in a simple scenario where the error handler's location ends with "/error-handler/1".
       // We cannot use the RootContainerLocation, since in case of nested TryScopes (the outer one creating the tx)

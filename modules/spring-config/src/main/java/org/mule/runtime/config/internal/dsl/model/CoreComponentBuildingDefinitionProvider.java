@@ -7,9 +7,11 @@
 
 package org.mule.runtime.config.internal.dsl.model;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.REUSE_GLOBAL_ERROR_HANDLER;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
+import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_HANDLER_PROPERTY;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.PARALLEL_FOREACH_ELEMENT;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.SCATTER_GATHER_ELEMENT;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.createNewInstance;
@@ -20,7 +22,6 @@ import static org.mule.runtime.core.api.context.notification.AnySelector.ANY_SEL
 import static org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair.ANY_SELECTOR_STRING;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
-import static org.mule.runtime.core.internal.context.DefaultMuleContext.getFeatureFlaggingService;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
@@ -219,7 +220,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
   @Override
   public void init() {
-    featureFlaggingService = getFeatureFlaggingService();
+    // Nothing to do
   }
 
   @SuppressWarnings("unchecked")
@@ -613,7 +614,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build())
         .withSetterParameterDefinition("exceptionListeners",
                                        fromChildCollectionConfiguration(FlowExceptionHandler.class).build());
-    if (!featureFlaggingService.isEnabled(REUSE_GLOBAL_ERROR_HANDLER)) {
+    if (!parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY))) {
       errorHandlerBuilder = errorHandlerBuilder.asPrototype();
     }
     return errorHandlerBuilder;
@@ -878,7 +879,4 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return getMuleMessageTransformerBaseBuilder().withNamespace(CORE_PREFIX);
   }
 
-  public void setFeatureFlaggingService(FeatureFlaggingService featureFlaggingService) {
-    this.featureFlaggingService = featureFlaggingService;
-  }
 }
