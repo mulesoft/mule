@@ -107,8 +107,8 @@ public class PluginsDependenciesProcessor {
   }
 
   /**
-   * Sanitizes the exported packages of the given plugins by removing the ones that are already being exported by their
-   * transitive dependencies.
+   * Sanitizes the exported packages of the given plugins by removing the ones that are already being exported by their transitive
+   * dependencies.
    *
    * @param artifactPlugins plugin artifacts whose exported packages are to be sanitized.
    * @return plugins with sanitized exported packages.
