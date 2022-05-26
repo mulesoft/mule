@@ -15,6 +15,8 @@ import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import java.util.List;
 
+import static org.mule.runtime.core.internal.exception.GlobalErrorHandler.REUSE_GLOBAL_ERROR_HANDLER;
+
 /**
  * An {@link org.mule.runtime.dsl.api.component.ObjectFactory} which produces {@link ErrorHandler} instances.
  *
@@ -29,6 +31,9 @@ public class ErrorHandlerFactoryBean extends AbstractComponentFactory<ErrorHandl
   @Override
   public ErrorHandler doGetObject() throws Exception {
     if (delegate != null) {
+      if (REUSE_GLOBAL_ERROR_HANDLER) {
+        return delegate;
+      }
       return delegate.createLocalErrorHandler(from(this.getRootContainerLocation().getGlobalName()));
     }
 

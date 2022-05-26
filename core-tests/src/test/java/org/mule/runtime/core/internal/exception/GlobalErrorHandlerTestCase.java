@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_HANDLER_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -23,6 +24,7 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 
+import org.junit.Rule;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.ErrorHandlerTestCase.DefaultMessagingExceptionHandlerAcceptor;
@@ -35,12 +37,16 @@ import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
 
 @SmallTest
 @Feature(ERROR_HANDLING)
 @Story(GLOBAL_ERROR_HANDLER)
 public class GlobalErrorHandlerTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public SystemProperty expectedStatus = new SystemProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY, "true");
 
   private GlobalErrorHandler globalErrorHandler;
 
@@ -54,7 +60,6 @@ public class GlobalErrorHandlerTestCase extends AbstractMuleTestCase {
   @Before
   public void setUp() throws Exception {
     globalErrorHandler = new GlobalErrorHandler();
-    globalErrorHandler.featureFlaggingService = getFeatureFlaggingService();
     when(onErrorHandler.isInitialised()).thenReturn(true);
     globalErrorHandler.setExceptionListeners(new ArrayList<>(asList(onErrorHandler)));
     when(mockMuleContext.getDefaultErrorHandler(empty())).thenReturn(defaultMessagingExceptionHandler);
@@ -97,13 +102,4 @@ public class GlobalErrorHandlerTestCase extends AbstractMuleTestCase {
     verify(onErrorHandler, times(1)).dispose();
   }
 
-  @Test
-  public void doNotSetFromGlobalErrorHandlerWhenFeatureFlagIsDisabled() throws InitialisationException {
-    globalErrorHandler.featureFlaggingService = feature -> false;
-    initialiseIfNeeded(globalErrorHandler, mockMuleContext);
-
-
-    verify(onErrorHandler, times(0)).setFromGlobalErrorHandler(true);
-    verify(onErrorHandler, times(1)).initialise();
-  }
 }
