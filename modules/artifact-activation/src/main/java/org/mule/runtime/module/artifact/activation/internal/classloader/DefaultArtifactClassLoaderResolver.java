@@ -112,7 +112,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
     regionClassLoader.addClassLoader(domainClassLoader, artifactClassLoaderFilter);
 
     List<ArtifactPluginDescriptor> artifactPluginDescriptors =
-        PluginsDependenciesProcessor.sanitizeExportedPackages(PluginsDependenciesProcessor
+        PluginsDependenciesProcessor.removeExportedPackagesAlreadyExportedByTransitiveDependencies(PluginsDependenciesProcessor
             .process(new ArrayList<>(descriptor.getPlugins()), false, List::add));
 
     artifactPluginDescriptors
@@ -199,7 +199,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
     regionClassLoader.addClassLoader(appClassLoader, artifactClassLoaderFilter);
 
     List<ArtifactPluginDescriptor> artifactPluginDescriptors =
-        PluginsDependenciesProcessor.sanitizeExportedPackages(PluginsDependenciesProcessor
+        PluginsDependenciesProcessor.removeExportedPackagesAlreadyExportedByTransitiveDependencies(PluginsDependenciesProcessor
             .process(new ArrayList<>(descriptor.getPlugins()), false, List::add));
 
     artifactPluginDescriptors

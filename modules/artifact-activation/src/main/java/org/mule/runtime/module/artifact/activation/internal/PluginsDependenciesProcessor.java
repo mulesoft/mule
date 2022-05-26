@@ -107,12 +107,13 @@ public class PluginsDependenciesProcessor {
   }
 
   /**
-   * Sanitizes the exported packages of the given plugins.
+   * Sanitizes the exported packages of the given plugins, by removing the ones that are already being exported by their
+   * transitive dependencies.
    *
    * @param artifactPlugins plugin artifacts whose exported packages are to be sanitized.
    * @return plugins with sanitized exported packages.
    */
-  public static List<ArtifactPluginDescriptor> sanitizeExportedPackages(List<ArtifactPluginDescriptor> artifactPlugins) {
+  public static List<ArtifactPluginDescriptor> removeExportedPackagesAlreadyExportedByTransitiveDependencies(List<ArtifactPluginDescriptor> artifactPlugins) {
     List<ArtifactPluginDescriptor> resolvedPlugins = new LinkedList<>();
     List<ArtifactPluginDescriptor> unresolvedPlugins = new LinkedList<>(artifactPlugins);
 
@@ -176,7 +177,7 @@ public class PluginsDependenciesProcessor {
     ClassLoaderModel originalClassLoaderModel = pluginDescriptor.getClassLoaderModel();
     final Set<String> exportedClassPackages = new HashSet<>(originalClassLoaderModel.getExportedPackages());
     exportedClassPackages.removeAll(packagesExportedByDependencies);
-    // boolean includeLocals = !isDenylisted(pluginDescriptor.getBundleDescriptor());
+    // TODO W-11203349 - check if the dependency belongs to the deny-list to decide whether to include local packages
     boolean includeLocals = true;
     pluginDescriptor.setClassLoaderModel(createBuilderWithoutExportedPackages(originalClassLoaderModel, includeLocals)
         .exportingPackages(exportedClassPackages).build());

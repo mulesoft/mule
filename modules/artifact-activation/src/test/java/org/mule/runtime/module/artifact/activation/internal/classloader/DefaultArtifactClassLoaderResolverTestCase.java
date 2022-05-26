@@ -40,6 +40,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.qameta.allure.Issue;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
@@ -242,6 +243,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
   }
 
   @Test
+  @Issue("W-11210306")
   public void createDomainClassLoaderWithPluginsSharingExportedPackages() {
     String exportedPackage = "plugin-package";
 
@@ -352,6 +354,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
   }
 
   @Test
+  @Issue("W-11210306")
   public void createApplicationClassLoaderWithPluginsSharingExportedPackages() {
     String exportedPackage = "plugin-package";
 
