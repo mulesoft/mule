@@ -67,9 +67,42 @@ public final class CompositeRoutingException extends MuleException implements Co
     // provide information about the composite exception itself
     builder.append(super.getDetailedMessage());
 
-    // get detailed information about the exceptions that make up the composite exception
+    // get detailed information about exceptions that make up composite exception
     builder.append(lineSeparator()).append(MESSAGE_SUB_TITLE).append(lineSeparator());
+    Map<String, Pair<Error, EventProcessingException>> detailedFailures = getDetailedFailures();
 
+    // If we only have an error map that doesn't provide information about exceptions,
+    // process with original logic
+    if (detailedFailures.isEmpty()) {
+      for (Entry<String, Error> entry : routingResult.getFailures().entrySet()) {
+        MuleException muleException = ExceptionHelper.getRootMuleException(entry.getValue().getCause());
+        Throwable exception = entry.getValue().getCause();
+        appendMessageForExceptions(builder, entry.getKey(), exception, muleException);
+      }
+      // If we are provided an error map that also stores exceptions that make up composite exception,
+      // process with new logic to provide detailed error message
+    } else {
+      for (Entry<String, Pair<Error, EventProcessingException>> entry : detailedFailures.entrySet()) {
+        MuleException muleException = entry.getValue().getSecond();
+        Throwable exception = entry.getValue().getFirst().getCause();
+        appendMessageForExceptions(builder, entry.getKey(), exception, muleException);
+      }
+    }
+    return builder.toString();
+  }
+
+  private void appendMessageForExceptions(StringBuilder builder, String route, Throwable exception, MuleException muleException) {
+    String routeSubtitle = String.format("Route %s: ", route);
+    builder.append(lineSeparator());
+    if (muleException != null) {
+      builder.append(routeSubtitle).append(muleException.getDetailedMessage());
+    } else {
+      builder.append(routeSubtitle)
+          .append("Caught exception in Exception Strategy: " + exception.getMessage());
+    }
+  }
+
+  private Map<String, Pair<Error, EventProcessingException>> getDetailedFailures() {
     Method getDetailedFailuresMethod = null;
     Map<String, Pair<Error, EventProcessingException>> detailedFailures = null;
     try {
@@ -80,33 +113,7 @@ public final class CompositeRoutingException extends MuleException implements Co
       e.printStackTrace();
       LOGGER.warn("Invalid Invocation, Expected method doesn't exist");
     }
-
-    if (detailedFailures.isEmpty()) {
-      // If we only have an error map that doesn't provide information about exceptions, process with original logic
-      for (Entry<String, Error> entry : routingResult.getFailures().entrySet()) {
-        String routeSubtitle = String.format("Route %s: ", entry.getKey());
-        MuleException muleException = ExceptionHelper.getRootMuleException(entry.getValue().getCause());
-        if (muleException != null) {
-          builder.append(routeSubtitle).append(muleException.getDetailedMessage());
-        } else {
-          builder.append(routeSubtitle)
-              .append("Caught exception in Exception Strategy: " + entry.getValue().getCause().getMessage());
-        }
-      }
-    } else {
-      // If we are provided an error map that also stores the exceptions that make up the composite exception,
-      // process with new logic to provide detailed error message
-      for (Entry<String, Pair<Error, EventProcessingException>> entry : detailedFailures.entrySet()) {
-        String routeSubtitle = String.format("Route %s: ", entry.getKey());
-        MuleException muleException = entry.getValue().getSecond();
-
-        builder.append(lineSeparator());
-        if (muleException != null) {
-          builder.append(routeSubtitle).append(muleException.getVerboseMessage());
-        }
-      }
-    }
-    return builder.toString();
+    return detailedFailures;
   }
 
   private static I18nMessage buildExceptionMessage(RoutingResult routingResult) {
