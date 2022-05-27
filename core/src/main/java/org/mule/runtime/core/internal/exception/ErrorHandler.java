@@ -19,7 +19,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
-import static org.mule.runtime.core.internal.exception.GlobalErrorHandler.REUSE_GLOBAL_ERROR_HANDLER;
+import static org.mule.runtime.core.internal.exception.GlobalErrorHandler.reuseGlobalErrorHandler;
 import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -192,7 +192,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
     String defaultErrorHandlerName = getMuleContext().getConfiguration().getDefaultErrorHandlerName();
     if (defaultErrorHandlerName != null && defaultErrorHandlerName.equals(name)) {
-      if (REUSE_GLOBAL_ERROR_HANDLER) {
+      if (reuseGlobalErrorHandler()) {
         inDefaultErrorHandler = true;
       }
       logger
