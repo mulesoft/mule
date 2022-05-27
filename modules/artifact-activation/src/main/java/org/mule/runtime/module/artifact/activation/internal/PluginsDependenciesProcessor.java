@@ -12,7 +12,6 @@ import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUt
 
 import static java.util.Collections.synchronizedList;
 import static java.util.Collections.synchronizedSet;
-
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.i18n.I18nMessage;
