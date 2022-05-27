@@ -16,6 +16,11 @@ public class ConnectionProperties {
 
   public ConnectionProperties() {}
 
+  public ConnectionProperties(String connectionDescription, ConnectionType connectionType) {
+    this.connectionDescription = connectionDescription;
+    this.connectionType = connectionType;
+  }
+
   public ConnectionProperties(String connectionDescription, ConnectionType connectionType,
                               Literal<String> connectionPropertyGrade) {
     this.connectionDescription = connectionDescription;

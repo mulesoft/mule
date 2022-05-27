@@ -8,7 +8,9 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static com.google.common.collect.ImmutableBiMap.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver.fromValues;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -17,14 +19,14 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.extension.api.runtime.parameter.Literal;
-import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.sdk.api.runtime.parameter.Literal;
+import org.mule.sdk.api.runtime.parameter.ParameterResolver;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -143,20 +145,38 @@ public class ResolverSetUtils {
     Optional<StackedTypesModelProperty> stackedTypesModelProperty =
         parameterModel.getModelProperty(StackedTypesModelProperty.class);
 
+    Type parameterType = extensionParameterDescriptorModelProperty.get().getExtensionParameter().getType();
+
     if (stackedTypesModelProperty.isPresent()) {
-      Type parameterType = extensionParameterDescriptorModelProperty.get().getExtensionParameter().getType();
-      return stackedTypesModelProperty.get().getValueResolverFactory()
-          .getWrapperValueResolver(getParameterValueResolver(getNonSpecialType(parameterType), value, reflectionCache,
-                                                             muleContext));
+      if (isExpression(value)) {
+        return stackedTypesModelProperty.get().getValueResolverFactory()
+            .getExpressionBasedValueResolver((String) value,
+                                             getNonSpecialType(parameterType).getDeclaringClass().orElse(Object.class));
+      } else {
+        // CHECK OPTIONAL!!!
+        return stackedTypesModelProperty.get().getValueResolverFactory()
+            .getStaticValueResolver(resolveStaticValue(getNonSpecialType(parameterType), value,
+                                                       reflectionCache, muleContext),
+                                    /* check optional */ parameterType.getDeclaringClass().get())
+            .get();
+      }
     }
 
-    Type parameterType = extensionParameterDescriptorModelProperty.get().getExtensionParameter().getType();
     return getParameterValueResolver(parameterType, value, reflectionCache, muleContext);
+  }
+
+  private static Object resolveStaticValue(Type type, Object value, ReflectionCache reflectionCache,
+                                           MuleContext muleContext)
+      throws MuleException {
+    ValueResolver resolver = getParameterValueResolver(type, value, reflectionCache, muleContext);
+    if (!resolver.isDynamic()) {
+      return resolver.resolve(ValueResolvingContext.builder(getNullEvent(muleContext)).build());
+    }
+    return value;
   }
 
   private static Type getNonSpecialType(Type parameterType) {
     Class expectedType = parameterType.getDeclaringClass().orElse(null);
-    // TODO : SDK-API TYPES
     if (TypedValue.class.isAssignableFrom(expectedType)) {
       List<Type> parameterTypeGenerics = parameterType.getSuperTypeGenerics(TypedValue.class);
       if (parameterTypeGenerics.size() == 1) {
