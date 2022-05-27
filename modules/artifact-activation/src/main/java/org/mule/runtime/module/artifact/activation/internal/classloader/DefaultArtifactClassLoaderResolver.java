@@ -47,7 +47,6 @@ import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
@@ -113,7 +112,8 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
     regionClassLoader.addClassLoader(domainClassLoader, artifactClassLoaderFilter);
 
     List<ArtifactPluginDescriptor> artifactPluginDescriptors =
-        PluginsDependenciesProcessor.process(new ArrayList<>(descriptor.getPlugins()), false, List::add);
+        PluginsDependenciesProcessor.removeExportedPackagesAlreadyExportedByTransitiveDependencies(PluginsDependenciesProcessor
+            .process(new ArrayList<>(descriptor.getPlugins()), false, List::add));
 
     artifactPluginDescriptors
         .stream()
@@ -199,7 +199,8 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
     regionClassLoader.addClassLoader(appClassLoader, artifactClassLoaderFilter);
 
     List<ArtifactPluginDescriptor> artifactPluginDescriptors =
-        PluginsDependenciesProcessor.process(new ArrayList<>(descriptor.getPlugins()), false, List::add);
+        PluginsDependenciesProcessor.removeExportedPackagesAlreadyExportedByTransitiveDependencies(PluginsDependenciesProcessor
+            .process(new ArrayList<>(descriptor.getPlugins()), false, List::add));
 
     artifactPluginDescriptors
         .stream()
