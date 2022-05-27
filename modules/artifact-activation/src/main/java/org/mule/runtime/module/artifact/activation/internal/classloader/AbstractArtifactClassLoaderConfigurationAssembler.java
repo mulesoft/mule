@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader;
 
-import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+
+import static com.google.common.collect.Sets.newHashSet;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -27,9 +30,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
+
 import org.slf4j.Logger;
 
 /**
@@ -52,8 +55,8 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
     ClassLoaderModelBuilder classLoaderConfigurationBuilder = getClassLoaderConfigurationBuilder();
 
     classLoaderConfigurationBuilder
-        .exportingPackages(getExportedPackages())
-        .exportingResources(getExportedResources());
+        .exportingPackages(newHashSet(packagerClassLoaderModel.getPackages()))
+        .exportingResources(newHashSet(packagerClassLoaderModel.getResources()));
 
     List<BundleDependency> bundleDependencies = getProcessedBundleDependencies();
 
@@ -98,8 +101,7 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
 
     // TODO W-11202141 - consider artifact patches for the case this is run within a Runtime
 
-    final URL artifactFileUrl = getUrl(artifactFile, artifactFile);
-    dependenciesArtifactsUrls.add(artifactFileUrl);
+    dependenciesArtifactsUrls.add(getUrl(artifactFile, artifactFile));
 
     dependenciesArtifactsUrls.addAll(addArtifactSpecificClassLoaderConfiguration(classLoaderConfigurationBuilder));
     dependenciesArtifactsUrls.addAll(addDependenciesToClasspathUrls(artifactFile, dependencies));
@@ -188,10 +190,6 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
   }
 
   protected abstract List<BundleDependency> getBundleDependencies();
-
-  protected abstract Set<String> getExportedPackages();
-
-  protected abstract Set<String> getExportedResources();
 
   protected abstract File getProjectFolder();
 }

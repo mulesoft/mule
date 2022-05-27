@@ -33,37 +33,24 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 
 import static org.codehaus.plexus.util.xml.Xpp3DomUtils.mergeXpp3Dom;
-import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.SettingsSupplierFactory;
 import org.mule.maven.client.api.model.BundleDependency;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.internal.AetherMavenClient;
-import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
-import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
-import org.mule.runtime.api.deployment.meta.MuleDomainModel;
-import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
-import org.mule.runtime.api.deployment.persistence.MuleApplicationModelJsonSerializer;
-import org.mule.runtime.api.deployment.persistence.MuleDomainModelJsonSerializer;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
-import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModelFactory;
+import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.activation.internal.deployable.DeployablePluginsDependenciesResolver;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
-import org.mule.runtime.module.artifact.internal.util.JarInfo;
 import org.mule.tools.api.classloader.model.ApplicationGAVModel;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 import org.mule.tools.api.classloader.model.Plugin;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -85,15 +72,13 @@ import org.apache.maven.model.Model;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import org.slf4j.Logger;
-
 /**
- * Implementation of {@link DeployableProjectModelFactory} that uses Maven.
+ * Implementation of {@link DeployableProjectModelBuilder} that uses Maven.
  *
  * @since 4.5
  */
-public class MavenDeployableProjectModelFactory
-    implements DeployableProjectModelFactory {
+public class MavenDeployableProjectModelBuilder
+    implements DeployableProjectModelBuilder {
 
   private static final String DEFAULT_PACKAGE_EXPORT = "";
   private static final String JAVA_EXTENSION = "java";
@@ -109,8 +94,6 @@ public class MavenDeployableProjectModelFactory
   private static final String DEFAULT_RESOURCES_DIRECTORY = "src/main/resources";
   private static final String DEFAULT_MULE_DIRECTORY = "src/main/mule";
 
-  private static final Logger LOGGER = getLogger(MavenDeployableProjectModelFactory.class);
-
   private final File projectFolder;
   private final MavenConfiguration mavenConfiguration;
   private List<String> packages = emptyList();
@@ -122,21 +105,19 @@ public class MavenDeployableProjectModelFactory
   private ArtifactCoordinates deployableArtifactCoordinates;
   private List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> deployableBundleDependencies;
   private Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> pluginsBundleDependencies;
-  private Map<BundleDescriptor, List<String>> pluginsPackages;
-  private Map<BundleDescriptor, List<String>> pluginsResources;
 
-  public MavenDeployableProjectModelFactory(File projectFolder, MavenConfiguration mavenConfiguration) {
+  public MavenDeployableProjectModelBuilder(File projectFolder, MavenConfiguration mavenConfiguration) {
     this.projectFolder = projectFolder;
     this.mavenConfiguration = mavenConfiguration;
   }
 
-  public MavenDeployableProjectModelFactory(File projectFolder) {
+  public MavenDeployableProjectModelBuilder(File projectFolder) {
     this(projectFolder, getDefaultMavenConfiguration());
   }
 
   private static MavenConfiguration getDefaultMavenConfiguration() {
     final MavenClientProvider mavenClientProvider =
-        discoverProvider(MavenDeployableProjectModelFactory.class.getClassLoader());
+        discoverProvider(MavenDeployableProjectModelBuilder.class.getClassLoader());
     final Supplier<File> localMavenRepository =
         mavenClientProvider.getLocalRepositorySuppliers().environmentMavenRepositorySupplier();
 
@@ -160,34 +141,7 @@ public class MavenDeployableProjectModelFactory
   }
 
   @Override
-  public DeployableProjectModel<MuleDomainModel> createDomainProjectModel() {
-    processDeployableProjectModel();
-
-    MuleDomainModel domainModel = createArtifactModel(projectFolder, new MuleDomainModelJsonSerializer());
-
-    return new DeployableProjectModel<>(packages, resources, deployableArtifactDependencies,
-                                        additionalPluginDependencies, pluginsArtifactDependencies, deployableArtifactCoordinates,
-                                        projectFolder, deployableBundleDependencies,
-                                        buildBundleDescriptor(deployableArtifactCoordinates), pluginsBundleDependencies,
-                                        pluginsPackages, pluginsResources,
-                                        domainModel);
-  }
-
-  @Override
-  public DeployableProjectModel<MuleApplicationModel> createApplicationProjectModel() {
-    processDeployableProjectModel();
-
-    MuleApplicationModel applicationModel = createArtifactModel(projectFolder, new MuleApplicationModelJsonSerializer());
-
-    return new DeployableProjectModel<>(packages, resources, deployableArtifactDependencies,
-                                        additionalPluginDependencies, pluginsArtifactDependencies, deployableArtifactCoordinates,
-                                        projectFolder, deployableBundleDependencies,
-                                        buildBundleDescriptor(deployableArtifactCoordinates), pluginsBundleDependencies,
-                                        pluginsPackages, pluginsResources,
-                                        applicationModel);
-  }
-
-  private void processDeployableProjectModel() {
+  public DeployableProjectModel build() {
     File pom = getPomFromFolder(projectFolder);
     Model pomModel = getPomModelFromFile(pom);
 
@@ -208,6 +162,11 @@ public class MavenDeployableProjectModelFactory
     } catch (IOException e) {
       throw new ArtifactActivationException(createStaticMessage("Couldn't search exported packages and resources"), e);
     }
+
+    return new DeployableProjectModel(packages, resources, deployableArtifactDependencies,
+                                      additionalPluginDependencies, pluginsArtifactDependencies, deployableArtifactCoordinates,
+                                      projectFolder, deployableBundleDependencies,
+                                      buildBundleDescriptor(deployableArtifactCoordinates), pluginsBundleDependencies);
   }
 
   private void getDeployableProjectArtifactCoordinates(Model pomModel) {
@@ -275,17 +234,6 @@ public class MavenDeployableProjectModelFactory
         .forEach((pluginArtifactCoordinates, pluginDependencies) -> pluginsBundleDependencies.put(pluginsBundleDescriptors
             .get(pluginArtifactCoordinates), pluginDependencies.stream()
                 .map(artifact -> createBundleDependencyFromPackagerDependency(uri -> uri).apply(artifact)).collect(toList())));
-
-    // Resolve the plugins' associated packages and resources
-    pluginsPackages = new HashMap<>();
-    pluginsResources = new HashMap<>();
-    deployableArtifactDependencies.forEach(artifact -> {
-      JarInfo jarInfo = new FileJarExplorer(false).explore(artifact.getUri());
-      pluginsPackages.put(pluginsBundleDescriptors.get(artifact.getArtifactCoordinates()),
-                          new ArrayList<>(jarInfo.getPackages()));
-      pluginsResources.put(pluginsBundleDescriptors.get(artifact.getArtifactCoordinates()),
-                           new ArrayList<>(jarInfo.getResources()));
-    });
   }
 
   private List<Plugin> toPluginDependencies(Map<BundleDependency, List<BundleDependency>> pluginsAndDependencies) {
@@ -301,33 +249,6 @@ public class MavenDeployableProjectModelFactory
                                                             return plugin;
                                                           })
         .collect(toList());
-  }
-
-  private <M extends MuleDeployableModel> M createArtifactModel(File artifactFolder,
-                                                                AbstractMuleArtifactModelJsonSerializer<M> deserializer) {
-    // TODO W-11203071 - the model needs to be completed, when the app is packaged every field is present in the output
-    // mule-artifact.json,
-    // but here we don't have that
-    final File artifactJsonFile = new File(artifactFolder, "mule-artifact.json");
-    if (!artifactJsonFile.exists()) {
-      throw new ArtifactActivationException(createStaticMessage("Couldn't find model file " + artifactJsonFile));
-    }
-
-    return deserializer.deserialize(getDescriptorContent(artifactJsonFile));
-  }
-
-  private String getDescriptorContent(File jsonFile) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Loading artifact descriptor from '{}'..." + jsonFile.getAbsolutePath());
-    }
-
-    try (InputStream stream = new BufferedInputStream(new FileInputStream(jsonFile))) {
-      return IOUtils.toString(stream);
-    } catch (IOException e) {
-      throw new IllegalArgumentException(format("Could not read extension describer on artifact '%s'",
-                                                jsonFile.getAbsolutePath()),
-                                         e);
-    }
   }
 
   private BundleDescriptor buildBundleDescriptor(ArtifactCoordinates artifactCoordinates) {

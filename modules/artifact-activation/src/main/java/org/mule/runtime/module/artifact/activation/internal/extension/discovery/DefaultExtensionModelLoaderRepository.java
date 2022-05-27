@@ -22,6 +22,7 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -32,12 +33,13 @@ import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.api.plugin.LoaderDescriber;
-import org.slf4j.Logger;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
+
+import org.slf4j.Logger;
 
 /**
  * Implementation of {@link ExtensionModelLoaderRepository} that uses SPI to look for the {@link ExtensionModelLoader} available

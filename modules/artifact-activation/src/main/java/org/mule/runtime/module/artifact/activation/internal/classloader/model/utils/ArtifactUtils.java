@@ -34,7 +34,6 @@ import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -84,7 +83,7 @@ public class ArtifactUtils {
    * @param dependencies the bundle dependency list to be converted.
    * @return the corresponding artifact list, each one with normalized version.
    */
-  public static List<Artifact> toArtifacts(Collection<BundleDependency> dependencies) {
+  public static List<Artifact> toArtifacts(List<BundleDependency> dependencies) {
     return dependencies.stream().map(ArtifactUtils::toArtifact).collect(toList());
   }
 
@@ -95,9 +94,7 @@ public class ArtifactUtils {
    * @return true if the artifact is a mule-plugin, false otherwise.
    */
   public static boolean isValidMulePlugin(Artifact artifact) {
-    ArtifactCoordinates pluginCoordinates = artifact.getArtifactCoordinates();
-    Optional<String> pluginClassifier = ofNullable(pluginCoordinates.getClassifier());
-    return pluginClassifier.map(MULE_PLUGIN_CLASSIFIER::equals).orElse(false);
+    return ofNullable(artifact.getArtifactCoordinates().getClassifier()).map(MULE_PLUGIN_CLASSIFIER::equals).orElse(false);
   }
 
   /**

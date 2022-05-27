@@ -9,6 +9,8 @@ package org.mule.runtime.module.artifact.activation.internal.deployable;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 
+import static com.google.common.collect.Sets.newHashSet;
+
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
@@ -18,8 +20,6 @@ import org.mule.tools.api.classloader.model.Artifact;
 
 import java.io.File;
 import java.util.List;
-
-import com.google.common.collect.Sets;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -55,9 +55,9 @@ public class DeployableClassLoaderConfigurationBuilder extends ClassLoaderModel.
         .filter(Artifact::isShared)
         // No need to validate the shared dependency here, as it has already been done by now
         .forEach(sharedDep -> {
-          this.exportingPackages(sharedDep.getPackages() == null ? emptySet() : Sets.newHashSet(sharedDep.getPackages()));
+          this.exportingPackages(sharedDep.getPackages() == null ? emptySet() : newHashSet(sharedDep.getPackages()));
           this.exportingResources(sharedDep.getResources() == null ? emptySet()
-              : Sets.newHashSet(sharedDep.getResources()));
+              : newHashSet(sharedDep.getResources()));
         });
   }
 
@@ -118,9 +118,9 @@ public class DeployableClassLoaderConfigurationBuilder extends ClassLoaderModel.
             .build());
 
     bundleDependencyBuilder
-        .setPackages(artifact.getPackages() == null ? emptySet() : Sets.newHashSet(artifact.getPackages()));
+        .setPackages(artifact.getPackages() == null ? emptySet() : newHashSet(artifact.getPackages()));
     bundleDependencyBuilder
-        .setResources(artifact.getResources() == null ? emptySet() : Sets.newHashSet(artifact.getResources()));
+        .setResources(artifact.getResources() == null ? emptySet() : newHashSet(artifact.getResources()));
     return bundleDependencyBuilder.build();
   }
 

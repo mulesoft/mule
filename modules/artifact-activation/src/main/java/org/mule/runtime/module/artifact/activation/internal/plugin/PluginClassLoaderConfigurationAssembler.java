@@ -7,14 +7,11 @@
 package org.mule.runtime.module.artifact.activation.internal.plugin;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
-import org.mule.runtime.api.deployment.meta.MulePluginModel;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.internal.classloader.AbstractArtifactClassLoaderConfigurationAssembler;
 import org.mule.runtime.module.artifact.activation.internal.classloader.model.ClassLoaderModelAssembler;
@@ -30,10 +27,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Assembles the class loader configuration for a plugin.
@@ -41,20 +35,18 @@ import java.util.Set;
 public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactClassLoaderConfigurationAssembler {
 
   private final File artifactLocation;
-  private final MulePluginModel pluginModel;
   private final List<BundleDependency> bundleDependencies;
   private final BundleDescriptor bundleDescriptor;
   private final DeployableArtifactDescriptor ownerDescriptor;
 
-  public PluginClassLoaderConfigurationAssembler(ArtifactCoordinates artifactCoordinates, List<String> exportedPackages,
-                                                 List<String> exportedResources, List<Artifact> dependencies,
-                                                 File artifactLocation, MulePluginModel pluginModel,
+  public PluginClassLoaderConfigurationAssembler(ArtifactCoordinates artifactCoordinates,
+                                                 List<Artifact> dependencies,
+                                                 File artifactLocation, MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor,
                                                  List<BundleDependency> bundleDependencies, BundleDescriptor bundleDescriptor,
                                                  DeployableArtifactDescriptor ownerDescriptor) {
-    super(new ClassLoaderModelAssembler(artifactCoordinates, dependencies, exportedPackages, exportedResources)
+    super(new ClassLoaderModelAssembler(artifactCoordinates, dependencies, muleArtifactLoaderDescriptor)
         .createClassLoaderModel());
     this.artifactLocation = artifactLocation;
-    this.pluginModel = pluginModel;
     this.bundleDependencies = bundleDependencies;
     this.bundleDescriptor = bundleDescriptor;
     this.ownerDescriptor = ownerDescriptor;
@@ -106,23 +98,6 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
   @Override
   protected List<BundleDependency> getBundleDependencies() {
     return bundleDependencies;
-  }
-
-  @Override
-  protected Set<String> getExportedPackages() {
-    return new HashSet<>(getAttribute(pluginModel.getClassLoaderModelLoaderDescriptor().getAttributes(), EXPORTED_PACKAGES));
-  }
-
-  @Override
-  protected Set<String> getExportedResources() {
-    return new HashSet<>(getAttribute(pluginModel.getClassLoaderModelLoaderDescriptor().getAttributes(), EXPORTED_RESOURCES));
-  }
-
-  private List<String> getAttribute(Map<String, Object> attributes, String attribute) {
-    final Object attributeObject = attributes.getOrDefault(attribute, new ArrayList<String>());
-    checkArgument(attributeObject instanceof List, format("The '%s' attribute must be of '%s', found '%s'", attribute,
-                                                          List.class.getName(), attributeObject.getClass().getName()));
-    return (List<String>) attributeObject;
   }
 
   @Override

@@ -7,7 +7,6 @@
 package org.mule.runtime.module.artifact.activation.internal.maven;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.toBundleDescriptor;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.Classifier.MULE_PLUGIN;
 import static org.mule.tools.api.classloader.model.ArtifactCoordinates.DEFAULT_ARTIFACT_TYPE;
 
@@ -16,6 +15,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
+
 import static org.apache.commons.io.FileUtils.toFile;
 
 import org.mule.maven.client.api.model.BundleDependency;
@@ -45,6 +45,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 

@@ -13,6 +13,8 @@ import static org.mule.runtime.module.artifact.activation.internal.classloader.m
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.VersionUtils.getMajor;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 
+import static java.util.stream.Collectors.toList;
+
 import org.mule.maven.client.api.model.BundleDependency;
 import org.mule.maven.client.api.model.BundleDescriptor;
 import org.mule.tools.api.classloader.model.Artifact;
@@ -25,7 +27,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -42,7 +43,7 @@ public class DeployablePluginsDependenciesResolver {
     List<BundleDependency> dependencies = deployableDependencies.stream()
         .filter(dep -> dep.getDescriptor().getClassifier().isPresent())
         .filter(dep -> dep.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER))
-        .collect(Collectors.toList());
+        .collect(toList());
 
     Map<BundleDependency, List<BundleDependency>> dependenciesMap = resolveDependencies(dependencies);
 

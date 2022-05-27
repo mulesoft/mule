@@ -6,35 +6,28 @@
  */
 package org.mule.runtime.module.artifact.activation.api.descriptor;
 
-import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
-import org.mule.runtime.api.deployment.meta.MuleDomainModel;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
-import org.mule.runtime.module.artifact.activation.internal.descriptor.DefaultArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.activation.internal.descriptor.DefaultDeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
-import org.mule.tools.api.classloader.model.Artifact;
-import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
-import java.util.List;
 import java.util.Map;
 
 /**
- * Provides methods to create the descriptors of different kind of artifacts (applications, plugins, domains) from the
- * {@link DeployableProjectModel}.
+ * Provides methods to create the descriptors of deployable artifacts (i.e. applications and domains with the descriptors for
+ * their plugins within) from a {@link DeployableProjectModel}.
  *
  * @since 4.5
  */
-public interface ArtifactDescriptorFactory {
+public interface DeployableArtifactDescriptorFactory {
 
-  static ArtifactDescriptorFactory defaultArtifactDescriptorFactory() {
-    return new DefaultArtifactDescriptorFactory();
+  static DeployableArtifactDescriptorFactory defaultArtifactDescriptorFactory() {
+    return new DefaultDeployableArtifactDescriptorFactory();
   }
 
   /**
@@ -49,7 +42,7 @@ public interface ArtifactDescriptorFactory {
    *                                 jar described by the {@link BundleDescriptor}, otherwise it will be created.
    * @return a descriptor for a domain.
    */
-  DomainDescriptor createDomainDescriptor(DeployableProjectModel<MuleDomainModel> model,
+  DomainDescriptor createDomainDescriptor(DeployableProjectModel model,
                                           Map<String, String> deploymentProperties,
                                           PluginModelResolver pluginModelResolver,
                                           PluginDescriptorResolver pluginDescriptorResolver);
@@ -66,7 +59,7 @@ public interface ArtifactDescriptorFactory {
    *                                 jar described by the {@link BundleDescriptor}, otherwise it will be created.
    * @return a descriptor for an application.
    */
-  ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel<MuleApplicationModel> model,
+  ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
                                                     Map<String, String> deploymentProperties,
                                                     PluginModelResolver pluginModelResolver,
                                                     PluginDescriptorResolver pluginDescriptorResolver);

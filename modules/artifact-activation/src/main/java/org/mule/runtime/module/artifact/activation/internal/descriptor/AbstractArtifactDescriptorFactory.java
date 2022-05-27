@@ -7,6 +7,7 @@
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
 import org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
@@ -24,14 +25,13 @@ import java.io.File;
  */
 public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleArtifactModel, T extends ArtifactDescriptor> {
 
-  protected final File artifactLocation;
-  protected final M artifactModel;
+  private final File artifactLocation;
+  private M artifactModel;
   private final ArtifactDescriptorValidator artifactDescriptorValidator;
 
-  public AbstractArtifactDescriptorFactory(File artifactLocation, M artifactModel,
+  public AbstractArtifactDescriptorFactory(File artifactLocation,
                                            ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
     this.artifactLocation = artifactLocation;
-    this.artifactModel = artifactModel;
 
     this.artifactDescriptorValidator = artifactDescriptorValidatorBuilder
         .validateMinMuleVersion()
@@ -40,7 +40,8 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
         .build();
   }
 
-  public T createArtifactDescriptor() {
+  public T create() {
+    artifactModel = createArtifactModel();
     final T descriptor = doCreateArtifactDescriptor();
     if (artifactLocation.isDirectory()) {
       descriptor.setRootFolder(artifactLocation);
@@ -52,7 +53,7 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
     descriptor.setRequiredProduct(artifactModel.getRequiredProduct());
 
     ClassLoaderModel classLoaderModel =
-        getClassLoaderModel();
+        getClassLoaderModel(artifactModel.getClassLoaderModelLoaderDescriptor());
     descriptor.setClassLoaderModel(classLoaderModel);
 
     doDescriptorConfig(descriptor);
@@ -63,9 +64,19 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
     return descriptor;
   }
 
+  protected M getArtifactModel() {
+    return artifactModel;
+  }
+
+  public File getArtifactLocation() {
+    return artifactLocation;
+  }
+
+  protected abstract M createArtifactModel();
+
   protected abstract void doDescriptorConfig(T descriptor);
 
-  protected abstract ClassLoaderModel getClassLoaderModel();
+  protected abstract ClassLoaderModel getClassLoaderModel(MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor);
 
   protected abstract BundleDescriptor getBundleDescriptor();
 

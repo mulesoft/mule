@@ -6,8 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.api.deployable;
 
-import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
-import org.mule.runtime.module.artifact.activation.api.descriptor.ArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -19,18 +18,19 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 /**
  * Represents the structure of a project, providing what is needed in order to create its {@link ArtifactDescriptor} with a
- * {@link ArtifactDescriptorFactory}.
+ * {@link DeployableArtifactDescriptorFactory}.
  * 
  * @since 4.5
  */
-public final class DeployableProjectModel<T extends MuleDeployableModel> {
+public final class DeployableProjectModel {
 
   private final List<String> packages;
-  private List<String> exportedPackages;
   private final List<String> resources;
-  private List<String> exportedResources;
   private final List<Artifact> dependencies;
   private final List<Plugin> additionalPluginDependencies;
   private final Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies;
@@ -39,74 +39,31 @@ public final class DeployableProjectModel<T extends MuleDeployableModel> {
   private final List<BundleDependency> deployableBundleDependencies;
   private final BundleDescriptor bundleDescriptor;
   private final Map<BundleDescriptor, List<BundleDependency>> pluginsBundleDependencies;
-  private final Map<BundleDescriptor, List<String>> pluginsExportedPackages;
-  private final Map<BundleDescriptor, List<String>> pluginsExportedResources;
-  private final T muleDeployableModel;
 
   public DeployableProjectModel(List<String> packages, List<String> resources, List<Artifact> dependencies,
                                 List<Plugin> additionalPluginDependencies,
                                 Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies,
                                 ArtifactCoordinates artifactCoordinates, File projectFolder,
                                 List<BundleDependency> deployableBundleDependencies, BundleDescriptor bundleDescriptor,
-                                Map<BundleDescriptor, List<BundleDependency>> pluginsBundleDependencies,
-                                Map<BundleDescriptor, List<String>> pluginsExportedPackages,
-                                Map<BundleDescriptor, List<String>> pluginsExportedResources, T muleDeployableModel) {
-    this.packages = packages;
-    this.resources = resources;
-    this.dependencies = dependencies;
-    this.additionalPluginDependencies = additionalPluginDependencies;
-    this.pluginsDependencies = pluginsDependencies;
+                                Map<BundleDescriptor, List<BundleDependency>> pluginsBundleDependencies) {
+    this.packages = ImmutableList.copyOf(packages);
+    this.resources = ImmutableList.copyOf(resources);
+    this.dependencies = ImmutableList.copyOf(dependencies);
+    this.additionalPluginDependencies = ImmutableList.copyOf(additionalPluginDependencies);
+    this.pluginsDependencies = ImmutableMap.copyOf(pluginsDependencies);
     this.artifactCoordinates = artifactCoordinates;
     this.projectFolder = projectFolder;
-    this.deployableBundleDependencies = deployableBundleDependencies;
+    this.deployableBundleDependencies = ImmutableList.copyOf(deployableBundleDependencies);
     this.bundleDescriptor = bundleDescriptor;
-    this.pluginsBundleDependencies = pluginsBundleDependencies;
-    this.pluginsExportedPackages = pluginsExportedPackages;
-    this.pluginsExportedResources = pluginsExportedResources;
-    this.muleDeployableModel = muleDeployableModel;
+    this.pluginsBundleDependencies = ImmutableMap.copyOf(pluginsBundleDependencies);
   }
 
-  /**
-   * Gets the packages configured by the project developer to be exported.
-   * 
-   * @return the packages configured by the project developer to be exported.
-   */
-  public List<String> getExportedPackages() {
-    if (exportedPackages == null) {
-      exportedPackages = getExportedAttribute("exportedPackages", packages);
-    }
-
-    return exportedPackages;
+  public List<String> getPackages() {
+    return packages;
   }
 
-  /**
-   * Gets the resources configured by the project developer to be exported.
-   * 
-   * @return the resources configured by the project developer to be exported.
-   */
-  public List<String> getExportedResources() {
-    if (exportedResources == null) {
-      exportedResources = getExportedAttribute("exportedResources", resources);
-    }
-
-    return exportedResources;
-  }
-
-  private List<String> getExportedAttribute(String exportedAttributeName, List<String> available) {
-    if (muleDeployableModel.getClassLoaderModelLoaderDescriptor() != null) {
-      Map<String, Object> originalAttributes = muleDeployableModel.getClassLoaderModelLoaderDescriptor().getAttributes();
-      List<String> exportedAttribute;
-
-      if (originalAttributes != null && originalAttributes.get(exportedAttributeName) != null) {
-        exportedAttribute = (List<String>) originalAttributes.get(exportedAttributeName);
-      } else {
-        exportedAttribute = available;
-      }
-
-      return exportedAttribute;
-    } else {
-      return available;
-    }
+  public List<String> getResources() {
+    return resources;
   }
 
   public List<Artifact> getProjectDependencies() {
@@ -141,15 +98,4 @@ public final class DeployableProjectModel<T extends MuleDeployableModel> {
     return pluginsBundleDependencies;
   }
 
-  public T getMuleDeployableModel() {
-    return muleDeployableModel;
-  }
-
-  public Map<BundleDescriptor, List<String>> getPluginsExportedPackages() {
-    return pluginsExportedPackages;
-  }
-
-  public Map<BundleDescriptor, List<String>> getPluginsExportedResources() {
-    return pluginsExportedResources;
-  }
 }

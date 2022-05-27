@@ -18,10 +18,10 @@ import org.mule.runtime.module.artifact.activation.api.extension.discovery.Exten
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer;
 import org.mule.runtime.module.artifact.activation.internal.PluginsDependenciesProcessor;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Default implementation of {@link ExtensionModelDiscoverer}.

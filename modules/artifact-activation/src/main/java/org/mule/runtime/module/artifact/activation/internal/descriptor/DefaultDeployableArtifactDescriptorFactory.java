@@ -6,52 +6,42 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
-import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
-import org.mule.runtime.api.deployment.meta.MuleDomainModel;
-import org.mule.runtime.api.deployment.meta.MulePluginModel;
-import org.mule.runtime.module.artifact.activation.api.descriptor.ArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
 import org.mule.runtime.module.artifact.activation.internal.application.ApplicationDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.internal.domain.DomainDescriptorFactory;
-import org.mule.runtime.module.artifact.activation.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
-import org.mule.tools.api.classloader.model.Artifact;
-import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
-import java.util.List;
 import java.util.Map;
 
 /**
- * Default implementation of {@link ArtifactDescriptorFactory}.
+ * Default implementation of {@link DeployableArtifactDescriptorFactory}.
  *
  * @since 4.5
  */
-public class DefaultArtifactDescriptorFactory implements ArtifactDescriptorFactory {
+public class DefaultDeployableArtifactDescriptorFactory implements DeployableArtifactDescriptorFactory {
 
   @Override
-  public ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel<MuleApplicationModel> model,
+  public ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
                                                            Map<String, String> deploymentProperties,
                                                            PluginModelResolver pluginModelResolver,
                                                            PluginDescriptorResolver pluginDescriptorResolver) {
 
     return new ApplicationDescriptorFactory(model, deploymentProperties, pluginModelResolver, pluginDescriptorResolver,
-                                            ArtifactDescriptorValidatorBuilder.builder()).createArtifactDescriptor();
+                                            ArtifactDescriptorValidatorBuilder.builder()).create();
   }
 
   @Override
-  public DomainDescriptor createDomainDescriptor(DeployableProjectModel<MuleDomainModel> model,
+  public DomainDescriptor createDomainDescriptor(DeployableProjectModel model,
                                                  Map<String, String> deploymentProperties,
                                                  PluginModelResolver pluginModelResolver,
                                                  PluginDescriptorResolver pluginDescriptorResolver) {
     return new DomainDescriptorFactory(model, deploymentProperties, pluginModelResolver, pluginDescriptorResolver,
-                                       ArtifactDescriptorValidatorBuilder.builder()).createArtifactDescriptor();
+                                       ArtifactDescriptorValidatorBuilder.builder()).create();
   }
 
 }

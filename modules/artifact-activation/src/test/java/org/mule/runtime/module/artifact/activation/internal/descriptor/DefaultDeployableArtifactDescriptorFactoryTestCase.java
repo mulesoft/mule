@@ -6,15 +6,6 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.everyItem;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.startsWith;
 import static org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver.pluginDescriptorResolver;
 import static org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver.mavenDeployablePluginModelResolver;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
@@ -24,11 +15,19 @@ import static java.util.Collections.emptyMap;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.everyItem;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.startsWith;
 
-import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
-import org.mule.runtime.module.artifact.activation.api.descriptor.ArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
-import org.mule.runtime.module.artifact.activation.internal.maven.MavenDeployableProjectModelFactory;
+import org.mule.runtime.module.artifact.activation.internal.maven.MavenDeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -44,7 +43,7 @@ import org.junit.Test;
 
 @Feature(CLASSLOADING_ISOLATION)
 @Story(ARTIFACT_DESCRIPTORS)
-public class DefaultArtifactDescriptorFactoryTestCase extends AbstractMuleTestCase {
+public class DefaultDeployableArtifactDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void createBasicApplicationDescriptor() throws Exception {
@@ -96,15 +95,15 @@ public class DefaultArtifactDescriptorFactoryTestCase extends AbstractMuleTestCa
   }
 
   private ApplicationDescriptor createApplicationDescriptor(String appPath) throws URISyntaxException {
-    MavenDeployableProjectModelFactory modelFactory =
-        new MavenDeployableProjectModelFactory(getApplicationFolder(appPath));
+    MavenDeployableProjectModelBuilder modelFactory =
+        new MavenDeployableProjectModelBuilder(getApplicationFolder(appPath));
 
-    DeployableProjectModel<MuleApplicationModel> model = modelFactory.createApplicationProjectModel();
+    DeployableProjectModel model = modelFactory.build();
 
-    ArtifactDescriptorFactory artifactDescriptorFactory = new DefaultArtifactDescriptorFactory();
-    return artifactDescriptorFactory.createApplicationDescriptor(model, emptyMap(),
-                                                                 mavenDeployablePluginModelResolver(),
-                                                                 pluginDescriptorResolver());
+    DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory = new DefaultDeployableArtifactDescriptorFactory();
+    return deployableArtifactDescriptorFactory.createApplicationDescriptor(model, emptyMap(),
+                                                                           mavenDeployablePluginModelResolver(),
+                                                                           pluginDescriptorResolver());
   }
 
   protected File getApplicationFolder(String appPath) throws URISyntaxException {

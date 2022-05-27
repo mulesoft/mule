@@ -7,13 +7,17 @@
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.of;
 
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
+import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
@@ -29,6 +33,11 @@ import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescrip
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +48,7 @@ import java.util.Set;
 import com.google.common.collect.ImmutableSet;
 
 import org.apache.commons.lang3.StringUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,17 +63,17 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDeployableArtifactDescriptorFactory.class);
 
-  private final DeployableProjectModel<M> deployableProjectModel;
-  protected final Optional<Properties> deploymentProperties;
+  private final DeployableProjectModel deployableProjectModel;
+  private final Optional<Properties> deploymentProperties;
   private final PluginModelResolver pluginModelResolver;
   private final PluginDescriptorResolver pluginDescriptorResolver;
 
-  public AbstractDeployableArtifactDescriptorFactory(DeployableProjectModel<M> deployableProjectModel,
+  public AbstractDeployableArtifactDescriptorFactory(DeployableProjectModel deployableProjectModel,
                                                      Map<String, String> deploymentProperties,
                                                      PluginModelResolver pluginModelResolver,
                                                      PluginDescriptorResolver pluginDescriptorResolver,
                                                      ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
-    super(deployableProjectModel.getProjectFolder(), deployableProjectModel.getMuleDeployableModel(),
+    super(deployableProjectModel.getProjectFolder(),
           artifactDescriptorValidatorBuilder);
     // TODO W-11202204 - validate model dependencies checking for incompatibilities
     this.deployableProjectModel = deployableProjectModel;
@@ -78,9 +88,66 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
     return of(properties);
   }
 
+  protected Optional<Properties> getDeploymentProperties() {
+    return deploymentProperties;
+  }
+
   @Override
-  protected ClassLoaderModel getClassLoaderModel() {
-    return new DeployableClassLoaderConfigurationAssembler<>(deployableProjectModel)
+  protected final M createArtifactModel() {
+    // TODO W-11203071 - the model needs to be completed, when the app is packaged every field is present in the output
+    // mule-artifact.json, but here we don't have that
+    final File artifactJsonFile = new File(getArtifactLocation(), getDescriptorFileName());
+    if (!artifactJsonFile.exists()) {
+      throw new ArtifactActivationException(createStaticMessage("Couldn't find model file " + artifactJsonFile));
+    }
+
+    return loadModelFromJson(getDescriptorContent(artifactJsonFile));
+  }
+
+  private String getDescriptorContent(File jsonFile) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Loading artifact descriptor from '{}'..." + jsonFile.getAbsolutePath());
+    }
+
+    try (InputStream stream = new BufferedInputStream(new FileInputStream(jsonFile))) {
+      return IOUtils.toString(stream);
+    } catch (IOException e) {
+      throw new IllegalArgumentException(format("Could not read extension describer on artifact '%s'",
+                                                jsonFile.getAbsolutePath()),
+                                         e);
+    }
+  }
+
+  /**
+   * Generates an artifact model from a given JSON descriptor
+   *
+   * @param jsonString artifact descriptor in JSON format
+   * @return the artifact model matching the provided JSON content.
+   */
+  private M loadModelFromJson(String jsonString) {
+    try {
+      return deserializeArtifactModel(jsonString);
+    } catch (IOException e) {
+      throw new IllegalArgumentException("Cannot deserialize artifact descriptor from: " + jsonString);
+    }
+  }
+
+  private M deserializeArtifactModel(String jsonString) throws IOException {
+    return getMuleArtifactModelJsonSerializer().deserialize(jsonString);
+  }
+
+  /**
+   * @return the serializer for the artifact model.
+   */
+  protected abstract AbstractMuleArtifactModelJsonSerializer<M> getMuleArtifactModelJsonSerializer();
+
+  private String getDescriptorFileName() {
+    return MULE_ARTIFACT_JSON_DESCRIPTOR;
+  }
+
+  @Override
+  protected ClassLoaderModel getClassLoaderModel(MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
+    return new DeployableClassLoaderConfigurationAssembler<>(deployableProjectModel, muleArtifactLoaderDescriptor)
         .createClassLoaderModel();
   }
 
@@ -91,10 +158,10 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
 
   @Override
   protected void doDescriptorConfig(T descriptor) {
-    descriptor.setArtifactLocation(artifactLocation);
-    descriptor.setRedeploymentEnabled(artifactModel.isRedeploymentEnabled());
+    descriptor.setArtifactLocation(getArtifactLocation());
+    descriptor.setRedeploymentEnabled(getArtifactModel().isRedeploymentEnabled());
 
-    Set<String> configs = artifactModel.getConfigs();
+    Set<String> configs = getArtifactModel().getConfigs();
     if (configs != null && !configs.isEmpty()) {
       descriptor.setConfigResources(new HashSet<>(configs));
     } else {
@@ -132,9 +199,7 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
                   .orElse(createPluginDescriptor(bundlePluginDependency,
                                                  pluginModelResolver.resolve(bundlePluginDependency), descriptor,
                                                  bundleDependencies,
-                                                 pluginDependencies.getKey(), pluginDependencies.getValue(),
-                                                 deployableProjectModel.getPluginsExportedPackages().get(bundleDescriptor),
-                                                 deployableProjectModel.getPluginsExportedResources().get(bundleDescriptor))));
+                                                 pluginDependencies.getKey(), pluginDependencies.getValue())));
         }
       }
     }
@@ -152,8 +217,6 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
    * @param bundleDependencies        plugin dependencies on a bundle.
    * @param pluginArtifactCoordinates plugin coordinates.
    * @param pluginDependencies        resolved plugin dependencies as artifacts.
-   * @param pluginExportedPackages    {@link List list} of the packages the plugin exports.
-   * @param pluginExportedResources   {@link List list} of the resources the plugin exports.
    * @return a descriptor for a plugin.
    */
   private ArtifactPluginDescriptor createPluginDescriptor(BundleDependency bundleDependency,
@@ -161,13 +224,10 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
                                                           DeployableArtifactDescriptor ownerDescriptor,
                                                           List<BundleDependency> bundleDependencies,
                                                           ArtifactCoordinates pluginArtifactCoordinates,
-                                                          List<Artifact> pluginDependencies,
-                                                          List<String> pluginExportedPackages,
-                                                          List<String> pluginExportedResources) {
+                                                          List<Artifact> pluginDependencies) {
     return new ArtifactPluginDescriptorFactory(bundleDependency, pluginModel, ownerDescriptor,
                                                bundleDependencies, pluginArtifactCoordinates, pluginDependencies,
-                                               pluginExportedPackages, pluginExportedResources,
-                                               ArtifactDescriptorValidatorBuilder.builder()).createArtifactDescriptor();
+                                               ArtifactDescriptorValidatorBuilder.builder()).create();
   }
 
 }

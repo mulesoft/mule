@@ -8,6 +8,7 @@ package org.mule.runtime.module.artifact.activation.internal.plugin;
 
 import static java.util.Optional.empty;
 
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.module.artifact.activation.internal.descriptor.AbstractArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
@@ -29,47 +30,49 @@ import java.util.List;
 public class ArtifactPluginDescriptorFactory
     extends AbstractArtifactDescriptorFactory<MulePluginModel, ArtifactPluginDescriptor> {
 
+  private final MulePluginModel pluginModel;
   private final BundleDescriptor bundleDescriptor;
   private final DeployableArtifactDescriptor ownerDescriptor;
   private final List<BundleDependency> bundleDependencies;
   private final ArtifactCoordinates pluginArtifactCoordinates;
   private final List<Artifact> pluginDependencies;
-  private final List<String> pluginExportedPackages;
-  private final List<String> pluginExportedResources;
 
   public ArtifactPluginDescriptorFactory(BundleDependency bundleDependency, MulePluginModel pluginModel,
                                          DeployableArtifactDescriptor ownerDescriptor, List<BundleDependency> bundleDependencies,
                                          ArtifactCoordinates pluginArtifactCoordinates, List<Artifact> pluginDependencies,
-                                         List<String> pluginExportedPackages, List<String> pluginExportedResources,
                                          ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
-    super(new File(bundleDependency.getBundleUri()), pluginModel, artifactDescriptorValidatorBuilder);
+    super(new File(bundleDependency.getBundleUri()), artifactDescriptorValidatorBuilder);
 
+    this.pluginModel = pluginModel;
     this.bundleDescriptor = bundleDependency.getDescriptor();
     this.ownerDescriptor = ownerDescriptor;
     this.bundleDependencies = bundleDependencies;
     this.pluginArtifactCoordinates = pluginArtifactCoordinates;
     this.pluginDependencies = pluginDependencies;
-    this.pluginExportedPackages = pluginExportedPackages;
-    this.pluginExportedResources = pluginExportedResources;
+  }
+
+  @Override
+  protected MulePluginModel createArtifactModel() {
+    return pluginModel;
   }
 
   @Override
   protected void doDescriptorConfig(ArtifactPluginDescriptor descriptor) {
-    artifactModel.getExtensionModelLoaderDescriptor().ifPresent(extensionModelDescriptor -> {
+    getArtifactModel().getExtensionModelLoaderDescriptor().ifPresent(extensionModelDescriptor -> {
       final LoaderDescriber loaderDescriber = new LoaderDescriber(extensionModelDescriptor.getId());
       loaderDescriber.addAttributes(extensionModelDescriptor.getAttributes());
       descriptor.setExtensionModelDescriptorProperty(loaderDescriber);
     });
 
-    artifactModel.getLicense().ifPresent(descriptor::setLicenseModel);
+    getArtifactModel().getLicense().ifPresent(descriptor::setLicenseModel);
   }
 
   @Override
-  protected ClassLoaderModel getClassLoaderModel() {
-    return new PluginClassLoaderConfigurationAssembler(pluginArtifactCoordinates, pluginExportedPackages,
-                                                       pluginExportedResources, pluginDependencies,
-                                                       artifactLocation,
-                                                       artifactModel,
+  protected ClassLoaderModel getClassLoaderModel(MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
+    return new PluginClassLoaderConfigurationAssembler(pluginArtifactCoordinates,
+                                                       pluginDependencies,
+                                                       getArtifactLocation(),
+                                                       muleArtifactLoaderDescriptor,
                                                        bundleDependencies, bundleDescriptor, ownerDescriptor)
                                                            .createClassLoaderModel();
   }
@@ -81,6 +84,6 @@ public class ArtifactPluginDescriptorFactory
 
   @Override
   protected ArtifactPluginDescriptor doCreateArtifactDescriptor() {
-    return new ArtifactPluginDescriptor(artifactModel.getName(), empty());
+    return new ArtifactPluginDescriptor(getArtifactModel().getName(), empty());
   }
 }

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.classloader.AbstractArtifactClassLoaderConfigurationAssembler;
@@ -13,9 +14,7 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 
 import java.io.File;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Assembles the class loader configuration for a deployable artifact.
@@ -25,26 +24,18 @@ import java.util.Set;
 public class DeployableClassLoaderConfigurationAssembler<M extends MuleDeployableModel>
     extends AbstractArtifactClassLoaderConfigurationAssembler {
 
-  DeployableProjectModel<M> deployableProjectModel;
+  DeployableProjectModel deployableProjectModel;
 
-  public DeployableClassLoaderConfigurationAssembler(DeployableProjectModel<M> model) {
-    super(new DeployableClassLoaderModelAssembler<>(model).createClassLoaderModel());
-    deployableProjectModel = model;
+  public DeployableClassLoaderConfigurationAssembler(DeployableProjectModel deployableProjectModel,
+                                                     MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
+    super(new DeployableClassLoaderModelAssembler<>(deployableProjectModel, muleArtifactLoaderDescriptor)
+        .createClassLoaderModel());
+    this.deployableProjectModel = deployableProjectModel;
   }
 
   @Override
   protected List<BundleDependency> getBundleDependencies() {
     return deployableProjectModel.getDeployableBundleDependencies();
-  }
-
-  @Override
-  protected Set<String> getExportedPackages() {
-    return new HashSet<>(deployableProjectModel.getExportedPackages());
-  }
-
-  @Override
-  protected Set<String> getExportedResources() {
-    return new HashSet<>(deployableProjectModel.getExportedResources());
   }
 
   @Override

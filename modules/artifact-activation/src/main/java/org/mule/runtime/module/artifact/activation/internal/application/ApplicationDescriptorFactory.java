@@ -9,6 +9,8 @@ package org.mule.runtime.module.artifact.activation.internal.application;
 import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
+import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
+import org.mule.runtime.api.deployment.persistence.MuleApplicationModelJsonSerializer;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
@@ -24,7 +26,7 @@ import java.util.Map;
 public class ApplicationDescriptorFactory
     extends AbstractDeployableArtifactDescriptorFactory<MuleApplicationModel, ApplicationDescriptor> {
 
-  public ApplicationDescriptorFactory(DeployableProjectModel<MuleApplicationModel> deployableProjectModel,
+  public ApplicationDescriptorFactory(DeployableProjectModel deployableProjectModel,
                                       Map<String, String> deploymentProperties, PluginModelResolver pluginModelResolver,
                                       PluginDescriptorResolver pluginDescriptorResolver,
                                       ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
@@ -33,9 +35,14 @@ public class ApplicationDescriptorFactory
   }
 
   @Override
+  protected AbstractMuleArtifactModelJsonSerializer<MuleApplicationModel> getMuleArtifactModelJsonSerializer() {
+    return new MuleApplicationModelJsonSerializer();
+  }
+
+  @Override
   protected void doDescriptorConfig(ApplicationDescriptor descriptor) {
     super.doDescriptorConfig(descriptor);
-    artifactModel.getDomain().ifPresent(descriptor::setDomainName);
+    getArtifactModel().getDomain().ifPresent(descriptor::setDomainName);
   }
 
   @Override
@@ -45,6 +52,6 @@ public class ApplicationDescriptorFactory
 
   @Override
   protected ApplicationDescriptor doCreateArtifactDescriptor() {
-    return new ApplicationDescriptor(artifactLocation.getName(), deploymentProperties);
+    return new ApplicationDescriptor(getArtifactLocation().getName(), getDeploymentProperties());
   }
 }

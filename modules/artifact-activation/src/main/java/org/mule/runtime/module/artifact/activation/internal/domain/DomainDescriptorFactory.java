@@ -9,6 +9,8 @@ package org.mule.runtime.module.artifact.activation.internal.domain;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 
 import org.mule.runtime.api.deployment.meta.MuleDomainModel;
+import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
+import org.mule.runtime.api.deployment.persistence.MuleDomainModelJsonSerializer;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
@@ -23,12 +25,17 @@ import java.util.Map;
  */
 public class DomainDescriptorFactory extends AbstractDeployableArtifactDescriptorFactory<MuleDomainModel, DomainDescriptor> {
 
-  public DomainDescriptorFactory(DeployableProjectModel<MuleDomainModel> deployableProjectModel,
+  public DomainDescriptorFactory(DeployableProjectModel deployableProjectModel,
                                  Map<String, String> deploymentProperties, PluginModelResolver pluginModelResolver,
                                  PluginDescriptorResolver pluginDescriptorResolver,
                                  ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
     super(deployableProjectModel, deploymentProperties, pluginModelResolver, pluginDescriptorResolver,
           artifactDescriptorValidatorBuilder);
+  }
+
+  @Override
+  protected AbstractMuleArtifactModelJsonSerializer<MuleDomainModel> getMuleArtifactModelJsonSerializer() {
+    return new MuleDomainModelJsonSerializer();
   }
 
   @Override
@@ -38,6 +45,6 @@ public class DomainDescriptorFactory extends AbstractDeployableArtifactDescripto
 
   @Override
   protected DomainDescriptor doCreateArtifactDescriptor() {
-    return new DomainDescriptor(artifactLocation.getName(), deploymentProperties);
+    return new DomainDescriptor(getArtifactLocation().getName(), getDeploymentProperties());
   }
 }

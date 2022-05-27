@@ -17,12 +17,13 @@ import static de.skuzzle.semantic.Version.create;
 import static de.skuzzle.semantic.Version.isValidVersion;
 import static de.skuzzle.semantic.Version.parseVersion;
 
+import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
+
 import java.util.Optional;
 
 import com.vdurmont.semver4j.Semver;
 
 import org.apache.commons.lang3.StringUtils;
-import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 
 /**
  * Helper methods to work with semantic versioning.

@@ -6,11 +6,15 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader.model;
 
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 import org.mule.tools.api.classloader.model.ClassLoaderModel;
 
 import java.util.List;
+import java.util.Map;
+
+import static java.util.Collections.emptyList;
 
 /**
  * Assembles the class loader model for an artifact given all its pieces.
@@ -21,15 +25,23 @@ public class ClassLoaderModelAssembler {
 
   protected final ArtifactCoordinates artifactCoordinates;
   protected final List<Artifact> projectDependencies;
-  protected final List<String> exportedPackages;
-  protected final List<String> exportedResources;
+  protected final List<String> availablePackages;
+  protected final List<String> availableResources;
+  private final MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor;
 
   public ClassLoaderModelAssembler(ArtifactCoordinates artifactCoordinates, List<Artifact> projectDependencies,
-                                   List<String> exportedPackages, List<String> exportedResources) {
+                                   List<String> availablePackages, List<String> availableResources,
+                                   MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
     this.artifactCoordinates = artifactCoordinates;
     this.projectDependencies = projectDependencies;
-    this.exportedPackages = exportedPackages;
-    this.exportedResources = exportedResources;
+    this.availablePackages = availablePackages;
+    this.availableResources = availableResources;
+    this.muleArtifactLoaderDescriptor = muleArtifactLoaderDescriptor;
+  }
+
+  public ClassLoaderModelAssembler(ArtifactCoordinates artifactCoordinates, List<Artifact> dependencies,
+                                   MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
+    this(artifactCoordinates, dependencies, emptyList(), emptyList(), muleArtifactLoaderDescriptor);
   }
 
   public ClassLoaderModel createClassLoaderModel() {
@@ -42,8 +54,20 @@ public class ClassLoaderModelAssembler {
 
   protected final void assembleClassLoaderModel(ClassLoaderModel classLoaderModel) {
     classLoaderModel.setDependencies(projectDependencies);
-    classLoaderModel.setPackages(exportedPackages.toArray(new String[0]));
-    classLoaderModel.setResources(exportedResources.toArray(new String[0]));
+    classLoaderModel.setPackages(getExportedAttribute("exportedPackages", availablePackages));
+    classLoaderModel.setResources(getExportedAttribute("exportedResources", availableResources));
+  }
+
+  private String[] getExportedAttribute(String exportedAttributeName, List<String> availableAttribute) {
+    List<String> exportedAttribute = availableAttribute;
+    if (muleArtifactLoaderDescriptor != null) {
+      Map<String, Object> originalAttributes = muleArtifactLoaderDescriptor.getAttributes();
+      if (originalAttributes != null && originalAttributes.get(exportedAttributeName) != null) {
+        exportedAttribute = (List<String>) originalAttributes.get(exportedAttributeName);
+      }
+    }
+
+    return exportedAttribute.toArray(new String[0]);
   }
 
 }

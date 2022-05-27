@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.classloader.model.ClassLoaderModelAssembler;
@@ -24,9 +25,10 @@ public class DeployableClassLoaderModelAssembler<M extends MuleDeployableModel> 
 
   private final List<Plugin> additionalPluginDependencies;
 
-  public DeployableClassLoaderModelAssembler(DeployableProjectModel<M> model) {
-    super(model.getArtifactCoordinates(), model.getProjectDependencies(), model.getExportedPackages(),
-          model.getExportedResources());
+  public DeployableClassLoaderModelAssembler(DeployableProjectModel model,
+                                             MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
+    super(model.getArtifactCoordinates(), model.getProjectDependencies(), model.getPackages(),
+          model.getResources(), muleArtifactLoaderDescriptor);
     additionalPluginDependencies = model.getAdditionalPluginDependencies();
   }
 
