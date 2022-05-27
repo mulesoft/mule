@@ -68,13 +68,19 @@ public class TrackingArtifactClassLoaderResolverDecoratorTestCase extends Abstra
     MuleDeployableArtifactClassLoader domainClassLoader2 = classLoaderWithPluginsFactory.apply("Domain Class loader 2");
     MuleDeployableArtifactClassLoader applicationClassLoader1 = classLoaderWithPluginsFactory.apply("Application Class loader 1");
     MuleDeployableArtifactClassLoader applicationClassLoader2 = classLoaderWithPluginsFactory.apply("Application Class loader 2");
+    MuleDeployableArtifactClassLoader applicationClassLoader3 = classLoaderWithPluginsFactory.apply("Application Class loader 3");
+    MuleDeployableArtifactClassLoader applicationClassLoader4 = classLoaderWithPluginsFactory.apply("Application Class loader 4");
     MuleDeployableArtifactClassLoader pluginClassLoader1 = classLoaderWithPluginsFactory.apply("Plugin Class loader 1");
     MuleDeployableArtifactClassLoader pluginClassLoader2 = classLoaderWithPluginsFactory.apply("Plugin Class loader 2");
 
     when(artifactClassLoaderResolver.createDomainClassLoader(any())).thenReturn(domainClassLoader1);
     when(artifactClassLoaderResolver.createDomainClassLoader(any(), any())).thenReturn(domainClassLoader2);
-    when(artifactClassLoaderResolver.createApplicationClassLoader(any(), any())).thenReturn(applicationClassLoader1);
-    when(artifactClassLoaderResolver.createApplicationClassLoader(any(), any(), any())).thenReturn(applicationClassLoader2);
+    when(artifactClassLoaderResolver.createApplicationClassLoader(any())).thenReturn(applicationClassLoader1);
+    when(artifactClassLoaderResolver.createApplicationClassLoader(any(), any(PluginClassLoaderResolver.class)))
+        .thenReturn(applicationClassLoader2);
+    when(artifactClassLoaderResolver.createApplicationClassLoader(any(), any(Supplier.class)))
+        .thenReturn(applicationClassLoader3);
+    when(artifactClassLoaderResolver.createApplicationClassLoader(any(), any(), any())).thenReturn(applicationClassLoader4);
     when(artifactClassLoaderResolver.createMulePluginClassLoader(any(), any(), any())).thenReturn(pluginClassLoader1);
     when(artifactClassLoaderResolver.createMulePluginClassLoader(any(), any(), any(), any())).thenReturn(pluginClassLoader2);
   }
@@ -84,6 +90,9 @@ public class TrackingArtifactClassLoaderResolverDecoratorTestCase extends Abstra
     verifyClassLoaderRegistered(decorator.createDomainClassLoader(mock(DomainDescriptor.class)));
     verifyClassLoaderRegistered(decorator.createDomainClassLoader(mock(DomainDescriptor.class),
                                                                   mock(PluginClassLoaderResolver.class)));
+    verifyClassLoaderRegistered(decorator.createApplicationClassLoader(mock(ApplicationDescriptor.class)));
+    verifyClassLoaderRegistered(decorator.createApplicationClassLoader(mock(ApplicationDescriptor.class),
+                                                                       mock(PluginClassLoaderResolver.class)));
     verifyClassLoaderRegistered(decorator.createApplicationClassLoader(mock(ApplicationDescriptor.class), mock(Supplier.class)));
     verifyClassLoaderRegistered(decorator.createApplicationClassLoader(mock(ApplicationDescriptor.class), mock(Supplier.class),
                                                                        mock(PluginClassLoaderResolver.class)));
@@ -109,6 +118,9 @@ public class TrackingArtifactClassLoaderResolverDecoratorTestCase extends Abstra
     verifyClassLoaderDisposed(decorator.createDomainClassLoader(mock(DomainDescriptor.class)));
     verifyClassLoaderDisposed(decorator.createDomainClassLoader(mock(DomainDescriptor.class),
                                                                 mock(PluginClassLoaderResolver.class)));
+    verifyClassLoaderDisposed(decorator.createApplicationClassLoader(mock(ApplicationDescriptor.class)));
+    verifyClassLoaderDisposed(decorator.createApplicationClassLoader(mock(ApplicationDescriptor.class),
+                                                                     mock(PluginClassLoaderResolver.class)));
     verifyClassLoaderDisposed(decorator.createApplicationClassLoader(mock(ApplicationDescriptor.class), mock(Supplier.class)));
     verifyClassLoaderDisposed(decorator.createApplicationClassLoader(mock(ApplicationDescriptor.class), mock(Supplier.class),
                                                                      mock(PluginClassLoaderResolver.class)));

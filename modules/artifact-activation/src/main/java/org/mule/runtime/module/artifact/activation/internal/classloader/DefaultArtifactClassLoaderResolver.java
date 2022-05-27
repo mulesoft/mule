@@ -73,11 +73,13 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
   private final ModuleRepository moduleRepository;
   private final NativeLibraryFinderFactory nativeLibraryFinderFactory;
+  private final MuleDeployableArtifactClassLoader defaultDomainClassloader;
 
   public DefaultArtifactClassLoaderResolver(ModuleRepository moduleRepository,
                                             NativeLibraryFinderFactory nativeLibraryFinderFactory) {
     this.moduleRepository = moduleRepository;
     this.nativeLibraryFinderFactory = nativeLibraryFinderFactory;
+    defaultDomainClassloader = createDomainClassLoader(new DomainDescriptor(DEFAULT_DOMAIN_NAME));
   }
 
   @Override
@@ -114,7 +116,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
     List<ArtifactPluginDescriptor> artifactPluginDescriptors =
         PluginsDependenciesProcessor.removeExportedPackagesAlreadyExportedByTransitiveDependencies(PluginsDependenciesProcessor
-            .process(new ArrayList<>(descriptor.getPlugins()), false, List::add));
+            .process(descriptor.getPlugins(), false, List::add));
 
     artifactPluginDescriptors
         .stream()
@@ -166,6 +168,17 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
   }
 
   @Override
+  public MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor) {
+    return createApplicationClassLoader(descriptor, () -> defaultDomainClassloader);
+  }
+
+  @Override
+  public MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
+                                                                        PluginClassLoaderResolver pluginClassLoaderResolver) {
+    return createApplicationClassLoader(descriptor, () -> defaultDomainClassloader, pluginClassLoaderResolver);
+  }
+
+  @Override
   public MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
                                                                         Supplier<ArtifactClassLoader> domainClassLoader) {
     return createApplicationClassLoader(descriptor, domainClassLoader,
@@ -201,7 +214,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
     List<ArtifactPluginDescriptor> artifactPluginDescriptors =
         PluginsDependenciesProcessor.removeExportedPackagesAlreadyExportedByTransitiveDependencies(PluginsDependenciesProcessor
-            .process(new ArrayList<>(descriptor.getPlugins()), false, List::add));
+            .process(descriptor.getPlugins(), false, List::add));
 
     artifactPluginDescriptors
         .stream()

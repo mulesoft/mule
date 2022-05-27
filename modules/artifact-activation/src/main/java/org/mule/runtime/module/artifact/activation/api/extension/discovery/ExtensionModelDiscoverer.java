@@ -10,6 +10,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderSupplier;
 import org.mule.runtime.module.artifact.activation.internal.extension.discovery.DefaultExtensionModelDiscoverer;
 import org.mule.runtime.module.artifact.activation.internal.extension.discovery.RepositoryLookupExtensionModelGenerator;
+import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 
 import java.util.Set;
 
@@ -24,7 +25,7 @@ public interface ExtensionModelDiscoverer {
   /**
    * Creates an {@link ExtensionModelDiscoverer} that will generate the extension models for plugins in a class loader.
    * 
-   * @param classLoaderFactory             a way to obtain the classloader for a given plugin.
+   * @param classLoaderFactory             a way to obtain the class loader for a given plugin.
    * @param extensionModelLoaderRepository repository to manage access to an
    *                                       {@link org.mule.runtime.extension.api.loader.ExtensionModelLoader}.
    * @return a newly created {@link ExtensionModelDiscoverer}.
@@ -33,6 +34,26 @@ public interface ExtensionModelDiscoverer {
                                                                   ExtensionModelLoaderRepository extensionModelLoaderRepository) {
     return new DefaultExtensionModelDiscoverer(new RepositoryLookupExtensionModelGenerator(classLoaderFactory,
                                                                                            extensionModelLoaderRepository));
+  }
+
+  /**
+   * Creates an {@link ExtensionModelDiscoverer} that will generate the extension models for plugins in a class loader.
+   *
+   * @param applicationClassLoader         class loader of the application containing the plugin class loaders needed for the
+   *                                       discovery.
+   * @param extensionModelLoaderRepository repository to manage access to an
+   *                                       {@link org.mule.runtime.extension.api.loader.ExtensionModelLoader}.
+   * @return a newly created {@link ExtensionModelDiscoverer}.
+   */
+  static ExtensionModelDiscoverer defaultExtensionModelDiscoverer(MuleDeployableArtifactClassLoader applicationClassLoader,
+                                                                  ExtensionModelLoaderRepository extensionModelLoaderRepository) {
+    return new DefaultExtensionModelDiscoverer(new RepositoryLookupExtensionModelGenerator(artifactPluginDescriptor -> applicationClassLoader
+        .getArtifactPluginClassLoaders().stream()
+        .filter(apcl -> apcl.getArtifactDescriptor().getBundleDescriptor().getGroupId()
+            .equals(artifactPluginDescriptor.getBundleDescriptor().getGroupId())
+            && apcl.getArtifactDescriptor().getBundleDescriptor().getArtifactId()
+                .equals(artifactPluginDescriptor.getBundleDescriptor().getArtifactId()))
+        .findAny().get(), extensionModelLoaderRepository));
   }
 
   /**
