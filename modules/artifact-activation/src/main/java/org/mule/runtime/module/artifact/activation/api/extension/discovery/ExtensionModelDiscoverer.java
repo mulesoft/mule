@@ -53,8 +53,7 @@ public interface ExtensionModelDiscoverer {
             .equals(artifactPluginDescriptor.getBundleDescriptor().getGroupId())
             && apcl.getArtifactDescriptor().getBundleDescriptor().getArtifactId()
                 .equals(artifactPluginDescriptor.getBundleDescriptor().getArtifactId()))
-        .findAny().get(),
-                                                                                           extensionModelLoaderRepository));
+        .findAny().get(), extensionModelLoaderRepository));
   }
 
   /**

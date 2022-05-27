@@ -14,7 +14,7 @@ import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.module.artifact.activation.internal.extension.discovery.DefaultExtensionDiscoveryRequest;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -35,7 +35,7 @@ public interface ExtensionDiscoveryRequest {
   /**
    * @return {@link ArtifactPluginDescriptor}s for artifact plugins deployed inside the artifact. Non-null.
    */
-  List<ArtifactPluginDescriptor> getArtifactPluginDescriptors();
+  Collection<ArtifactPluginDescriptor> getArtifactPluginDescriptors();
 
   /**
    * @return {@link Set} of {@link ExtensionModel} to also take into account when parsing extensions
@@ -61,12 +61,12 @@ public interface ExtensionDiscoveryRequest {
 
   final class ExtensionDiscoveryRequestBuilder {
 
-    private List<ArtifactPluginDescriptor> artifactPlugins;
+    private Collection<ArtifactPluginDescriptor> artifactPlugins;
     private Set<ExtensionModel> parentArtifactExtensions = emptySet();
     private boolean parallelDiscovery = false;
     private boolean enrichDescriptions = true;
 
-    public ExtensionDiscoveryRequestBuilder setArtifactPlugins(List<ArtifactPluginDescriptor> artifactPlugins) {
+    public ExtensionDiscoveryRequestBuilder setArtifactPlugins(Collection<ArtifactPluginDescriptor> artifactPlugins) {
       this.artifactPlugins = artifactPlugins;
       return this;
     }

@@ -116,7 +116,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
     List<ArtifactPluginDescriptor> artifactPluginDescriptors =
         PluginsDependenciesProcessor.removeExportedPackagesAlreadyExportedByTransitiveDependencies(PluginsDependenciesProcessor
-            .process(new ArrayList<>(descriptor.getPlugins()), false, List::add));
+            .process(descriptor.getPlugins(), false, List::add));
 
     artifactPluginDescriptors
         .stream()
@@ -214,7 +214,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
     List<ArtifactPluginDescriptor> artifactPluginDescriptors =
         PluginsDependenciesProcessor.removeExportedPackagesAlreadyExportedByTransitiveDependencies(PluginsDependenciesProcessor
-            .process(new ArrayList<>(descriptor.getPlugins()), false, List::add));
+            .process(descriptor.getPlugins(), false, List::add));
 
     artifactPluginDescriptors
         .stream()

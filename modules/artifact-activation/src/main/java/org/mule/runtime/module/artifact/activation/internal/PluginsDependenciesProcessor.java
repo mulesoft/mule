@@ -23,6 +23,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,7 +57,7 @@ public class PluginsDependenciesProcessor {
    *
    * @return {@link List} with the result of the plugins processing.
    */
-  public static <T> List<T> process(List<ArtifactPluginDescriptor> artifactPlugins, boolean parallelize,
+  public static <T> List<T> process(Collection<ArtifactPluginDescriptor> artifactPlugins, boolean parallelize,
                                     BiConsumer<List<T>, ArtifactPluginDescriptor> processor) {
     final List<T> processedDependencies = synchronizedList(new ArrayList<>());
 
@@ -100,7 +101,7 @@ public class PluginsDependenciesProcessor {
     return processedDependencies;
   }
 
-  private static Stream<ArtifactPluginDescriptor> artifactPluginsStream(List<ArtifactPluginDescriptor> artifactPlugins,
+  private static Stream<ArtifactPluginDescriptor> artifactPluginsStream(Collection<ArtifactPluginDescriptor> artifactPlugins,
                                                                         boolean parallelize) {
     return parallelize ? artifactPlugins.parallelStream() : artifactPlugins.stream();
   }

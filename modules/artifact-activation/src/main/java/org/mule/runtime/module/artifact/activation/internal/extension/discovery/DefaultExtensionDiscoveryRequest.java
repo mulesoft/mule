@@ -11,7 +11,7 @@ import org.mule.runtime.module.artifact.activation.api.extension.discovery.Exten
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -22,12 +22,12 @@ import java.util.Set;
  */
 public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryRequest {
 
-  private final List<ArtifactPluginDescriptor> artifactPlugins;
+  private final Collection<ArtifactPluginDescriptor> artifactPlugins;
   private final Set<ExtensionModel> parentArtifactExtensions;
   private final boolean parallelDiscovery;
   private final boolean enrichDescriptions;
 
-  public DefaultExtensionDiscoveryRequest(List<ArtifactPluginDescriptor> artifactPlugins,
+  public DefaultExtensionDiscoveryRequest(Collection<ArtifactPluginDescriptor> artifactPlugins,
                                           Set<ExtensionModel> parentArtifactExtensions,
                                           boolean parallelDiscovery,
                                           boolean enrichDescriptions) {
@@ -38,7 +38,7 @@ public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryReque
   }
 
   @Override
-  public List<ArtifactPluginDescriptor> getArtifactPluginDescriptors() {
+  public Collection<ArtifactPluginDescriptor> getArtifactPluginDescriptors() {
     return artifactPlugins;
   }
 
