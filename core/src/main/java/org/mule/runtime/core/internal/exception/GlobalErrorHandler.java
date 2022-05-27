@@ -45,7 +45,7 @@ public class GlobalErrorHandler extends ErrorHandler {
     }
   }
 
-  private static boolean reuseGlobalErrorHandler() {
+  public static boolean reuseGlobalErrorHandler() {
     return parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY));
   }
 
