@@ -46,7 +46,7 @@ import org.mule.tck.size.SmallTest;
 public class GlobalErrorHandlerTestCase extends AbstractMuleTestCase {
 
   @Rule
-  public SystemProperty expectedStatus = new SystemProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY, "true");
+  public SystemProperty reuseGlobalErrorHandler = new SystemProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY, "true");
 
   private GlobalErrorHandler globalErrorHandler;
 

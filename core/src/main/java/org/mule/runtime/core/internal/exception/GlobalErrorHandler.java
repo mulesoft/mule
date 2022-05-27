@@ -23,8 +23,6 @@ import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_
 
 public class GlobalErrorHandler extends ErrorHandler {
 
-  public static final boolean REUSE_GLOBAL_ERROR_HANDLER = parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY));
-
   private final AtomicBoolean initialised = new AtomicBoolean(false);
   private final AtomicInteger started = new AtomicInteger(0);
   private final AtomicBoolean disposed = new AtomicBoolean(false);
@@ -36,7 +34,7 @@ public class GlobalErrorHandler extends ErrorHandler {
 
   @Override
   public void initialise() throws InitialisationException {
-    if (!REUSE_GLOBAL_ERROR_HANDLER) {
+    if (!reuseGlobalErrorHandler()) {
       super.initialise();
       return;
     }
@@ -47,9 +45,13 @@ public class GlobalErrorHandler extends ErrorHandler {
     }
   }
 
+  private static boolean reuseGlobalErrorHandler() {
+    return parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY));
+  }
+
   @Override
   public void start() throws MuleException {
-    if (!REUSE_GLOBAL_ERROR_HANDLER) {
+    if (!reuseGlobalErrorHandler()) {
       super.start();
       return;
     }
@@ -61,7 +63,7 @@ public class GlobalErrorHandler extends ErrorHandler {
 
   @Override
   public void stop() throws MuleException {
-    if (!REUSE_GLOBAL_ERROR_HANDLER) {
+    if (!reuseGlobalErrorHandler()) {
       super.stop();
       return;
     }
@@ -73,7 +75,7 @@ public class GlobalErrorHandler extends ErrorHandler {
 
   @Override
   public void dispose() {
-    if (!REUSE_GLOBAL_ERROR_HANDLER) {
+    if (!reuseGlobalErrorHandler()) {
       super.dispose();
       return;
     }
