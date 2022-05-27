@@ -70,16 +70,16 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultArtifactClassLoaderResolver.class);
 
   public static final String PLUGIN_CLASSLOADER_IDENTIFIER = "/plugin/";
-  private final MuleDeployableArtifactClassLoader DEFAULT_DOMAIN_CLASSLOADER;
 
   private final ModuleRepository moduleRepository;
   private final NativeLibraryFinderFactory nativeLibraryFinderFactory;
+  private final MuleDeployableArtifactClassLoader defaultDomainClassloader;
 
   public DefaultArtifactClassLoaderResolver(ModuleRepository moduleRepository,
                                             NativeLibraryFinderFactory nativeLibraryFinderFactory) {
     this.moduleRepository = moduleRepository;
     this.nativeLibraryFinderFactory = nativeLibraryFinderFactory;
-    DEFAULT_DOMAIN_CLASSLOADER = createDomainClassLoader(new DomainDescriptor(DEFAULT_DOMAIN_NAME));
+    defaultDomainClassloader = createDomainClassLoader(new DomainDescriptor(DEFAULT_DOMAIN_NAME));
   }
 
   @Override
@@ -169,13 +169,13 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
   @Override
   public MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor) {
-    return createApplicationClassLoader(descriptor, () -> DEFAULT_DOMAIN_CLASSLOADER);
+    return createApplicationClassLoader(descriptor, () -> defaultDomainClassloader);
   }
 
   @Override
   public MuleDeployableArtifactClassLoader createApplicationClassLoader(ApplicationDescriptor descriptor,
                                                                         PluginClassLoaderResolver pluginClassLoaderResolver) {
-    return createApplicationClassLoader(descriptor, () -> DEFAULT_DOMAIN_CLASSLOADER, pluginClassLoaderResolver);
+    return createApplicationClassLoader(descriptor, () -> defaultDomainClassloader, pluginClassLoaderResolver);
   }
 
   @Override
