@@ -101,7 +101,9 @@ public final class CompositeRoutingException extends MuleException implements Co
         MuleException muleException = entry.getValue().getSecond();
 
         builder.append(lineSeparator());
-        builder.append(routeSubtitle).append(muleException.getVerboseMessage());
+        if (muleException != null) {
+          builder.append(routeSubtitle).append(muleException.getVerboseMessage());
+        }
       }
     }
     return builder.toString();
