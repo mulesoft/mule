@@ -267,7 +267,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
   }
 
   @Test
-  public void createApplicationClassLoader() {
+  public void createApplicationClassLoaderWithDomainClassLoader() {
     final String applicationName = "app";
 
     final MuleDeployableArtifactClassLoader domainClassLoader = getTestDomainClassLoader(emptyList());
@@ -282,6 +282,26 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
 
     final MuleApplicationClassLoader applicationClassLoader = (MuleApplicationClassLoader) artifactClassLoader;
     assertThat(applicationClassLoader.getParent().getParent(), is(domainClassLoader.getClassLoader()));
+    assertThat(applicationClassLoader.getArtifactId(), is(artifactId));
+  }
+
+  @Test
+  @Issue("W-11214775")
+  public void createApplicationClassLoaderWithoutDomainClassLoader() {
+    final String applicationName = "app";
+
+    ApplicationDescriptor descriptor = new ApplicationDescriptor(applicationName);
+    descriptor.setArtifactLocation(new File(muleHomeFolder, applicationName));
+    final ArtifactClassLoader artifactClassLoader = artifactClassLoaderResolver
+        .createApplicationClassLoader(descriptor);
+
+    assertThat(artifactClassLoader.getClassLoader(), instanceOf(MuleApplicationClassLoader.class));
+
+    final MuleApplicationClassLoader applicationClassLoader = (MuleApplicationClassLoader) artifactClassLoader;
+    final MuleDeployableArtifactClassLoader domainClassLoader =
+        (MuleDeployableArtifactClassLoader) applicationClassLoader.getParent().getParent();
+    final String artifactId = getApplicationId(domainClassLoader.getArtifactId(), applicationName);
+    assertThat(domainClassLoader.getArtifactDescriptor().getName(), is(DEFAULT_DOMAIN_NAME));
     assertThat(applicationClassLoader.getArtifactId(), is(artifactId));
   }
 
