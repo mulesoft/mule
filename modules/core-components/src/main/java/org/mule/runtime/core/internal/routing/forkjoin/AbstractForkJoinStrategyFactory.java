@@ -38,6 +38,7 @@ import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategyFactory;
+import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.runtime.core.privileged.routing.CompositeRoutingException;
 import org.mule.runtime.core.privileged.routing.RoutingResult;
 
@@ -51,6 +52,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.reactivestreams.Publisher;
 
@@ -93,20 +95,24 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
           .flatMapSequential(processRoutePair(processingStrategy, maxConcurrency, delayErrors, timeout, reactorTimeoutScheduler,
                                               timeoutErrorType),
                              maxConcurrency)
-          .reduce(new Pair<List<CoreEvent>, Boolean>(new ArrayList<>(), false), (pair, event) -> {
-            // Accumulates events and check if there is a (new) error within those events
-            pair.getFirst().add(event);
-            boolean hasNewError = event.getError().map(err -> !isOriginalError(err, original.getError())).orElse(false);
-            return new Pair(pair.getFirst(), pair.getSecond() || hasNewError);
-          })
-          .doOnNext(p -> {
-            Pair<List<CoreEvent>, Boolean> pair = (Pair<List<CoreEvent>, Boolean>) p;
-            if (pair.getSecond()) {
-              throw propagate(createCompositeRoutingException(pair.getFirst().stream()
-                  .map(event -> removeOriginalError(event, original.getError())).collect(toList())));
+          .reduce(new Pair<List<Pair<CoreEvent, EventProcessingException>>, Boolean>(new ArrayList<>(), false),
+                  (listBooleanPair, coreEventExceptionPair) -> {
+                    // Accumulates events and check if there is a (new) error within those events
+                    listBooleanPair.getFirst().add(coreEventExceptionPair);
+                    boolean hasNewError =
+                        coreEventExceptionPair.getFirst().getError().map(err -> !isOriginalError(err, original.getError()))
+                            .orElse(false);
+                    return new Pair<>(listBooleanPair.getFirst(), listBooleanPair.getSecond() || hasNewError);
+                  })
+          .doOnNext(listBooleanPair -> {
+            if (listBooleanPair.getSecond()) {
+              throw propagate(createCompositeRoutingException(listBooleanPair.getFirst().stream()
+                  .map(coreEventExceptionPair -> removeOriginalError(coreEventExceptionPair,
+                                                                     original.getError()))
+                  .collect(toList())));
             }
           })
-          .map(pair -> ((Pair<List<CoreEvent>, Boolean>) pair).getFirst())
+          .map(listBooleanPair -> listBooleanPair.getFirst().stream().map(Pair::getFirst).collect(Collectors.toList()))
           .doOnNext(mergeVariables(original, resultBuilder))
           .map(createResultEvent(original, resultBuilder));
     };
@@ -116,9 +122,15 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
     return originalError.map(error -> error.equals(newError)).orElse(false);
   }
 
-  private CoreEvent removeOriginalError(CoreEvent event, Optional<Error> originalError) {
-    return event.getError().map(err -> isOriginalError(err, originalError) ? CoreEvent.builder(event).error(null).build() : event)
-        .orElse(event);
+  private Pair<CoreEvent, EventProcessingException> removeOriginalError(Pair<CoreEvent, EventProcessingException> coreEventExceptionPair,
+                                                                        Optional<Error> originalError) {
+    CoreEvent coreEvent = coreEventExceptionPair.getFirst();
+    EventProcessingException eventProcessingException = coreEventExceptionPair.getSecond();
+    return coreEvent.getError()
+        .map(err -> isOriginalError(err, originalError)
+            ? new Pair<>(CoreEvent.builder(coreEvent).error(null).build(), eventProcessingException)
+            : new Pair<>(coreEvent, eventProcessingException))
+        .orElse(coreEventExceptionPair);
   }
 
   /**
@@ -137,11 +149,12 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
         .build(), pair.getRoute());
   }
 
-  private Function<RoutingPair, Publisher<? extends CoreEvent>> processRoutePair(ProcessingStrategy processingStrategy,
-                                                                                 int maxConcurrency,
-                                                                                 boolean delayErrors, long timeout,
-                                                                                 reactor.core.scheduler.Scheduler timeoutScheduler,
-                                                                                 ErrorType timeoutErrorType) {
+  private Function<RoutingPair, Publisher<Pair<CoreEvent, EventProcessingException>>> processRoutePair(ProcessingStrategy processingStrategy,
+                                                                                                       int maxConcurrency,
+                                                                                                       boolean delayErrors,
+                                                                                                       long timeout,
+                                                                                                       reactor.core.scheduler.Scheduler timeoutScheduler,
+                                                                                                       ErrorType timeoutErrorType) {
 
     return pair -> {
       ReactiveProcessor route = publisher -> from(publisher)
@@ -153,15 +166,22 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
                                                                    onTimeout(processingStrategy, delayErrors, timeoutErrorType,
                                                                              pair),
                                                                    timeoutScheduler)
-                                                          .map(event -> (CoreEvent) ((DefaultEventBuilder) CoreEvent
-                                                              .builder(event)).removeInternalParameter(ERROR_HANDLER_CONTEXT)
-                                                                  .build())
+                                                          .map(coreEvent -> new Pair<CoreEvent, EventProcessingException>(
+                                                                                                                          ((DefaultEventBuilder) CoreEvent
+                                                                                                                              .builder(coreEvent))
+                                                                                                                                  .removeInternalParameter(ERROR_HANDLER_CONTEXT)
+                                                                                                                                  .build(),
+                                                                                                                          null))
                                                           .onErrorResume(MessagingException.class,
-                                                                         me -> delayErrors ? just(me.getEvent()) : error(me))
-
-      ;
+                                                                         me -> getPublisher(delayErrors, me));
     };
   }
+
+  private Publisher<Pair<CoreEvent, EventProcessingException>> getPublisher(boolean delayErrors, EventProcessingException me) {
+    Pair<CoreEvent, EventProcessingException> pair = new Pair<>(me.getEvent(), me);
+    return delayErrors ? just(pair) : error(me);
+  }
+
 
   private Mono<CoreEvent> onTimeout(ProcessingStrategy processingStrategy, boolean delayErrors, ErrorType timeoutErrorType,
                                     RoutingPair pair) {
@@ -196,19 +216,22 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
         + pair.getEvent().getGroupCorrelation().get().getSequence() + "'";
   }
 
-  private CompositeRoutingException createCompositeRoutingException(List<CoreEvent> results) {
+  private CompositeRoutingException createCompositeRoutingException(List<Pair<CoreEvent, EventProcessingException>> results) {
     Map<String, Message> successMap = new LinkedHashMap<>();
-    Map<String, Error> errorMap = new LinkedHashMap<>();
+    Map<String, Pair<Error, EventProcessingException>> errorMap = new LinkedHashMap<>();
 
-    for (CoreEvent event : results) {
-      String key = Integer.toString(event.getGroupCorrelation().get().getSequence());
-      if (event.getError().isPresent()) {
-        errorMap.put(key, event.getError().get());
+
+    for (Pair<CoreEvent, EventProcessingException> eventExceptionPair : results) {
+      String key = Integer.toString(eventExceptionPair.getFirst().getGroupCorrelation().get().getSequence());
+      if (eventExceptionPair.getFirst().getError().isPresent()) {
+        errorMap.put(key, new Pair<>(eventExceptionPair.getFirst().getError().get(),
+                                     eventExceptionPair.getSecond()));
       } else {
-        successMap.put(key, event.getMessage());
+        successMap.put(key, eventExceptionPair.getFirst().getMessage());
       }
     }
-    return new CompositeRoutingException(new RoutingResult(successMap, errorMap));
+    return new CompositeRoutingException(RoutingResult.routingResultWithException(successMap, errorMap));
+
   }
 
   private Consumer<List<CoreEvent>> mergeVariables(CoreEvent original, CoreEvent.Builder result) {

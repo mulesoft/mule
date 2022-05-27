@@ -18,11 +18,19 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
+import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.runtime.core.privileged.processor.Router;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link MuleException} used to aggregate exceptions thrown by several routes in the context of a single {@link Router}. This
@@ -35,11 +43,13 @@ import java.util.Map.Entry;
  */
 public final class CompositeRoutingException extends MuleException implements ComposedErrorException, ErrorMessageAwareException {
 
-  private static final String MESSAGE_TITLE = "Exception(s) were found for route(s): ";
+  private static final String MESSAGE_TITLE = "Exception/Error(s) were found for route(s):";
+  private static final String MESSAGE_SUB_TITLE = "Detailed Exception/Error(s) for route(s):";
 
   private static final long serialVersionUID = -4421728527040579605L;
 
   private final RoutingResult routingResult;
+  private static final Logger LOGGER = LoggerFactory.getLogger(CompositeRoutingException.class);
 
   /**
    * Constructs a new {@link CompositeRoutingException}
@@ -54,16 +64,44 @@ public final class CompositeRoutingException extends MuleException implements Co
   @Override
   public String getDetailedMessage() {
     StringBuilder builder = new StringBuilder();
-    builder.append(MESSAGE_TITLE).append(lineSeparator());
+    // provide information about the composite exception itself
+    builder.append(super.getDetailedMessage());
 
-    for (Entry<String, Error> entry : routingResult.getFailures().entrySet()) {
-      String routeSubtitle = String.format("Route %s: ", entry.getKey());
-      MuleException muleException = ExceptionHelper.getRootMuleException(entry.getValue().getCause());
-      if (muleException != null) {
-        builder.append(routeSubtitle).append(muleException.getDetailedMessage());
-      } else {
-        builder.append(routeSubtitle)
-            .append("Caught exception in Exception Strategy: " + entry.getValue().getCause().getMessage());
+    // get detailed information about the exceptions that make up the composite exception
+    builder.append(lineSeparator()).append(MESSAGE_SUB_TITLE).append(lineSeparator());
+
+    Method getDetailedFailuresMethod = null;
+    Map<String, Pair<Error, EventProcessingException>> detailedFailures = null;
+    try {
+      getDetailedFailuresMethod = RoutingResult.class.getMethod("getFailuresWithExceptionInfo");
+      detailedFailures =
+          (Map<String, Pair<Error, EventProcessingException>>) getDetailedFailuresMethod.invoke(routingResult);
+    } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+      e.printStackTrace();
+      LOGGER.warn("Invalid Invocation, Expected method doesn't exist");
+    }
+
+    if (detailedFailures.isEmpty()) {
+      // If we only have an error map that doesn't provide information about exceptions, process with original logic
+      for (Entry<String, Error> entry : routingResult.getFailures().entrySet()) {
+        String routeSubtitle = String.format("Route %s: ", entry.getKey());
+        MuleException muleException = ExceptionHelper.getRootMuleException(entry.getValue().getCause());
+        if (muleException != null) {
+          builder.append(routeSubtitle).append(muleException.getDetailedMessage());
+        } else {
+          builder.append(routeSubtitle)
+              .append("Caught exception in Exception Strategy: " + entry.getValue().getCause().getMessage());
+        }
+      }
+    } else {
+      // If we are provided an error map that also stores the exceptions that make up the composite exception,
+      // process with new logic to provide detailed error message
+      for (Entry<String, Pair<Error, EventProcessingException>> entry : detailedFailures.entrySet()) {
+        String routeSubtitle = String.format("Route %s: ", entry.getKey());
+        MuleException muleException = entry.getValue().getSecond();
+
+        builder.append(lineSeparator());
+        builder.append(routeSubtitle).append(muleException.getVerboseMessage());
       }
     }
     return builder.toString();
@@ -83,7 +121,11 @@ public final class CompositeRoutingException extends MuleException implements Co
 
   @Override
   public List<Error> getErrors() {
-    return routingResult.getFailures().values().stream().collect(toList());
+    if (!routingResult.getFailures().isEmpty()) {
+      return routingResult.getFailures().values().stream().collect(toList());
+    } else {
+      return routingResult.getFailuresWithExceptionInfo().values().stream().map(pair -> pair.getFirst()).collect(toList());
+    }
   }
 
   @Override
