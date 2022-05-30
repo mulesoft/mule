@@ -10,8 +10,6 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
-import static org.mule.runtime.module.extension.internal.loader.java.validation.ModelValidationUtils.validateConfigParametersNamesNotAllowed;
-import static org.mule.runtime.module.extension.internal.loader.java.validation.ModelValidationUtils.validateConfigOverrideParametersNotAllowed;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConfigurationFactory;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -40,7 +38,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public final class ConfigurationModelValidator implements ExtensionModelValidator {
+public final class JavaConfigurationModelValidator implements ExtensionModelValidator {
 
   @Override
   public void validate(ExtensionModel model, ProblemsReporter problemsReporter) {
@@ -87,12 +85,6 @@ public final class ConfigurationModelValidator implements ExtensionModelValidato
           }
         }
 
-      }
-
-      @Override
-      protected void onConfiguration(ConfigurationModel model) {
-        validateConfigParametersNamesNotAllowed(model, problemsReporter, "Configuration");
-        validateConfigOverrideParametersNotAllowed(model, problemsReporter, "Configuration");
       }
     }.walk(model);
   }

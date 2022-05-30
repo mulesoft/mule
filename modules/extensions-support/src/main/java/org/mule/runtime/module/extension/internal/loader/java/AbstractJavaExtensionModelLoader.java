@@ -59,8 +59,8 @@ import org.mule.runtime.module.extension.internal.loader.java.validation.Privile
 import org.mule.runtime.module.extension.internal.loader.java.validation.SourceCallbacksModelValidator;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserFactory;
-import org.mule.runtime.module.extension.internal.loader.validator.ConfigurationModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validator.ConnectionProviderModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validator.JavaConfigurationModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validator.JavaConnectionProviderModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validator.DeprecationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validator.ParameterPluralNameModelValidator;
 
@@ -76,8 +76,8 @@ public abstract class AbstractJavaExtensionModelLoader extends AbstractExtension
   public static final String VERSION = "version";
 
   private final List<ExtensionModelValidator> customValidators = unmodifiableList(asList(
-                                                                                         new ConfigurationModelValidator(),
-                                                                                         new ConnectionProviderModelValidator(),
+                                                                                         new JavaConfigurationModelValidator(),
+                                                                                         new JavaConnectionProviderModelValidator(),
                                                                                          new PojosModelValidator(),
                                                                                          new DeprecationModelValidator(),
                                                                                          new JavaInputParametersTypeModelValidator(),

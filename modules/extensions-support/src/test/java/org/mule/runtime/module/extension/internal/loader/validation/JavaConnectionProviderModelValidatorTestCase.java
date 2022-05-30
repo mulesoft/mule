@@ -25,7 +25,7 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validator.ConnectionProviderModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validator.JavaConnectionProviderModelValidator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -36,12 +36,12 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 @SmallTest
-public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCase {
+public class JavaConnectionProviderModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Rule
   public ExpectedException expectedException = none();
 
-  private ExtensionModelValidator validator = new ConnectionProviderModelValidator();
+  private ExtensionModelValidator validator = new JavaConnectionProviderModelValidator();
 
   @Test
   public void validModel() throws Exception {

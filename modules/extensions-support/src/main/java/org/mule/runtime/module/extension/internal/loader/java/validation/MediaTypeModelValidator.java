@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.java.validation;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.toMetadataFormat;
-import static org.mule.runtime.module.extension.internal.loader.java.validation.ModelValidationUtils.isCompiletime;
+import static org.mule.runtime.module.extension.internal.loader.java.validation.JavaModelValidationUtils.isCompiletime;
 
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.AnyType;

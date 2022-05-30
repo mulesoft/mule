@@ -14,7 +14,7 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validator.ConfigurationModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validator.JavaConfigurationModelValidator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -25,12 +25,12 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 @SmallTest
-public class ConfigurationModelValidatorTestCase extends AbstractMuleTestCase {
+public class JavaConfigurationModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  private ExtensionModelValidator validator = new ConfigurationModelValidator();
+  private ExtensionModelValidator validator = new JavaConfigurationModelValidator();
 
   @Test
   public void validConfigurationTypesForOperations() throws Exception {
