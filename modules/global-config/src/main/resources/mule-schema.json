@@ -66,7 +66,7 @@
           "type": "string"
         },
         "settingsSecurityLocation": {
-          "description": "Location of the maven settings-security.xml file. It can be a classpath reference in which case the file can be placed in the MULE_HOME/conf folder or an absolute path to the file. If defined, the encrypted passwords for servers on user and global settings will be decrypted using the master password defined on this file",
+          "description": "Location of the maven settings-security.xml file. It can be a classpath reference in which case the file can be placed in the MULE_HOME/conf folder or an absolute path to the file. If defined, the encrypted passwords for servers on user and global settings will be decrypted using the main password defined on this file",
           "type": "string"
         },
         "repositoryLocation": {
