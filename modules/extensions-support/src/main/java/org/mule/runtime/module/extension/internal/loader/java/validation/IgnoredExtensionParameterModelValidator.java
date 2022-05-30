@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.java.validation;
 
 import static java.lang.String.format;
-import static org.mule.runtime.module.extension.internal.loader.java.validation.ModelValidationUtils.isCompiletime;
+import static org.mule.runtime.module.extension.internal.loader.java.validation.JavaModelValidationUtils.isCompiletime;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;

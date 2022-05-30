@@ -7,10 +7,8 @@
 package org.mule.runtime.module.extension.internal.loader.validator;
 
 import static java.lang.String.format;
-import static org.mule.runtime.module.extension.internal.loader.java.validation.ModelValidationUtils.validateConfigOverrideParametersNotAllowed;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isSynthetic;
 
-import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
@@ -46,13 +44,11 @@ import com.google.common.collect.Multimap;
  * <ul>
  * <li>All operations require the same type of connections</li>
  * <li>All the {@link ConnectionProvider}s return connections of the same type as expected by the {@link OperationModel}s</li>
- * <li>Transactional connections can not be produced by {@link CachedConnectionProvider}s</li>
  * </ul>
  *
  * @since 4.0
  */
-// TODO: MULE-20026 Split java part away
-public final class ConnectionProviderModelValidator implements ExtensionModelValidator {
+public final class JavaConnectionProviderModelValidator implements ExtensionModelValidator {
 
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
@@ -69,7 +65,6 @@ public final class ConnectionProviderModelValidator implements ExtensionModelVal
           globalConnectionProviders.add(model);
         }
 
-        validateConfigOverrideParametersNotAllowed(model, problemsReporter, "Connection");
       }
     }.walk(extensionModel);
 

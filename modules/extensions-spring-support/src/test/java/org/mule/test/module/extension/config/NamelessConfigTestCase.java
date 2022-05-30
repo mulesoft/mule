@@ -11,7 +11,7 @@ import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validator.ConfigurationModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validator.JavaConfigurationModelValidator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
@@ -24,7 +24,7 @@ public class NamelessConfigTestCase extends AbstractMuleTestCase {
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  private ExtensionModelValidator validator = new ConfigurationModelValidator();
+  private ExtensionModelValidator validator = new JavaConfigurationModelValidator();
 
   @Test
   public void useDefaultConfigurationNameOnceAnnotated() throws Exception {

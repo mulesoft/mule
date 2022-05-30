@@ -21,8 +21,8 @@ import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
-import org.mule.runtime.module.extension.internal.loader.validator.ConfigurationModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validator.ConnectionProviderModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validator.JavaConfigurationModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validator.JavaConnectionProviderModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validator.DeprecationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validator.ParameterPluralNameModelValidator;
 
@@ -39,8 +39,8 @@ public abstract class AbstractExtensionModelLoader extends ExtensionModelLoader 
   private static final boolean ENABLE_POLLING_SOURCE_LIMIT = getProperty(ENABLE_SDK_POLLING_SOURCE_LIMIT) != null;
 
   private final List<ExtensionModelValidator> validators = unmodifiableList(asList(
-                                                                                   new ConfigurationModelValidator(),
-                                                                                   new ConnectionProviderModelValidator(),
+                                                                                   new JavaConfigurationModelValidator(),
+                                                                                   new JavaConnectionProviderModelValidator(),
                                                                                    new DeprecationModelValidator(),
                                                                                    new ParameterPluralNameModelValidator()));
 
