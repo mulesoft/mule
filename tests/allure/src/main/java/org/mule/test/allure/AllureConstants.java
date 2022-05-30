@@ -1027,4 +1027,9 @@ public interface AllureConstants {
 
     String CUSTOM_OBJECT_SERIALIZER = "Custom object serializer";
   }
+
+  interface FipsEnablement {
+
+    String MULE_RUNTIME_IN_FIPS_MODE = "Mule runtime in FIPS mode on Java 11 and above";
+  }
 }
