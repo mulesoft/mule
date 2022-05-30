@@ -6,13 +6,6 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
-import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
@@ -21,6 +14,13 @@ import static org.mule.runtime.module.extension.mule.internal.loader.parser.util
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.AnyMatchFilteringCharacteristic;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.AggregatedNotificationsCharacteristic;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.FilteringCharacteristic;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.BinaryType;
@@ -319,6 +319,11 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
     return getOperationModelsRecursiveStream(operationModelParsersByName, componentAst -> false, componentAst -> false);
   }
 
+  /**
+   * @return returns a stream of OperationModels with all the operation models within an Operation. When @param filterCondition
+   *         returns true for a ComponentAst, that component's corresponding OperationModel, as well as all its inner children
+   *         will be filtered. When @param ignoreCondition returns true, that particular component is ignored.
+   */
   private Stream<OperationModel> getOperationModelsRecursiveStream(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName,
                                                                    Predicate<ComponentAst> filterCondition,
                                                                    Predicate<ComponentAst> ignoreCondition) {
