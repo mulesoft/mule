@@ -35,6 +35,15 @@
         </operation:body>
     </operation:def>
 
+    <operation:def name="usingStreamingOp">
+        <operation:output>
+            <operation:payload-type type="binary"/>
+        </operation:output>
+        <operation:body>
+            <this:with-repeatable-streaming/>
+        </operation:body>
+    </operation:def>
+
     <operation:def name="withRepeatableStreamingUsed">
         <operation:output>
             <operation:payload-type type="binary"/>

@@ -43,33 +43,39 @@ public class MuleOperationSupportsStreamingTestCase extends MuleArtifactFunction
   }
 
   @Test
-  @Description("Checks that an operation without streaming does not support streaming, and has no parameter to support streaming")
+  @Description("Checks that an operation without streaming does not support streaming, and has no parameter for streaming strategy")
   public void withoutStreaming() {
-    assertForOpeartion("nonStreaming", false);
+    assertForOperation("nonStreaming", false);
   }
 
   @Test
-  @Description("Checks that an operation that returns a repeatable stream supports streaming, but has no parameter to support streaming")
+  @Description("Checks that an operation that returns a repeatable stream supports streaming, but has no parameter for streaming strategy")
   public void withRepeatableStreaming() {
-    assertForOpeartion("withRepeatableStreaming", true);
+    assertForOperation("withRepeatableStreaming", true);
   }
 
   @Test
-  @Description("Checks that an operation that returns a non repeatable stream supports streaming, but has no parameter to support streaming")
+  @Description("Checks that an operation that returns a non repeatable stream supports streaming, but has no parameter for streaming strategy")
   public void withNonRepeatableStreaming() {
-    assertForOpeartion("withNonRepeatableStreaming", true);
+    assertForOperation("withNonRepeatableStreaming", true);
   }
 
   @Test
-  @Description("Checks that an operation that returns a repeatable stream supports streaming even if it's used, but has no parameter to support streaming")
+  @Description("Checks that an operation that returns a repeatable stream supports streaming even if it's used, but has no parameter for streaming strategy")
   public void withRepeatableStreamingUsed() {
-    assertForOpeartion("withRepeatableStreamingUsed", true);
+    assertForOperation("withRepeatableStreamingUsed", true);
   }
 
   @Test
-  @Description("Checks that an operation that returns a non repeatable stream supports streaming even if it's consumed, but has no parameter to support streaming")
+  @Description("Checks that an operation that returns a non repeatable stream supports streaming even if it's consumed, but has no parameter for streaming strategy")
   public void withNonRepeatableStreamingConsumed() {
-    assertForOpeartion("withNonRepeatableStreamingConsumed", true);
+    assertForOperation("withNonRepeatableStreamingConsumed", true);
+  }
+
+  @Test
+  @Description("Check that an operation that uses an operation with repeatable streaming, but has no parameter for streaming strategy")
+  public void usingStreamingOp() {
+    assertForOperation("usingStreamingOp", true);
   }
 
   @Test
@@ -110,7 +116,7 @@ public class MuleOperationSupportsStreamingTestCase extends MuleArtifactFunction
     assertThat(streamingIterator.hasNext(), is(false));
   }
 
-  private void assertForOpeartion(String operation, boolean expectedSupportStreaming) {
+  private void assertForOperation(String operation, boolean expectedSupportStreaming) {
     OperationModel model = getOperationModel(operation);
     assertThat(model.supportsStreaming(), is(expectedSupportStreaming));
     assertThat(model.getAllParameterModels().stream()
