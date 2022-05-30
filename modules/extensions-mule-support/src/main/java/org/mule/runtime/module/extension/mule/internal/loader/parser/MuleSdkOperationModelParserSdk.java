@@ -8,7 +8,9 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static java.util.Collections.*;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
@@ -79,6 +81,8 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   private final Characteristic<Boolean> isBlocking = new AnyMatchCharacteristic(OperationModel::isBlocking);
   private final Characteristic<List<NotificationModel>> notificationModels = new AggregatedNotificationsCharacteristic();
 
+  private final List<ModelProperty> additionalModelProperties = singletonList(new NoStreamingConfigurationModelProperty());
+
   private String name;
 
   public MuleSdkOperationModelParserSdk(ComponentAst operation, TypeLoader typeLoader) {
@@ -116,7 +120,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public List<ModelProperty> getAdditionalModelProperties() {
-    return singletonList(new NoStreamingConfigurationModelProperty());
+    return additionalModelProperties;
   }
 
   @Override

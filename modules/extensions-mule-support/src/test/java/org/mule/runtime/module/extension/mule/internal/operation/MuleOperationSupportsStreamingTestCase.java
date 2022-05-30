@@ -10,7 +10,12 @@ import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATE
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
+import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERATIONS;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
@@ -23,6 +28,8 @@ import org.junit.Test;
 import javax.inject.Inject;
 import java.util.List;
 
+@Feature(REUSE)
+@Story(OPERATIONS)
 public class MuleOperationSupportsStreamingTestCase extends MuleArtifactFunctionalTestCase {
 
   @Inject
@@ -36,31 +43,37 @@ public class MuleOperationSupportsStreamingTestCase extends MuleArtifactFunction
   }
 
   @Test
+  @Description("Checks that an operation without streaming does not support streaming, and has no parameter to support streaming")
   public void withoutStreaming() {
     assertForOpeartion("nonStreaming", false);
   }
 
   @Test
+  @Description("Checks that an operation that returns a repeatable stream supports streaming, but has no parameter to support streaming")
   public void withRepeatableStreaming() {
     assertForOpeartion("withRepeatableStreaming", true);
   }
 
   @Test
+  @Description("Checks that an operation that returns a non repeatable stream supports streaming, but has no parameter to support streaming")
   public void withNonRepeatableStreaming() {
     assertForOpeartion("withNonRepeatableStreaming", true);
   }
 
   @Test
+  @Description("Checks that an operation that returns a repeatable stream supports streaming even if it's used, but has no parameter to support streaming")
   public void withRepeatableStreamingUsed() {
     assertForOpeartion("withRepeatableStreamingUsed", true);
   }
 
   @Test
+  @Description("Checks that an operation that returns a non repeatable stream supports streaming even if it's consumed, but has no parameter to support streaming")
   public void withNonRepeatableStreamingConsumed() {
     assertForOpeartion("withNonRepeatableStreamingConsumed", true);
   }
 
   @Test
+  @Description("Checks that return type is correct for operations that return a repeatable stream")
   public void repeatableStreamingOperationExecution() throws Exception {
     CoreEvent resultEvent = flowRunner("flowRepeatable").run();
     Object stream = resultEvent.getMessage().getPayload().getValue();
@@ -68,6 +81,7 @@ public class MuleOperationSupportsStreamingTestCase extends MuleArtifactFunction
   }
 
   @Test
+  @Description("Checks that return type is correct for operations that return a non repeatable stream")
   public void nonRepeatableStreamingOperationExecution() throws Exception {
     CoreEvent resultEvent = flowRunner("flowNonRepeatable").keepStreamsOpen().run();
     Object stream = resultEvent.getMessage().getPayload().getValue();
@@ -78,6 +92,7 @@ public class MuleOperationSupportsStreamingTestCase extends MuleArtifactFunction
   }
 
   @Test
+  @Description("Checks that return type is correct for operations that return a repeatable stream, including when used")
   public void repeatableStreamingUsedOperationExecution() throws Exception {
     CoreEvent resultEvent = flowRunner("flowRepeatableUsed").run();
     Object stream = resultEvent.getMessage().getPayload().getValue();
@@ -85,6 +100,7 @@ public class MuleOperationSupportsStreamingTestCase extends MuleArtifactFunction
   }
 
   @Test
+  @Description("Checks that return type is correct for operations that return a non repeatable stream, including when consumed")
   public void consumedNonRepeatableStreamingOperationExecution() throws Exception {
     CoreEvent resultEvent = flowRunner("flowNonRepeatableConsumed").keepStreamsOpen().run();
     Object stream = resultEvent.getMessage().getPayload().getValue();
