@@ -13,6 +13,7 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.TRY_IDENTIFIER;
 import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_ALWAYS_BEGIN_STRING;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
@@ -53,15 +54,13 @@ public class MuleSdkOperationodelParserUtils {
    * @return if this particular component should be ignored for considered for isTransactional calculation
    */
   public static boolean isIgnoredComponentForTx(ComponentAst componentAst) {
-    try {
-      ComponentParameterAst transactionalAction =
-          componentAst.getParameter(DEFAULT_GROUP_NAME, TRANSACTIONAL_ACTION_PARAMETER_NAME);
-      return transactionalAction != null && !isTry(componentAst) && OperationTransactionalAction
-          .valueOf(transactionalAction.getValue().getValue().get().toString()).equals(OperationTransactionalAction.NOT_SUPPORTED);
-    } catch (IllegalStateException e) {
-      // For Mule Operations this will fail, but we already know they should not be ignored
+    if (!componentAst.getModel(ParameterizedModel.class).isPresent()) {
       return false;
     }
+    ComponentParameterAst transactionalAction =
+        componentAst.getParameter(DEFAULT_GROUP_NAME, TRANSACTIONAL_ACTION_PARAMETER_NAME);
+    return transactionalAction != null && !isTry(componentAst) && OperationTransactionalAction
+        .valueOf(transactionalAction.getValue().getValue().get().toString()).equals(OperationTransactionalAction.NOT_SUPPORTED);
   }
 
 }

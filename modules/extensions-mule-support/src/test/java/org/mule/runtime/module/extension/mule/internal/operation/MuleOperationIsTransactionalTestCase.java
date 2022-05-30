@@ -32,125 +32,133 @@ public class MuleOperationIsTransactionalTestCase extends MuleArtifactFunctional
 
   @Test
   public void withoutInnerTransactionalOps() {
-    assertForOpeartion("withoutTxAction", false);
+    assertForOperation("withoutTxAction", false);
   }
 
   @Test
   public void withTxActionNotJoining() {
-    assertForOpeartion("withTxActionNotJoining", false);
+    assertForOperation("withTxActionNotJoining", false);
   }
 
   @Test
   public void withTxActionJoining() {
-    assertForOpeartion("withTxActionJoining", true);
+    assertForOperation("withTxActionJoining", true);
   }
 
   @Test
   public void withTxActionAlwaysJoining() {
-    assertForOpeartion("withTxActionAlwaysJoining", true);
+    assertForOperation("withTxActionAlwaysJoining", true);
   }
 
   @Test
   public void withTxActionJoiningWithinTryIndifferent() {
-    assertForOpeartion("withTxActionJoiningWithinTryIndifferent", true);
+    assertForOperation("withTxActionJoiningWithinTryIndifferent", true);
   }
 
   @Test
   public void withTxActionNotJoiningWithinTryIndifferent() {
-    assertForOpeartion("withTxActionNotJoiningWithinTryIndifferent", false);
+    assertForOperation("withTxActionNotJoiningWithinTryIndifferent", false);
   }
 
   @Test
   public void withTxActionAlwaysJoiningWithinTryJoining() {
-    assertForOpeartion("withTxActionAlwaysJoiningWithinTryJoining", true);
+    assertForOperation("withTxActionAlwaysJoiningWithinTryJoining", true);
   }
 
   @Test
   public void withTxActionNotJoiningWithinTryJoining() {
-    assertForOpeartion("withTxActionNotJoiningWithinTryJoining", false);
+    assertForOperation("withTxActionNotJoiningWithinTryJoining", false);
   }
 
   @Test
   public void withTxActionAlwaysJoiningWithinTryCreateTx() {
-    assertForOpeartion("withTxActionAlwaysJoiningWithinTryCreateTx", false);
+    assertForOperation("withTxActionAlwaysJoiningWithinTryCreateTx", false);
   }
 
   @Test
   public void withTxActionAlwaysNotJoiningWithinTryCreateTx() {
-    assertForOpeartion("withTxActionAlwaysNotJoiningWithinTryCreateTx", false);
+    assertForOperation("withTxActionAlwaysNotJoiningWithinTryCreateTx", false);
   }
 
   @Test
   public void withTxActionAlwaysJoiningWithinTryCreateTxFollowed() {
-    assertForOpeartion("withTxActionAlwaysJoiningWithinTryCreateTxFollowed", true);
+    assertForOperation("withTxActionAlwaysJoiningWithinTryCreateTxFollowed", true);
   }
 
   @Test
   public void withTxActionAlwaysJoiningWithinTryCreateTxFollowedNot() {
-    assertForOpeartion("withTxActionAlwaysJoiningWithinTryCreateTxFollowedNot", false);
+    assertForOperation("withTxActionAlwaysJoiningWithinTryCreateTxFollowedNot", false);
   }
 
   @Test
   public void asyncWithNotSupported() {
-    assertForOpeartion("asyncWithNotSupported", false);
+    assertForOperation("asyncWithNotSupported", false);
   }
 
   @Test
   public void asyncWithJoin() {
-    assertForOpeartion("asyncWithJoin", false);
+    assertForOperation("asyncWithJoin", false);
   }
 
   @Test
   public void asyncWithJoinIfPossible() {
-    assertForOpeartion("asyncWithJoinIfPossible", false);
+    assertForOperation("asyncWithJoinIfPossible", false);
   }
 
   @Test
   public void tryAndAsyncWithNotSupported() {
-    assertForOpeartion("tryAndAsyncWithNotSupported", false);
+    assertForOperation("tryAndAsyncWithNotSupported", false);
   }
 
   @Test
   public void tryAndAsyncJoin() {
-    assertForOpeartion("tryAndAsyncJoin", false);
+    assertForOperation("tryAndAsyncJoin", false);
   }
 
   @Test
   public void tryAndAsyncJoinFollowedByNotSupported() {
-    assertForOpeartion("tryAndAsyncJoinFollowedByNotSupported", false);
+    assertForOperation("tryAndAsyncJoinFollowedByNotSupported", false);
   }
 
   @Test
   public void tryAndAsyncJoinFollowedByJoin() {
-    assertForOpeartion("tryAndAsyncJoinFollowedByJoin", true);
+    assertForOperation("tryAndAsyncJoinFollowedByJoin", true);
   }
 
   @Test
   public void tryAlwaysJoinAndAsyncJoinFollowedByJoin() {
-    assertForOpeartion("tryAlwaysJoinAndAsyncJoinFollowedByJoin", false);
+    assertForOperation("tryAlwaysJoinAndAsyncJoinFollowedByJoin", false);
   }
 
   @Test
   public void callingOtherOp() {
-    assertForOpeartion("callingOtherOp", true);
+    assertForOperation("callingOtherOp", true);
   }
 
   @Test
   public void callingOtherOpNonTx() {
-    assertForOpeartion("callingOtherOpNonTx", false);
+    assertForOperation("callingOtherOpNonTx", false);
   }
 
   @Test
   public void callingOtherOpWithinTryWithTx() {
-    assertForOpeartion("callingOtherOpWithinTryWithTx", false);
+    assertForOperation("callingOtherOpWithinTryWithTx", false);
   }
 
   @Test
   public void choiceWithOneRouteJoining() {
-    assertForOpeartion("choice", true);
+    assertForOperation("choice", true);
   }
 
-  private void assertForOpeartion(String operation, boolean expectedIsTransactional) {
+  @Test
+  public void havingTransactionalActionParameter() {
+    OperationModel model = getOperationModel( "operationWithTransactionalActionParameter");
+    assertThat(model.isTransactional(), is(false));
+    assertThat(model.getAllParameterModels().stream()
+            .anyMatch(parameterModel -> parameterModel.getName().equals(TRANSACTIONAL_ACTION_PARAMETER_NAME)), is(true));
+  }
+
+  private void assertForOperation(String operation, boolean expectedIsTransactional) {
     OperationModel model = getOperationModel(operation);
     assertThat(model.isTransactional(), is(expectedIsTransactional));
     assertThat(model.getAllParameterModels().stream()

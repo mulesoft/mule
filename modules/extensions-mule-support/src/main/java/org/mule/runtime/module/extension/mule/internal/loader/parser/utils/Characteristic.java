@@ -91,6 +91,9 @@ public class Characteristic<T> {
 
   }
 
+  /**
+   * Boolean Characteristic that is meant to finish checking whenever the predicate returns true.
+   */
   public static class AnyMatchCharacteristic extends BooleanCharacteristic {
 
     public AnyMatchCharacteristic(Predicate<OperationModel> predicate) {
@@ -99,6 +102,10 @@ public class Characteristic<T> {
 
   }
 
+  /**
+   * {@link Characteristic} that retrieves all the {@link NotificationModel} emitted by the inner components of this
+   * Model
+   */
   public static class AggregatedNotificationsCharacteristic extends Characteristic<List<NotificationModel>> {
 
     public AggregatedNotificationsCharacteristic() {
@@ -139,6 +146,9 @@ public class Characteristic<T> {
     }
   }
 
+  /**
+   * Extension of {@link FilteringCharacteristic} for Boolean features (such as isTransactional)
+   */
   public static class BooleanFilteringCharacteristic extends FilteringCharacteristic<Boolean> {
 
     private BooleanFilteringCharacteristic(Predicate<OperationModel> predicate, Boolean defaultValue, Boolean stopValue,
@@ -149,6 +159,9 @@ public class Characteristic<T> {
     }
   }
 
+  /**
+   * Boolean Filtered Characteristic that is meant to finish checking whenever the predicate returns true.
+   */
   public static class AnyMatchFilteringCharacteristic extends BooleanFilteringCharacteristic {
 
     public AnyMatchFilteringCharacteristic(Predicate<OperationModel> predicate, Predicate<ComponentAst> filterExpression,

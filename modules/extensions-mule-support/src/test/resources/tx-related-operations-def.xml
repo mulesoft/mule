@@ -11,12 +11,6 @@
         http://www.mulesoft.org/schema/mule/tx http://www.mulesoft.org/schema/mule/tx/current/mule-tx.xsd
         http://www.mulesoft.org/schema/mule/this http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd">
 
-    <tx:config name="localTx1">
-        <tx:connection>
-            <pooling-profile maxActive="1" exhaustedAction="WHEN_EXHAUSTED_WAIT"/>
-        </tx:connection>
-    </tx:config>
-
     <operation:def name="withoutTxAction">
         <operation:output>
             <operation:payload-type type="string"/>
@@ -309,6 +303,19 @@
                 <this:with-tx-action-joining/>
             </try>
             <set-payload value="hello worlddd!"/>
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="operationWithTransactionalActionParameter">
+        <operation:parameters>
+            <operation:parameter name="transactionalAction" type="string"/>
+        </operation:parameters>
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <set-payload
+                    value="#['$(params.transactionalAction)']"/>
         </operation:body>
     </operation:def>
 
