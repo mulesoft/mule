@@ -103,8 +103,7 @@ public class Characteristic<T> {
   }
 
   /**
-   * {@link Characteristic} that retrieves all the {@link NotificationModel} emitted by the inner components of this
-   * Model
+   * {@link Characteristic} that retrieves all the {@link NotificationModel} emitted by the inner components of this Model
    */
   public static class AggregatedNotificationsCharacteristic extends Characteristic<List<NotificationModel>> {
 

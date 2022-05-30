@@ -152,10 +152,10 @@ public class MuleOperationIsTransactionalTestCase extends MuleArtifactFunctional
 
   @Test
   public void havingTransactionalActionParameter() {
-    OperationModel model = getOperationModel( "operationWithTransactionalActionParameter");
+    OperationModel model = getOperationModel("operationWithTransactionalActionParameter");
     assertThat(model.isTransactional(), is(false));
     assertThat(model.getAllParameterModels().stream()
-            .anyMatch(parameterModel -> parameterModel.getName().equals(TRANSACTIONAL_ACTION_PARAMETER_NAME)), is(true));
+        .anyMatch(parameterModel -> parameterModel.getName().equals(TRANSACTIONAL_ACTION_PARAMETER_NAME)), is(true));
   }
 
   private void assertForOperation(String operation, boolean expectedIsTransactional) {
