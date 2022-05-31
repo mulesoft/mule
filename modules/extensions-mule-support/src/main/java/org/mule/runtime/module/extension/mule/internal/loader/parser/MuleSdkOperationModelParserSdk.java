@@ -87,7 +87,8 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
       new AnyMatchFilteringCharacteristic(OperationModel::isTransactional, MuleSdkOperationodelParserUtils::isSkippedScopeForTx,
                                           MuleSdkOperationodelParserUtils::isIgnoredComponentForTx);
 
-  private final List<ModelProperty> additionalModelProperties = asList(new NoStreamingConfigurationModelProperty(), new NoTransactionalActionModelProperty());
+  private final List<ModelProperty> additionalModelProperties =
+      asList(new NoStreamingConfigurationModelProperty(), new NoTransactionalActionModelProperty());
 
   private String name;
 
