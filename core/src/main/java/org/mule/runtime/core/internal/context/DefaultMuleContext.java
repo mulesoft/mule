@@ -23,7 +23,6 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAI
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.REUSE_GLOBAL_ERROR_HANDLER;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.VALIDATE_APPLICATION_MODEL_WITH_REGION_CLASSLOADER;
@@ -74,8 +73,6 @@ import static org.apache.commons.lang3.SystemUtils.JAVA_VERSION;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
-import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -140,7 +137,6 @@ import org.mule.runtime.core.internal.connector.DefaultSchedulerController;
 import org.mule.runtime.core.internal.connector.SchedulerController;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
-import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.LifecycleStrategy;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
@@ -167,7 +163,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
-import javax.inject.Inject;
 import javax.transaction.TransactionManager;
 
 import org.slf4j.Logger;
@@ -300,9 +295,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
   private LifecycleStrategy lifecycleStrategy = new DefaultLifecycleStrategy();
 
-  @Inject
-  private FeatureFlaggingService featureFlaggingService;
-
   private static final AtomicBoolean areFeatureFlagsConfigured = new AtomicBoolean();
 
 
@@ -335,7 +327,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureDisableApplyObjectProcessor();
       configureEnableByteBuddyObjectCreation();
       configureValidateAppModelWithRegionClassloader();
-      configureReuseGlobalErrorHandler();
     }
   }
 
@@ -943,20 +934,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
         throw new MuleRuntimeException(createStaticMessage(format("No global error handler named %s",
                                                                   config.getDefaultErrorHandlerName())));
       }
-
-      if (!featureFlaggingService.isEnabled(REUSE_GLOBAL_ERROR_HANDLER)) {
-        if (rootContainerName.isPresent()) {
-          defaultErrorHandler = ((GlobalErrorHandler) defaultErrorHandler)
-              .createLocalErrorHandler(Location.builder().globalName(rootContainerName.get()).build());
-        } else {
-          try {
-            defaultErrorHandler =
-                new ErrorHandlerFactory().createDefault(getRegistry().lookupObject(NotificationDispatcher.class));
-          } catch (RegistrationException e) {
-            throw new MuleRuntimeException(e);
-          }
-        }
-      }
     } else {
       try {
         defaultErrorHandler = new ErrorHandlerFactory().createDefault(getRegistry().lookupObject(NotificationDispatcher.class));
@@ -1451,17 +1428,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureValidateAppModelWithRegionClassloader() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(VALIDATE_APPLICATION_MODEL_WITH_REGION_CLASSLOADER,
-                                                minMuleVersion("4.5.0"));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#REUSE_GLOBAL_ERROR_HANDLER} feature flag.
-   *
-   * @since 4.5.0
-   */
-  private static void configureReuseGlobalErrorHandler() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(REUSE_GLOBAL_ERROR_HANDLER,
                                                 minMuleVersion("4.5.0"));
   }
 
