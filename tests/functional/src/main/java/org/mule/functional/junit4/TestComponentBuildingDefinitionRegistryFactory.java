@@ -35,6 +35,7 @@ public class TestComponentBuildingDefinitionRegistryFactory implements Component
   private static final String EXTENSION_SEPARATOR = ",";
 
   private final Map<String, ComponentBuildingDefinitionRegistry> registries = new ConcurrentHashMap<>();
+  private boolean refreshRuntimeComponentBuildingDefinitions = false;
 
   @Override
   public ComponentBuildingDefinitionRegistry create(Set<ExtensionModel> extensionModels) {
@@ -42,7 +43,11 @@ public class TestComponentBuildingDefinitionRegistryFactory implements Component
 
     return registries.computeIfAbsent(key, k -> {
       LOGGER.info(format("Creating new ComponentBuildingDefinitionRegistryFactory for key: %s", key));
-      return new DefaultComponentBuildingDefinitionRegistryFactory().create(extensionModels);
+      DefaultComponentBuildingDefinitionRegistryFactory registryFactory = new DefaultComponentBuildingDefinitionRegistryFactory();
+      if (refreshRuntimeComponentBuildingDefinitions) {
+        registryFactory.refreshRuntimeComponentBuildingDefinitions();
+      }
+      return registryFactory.create(extensionModels);
     });
   }
 
@@ -56,4 +61,8 @@ public class TestComponentBuildingDefinitionRegistryFactory implements Component
       return extensionModels.stream().map(ExtensionModel::getName).sorted().collect(joining(EXTENSION_SEPARATOR));
     }
   }
+
+    public void setRefreshRuntimeComponentBuildingDefinitions(boolean refreshRuntimeComponentBuildingDefinitions) {
+      this.refreshRuntimeComponentBuildingDefinitions = refreshRuntimeComponentBuildingDefinitions;
+    }
 }

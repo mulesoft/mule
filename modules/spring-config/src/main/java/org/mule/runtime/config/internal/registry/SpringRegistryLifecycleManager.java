@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.registry;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_USE_LEGACY_LIFECYCLE_OBJECT_SORTER;
+import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_HANDLER_PROPERTY;
 import static org.mule.runtime.config.internal.context.MuleArtifactContext.INNER_BEAN_PREFIX;
 
 import static java.lang.Boolean.parseBoolean;
@@ -182,15 +183,26 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
     public SpringContextDisposePhase() {
       super();
-      setIgnoredObjectTypes(new Class[] {
-          Component.class,
-          InterceptingMessageProcessor.class,
-          OutboundRouter.class,
-          MuleContext.class,
-          ServerNotificationManager.class,
-          Service.class,
-          GlobalErrorHandler.class
-      });
+      if (parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY))) {
+        setIgnoredObjectTypes(new Class[] {
+            Component.class,
+            InterceptingMessageProcessor.class,
+            OutboundRouter.class,
+            MuleContext.class,
+            ServerNotificationManager.class,
+            Service.class,
+            GlobalErrorHandler.class
+        });
+      } else {
+        setIgnoredObjectTypes(new Class[] {
+            Component.class,
+            InterceptingMessageProcessor.class,
+            OutboundRouter.class,
+            MuleContext.class,
+            ServerNotificationManager.class,
+            Service.class
+        });
+      }
     }
 
     @Override
