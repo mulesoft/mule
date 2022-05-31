@@ -6,16 +6,12 @@
  */
 package org.mule.runtime.config.internal.factories;
 
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
-import javax.inject.Inject;
 import java.util.List;
-
-import static org.mule.runtime.api.config.MuleRuntimeFeature.REUSE_GLOBAL_ERROR_HANDLER;
 
 /**
  * An {@link org.mule.runtime.dsl.api.component.ObjectFactory} which produces {@link ErrorHandler} instances.
@@ -28,16 +24,10 @@ public class ErrorHandlerFactoryBean extends AbstractComponentFactory<ErrorHandl
   private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
   private String name;
 
-  @Inject
-  private FeatureFlaggingService featureFlaggingService;
-
   @Override
   public ErrorHandler doGetObject() throws Exception {
     if (delegate != null) {
-      if (featureFlaggingService.isEnabled(REUSE_GLOBAL_ERROR_HANDLER)) {
-        return delegate;
-      }
-      return delegate.createLocalErrorHandler(this.getRootContainerLocation());
+      return delegate;
     }
 
     ErrorHandler errorHandler;
