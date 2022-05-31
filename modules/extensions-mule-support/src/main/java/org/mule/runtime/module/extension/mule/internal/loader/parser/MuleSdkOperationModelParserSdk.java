@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
@@ -19,6 +20,7 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.metadata.api.TypeLoader;
+import org.mule.metadata.api.model.BinaryType;
 import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -30,6 +32,7 @@ import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.extension.internal.property.NoStreamingConfigurationModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
@@ -78,6 +81,8 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   private final Characteristic<Boolean> isBlocking = new AnyMatchCharacteristic(OperationModel::isBlocking);
   private final Characteristic<List<NotificationModel>> notificationModels = new AggregatedNotificationsCharacteristic();
 
+  private final List<ModelProperty> additionalModelProperties = singletonList(new NoStreamingConfigurationModelProperty());
+
   private String name;
 
   public MuleSdkOperationModelParserSdk(ComponentAst operation, TypeLoader typeLoader) {
@@ -115,7 +120,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public List<ModelProperty> getAdditionalModelProperties() {
-    return emptyList();
+    return additionalModelProperties;
   }
 
   @Override
@@ -198,8 +203,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public boolean supportsStreaming() {
-    // TODO: MULE-20079
-    return false;
+    return this.getOutputType().getType() instanceof BinaryType;
   }
 
   @Override
