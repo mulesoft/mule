@@ -7,17 +7,18 @@
 package org.mule.runtime.module.extension.mule.internal.operation;
 
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.CoreMatchers.is;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERATIONS;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.is;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
 
 import org.junit.Test;
 import javax.inject.Inject;
@@ -128,7 +129,7 @@ public class MuleOperationIsTransactionalTestCase extends MuleArtifactFunctional
   }
 
   @Test
-  @Description("Checks that operation not joining within async within is not transactional")
+  @Description("Checks that operation not joining within async within try is not transactional")
   public void tryAndAsyncWithNotSupported() {
     assertForOperation("tryAndAsyncWithNotSupported", false);
   }
@@ -140,13 +141,13 @@ public class MuleOperationIsTransactionalTestCase extends MuleArtifactFunctional
   }
 
   @Test
-  @Description("Checks that operation not joining within async within, followed by not supported is not transactional")
+  @Description("Checks that operation not joining within async within try, followed by not supported is not transactional")
   public void tryAndAsyncJoinFollowedByNotSupported() {
     assertForOperation("tryAndAsyncJoinFollowedByNotSupported", false);
   }
 
   @Test
-  @Description("Checks that operation not joining within async within, followed by join is transactional")
+  @Description("Checks that operation not joining within async within try, followed by join is transactional")
   public void tryAndAsyncJoinFollowedByJoin() {
     assertForOperation("tryAndAsyncJoinFollowedByJoin", true);
   }
