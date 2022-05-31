@@ -62,7 +62,7 @@ public class TestComponentBuildingDefinitionRegistryFactory implements Component
     }
   }
 
-    public void setRefreshRuntimeComponentBuildingDefinitions(boolean refreshRuntimeComponentBuildingDefinitions) {
-      this.refreshRuntimeComponentBuildingDefinitions = refreshRuntimeComponentBuildingDefinitions;
-    }
+  public void setRefreshRuntimeComponentBuildingDefinitions(boolean refreshRuntimeComponentBuildingDefinitions) {
+    this.refreshRuntimeComponentBuildingDefinitions = refreshRuntimeComponentBuildingDefinitions;
+  }
 }
