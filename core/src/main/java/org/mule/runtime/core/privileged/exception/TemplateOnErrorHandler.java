@@ -13,22 +13,25 @@ import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createI
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_START;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LAX_ERROR_TYPES;
+import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_HANDLER_PROPERTY;
 import static org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher.WILDCARD_TOKEN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.addContext;
-import static org.mule.runtime.core.internal.exception.GlobalErrorHandler.reuseGlobalErrorHandler;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.getBoolean;
+import static java.lang.System.getProperty;
 import static java.util.Arrays.stream;
 import static java.util.Collections.newSetFromMap;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static java.util.regex.Pattern.compile;
@@ -284,7 +287,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   protected void doInitialise() throws InitialisationException {
     super.doInitialise();
     Optional<ProcessingStrategy> processingStrategy;
-    if (fromGlobalErrorHandler && reuseGlobalErrorHandler()) {
+    if (fromGlobalErrorHandler && parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY))) {
       processingStrategy = getProcessingStrategyFromGlobalErrorHandler(locator);
     } else if (flowLocation.isPresent()) {
       Location location = builderFromStringRepresentation(flowLocation.get()).build();
@@ -526,7 +529,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       return defaultErrorHandlerOwnsTransaction(transaction);
     }
 
-    if (reuseGlobalErrorHandler()) {
+    if (parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY))) {
       if (fromGlobalErrorHandler) {
         String location = ((MessagingException) exception).getFailingComponent().getRootContainerLocation().getGlobalName();
         return transaction.getComponentLocation().get().getRootContainerName().equals(location);

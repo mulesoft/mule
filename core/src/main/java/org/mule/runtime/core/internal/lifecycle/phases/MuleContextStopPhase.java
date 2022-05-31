@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.core.internal.lifecycle.phases;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
+import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_HANDLER_PROPERTY;
+
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -49,12 +53,11 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase {
         InterceptingMessageProcessor.class,
         Component.class,
         OutboundRouter.class,
-        Service.class,
-        GlobalErrorHandler.class
+        Service.class
     });
   }
 
-  public MuleContextStopPhase(Class<?>[] ignorredObjects) {
+  public MuleContextStopPhase(Class<?>[] ignoredObjects) {
     super(Stoppable.PHASE_NAME, LifecycleUtils::stopIfNeeded);
 
     setOrderedLifecycleTypes(new Class<?>[] {
@@ -65,7 +68,19 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase {
         Stoppable.class
     });
 
-    setIgnoredObjectTypes(ignorredObjects);
+    if (parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY))) {
+      ignoredObjects = new Class[] {
+          Registry.class,
+          MuleContext.class,
+          InterceptingMessageProcessor.class,
+          Component.class,
+          OutboundRouter.class,
+          Service.class,
+          GlobalErrorHandler.class
+      };
+    }
+
+    setIgnoredObjectTypes(ignoredObjects);
     // Yuo can initialise and stop
     registerSupportedPhase(Initialisable.PHASE_NAME);
     // Stop/Start/Stop
