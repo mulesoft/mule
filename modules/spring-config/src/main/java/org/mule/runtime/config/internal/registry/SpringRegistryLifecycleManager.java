@@ -13,6 +13,7 @@ import static org.mule.runtime.config.internal.context.MuleArtifactContext.INNER
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -183,26 +184,18 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
     public SpringContextDisposePhase() {
       super();
+      Class<?>[] ignoredObjects = new Class[] {
+              Component.class,
+              InterceptingMessageProcessor.class,
+              OutboundRouter.class,
+              MuleContext.class,
+              ServerNotificationManager.class,
+              Service.class
+      };
       if (parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY))) {
-        setIgnoredObjectTypes(new Class[] {
-            Component.class,
-            InterceptingMessageProcessor.class,
-            OutboundRouter.class,
-            MuleContext.class,
-            ServerNotificationManager.class,
-            Service.class,
-            GlobalErrorHandler.class
-        });
-      } else {
-        setIgnoredObjectTypes(new Class[] {
-            Component.class,
-            InterceptingMessageProcessor.class,
-            OutboundRouter.class,
-            MuleContext.class,
-            ServerNotificationManager.class,
-            Service.class
-        });
+        ignoredObjects = ArrayUtils.add(ignoredObjects, GlobalErrorHandler.class);
       }
+      setIgnoredObjectTypes(ignoredObjects);
     }
 
     @Override
