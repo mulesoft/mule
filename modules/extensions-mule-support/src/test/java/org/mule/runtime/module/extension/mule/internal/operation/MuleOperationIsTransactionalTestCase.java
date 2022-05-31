@@ -135,7 +135,7 @@ public class MuleOperationIsTransactionalTestCase extends MuleArtifactFunctional
   }
 
   @Test
-  @Description("Checks that operation joining within async within is not transactional")
+  @Description("Checks that operation joining within async within try is not transactional")
   public void tryAndAsyncJoin() {
     assertForOperation("tryAndAsyncJoin", false);
   }
