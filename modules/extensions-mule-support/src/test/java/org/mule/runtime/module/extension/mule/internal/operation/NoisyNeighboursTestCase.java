@@ -50,6 +50,9 @@ public class NoisyNeighboursTestCase extends MuleArtifactFunctionalTestCase {
   protected DefaultMuleConfiguration createMuleConfiguration() {
     DefaultMuleConfiguration configuration = super.createMuleConfiguration();
     ProcessingStrategyFactory factory = createDefaultProcessingStrategyFactory();
+
+    // Setting the max concurrency to the default processing strategy factory so the processing strategy applied
+    // to the shared operation has that value.
     setMaxConcurrency(factory, 1);
     configuration.setDefaultProcessingStrategyFactory(factory);
     return configuration;
