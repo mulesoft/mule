@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.functional.Either.right;
+import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 
 import org.junit.Before;
@@ -39,6 +40,10 @@ public class MuleSdkOperationModelParserSdkTestCase {
     TypeLoader typeLoader = mock(TypeLoader.class);
     operationModelParser = new MuleSdkOperationModelParserSdk(operationAst, typeLoader);
   }
+
+  // ------------------------------- //
+  // Deprecation
+  // ------------------------------- //
 
   @Test
   public void when_operationAstHasNotDeprecationParameter_then_parserHasNotDeprecationModel() {
@@ -67,6 +72,15 @@ public class MuleSdkOperationModelParserSdkTestCase {
 
     DeprecationModel deprecationModel = operationModelParser.getDeprecationModel().get();
     assertThat(deprecationModel.getToRemoveIn(), is(empty()));
+  }
+
+  // ------------------------------- //
+  // Execution Type
+  // ------------------------------- //
+
+  @Test
+  public void when_weHaveAnOperation_then_theExecutionTypeIsCpuLite() {
+    assertThat(operationModelParser.getExecutionType(), is(Optional.of(CPU_LITE)));
   }
 
   private ComponentAst mockDeprecatedAst(String since, String message, String toRemoveIn) {

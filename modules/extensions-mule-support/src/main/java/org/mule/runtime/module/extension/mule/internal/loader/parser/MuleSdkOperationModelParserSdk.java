@@ -226,7 +226,6 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public Optional<ExecutionType> getExecutionType() {
-    // TODO: MULE-20082
     return of(CPU_LITE);
   }
 
