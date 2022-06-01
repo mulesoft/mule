@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:operation="http://www.mulesoft.org/schema/mule/operation"
+      xmlns:this="http://www.mulesoft.org/schema/mule/this"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:ps-test="http://www.mulesoft.org/schema/mule/mule-ps-test"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/operation http://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd
+        http://www.mulesoft.org/schema/mule/mule-ps-test http://www.mulesoft.org/schema/mule/mule-ps-test/current/mule-mule-ps-test.xsd
+        http://www.mulesoft.org/schema/mule/this http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd">
+
+    <flow name="caller1" maxConcurrency="1" >
+        <this:callee />
+    </flow>
+
+    <flow name="caller2" maxConcurrency="1" >
+        <this:callee />
+    </flow>
+
+    <operation:def name="callee" displayName="." summary=".">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <ps-test:barrier name="sharedBarrier" />
+        </operation:body>
+    </operation:def>
+</mule>
