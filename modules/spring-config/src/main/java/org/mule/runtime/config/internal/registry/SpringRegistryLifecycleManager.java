@@ -13,7 +13,6 @@ import static org.mule.runtime.config.internal.context.MuleArtifactContext.INNER
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -60,6 +59,8 @@ import org.mule.runtime.core.privileged.routing.OutboundRouter;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.util.Map;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
