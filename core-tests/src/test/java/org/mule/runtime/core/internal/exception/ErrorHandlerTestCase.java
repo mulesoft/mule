@@ -62,6 +62,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoRule;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
 @SmallTest
@@ -156,6 +157,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Issue("W-11117613")
   public void doNotSetFromGlobalErrorHandlerWhenSystemPropertyIsDisabled() throws InitialisationException {
     GlobalErrorHandler globalErrorHandler = new GlobalErrorHandler();
     TemplateOnErrorHandler onErrorHandler = mock(TemplateOnErrorHandler.class);

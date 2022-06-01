@@ -14,6 +14,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.mockito.junit.MockitoJUnit;
@@ -25,9 +26,10 @@ import org.junit.Test;
 import org.mule.tck.size.SmallTest;
 
 @SmallTest
+@Issue("W-11117613")
 @Feature(ERROR_HANDLING)
 @Story(GLOBAL_ERROR_HANDLER)
-public class CoreComponentBuildingDefinitionProviderTest {
+public class CoreComponentBuildingDefinitionProviderTestCase {
 
   @Rule
   public MockitoRule mockitoRule = MockitoJUnit.rule();
