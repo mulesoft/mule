@@ -32,6 +32,7 @@ import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import java.util.ArrayList;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,6 +41,7 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
 
 @SmallTest
+@Issue("W-11117613")
 @Feature(ERROR_HANDLING)
 @Story(GLOBAL_ERROR_HANDLER)
 public class GlobalErrorHandlerTestCase extends AbstractMuleTestCase {

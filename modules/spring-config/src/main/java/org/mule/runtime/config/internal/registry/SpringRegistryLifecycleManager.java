@@ -185,12 +185,12 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
     public SpringContextDisposePhase() {
       super();
       Class<?>[] ignoredObjects = new Class[] {
-              Component.class,
-              InterceptingMessageProcessor.class,
-              OutboundRouter.class,
-              MuleContext.class,
-              ServerNotificationManager.class,
-              Service.class
+          Component.class,
+          InterceptingMessageProcessor.class,
+          OutboundRouter.class,
+          MuleContext.class,
+          ServerNotificationManager.class,
+          Service.class
       };
       if (parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY))) {
         ignoredObjects = ArrayUtils.add(ignoredObjects, GlobalErrorHandler.class);
