@@ -192,6 +192,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
       return;
     }
 
+    boolean inDefaultErrorHandler = false;
     String defaultErrorHandlerName = getMuleContext().getConfiguration().getDefaultErrorHandlerName();
     if (defaultErrorHandlerName != null && defaultErrorHandlerName.equals(name)) {
       if (parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY))) {
@@ -207,6 +208,9 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
     initialiseIfNeeded(acceptsAllOnErrorPropagate, muleContext);
 
     if (this.getLocation() != null && shouldAddLocationToDefaultErrorHandler()) {
+      String location = this.getLocation().getLocation();
+      String containerLocation =
+          inDefaultErrorHandler ? location : location.substring(0, location.length() - ERROR_HANDLER.length() - 1);
       acceptsAllOnErrorPropagate.setFlowLocation(this.getLocation());
     }
     this.exceptionListeners.add(acceptsAllOnErrorPropagate);
