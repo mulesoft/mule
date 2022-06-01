@@ -189,10 +189,8 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
       return;
     }
 
-    boolean inDefaultErrorHandler = false;
     String defaultErrorHandlerName = getMuleContext().getConfiguration().getDefaultErrorHandlerName();
     if (defaultErrorHandlerName != null && defaultErrorHandlerName.equals(name)) {
-      inDefaultErrorHandler = true;
       logger
           .warn("Default 'error-handler' should include a final \"catch-all\" 'on-error-propagate'. Attempting implicit injection.");
     }
@@ -204,8 +202,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
     if (this.getLocation() != null && shouldAddLocationToDefaultErrorHandler()) {
       String location = this.getLocation().getLocation();
-      String containerLocation =
-          inDefaultErrorHandler ? location : location.substring(0, location.length() - ERROR_HANDLER.length() - 1);
+      String containerLocation = location.substring(0, location.length() - ERROR_HANDLER.length() - 1);
       acceptsAllOnErrorPropagate.setFlowLocation(builderFromStringRepresentation(containerLocation).build());
     }
     this.exceptionListeners.add(acceptsAllOnErrorPropagate);
