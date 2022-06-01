@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.internal.lifecycle.phases;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.System.getProperty;
 import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_HANDLER_PROPERTY;
 
-import org.apache.commons.lang3.ArrayUtils;
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
+
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -27,8 +27,7 @@ import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.core.privileged.routing.OutboundRouter;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
-import java.util.Arrays;
-import java.util.List;
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * The Stop phase for the Management context LifecycleManager. Calling {@link MuleContext#stop()} with initiate this phase via the
