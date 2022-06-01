@@ -6,6 +6,14 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
+import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
+import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.AnyMatchCharacteristic;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.AnyMatchFilteringCharacteristic;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.AggregatedNotificationsCharacteristic;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.FilteringCharacteristic;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -13,11 +21,6 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
-import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
-import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
-import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.BinaryType;
@@ -33,6 +36,7 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.internal.property.NoStreamingConfigurationModelProperty;
+import org.mule.runtime.extension.internal.property.NoTransactionalActionModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
@@ -45,15 +49,15 @@ import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParse
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.mule.internal.execution.MuleOperationExecutor;
+import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic;
+import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.MuleSdkOperationodelParserUtils;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -73,15 +77,18 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   private static final String TYPE_PARAMETER = "type";
   private static final String VISIBILITY_PARAMETER = "visibility";
   private static final String DEPRECATED_CONSTRUCT_NAME = "deprecated";
-  private static final String CHARACTERISTICS_NOT_COMPUTED_MSG = "Characteristics have not been computed yet.";
 
   private final ComponentAst operation;
   private final TypeLoader typeLoader;
 
   private final Characteristic<Boolean> isBlocking = new AnyMatchCharacteristic(OperationModel::isBlocking);
   private final Characteristic<List<NotificationModel>> notificationModels = new AggregatedNotificationsCharacteristic();
+  private final FilteringCharacteristic<Boolean> isTransactional =
+      new AnyMatchFilteringCharacteristic(OperationModel::isTransactional, MuleSdkOperationodelParserUtils::isSkippedScopeForTx,
+                                          MuleSdkOperationodelParserUtils::isIgnoredComponentForTx);
 
-  private final List<ModelProperty> additionalModelProperties = singletonList(new NoStreamingConfigurationModelProperty());
+  private final List<ModelProperty> additionalModelProperties =
+      asList(new NoStreamingConfigurationModelProperty(), new NoTransactionalActionModelProperty());
 
   private String name;
 
@@ -208,8 +215,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public boolean isTransactional() {
-    // TODO: MULE-20080
-    return false;
+    return isTransactional.getValue();
   }
 
   @Override
@@ -296,134 +302,104 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   }
 
   private Stream<OperationModel> expandOperationWithoutModel(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName,
-                                                             Set<String> visitedOperations,
-                                                             ComponentAst componentAst) {
+                                                             Set<String> visitedOperations, ComponentAst componentAst,
+                                                             Predicate<ComponentAst> filterCondition,
+                                                             Predicate<ComponentAst> ignoreCondition) {
     final MuleSdkOperationModelParserSdk operationParser =
         operationModelParsersByName.get(componentAst.getIdentifier().getName());
 
     if (operationParser != null) {
-      return operationParser.getOperationModelsRecursiveStream(operationModelParsersByName, visitedOperations);
+      return operationParser.getOperationModelsRecursiveStream(operationModelParsersByName, visitedOperations, filterCondition,
+                                                               ignoreCondition);
     } else {
       return Stream.empty();
     }
   }
 
   private Stream<OperationModel> getOperationModelsRecursiveStream(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
+    return getOperationModelsRecursiveStream(operationModelParsersByName, componentAst -> false, componentAst -> false);
+  }
+
+  /**
+   * @return returns a stream of OperationModels with all the operation models within an Operation. When @param filterCondition
+   *         returns true for a ComponentAst, that component's corresponding OperationModel, as well as all its inner children
+   *         will be filtered. When @param ignoreCondition returns true, that particular component is ignored.
+   */
+  private Stream<OperationModel> getOperationModelsRecursiveStream(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName,
+                                                                   Predicate<ComponentAst> filterCondition,
+                                                                   Predicate<ComponentAst> ignoreCondition) {
     final Set<String> visitedOperations = new HashSet<>();
-    return getOperationModelsRecursiveStream(operationModelParsersByName, visitedOperations);
+    return getOperationModelsRecursiveStream(operationModelParsersByName, visitedOperations, filterCondition, ignoreCondition);
   }
 
   private Stream<OperationModel> getOperationModelsRecursiveStream(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName,
-                                                                   Set<String> visitedOperations) {
+                                                                   Set<String> visitedOperations,
+                                                                   Predicate<ComponentAst> filterCondition,
+                                                                   Predicate<ComponentAst> ignoreCondition) {
     if (!visitedOperations.add(this.getName())) {
       return Stream.empty();
     }
 
+    Set<ComponentAst> filtered = new HashSet<>();
+
     return getBody().recursiveStream()
         .flatMap(componentAst -> {
+          if (filtered.contains(componentAst) || ignoreCondition.test(componentAst)) {
+            return Stream.empty();
+          }
           Optional<OperationModel> operationModel = componentAst.getModel(OperationModel.class);
           if (operationModel.isPresent()) {
             return Stream.of(operationModel.get());
+          } else if (filterCondition.test(componentAst)) {
+            recursiveAddToFiltered(componentAst, filtered);
+            return Stream.empty();
           } else if (componentAst.getComponentType().equals(UNKNOWN)) {
-            return expandOperationWithoutModel(operationModelParsersByName, visitedOperations, componentAst);
+            return expandOperationWithoutModel(operationModelParsersByName, visitedOperations, componentAst, filterCondition,
+                                               ignoreCondition);
           } else {
             return Stream.empty();
           }
         });
   }
 
-  public void computeCharacteristics(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
-    computeCharacteristics(asList(isBlocking, notificationModels), operationModelParsersByName);
+  private void recursiveAddToFiltered(ComponentAst ast, Set<ComponentAst> filtered) {
+    filtered.add(ast);
+    for (ComponentAst child : ast.directChildren()) {
+      recursiveAddToFiltered(child, filtered);
+    }
   }
 
-  private void computeCharacteristics(List<Characteristic<?>> characteristics,
-                                      Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
+  public void computeCharacteristics(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
+    computeCharacteristicsWithoutFiltering(asList(isBlocking, notificationModels), operationModelParsersByName);
+    computeCharacteristicsWithFiltering(singletonList(isTransactional), operationModelParsersByName);
+  }
+
+  private void computeCharacteristicsWithoutFiltering(List<Characteristic<?>> characteristics,
+                                                      Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
+    // For characteristics that don't involve filtering components we get the stream of operation models only once, as a
+    // performance improvement
     getOperationModelsRecursiveStream(operationModelParsersByName).anyMatch(operationModel -> {
       for (Characteristic<?> characteristic : characteristics) {
         characteristic.computeFrom(operationModel);
       }
-
       return areAllCharacteristicsWithDefinitiveValue(characteristics);
     });
+    characteristics.stream().filter(c -> !c.hasValue()).forEach(Characteristic::setWithDefault);
+  }
 
-    for (Characteristic<?> characteristic : characteristics) {
-      if (!characteristic.hasValue()) {
-        characteristic.setWithDefault();
-      }
+  private void computeCharacteristicsWithFiltering(List<FilteringCharacteristic<?>> characteristics,
+                                                   Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
+    for (FilteringCharacteristic<?> characteristic : characteristics) {
+      getOperationModelsRecursiveStream(operationModelParsersByName, characteristic::filterComponent,
+                                        characteristic::ignoreComponent).anyMatch(operationModel -> {
+                                          characteristic.computeFrom(operationModel);
+                                          return characteristic.hasDefinitiveValue();
+                                        });
     }
+    characteristics.stream().filter(c -> !c.hasValue()).forEach(Characteristic::setWithDefault);
   }
 
   private boolean areAllCharacteristicsWithDefinitiveValue(List<Characteristic<?>> characteristics) {
     return characteristics.stream().allMatch(Characteristic::hasDefinitiveValue);
-  }
-
-  private static class Characteristic<T> {
-
-    private final BiFunction<OperationModel, T, T> mapper;
-    private final T defaultValue;
-    private final T stopValue;
-
-    private T value;
-
-    private Characteristic(BiFunction<OperationModel, T, T> mapper, T defaultValue, T stopValue) {
-      this.mapper = mapper;
-      this.defaultValue = defaultValue;
-      this.stopValue = stopValue;
-    }
-
-    public void computeFrom(OperationModel operationModel) {
-      value = mapper.apply(operationModel, value);
-    }
-
-    public void setWithDefault() {
-      value = defaultValue;
-    }
-
-    public boolean hasDefinitiveValue() {
-      if (stopValue == null) {
-        return false;
-      }
-      return stopValue.equals(value);
-    }
-
-    public boolean hasValue() {
-      return value != null;
-    }
-
-    public T getValue() {
-      checkState(hasValue(), CHARACTERISTICS_NOT_COMPUTED_MSG);
-      return value;
-    }
-  }
-
-  private static class BooleanCharacteristic extends Characteristic<Boolean> {
-
-    private BooleanCharacteristic(Predicate<OperationModel> predicate, Boolean defaultValue, Boolean stopValue) {
-      super(((operationModel,
-              curValue) -> (curValue != null && curValue == stopValue) ? curValue : predicate.test(operationModel)),
-            defaultValue, stopValue);
-    }
-  }
-
-  private static class AnyMatchCharacteristic extends BooleanCharacteristic {
-
-    private AnyMatchCharacteristic(Predicate<OperationModel> predicate) {
-      super(predicate, false, true);
-    }
-  }
-
-  private static class AggregatedNotificationsCharacteristic extends Characteristic<List<NotificationModel>> {
-
-    private AggregatedNotificationsCharacteristic() {
-      super(AggregatedNotificationsCharacteristic::aggregator, emptyList(), null);
-    }
-
-    private static List<NotificationModel> aggregator(OperationModel operationModel, List<NotificationModel> notificationModels) {
-      if (notificationModels == null) {
-        notificationModels = new ArrayList<>();
-      }
-      notificationModels.addAll(operationModel.getNotificationModels());
-      return notificationModels;
-    }
   }
 }

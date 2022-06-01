@@ -111,6 +111,7 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+import org.mule.runtime.extension.internal.property.NoTransactionalActionModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
@@ -1258,6 +1259,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return componentModel instanceof ConnectableComponentModel && ((ConnectableComponentModel) componentModel).isTransactional();
   }
 
+  private boolean requiresTransactionalActionConfiguration(T componentModel) {
+    return !componentModel.getModelProperty(NoTransactionalActionModelProperty.class).isPresent();
+  }
+
   private boolean hasNestedChain(T componentModel) {
     return componentModel.getNestedComponents().stream()
         .anyMatch(nestedComp -> nestedComp instanceof NestedRouteModel
@@ -1265,16 +1270,15 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private Optional<TransactionConfig> buildTransactionConfig() throws MuleException {
-    if (supportsTransactions(componentModel)) {
-      MuleTransactionConfig transactionConfig = new MuleTransactionConfig();
-      transactionConfig.setAction(toActionCode(getTransactionalAction()));
-      transactionConfig.setMuleContext(muleContext);
-      transactionConfig.setFactory(TRANSACTION_FACTORY);
-
-      return of(transactionConfig);
+    if (!supportsTransactions(componentModel) || !requiresTransactionalActionConfiguration(componentModel)) {
+      return empty();
     }
+    MuleTransactionConfig transactionConfig = new MuleTransactionConfig();
+    transactionConfig.setAction(toActionCode(getTransactionalAction()));
+    transactionConfig.setMuleContext(muleContext);
+    transactionConfig.setFactory(TRANSACTION_FACTORY);
 
-    return empty();
+    return of(transactionConfig);
   }
 
   private OperationTransactionalAction getTransactionalAction() throws MuleException {

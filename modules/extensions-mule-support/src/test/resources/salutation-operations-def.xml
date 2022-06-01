@@ -33,7 +33,6 @@
                     <raise-error type="MULE:ANY" description="payload or attributes not null"/>
                 </when>
             </choice>
-            
             <set-payload
                     value="#['$(params.greeting) $(params.prefix) $(params.receiver) $(if(params.suffix == null) '' else params.suffix)']"/>
         </operation:body>
