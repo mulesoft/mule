@@ -7,9 +7,13 @@
 
 package org.mule.runtime.core.privileged.routing;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
 import static java.lang.System.lineSeparator;
+import static java.lang.System.setProperty;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG;
 
 import org.mule.runtime.api.exception.ComposedErrorException;
 import org.mule.runtime.api.exception.ErrorMessageAwareException;
@@ -45,6 +49,7 @@ public final class CompositeRoutingException extends MuleException implements Co
 
   private static final String MESSAGE_TITLE = "Exception/Error(s) were found for route(s):";
   private static final String MESSAGE_SUB_TITLE = "Detailed Exception/Error(s) for route(s):";
+  private static final String LEGACY_MESSAGE_TITLE = "Exception(s) were found for route(s): ";
 
   private static final long serialVersionUID = -4421728527040579605L;
 
@@ -64,16 +69,20 @@ public final class CompositeRoutingException extends MuleException implements Co
   @Override
   public String getDetailedMessage() {
     StringBuilder builder = new StringBuilder();
-    // provide information about the composite exception itself
-    builder.append(super.getDetailedMessage());
-
-    // get detailed information about exceptions that make up composite exception
-    builder.append(lineSeparator()).append(MESSAGE_SUB_TITLE).append(lineSeparator());
     Map<String, Pair<Error, EventProcessingException>> detailedFailures = getDetailedFailures();
 
-    // If we only have an error map that doesn't provide information about exceptions,
+    if (parseBoolean(getProperty(MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG))) {
+      builder.append(LEGACY_MESSAGE_TITLE).append(lineSeparator());
+    } else {
+      // provide information about the composite exception itself
+      builder.append(super.getDetailedMessage());
+      // get detailed information about exceptions that make up composite exception
+      builder.append(lineSeparator()).append(MESSAGE_SUB_TITLE).append(lineSeparator());
+    }
+
+    // If we don't have a map with a detailed error information or if we want to print legacy log,
     // process with original logic
-    if (detailedFailures.isEmpty()) {
+    if (detailedFailures.isEmpty() || parseBoolean(getProperty(MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG))) {
       for (Entry<String, Error> entry : routingResult.getFailures().entrySet()) {
         MuleException muleException = ExceptionHelper.getRootMuleException(entry.getValue().getCause());
         Throwable exception = entry.getValue().getCause();
@@ -123,14 +132,17 @@ public final class CompositeRoutingException extends MuleException implements Co
       builder.append(lineSeparator() + "\t").append(routeResult.getKey()).append(": ").append(routeException.getClass().getName())
           .append(": ").append(routeException.getMessage());
     }
-
-    builder.insert(0, MESSAGE_TITLE);
+    if (parseBoolean(getProperty(MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG))) {
+      builder.insert(0, LEGACY_MESSAGE_TITLE);
+    } else {
+      builder.insert(0, MESSAGE_TITLE);
+    }
     return I18nMessageFactory.createStaticMessage(builder.toString());
   }
 
   @Override
   public List<Error> getErrors() {
-    if (!routingResult.getFailures().isEmpty()) {
+    if (!routingResult.getFailures().isEmpty() || parseBoolean(getProperty(MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG))) {
       return routingResult.getFailures().values().stream().collect(toList());
     } else {
       return routingResult.getFailuresWithExceptionInfo().values().stream().map(pair -> pair.getFirst()).collect(toList());
@@ -141,5 +153,10 @@ public final class CompositeRoutingException extends MuleException implements Co
   public Message getErrorMessage() {
     return of(routingResult);
   }
+
+  public static void setLegacyCompositeExceptionLog(boolean legacy) {
+    setProperty(MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG, Boolean.toString(legacy));
+  }
+
 
 }
