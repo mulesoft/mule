@@ -50,11 +50,11 @@ public final class ProcessorChainValueResolver implements ValueResolver<Chain> {
   }
 
   /**
-   * @return {@code false}
+   * @return {@code true}
    */
   @Override
   public boolean isDynamic() {
-    return false;
+    return true;
   }
 
 }

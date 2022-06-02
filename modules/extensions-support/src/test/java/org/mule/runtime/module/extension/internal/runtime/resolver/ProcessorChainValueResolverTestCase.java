@@ -38,7 +38,7 @@ import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Mono;
 
-public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTestCase {
+public class ProcessorChainValueResolverTestCase extends AbstractMuleContextTestCase {
 
   @Rule
   public MockitoRule mockitorule = MockitoJUnit.rule();
@@ -78,6 +78,12 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
       CoreEvent capturedEvent = captor.getValue();
       assertThat(capturedEvent, is(event));
     }, (e, r) -> fail(e.getMessage()));
+  }
+
+  @Test
+  public void isDynamic() throws Exception {
+    ValueResolver<Chain> resolver = new ProcessorChainValueResolver(mock(StreamingManager.class), messageProcessor);
+    assertThat(resolver.isDynamic(), is(true));
   }
 
   @Test

@@ -49,12 +49,9 @@ public final class NativeQueryParameterValueResolver extends LifecycleAwareValue
     return dsqlQuery.translate(queryTranslator);
   }
 
-  /**
-   * @return {@code false}
-   */
   @Override
   public boolean isDynamic() {
-    return false;
+    return super.isDynamic();
   }
 
   private QueryTranslator instantiateTranslator(Class<? extends QueryTranslator> translator) {
