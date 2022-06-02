@@ -94,34 +94,6 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
   public ForkJoinStrategy createForkJoinStrategy(ProcessingStrategy processingStrategy, int maxConcurrency, boolean delayErrors,
                                                  long timeout, Scheduler timeoutScheduler, ErrorType timeoutErrorType) {
     reactor.core.scheduler.Scheduler reactorTimeoutScheduler = Schedulers.fromExecutorService(timeoutScheduler);
-    if (PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG) {
-      return (original, routingPairs) -> {
-        final AtomicInteger count = new AtomicInteger();
-        final CoreEvent.Builder resultBuilder = builder(original);
-        return from(routingPairs)
-            .map(addSequence(count))
-            .flatMapSequential(legacyProcessRoutePair(processingStrategy, maxConcurrency, delayErrors, timeout,
-                                                      reactorTimeoutScheduler,
-                                                      timeoutErrorType),
-                               maxConcurrency)
-            .reduce(new Pair<List<CoreEvent>, Boolean>(new ArrayList<>(), false), (pair, event) -> {
-              // Accumulates events and check if there is a (new) error within those events
-              pair.getFirst().add(event);
-              boolean hasNewError = event.getError().map(err -> !isOriginalError(err, original.getError())).orElse(false);
-              return new Pair(pair.getFirst(), pair.getSecond() || hasNewError);
-            })
-            .doOnNext(p -> {
-              Pair<List<CoreEvent>, Boolean> pair = (Pair<List<CoreEvent>, Boolean>) p;
-              if (pair.getSecond()) {
-                throw propagate(legacyCreateCompositeRoutingException(pair.getFirst().stream()
-                    .map(event -> legacyRemoveOriginalError(event, original.getError())).collect(toList())));
-              }
-            })
-            .map(pair -> ((Pair<List<CoreEvent>, Boolean>) pair).getFirst())
-            .doOnNext(mergeVariables(original, resultBuilder))
-            .map(createResultEvent(original, resultBuilder));
-      };
-    }
     return (original, routingPairs) -> {
       final AtomicInteger count = new AtomicInteger();
       final CoreEvent.Builder resultBuilder = builder(original);
@@ -168,11 +140,6 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
         .orElse(coreEventExceptionPair);
   }
 
-  private CoreEvent legacyRemoveOriginalError(CoreEvent event, Optional<Error> originalError) {
-    return event.getError().map(err -> isOriginalError(err, originalError) ? CoreEvent.builder(event).error(null).build() : event)
-        .orElse(event);
-  }
-
   /**
    * Template method to be implemented by implementations that defines how the list of result {@link CoreEvent}'s should be
    * aggregated into a result {@link CoreEvent}
@@ -214,32 +181,6 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
                                                                                                                           null))
                                                           .onErrorResume(MessagingException.class,
                                                                          me -> getPublisher(delayErrors, me));
-    };
-  }
-
-  private Function<RoutingPair, Publisher<? extends CoreEvent>> legacyProcessRoutePair(ProcessingStrategy processingStrategy,
-                                                                                       int maxConcurrency,
-                                                                                       boolean delayErrors, long timeout,
-                                                                                       reactor.core.scheduler.Scheduler timeoutScheduler,
-                                                                                       ErrorType timeoutErrorType) {
-
-    return pair -> {
-      ReactiveProcessor route = publisher -> from(publisher)
-          .transform(pair.getRoute());
-      return from(processWithChildContextDontComplete(pair.getEvent(),
-                                                      applyProcessingStrategy(processingStrategy, route, maxConcurrency),
-                                                      empty()))
-                                                          .timeout(ofMillis(timeout),
-                                                                   onTimeout(processingStrategy, delayErrors, timeoutErrorType,
-                                                                             pair),
-                                                                   timeoutScheduler)
-                                                          .map(event -> (CoreEvent) ((DefaultEventBuilder) CoreEvent
-                                                              .builder(event)).removeInternalParameter(ERROR_HANDLER_CONTEXT)
-                                                                  .build())
-                                                          .onErrorResume(MessagingException.class,
-                                                                         me -> delayErrors ? just(me.getEvent()) : error(me))
-
-      ;
     };
   }
 
@@ -298,21 +239,6 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
     }
     return new CompositeRoutingException(RoutingResult.routingResultWithException(successMap, errorMap));
 
-  }
-
-  private CompositeRoutingException legacyCreateCompositeRoutingException(List<CoreEvent> results) {
-    Map<String, Message> successMap = new LinkedHashMap<>();
-    Map<String, Error> errorMap = new LinkedHashMap<>();
-
-    for (CoreEvent event : results) {
-      String key = Integer.toString(event.getGroupCorrelation().get().getSequence());
-      if (event.getError().isPresent()) {
-        errorMap.put(key, event.getError().get());
-      } else {
-        successMap.put(key, event.getMessage());
-      }
-    }
-    return new CompositeRoutingException(new RoutingResult(successMap, errorMap));
   }
 
   private Consumer<List<CoreEvent>> mergeVariables(CoreEvent original, CoreEvent.Builder result) {

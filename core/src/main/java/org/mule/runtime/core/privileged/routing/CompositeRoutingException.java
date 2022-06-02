@@ -154,9 +154,5 @@ public final class CompositeRoutingException extends MuleException implements Co
     return of(routingResult);
   }
 
-  public static void setLegacyCompositeExceptionLog(boolean legacy) {
-    setProperty(MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG, Boolean.toString(legacy));
-  }
-
 
 }
