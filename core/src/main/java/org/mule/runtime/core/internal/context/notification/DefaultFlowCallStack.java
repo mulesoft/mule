@@ -67,9 +67,10 @@ public class DefaultFlowCallStack implements FlowCallStack {
   }
 
   /**
-   * Adds a message processor path to the list of processors that were invoked as part of the processing of this stack's event.
+   * Adds a message processor path and a component location to the list of processors that were invoked as part of the processing of this stack's event.
    *
    * @param processorPath the path to mark as invoked.
+   * @param componentLocation the component location.
    * @throws EmptyStackException if this stack is empty.
    */
   public void pushCurrentProcessorPathAndComponentLocation(String processorPath, ComponentLocation componentLocation) {
