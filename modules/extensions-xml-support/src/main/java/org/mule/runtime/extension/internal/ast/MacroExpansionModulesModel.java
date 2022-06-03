@@ -8,7 +8,6 @@ package org.mule.runtime.extension.internal.ast;
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
-import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.repeat;
@@ -18,6 +17,7 @@ import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyRecursi
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 
 import java.util.ArrayList;
@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -100,7 +101,24 @@ public class MacroExpansionModulesModel {
               .filter(comp -> comp.getComponentType() != null && comp.getComponentType().equals(FLOW));
       List<ComponentAst> componentsToAdd =
           flowComponents.filter(comp -> !applicationModel.topLevelComponents().contains(comp)).collect(Collectors.toList());
-      applicationModel = copyRecursively(applicationModel, identity(), () -> componentsToAdd, c -> false);
+      final UnaryOperator<ComponentAst> function = comp -> {
+        List<ComponentAst> childrenToKeep = comp.directChildrenStream()
+            .filter(child -> !(child.getComponentType() != null && child.getComponentType().equals(FLOW)))
+            .collect(Collectors.toList());
+        return new BaseComponentAstDecorator(comp) {
+
+          @Override
+          public List<ComponentAst> directChildren() {
+            return childrenToKeep;
+          }
+
+          @Override
+          public Stream<ComponentAst> directChildrenStream() {
+            return childrenToKeep.stream();
+          }
+        };
+      };
+      applicationModel = copyRecursively(applicationModel, function, () -> componentsToAdd, c -> false);
 
       if (LOGGER.isDebugEnabled()) {
         // only log the macro expanded app if there are smart connectors in it
