@@ -58,7 +58,14 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
               .createMulePluginClassLoader((MuleDeployableArtifactClassLoader) ((RegionClassLoader) regionClassLoader)
                   .getOwnerClassLoader(),
                                            artifactPluginDescriptor,
-                                           pluginDescriptorResolver(),
+                                           (pluginDescriptors, bundleDescriptor) -> artifactPluginDescriptors
+                                               .stream()
+                                               .filter(apd -> apd.getBundleDescriptor()
+                                                   .getArtifactId()
+                                                   .equals(bundleDescriptor.getArtifactId())
+                                                   && apd.getBundleDescriptor().getGroupId()
+                                                       .equals(bundleDescriptor.getGroupId()))
+                                               .findAny(),
                                            (ownerArtifactClassLoader, dependencyPluginDescriptor) -> of(() -> classLoaders
                                                .stream().filter(
                                                                 c -> c
