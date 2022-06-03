@@ -74,30 +74,23 @@ public final class CompositeRoutingException extends MuleException implements Co
 
     if (detailedFailures.isEmpty()) {
       builder.append(LEGACY_MESSAGE_TITLE).append(lineSeparator());
-    } else {
-      // provide information about the composite exception itself
-      builder.append(super.getDetailedMessage());
-      // get detailed information about exceptions that make up composite exception
-      builder.append(lineSeparator()).append(MESSAGE_SUB_TITLE).append(lineSeparator());
-    }
-
-    // If we don't have a map with a detailed error information or if we want to print legacy log,
-    // process with original logic
-    if (parseBoolean(getProperty(MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG))) {
       for (Entry<String, Error> entry : routingResult.getFailures().entrySet()) {
         MuleException muleException = ExceptionHelper.getRootMuleException(entry.getValue().getCause());
         Throwable exception = entry.getValue().getCause();
         appendMessageForExceptions(builder, entry.getKey(), exception, muleException);
       }
-      // If we are provided an error map that also stores exceptions that make up composite exception,
-      // process with new logic to provide detailed error message
     } else {
+      // provide information about the composite exception itself
+      builder.append(super.getDetailedMessage());
+      // get detailed information about exceptions that make up composite exception
+      builder.append(lineSeparator()).append(MESSAGE_SUB_TITLE).append(lineSeparator());
       for (Entry<String, Pair<Error, EventProcessingException>> entry : detailedFailures.entrySet()) {
         MuleException muleException = entry.getValue().getSecond();
         Throwable exception = entry.getValue().getFirst().getCause();
         appendMessageForExceptions(builder, entry.getKey(), exception, muleException);
       }
     }
+
     return builder.toString();
   }
 
@@ -133,7 +126,7 @@ public final class CompositeRoutingException extends MuleException implements Co
       builder.append(lineSeparator() + "\t").append(routeResult.getKey()).append(": ").append(routeException.getClass().getName())
           .append(": ").append(routeException.getMessage());
     }
-    if (parseBoolean(getProperty(MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG))) {
+    if (!routingResult.getFailures().isEmpty()) {
       builder.insert(0, LEGACY_MESSAGE_TITLE);
     } else {
       builder.insert(0, MESSAGE_TITLE);
@@ -143,7 +136,7 @@ public final class CompositeRoutingException extends MuleException implements Co
 
   @Override
   public List<Error> getErrors() {
-    if (!routingResult.getFailures().isEmpty() || parseBoolean(getProperty(MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG))) {
+    if (!routingResult.getFailures().isEmpty()) {
       return routingResult.getFailures().values().stream().collect(toList());
     } else {
       return routingResult.getFailuresWithExceptionInfo().values().stream().map(pair -> pair.getFirst()).collect(toList());

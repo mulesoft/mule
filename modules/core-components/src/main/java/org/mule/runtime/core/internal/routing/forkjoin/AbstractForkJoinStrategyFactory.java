@@ -79,9 +79,6 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
   public static final String TIMEOUT_EXCEPTION_DETAILED_DESCRIPTION_PREFIX = "Timeout while processing route/part:";
   private final boolean mergeVariables;
 
-  private static final boolean PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG =
-      parseBoolean(getProperty(MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG, "false"));
-
   public AbstractForkJoinStrategyFactory() {
     this(true);
   }
@@ -227,7 +224,6 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
     Map<String, Message> successMap = new LinkedHashMap<>();
     Map<String, Pair<Error, EventProcessingException>> errorMap = new LinkedHashMap<>();
 
-
     for (Pair<CoreEvent, EventProcessingException> eventExceptionPair : results) {
       String key = Integer.toString(eventExceptionPair.getFirst().getGroupCorrelation().get().getSequence());
       if (eventExceptionPair.getFirst().getError().isPresent()) {
@@ -237,7 +233,13 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
         successMap.put(key, eventExceptionPair.getFirst().getMessage());
       }
     }
-    return new CompositeRoutingException(RoutingResult.routingResultWithException(successMap, errorMap));
+    if (parseBoolean(getProperty(MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG))){
+      Map<String, Error> previousErrorMap = errorMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, pair -> pair.getValue().getFirst()));
+      return new CompositeRoutingException(new RoutingResult(successMap, previousErrorMap));
+    } else {
+      return new CompositeRoutingException(RoutingResult.routingResultWithException(successMap, errorMap));
+    }
+
 
   }
 
