@@ -10,6 +10,7 @@ package org.mule.runtime.core.privileged.routing;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
 import static java.lang.System.lineSeparator;
+import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG;
@@ -28,6 +29,7 @@ import org.mule.runtime.core.privileged.processor.Router;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -70,7 +72,7 @@ public final class CompositeRoutingException extends MuleException implements Co
     StringBuilder builder = new StringBuilder();
     Map<String, Pair<Error, EventProcessingException>> detailedFailures = getDetailedFailures();
 
-    if (parseBoolean(getProperty(MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG))) {
+    if (detailedFailures.isEmpty()) {
       builder.append(LEGACY_MESSAGE_TITLE).append(lineSeparator());
     } else {
       // provide information about the composite exception itself
@@ -81,7 +83,7 @@ public final class CompositeRoutingException extends MuleException implements Co
 
     // If we don't have a map with a detailed error information or if we want to print legacy log,
     // process with original logic
-    if (detailedFailures.isEmpty() || parseBoolean(getProperty(MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG))) {
+    if (parseBoolean(getProperty(MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG))) {
       for (Entry<String, Error> entry : routingResult.getFailures().entrySet()) {
         MuleException muleException = ExceptionHelper.getRootMuleException(entry.getValue().getCause());
         Throwable exception = entry.getValue().getCause();
@@ -112,7 +114,7 @@ public final class CompositeRoutingException extends MuleException implements Co
 
   private Map<String, Pair<Error, EventProcessingException>> getDetailedFailures() {
     Method getDetailedFailuresMethod = null;
-    Map<String, Pair<Error, EventProcessingException>> detailedFailures = null;
+    Map<String, Pair<Error, EventProcessingException>> detailedFailures = emptyMap();
     try {
       getDetailedFailuresMethod = RoutingResult.class.getMethod("getFailuresWithExceptionInfo");
       detailedFailures =
