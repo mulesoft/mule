@@ -8,6 +8,8 @@ package org.mule.runtime.module.artifact.activation.api.extension.discovery;
 
 import static java.util.Collections.emptySet;
 
+import org.mule.api.annotation.NoImplement;
+import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
@@ -23,6 +25,7 @@ import java.util.Set;
  * 
  * @since 4.5
  */
+@NoImplement
 public interface ExtensionDiscoveryRequest {
 
   /**
@@ -59,6 +62,7 @@ public interface ExtensionDiscoveryRequest {
    */
   boolean isEnrichDescriptions();
 
+  @NoInstantiate
   final class ExtensionDiscoveryRequestBuilder {
 
     private Collection<ArtifactPluginDescriptor> artifactPlugins;

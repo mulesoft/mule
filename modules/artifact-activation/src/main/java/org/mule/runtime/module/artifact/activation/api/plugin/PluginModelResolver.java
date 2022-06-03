@@ -32,7 +32,7 @@ public interface PluginModelResolver {
   /**
    * @return the default implementation of a {@link PluginModelResolver}.
    */
-  static PluginModelResolver mavenDeployablePluginModelResolver() {
+  static PluginModelResolver pluginModelResolver() {
     return bundleDependency -> {
       File pluginJarFile = new File(bundleDependency.getBundleUri());
       String mulePluginJsonPathInsideJarFile = MULE_ARTIFACT_PATH_INSIDE_JAR + "/" + MULE_ARTIFACT_JSON_DESCRIPTOR;

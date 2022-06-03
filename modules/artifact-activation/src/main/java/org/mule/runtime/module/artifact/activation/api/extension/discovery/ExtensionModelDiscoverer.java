@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.api.extension.discovery;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderSupplier;
 import org.mule.runtime.module.artifact.activation.internal.extension.discovery.DefaultExtensionModelDiscoverer;
@@ -20,6 +21,7 @@ import java.util.Set;
  * 
  * @since 4.5
  */
+@NoImplement
 public interface ExtensionModelDiscoverer {
 
   /**

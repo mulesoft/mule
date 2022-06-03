@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.api.descriptor;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
@@ -24,6 +25,7 @@ import java.util.Map;
  *
  * @since 4.5
  */
+@NoImplement
 public interface DeployableArtifactDescriptorFactory {
 
   static DeployableArtifactDescriptorFactory defaultArtifactDescriptorFactory() {
@@ -37,7 +39,7 @@ public interface DeployableArtifactDescriptorFactory {
    *                                 descriptor.
    * @param deploymentProperties     properties that affect how the artifact is deployed.
    * @param pluginModelResolver      resolves {@link MulePluginModel} from a dependency. Default implementation is
-   *                                 {@link PluginModelResolver#mavenDeployablePluginModelResolver()}.
+   *                                 {@link PluginModelResolver#pluginModelResolver()}.
    * @param pluginDescriptorResolver a wrapper function around the logic to extract an {@link ArtifactPluginDescriptor} from the
    *                                 jar described by the {@link BundleDescriptor}, otherwise it will be created.
    * @return a descriptor for a domain.
@@ -48,13 +50,24 @@ public interface DeployableArtifactDescriptorFactory {
                                           PluginDescriptorResolver pluginDescriptorResolver);
 
   /**
+   * Creates a descriptor for a domain, including its plugin descriptors, using the default resolvers.
+   *
+   * @param model                model describing the structure of the domain with all the necessary information to build its
+   *                             descriptor.
+   * @param deploymentProperties properties that affect how the artifact is deployed.
+   * @return a descriptor for a domain.
+   */
+  DomainDescriptor createDomainDescriptor(DeployableProjectModel model,
+                                          Map<String, String> deploymentProperties);
+
+  /**
    * Creates a descriptor for an application, including its plugin descriptors.
    *
    * @param model                    model describing the structure of the application with all the necessary information to build
    *                                 its descriptor.
    * @param deploymentProperties     properties that affect how the artifact is deployed.
    * @param pluginModelResolver      resolves {@link MulePluginModel} from a dependency. Default implementation is
-   *                                 {@link PluginModelResolver#mavenDeployablePluginModelResolver()}.
+   *                                 {@link PluginModelResolver#pluginModelResolver()}.
    * @param pluginDescriptorResolver a wrapper function around the logic to extract an {@link ArtifactPluginDescriptor} from the
    *                                 jar described by the {@link BundleDescriptor}, otherwise it will be created.
    * @return a descriptor for an application.
@@ -63,5 +76,16 @@ public interface DeployableArtifactDescriptorFactory {
                                                     Map<String, String> deploymentProperties,
                                                     PluginModelResolver pluginModelResolver,
                                                     PluginDescriptorResolver pluginDescriptorResolver);
+
+  /**
+   * Creates a descriptor for an application, including its plugin descriptors, using the default resolvers.
+   *
+   * @param model                model describing the structure of the application with all the necessary information to build its
+   *                             descriptor.
+   * @param deploymentProperties properties that affect how the artifact is deployed.
+   * @return a descriptor for an application.
+   */
+  ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
+                                                    Map<String, String> deploymentProperties);
 
 }

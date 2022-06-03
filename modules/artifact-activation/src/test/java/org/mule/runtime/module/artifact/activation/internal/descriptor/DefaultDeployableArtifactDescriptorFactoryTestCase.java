@@ -7,7 +7,7 @@
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
 import static org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver.pluginDescriptorResolver;
-import static org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver.mavenDeployablePluginModelResolver;
+import static org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver.pluginModelResolver;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
 
@@ -102,7 +102,7 @@ public class DefaultDeployableArtifactDescriptorFactoryTestCase extends Abstract
 
     DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory = new DefaultDeployableArtifactDescriptorFactory();
     return deployableArtifactDescriptorFactory.createApplicationDescriptor(model, emptyMap(),
-                                                                           mavenDeployablePluginModelResolver(),
+                                                                           pluginModelResolver(),
                                                                            pluginDescriptorResolver());
   }
 

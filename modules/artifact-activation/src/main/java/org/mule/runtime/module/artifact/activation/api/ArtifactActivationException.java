@@ -20,6 +20,8 @@ import org.mule.runtime.api.i18n.I18nMessage;
 @NoInstantiate
 public class ArtifactActivationException extends MuleRuntimeException {
 
+  private static final long serialVersionUID = 1402222804782983837L;
+
   /**
    * @param message the exception message
    */
