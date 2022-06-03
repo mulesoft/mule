@@ -7,13 +7,11 @@
 
 package org.mule.runtime.core.privileged.routing;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.System.getProperty;
+import static org.mule.runtime.api.message.Message.of;
+
 import static java.lang.System.lineSeparator;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG;
 
 import org.mule.runtime.api.exception.ComposedErrorException;
 import org.mule.runtime.api.exception.ErrorMessageAwareException;
@@ -29,7 +27,6 @@ import org.mule.runtime.core.privileged.processor.Router;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
