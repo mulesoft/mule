@@ -25,7 +25,6 @@ public class GlobalErrorHandler extends ErrorHandler {
 
   private final AtomicBoolean initialised = new AtomicBoolean(false);
   private final AtomicInteger started = new AtomicInteger(0);
-  private final AtomicBoolean disposed = new AtomicBoolean(false);
 
   @Override
   public Publisher<CoreEvent> apply(Exception exception) {
@@ -40,7 +39,6 @@ public class GlobalErrorHandler extends ErrorHandler {
     }
 
     if (!initialised.getAndSet(true)) {
-      setFromGlobalErrorHandler();
       super.initialise();
     }
   }
@@ -80,12 +78,12 @@ public class GlobalErrorHandler extends ErrorHandler {
       return;
     }
 
-    if (started.get() == 0 && !disposed.getAndSet(true)) {
+    if (started.get() == 0 && initialised.getAndSet(false)) {
       super.dispose();
     }
   }
 
-  private void setFromGlobalErrorHandler() {
+  public void setFromGlobalErrorHandler() {
     this.getExceptionListeners().stream()
         .filter(exceptionListener -> exceptionListener instanceof TemplateOnErrorHandler)
         .forEach(exceptionListener -> ((TemplateOnErrorHandler) exceptionListener).setFromGlobalErrorHandler(true));
