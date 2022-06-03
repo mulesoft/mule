@@ -28,6 +28,8 @@ import static java.util.Optional.empty;
 /**
  * A {@link ProcessingStrategy} used for {@link org.mule.runtime.core.internal.exception.GlobalErrorHandler}. The resolution of
  * the processing strategy is done in runtime depending on the flow location where the error that is being handled was thrown.
+ *
+ * @since 4.3.0
  */
 public class OnRuntimeProcessingStrategy implements ProcessingStrategy {
 
@@ -41,7 +43,7 @@ public class OnRuntimeProcessingStrategy implements ProcessingStrategy {
 
   @Override
   public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
-    return null;
+    throw new UnsupportedOperationException("This processing strategy shouldn't create any sinks, it uses the processing strategy from the parent flow.");
   }
 
   @Override

@@ -15,6 +15,7 @@ import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HA
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_HANDLER;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
@@ -61,6 +62,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoRule;
 
+import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
@@ -158,11 +160,12 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
 
   @Test
   @Issue("W-11117613")
+  @Description("There is a method setFromGlobalErrorHandler that sets a boolean to the listeners, this tests that it is not set.")
   public void doNotSetFromGlobalErrorHandlerWhenSystemPropertyIsDisabled() throws InitialisationException {
     GlobalErrorHandler globalErrorHandler = new GlobalErrorHandler();
     TemplateOnErrorHandler onErrorHandler = mock(TemplateOnErrorHandler.class);
     when(onErrorHandler.isInitialised()).thenReturn(true);
-    globalErrorHandler.setExceptionListeners(new ArrayList<>(asList(onErrorHandler)));
+    globalErrorHandler.setExceptionListeners(singletonList(onErrorHandler));
     when(mockMuleContext.getDefaultErrorHandler(empty())).thenReturn(defaultMessagingExceptionHandler);
     globalErrorHandler.setMuleContext(mockMuleContext);
     globalErrorHandler.setRootContainerName("root");

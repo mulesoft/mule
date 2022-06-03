@@ -43,10 +43,12 @@ public class ErrorHandlerFactoryBean extends AbstractComponentFactory<ErrorHandl
     if (isGlobalErrorHandler()) {
       errorHandler = new GlobalErrorHandler();
       errorHandler.setName(name);
+      errorHandler.setExceptionListeners(exceptionListeners);
+      ((GlobalErrorHandler) errorHandler).setFromGlobalErrorHandler();
     } else {
       errorHandler = new ErrorHandler();
+      errorHandler.setExceptionListeners(exceptionListeners);
     }
-    errorHandler.setExceptionListeners(exceptionListeners);
     return errorHandler;
   }
 
