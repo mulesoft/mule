@@ -10,6 +10,7 @@ import static java.lang.Integer.getInteger;
 import static java.lang.System.lineSeparator;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_FLOW_STACK_MAX_DEPTH;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.internal.event.EventContextDeepNestingException;
@@ -71,10 +72,10 @@ public class DefaultFlowCallStack implements FlowCallStack {
    * @param processorPath the path to mark as invoked.
    * @throws EmptyStackException if this stack is empty.
    */
-  public void pushCurrentProcessorPath(String processorPath) {
+  public void pushCurrentProcessorPathAndComponentLocation(String processorPath, ComponentLocation componentLocation) {
     if (!innerStack.isEmpty()) {
       synchronized (innerStack) {
-        innerStack.push(new FlowStackElement(innerStack.pop().getFlowName(), processorPath));
+        innerStack.push(new FlowStackElement(innerStack.pop().getFlowName(), processorPath, componentLocation));
       }
     }
   }
