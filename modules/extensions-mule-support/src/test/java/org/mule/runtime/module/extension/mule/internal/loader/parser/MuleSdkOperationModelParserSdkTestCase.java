@@ -6,29 +6,43 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
-import static java.util.Optional.empty;
-import static java.util.stream.Stream.of;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.mockDeprecatedAst;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.stringParameterAst;
+import static java.util.Optional.empty;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import org.junit.Before;
-import org.junit.Test;
 import org.mule.metadata.api.TypeLoader;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 
 import java.util.Optional;
+import java.util.stream.Stream;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class MuleSdkOperationModelParserSdkTestCase {
 
+  @Rule
+  public ExpectedException expected = none();
+
   private MuleSdkOperationModelParserSdk operationModelParser;
   private ComponentAst operationAst;
+  private MetadataType someMetadataType;
 
   @Before
   public void setup() {
@@ -38,6 +52,9 @@ public class MuleSdkOperationModelParserSdkTestCase {
     when(operationAst.getParameter(DEFAULT_GROUP_NAME, "name")).thenReturn(operationName);
 
     TypeLoader typeLoader = mock(TypeLoader.class);
+    someMetadataType = mock(MetadataType.class);
+    when(typeLoader.load("some")).thenReturn(Optional.of(someMetadataType));
+
     operationModelParser = new MuleSdkOperationModelParserSdk(operationAst, typeLoader);
   }
 
@@ -53,7 +70,7 @@ public class MuleSdkOperationModelParserSdkTestCase {
   @Test
   public void when_operationAstHasDeprecationParameter_then_parserHasDeprecationModelWithCorrespondingValues() {
     ComponentAst deprecatedAst = mockDeprecatedAst("1.1.0", "Some Message", "2.0.0");
-    when(operationAst.directChildrenStreamByIdentifier(null, "deprecated")).thenAnswer(invocation -> of(deprecatedAst));
+    when(operationAst.directChildrenStreamByIdentifier(null, "deprecated")).thenAnswer(invocation -> Stream.of(deprecatedAst));
 
     assertThat(operationModelParser.getDeprecationModel().isPresent(), is(true));
 
@@ -66,7 +83,7 @@ public class MuleSdkOperationModelParserSdkTestCase {
   @Test
   public void when_toRemoveInParameterIsNotConfigured_then_theDeprecationModelReturnsAnEmptyOptional() {
     ComponentAst deprecatedAst = mockDeprecatedAst("1.1.0", "Some Message", null);
-    when(operationAst.directChildrenStreamByIdentifier(null, "deprecated")).thenAnswer(invocation -> of(deprecatedAst));
+    when(operationAst.directChildrenStreamByIdentifier(null, "deprecated")).thenAnswer(invocation -> Stream.of(deprecatedAst));
 
     assertThat(operationModelParser.getDeprecationModel().isPresent(), is(true));
 
@@ -83,22 +100,60 @@ public class MuleSdkOperationModelParserSdkTestCase {
     assertThat(operationModelParser.getExecutionType(), is(Optional.of(CPU_LITE)));
   }
 
-  private ComponentAst mockDeprecatedAst(String since, String message, String toRemoveIn) {
-    ComponentParameterAst sinceAst = stringParameterAst(since);
-    ComponentParameterAst messageAst = stringParameterAst(message);
-    ComponentParameterAst toRemoveInAst = stringParameterAst(toRemoveIn);
+  // ------------------------------- //
+  // Output Type
+  // ------------------------------- //
 
-    ComponentAst deprecatedAst = mock(ComponentAst.class);
-    when(deprecatedAst.getParameter(DEFAULT_GROUP_NAME, "since")).thenReturn(sinceAst);
-    when(deprecatedAst.getParameter(DEFAULT_GROUP_NAME, "message")).thenReturn(messageAst);
-    when(deprecatedAst.getParameter(DEFAULT_GROUP_NAME, "toRemoveIn")).thenReturn(toRemoveInAst);
-
-    return deprecatedAst;
+  @Test
+  public void when_anOperationHasNotOutput_then_anExceptionIsRaised() {
+    expected.expect(IllegalOperationModelDefinitionException.class);
+    expected.expectMessage("Operation 'mockName' is missing its <output> declaration");
+    operationModelParser.getOutputType();
   }
 
-  private ComponentParameterAst stringParameterAst(String value) {
-    ComponentParameterAst parameterAst = mock(ComponentParameterAst.class);
-    when(parameterAst.getValue()).thenReturn(right(value));
-    return parameterAst;
+  @Test
+  public void when_anOperationOutputHasNotPayloadType_then_anExceptionIsRaised() {
+    ComponentAst output = mockOutputAst(null, null);
+    when(operationAst.directChildrenStreamByIdentifier(null, "output")).thenAnswer(invocation -> Stream.of(output));
+
+    expected.expect(IllegalOperationModelDefinitionException.class);
+    expected.expectMessage("Operation 'mockName' is missing its <payload-type> declaration");
+    operationModelParser.getOutputType();
+  }
+
+  @Test
+  public void when_anOperationOutputHasAPayloadTypeNotInTheTypeLoader_then_anExceptionIsRaised() {
+    ComponentAst output = mockOutputAst("notDefined", null);
+    when(operationAst.directChildrenStreamByIdentifier(null, "output")).thenAnswer(invocation -> Stream.of(output));
+
+    expected.expect(IllegalModelDefinitionException.class);
+    expected
+        .expectMessage("Component <this:payload-type> defines type as 'notDefined' but such type is not defined in the application");
+    operationModelParser.getOutputType();
+  }
+
+  @Test
+  public void when_anOperationOutputHasAPayloadTypeInTheTypeLoader_then_theOutputTypeIsRetrievedFromThere() {
+    ComponentAst output = mockOutputAst("some", null);
+    when(operationAst.directChildrenStreamByIdentifier(null, "output")).thenAnswer(invocation -> Stream.of(output));
+
+    assertThat(operationModelParser.getOutputType().getType(), is(someMetadataType));
+  }
+
+  private ComponentAst mockOutputAst(String payloadType, String attributesType) {
+    ComponentAst outputAst = mock(ComponentAst.class);
+    when(outputAst.directChildrenStreamByIdentifier(null, "payload-type")).thenAnswer(invocation -> {
+      if (payloadType != null) {
+        ComponentParameterAst typeParameterAst = stringParameterAst(payloadType);
+        ComponentAst payloadTypeAst = mock(ComponentAst.class);
+        when(payloadTypeAst.getIdentifier())
+            .thenReturn(ComponentIdentifier.builder().namespace("this").name("payload-type").build());
+        when(payloadTypeAst.getParameter(DEFAULT_GROUP_NAME, "type")).thenReturn(typeParameterAst);
+        return Stream.of(payloadTypeAst);
+      } else {
+        return Stream.empty();
+      }
+    });
+    return outputAst;
   }
 }
