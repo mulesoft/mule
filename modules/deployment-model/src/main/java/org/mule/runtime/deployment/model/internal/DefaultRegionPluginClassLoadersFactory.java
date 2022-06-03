@@ -55,7 +55,7 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
     for (ArtifactPluginDescriptor artifactPluginDescriptor : artifactPluginDescriptors) {
       final ArtifactClassLoader artifactClassLoader =
           artifactClassLoaderResolver
-                .createMulePluginClassLoader((MuleDeployableArtifactClassLoader) ((RegionClassLoader) regionClassLoader)
+              .createMulePluginClassLoader((MuleDeployableArtifactClassLoader) ((RegionClassLoader) regionClassLoader)
                   .getOwnerClassLoader(),
                                            artifactPluginDescriptor,
                                            (pluginDescriptors, bundleDescriptor) -> artifactPluginDescriptors
