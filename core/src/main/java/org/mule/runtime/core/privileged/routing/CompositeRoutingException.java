@@ -10,7 +10,6 @@ package org.mule.runtime.core.privileged.routing;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
 import static java.lang.System.lineSeparator;
-import static java.lang.System.setProperty;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG;
