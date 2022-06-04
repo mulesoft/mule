@@ -61,7 +61,7 @@ public final class RoutingResult {
     // or an error map with exception info(failedRoutesErrorWithExceptionMap)
     if (!failedRoutesErrorWithExceptionMap.isEmpty()) {
       return failedRoutesErrorWithExceptionMap.entrySet().stream()
-              .collect(Collectors.toMap(Map.Entry::getKey, pair -> pair.getValue().getFirst()));
+          .collect(Collectors.toMap(Map.Entry::getKey, pair -> pair.getValue().getFirst()));
     } else {
       return failedRoutesErrorMap;
     }

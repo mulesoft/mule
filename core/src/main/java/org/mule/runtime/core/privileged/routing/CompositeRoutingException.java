@@ -98,7 +98,7 @@ public final class CompositeRoutingException extends MuleException implements Co
       builder.append(routeSubtitle).append(muleException.getDetailedMessage());
     } else {
       builder.append(routeSubtitle)
-              .append("Caught exception in Exception Strategy: " + exception.getMessage());
+          .append("Caught exception in Exception Strategy: " + exception.getMessage());
     }
   }
 
@@ -108,7 +108,7 @@ public final class CompositeRoutingException extends MuleException implements Co
     try {
       getDetailedFailuresMethod = RoutingResult.class.getMethod("getFailuresWithExceptionInfo");
       detailedFailures =
-              (Map<String, Pair<Error, EventProcessingException>>) getDetailedFailuresMethod.invoke(routingResult);
+          (Map<String, Pair<Error, EventProcessingException>>) getDetailedFailuresMethod.invoke(routingResult);
     } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
       e.printStackTrace();
       LOGGER.warn("Invalid Invocation, Expected method doesn't exist");
@@ -121,7 +121,7 @@ public final class CompositeRoutingException extends MuleException implements Co
     for (Entry<String, Error> routeResult : routingResult.getFailures().entrySet()) {
       Throwable routeException = routeResult.getValue().getCause();
       builder.append(lineSeparator() + "\t").append(routeResult.getKey()).append(": ").append(routeException.getClass().getName())
-              .append(": ").append(routeException.getMessage());
+          .append(": ").append(routeException.getMessage());
     }
     if (!routingResult.getFailuresWithExceptionInfo().isEmpty()) {
       builder.insert(0, MESSAGE_TITLE);
