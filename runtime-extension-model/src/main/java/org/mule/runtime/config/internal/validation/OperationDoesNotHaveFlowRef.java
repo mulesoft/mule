@@ -35,7 +35,7 @@ public class OperationDoesNotHaveFlowRef implements Validation {
 
   @Override
   public String getName() {
-    return "Operation don't have flow-ref";
+    return "Operation doesn't have flow-ref";
   }
 
   @Override
