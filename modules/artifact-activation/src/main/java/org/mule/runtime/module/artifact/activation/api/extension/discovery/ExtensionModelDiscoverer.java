@@ -6,8 +6,14 @@
  */
 package org.mule.runtime.module.artifact.activation.api.extension.discovery;
 
+import static java.lang.Thread.currentThread;
+import static java.util.Collections.unmodifiableSet;
+import static java.util.stream.Collectors.toSet;
+
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider;
+import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderSupplier;
 import org.mule.runtime.module.artifact.activation.internal.extension.discovery.DefaultExtensionModelDiscoverer;
 import org.mule.runtime.module.artifact.activation.internal.extension.discovery.RepositoryLookupExtensionModelGenerator;
@@ -63,7 +69,13 @@ public interface ExtensionModelDiscoverer {
    *
    * @return {@link Set} of the runtime provided {@link ExtensionModel}s.
    */
-  Set<ExtensionModel> discoverRuntimeExtensionModels();
+  static Set<ExtensionModel> discoverRuntimeExtensionModels() {
+    return unmodifiableSet(new SpiServiceRegistry()
+        .lookupProviders(RuntimeExtensionModelProvider.class, currentThread().getContextClassLoader())
+        .stream()
+        .map(RuntimeExtensionModelProvider::createExtensionModel)
+        .collect(toSet()));
+  }
 
   /**
    * For each artifactPlugin discovers the {@link ExtensionModel}.

@@ -37,15 +37,6 @@ public class DefaultExtensionModelDiscoverer implements ExtensionModelDiscoverer
   }
 
   @Override
-  public Set<ExtensionModel> discoverRuntimeExtensionModels() {
-    return unmodifiableSet(new SpiServiceRegistry()
-        .lookupProviders(RuntimeExtensionModelProvider.class, currentThread().getContextClassLoader())
-        .stream()
-        .map(RuntimeExtensionModelProvider::createExtensionModel)
-        .collect(toSet()));
-  }
-
-  @Override
   public Set<ExtensionModel> discoverPluginsExtensionModels(ExtensionDiscoveryRequest discoveryRequest) {
     return unmodifiableSet(new HashSet<>(PluginsDependenciesProcessor
         .process(discoveryRequest.getArtifactPluginDescriptors(), discoveryRequest.isParallelDiscovery(),
@@ -57,7 +48,7 @@ public class DefaultExtensionModelDiscoverer implements ExtensionModelDiscoverer
                    if (!dependencies.contains(MuleExtensionModelProvider.getExtensionModel())) {
                      dependencies = ImmutableSet.<ExtensionModel>builder()
                          .addAll(extensions)
-                         .addAll(discoverRuntimeExtensionModels())
+                         .addAll(ExtensionModelDiscoverer.discoverRuntimeExtensionModels())
                          .build();
                    }
 
