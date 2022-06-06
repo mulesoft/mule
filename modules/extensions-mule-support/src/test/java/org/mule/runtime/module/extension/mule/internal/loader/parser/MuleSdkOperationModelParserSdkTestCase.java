@@ -12,6 +12,8 @@ import static org.mule.runtime.module.extension.mule.internal.loader.parser.Util
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.mockDeprecatedAst;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.mockOutputAst;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.stringParameterAst;
+import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
+import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERATIONS;
 import static java.util.Optional.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -30,11 +32,15 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Optional;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+@Feature(REUSE)
+@Story(OPERATIONS)
 public class MuleSdkOperationModelParserSdkTestCase extends AbstractMuleTestCase {
 
   @Rule

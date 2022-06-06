@@ -8,18 +8,21 @@ package org.mule.runtime.module.extension.mule.internal.validation;
 
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERATIONS;
+import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.PARAMETERS;
+import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.TYPES_CATALOG;
 
 import org.mule.runtime.core.api.config.ConfigurationException;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 @Feature(REUSE)
-@Story(OPERATIONS)
+@Stories({@Story(OPERATIONS), @Story(PARAMETERS), @Story(TYPES_CATALOG)})
 public class TypesValidationsTestCase extends AbstractConfigFileValidationTestCase {
 
   @Rule

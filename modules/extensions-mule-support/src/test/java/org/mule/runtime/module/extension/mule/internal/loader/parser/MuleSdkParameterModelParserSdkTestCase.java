@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.stringParameterAst;
+import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
+import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.PARAMETERS;
 import static java.util.Optional.of;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -22,11 +24,15 @@ import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+@Feature(REUSE)
+@Story(PARAMETERS)
 public class MuleSdkParameterModelParserSdkTestCase extends AbstractMuleTestCase {
 
   @Rule
