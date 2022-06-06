@@ -6,18 +6,24 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import org.junit.Test;
-import org.mule.runtime.ast.api.validation.Validation;
-import org.mule.runtime.ast.api.validation.ValidationResultItem;
-
-import java.util.Optional;
-
 import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
+import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
+import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.mule.runtime.ast.api.validation.Validation;
+import org.mule.runtime.ast.api.validation.ValidationResultItem;
+import java.util.Optional;
+import org.junit.Test;
+
+@Feature(MULE_DSL)
+@Story(DSL_VALIDATION_STORY)
 public class OperationDoesNotHaveFlowRefTestCase extends AbstractCoreValidationTestCase {
 
   private static final String XML_NAMESPACE_DEF = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
@@ -35,6 +41,7 @@ public class OperationDoesNotHaveFlowRefTestCase extends AbstractCoreValidationT
   }
 
   @Test
+  @Description("Checks that no validation message is returned if there is no operation")
   public void withoutOperation() {
     final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
         "    <flow name=\"flow\">\n" +
@@ -48,6 +55,7 @@ public class OperationDoesNotHaveFlowRefTestCase extends AbstractCoreValidationT
   }
 
   @Test
+  @Description("Checks that no validation message is returned if there is no flow-ref inside operation")
   public void withoutFlowRef() {
     final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
         "    <flow name=\"flow\">\n" +
@@ -59,6 +67,7 @@ public class OperationDoesNotHaveFlowRefTestCase extends AbstractCoreValidationT
   }
 
   @Test
+  @Description("Checks that a corresponding validation message is returned if there is a flow-ref inside an operation")
   public void withFlowRef() {
     final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
         "    <flow name=\"flow\">\n" +
