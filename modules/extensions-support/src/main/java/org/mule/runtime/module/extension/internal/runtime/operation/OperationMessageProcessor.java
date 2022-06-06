@@ -37,8 +37,8 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.metadata.EntityMetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ResultTransformer;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationProviderResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import javax.inject.Inject;
@@ -64,7 +64,7 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
 
   public OperationMessageProcessor(ExtensionModel extensionModel,
                                    OperationModel operationModel,
-                                   ConfigurationProviderResolverWrapper configurationProviderResolver,
+                                   ValueResolver<ConfigurationProvider> configurationProviderResolver,
                                    String target,
                                    String targetValue,
                                    List<EnrichedErrorMapping> errorMappings,
@@ -82,7 +82,7 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
 
   public OperationMessageProcessor(ExtensionModel extensionModel,
                                    OperationModel operationModel,
-                                   ConfigurationProviderResolverWrapper configurationProviderResolver,
+                                   ValueResolver<ConfigurationProvider> configurationProviderResolver,
                                    String target,
                                    String targetValue,
                                    List<EnrichedErrorMapping> errorMappings,

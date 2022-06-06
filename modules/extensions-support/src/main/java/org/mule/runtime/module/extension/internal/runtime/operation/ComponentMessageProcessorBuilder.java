@@ -155,13 +155,13 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
     return this;
   }
 
-  protected ConfigurationProviderResolverWrapper getConfigurationProviderResolver() {
+  protected ValueResolver<ConfigurationProvider> getConfigurationProviderResolver() {
     // Uses the configurationProvider given to the builder if any, otherwise evaluates the parameters.
     return configurationProvider != null ? new ConfigurationProviderResolverWrapper(configurationProvider)
         : getConfigurationProviderResolver(parameters.get(CONFIG_ATTRIBUTE_NAME));
   }
 
-  private ConfigurationProviderResolverWrapper getConfigurationProviderResolver(Object configRefParameter) {
+  private ValueResolver<ConfigurationProvider> getConfigurationProviderResolver(Object configRefParameter) {
     if (configRefParameter instanceof ValueResolver) {
       return new ConfigurationProviderResolverWrapper((ValueResolver<ConfigurationProvider>) configRefParameter);
     }

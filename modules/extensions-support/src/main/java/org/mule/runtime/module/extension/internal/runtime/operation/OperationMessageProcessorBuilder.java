@@ -25,8 +25,8 @@ import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ResultTransformer;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationProviderResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProviderProducer;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
@@ -57,7 +57,7 @@ public final class OperationMessageProcessorBuilder
 
   @Override
   protected OperationMessageProcessor createMessageProcessor(ExtensionManager extensionManager, ResolverSet arguments) {
-    ConfigurationProviderResolverWrapper configurationProviderResolver = getConfigurationProviderResolver();
+    ValueResolver<ConfigurationProvider> configurationProviderResolver = getConfigurationProviderResolver();
     ResultTransformer resultTransformer = null;
 
     final boolean supportsOAuth = supportsOAuth(extensionModel);

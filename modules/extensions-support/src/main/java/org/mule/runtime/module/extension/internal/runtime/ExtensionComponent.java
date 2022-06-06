@@ -90,6 +90,7 @@ import org.mule.runtime.module.extension.internal.runtime.config.DynamicConfigur
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationProviderResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -121,7 +122,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   private final static Logger LOGGER = getLogger(ExtensionComponent.class);
 
   private final ExtensionModel extensionModel;
-  private final AtomicReference<ConfigurationProviderResolverWrapper> configurationProviderResolver = new AtomicReference<>();
+  private final AtomicReference<ValueResolver<ConfigurationProvider>> configurationProviderResolver = new AtomicReference<>();
   private final MetadataMediator<T> metadataMediator;
   private final ClassTypeLoader typeLoader;
   private final LazyValue<Boolean> requiresConfig = new LazyValue<>(this::computeRequiresConfig);
@@ -195,7 +196,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   protected ExtensionComponent(ExtensionModel extensionModel,
                                T componentModel,
-                               ConfigurationProviderResolverWrapper configurationProviderResolver,
+                               ValueResolver<ConfigurationProvider> configurationProviderResolver,
                                CursorProviderFactory cursorProviderFactory,
                                ExtensionManager extensionManager) {
     this.extensionModel = extensionModel;
@@ -233,7 +234,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     }
 
     withContextClassLoader(classLoader, () -> {
-      Optional<ConfigurationProviderResolverWrapper> configProviderResolver = findConfigurationProviderResolver();
+      Optional<ValueResolver<ConfigurationProvider>> configProviderResolver = findConfigurationProviderResolver();
       if (configProviderResolver.isPresent()) {
         initialiseIfNeeded(configProviderResolver.get(), muleContext);
       }
@@ -621,7 +622,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       Optional<ConfigurationInstance> configuration = getConfiguration(fakeEvent);
 
       if (configuration.isPresent()) {
-        ConfigurationProviderResolverWrapper configurationProviderResolver = findConfigurationProviderResolver()
+        ValueResolver<ConfigurationProvider> configurationProviderResolver = findConfigurationProviderResolver()
             .orElseThrow(
                          () -> new MetadataResolvingException("Failed to create the required configuration for Metadata retrieval",
                                                               INVALID_CONFIGURATION));
@@ -669,7 +670,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return requiresConfig.get();
   }
 
-  private ConfigurationProvider resolveConfigurationProvider(ConfigurationProviderResolverWrapper configurationProviderResolver,
+  private ConfigurationProvider resolveConfigurationProvider(ValueResolver<ConfigurationProvider> configurationProviderResolver,
                                                              CoreEvent event)
       throws MuleException {
     ValueResolvingContext valueResolvingContext = ValueResolvingContext.builder(event)
@@ -679,7 +680,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return configurationProviderResolver.resolve(valueResolvingContext);
   }
 
-  private Optional<ConfigurationProvider> resolveConfigurationProviderStatically(ConfigurationProviderResolverWrapper configurationProviderResolver) {
+  private Optional<ConfigurationProvider> resolveConfigurationProviderStatically(ValueResolver<ConfigurationProvider> configurationProviderResolver) {
     // If the resolver is dynamic, then it cannot be resolved statically
     if (configurationProviderResolver.isDynamic()) {
       return empty();
@@ -736,7 +737,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return cursorProviderFactory;
   }
 
-  private Optional<ConfigurationProviderResolverWrapper> findConfigurationProviderResolver() {
+  private Optional<ValueResolver<ConfigurationProvider>> findConfigurationProviderResolver() {
     if (isConfigurationSpecified()) {
       return of(configurationProviderResolver.get());
     }

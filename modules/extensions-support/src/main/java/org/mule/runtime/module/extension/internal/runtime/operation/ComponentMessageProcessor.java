@@ -133,7 +133,6 @@ import org.mule.runtime.module.extension.internal.runtime.operation.adapter.SdkO
 import org.mule.runtime.module.extension.internal.runtime.operation.retry.ComponentRetryPolicyTemplateResolver;
 import org.mule.runtime.module.extension.internal.runtime.operation.retry.RetryPolicyTemplateResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigOverrideValueResolverWrapper;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationProviderResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.RouteBuilderValueResolver;
@@ -265,7 +264,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   public ComponentMessageProcessor(ExtensionModel extensionModel,
                                    T componentModel,
-                                   ConfigurationProviderResolverWrapper configurationProviderResolver,
+                                   ValueResolver<ConfigurationProvider> configurationProviderResolver,
                                    String target,
                                    String targetValue,
                                    ResolverSet resolverSet,

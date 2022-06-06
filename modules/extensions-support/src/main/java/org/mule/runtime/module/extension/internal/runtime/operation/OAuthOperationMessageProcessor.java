@@ -23,8 +23,8 @@ import org.mule.runtime.extension.api.connectivity.oauth.AccessTokenExpiredExcep
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationProviderResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.streaming.CursorResetHandler;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
@@ -44,7 +44,7 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
 
   public OAuthOperationMessageProcessor(ExtensionModel extensionModel,
                                         OperationModel operationModel,
-                                        ConfigurationProviderResolverWrapper configurationProviderResolver,
+                                        ValueResolver<ConfigurationProvider> configurationProviderResolver,
                                         String target,
                                         String targetValue,
                                         List<EnrichedErrorMapping> errorMappings,
