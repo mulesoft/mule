@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
-import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
+import static org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver.pluginDescriptorResolver;
+import static org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver.pluginModelResolver;
+
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
+import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
 import org.mule.runtime.module.artifact.activation.internal.application.ApplicationDescriptorFactory;
@@ -36,6 +39,14 @@ public class DefaultDeployableArtifactDescriptorFactory implements DeployableArt
   }
 
   @Override
+  public ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
+                                                           Map<String, String> deploymentProperties) {
+    return createApplicationDescriptor(model, deploymentProperties,
+                                       pluginModelResolver(),
+                                       pluginDescriptorResolver());
+  }
+
+  @Override
   public DomainDescriptor createDomainDescriptor(DeployableProjectModel model,
                                                  Map<String, String> deploymentProperties,
                                                  PluginModelResolver pluginModelResolver,
@@ -44,4 +55,10 @@ public class DefaultDeployableArtifactDescriptorFactory implements DeployableArt
                                        ArtifactDescriptorValidatorBuilder.builder()).create();
   }
 
+  @Override
+  public DomainDescriptor createDomainDescriptor(DeployableProjectModel model, Map<String, String> deploymentProperties) {
+    return createDomainDescriptor(model, deploymentProperties,
+                                  pluginModelResolver(),
+                                  pluginDescriptorResolver());
+  }
 }

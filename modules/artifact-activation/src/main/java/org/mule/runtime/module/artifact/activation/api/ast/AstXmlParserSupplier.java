@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.api.ast;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 
@@ -17,6 +18,7 @@ import java.util.Set;
  * @since 4.5.0
  */
 @FunctionalInterface
+@NoImplement
 public interface AstXmlParserSupplier {
 
   /**

@@ -9,6 +9,8 @@ package org.mule.runtime.module.artifact.activation.internal.classloader;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver.pluginDescriptorResolver;
+import static org.mule.runtime.module.artifact.activation.internal.PluginsDependenciesProcessor.process;
+import static org.mule.runtime.module.artifact.activation.internal.PluginsDependenciesProcessor.removeExportedPackagesAlreadyExportedByTransitiveDependencies;
 import static org.mule.runtime.module.artifact.api.classloader.ChildOnlyLookupStrategy.CHILD_ONLY;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
@@ -115,8 +117,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
     regionClassLoader.addClassLoader(domainClassLoader, artifactClassLoaderFilter);
 
     List<ArtifactPluginDescriptor> artifactPluginDescriptors =
-        PluginsDependenciesProcessor.removeExportedPackagesAlreadyExportedByTransitiveDependencies(PluginsDependenciesProcessor
-            .process(descriptor.getPlugins(), false, List::add));
+        removeExportedPackagesAlreadyExportedByTransitiveDependencies(process(descriptor.getPlugins(), false, List::add));
 
     artifactPluginDescriptors
         .stream()

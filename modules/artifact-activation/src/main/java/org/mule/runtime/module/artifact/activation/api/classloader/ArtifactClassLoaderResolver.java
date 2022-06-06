@@ -8,6 +8,7 @@ package org.mule.runtime.module.artifact.activation.api.classloader;
 
 import static java.nio.file.Files.createTempDirectory;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
@@ -34,6 +35,7 @@ import java.util.function.Supplier;
  * 
  * @since 4.5
  */
+@NoImplement
 // TODO W-10914518 - Test with native libraries at all levels: domain, app, plugin.
 public interface ArtifactClassLoaderResolver {
 
