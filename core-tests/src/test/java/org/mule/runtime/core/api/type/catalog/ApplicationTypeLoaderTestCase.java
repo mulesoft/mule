@@ -8,13 +8,21 @@ package org.mule.runtime.core.api.type.catalog;
 
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.STRING;
 import static org.mule.runtime.core.api.type.catalog.SpecialTypesTypeLoader.VOID;
+import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
+import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.TYPES_CATALOG;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ApplicationTypeLoaderTestCase {
+@Feature(REUSE)
+@Story(TYPES_CATALOG)
+public class ApplicationTypeLoaderTestCase extends AbstractMuleTestCase {
 
   private ApplicationTypeLoader applicationTypeLoader;
 

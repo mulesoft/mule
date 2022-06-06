@@ -9,6 +9,7 @@
 
     <operation:def name="parameterWithVoidType" >
         <operation:parameters>
+            <!-- This isn't valid: a parameter can't be void -->
             <operation:parameter name="someparam" type="void" />
         </operation:parameters>
         <operation:output>

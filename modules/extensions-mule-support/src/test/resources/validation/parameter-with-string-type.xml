@@ -7,9 +7,13 @@
         http://www.mulesoft.org/schema/mule/operation http://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd
         http://www.mulesoft.org/schema/mule/this http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd">
 
-    <operation:def name="outputWithoutPayloadType" >
+    <operation:def name="parameterWithStringType" >
+        <operation:parameters>
+            <!-- This is valid -->
+            <operation:parameter name="someparam" type="string" />
+        </operation:parameters>
         <operation:output>
-        <!-- operation:payload-type type="" /-->
+            <operation:payload-type type="string"/>
         </operation:output>
         <operation:body>
             <logger />

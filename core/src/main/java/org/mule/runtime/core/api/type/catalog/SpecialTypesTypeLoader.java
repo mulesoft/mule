@@ -13,8 +13,8 @@ import static java.util.Optional.ofNullable;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.util.collection.SmallMap;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -26,14 +26,10 @@ import java.util.Optional;
  */
 public class SpecialTypesTypeLoader implements TypeLoader {
 
-  private static final Map<String, MetadataType> SPECIAL_TYPES;
   public static final String VOID = "void";
 
-  static {
-    Map<String, MetadataType> types = new HashMap<>(1);
-    types.put(VOID, create(JAVA).voidType().build());
-    SPECIAL_TYPES = unmodifiableMap(types);
-  }
+  private static final Map<String, MetadataType> SPECIAL_TYPES =
+      unmodifiableMap(SmallMap.of(VOID, create(JAVA).voidType().build()));
 
   @Override
   public Optional<MetadataType> load(String typeIdentifier) {

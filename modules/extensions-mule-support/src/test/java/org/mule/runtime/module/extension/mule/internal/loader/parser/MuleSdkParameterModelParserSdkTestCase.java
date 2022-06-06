@@ -20,13 +20,14 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class MuleSdkParameterModelParserSdkTestCase {
+public class MuleSdkParameterModelParserSdkTestCase extends AbstractMuleTestCase {
 
   @Rule
   public ExpectedException expected = none();

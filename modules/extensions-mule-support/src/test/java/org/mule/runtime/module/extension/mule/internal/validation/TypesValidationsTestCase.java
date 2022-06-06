@@ -69,4 +69,10 @@ public class TypesValidationsTestCase extends AbstractConfigFileValidationTestCa
     expected.expectMessage("Parameter 'someparam' references type 'void', which is forbidden for parameters");
     parseConfig("validation/parameter-with-void-type.xml");
   }
+
+  @Test
+  @Description("Parameter type can be a primitive")
+  public void parameterTypeCanBeString() throws Exception {
+    parseConfig("validation/parameter-with-string-type.xml");
+  }
 }
