@@ -66,12 +66,12 @@ public final class CompositeRoutingException extends MuleException implements Co
 
   @Override
   public String getDetailedMessage() {
-    StringBuilder builder = new StringBuilder();
     Map<String, Pair<Error, EventProcessingException>> detailedFailures = getDetailedFailures();
 
     if (detailedFailures.isEmpty()) {
-      return getLegacyDetailedMessage(builder);
+      return getLegacyDetailedMessage();
     } else {
+      StringBuilder builder = new StringBuilder();
       // provide information about the composite exception itself
       builder.append(super.getDetailedMessage());
       // get detailed information about exceptions that make up composite exception
@@ -81,11 +81,12 @@ public final class CompositeRoutingException extends MuleException implements Co
         Throwable exception = entry.getValue().getFirst().getCause();
         appendMessageForExceptions(builder, entry.getKey(), exception, muleException);
       }
+      return builder.toString();
     }
-    return builder.toString();
   }
 
-  private String getLegacyDetailedMessage(StringBuilder builder) {
+  private String getLegacyDetailedMessage() {
+    StringBuilder builder = new StringBuilder();
     builder.append(LEGACY_MESSAGE_TITLE).append(lineSeparator());
     for (Entry<String, Error> entry : routingResult.getFailures().entrySet()) {
       MuleException muleException = ExceptionHelper.getRootMuleException(entry.getValue().getCause());
