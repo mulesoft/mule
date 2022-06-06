@@ -42,6 +42,7 @@ public class MuleContainerWrapper implements WrapperListener {
    */
   public Integer start(String[] args) {
     try {
+      System.out.println("in MuleContainerWrapper.");
       ClassLoader muleSystemCl = createContainerSystemClassLoader();
 
       Thread.currentThread().setContextClassLoader(muleSystemCl);
@@ -49,10 +50,12 @@ public class MuleContainerWrapper implements WrapperListener {
       Class<?> muleClass = Thread.currentThread().getContextClassLoader().loadClass(CLASSNAME_MULE_CONTAINER);
       Constructor<?> c = muleClass.getConstructor(String[].class);
       mule = c.newInstance(new Object[] {args});
+      System.out.println("muleClass." + muleClass);
       Method startMethod = muleClass.getMethod("start", boolean.class);
       startMethod.invoke(mule, true);
       return null;
     } catch (Exception e) {
+      e.printStackTrace();
       StringWriter stackWriter = new StringWriter();
       e.printStackTrace(new PrintWriter(stackWriter));
 
