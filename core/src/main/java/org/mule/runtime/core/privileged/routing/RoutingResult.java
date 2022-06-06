@@ -57,8 +57,6 @@ public final class RoutingResult {
   }
 
   public Map<String, Error> getFailures() {
-    // provide an error map(Map<String, Error>) using either a simple error map(failedRoutesErrorMap)
-    // or an error map with exception info(failedRoutesErrorWithExceptionMap)
     if (!failedRoutesErrorWithExceptionMap.isEmpty()) {
       return failedRoutesErrorWithExceptionMap.entrySet().stream()
           .collect(Collectors.toMap(Map.Entry::getKey, pair -> pair.getValue().getFirst()));

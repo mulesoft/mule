@@ -70,12 +70,7 @@ public final class CompositeRoutingException extends MuleException implements Co
     Map<String, Pair<Error, EventProcessingException>> detailedFailures = getDetailedFailures();
 
     if (detailedFailures.isEmpty()) {
-      builder.append(LEGACY_MESSAGE_TITLE).append(lineSeparator());
-      for (Entry<String, Error> entry : routingResult.getFailures().entrySet()) {
-        MuleException muleException = ExceptionHelper.getRootMuleException(entry.getValue().getCause());
-        Throwable exception = entry.getValue().getCause();
-        appendMessageForExceptions(builder, entry.getKey(), exception, muleException);
-      }
+      return getLegacyDetailedMessage(builder);
     } else {
       // provide information about the composite exception itself
       builder.append(super.getDetailedMessage());
@@ -87,7 +82,16 @@ public final class CompositeRoutingException extends MuleException implements Co
         appendMessageForExceptions(builder, entry.getKey(), exception, muleException);
       }
     }
+    return builder.toString();
+  }
 
+  private String getLegacyDetailedMessage(StringBuilder builder) {
+    builder.append(LEGACY_MESSAGE_TITLE).append(lineSeparator());
+    for (Entry<String, Error> entry : routingResult.getFailures().entrySet()) {
+      MuleException muleException = ExceptionHelper.getRootMuleException(entry.getValue().getCause());
+      Throwable exception = entry.getValue().getCause();
+      appendMessageForExceptions(builder, entry.getKey(), exception, muleException);
+    }
     return builder.toString();
   }
 
@@ -110,8 +114,7 @@ public final class CompositeRoutingException extends MuleException implements Co
       detailedFailures =
           (Map<String, Pair<Error, EventProcessingException>>) getDetailedFailuresMethod.invoke(routingResult);
     } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-      e.printStackTrace();
-      LOGGER.warn("Invalid Invocation, Expected method doesn't exist");
+      LOGGER.warn("Invalid Invocation, Expected method {} doesn't exist", getDetailedFailuresMethod.getName());
     }
     return detailedFailures;
   }
@@ -144,6 +147,5 @@ public final class CompositeRoutingException extends MuleException implements Co
   public Message getErrorMessage() {
     return of(routingResult);
   }
-
 
 }
