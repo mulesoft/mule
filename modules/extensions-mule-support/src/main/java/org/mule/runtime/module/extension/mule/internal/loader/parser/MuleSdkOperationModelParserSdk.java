@@ -77,6 +77,8 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   private static final String TYPE_PARAMETER = "type";
   private static final String VISIBILITY_PARAMETER = "visibility";
   private static final String DEPRECATED_CONSTRUCT_NAME = "deprecated";
+  private static final String PAYLOAD_TYPE_ELEMENT_NAME = "payload-type";
+  private static final String OUTPUT_ELEMENT_NAME = "output";
 
   private final ComponentAst operation;
   private final TypeLoader typeLoader;
@@ -108,11 +110,10 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
     return typeLoader.load(type)
         .map(mt -> new DefaultOutputModelParser(mt, false))
-        .orElseThrow(() -> new IllegalModelDefinitionException(format(
-                                                                      "Component <%s:%s> defines %s as '%s' but such type is not defined in the application",
+        .orElseThrow(() -> new IllegalModelDefinitionException(format("Component <%s:%s> defines %s as '%s' but such type is not defined in the application",
                                                                       outputTypeElement.getIdentifier().getNamespace(),
                                                                       outputTypeElement.getIdentifier().getName(),
-                                                                      outputTypeElement.getIdentifier().getName())));
+                                                                      TYPE_PARAMETER, type)));
   }
 
   @Override
@@ -275,11 +276,10 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   }
 
   private ComponentAst getOutputPayloadTypeElement() {
-    final String elementName = "payload-type";
-    return getOutputElement(elementName)
+    return getOutputElement(PAYLOAD_TYPE_ELEMENT_NAME)
         .orElseThrow(() -> new IllegalOperationModelDefinitionException(format(
                                                                                "Operation '%s' is missing its <%s> declaration",
-                                                                               getName(), elementName)));
+                                                                               getName(), PAYLOAD_TYPE_ELEMENT_NAME)));
   }
 
   private Optional<ComponentAst> getOutputAttributesTypeElement() {
@@ -287,11 +287,11 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   }
 
   private Optional<ComponentAst> getOutputElement(String elementName) {
-    ComponentAst output = operation.directChildrenStreamByIdentifier(null, "output")
+    ComponentAst output = operation.directChildrenStreamByIdentifier(null, OUTPUT_ELEMENT_NAME)
         .findFirst()
         .orElseThrow(() -> new IllegalOperationModelDefinitionException(format(
-                                                                               "Operation '%s' is missing its <output> declaration",
-                                                                               getName())));
+                                                                               "Operation '%s' is missing its <%s> declaration",
+                                                                               getName(), OUTPUT_ELEMENT_NAME)));
 
     return output.directChildrenStreamByIdentifier(null, elementName).findFirst();
   }

@@ -327,6 +327,8 @@ public interface AllureConstants {
 
       String APPLICATION_EXTENSION_MODEL = "Application Extension Model";
       String OPERATIONS = "Operations";
+      String PARAMETERS = "Parameters";
+      String TYPES_CATALOG = "Types Catalog";
     }
   }
 

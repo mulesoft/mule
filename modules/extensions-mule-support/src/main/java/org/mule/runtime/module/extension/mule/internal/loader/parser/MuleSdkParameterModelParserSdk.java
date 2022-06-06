@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
+import static org.mule.runtime.core.api.type.catalog.SpecialTypesTypeLoader.VOID;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
-import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -75,9 +76,18 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
   @Override
   public MetadataType getType() {
     final String type = getParameter(parameter, "type");
-    return typeLoader.load(type).orElseThrow(() -> new IllegalModelDefinitionException(
-                                                                                       format("Parameter '%s' references unknown type '%s'",
-                                                                                              getName(), type)));
+    if (VOID.equals(type)) {
+      throw new IllegalModelDefinitionException(voidParameterIsForbidden());
+    }
+    return typeLoader.load(type).orElseThrow(() -> new IllegalModelDefinitionException(unknownType(type)));
+  }
+
+  private String unknownType(String type) {
+    return format("Parameter '%s' references unknown type '%s'", getName(), type);
+  }
+
+  private String voidParameterIsForbidden() {
+    return format("Parameter '%s' references type '%s', which is forbidden for parameters", getName(), VOID);
   }
 
   @Override
