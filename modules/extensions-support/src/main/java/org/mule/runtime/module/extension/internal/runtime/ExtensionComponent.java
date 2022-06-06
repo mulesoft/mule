@@ -260,11 +260,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
     if (doesConfigurationDependOnEvent()) {
       configurationResolver = event -> {
-        ValueResolvingContext resolvingContext = ValueResolvingContext.builder(event)
-            .withExpressionManager(expressionManager).build();
         ConfigurationProvider configurationProvider;
         try {
-          configurationProvider = configurationProviderResolver.get().resolve(resolvingContext);
+          configurationProvider = resolveConfigurationProvider(configurationProviderResolver.get(), event);
         } catch (MuleException e) {
           throw new IllegalModelDefinitionException(format(
                                                            "Error resolving configuration for component '%s'",
@@ -671,6 +669,16 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return requiresConfig.get();
   }
 
+  private ConfigurationProvider resolveConfigurationProvider(ConfigurationProviderResolverWrapper configurationProviderResolver,
+                                                             CoreEvent event)
+      throws MuleException {
+    ValueResolvingContext valueResolvingContext = ValueResolvingContext.builder(event)
+        .withExpressionManager(expressionManager)
+        .build();
+
+    return configurationProviderResolver.resolve(valueResolvingContext);
+  }
+
   private Optional<ConfigurationProvider> resolveConfigurationProviderStatically(ConfigurationProviderResolverWrapper configurationProviderResolver) {
     // If the resolver is dynamic, then it cannot be resolved statically
     if (configurationProviderResolver.isDynamic()) {
@@ -679,10 +687,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
     // Since the resolver is not dynamic, we can resolve it using a null Event
     CoreEvent nullEvent = getNullEvent(muleContext);
-    ValueResolvingContext valueResolvingContext = ValueResolvingContext.builder(nullEvent).build();
 
     try {
-      return of(configurationProviderResolver.resolve(valueResolvingContext));
+      return of(resolveConfigurationProvider(configurationProviderResolver, nullEvent));
     } catch (MuleException e) {
       throw new MuleRuntimeException(e);
     } finally {
