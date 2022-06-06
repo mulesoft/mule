@@ -10,7 +10,9 @@ import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DS
 import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERATIONS;
+
 import static java.util.Optional.empty;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -18,16 +20,19 @@ import static org.hamcrest.Matchers.not;
 
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
+
 import java.util.Optional;
+
 import org.junit.Test;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Features;
 import io.qameta.allure.Story;
+import io.qameta.allure.Stories;
 
-@Feature(MULE_DSL)
-@Feature(REUSE)
-@Story(DSL_VALIDATION_STORY)
-@Story(OPERATIONS)
+
+@Features({@Feature(MULE_DSL), @Feature(REUSE)})
+@Stories({@Story(DSL_VALIDATION_STORY), @Story(OPERATIONS)})
 public class OperationDoesNotHaveFlowRefTestCase extends AbstractCoreValidationTestCase {
 
   private static final String XML_NAMESPACE_DEF = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
