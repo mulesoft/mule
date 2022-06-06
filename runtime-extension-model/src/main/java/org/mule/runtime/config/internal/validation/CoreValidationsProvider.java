@@ -69,7 +69,8 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                           new FirstSuccessfulRoutes(),
                                                           new ScatterGatherRoutes(),
                                                           new ParseTemplateResourceExist(artifactRegionClassLoader),
-                                                          new SourcePositiveMaxItemsPerPoll()));
+                                                          new SourcePositiveMaxItemsPerPoll(),
+                                                          new OperationDoesNotHaveFlowRef()));
 
     // Do not fail if the expressionLanguage was not provided, skip these validations.
     if (expressionLanguage != null) {
