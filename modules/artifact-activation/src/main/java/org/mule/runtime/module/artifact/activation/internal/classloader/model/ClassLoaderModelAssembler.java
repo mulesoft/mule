@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader.model;
 
+import static java.util.Collections.emptyList;
+import static java.util.Objects.requireNonNull;
+
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
@@ -14,8 +17,6 @@ import org.mule.tools.api.classloader.model.ClassLoaderModel;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Collections.emptyList;
-
 /**
  * Assembles the class loader model for an artifact given all its pieces.
  */
@@ -23,19 +24,19 @@ public class ClassLoaderModelAssembler {
 
   protected static final String CLASS_LOADER_MODEL_VERSION = "1.2.0";
 
-  protected final ArtifactCoordinates artifactCoordinates;
-  protected final List<Artifact> projectDependencies;
-  protected final List<String> availablePackages;
-  protected final List<String> availableResources;
+  private final ArtifactCoordinates artifactCoordinates;
+  private final List<Artifact> projectDependencies;
+  private final List<String> availablePackages;
+  private final List<String> availableResources;
   private final MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor;
 
   public ClassLoaderModelAssembler(ArtifactCoordinates artifactCoordinates, List<Artifact> projectDependencies,
                                    List<String> availablePackages, List<String> availableResources,
                                    MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
-    this.artifactCoordinates = artifactCoordinates;
-    this.projectDependencies = projectDependencies;
-    this.availablePackages = availablePackages;
-    this.availableResources = availableResources;
+    this.artifactCoordinates = requireNonNull(artifactCoordinates);
+    this.projectDependencies = requireNonNull(projectDependencies);
+    this.availablePackages = requireNonNull(availablePackages);
+    this.availableResources = requireNonNull(availableResources);
     this.muleArtifactLoaderDescriptor = muleArtifactLoaderDescriptor;
   }
 
@@ -45,7 +46,7 @@ public class ClassLoaderModelAssembler {
   }
 
   public ClassLoaderModel createClassLoaderModel() {
-    ClassLoaderModel classLoaderModel = new ClassLoaderModel(CLASS_LOADER_MODEL_VERSION, artifactCoordinates);
+    ClassLoaderModel classLoaderModel = new ClassLoaderModel(CLASS_LOADER_MODEL_VERSION, getArtifactCoordinates());
 
     assembleClassLoaderModel(classLoaderModel);
 
@@ -70,4 +71,7 @@ public class ClassLoaderModelAssembler {
     return exportedAttribute.toArray(new String[0]);
   }
 
+  protected ArtifactCoordinates getArtifactCoordinates() {
+    return artifactCoordinates;
+  }
 }

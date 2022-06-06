@@ -34,7 +34,7 @@ public class DeployableClassLoaderModelAssembler<M extends MuleDeployableModel> 
 
   @Override
   public ClassLoaderModel createClassLoaderModel() {
-    AppClassLoaderModel deployableModel = new AppClassLoaderModel(CLASS_LOADER_MODEL_VERSION, artifactCoordinates);
+    AppClassLoaderModel deployableModel = new AppClassLoaderModel(CLASS_LOADER_MODEL_VERSION, getArtifactCoordinates());
     assembleClassLoaderModel(deployableModel);
     deployableModel.setAdditionalPluginDependencies(additionalPluginDependencies);
 
