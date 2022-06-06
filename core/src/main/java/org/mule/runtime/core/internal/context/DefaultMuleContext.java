@@ -22,7 +22,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_REQUIRED_EX
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
@@ -330,7 +330,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureDisableApplyObjectProcessor();
       configureEnableByteBuddyObjectCreation();
       configureValidateAppModelWithRegionClassloader();
-      configurePrintLegacyCompositeExceptionLog();
+      configurePrintDetailedCompositeExceptionLog();
     }
   }
 
@@ -1447,13 +1447,13 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   }
 
   /**
-   * Configures the {@link MuleRuntimeFeature#MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG} feature flag.
+   * Configures the {@link MuleRuntimeFeature#MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG} feature flag.
    *
    * @since 5.0.0
    */
-  private static void configurePrintLegacyCompositeExceptionLog() {
+  private static void configurePrintDetailedCompositeExceptionLog() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG,
+    featureFlaggingRegistry.registerFeatureFlag(MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG,
                                                 minMuleVersion("5.0.0"));
   }
 

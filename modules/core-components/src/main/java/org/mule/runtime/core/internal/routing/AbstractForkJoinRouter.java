@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.internal.routing;
 
-import static org.mule.runtime.api.config.MuleRuntimeFeature.MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.TIMEOUT;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
@@ -123,12 +123,12 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
     timeoutErrorType = errorTypeRepository.getErrorType(TIMEOUT).get();
     maxConcurrency = maxConcurrency != null ? maxConcurrency : getDefaultMaxConcurrency();
     forkJoinStrategyFactory = forkJoinStrategyFactory != null ? forkJoinStrategyFactory : getDefaultForkJoinStrategyFactory();
-    boolean isLegacyCompositeRoutingExceptionLogEnabled =
-        featureFlaggingService.isEnabled(MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG);
+    boolean isDetailedCompositeRoutingExceptionLogEnabled =
+        featureFlaggingService.isEnabled(MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG);
     forkJoinStrategy =
         forkJoinStrategyFactory.createForkJoinStrategy(resolveProcessingStrategy(), maxConcurrency,
                                                        isDelayErrors(), timeout, timeoutScheduler, timeoutErrorType,
-                                                       isLegacyCompositeRoutingExceptionLogEnabled);
+                                                       isDetailedCompositeRoutingExceptionLogEnabled);
   }
 
   protected ProcessingStrategy resolveProcessingStrategy() {
