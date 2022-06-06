@@ -19,6 +19,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
+import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERATIONS;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
@@ -29,13 +31,18 @@ import org.mule.runtime.extension.api.model.notification.ImmutableNotificationMo
 import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic;
 import java.util.HashSet;
 import java.util.List;
-
 import org.junit.Test;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 
+@Feature(REUSE)
+@Story(OPERATIONS)
 public class CharacteristicsTestsCase {
 
   @Test
+  @Description("Checks that AnyMatchCharacteristic is updated accordingly after different computations")
   public void anyMatchTestCase() {
     OperationModel model = mock(OperationModel.class);
     Reference<Boolean> value = new Reference<>(FALSE);
@@ -56,6 +63,7 @@ public class CharacteristicsTestsCase {
   }
 
   @Test
+  @Description("Checks that AnyMatchFilteringCharacteristic is updated accordingly after different computations, including filters")
   public void anyMathFilterTestCase() {
     OperationModel model = mock(OperationModel.class);
     ComponentAst ast = mock(ComponentAst.class);
@@ -91,6 +99,7 @@ public class CharacteristicsTestsCase {
   }
 
   @Test
+  @Description("Checks that AggregatedNotificationsCharacteristic is updated accordingly and aggregates results after different computations")
   public void aggregatedTestCase() {
     OperationModel model1 = mock(OperationModel.class);
     OperationModel model2 = mock(OperationModel.class);
