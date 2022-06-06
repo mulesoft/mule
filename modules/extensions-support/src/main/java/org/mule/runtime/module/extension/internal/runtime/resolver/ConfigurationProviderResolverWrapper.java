@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -16,8 +14,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-
-import java.util.Optional;
 
 /**
  * A {@link ValueResolver} wrapper which returns a {@link ConfigurationProvider} obtained through a {@link ValueResolver
@@ -44,21 +40,9 @@ public class ConfigurationProviderResolverWrapper
     return delegate.resolve(context);
   }
 
-  public Optional<ConfigurationProvider> resolve() throws MuleException {
-    if (dependsOnEvent()) {
-      return empty();
-    }
-
-    return of(((EventAgnosticValueResolver<ConfigurationProvider>) delegate).resolve());
-  }
-
   @Override
   public boolean isDynamic() {
     return delegate.isDynamic();
-  }
-
-  public boolean dependsOnEvent() {
-    return !(delegate instanceof EventAgnosticValueResolver);
   }
 
   @Override

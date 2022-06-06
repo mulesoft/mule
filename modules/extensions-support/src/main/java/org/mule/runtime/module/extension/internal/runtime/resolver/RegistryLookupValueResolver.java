@@ -25,7 +25,7 @@ import javax.inject.Inject;
  *
  * @since 3.7.0
  */
-public class RegistryLookupValueResolver<T> implements EventAgnosticValueResolver<T> {
+public class RegistryLookupValueResolver<T> implements ValueResolver<T> {
 
   private final String key;
   private final Once.RunOnce keyValidator;
@@ -46,12 +46,13 @@ public class RegistryLookupValueResolver<T> implements EventAgnosticValueResolve
   /**
    * Returns the registry value associated with {@link #key}
    *
+   * @param context a {@link ValueResolvingContext}
    * @return the registry value associated with {@link #key}
    * @throws MuleException          if an error occurred fetching the value
    * @throws ConfigurationException if no object is registered under {@link #key}
    */
   @Override
-  public T resolve() throws MuleException {
+  public T resolve(ValueResolvingContext context) throws MuleException {
     keyValidator.runOnce();
     return registry.<T>lookupByName(key)
         .orElseThrow(() -> new ConfigurationException(createStaticMessage(format("Element '%s' is not defined in the Mule Registry",

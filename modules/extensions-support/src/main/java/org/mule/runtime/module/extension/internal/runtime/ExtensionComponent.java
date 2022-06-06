@@ -20,7 +20,6 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
-import static org.mule.runtime.core.privileged.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
@@ -74,7 +73,6 @@ import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.privileged.util.TemplateParser;
 import org.mule.runtime.extension.api.data.sample.ComponentSampleDataProvider;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -240,7 +238,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
         initialiseIfNeeded(configProviderResolver.get(), muleContext);
       }
       initConfigurationResolver();
-      configProviderResolver.flatMap(this::resolveConfigurationProvider).ifPresent(this::validateOperationConfiguration);
+      configProviderResolver.flatMap(this::resolveConfigurationProviderStatically)
+          .ifPresent(this::validateOperationConfiguration);
       doInitialise();
       return null;
     }, InitialisationException.class, e -> {
@@ -629,12 +628,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                          () -> new MetadataResolvingException("Failed to create the required configuration for Metadata retrieval",
                                                               INVALID_CONFIGURATION));
 
-        if (configurationProviderResolver.dependsOnEvent()) {
-          throw new MetadataResolvingException("Configuration used for Metadata fetch cannot depend on Event context",
-                                               INVALID_CONFIGURATION);
-        }
-
-        Optional<ConfigurationProvider> configurationProvider = resolveConfigurationProvider(configurationProviderResolver);
+        Optional<ConfigurationProvider> configurationProvider =
+            resolveConfigurationProviderStatically(configurationProviderResolver);
         if (!configurationProvider.isPresent() || configurationProvider.get() instanceof DynamicConfigurationProvider) {
           throw new MetadataResolvingException("Configuration used for Metadata fetch cannot be dynamic", INVALID_CONFIGURATION);
         }
@@ -676,20 +671,29 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return requiresConfig.get();
   }
 
-  private Optional<ConfigurationProvider> resolveConfigurationProvider(ConfigurationProviderResolverWrapper configurationProviderResolver) {
-    if (configurationProviderResolver.dependsOnEvent()) {
+  private Optional<ConfigurationProvider> resolveConfigurationProviderStatically(ConfigurationProviderResolverWrapper configurationProviderResolver) {
+    // If the resolver is dynamic, then it cannot be resolved statically
+    if (configurationProviderResolver.isDynamic()) {
       return empty();
     }
 
+    // Since the resolver is not dynamic, we can resolve it using a null Event
+    CoreEvent nullEvent = getNullEvent(muleContext);
+    ValueResolvingContext valueResolvingContext = ValueResolvingContext.builder(nullEvent).build();
+
     try {
-      return configurationProviderResolver.resolve();
+      return of(configurationProviderResolver.resolve(valueResolvingContext));
     } catch (MuleException e) {
       throw new MuleRuntimeException(e);
+    } finally {
+      if (nullEvent != null) {
+        ((BaseEventContext) nullEvent.getContext()).success();
+      }
     }
   }
 
   protected Optional<ConfigurationProvider> getConfigurationProvider() {
-    return resolveConfigurationProvider(configurationProviderResolver.get());
+    return resolveConfigurationProviderStatically(configurationProviderResolver.get());
   }
 
   protected boolean usesDynamicConfiguration() {
@@ -739,7 +743,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   private boolean doesConfigurationDependOnEvent() {
-    return isConfigurationSpecified() && configurationProviderResolver.get().dependsOnEvent();
+    return isConfigurationSpecified() && configurationProviderResolver.get().isDynamic();
   }
 
   private boolean computeRequiresConfig() {
