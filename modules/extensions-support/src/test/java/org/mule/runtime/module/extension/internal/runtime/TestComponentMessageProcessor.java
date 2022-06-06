@@ -16,8 +16,8 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ResultTransformer;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationProviderResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 public abstract class TestComponentMessageProcessor extends ComponentMessageProcessor<ComponentModel> {
@@ -30,7 +30,7 @@ public abstract class TestComponentMessageProcessor extends ComponentMessageProc
                                        ReflectionCache reflectionCache, ResultTransformer resultTransformer,
                                        long terminationTimeout) {
     super(extensionModel, componentModel,
-          configurationProvider != null ? new ConfigurationProviderResolverWrapper(configurationProvider) : null, target,
+          configurationProvider != null ? new StaticValueResolver<>(configurationProvider) : null, target,
           targetValue,
           resolverSet, cursorProviderFactory,
           retryPolicyTemplate, nestedChain, extensionManager, policyManager, reflectionCache, resultTransformer,

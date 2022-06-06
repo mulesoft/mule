@@ -27,9 +27,9 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationProviderResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
@@ -157,17 +157,17 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
 
   protected ValueResolver<ConfigurationProvider> getConfigurationProviderResolver() {
     // Uses the configurationProvider given to the builder if any, otherwise evaluates the parameters.
-    return configurationProvider != null ? new ConfigurationProviderResolverWrapper(configurationProvider)
+    return configurationProvider != null ? new StaticValueResolver<>(configurationProvider)
         : getConfigurationProviderResolver(parameters.get(CONFIG_ATTRIBUTE_NAME));
   }
 
   private ValueResolver<ConfigurationProvider> getConfigurationProviderResolver(Object configRefParameter) {
     if (configRefParameter instanceof ValueResolver) {
-      return new ConfigurationProviderResolverWrapper((ValueResolver<ConfigurationProvider>) configRefParameter);
+      return (ValueResolver<ConfigurationProvider>) configRefParameter;
     }
 
     if (configRefParameter instanceof ConfigurationProvider) {
-      return new ConfigurationProviderResolverWrapper((ConfigurationProvider) configRefParameter);
+      return new StaticValueResolver<>((ConfigurationProvider) configRefParameter);
     }
 
     return null;

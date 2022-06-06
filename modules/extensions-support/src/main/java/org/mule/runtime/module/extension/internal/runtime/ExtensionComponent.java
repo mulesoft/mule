@@ -32,7 +32,6 @@ import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.dsl.DslResolvingContext;
-import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
@@ -88,8 +87,8 @@ import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataContex
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.config.DynamicConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationProviderResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
@@ -189,7 +188,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                                CursorProviderFactory cursorProviderFactory,
                                ExtensionManager extensionManager) {
     this(extensionModel, componentModel,
-         configurationProvider != null ? new ConfigurationProviderResolverWrapper(configurationProvider) : null,
+         configurationProvider != null ? new StaticValueResolver<>(configurationProvider) : null,
          cursorProviderFactory,
          extensionManager);
   }
@@ -291,7 +290,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     }
   }
 
-  private Optional<ConfigurationInstance> resolveConfigFromProvider(ConfigurationProvider configurationProvider, Event event) {
+  private Optional<ConfigurationInstance> resolveConfigFromProvider(ConfigurationProvider configurationProvider,
+                                                                    CoreEvent event) {
     ConfigurationInstance instance = configurationProvider.get(event);
     if (instance == null) {
       throw new IllegalModelDefinitionException(format(
@@ -743,7 +743,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     }
 
     return extensionManager.getConfigurationProvider(extensionModel, componentModel)
-        .map(ConfigurationProviderResolverWrapper::new);
+        .map(StaticValueResolver::new);
   }
 
   private boolean isConfigurationSpecified() {
