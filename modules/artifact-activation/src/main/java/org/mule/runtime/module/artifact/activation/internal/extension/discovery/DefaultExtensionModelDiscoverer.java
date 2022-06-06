@@ -6,14 +6,10 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.extension.discovery;
 
-import static java.lang.Thread.currentThread;
 import static java.util.Collections.unmodifiableSet;
-import static java.util.stream.Collectors.toSet;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
-import org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionDiscoveryRequest;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer;
 import org.mule.runtime.module.artifact.activation.internal.PluginsDependenciesProcessor;
