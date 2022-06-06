@@ -194,7 +194,7 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
 
     verify(mockForkJoinStrategyFactory).createForkJoinStrategy(any(ProcessingStrategy.class), eq(concurrency), eq(true),
                                                                eq(timeout),
-                                                               any(Scheduler.class), any(ErrorType.class));
+                                                               any(Scheduler.class), any(ErrorType.class), false);
   }
 
 

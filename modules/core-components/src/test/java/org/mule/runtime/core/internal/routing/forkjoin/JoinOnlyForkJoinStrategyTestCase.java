@@ -34,7 +34,7 @@ public class JoinOnlyForkJoinStrategyTestCase extends AbstractForkJoinStrategyTe
                                             long timeout) {
     return new JoinOnlyForkJoinStrategyFactory().createForkJoinStrategy(processingStrategy, concurrency, delayErrors, timeout,
                                                                         scheduler,
-                                                                        timeoutErrorType);
+                                                                        timeoutErrorType, false);
   }
 
   @Test

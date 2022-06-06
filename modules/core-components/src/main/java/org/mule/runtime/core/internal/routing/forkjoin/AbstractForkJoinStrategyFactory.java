@@ -13,7 +13,7 @@ import static java.time.Duration.ofMillis;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG_PROPERTY;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ERROR_HANDLER_CONTEXT;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
@@ -89,7 +89,8 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
 
   @Override
   public ForkJoinStrategy createForkJoinStrategy(ProcessingStrategy processingStrategy, int maxConcurrency, boolean delayErrors,
-                                                 long timeout, Scheduler timeoutScheduler, ErrorType timeoutErrorType) {
+                                                 long timeout, Scheduler timeoutScheduler, ErrorType timeoutErrorType,
+                                                 boolean isLegacyLogEnabled) {
     reactor.core.scheduler.Scheduler reactorTimeoutScheduler = Schedulers.fromExecutorService(timeoutScheduler);
     return (original, routingPairs) -> {
       final AtomicInteger count = new AtomicInteger();
@@ -113,7 +114,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
               throw propagate(createCompositeRoutingException(listBooleanPair.getFirst().stream()
                   .map(coreEventExceptionPair -> removeOriginalError(coreEventExceptionPair,
                                                                      original.getError()))
-                  .collect(toList())));
+                  .collect(toList()), isLegacyLogEnabled));
             }
           })
           .map(listBooleanPair -> listBooleanPair.getFirst().stream().map(Pair::getFirst).collect(Collectors.toList()))
@@ -220,7 +221,8 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
         + pair.getEvent().getGroupCorrelation().get().getSequence() + "'";
   }
 
-  private CompositeRoutingException createCompositeRoutingException(List<Pair<CoreEvent, EventProcessingException>> results) {
+  private CompositeRoutingException createCompositeRoutingException(List<Pair<CoreEvent, EventProcessingException>> results,
+                                                                    boolean isLegacyLogEnabled) {
     Map<String, Message> successMap = new LinkedHashMap<>();
     Map<String, Pair<Error, EventProcessingException>> errorMap = new LinkedHashMap<>();
 
@@ -233,7 +235,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
         successMap.put(key, eventExceptionPair.getFirst().getMessage());
       }
     }
-    if (parseBoolean(getProperty(MULE_PRINT_LEGACY_COMPOSITE_EXCEPTION_LOG))) {
+    if (isLegacyLogEnabled) {
       Map<String, Error> previousErrorMap =
           errorMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, pair -> pair.getValue().getFirst()));
       return new CompositeRoutingException(new RoutingResult(successMap, previousErrorMap));

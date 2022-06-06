@@ -38,7 +38,7 @@ public class CollectListForkJoinStrategyTestCase extends AbstractForkJoinStrateg
                                             long timeout) {
     return new CollectListForkJoinStrategyFactory().createForkJoinStrategy(processingStrategy, concurrency, delayErrors, timeout,
                                                                            scheduler,
-                                                                           timeoutErrorType);
+                                                                           timeoutErrorType, false);
   }
 
   @Test
@@ -66,7 +66,7 @@ public class CollectListForkJoinStrategyTestCase extends AbstractForkJoinStrateg
   @Description("Checks that variables are not merged if set as it")
   public void flowVarsNotMerged() throws Throwable {
     strategy = new CollectListForkJoinStrategyFactory(false).createForkJoinStrategy(processingStrategy, 1, true, 50, scheduler,
-                                                                                    timeoutErrorType);
+                                                                                    timeoutErrorType, false);
     final String beforeVarName = "before";
     final String beforeVarValue = "beforeValue";
     final String beforeVar2Name = "before2";

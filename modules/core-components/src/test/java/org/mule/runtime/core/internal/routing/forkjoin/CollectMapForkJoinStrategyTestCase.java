@@ -36,7 +36,7 @@ public class CollectMapForkJoinStrategyTestCase extends AbstractForkJoinStrategy
                                             long timeout) {
     return new CollectMapForkJoinStrategyFactory().createForkJoinStrategy(processingStrategy, concurrency, delayErrors, timeout,
                                                                           scheduler,
-                                                                          timeoutErrorType);
+                                                                          timeoutErrorType, false);
   }
 
   @Test

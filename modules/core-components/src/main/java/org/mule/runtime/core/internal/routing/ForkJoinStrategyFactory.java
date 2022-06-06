@@ -24,11 +24,12 @@ public interface ForkJoinStrategyFactory {
    * @param delayErrors        if all routers/parts should be processed regardless of errors and a
    *                           {@link CompositeRoutingException} thrown or not.
    * @param timeoutErrorType   the timeout error type.
+   * @param isLegacyLogEnabled
    * @return new instance of {@link ForkJoinStrategy}
    */
   ForkJoinStrategy createForkJoinStrategy(ProcessingStrategy processingStrategy, int maxConcurrency, boolean delayErrors,
                                           long timeout, Scheduler timeoutScheduler,
-                                          ErrorType timeoutErrorType);
+                                          ErrorType timeoutErrorType, boolean isLegacyLogEnabled);
 
   DataType getResultDataType();
 
