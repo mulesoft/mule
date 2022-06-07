@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
+import static org.mule.runtime.module.artifact.activation.api.descriptor.DomainDescriptorResolver.domainDescriptorResolver;
 import static org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver.pluginDescriptorResolver;
 import static org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver.pluginModelResolver;
 
@@ -34,11 +35,6 @@ public class DefaultDeployableArtifactDescriptorFactory implements DeployableArt
                                                            Map<String, String> deploymentProperties,
                                                            PluginModelResolver pluginModelResolver,
                                                            PluginDescriptorResolver pluginDescriptorResolver,
-                                                           // TODO: if we invoke this resolver we must be handed a domain
-                                                           // descriptor,
-                                                           // should this return an optional and in case it's empty we fail, or
-                                                           // should the caller fail
-                                                           // in case it can't find the domain descriptor required?
                                                            DomainDescriptorResolver domainDescriptorResolver) {
     return new ApplicationDescriptorFactory(model, deploymentProperties, pluginModelResolver, pluginDescriptorResolver,
                                             ArtifactDescriptorValidatorBuilder.builder(), domainDescriptorResolver).create();
@@ -52,6 +48,12 @@ public class DefaultDeployableArtifactDescriptorFactory implements DeployableArt
                                        pluginModelResolver(),
                                        pluginDescriptorResolver(),
                                        domainDescriptorResolver);
+  }
+
+  @Override
+  public ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
+                                                           Map<String, String> deploymentProperties) {
+    return createApplicationDescriptor(model, deploymentProperties, domainDescriptorResolver());
   }
 
   @Override

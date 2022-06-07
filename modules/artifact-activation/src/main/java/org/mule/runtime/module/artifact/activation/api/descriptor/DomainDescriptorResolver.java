@@ -17,6 +17,13 @@ import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 public interface DomainDescriptorResolver {
 
   /**
+   * @return the default implementation of a {@link DomainDescriptorResolver}.
+   */
+  static DomainDescriptorResolver domainDescriptorResolver() {
+    return bundleDescriptor -> null;
+  }
+
+  /**
    * Holds the logic to obtain a {@link DomainDescriptor} based on the given {@link BundleDescriptor}.
    *
    * @param bundleDescriptor the bundle descriptor of the domain to get the artifact descriptor for.

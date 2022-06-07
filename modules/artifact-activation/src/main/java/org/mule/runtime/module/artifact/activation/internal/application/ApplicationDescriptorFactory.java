@@ -94,7 +94,16 @@ public class ApplicationDescriptorFactory
       return empty();
     }
 
+    if (domainDescriptorResolver == null) {
+      throw new IllegalStateException(format("Application depends on domain '%s', a domain descriptor resolver must be provided",
+                                             configuredDomainName));
+    }
+
     DomainDescriptor domainDescriptor = domainDescriptorResolver.resolve(domainBundleDescriptor.get());
+
+    if (domainDescriptor == null) {
+      throw new IllegalStateException(format("Domain '%s' couldn't be fetched", configuredDomainName));
+    }
 
     if (!isCompatibleBundle(domainDescriptor.getBundleDescriptor(), domainBundleDescriptor.get())) {
       throw new DomainDescriptorResolutionException(createStaticMessage("Domain was found, but the bundle descriptor is incompatible"));
