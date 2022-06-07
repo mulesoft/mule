@@ -100,7 +100,7 @@ public class MacroExpansionModulesModel {
           .filter(comp -> !applicationModel.topLevelComponents().contains(comp)).collect(toList());
       applicationModel = copyRecursively(applicationModel, comp -> {
         List<ComponentAst> childrenToKeep = comp.directChildrenStream()
-            .filter(child -> !FLOW.equals(comp.getComponentType()))
+            .filter(child -> !(child.getComponentType() != null && child.getComponentType().equals(FLOW)))
             .collect(toList());
         return new BaseComponentAstDecorator(comp) {
 
