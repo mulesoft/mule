@@ -62,7 +62,7 @@ public interface ArtifactClassLoaderResolver {
    * regionClassLoader, classLoaders for plugins.
    * </p>
    * The given descriptor must have its dependencies' exported packages sanitized (i.e. dependencies must not have packages that
-   * are already exported by their transitive dependencies).
+   * are already exported by their transitive dependencies nor any other dependency).
    *
    * @param descriptor the descriptor of the domain to generate a class loader for.
    * @return a class loader for a domain.
@@ -74,7 +74,7 @@ public interface ArtifactClassLoaderResolver {
    * regionClassLoader, classLoaders for plugins.
    * </p>
    * The given descriptor must have its dependencies' exported packages sanitized (i.e. dependencies must not have packages that
-   * are already exported by their transitive dependencies).
+   * are already exported by their transitive dependencies nor any other dependency).
    * 
    * @param descriptor                the descriptor of the domain to generate a class loader for.
    * @param pluginClassLoaderResolver allows the user to provide a class loader for the given plugin, otherwise it will be
@@ -89,7 +89,7 @@ public interface ArtifactClassLoaderResolver {
    * regionClassLoader, classLoaders for plugins.
    * </p>
    * The given descriptor must have its dependencies' exported packages sanitized (i.e. dependencies must not have packages that
-   * are already exported by their transitive dependencies).
+   * are already exported by their transitive dependencies nor any other dependency).
    *
    * @param descriptor the descriptor of the application to generate a class loader for.
    * @return a class loader for an application.
@@ -101,7 +101,7 @@ public interface ArtifactClassLoaderResolver {
    * regionClassLoader, classLoaders for plugins.
    * </p>
    * The given descriptor must have its dependencies' exported packages sanitized (i.e. dependencies must not have packages that
-   * are already exported by their transitive dependencies).
+   * are already exported by their transitive dependencies nor any other dependency).
    *
    * @param descriptor                the descriptor of the application to generate a class loader for.
    * @param pluginClassLoaderResolver allows the user to provide a class loader for the given plugin, otherwise it will be
@@ -116,7 +116,7 @@ public interface ArtifactClassLoaderResolver {
    * regionClassLoader, classLoaders for plugins.
    * </p>
    * The given descriptor must have its dependencies' exported packages sanitized (i.e. dependencies must not have packages that
-   * are already exported by their transitive dependencies).
+   * are already exported by their transitive dependencies nor any other dependency).
    * 
    * @param descriptor        the descriptor of the application to generate a class loader for.
    * @param domainClassLoader the class loader of the domain the application belongs to.
@@ -130,7 +130,7 @@ public interface ArtifactClassLoaderResolver {
    * regionClassLoader, classLoaders for plugins.
    * </p>
    * The given descriptor must have its dependencies' exported packages sanitized (i.e. dependencies must not have packages that
-   * are already exported by their transitive dependencies).
+   * are already exported by their transitive dependencies nor any other dependency).
    *
    * @param descriptor                the descriptor of the application to generate a class loader for.
    * @param domainClassLoader         the class loader of the domain the application belongs to.
