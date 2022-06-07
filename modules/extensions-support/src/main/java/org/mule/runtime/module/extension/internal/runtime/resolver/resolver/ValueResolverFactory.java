@@ -25,6 +25,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExclusiveOptionalModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
@@ -115,7 +116,7 @@ public class ValueResolverFactory {
       resolver = new ExpressionTypedValueValueResolver<>(value, expectedClass);
     } else if (isLiteral(expectedType) || isTargetParameter(modelProperties)) {
       resolver = new StaticLiteralValueResolver<>(value, expectedClass);
-    } else if (acceptsReferences) {
+    } else if (acceptsReferences && expectedClass.equals(ConfigurationProvider.class)) {
       ValueResolver<String> keyResolver = new TypeSafeExpressionValueResolver<>(value, String.class, fromType(String.class));
       return new RegistryLookupValueResolverWrapper<>(keyResolver);
     } else {
