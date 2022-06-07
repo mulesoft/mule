@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -70,6 +71,8 @@ public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
     if (!valueResolverDelegate.isDynamic() && !InputStream.class.isAssignableFrom(expectedType)) {
       resolver = new CachedResolver(resolver);
     }
+
+    initialiseIfNeeded(valueResolverDelegate, true, muleContext);
   }
 
   public void setTransformationService(TransformationService transformationService) {

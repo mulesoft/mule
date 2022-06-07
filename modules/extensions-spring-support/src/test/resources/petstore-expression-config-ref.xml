@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+      xmlns:marvel="http://www.mulesoft.org/schema/mule/marvel"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
+               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd
+               http://www.mulesoft.org/schema/mule/marvel http://www.mulesoft.org/schema/mule/marvel/current/mule-marvel.xsd">
 
     <petstore:config name="john-store" cashierName="jim">
         <petstore:connection username="john" password="doe"/>
@@ -23,12 +25,28 @@
         </petstore:pets>
     </petstore:config>
 
+    <object name="some-non-config" class="org.mule.test.module.extension.reconnection.ReconnectionTestCase$CaptureProcessor"/>
+
+    <marvel:iron-man-config name="some-incompatible-config" />
+
     <flow name="getPetsWithReference">
         <petstore:get-pets ownerName="john" config-ref="paw-patrol-store"/>
     </flow>
 
     <flow name="getPetsWithExpression">
         <petstore:get-pets ownerName="john" config-ref="#[vars.storeName ++ '-store']"/>
+    </flow>
+
+    <flow name="getPetsWithExpressionResolvingToNonConfig">
+        <petstore:get-pets ownerName="john" config-ref="#['some-non-config']"/>
+    </flow>
+
+    <flow name="getPetsWithExpressionResolvingToIncompatibleConfig">
+        <petstore:get-pets ownerName="john" config-ref="#['some-incompatible-config']"/>
+    </flow>
+
+    <flow name="getPetsWithExpressionResolvingToEmptyString">
+        <petstore:get-pets ownerName="john" config-ref="#['']"/>
     </flow>
 
 </mule>

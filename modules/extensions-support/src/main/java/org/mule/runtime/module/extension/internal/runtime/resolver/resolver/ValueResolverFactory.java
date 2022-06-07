@@ -37,6 +37,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.RequiredParam
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticLiteralValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.sdk.api.runtime.parameter.Literal;
@@ -117,8 +118,10 @@ public class ValueResolverFactory {
     } else if (isLiteral(expectedType) || isTargetParameter(modelProperties)) {
       resolver = new StaticLiteralValueResolver<>(value, expectedClass);
     } else if (acceptsReferences && expectedClass.equals(ConfigurationProvider.class)) {
+      // This case is for expressions support in config-refs, the idea is that the expression will resolve to a string
+      // reference, and we will take care of performing the lookup for the global configuration provider.
       ValueResolver<String> keyResolver = new TypeSafeExpressionValueResolver<>(value, String.class, fromType(String.class));
-      return new RegistryLookupValueResolverWrapper<>(keyResolver);
+      return new TypeSafeValueResolverWrapper<>(new RegistryLookupValueResolverWrapper<>(keyResolver), expectedClass);
     } else {
       resolver = new TypeSafeExpressionValueResolver<>(value, expectedClass, toDataType(expectedType));
     }

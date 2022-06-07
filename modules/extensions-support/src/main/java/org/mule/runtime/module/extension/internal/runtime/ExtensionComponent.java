@@ -263,6 +263,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
         ConfigurationProvider configurationProvider;
         try {
           configurationProvider = resolveConfigurationProvider(configurationProviderResolver.get(), event);
+          validateDynamicOperationConfiguration(configurationProvider);
         } catch (MuleException e) {
           throw new IllegalModelDefinitionException(format(
                                                            "Error resolving configuration for component '%s'",
@@ -381,6 +382,23 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    * @param configurationProvider
    */
   protected abstract void validateOperationConfiguration(ConfigurationProvider configurationProvider);
+
+  /**
+   * Validates that the configuration returned by the {@code configurationProvider} is compatible with the associated
+   * {@link ComponentModel}.
+   * <p>
+   * The difference with {@link #validateOperationConfiguration(ConfigurationProvider)} is that this version will wrap the thrown
+   * exception with {@link IllegalArgumentException} which is more suitable for runtime validations.
+   *
+   * @param configurationProvider
+   */
+  private void validateDynamicOperationConfiguration(ConfigurationProvider configurationProvider) {
+    try {
+      validateOperationConfiguration(configurationProvider);
+    } catch (Exception e) {
+      throw new IllegalArgumentException(e.getMessage(), e);
+    }
+  }
 
   @Override
   public void setMuleContext(MuleContext context) {

@@ -65,9 +65,6 @@ public class RegistryLookupValueResolverWrapper<T> implements ValueResolver<T>, 
                                                                                  key))));
   }
 
-  /**
-   * @return {@code false}
-   */
   @Override
   public boolean isDynamic() {
     return delegate.isDynamic();
