@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG_PROPERTY;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.test.allure.AllureConstants.ForkJoinStrategiesFeature.ForkJoinStrategiesStory.COLLECT_LIST;
 
@@ -22,23 +23,44 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.List;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Story;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 @Story(COLLECT_LIST)
 public class CollectListForkJoinStrategyTestCase extends AbstractForkJoinStrategyTestCase {
+
+  @Rule
+  public SystemProperty detailedCompositeRoutingExceptionLog;
+
+  public CollectListForkJoinStrategyTestCase(boolean detailedCompositeRoutingExceptionLog) {
+    this.detailedCompositeRoutingExceptionLog = new SystemProperty(MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG_PROPERTY,
+                                                                   Boolean.toString(detailedCompositeRoutingExceptionLog));
+  }
+
+  @Parameterized.Parameters(name = "Detailed log: {0}")
+  public static List<Object[]> parameters() {
+    return asList(
+                  new Object[] {true},
+                  new Object[] {false});
+  }
 
   @Override
   protected ForkJoinStrategy createStrategy(ProcessingStrategy processingStrategy, int concurrency, boolean delayErrors,
                                             long timeout) {
+    boolean isDetailedLogEnabled = Boolean.parseBoolean(detailedCompositeRoutingExceptionLog.getValue());
     return new CollectListForkJoinStrategyFactory().createForkJoinStrategy(processingStrategy, concurrency, delayErrors, timeout,
                                                                            scheduler,
-                                                                           timeoutErrorType);
+                                                                           timeoutErrorType, isDetailedLogEnabled);
   }
 
   @Test
@@ -65,8 +87,9 @@ public class CollectListForkJoinStrategyTestCase extends AbstractForkJoinStrateg
   @Test
   @Description("Checks that variables are not merged if set as it")
   public void flowVarsNotMerged() throws Throwable {
+    boolean isDetailedLogEnabled = Boolean.parseBoolean(detailedCompositeRoutingExceptionLog.getValue());
     strategy = new CollectListForkJoinStrategyFactory(false).createForkJoinStrategy(processingStrategy, 1, true, 50, scheduler,
-                                                                                    timeoutErrorType);
+                                                                                    timeoutErrorType, isDetailedLogEnabled);
     final String beforeVarName = "before";
     final String beforeVarValue = "beforeValue";
     final String beforeVar2Name = "before2";
