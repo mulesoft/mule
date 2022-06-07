@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.artifact.classloader;
 
-
-
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;

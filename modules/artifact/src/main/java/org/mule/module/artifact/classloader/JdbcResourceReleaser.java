@@ -6,7 +6,9 @@
  */
 package org.mule.module.artifact.classloader;
 
-import static org.mule.module.artifact.classloader.ThreadCommonMethodsUtil.*;
+import static org.mule.module.artifact.classloader.ThreadCommonMethodsUtil.clearReferencesStopTimerThread;
+import static org.mule.module.artifact.classloader.ThreadCommonMethodsUtil.isThreadLoadedByDisposedApplication;
+import static org.mule.module.artifact.classloader.ThreadCommonMethodsUtil.isThreadLoadedByDisposedDomain;
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.Thread.activeCount;
