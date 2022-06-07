@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import org.mule.runtime.api.component.location.ComponentLocation;
-
 import static java.lang.System.currentTimeMillis;
+
+import org.mule.runtime.api.component.ComponentIdentifier;
 
 import java.io.Serializable;
 
@@ -19,22 +19,22 @@ import java.io.Serializable;
  */
 public final class FlowStackElement implements Serializable {
 
-  private static final long serialVersionUID = 2793408009938124247L;
+  private static final long serialVersionUID = -2372094725681872367L;
 
   private final String flowName;
   private final String processorPath;
   private final long creationTime;
-  private final ComponentLocation componentLocation;
+  private final transient ComponentIdentifier componentIdentifier;
 
   public FlowStackElement(String flowName, String processorPath) {
     this(flowName, processorPath, null);
   }
 
-  public FlowStackElement(String flowName, String processorPath, ComponentLocation componentLocation) {
+  public FlowStackElement(String flowName, String processorPath, ComponentIdentifier componentIdentifier) {
     this.flowName = flowName;
     this.processorPath = processorPath;
     this.creationTime = currentTimeMillis();
-    this.componentLocation = componentLocation;
+    this.componentIdentifier = componentIdentifier;
   }
 
   /**
@@ -52,10 +52,10 @@ public final class FlowStackElement implements Serializable {
   }
 
   /**
-   * @return the component location of the currently executing processor in the flow represented by this element.
+   * @return the component identifier of the currently executing processor in the flow represented by this element.
    */
-  public ComponentLocation getComponentLocation() {
-    return componentLocation;
+  public ComponentIdentifier getIdentifier() {
+    return componentIdentifier;
   }
 
   /**

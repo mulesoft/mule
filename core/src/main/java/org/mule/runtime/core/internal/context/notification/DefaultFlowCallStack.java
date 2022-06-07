@@ -10,7 +10,6 @@ import static java.lang.Integer.getInteger;
 import static java.lang.System.lineSeparator;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_FLOW_STACK_MAX_DEPTH;
 
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.internal.event.EventContextDeepNestingException;
@@ -67,16 +66,16 @@ public class DefaultFlowCallStack implements FlowCallStack {
   }
 
   /**
-   * Adds a message processor path and a component location to the list of processors that were invoked as part of the processing of this stack's event.
+   * Adds a message processor path to the list of processors that were invoked as part of the processing of this stack's event.
    *
    * @param processorPath the path to mark as invoked.
-   * @param componentLocation the component location.
    * @throws EmptyStackException if this stack is empty.
    */
-  public void pushCurrentProcessorPathAndComponentLocation(String processorPath, ComponentLocation componentLocation) {
+  public void pushCurrentProcessorPath(String processorPath) {
     if (!innerStack.isEmpty()) {
       synchronized (innerStack) {
-        innerStack.push(new FlowStackElement(innerStack.pop().getFlowName(), processorPath, componentLocation));
+        FlowStackElement stackElement = innerStack.pop();
+        innerStack.push(new FlowStackElement(stackElement.getFlowName(), processorPath, stackElement.getIdentifier()));
       }
     }
   }

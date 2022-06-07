@@ -261,7 +261,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private ReturnDelegate valueReturnDelegate;
   private String processorPath = null;
   private FeatureUser featureUser;
-  private ComponentLocation componentLocation;
 
   public ComponentMessageProcessor(ExtensionModel extensionModel,
                                    T componentModel,
@@ -446,7 +445,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
       if (location != null) {
         ((DefaultFlowCallStack) event.getFlowCallStack())
-            .pushCurrentProcessorPathAndComponentLocation(resolvedProcessorRepresentation, componentLocation);
+            .pushCurrentProcessorPath(resolvedProcessorRepresentation);
 
         ExecutorCallback effectiveCallback =
             isTargetWithPolicies(event) ? getExecutionCallbackForPolicyAndOperationWithTarget(event, executorCallback)
@@ -602,7 +601,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       executionMediator = createExecutionMediator();
       initialiseIfNeeded(componentExecutor, true, muleContext);
 
-      componentLocation = getLocation();
+      ComponentLocation componentLocation = getLocation();
       if (componentLocation != null) {
         processorPath = componentLocation.getLocation();
       }

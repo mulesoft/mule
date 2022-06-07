@@ -93,16 +93,14 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
   /**
    * Callback method for when a message processor is about to be invoked.
    *
-   * @see DefaultFlowCallStack#pushCurrentProcessorPathAndComponentLocation(String)
+   * @see DefaultFlowCallStack#pushCurrentProcessorPath(String)
    *
    * @param notification the notification that contains the event and the processor that is about to be invoked.
    */
   public void onMessageProcessorNotificationPreInvoke(MessageProcessorNotification notification) {
     FlowCallStack flowCallStack = ((CoreEvent) notification.getEvent()).getFlowCallStack();
     if (flowCallStack != null) {
-      Component component = notification.getComponent();
-      ((DefaultFlowCallStack) flowCallStack).pushCurrentProcessorPathAndComponentLocation(component.getRepresentation(),
-                                                                                          component.getLocation());
+      ((DefaultFlowCallStack) flowCallStack).pushCurrentProcessorPath(notification.getComponent().getRepresentation());
     }
   }
 
