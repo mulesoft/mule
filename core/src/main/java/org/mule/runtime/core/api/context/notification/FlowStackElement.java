@@ -24,7 +24,7 @@ public final class FlowStackElement implements Serializable {
   private final String flowName;
   private final String processorPath;
   private final long creationTime;
-  private final transient ComponentIdentifier componentIdentifier;
+  private final transient ComponentIdentifier chainIdentifier;
 
   public FlowStackElement(String flowName, String processorPath) {
     this(flowName, processorPath, null);
@@ -34,7 +34,7 @@ public final class FlowStackElement implements Serializable {
     this.flowName = flowName;
     this.processorPath = processorPath;
     this.creationTime = currentTimeMillis();
-    this.componentIdentifier = componentIdentifier;
+    this.chainIdentifier = componentIdentifier;
   }
 
   /**
@@ -52,10 +52,10 @@ public final class FlowStackElement implements Serializable {
   }
 
   /**
-   * @return the component identifier of the currently executing processor in the flow represented by this element.
+   * @return the component identifier of the chain which execution is represented by this element.
    */
   public ComponentIdentifier getIdentifier() {
-    return componentIdentifier;
+    return chainIdentifier;
   }
 
   /**
