@@ -98,7 +98,7 @@ public class FlowTraceUtils {
 
       @Override
       protected boolean matchesSafely(FlowStackElement flowStackElement) {
-        return flowStackElement.getIdentifier().equals(componentIdentifier);
+        return flowStackElement.getChainIdentifier().equals(componentIdentifier);
       }
 
       @Override
@@ -114,9 +114,9 @@ public class FlowTraceUtils {
       protected void describeMismatchSafely(FlowStackElement flowStackElement, Description mismatchDescription) {
         mismatchDescription
             .appendText("identifier with namespace ")
-            .appendValue(flowStackElement.getIdentifier().getNamespace())
+            .appendValue(flowStackElement.getChainIdentifier().getNamespace())
             .appendText(" and name ")
-            .appendValue(flowStackElement.getIdentifier().getName());
+            .appendValue(flowStackElement.getChainIdentifier().getName());
       }
     };
   }

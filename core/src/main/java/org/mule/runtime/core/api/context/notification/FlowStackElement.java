@@ -54,7 +54,7 @@ public final class FlowStackElement implements Serializable {
   /**
    * @return the component identifier of the chain which execution is represented by this element.
    */
-  public ComponentIdentifier getIdentifier() {
+  public ComponentIdentifier getChainIdentifier() {
     return chainIdentifier;
   }
 
