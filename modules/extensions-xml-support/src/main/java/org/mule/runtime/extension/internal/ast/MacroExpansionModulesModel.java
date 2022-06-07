@@ -8,12 +8,17 @@ package org.mule.runtime.extension.internal.ast;
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.repeat;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
+import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyRecursively;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 
 import java.util.ArrayList;
@@ -22,6 +27,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
@@ -86,6 +93,29 @@ public class MacroExpansionModulesModel {
     }
 
     if (hasMacroExpansionExtension) {
+      // The macro expansion of xml sdk components causes inner flow components to be generated as a child of another component;
+      // so when generating the minimal app during lazy init, those flow components are not registered as top level components
+      // causing certain validations to fail. This code extracts those flow components and adds them as top level.
+      List<ComponentAst> componentsToAdd = applicationModel.recursiveStream().filter(comp -> FLOW.equals(comp.getComponentType()))
+          .filter(comp -> !applicationModel.topLevelComponents().contains(comp)).collect(toList());
+      applicationModel = copyRecursively(applicationModel, comp -> {
+        List<ComponentAst> childrenToKeep = comp.directChildrenStream()
+            .filter(child -> !FLOW.equals(child.getComponentType()))
+            .collect(toList());
+        return new BaseComponentAstDecorator(comp) {
+
+          @Override
+          public List<ComponentAst> directChildren() {
+            return childrenToKeep;
+          }
+
+          @Override
+          public Stream<ComponentAst> directChildrenStream() {
+            return childrenToKeep.stream();
+          }
+        };
+      }, () -> componentsToAdd, c -> false);
+
       if (LOGGER.isDebugEnabled()) {
         // only log the macro expanded app if there are smart connectors in it
         final StringBuilder buf = new StringBuilder(1024);
