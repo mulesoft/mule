@@ -110,7 +110,7 @@ public class ApplicationDescriptorFactory
    * @param expected  bundle descriptor that is expected.
    * @return true if match in group and artifact id, have the same classifier and the versions are compatible, false otherwise.
    */
-  public static boolean isCompatibleBundle(BundleDescriptor available, BundleDescriptor expected) {
+  private static boolean isCompatibleBundle(BundleDescriptor available, BundleDescriptor expected) {
     if (!available.getClassifier().equals(expected.getClassifier())) {
       return false;
     }
