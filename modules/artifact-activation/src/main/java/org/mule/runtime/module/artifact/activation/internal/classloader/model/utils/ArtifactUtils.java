@@ -18,8 +18,8 @@ import static org.mule.tools.api.classloader.Constants.SHARED_LIBRARIES_FIELD;
 import static org.mule.tools.api.classloader.Constants.SHARED_LIBRARY_FIELD;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;

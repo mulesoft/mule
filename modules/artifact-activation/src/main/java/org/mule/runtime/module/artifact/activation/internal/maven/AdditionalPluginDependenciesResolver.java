@@ -15,7 +15,6 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
-
 import static org.apache.commons.io.FileUtils.toFile;
 
 import org.mule.maven.client.api.model.BundleDependency;
@@ -39,13 +38,11 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import com.vdurmont.semver4j.Semver;
-
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
-
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 

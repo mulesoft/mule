@@ -12,7 +12,6 @@ import static java.util.Optional.ofNullable;
 import static java.util.regex.Pattern.matches;
 
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
-
 import static de.skuzzle.semantic.Version.create;
 import static de.skuzzle.semantic.Version.isValidVersion;
 import static de.skuzzle.semantic.Version.parseVersion;
@@ -22,7 +21,6 @@ import org.mule.runtime.module.artifact.activation.api.ArtifactActivationExcepti
 import java.util.Optional;
 
 import com.vdurmont.semver4j.Semver;
-
 import org.apache.commons.lang3.StringUtils;
 
 /**

@@ -8,6 +8,8 @@ package org.mule.runtime.module.artifact.activation.internal.domain;
 
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 
+import static java.util.Collections.emptySet;
+
 import org.mule.runtime.api.deployment.meta.MuleDomainModel;
 import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
 import org.mule.runtime.api.deployment.persistence.MuleDomainModelJsonSerializer;
@@ -18,6 +20,7 @@ import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractD
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -36,6 +39,12 @@ public class DomainDescriptorFactory extends AbstractDeployableArtifactDescripto
   @Override
   protected AbstractMuleArtifactModelJsonSerializer<MuleDomainModel> getMuleArtifactModelJsonSerializer() {
     return new MuleDomainModelJsonSerializer();
+  }
+
+  @Override
+  protected void doValidation(DomainDescriptor descriptor) {
+    super.doValidation(descriptor);
+    getPluginDependenciesResolver().resolve(emptySet(), new ArrayList<>(descriptor.getPlugins()), true);
   }
 
   @Override

@@ -8,6 +8,7 @@
 package org.mule.runtime.module.artifact.activation.internal.nativelib;
 
 import static org.apache.commons.lang3.SystemUtils.IS_OS_MAC;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.hamcrest.BaseMatcher;

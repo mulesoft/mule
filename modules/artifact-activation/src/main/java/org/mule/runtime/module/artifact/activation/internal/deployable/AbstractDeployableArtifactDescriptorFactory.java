@@ -24,6 +24,7 @@ import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorRe
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
 import org.mule.runtime.module.artifact.activation.internal.descriptor.AbstractArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.internal.plugin.ArtifactPluginDescriptorFactory;
+import org.mule.runtime.module.artifact.activation.internal.plugin.BundlePluginDependenciesResolver;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -46,9 +47,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
-
 import org.apache.commons.lang3.StringUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +66,7 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
   private final Optional<Properties> deploymentProperties;
   private final PluginModelResolver pluginModelResolver;
   private final PluginDescriptorResolver pluginDescriptorResolver;
+  private final BundlePluginDependenciesResolver pluginDependenciesResolver;
 
   public AbstractDeployableArtifactDescriptorFactory(DeployableProjectModel deployableProjectModel,
                                                      Map<String, String> deploymentProperties,
@@ -80,6 +80,7 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
     this.deploymentProperties = asProperties(deploymentProperties);
     this.pluginModelResolver = pluginModelResolver;
     this.pluginDescriptorResolver = pluginDescriptorResolver;
+    this.pluginDependenciesResolver = new BundlePluginDependenciesResolver();
   }
 
   private Optional<Properties> asProperties(Map<String, String> deploymentProperties) {
@@ -156,6 +157,10 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
     return deployableProjectModel.getBundleDescriptor();
   }
 
+  protected BundlePluginDependenciesResolver getPluginDependenciesResolver() {
+    return pluginDependenciesResolver;
+  }
+
   @Override
   protected void doDescriptorConfig(T descriptor) {
     descriptor.setArtifactLocation(getArtifactLocation());
@@ -229,5 +234,4 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
                                                bundleDependencies, pluginArtifactCoordinates, pluginDependencies,
                                                ArtifactDescriptorValidatorBuilder.builder()).create();
   }
-
 }

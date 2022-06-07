@@ -40,7 +40,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import io.qameta.allure.Issue;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
@@ -62,9 +61,6 @@ import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
@@ -72,6 +68,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -243,30 +242,6 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
   }
 
   @Test
-  @Issue("W-11210306")
-  public void createDomainClassLoaderWithPluginsSharingExportedPackages() {
-    String exportedPackage = "plugin-package";
-
-    BundleDependency pluginDependency = new BundleDependency.Builder().setScope(COMPILE).setDescriptor(
-                                                                                                       PLUGIN2_BUNDLE_DESCRIPTOR)
-        .setBundleUri(new File("test").toURI())
-        .build();
-    plugin1Descriptor
-        .setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().exportingPackages(singleton(exportedPackage))
-            .dependingOn(singleton(pluginDependency)).build());
-    plugin2Descriptor
-        .setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().exportingPackages(singleton(exportedPackage))
-            .build());
-
-    final MuleDeployableArtifactClassLoader domainClassLoader =
-        getTestDomainClassLoader(Stream.of(plugin1Descriptor, plugin2Descriptor).collect(toList()));
-    final RegionClassLoader regionClassLoader = (RegionClassLoader) domainClassLoader.getParent();
-
-    assertThat(regionClassLoader.getArtifactPluginClassLoaders().stream().map(ArtifactClassLoader::getArtifactDescriptor)
-        .collect(toList()), containsInAnyOrder(plugin1Descriptor, plugin2Descriptor));
-  }
-
-  @Test
   public void createApplicationClassLoaderWithDomainClassLoader() {
     final String applicationName = "app";
 
@@ -367,30 +342,6 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
 
     verify(artifactClassLoaderResolver, times(1)).createMulePluginClassLoader(any(), eq(plugin2Descriptor), any());
 
-    final RegionClassLoader regionClassLoader = (RegionClassLoader) applicationClassLoader.getParent();
-
-    assertThat(regionClassLoader.getArtifactPluginClassLoaders().stream().map(ArtifactClassLoader::getArtifactDescriptor)
-        .collect(toList()), containsInAnyOrder(plugin1Descriptor, plugin2Descriptor));
-  }
-
-  @Test
-  @Issue("W-11210306")
-  public void createApplicationClassLoaderWithPluginsSharingExportedPackages() {
-    String exportedPackage = "plugin-package";
-
-    BundleDependency pluginDependency = new BundleDependency.Builder().setScope(COMPILE).setDescriptor(
-                                                                                                       PLUGIN2_BUNDLE_DESCRIPTOR)
-        .setBundleUri(new File("test").toURI())
-        .build();
-    plugin1Descriptor
-        .setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().exportingPackages(singleton(exportedPackage))
-            .dependingOn(singleton(pluginDependency)).build());
-    plugin2Descriptor
-        .setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().exportingPackages(singleton(exportedPackage))
-            .build());
-
-    final MuleDeployableArtifactClassLoader applicationClassLoader =
-        getTestApplicationClassLoader(Stream.of(plugin1Descriptor, plugin2Descriptor).collect(toList()));
     final RegionClassLoader regionClassLoader = (RegionClassLoader) applicationClassLoader.getParent();
 
     assertThat(regionClassLoader.getArtifactPluginClassLoaders().stream().map(ArtifactClassLoader::getArtifactDescriptor)

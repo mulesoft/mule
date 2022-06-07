@@ -10,6 +10,7 @@ package org.mule.runtime.module.artifact.activation.internal.nativelib;
 import static java.net.URLDecoder.decode;
 import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Arrays.stream;
+
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_MAC;

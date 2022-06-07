@@ -75,7 +75,8 @@ public interface DeployableArtifactDescriptorFactory {
   ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
                                                     Map<String, String> deploymentProperties,
                                                     PluginModelResolver pluginModelResolver,
-                                                    PluginDescriptorResolver pluginDescriptorResolver);
+                                                    PluginDescriptorResolver pluginDescriptorResolver,
+                                                    DomainDescriptorResolver domainDescriptorResolver);
 
   /**
    * Creates a descriptor for an application, including its plugin descriptors, using the default resolvers.
@@ -86,6 +87,7 @@ public interface DeployableArtifactDescriptorFactory {
    * @return a descriptor for an application.
    */
   ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
-                                                    Map<String, String> deploymentProperties);
+                                                    Map<String, String> deploymentProperties,
+                                                    DomainDescriptorResolver domainDescriptorResolver);
 
 }
