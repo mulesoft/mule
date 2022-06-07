@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
-import static org.mule.runtime.module.artifact.activation.api.descriptor.DomainDescriptorResolver.domainDescriptorResolver;
+import static org.mule.runtime.module.artifact.activation.api.descriptor.DomainDescriptorResolver.noDomainDescriptorResolver;
 import static org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver.pluginDescriptorResolver;
 import static org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver.pluginModelResolver;
 
@@ -53,7 +53,7 @@ public class DefaultDeployableArtifactDescriptorFactory implements DeployableArt
   @Override
   public ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
                                                            Map<String, String> deploymentProperties) {
-    return createApplicationDescriptor(model, deploymentProperties, domainDescriptorResolver());
+    return createApplicationDescriptor(model, deploymentProperties, noDomainDescriptorResolver());
   }
 
   @Override

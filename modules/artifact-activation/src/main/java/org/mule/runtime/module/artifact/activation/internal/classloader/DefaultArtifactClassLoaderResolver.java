@@ -114,6 +114,8 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
     regionClassLoader.addClassLoader(domainClassLoader, artifactClassLoaderFilter);
 
+    // This is needed because although plugins must have been already ordered, they are in a Set, so here we guarantee the ordered
+    // list needed for the class
     List<ArtifactPluginDescriptor> artifactPluginDescriptors = process(descriptor.getPlugins(), false, List::add);
 
     artifactPluginDescriptors
@@ -210,6 +212,8 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
     regionClassLoader.addClassLoader(appClassLoader, artifactClassLoaderFilter);
 
+    // This is needed because although plugins must have been already ordered, they are in a Set, so here we guarantee the ordered
+    // list needed for the class loaders' creation.
     List<ArtifactPluginDescriptor> artifactPluginDescriptors = process(descriptor.getPlugins(), false, List::add);
 
     artifactPluginDescriptors

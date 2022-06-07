@@ -20,6 +20,8 @@ import org.mule.runtime.module.artifact.activation.api.ArtifactActivationExcepti
 @NoInstantiate
 public class DomainDescriptorResolutionException extends ArtifactActivationException {
 
+  private static final long serialVersionUID = 8465366672674298173L;
+
   public DomainDescriptorResolutionException(I18nMessage message) {
     super(message);
   }

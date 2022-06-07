@@ -19,7 +19,7 @@ public interface DomainDescriptorResolver {
   /**
    * @return the default implementation of a {@link DomainDescriptorResolver}.
    */
-  static DomainDescriptorResolver domainDescriptorResolver() {
+  static DomainDescriptorResolver noDomainDescriptorResolver() {
     return bundleDescriptor -> null;
   }
 
