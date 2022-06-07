@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_LIST;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG_PROPERTY;
 import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
@@ -55,6 +56,7 @@ import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.processor.ContextPropagationChecker;
 
 import java.util.ArrayList;
@@ -71,16 +73,34 @@ import org.junit.rules.ExpectedException;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 @Feature(ROUTERS)
 @Story(PARALLEL_FOR_EACH)
 public class ParallelForEachTestCase extends AbstractMuleContextTestCase {
+
+  @Rule
+  public SystemProperty detailedCompositeRoutingExceptionLog;
 
   @Rule
   public ExpectedException expectedException = none();
 
   private final ParallelForEach router = new ParallelForEach();
   private final ForkJoinStrategyFactory mockForkJoinStrategyFactory = mock(ForkJoinStrategyFactory.class);
+
+  public ParallelForEachTestCase(boolean detailedCompositeRoutingExceptionLog) {
+    this.detailedCompositeRoutingExceptionLog = new SystemProperty(MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG_PROPERTY,
+                                                                   Boolean.toString(detailedCompositeRoutingExceptionLog));
+  }
+
+  @Parameterized.Parameters(name = "Detailed log: {0}")
+  public static List<Object[]> parameters() {
+    return asList(
+                  new Object[] {true},
+                  new Object[] {false});
+  }
 
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
@@ -226,7 +246,9 @@ public class ParallelForEachTestCase extends AbstractMuleContextTestCase {
 
     verify(mockForkJoinStrategyFactory).createForkJoinStrategy(any(ProcessingStrategy.class), eq(concurrency), eq(true),
                                                                eq(timeout),
-                                                               any(Scheduler.class), any(ErrorType.class));
+                                                               any(Scheduler.class), any(ErrorType.class),
+                                                               eq(Boolean.parseBoolean(detailedCompositeRoutingExceptionLog
+                                                                   .getValue())));
   }
 
   @Test
