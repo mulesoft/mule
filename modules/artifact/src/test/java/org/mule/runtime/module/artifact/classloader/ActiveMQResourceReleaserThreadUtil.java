@@ -12,16 +12,16 @@ import java.lang.reflect.Method;
 import org.slf4j.Logger;
 
 /**
- * Created to be a Thread that start the connection to active mq in the test class {@link JMSResourceReleaserTestCase}
+ * Created to be a Thread that start the connection to active mq in the test class {@link ActiveMQResourceReleaserTestCase}
  */
-public class JMSReleaserThreadUtil implements Runnable {
+public class ActiveMQResourceReleaserThreadUtil implements Runnable {
 
   private final Method startActiveMq;
   private final Object connection;
 
-  private static final Logger LOGGER = getLogger(JMSReleaserThreadUtil.class);
+  private static final Logger LOGGER = getLogger(ActiveMQResourceReleaserThreadUtil.class);
 
-  JMSReleaserThreadUtil(Method method, Object connection) {
+  ActiveMQResourceReleaserThreadUtil(Method method, Object connection) {
     this.startActiveMq = method;
     this.connection = connection;
   }

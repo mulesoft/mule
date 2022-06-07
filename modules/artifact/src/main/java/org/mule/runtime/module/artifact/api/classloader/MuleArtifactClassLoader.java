@@ -20,7 +20,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
 import org.mule.module.artifact.classloader.IBMMQResourceReleaser;
-import org.mule.module.artifact.classloader.JMSResourceReleaser;
+import org.mule.module.artifact.classloader.ActiveMQResourceReleaser;
 import org.mule.module.artifact.classloader.ScalaClassValueReleaser;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -324,7 +324,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     }
 
     if (shouldReleaseJMSReferences) {
-      new JMSResourceReleaser(this).release();
+      new ActiveMQResourceReleaser(this).release();
     }
 
     super.dispose();

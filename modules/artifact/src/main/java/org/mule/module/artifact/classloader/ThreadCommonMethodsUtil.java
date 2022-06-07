@@ -15,6 +15,10 @@ import java.util.List;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
+/**
+ * This class contain common methods used by ActiveMQResourceReleaser and JdbcResourceReleaser Used to prevent leaks related to
+ * threads
+ */
 public class ThreadCommonMethodsUtil {
 
   private static final Logger logger = LoggerFactory.getLogger(ThreadCommonMethodsUtil.class);
@@ -22,13 +26,16 @@ public class ThreadCommonMethodsUtil {
 
   public static boolean isThreadLoadedByDisposedDomain(String undeployedArtifactId, ClassLoader threadContextClassLoader) {
     try {
+
       Class threadContextClassLoaderClass = threadContextClassLoader.getClass();
       if (!threadContextClassLoaderClass.getSimpleName().equals(COMPOSITE_CLASS_LOADER_CLASS_NAME)) {
         return false;
       }
 
+
       Method getDelegateClassLoadersMethod = threadContextClassLoaderClass.getMethod("getDelegates");
       List<ClassLoader> classLoaderList = (List<ClassLoader>) getDelegateClassLoadersMethod.invoke(threadContextClassLoader);
+
 
       for (ClassLoader classLoaderDelegate : classLoaderList) {
         if (classLoaderDelegate instanceof ArtifactClassLoader) {

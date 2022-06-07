@@ -9,6 +9,7 @@ package org.mule.runtime.module.artifact.classloader;
 
 
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
@@ -26,6 +27,7 @@ import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.model.BundleDependency;
 import org.mule.maven.client.api.model.BundleDescriptor;
 import org.mule.maven.client.api.model.MavenConfiguration;
+import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
@@ -53,7 +55,7 @@ import org.junit.runners.Parameterized;
 @Feature(LEAK_PREVENTION)
 @RunWith(Parameterized.class)
 @Story(METASPACE_LEAK_PREVENTION_ON_REDEPLOY)
-public class JMSResourceReleaserTestCase extends AbstractMuleTestCase {
+public class ActiveMQResourceReleaserTestCase extends AbstractMuleTestCase {
 
   private final static String DRIVER_ARTIFACT_ID = "activemq-all";
   private static final String TEST_CLASSLOADER_ARTIFACT_ID = "test";
@@ -67,7 +69,7 @@ public class JMSResourceReleaserTestCase extends AbstractMuleTestCase {
   private final ClassLoaderLookupPolicy testLookupPolicy;
   MuleArtifactClassLoader artifactClassLoader = null;
 
-  public JMSResourceReleaserTestCase(String driverVersion) {
+  public ActiveMQResourceReleaserTestCase(String driverVersion) {
     this.driverVersion = driverVersion;
     this.testLookupPolicy = new ClassLoaderLookupPolicy() {
 
@@ -129,13 +131,15 @@ public class JMSResourceReleaserTestCase extends AbstractMuleTestCase {
         .setArtifactId(DRIVER_ARTIFACT_ID).setVersion(driverVersion).build();
 
     BundleDependency dependency = mavenClient.resolveBundleDescriptor(bundleDescriptor);
-
     artifactClassLoader =
         new MuleArtifactClassLoader(TEST_CLASSLOADER_ARTIFACT_ID, mock(ArtifactDescriptor.class),
-                                    new URL[] {dependency.getBundleUri().toURL()},
-                                    currentThread().getContextClassLoader(), testLookupPolicy);
-  }
+                                    new URL[] {dependency.getBundleUri().toURL()}, currentThread().getContextClassLoader(),
+                                    testLookupPolicy);
 
+    CompositeClassLoader classLoader = from(artifactClassLoader);
+    currentThread().setContextClassLoader(classLoader);
+
+  }
 
   @Test
   public void checkIfJMSResourceReleaserInterruptAbstractInactivityMonitorThread() throws InterruptedException,
@@ -148,7 +152,7 @@ public class JMSResourceReleaserTestCase extends AbstractMuleTestCase {
     Class<?> connection = conObj.getClass();
 
     Method startActiveMQConn = connection.getMethod("start");
-    JMSReleaserThreadUtil runnable = new JMSReleaserThreadUtil(startActiveMQConn, conObj);
+    ActiveMQResourceReleaserThreadUtil runnable = new ActiveMQResourceReleaserThreadUtil(startActiveMQConn, conObj);
     Thread activeMQConnectionThread = new Thread(runnable, "ActiveMQConnectionThread");
     activeMQConnectionThread.start();
 
@@ -157,14 +161,10 @@ public class JMSResourceReleaserTestCase extends AbstractMuleTestCase {
     assertFalse(getNameListOfActiveThreads().contains(ACTIVEMQ_DRIVER_TIMER_THREAD_NAME));
   }
 
-  /////////////////////
-  // PRIVATE-METHODS //
-  /////////////////////
-
   private Callable<Boolean> listOfThreadsContainInactivityMonitorThread() {
     return new Callable<Boolean>() {
 
-      public Boolean call() throws Exception {
+      public Boolean call() {
         return getNameListOfActiveThreads().contains(ACTIVEMQ_DRIVER_TIMER_THREAD_NAME);
       }
     };
