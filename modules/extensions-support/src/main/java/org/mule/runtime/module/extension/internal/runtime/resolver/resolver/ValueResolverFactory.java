@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver.resolver;
 import static java.lang.String.format;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
+import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty.getStackedTypesModelProperty;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isLiteral;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
@@ -30,6 +31,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.stackable
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionBasedParameterResolverValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionTypedValueValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverValueResolverWrapper;
+import org.mule.runtime.module.extension.internal.runtime.resolver.RegistryLookupValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.RequiredParameterValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticLiteralValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
@@ -71,7 +73,7 @@ public class ValueResolverFactory {
 
     if (isExpression(value)) {
       final String expression = (String) value;
-      resolver = getExpressionBasedValueResolver(expectedType, expression, modelProperties, expectedClass);
+      resolver = getExpressionBasedValueResolver(expectedType, expression, modelProperties, acceptsReferences, expectedClass);
       if (required || isRequiredByExclusiveOptional(modelProperties)) {
         resolver = new RequiredParameterValueResolverWrapper<>(resolver, parameterName, expression);
       }
@@ -99,7 +101,8 @@ public class ValueResolverFactory {
    * Generates the {@link ValueResolver} for expression based values
    */
   private ValueResolver getExpressionBasedValueResolver(MetadataType expectedType, String value,
-                                                        Set<ModelProperty> modelProperties, Class<?> expectedClass) {
+                                                        Set<ModelProperty> modelProperties, boolean acceptsReferences,
+                                                        Class<?> expectedClass) {
     ValueResolver resolver;
     Optional<StackedTypesModelProperty> stackedTypesModelProperty = getStackedTypesModelProperty(modelProperties);
     if (stackedTypesModelProperty.isPresent()) {
@@ -112,6 +115,9 @@ public class ValueResolverFactory {
       resolver = new ExpressionTypedValueValueResolver<>(value, expectedClass);
     } else if (isLiteral(expectedType) || isTargetParameter(modelProperties)) {
       resolver = new StaticLiteralValueResolver<>(value, expectedClass);
+    } else if (acceptsReferences) {
+      ValueResolver<String> keyResolver = new TypeSafeExpressionValueResolver<>(value, String.class, fromType(String.class));
+      return new RegistryLookupValueResolverWrapper<>(keyResolver);
     } else {
       resolver = new TypeSafeExpressionValueResolver<>(value, expectedClass, toDataType(expectedType));
     }

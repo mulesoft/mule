@@ -28,7 +28,7 @@
     </flow>
 
     <flow name="getPetsWithExpression">
-        <petstore:get-pets ownerName="john" config-ref="#[app.registry[vars.storeName ++ '-store']]"/>
+        <petstore:get-pets ownerName="john" config-ref="#[vars.storeName ++ '-store']"/>
     </flow>
 
 </mule>
