@@ -19,8 +19,8 @@ public interface DomainDescriptorResolver {
   /**
    * Holds the logic to obtain a {@link DomainDescriptor} based on the given {@link BundleDescriptor}.
    *
-   * @param bundleDescriptor the bundle descriptor of the plugin to get the artifact descriptor for.
-   * @return optionally returns a {@link DomainDescriptor} corresponding to the given {@link BundleDescriptor}.
+   * @param bundleDescriptor the bundle descriptor of the domain to get the artifact descriptor for.
+   * @return returns a {@link DomainDescriptor} corresponding to the given {@link BundleDescriptor}.
    */
   DomainDescriptor resolve(BundleDescriptor bundleDescriptor) throws DomainDescriptorResolutionException;
 

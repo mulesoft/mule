@@ -9,6 +9,8 @@ package org.mule.runtime.module.artifact.activation.api.plugin;
 
 /**
  * Thrown to indicate that a given set of plugins was not resolved.
+ * 
+ * @since 4.5
  */
 public class PluginResolutionError extends RuntimeException {
 
