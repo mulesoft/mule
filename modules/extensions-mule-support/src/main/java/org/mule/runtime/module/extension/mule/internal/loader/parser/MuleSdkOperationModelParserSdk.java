@@ -76,7 +76,6 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   private static final String SUMMARY_PARAMETER = "summary";
   private static final String TYPE_PARAMETER = "type";
   private static final String VISIBILITY_PARAMETER = "visibility";
-  private static final String DEPRECATED_CONSTRUCT_NAME = "deprecated";
   private static final String PAYLOAD_TYPE_ELEMENT_NAME = "payload-type";
   private static final String OUTPUT_ELEMENT_NAME = "output";
 

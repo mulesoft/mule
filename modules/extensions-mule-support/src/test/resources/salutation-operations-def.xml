@@ -240,6 +240,22 @@
         </operation:body>
     </operation:def>
 
+    <operation:def name="operationWithDeprecatedParameter">
+        <operation:parameters>
+            <operation:parameter name="deprecatedParameter" type="string" summary="Some deprecated param">
+                <operation:deprecated since="1.1.0"
+                                      message="Some deprecation message"
+                                      toRemoveIn="2.0.0" />
+            </operation:parameter>
+        </operation:parameters>
+        <operation:output>
+            <operation:payload-type type="void"/>
+        </operation:output>
+        <operation:body>
+            <logger />
+        </operation:body>
+    </operation:def>
+
     <operation:def name="emit">
         <operation:output>
             <operation:payload-type type="string"/>

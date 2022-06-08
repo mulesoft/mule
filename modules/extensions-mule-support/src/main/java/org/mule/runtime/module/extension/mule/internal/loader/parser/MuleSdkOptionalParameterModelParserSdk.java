@@ -26,7 +26,7 @@ public class MuleSdkOptionalParameterModelParserSdk extends MuleSdkParameterMode
   }
 
   private void parseStructure() {
-    defaultValue = getOptionalParameter(parameter, "defaultValue").orElse(null);
+    defaultValue = getOptionalParameter(parameterAst, "defaultValue").orElse(null);
   }
 
   @Override

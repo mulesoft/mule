@@ -8,22 +8,46 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static java.util.Optional.of;
 import static java.util.stream.Stream.empty;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.metadata.api.TypeLoader;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 /**
- * Utilities class to ease the mock of the AST that the operation model parser is going to parse.
+ * Utilities class to ease the mocks creation of the resources that the operation model parser needs in order to parse the AST.
  */
 final class Utils {
 
   private Utils() {}
+
+  /**
+   * Creates a mock {@link TypeLoader} that can resolve the types passed by parameter.
+   *
+   * @param metadataTypesToAdd The {@link MetadataType}s that the resulting {@link TypeLoader} should be able to load.
+   *
+   * @return the mock {@link TypeLoader}.
+   */
+  public static TypeLoader mockTypeLoader(Map<String, MetadataType> metadataTypesToAdd) {
+    TypeLoader typeLoader = mock(TypeLoader.class);
+    // The type loader knows what "void" means, even if invalid for parameters.
+    MetadataType voidMetadataType = mock(MetadataType.class);
+    when(typeLoader.load("void")).thenReturn(of(voidMetadataType));
+    // And also knows some valid types.
+    for (Entry<String, MetadataType> metadataType : metadataTypesToAdd.entrySet()) {
+      when(typeLoader.load(metadataType.getKey())).thenReturn(of(metadataType.getValue()));
+    }
+    return typeLoader;
+  }
 
   /**
    * Creates a mock {@link ComponentAst} with the parameters of a "deprecated" construct.

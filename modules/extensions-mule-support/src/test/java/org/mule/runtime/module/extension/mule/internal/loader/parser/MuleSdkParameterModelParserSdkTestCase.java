@@ -7,10 +7,14 @@
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.mockDeprecatedAst;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.mockTypeLoader;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.setMockAstChild;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.stringParameterAst;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.PARAMETERS;
-import static java.util.Optional.of;
+import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
@@ -19,10 +23,13 @@ import static org.mockito.Mockito.when;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.util.Optional;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -48,9 +55,14 @@ public class MuleSdkParameterModelParserSdkTestCase extends AbstractMuleTestCase
     ComponentParameterAst parameterNameAst = stringParameterAst("someparam");
     when(componentAst.getParameter(DEFAULT_GROUP_NAME, "name")).thenReturn(parameterNameAst);
 
-    TypeLoader typeLoader = mockTypeLoader();
+    someValidMetadataType = mock(MetadataType.class);
+    TypeLoader typeLoader = mockTypeLoader(singletonMap("somevalid", someValidMetadataType));
     parameterModelParser = new MuleSdkParameterModelParserSdk(componentAst, typeLoader);
   }
+
+  // ------------------------------- //
+  // Parameter Type
+  // ------------------------------- //
 
   @Test
   public void invalidParameterTypeRaisesException() {
@@ -80,15 +92,36 @@ public class MuleSdkParameterModelParserSdkTestCase extends AbstractMuleTestCase
     assertThat(parameterModelParser.getType(), is(someValidMetadataType));
   }
 
-  private TypeLoader mockTypeLoader() {
-    TypeLoader typeLoader = mock(TypeLoader.class);
-    // The type loader knows what "void" means, even if invalid for parameters.
-    MetadataType voidMetadataType = mock(MetadataType.class);
-    when(typeLoader.load("void")).thenReturn(of(voidMetadataType));
-    // And also knows some valid type.
-    someValidMetadataType = mock(MetadataType.class);
-    when(typeLoader.load("somevalid")).thenReturn(of(someValidMetadataType));
+  // ------------------------------- //
+  // Deprecation
+  // ------------------------------- //
 
-    return typeLoader;
+  @Test
+  public void when_parameterAstHasNotDeprecationParameter_then_parserHasNotDeprecationModel() {
+    assertThat(parameterModelParser.getDeprecationModel().isPresent(), is(false));
+  }
+
+  @Test
+  public void when_parameterAstHasDeprecationParameter_then_parserHasDeprecationModelWithCorrespondingValues() {
+    ComponentAst deprecatedAst = mockDeprecatedAst("1.1.0", "Some Message", "2.0.0");
+    setMockAstChild(componentAst, "deprecated", deprecatedAst);
+
+    assertThat(parameterModelParser.getDeprecationModel().isPresent(), is(true));
+
+    DeprecationModel deprecationModel = parameterModelParser.getDeprecationModel().get();
+    assertThat(deprecationModel.getDeprecatedSince(), is("1.1.0"));
+    assertThat(deprecationModel.getMessage(), is("Some Message"));
+    assertThat(deprecationModel.getToRemoveIn(), is(Optional.of("2.0.0")));
+  }
+
+  @Test
+  public void when_toRemoveInParameterIsNotConfigured_then_theDeprecationModelReturnsAnEmptyOptional() {
+    ComponentAst deprecatedAst = mockDeprecatedAst("1.1.0", "Some Message", null);
+    setMockAstChild(componentAst, "deprecated", deprecatedAst);
+
+    assertThat(parameterModelParser.getDeprecationModel().isPresent(), is(true));
+
+    DeprecationModel deprecationModel = parameterModelParser.getDeprecationModel().get();
+    assertThat(deprecationModel.getToRemoveIn(), is(empty()));
   }
 }
