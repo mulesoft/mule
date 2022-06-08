@@ -18,11 +18,11 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.plugin.LoaderDescriber;
-import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Creates an artifact descriptor for a plugin.
@@ -35,11 +35,16 @@ public class ArtifactPluginDescriptorFactory
   private final DeployableArtifactDescriptor ownerDescriptor;
   private final List<BundleDependency> bundleDependencies;
   private final ArtifactCoordinates pluginArtifactCoordinates;
-  private final List<Artifact> pluginDependencies;
+  private final List<BundleDependency> projectDependencies;
+  private final Set<BundleDescriptor> sharedProjectDependencies;
 
-  public ArtifactPluginDescriptorFactory(BundleDependency bundleDependency, MulePluginModel pluginModel,
-                                         DeployableArtifactDescriptor ownerDescriptor, List<BundleDependency> bundleDependencies,
-                                         ArtifactCoordinates pluginArtifactCoordinates, List<Artifact> pluginDependencies,
+  public ArtifactPluginDescriptorFactory(BundleDependency bundleDependency,
+                                         MulePluginModel pluginModel,
+                                         DeployableArtifactDescriptor ownerDescriptor,
+                                         List<BundleDependency> bundleDependencies,
+                                         ArtifactCoordinates pluginArtifactCoordinates,
+                                         List<BundleDependency> projectDependencies,
+                                         Set<BundleDescriptor> sharedProjectDependencies,
                                          ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
     super(new File(bundleDependency.getBundleUri()), artifactDescriptorValidatorBuilder);
 
@@ -48,7 +53,8 @@ public class ArtifactPluginDescriptorFactory
     this.ownerDescriptor = ownerDescriptor;
     this.bundleDependencies = bundleDependencies;
     this.pluginArtifactCoordinates = pluginArtifactCoordinates;
-    this.pluginDependencies = pluginDependencies;
+    this.projectDependencies = projectDependencies;
+    this.sharedProjectDependencies = sharedProjectDependencies;
   }
 
   @Override
@@ -70,10 +76,12 @@ public class ArtifactPluginDescriptorFactory
   @Override
   protected ClassLoaderModel getClassLoaderModel(MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
     return new PluginClassLoaderConfigurationAssembler(pluginArtifactCoordinates,
-                                                       pluginDependencies,
+                                                       projectDependencies,
+                                                       sharedProjectDependencies,
                                                        getArtifactLocation(),
                                                        muleArtifactLoaderDescriptor,
-                                                       bundleDependencies, bundleDescriptor, ownerDescriptor)
+                                                       bundleDependencies,
+                                                       bundleDescriptor, ownerDescriptor)
                                                            .createClassLoaderModel();
   }
 

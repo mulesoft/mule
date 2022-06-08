@@ -27,8 +27,12 @@ public class DeployableClassLoaderModelAssembler<M extends MuleDeployableModel> 
 
   public DeployableClassLoaderModelAssembler(DeployableProjectModel model,
                                              MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
-    super(model.getArtifactCoordinates(), model.getProjectDependencies(), model.getPackages(),
-          model.getResources(), muleArtifactLoaderDescriptor);
+    super(model.getArtifactCoordinates(),
+          model.getDeployableBundleDependencies(),
+          model.getSharedDeployableBundleDescriptors(),
+          model.getPackages(),
+          model.getResources(),
+          muleArtifactLoaderDescriptor);
     additionalPluginDependencies = model.getAdditionalPluginDependencies();
   }
 

@@ -202,9 +202,12 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
           pluginDescriptors
               .add(pluginDescriptorResolver.resolve(emptySet(), bundleDescriptor)
                   .orElse(createPluginDescriptor(bundlePluginDependency,
-                                                 pluginModelResolver.resolve(bundlePluginDependency), descriptor,
+                                                 pluginModelResolver.resolve(bundlePluginDependency),
+                                                 descriptor,
                                                  bundleDependencies,
-                                                 pluginDependencies.getKey(), pluginDependencies.getValue())));
+                                                 pluginDependencies.getKey(),
+                                                 deployableProjectModel.getDeployableBundleDependencies(),
+                                                 deployableProjectModel.getSharedDeployableBundleDescriptors())));
         }
       }
     }
@@ -221,7 +224,9 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
    * @param ownerDescriptor           descriptor of the artifact that owns the plugin.
    * @param bundleDependencies        plugin dependencies on a bundle.
    * @param pluginArtifactCoordinates plugin coordinates.
-   * @param pluginDependencies        resolved plugin dependencies as artifacts.
+   * @param pluginDependencies        the dependencies on the deployable artifact.
+   * @param sharedPluginDependencies  the dependencies on the deployable artifact taht are shared to plugins.
+   * 
    * @return a descriptor for a plugin.
    */
   private ArtifactPluginDescriptor createPluginDescriptor(BundleDependency bundleDependency,
@@ -229,9 +234,16 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
                                                           DeployableArtifactDescriptor ownerDescriptor,
                                                           List<BundleDependency> bundleDependencies,
                                                           ArtifactCoordinates pluginArtifactCoordinates,
-                                                          List<Artifact> pluginDependencies) {
-    return new ArtifactPluginDescriptorFactory(bundleDependency, pluginModel, ownerDescriptor,
-                                               bundleDependencies, pluginArtifactCoordinates, pluginDependencies,
-                                               ArtifactDescriptorValidatorBuilder.builder()).create();
+                                                          List<BundleDependency> pluginDependencies,
+                                                          Set<BundleDescriptor> sharedPluginDependencies) {
+    return new ArtifactPluginDescriptorFactory(bundleDependency,
+                                               pluginModel,
+                                               ownerDescriptor,
+                                               bundleDependencies,
+                                               pluginArtifactCoordinates,
+                                               pluginDependencies,
+                                               sharedPluginDependencies,
+                                               ArtifactDescriptorValidatorBuilder.builder())
+                                                   .create();
   }
 }

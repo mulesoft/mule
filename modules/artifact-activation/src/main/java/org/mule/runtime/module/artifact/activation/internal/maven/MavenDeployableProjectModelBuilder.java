@@ -28,10 +28,13 @@ import static org.mule.tools.api.classloader.model.ArtifactCoordinates.DEFAULT_A
 import static java.lang.String.format;
 import static java.nio.file.Paths.get;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static org.codehaus.plexus.util.xml.Xpp3DomUtils.mergeXpp3Dom;
 
 import org.mule.maven.client.api.MavenClientProvider;
@@ -59,6 +62,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -97,12 +101,12 @@ public class MavenDeployableProjectModelBuilder
   private final MavenConfiguration mavenConfiguration;
   private List<String> packages = emptyList();
   private List<String> resources = emptyList();
-  private List<Artifact> deployableArtifactDependencies;
   private List<BundleDependency> deployableMavenBundleDependencies;
   private List<Plugin> additionalPluginDependencies;
   private Map<ArtifactCoordinates, List<Artifact>> pluginsArtifactDependencies;
   private ArtifactCoordinates deployableArtifactCoordinates;
   private List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> deployableBundleDependencies;
+  private Set<org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor> sharedDeployableBundleDescriptors;
   private Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> pluginsBundleDependencies;
   private File deployableArtifactRepositoryFolder;
 
@@ -165,9 +169,9 @@ public class MavenDeployableProjectModelBuilder
       throw new ArtifactActivationException(createStaticMessage("Couldn't search exported packages and resources"), e);
     }
 
-    return new DeployableProjectModel(packages, resources, deployableArtifactDependencies,
+    return new DeployableProjectModel(packages, resources,
                                       additionalPluginDependencies, pluginsArtifactDependencies, deployableArtifactCoordinates,
-                                      projectFolder, deployableBundleDependencies,
+                                      projectFolder, deployableBundleDependencies, sharedDeployableBundleDescriptors,
                                       buildBundleDescriptor(deployableArtifactCoordinates), pluginsBundleDependencies);
   }
 
@@ -194,7 +198,7 @@ public class MavenDeployableProjectModelBuilder
     deployableMavenBundleDependencies = deployableDependencyResolver.resolveDeployableDependencies(pom, false, empty());
 
     // Get the dependencies as Artifacts, accounting for the shared libraries configuration
-    deployableArtifactDependencies =
+    List<Artifact> deployableArtifactDependencies =
         updateArtifactsSharedState(deployableMavenBundleDependencies,
                                    updatePackagesResources(toApplicationModelArtifacts(deployableMavenBundleDependencies)),
                                    pomModel, activeProfiles);
@@ -205,6 +209,15 @@ public class MavenDeployableProjectModelBuilder
             .map(artifact -> createBundleDependencyFromPackagerDependency(getDeployableArtifactRepositoryUriResolver())
                 .apply(artifact))
             .collect(toList());
+
+    sharedDeployableBundleDescriptors =
+        deployableBundleDependencies.stream()
+            .filter(bd -> deployableArtifactDependencies.stream()
+                .anyMatch(artifact -> artifact.isShared()
+                    && bd.getDescriptor().getGroupId().equals(artifact.getArtifactCoordinates().getGroupId())
+                    && bd.getDescriptor().getArtifactId().equals(artifact.getArtifactCoordinates().getArtifactId())))
+            .map(org.mule.runtime.module.artifact.api.descriptor.BundleDependency::getDescriptor)
+            .collect(toSet());
   }
 
   private void resolveAdditionalPluginDependencies(AetherMavenClient aetherMavenClient, Model pomModel,
@@ -243,17 +256,16 @@ public class MavenDeployableProjectModelBuilder
   }
 
   private List<Plugin> toPluginDependencies(Map<BundleDependency, List<BundleDependency>> pluginsAndDependencies) {
-    return pluginsAndDependencies.entrySet().stream().map(
-                                                          pluginEntry -> {
-                                                            Plugin plugin = new Plugin();
-                                                            plugin.setArtifactId(pluginEntry.getKey().getDescriptor()
-                                                                .getArtifactId());
-                                                            plugin.setGroupId(pluginEntry.getKey().getDescriptor().getGroupId());
-                                                            plugin.setAdditionalDependencies(
-                                                                                             updatePackagesResources(toApplicationModelArtifacts(pluginEntry
-                                                                                                 .getValue())));
-                                                            return plugin;
-                                                          })
+    return pluginsAndDependencies.entrySet().stream()
+        .map(pluginEntry -> {
+          Plugin plugin = new Plugin();
+          plugin.setArtifactId(pluginEntry.getKey().getDescriptor()
+              .getArtifactId());
+          plugin.setGroupId(pluginEntry.getKey().getDescriptor().getGroupId());
+          plugin.setAdditionalDependencies(updatePackagesResources(toApplicationModelArtifacts(pluginEntry
+              .getValue())));
+          return plugin;
+        })
         .collect(toList());
   }
 
@@ -331,6 +343,8 @@ public class MavenDeployableProjectModelBuilder
                              .setBaseVersion(d.getArtifactCoordinates().getVersion())
                              .build())
           .setBundleUri(bundle)
+          .setPackages(d.getPackages() == null ? emptySet() : newHashSet(d.getPackages()))
+          .setResources(d.getResources() == null ? emptySet() : newHashSet(d.getResources()))
           .build();
     };
   }
