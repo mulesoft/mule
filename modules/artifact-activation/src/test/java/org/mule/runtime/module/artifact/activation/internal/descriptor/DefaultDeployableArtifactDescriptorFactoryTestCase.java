@@ -40,7 +40,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 
 import io.qameta.allure.Description;
@@ -143,6 +142,7 @@ public class DefaultDeployableArtifactDescriptorFactoryTestCase extends Abstract
   }
 
   @Test
+  @Issue("W-11261035")
   public void applicationDescriptorWithDependenciesSharingExportedPackagesAllowsClassLoaderCreation() throws Exception {
     ApplicationDescriptor applicationDescriptor = createApplicationDescriptor("apps/basic");
 

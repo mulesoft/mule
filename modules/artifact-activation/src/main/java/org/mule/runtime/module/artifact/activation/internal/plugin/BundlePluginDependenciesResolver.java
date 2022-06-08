@@ -196,7 +196,6 @@ public class BundlePluginDependenciesResolver {
     if (!pluginDescriptors.isEmpty()) {
       List<ArtifactPluginDescriptor> foundDependencies = new ArrayList<>();
       pluginDescriptors.stream()
-          .filter(pluginDescriptor -> !pluginDescriptor.getClassLoaderModel().getDependencies().isEmpty())
           .filter(pluginDescriptor -> pluginDescriptor.getBundleDescriptor().isPlugin())
           .forEach(pluginDescriptor -> pluginDescriptor.getClassLoaderModel().getDependencies()
               .forEach(dependency -> {
