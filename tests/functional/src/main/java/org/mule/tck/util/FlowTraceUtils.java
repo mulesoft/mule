@@ -93,21 +93,21 @@ public class FlowTraceUtils {
     };
   }
 
-  public static Matcher<FlowStackElement> withIdentifier(final ComponentIdentifier componentIdentifier) {
+  public static Matcher<FlowStackElement> withChainIdentifier(final ComponentIdentifier chainIdentifier) {
     return new TypeSafeMatcher<FlowStackElement>() {
 
       @Override
       protected boolean matchesSafely(FlowStackElement flowStackElement) {
-        return flowStackElement.getChainIdentifier().equals(componentIdentifier);
+        return flowStackElement.getChainIdentifier().equals(chainIdentifier);
       }
 
       @Override
       public void describeTo(Description description) {
         description
             .appendText("identifier with namespace ")
-            .appendValue(componentIdentifier.getNamespace())
+            .appendValue(chainIdentifier.getNamespace())
             .appendText(" and name ")
-            .appendValue(componentIdentifier.getName());
+            .appendValue(chainIdentifier.getName());
       }
 
       @Override

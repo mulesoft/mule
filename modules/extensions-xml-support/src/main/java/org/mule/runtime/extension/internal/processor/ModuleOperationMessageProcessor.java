@@ -258,9 +258,9 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
       final String[] peekedWithNamespace = top.getFlowName().split("\\:");
       String peekedNamespace = peekedWithNamespace[0];
 
-      return new FlowStackElement(peekedNamespace + ":" + identifier.getName(), null, identifier);
+      return new FlowStackElement(peekedNamespace + ":" + identifier.getName(), identifier, null);
     } else {
-      return new FlowStackElement(identifier.getNamespace() + ":" + identifier.getName(), null, identifier);
+      return new FlowStackElement(identifier.getNamespace() + ":" + identifier.getName(), identifier, null);
     }
   }
 
