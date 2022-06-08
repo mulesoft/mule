@@ -8,6 +8,8 @@ package org.mule.runtime.core.api.context.notification;
 
 import static java.lang.System.currentTimeMillis;
 
+import org.mule.runtime.api.component.ComponentIdentifier;
+
 import java.io.Serializable;
 
 /**
@@ -22,11 +24,17 @@ public final class FlowStackElement implements Serializable {
   private final String flowName;
   private final String processorPath;
   private final long creationTime;
+  private final transient ComponentIdentifier chainIdentifier;
 
   public FlowStackElement(String flowName, String processorPath) {
+    this(flowName, null, processorPath);
+  }
+
+  public FlowStackElement(String flowName, ComponentIdentifier chainIdentifier, String processorPath) {
     this.flowName = flowName;
     this.processorPath = processorPath;
     this.creationTime = currentTimeMillis();
+    this.chainIdentifier = chainIdentifier;
   }
 
   /**
@@ -41,6 +49,13 @@ public final class FlowStackElement implements Serializable {
    */
   public String getFlowName() {
     return flowName;
+  }
+
+  /**
+   * @return the component identifier of the chain which execution is represented by {@link #getFlowName()}.
+   */
+  public ComponentIdentifier getChainIdentifier() {
+    return chainIdentifier;
   }
 
   /**

@@ -74,7 +74,8 @@ public class DefaultFlowCallStack implements FlowCallStack {
   public void pushCurrentProcessorPath(String processorPath) {
     if (!innerStack.isEmpty()) {
       synchronized (innerStack) {
-        innerStack.push(new FlowStackElement(innerStack.pop().getFlowName(), processorPath));
+        FlowStackElement stackElement = innerStack.pop();
+        innerStack.push(new FlowStackElement(stackElement.getFlowName(), stackElement.getChainIdentifier(), processorPath));
       }
     }
   }
