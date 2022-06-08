@@ -69,6 +69,11 @@
             <version>1.13.1</version>
             <classifier>mule-plugin</classifier>
         </dependency>
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>${derbyVersion}</version>
+        </dependency>
     </dependencies>
 
     <repositories>
