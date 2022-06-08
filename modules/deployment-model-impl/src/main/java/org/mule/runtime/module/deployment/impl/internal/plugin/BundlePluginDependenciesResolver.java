@@ -241,14 +241,14 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
                                           dependency.getDescriptor(), pluginDescriptor.getBundleDescriptor(),
                                           dependency.getDescriptor()));
                     }
-                    ArtifactPluginDescriptor artifactPluginDescriptor =
-                        artifactDescriptorFactory
-                            .create(mulePluginLocation,
-                                    of(new PluginExtendedDeploymentProperties(new Properties(), dependency.getDescriptor(),
-                                                                              pluginDescriptor)));
-                    artifactPluginDescriptor.setBundleDescriptor(dependency.getDescriptor());
-                    foundDependencies.add(artifactPluginDescriptor);
-                    visited.add(dependency.getDescriptor());
+                    // ArtifactPluginDescriptor artifactPluginDescriptor =
+                    // artifactDescriptorFactory
+                    // .create(mulePluginLocation,
+                    // of(new PluginExtendedDeploymentProperties(new Properties(), dependency.getDescriptor(),
+                    // pluginDescriptor)));
+                    // artifactPluginDescriptor.setBundleDescriptor(dependency.getDescriptor());
+                    // foundDependencies.add(artifactPluginDescriptor);
+                    // visited.add(dependency.getDescriptor());
                   }
                 } else {
                   if (resolvedPluginApplicationLevelOptional.isPresent()) {
