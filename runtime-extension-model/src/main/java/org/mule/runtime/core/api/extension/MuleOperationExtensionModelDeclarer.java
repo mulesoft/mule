@@ -27,6 +27,7 @@ import static org.mule.sdk.api.stereotype.MuleStereotypes.OUTPUT_STEREOTYPE;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.XmlDslModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedComponentDeclarer;
@@ -159,7 +160,7 @@ class MuleOperationExtensionModelDeclarer {
     declareOutputTypeParameters(attributesType, "attributes");
   }
 
-  private void declareDeprecationConstruct(ConstructDeclarer def) {
+  private void declareDeprecationConstruct(ComponentDeclarer def) {
     NestedComponentDeclarer deprecationConstruct = def.withComponent("deprecated")
         .describedAs("Defines a operation's deprecation.")
         .withStereotype(DEPRECATED_STEREOTYPE)
@@ -220,6 +221,8 @@ class MuleOperationExtensionModelDeclarer {
         .describedAs("Defines an operation parameter")
         .withMinOccurs(1)
         .withMaxOccurs(null);
+
+    declareDeprecationConstruct(parameterDef);
 
     final ParameterGroupDeclarer parameterDefParameters = parameterDef.onDefaultParameterGroup();
     addParameterDeclaration(parameterDefParameters);
