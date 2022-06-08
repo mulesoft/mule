@@ -7,11 +7,11 @@
 package org.mule.runtime.config.internal.registry;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_USE_LEGACY_LIFECYCLE_OBJECT_SORTER;
-import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_HANDLER_PROPERTY;
 import static org.mule.runtime.config.internal.context.MuleArtifactContext.INNER_BEAN_PREFIX;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
+import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.REUSE_GLOBAL_ERROR_HANDLER;
 
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
@@ -193,7 +193,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
           ServerNotificationManager.class,
           Service.class
       };
-      if (parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY))) {
+      if (REUSE_GLOBAL_ERROR_HANDLER) {
         ignoredObjects = ArrayUtils.add(ignoredObjects, GlobalErrorHandler.class);
       }
       setIgnoredObjectTypes(ignoredObjects);
