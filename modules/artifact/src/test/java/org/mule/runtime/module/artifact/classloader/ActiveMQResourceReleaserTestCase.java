@@ -56,7 +56,6 @@ import org.junit.runners.Parameterized;
 public class ActiveMQResourceReleaserTestCase extends AbstractMuleTestCase {
 
   private final static String DRIVER_ARTIFACT_ID = "activemq-all";
-  private static final String TEST_CLASSLOADER_ARTIFACT_ID = "test";
   private final static String DRIVER_GROUP_ID = "org.apache.activemq";
   static final String DRIVER_CLASS_NAME = "org.apache.activemq.ActiveMQConnectionFactory";
   private static final String ACTIVEMQ_DRIVER_TIMER_THREAD_NAME = "ActiveMQ InactivityMonitor ReadCheckTimer";
@@ -130,7 +129,7 @@ public class ActiveMQResourceReleaserTestCase extends AbstractMuleTestCase {
 
     BundleDependency dependency = mavenClient.resolveBundleDescriptor(bundleDescriptor);
     artifactClassLoader =
-        new MuleArtifactClassLoader(TEST_CLASSLOADER_ARTIFACT_ID, mock(ArtifactDescriptor.class),
+        new MuleArtifactClassLoader("test", mock(ArtifactDescriptor.class),
                                     new URL[] {dependency.getBundleUri().toURL()}, currentThread().getContextClassLoader(),
                                     testLookupPolicy);
 
