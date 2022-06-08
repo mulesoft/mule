@@ -42,20 +42,20 @@ import java.util.Set;
  */
 public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelParser implements ParameterModelParser {
 
-  protected final ComponentAst parameter;
+  protected final ComponentAst parameterAst;
   private final TypeLoader typeLoader;
 
   private String name;
 
-  public MuleSdkParameterModelParserSdk(ComponentAst parameter, TypeLoader typeLoader) {
-    this.parameter = parameter;
+  public MuleSdkParameterModelParserSdk(ComponentAst parameterAst, TypeLoader typeLoader) {
+    this.parameterAst = parameterAst;
     this.typeLoader = typeLoader;
 
     parseStructure();
   }
 
   private void parseStructure() {
-    name = getParameter(parameter, "name");
+    name = getParameter(parameterAst, "name");
   }
 
   @Override
@@ -70,12 +70,12 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
 
   @Override
   public String getDescription() {
-    return this.<String>getOptionalParameter(parameter, "description").orElse("");
+    return this.<String>getOptionalParameter(parameterAst, "description").orElse("");
   }
 
   @Override
   public MetadataType getType() {
-    final String type = getParameter(parameter, "type");
+    final String type = getParameter(parameterAst, "type");
     if (VOID.equals(type)) {
       throw new IllegalModelDefinitionException(voidParameterIsForbidden());
     }
@@ -107,7 +107,7 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
 
   @Override
   public ExpressionSupport getExpressionSupport() {
-    return ExpressionSupport.valueOf(getParameter(parameter, "expressionSupport"));
+    return ExpressionSupport.valueOf(getParameter(parameterAst, "expressionSupport"));
   }
 
   @Override
@@ -127,7 +127,7 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
 
   @Override
   public boolean isConfigOverride() {
-    return getParameter(parameter, "configOverride");
+    return getParameter(parameterAst, "configOverride");
   }
 
   @Override
@@ -142,12 +142,12 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
 
   @Override
   public Optional<DeprecationModel> getDeprecationModel() {
-    return empty();
+    return getSingleChild(parameterAst, DEPRECATED_CONSTRUCT_NAME).map(this::buildDeprecationModel);
   }
 
   @Override
   public Optional<DisplayModel> getDisplayModel() {
-    String summary = getParameter(parameter, "summary");
+    String summary = getParameter(parameterAst, "summary");
     if (!isBlank(summary)) {
       return of(DisplayModel.builder().summary(summary).build());
     }
