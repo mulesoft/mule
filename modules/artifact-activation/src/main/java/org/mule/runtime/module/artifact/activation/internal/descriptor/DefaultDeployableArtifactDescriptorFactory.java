@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
+import static org.mule.runtime.module.artifact.activation.api.descriptor.DomainDescriptorResolver.noDomainDescriptorResolver;
 import static org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver.pluginDescriptorResolver;
 import static org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver.pluginModelResolver;
 
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.activation.api.descriptor.DomainDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
 import org.mule.runtime.module.artifact.activation.internal.application.ApplicationDescriptorFactory;
@@ -32,18 +34,26 @@ public class DefaultDeployableArtifactDescriptorFactory implements DeployableArt
   public ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
                                                            Map<String, String> deploymentProperties,
                                                            PluginModelResolver pluginModelResolver,
-                                                           PluginDescriptorResolver pluginDescriptorResolver) {
-
+                                                           PluginDescriptorResolver pluginDescriptorResolver,
+                                                           DomainDescriptorResolver domainDescriptorResolver) {
     return new ApplicationDescriptorFactory(model, deploymentProperties, pluginModelResolver, pluginDescriptorResolver,
-                                            ArtifactDescriptorValidatorBuilder.builder()).create();
+                                            ArtifactDescriptorValidatorBuilder.builder(), domainDescriptorResolver).create();
+  }
+
+  @Override
+  public ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
+                                                           Map<String, String> deploymentProperties,
+                                                           DomainDescriptorResolver domainDescriptorResolver) {
+    return createApplicationDescriptor(model, deploymentProperties,
+                                       pluginModelResolver(),
+                                       pluginDescriptorResolver(),
+                                       domainDescriptorResolver);
   }
 
   @Override
   public ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
                                                            Map<String, String> deploymentProperties) {
-    return createApplicationDescriptor(model, deploymentProperties,
-                                       pluginModelResolver(),
-                                       pluginDescriptorResolver());
+    return createApplicationDescriptor(model, deploymentProperties, noDomainDescriptorResolver());
   }
 
   @Override

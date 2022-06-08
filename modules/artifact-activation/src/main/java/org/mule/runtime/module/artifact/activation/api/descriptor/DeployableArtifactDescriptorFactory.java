@@ -70,12 +70,27 @@ public interface DeployableArtifactDescriptorFactory {
    *                                 {@link PluginModelResolver#pluginModelResolver()}.
    * @param pluginDescriptorResolver a wrapper function around the logic to extract an {@link ArtifactPluginDescriptor} from the
    *                                 jar described by the {@link BundleDescriptor}, otherwise it will be created.
+   * @param domainDescriptorResolver a wrapper function around the logic to obtain a {@link DomainDescriptor}, or null if .
    * @return a descriptor for an application.
    */
   ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
                                                     Map<String, String> deploymentProperties,
                                                     PluginModelResolver pluginModelResolver,
-                                                    PluginDescriptorResolver pluginDescriptorResolver);
+                                                    PluginDescriptorResolver pluginDescriptorResolver,
+                                                    DomainDescriptorResolver domainDescriptorResolver);
+
+  /**
+   * Creates a descriptor for an application, including its plugin descriptors, using the default resolvers.
+   *
+   * @param model                    model describing the structure of the application with all the necessary information to build
+   *                                 its descriptor.
+   * @param deploymentProperties     properties that affect how the artifact is deployed.
+   * @param domainDescriptorResolver a wrapper function around the logic to obtain a {@link DomainDescriptor}.
+   * @return a descriptor for an application.
+   */
+  ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
+                                                    Map<String, String> deploymentProperties,
+                                                    DomainDescriptorResolver domainDescriptorResolver);
 
   /**
    * Creates a descriptor for an application, including its plugin descriptors, using the default resolvers.

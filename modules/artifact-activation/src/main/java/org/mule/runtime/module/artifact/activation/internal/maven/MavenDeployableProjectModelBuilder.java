@@ -69,7 +69,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
-
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
@@ -105,6 +104,7 @@ public class MavenDeployableProjectModelBuilder
   private ArtifactCoordinates deployableArtifactCoordinates;
   private List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> deployableBundleDependencies;
   private Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> pluginsBundleDependencies;
+  private File deployableArtifactRepositoryFolder;
 
   public MavenDeployableProjectModelBuilder(File projectFolder, MavenConfiguration mavenConfiguration) {
     this.projectFolder = projectFolder;
@@ -144,6 +144,8 @@ public class MavenDeployableProjectModelBuilder
   public DeployableProjectModel build() {
     File pom = getPomFromFolder(projectFolder);
     Model pomModel = getPomModelFromFile(pom);
+
+    deployableArtifactRepositoryFolder = this.mavenConfiguration.getLocalMavenRepositoryLocation();
 
     getDeployableProjectArtifactCoordinates(pomModel);
 
@@ -200,7 +202,9 @@ public class MavenDeployableProjectModelBuilder
     // Prepare bundle dependencies as expected by the project model
     deployableBundleDependencies =
         deployableArtifactDependencies.stream()
-            .map(artifact -> createBundleDependencyFromPackagerDependency(uri -> uri).apply(artifact)).collect(toList());
+            .map(artifact -> createBundleDependencyFromPackagerDependency(getDeployableArtifactRepositoryUriResolver())
+                .apply(artifact))
+            .collect(toList());
   }
 
   private void resolveAdditionalPluginDependencies(AetherMavenClient aetherMavenClient, Model pomModel,
@@ -217,7 +221,7 @@ public class MavenDeployableProjectModelBuilder
                                                  new File("temp"));
 
     additionalPluginDependencies = toPluginDependencies(additionalPluginDependenciesResolver
-        .resolveDependencies(deployableMavenBundleDependencies, this.pluginsArtifactDependencies));
+        .resolveDependencies(deployableMavenBundleDependencies, pluginsDependencies));
   }
 
   private void resolveDeployablePluginsData(List<BundleDependency> deployableMavenBundleDependencies) {
@@ -233,7 +237,9 @@ public class MavenDeployableProjectModelBuilder
     pluginsArtifactDependencies
         .forEach((pluginArtifactCoordinates, pluginDependencies) -> pluginsBundleDependencies.put(pluginsBundleDescriptors
             .get(pluginArtifactCoordinates), pluginDependencies.stream()
-                .map(artifact -> createBundleDependencyFromPackagerDependency(uri -> uri).apply(artifact)).collect(toList())));
+                .map(artifact -> createBundleDependencyFromPackagerDependency(getDeployableArtifactRepositoryUriResolver())
+                    .apply(artifact))
+                .collect(toList())));
   }
 
   private List<Plugin> toPluginDependencies(Map<BundleDependency, List<BundleDependency>> pluginsAndDependencies) {
@@ -327,6 +333,10 @@ public class MavenDeployableProjectModelBuilder
           .setBundleUri(bundle)
           .build();
     };
+  }
+
+  private Function<URI, URI> getDeployableArtifactRepositoryUriResolver() {
+    return uri -> new File(deployableArtifactRepositoryFolder, uri.toString()).toURI();
   }
 
   private File getPomFromFolder(File projectFolder) {

@@ -28,6 +28,14 @@ import org.mule.runtime.module.artifact.api.plugin.LoaderDescriber;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Paths;
+import java.util.Optional;
+import java.util.Set;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.After;
@@ -37,14 +45,6 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.nio.file.Paths;
-import java.util.Optional;
-import java.util.Set;
 
 @Feature(EXTENSION_MODEL_DISCOVERY)
 @Story(EXTENSION_MODEL_LOADER_REPOSITORY)

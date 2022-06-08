@@ -13,7 +13,6 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 
 import static com.google.common.collect.Sets.newHashSet;
-
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -32,7 +31,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import com.google.common.collect.ImmutableSet;
-
 import org.slf4j.Logger;
 
 /**

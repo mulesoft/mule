@@ -10,7 +10,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver.pluginDescriptorResolver;
 import static org.mule.runtime.module.artifact.activation.internal.PluginsDependenciesProcessor.process;
-import static org.mule.runtime.module.artifact.activation.internal.PluginsDependenciesProcessor.removeExportedPackagesAlreadyExportedByTransitiveDependencies;
 import static org.mule.runtime.module.artifact.api.classloader.ChildOnlyLookupStrategy.CHILD_ONLY;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
@@ -33,7 +32,6 @@ import org.mule.runtime.module.artifact.activation.api.ArtifactActivationExcepti
 import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
-import org.mule.runtime.module.artifact.activation.internal.PluginsDependenciesProcessor;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinder;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -116,8 +114,9 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
     regionClassLoader.addClassLoader(domainClassLoader, artifactClassLoaderFilter);
 
-    List<ArtifactPluginDescriptor> artifactPluginDescriptors =
-        removeExportedPackagesAlreadyExportedByTransitiveDependencies(process(descriptor.getPlugins(), false, List::add));
+    // This is needed because although plugins must have been already ordered, they are in a Set, so here we guarantee the ordered
+    // list needed for the class
+    List<ArtifactPluginDescriptor> artifactPluginDescriptors = process(descriptor.getPlugins(), false, List::add);
 
     artifactPluginDescriptors
         .stream()
@@ -213,9 +212,9 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
     regionClassLoader.addClassLoader(appClassLoader, artifactClassLoaderFilter);
 
-    List<ArtifactPluginDescriptor> artifactPluginDescriptors =
-        PluginsDependenciesProcessor.removeExportedPackagesAlreadyExportedByTransitiveDependencies(PluginsDependenciesProcessor
-            .process(descriptor.getPlugins(), false, List::add));
+    // This is needed because although plugins must have been already ordered, they are in a Set, so here we guarantee the ordered
+    // list needed for the class loaders' creation.
+    List<ArtifactPluginDescriptor> artifactPluginDescriptors = process(descriptor.getPlugins(), false, List::add);
 
     artifactPluginDescriptors
         .stream()

@@ -29,13 +29,13 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.plugin.LoaderDescriber;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import org.junit.Test;
-
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Feature(EXTENSION_MODEL_DISCOVERY)
 public class DefaultExtensionModelDiscovererTestCase extends AbstractMuleTestCase {
