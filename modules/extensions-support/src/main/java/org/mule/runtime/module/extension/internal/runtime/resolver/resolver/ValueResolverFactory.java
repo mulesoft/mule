@@ -120,6 +120,10 @@ public class ValueResolverFactory {
     } else if (acceptsReferences && expectedClass.equals(ConfigurationProvider.class)) {
       // This case is for expressions support in config-refs, the idea is that the expression will resolve to a string
       // reference, and we will take care of performing the lookup for the global configuration provider.
+      // TODO W-11272333: also support expressions returning a ConfigurationProvider directly
+      // TODO W-11272350: use ExtensionManager to resolve from String to ConfigurationProvider instead of the application
+      // registry.
+      // make sure to also change it for static references
       ValueResolver<String> keyResolver = new TypeSafeExpressionValueResolver<>(value, String.class, fromType(String.class));
       return new TypeSafeValueResolverWrapper<>(new RegistryLookupValueResolverWrapper<>(keyResolver), expectedClass);
     } else {

@@ -723,6 +723,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   protected boolean usesDynamicConfiguration() {
+    // TODO W-11267571: if not being able to resolve the ValueResolver<ConfigurationProvider> at this point, hence
+    // treating it as dynamic, ends up causing performance issues.
     return isConfigurationSpecified()
         && (doesConfigurationDependOnEvent() || getConfigurationProvider().map(ConfigurationProvider::isDynamic).orElse(true));
   }
