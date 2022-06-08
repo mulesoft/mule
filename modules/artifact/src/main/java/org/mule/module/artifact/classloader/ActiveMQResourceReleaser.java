@@ -52,7 +52,7 @@ public class ActiveMQResourceReleaser implements ResourceReleaser {
       Thread[] threads = new Thread[activeCount()];
       try {
         enumerate(threads);
-      } catch (Throwable t) {
+      } catch (SecurityException t) {
         logger.debug("An error occurred trying to obtain available Threads. Thread cleanup will be skipped.", t);
         return;
       }
@@ -80,10 +80,9 @@ public class ActiveMQResourceReleaser implements ResourceReleaser {
       return false;
     }
     String artifactId = ((ArtifactClassLoader) classLoader).getArtifactId();
-    boolean isActiveMqThread = thread.getName().equals(ACTIVEMQ_DRIVER_TIMER_THREAD_NAME);
 
     return thread.getClass().getSimpleName().equals(ACTIVEMQ_DRIVER_TIMER_THREAD_CLASS_NAME)
-        && isActiveMqThread
+        && thread.getName().equals(ACTIVEMQ_DRIVER_TIMER_THREAD_NAME)
         && (isThreadLoadedByDisposedApplication(artifactId, thread.getContextClassLoader())
             || isThreadLoadedByDisposedDomain(artifactId, thread.getContextClassLoader()));
   }

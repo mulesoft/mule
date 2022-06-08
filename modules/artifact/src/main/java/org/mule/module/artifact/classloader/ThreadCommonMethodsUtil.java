@@ -6,14 +6,16 @@
  */
 package org.mule.module.artifact.classloader;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+
 
 /**
  * This class contain common methods used by ActiveMQResourceReleaser and JdbcResourceReleaser Used to prevent leaks related to
@@ -21,7 +23,7 @@ import org.slf4j.Logger;
  */
 public class ThreadCommonMethodsUtil {
 
-  private static final Logger logger = LoggerFactory.getLogger(ThreadCommonMethodsUtil.class);
+  private static final Logger logger = getLogger(ThreadCommonMethodsUtil.class);
   public static final String COMPOSITE_CLASS_LOADER_CLASS_NAME = "CompositeClassLoader";
 
   public static boolean isThreadLoadedByDisposedDomain(String undeployedArtifactId, ClassLoader threadContextClassLoader) {
