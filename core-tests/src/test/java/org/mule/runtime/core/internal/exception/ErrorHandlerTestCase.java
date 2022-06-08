@@ -15,7 +15,6 @@ import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HA
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_HANDLER;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
@@ -46,7 +45,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
-import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -62,9 +60,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoRule;
 
-import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
 @SmallTest
@@ -156,24 +152,6 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
 
     assertThat(defaultHandler.getExceptionListeners(), hasSize(1));
     assertThat(defaultHandler.getExceptionListeners(), hasItem(instanceOf(OnErrorPropagateHandler.class)));
-  }
-
-  @Test
-  @Issue("W-11117613")
-  @Description("There is a method setFromGlobalErrorHandler that sets a boolean to the listeners, this tests that it is not set.")
-  public void doNotSetFromGlobalErrorHandlerWhenSystemPropertyIsDisabled() throws InitialisationException {
-    GlobalErrorHandler globalErrorHandler = new GlobalErrorHandler();
-    TemplateOnErrorHandler onErrorHandler = mock(TemplateOnErrorHandler.class);
-    when(onErrorHandler.isInitialised()).thenReturn(true);
-    globalErrorHandler.setExceptionListeners(singletonList(onErrorHandler));
-    when(mockMuleContext.getDefaultErrorHandler(empty())).thenReturn(defaultMessagingExceptionHandler);
-    globalErrorHandler.setMuleContext(mockMuleContext);
-    globalErrorHandler.setRootContainerName("root");
-
-    initialiseIfNeeded(globalErrorHandler, mockMuleContext);
-
-    verify(onErrorHandler, times(0)).setFromGlobalErrorHandler(true);
-    verify(onErrorHandler, times(1)).initialise();
   }
 
   @Test

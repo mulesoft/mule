@@ -25,6 +25,7 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 
 import org.junit.Rule;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.ErrorHandlerTestCase.DefaultMessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
@@ -73,7 +74,6 @@ public class GlobalErrorHandlerTestCase extends AbstractMuleTestCase {
     initialiseIfNeeded(globalErrorHandler, mockMuleContext);
     initialiseIfNeeded(globalErrorHandler, mockMuleContext);
 
-    verify(onErrorHandler, times(1)).setFromGlobalErrorHandler(true);
     verify(onErrorHandler, times(1)).initialise();
   }
 
@@ -96,7 +96,8 @@ public class GlobalErrorHandlerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void globalErrorHandlerDisposeOnce() {
+  public void globalErrorHandlerDisposeOnce() throws InitialisationException {
+    initialiseIfNeeded(globalErrorHandler, mockMuleContext);
     disposeIfNeeded(globalErrorHandler, null);
     disposeIfNeeded(globalErrorHandler, null);
 

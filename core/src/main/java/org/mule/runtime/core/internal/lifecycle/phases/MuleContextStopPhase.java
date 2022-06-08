@@ -6,10 +6,7 @@
  */
 package org.mule.runtime.core.internal.lifecycle.phases;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_HANDLER_PROPERTY;
-
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.System.getProperty;
+import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.REUSE_GLOBAL_ERROR_HANDLER;
 
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -71,7 +68,7 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase {
         Stoppable.class
     });
 
-    if (parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY))) {
+    if (REUSE_GLOBAL_ERROR_HANDLER) {
       ignoredObjects = ArrayUtils.add(ignoredObjects, GlobalErrorHandler.class);
     }
 
