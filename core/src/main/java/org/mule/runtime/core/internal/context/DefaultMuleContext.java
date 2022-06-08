@@ -1449,12 +1449,12 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   /**
    * Configures the {@link MuleRuntimeFeature#MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG} feature flag.
    *
-   * @since 5.0.0
+   * @since 4.5.0
    */
   private static void configurePrintDetailedCompositeExceptionLog() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG,
-                                                minMuleVersion("5.0.0"));
+                                                minMuleVersion("4.5.0"));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {
