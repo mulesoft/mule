@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.extension.discovery;
 
+import static org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer.discoverRuntimeExtensionModels;
+
 import static java.util.Collections.unmodifiableSet;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -44,7 +46,7 @@ public class DefaultExtensionModelDiscoverer implements ExtensionModelDiscoverer
                    if (!dependencies.contains(MuleExtensionModelProvider.getExtensionModel())) {
                      dependencies = ImmutableSet.<ExtensionModel>builder()
                          .addAll(extensions)
-                         .addAll(ExtensionModelDiscoverer.discoverRuntimeExtensionModels())
+                         .addAll(discoverRuntimeExtensionModels())
                          .build();
                    }
 
