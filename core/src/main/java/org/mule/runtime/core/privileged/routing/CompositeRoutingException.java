@@ -45,8 +45,8 @@ import org.slf4j.LoggerFactory;
  */
 public final class CompositeRoutingException extends MuleException implements ComposedErrorException, ErrorMessageAwareException {
 
-  private static final String MESSAGE_TITLE = "Exception/Error(s) were found for route(s):";
-  private static final String MESSAGE_SUB_TITLE = "Detailed Exception/Error(s) for route(s):";
+  private static final String MESSAGE_TITLE = "Error(s) were found for route(s):";
+  private static final String MESSAGE_SUB_TITLE = "Detailed Error(s) for route(s):";
   private static final String LEGACY_MESSAGE_TITLE = "Exception(s) were found for route(s): ";
 
   private static final long serialVersionUID = -4421728527040579605L;
@@ -124,7 +124,8 @@ public final class CompositeRoutingException extends MuleException implements Co
     StringBuilder builder = new StringBuilder();
     for (Entry<String, Error> routeResult : routingResult.getFailures().entrySet()) {
       Throwable routeException = routeResult.getValue().getCause();
-      builder.append(lineSeparator() + "\t").append(routeResult.getKey()).append(": ").append(routeException.getClass().getName())
+      builder.append(lineSeparator() + "\t").append("Route ").append(routeResult.getKey()).append(": ")
+          .append(routeException.getClass().getName())
           .append(": ").append(routeException.getMessage());
     }
     if (!routingResult.getFailuresWithExceptionInfo().isEmpty()) {
