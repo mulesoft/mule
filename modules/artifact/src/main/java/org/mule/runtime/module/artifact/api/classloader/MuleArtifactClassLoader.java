@@ -103,7 +103,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   private final ResourceReleaser classLoaderReferenceReleaser;
   private volatile boolean shouldReleaseJdbcReferences = false;
   private volatile boolean shouldReleaseIbmMQResources = false;
-  private volatile boolean shouldReleaseJMSReferences = false;
+  private volatile boolean shouldReleaseActiveMQReferences = false;
   private ResourceReleaser jdbcResourceReleaserInstance;
   private final ResourceReleaser scalaClassValueReleaserInstance;
   private final ArtifactDescriptor artifactDescriptor;
@@ -269,8 +269,8 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
       shouldReleaseIbmMQResources = true;
     }
 
-    if (!shouldReleaseJMSReferences && name.startsWith("org.apache.activemq")) {
-      shouldReleaseJMSReferences = true;
+    if (!shouldReleaseActiveMQReferences && name.startsWith("org.apache.activemq")) {
+      shouldReleaseActiveMQReferences = true;
     }
     return clazz;
   }
@@ -323,7 +323,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
       new IBMMQResourceReleaser(this).release();
     }
 
-    if (shouldReleaseJMSReferences) {
+    if (shouldReleaseActiveMQReferences) {
       new ActiveMQResourceReleaser(this).release();
     }
 

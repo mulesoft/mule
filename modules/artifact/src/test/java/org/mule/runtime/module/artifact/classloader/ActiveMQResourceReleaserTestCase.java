@@ -140,8 +140,8 @@ public class ActiveMQResourceReleaserTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void checkIfJMSResourceReleaserInterruptAbstractInactivityMonitorThread() throws InterruptedException,
-      ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+  public void checkIfActiveMQResourceReleaserInterruptAbstractInactivityMonitorThread() throws ClassNotFoundException,
+      NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
 
     Class<?> activeMqFactoryClass = Class.forName(DRIVER_CLASS_NAME, true, artifactClassLoader);
     Object activeMpFactoryObject = activeMqFactoryClass.getDeclaredConstructor(String.class).newInstance(ACTIVEMQ_URL_CONFIG);
