@@ -129,7 +129,7 @@ class MuleOperationExtensionModelDeclarer {
 
     addParametersDeclaration(def);
     declareOutputConstruct(def);
-    declareDeprecationConstruct(def);
+    declareDeprecationConstruct(def, "Defines an operation's deprecation.");
 
     def.withChain("body")
         .describedAs("The operations that makes for the operation's implementation")
@@ -160,9 +160,9 @@ class MuleOperationExtensionModelDeclarer {
     declareOutputTypeParameters(attributesType, "attributes");
   }
 
-  private void declareDeprecationConstruct(ComponentDeclarer def) {
+  private void declareDeprecationConstruct(ComponentDeclarer def, String description) {
     NestedComponentDeclarer deprecationConstruct = def.withComponent("deprecated")
-        .describedAs("Defines a operation's deprecation.")
+        .describedAs(description)
         .withStereotype(DEPRECATED_STEREOTYPE)
         .withMinOccurs(0)
         .withMaxOccurs(1);
@@ -222,7 +222,7 @@ class MuleOperationExtensionModelDeclarer {
         .withMinOccurs(1)
         .withMaxOccurs(null);
 
-    declareDeprecationConstruct(parameterDef);
+    declareDeprecationConstruct(parameterDef, "Defines a parameter's deprecation.");
 
     final ParameterGroupDeclarer parameterDefParameters = parameterDef.onDefaultParameterGroup();
     addParameterDeclaration(parameterDefParameters);
