@@ -18,7 +18,9 @@ import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.sdk.api.annotation.semantics.security.TenantIdentifier;
+import org.mule.test.values.extension.MyPojo;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -100,6 +102,14 @@ public class TestOAuthConnectionState {
   @Optional
   private ParameterResolver<String> resolverConnectionDisplayName;
 
+  @Parameter
+  @Optional
+  private ZonedDateTime connectionTime;
+
+  @Parameter
+  @Optional
+  private MyPojo externalPojo;
+
   private AuthorizationCodeState state;
 
   public Double getApiVersion() {
@@ -176,5 +186,13 @@ public class TestOAuthConnectionState {
 
   public ParameterResolver<String> getResolverConnectionDisplayName() {
     return resolverConnectionDisplayName;
+  }
+
+  public ZonedDateTime getConnectionTime() {
+    return connectionTime;
+  }
+
+  public MyPojo getExternalPojo() {
+    return externalPojo;
   }
 }
