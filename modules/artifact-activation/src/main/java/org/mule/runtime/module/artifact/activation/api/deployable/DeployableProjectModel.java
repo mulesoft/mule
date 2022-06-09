@@ -12,7 +12,6 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
-import org.mule.tools.api.classloader.model.Plugin;
 
 import java.io.File;
 import java.util.List;
@@ -33,33 +32,33 @@ public final class DeployableProjectModel {
 
   private final List<String> packages;
   private final List<String> resources;
-  private final List<Plugin> additionalPluginDependencies;
   private final Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies;
   private final ArtifactCoordinates artifactCoordinates;
   private final File projectFolder;
   private final List<BundleDependency> deployableBundleDependencies;
   private final Set<BundleDescriptor> sharedDeployableBundleDescriptors;
+  private final Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies;
   private final BundleDescriptor bundleDescriptor;
   private final Map<BundleDescriptor, List<BundleDependency>> pluginsBundleDependencies;
 
   public DeployableProjectModel(List<String> packages,
                                 List<String> resources,
-                                List<Plugin> additionalPluginDependencies,
                                 Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies,
                                 ArtifactCoordinates artifactCoordinates,
                                 File projectFolder,
                                 List<BundleDependency> deployableBundleDependencies,
                                 Set<BundleDescriptor> sharedDeployableBundleDescriptors,
+                                Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies,
                                 BundleDescriptor bundleDescriptor,
                                 Map<BundleDescriptor, List<BundleDependency>> pluginsBundleDependencies) {
     this.packages = ImmutableList.copyOf(packages);
     this.resources = ImmutableList.copyOf(resources);
-    this.additionalPluginDependencies = ImmutableList.copyOf(additionalPluginDependencies);
     this.pluginsDependencies = ImmutableMap.copyOf(pluginsDependencies);
     this.artifactCoordinates = artifactCoordinates;
     this.projectFolder = projectFolder;
     this.deployableBundleDependencies = ImmutableList.copyOf(deployableBundleDependencies);
     this.sharedDeployableBundleDescriptors = ImmutableSet.copyOf(sharedDeployableBundleDescriptors);
+    this.additionalPluginDependencies = ImmutableMap.copyOf(additionalPluginDependencies);
     this.bundleDescriptor = bundleDescriptor;
     this.pluginsBundleDependencies = ImmutableMap.copyOf(pluginsBundleDependencies);
   }
@@ -76,10 +75,6 @@ public final class DeployableProjectModel {
     return pluginsDependencies;
   }
 
-  public List<Plugin> getAdditionalPluginDependencies() {
-    return additionalPluginDependencies;
-  }
-
   public ArtifactCoordinates getArtifactCoordinates() {
     return artifactCoordinates;
   }
@@ -94,6 +89,10 @@ public final class DeployableProjectModel {
 
   public Set<BundleDescriptor> getSharedDeployableBundleDescriptors() {
     return sharedDeployableBundleDescriptors;
+  }
+
+  public Map<BundleDescriptor, List<BundleDependency>> getAdditionalPluginDependencies() {
+    return additionalPluginDependencies;
   }
 
   public BundleDescriptor getBundleDescriptor() {
