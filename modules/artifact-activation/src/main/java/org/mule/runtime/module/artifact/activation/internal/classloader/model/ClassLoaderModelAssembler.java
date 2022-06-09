@@ -79,7 +79,7 @@ public class ClassLoaderModelAssembler {
    * Convert a {@link BundleDependency} instance to {@link Artifact}.
    *
    * @param bundleDependency the bundle dependency to be converted.
-   * @return the corresponding artifact with normalized version.
+   * @return the artifact for the provided dependency.
    */
   private Artifact toArtifact(BundleDependency bundleDependency) {
     ArtifactCoordinates artifactCoordinates = toArtifactCoordinates(bundleDependency.getDescriptor());

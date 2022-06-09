@@ -15,6 +15,7 @@ import org.mule.runtime.module.artifact.activation.internal.classloader.model.Cl
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.tools.api.classloader.model.AppClassLoaderModel;
+import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 import org.mule.tools.api.classloader.model.ClassLoaderModel;
 import org.mule.tools.api.classloader.model.Plugin;
 
@@ -32,7 +33,9 @@ public class DeployableClassLoaderModelAssembler<M extends MuleDeployableModel> 
 
   public DeployableClassLoaderModelAssembler(DeployableProjectModel model,
                                              MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
-    super(model.getArtifactCoordinates(),
+    super(new ArtifactCoordinates(model.getDescriptor().getGroupId(),
+                                  model.getDescriptor().getArtifactId(),
+                                  model.getDescriptor().getVersion()),
           model.getDependencies(),
           model.getSharedLibraries(),
           model.getPackages(),

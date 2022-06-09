@@ -103,7 +103,6 @@ public class MavenDeployableProjectModelBuilder
   private List<String> resources = emptyList();
   private List<BundleDependency> deployableMavenBundleDependencies;
   private Map<ArtifactCoordinates, List<Artifact>> pluginsArtifactDependencies;
-  private ArtifactCoordinates deployableArtifactCoordinates;
   private List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> deployableBundleDependencies;
   private Set<org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor> sharedDeployableBundleDescriptors;
   private Map<org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> additionalPluginDependencies;
@@ -151,7 +150,7 @@ public class MavenDeployableProjectModelBuilder
 
     deployableArtifactRepositoryFolder = this.mavenConfiguration.getLocalMavenRepositoryLocation();
 
-    getDeployableProjectArtifactCoordinates(pomModel);
+    ArtifactCoordinates deployableArtifactCoordinates = getDeployableProjectArtifactCoordinates(pomModel);
 
     AetherMavenClient aetherMavenClient = new AetherMavenClient(mavenConfiguration);
     List<String> activeProfiles = mavenConfiguration.getActiveProfiles().orElse(emptyList());
@@ -170,16 +169,15 @@ public class MavenDeployableProjectModelBuilder
     }
 
     return new DeployableProjectModel(packages, resources,
-                                      deployableArtifactCoordinates,
+                                      buildBundleDescriptor(deployableArtifactCoordinates),
                                       projectFolder, deployableBundleDependencies,
-                                      sharedDeployableBundleDescriptors, additionalPluginDependencies,
-                                      buildBundleDescriptor(deployableArtifactCoordinates), pluginsBundleDependencies);
+                                      sharedDeployableBundleDescriptors, additionalPluginDependencies);
   }
 
-  private void getDeployableProjectArtifactCoordinates(Model pomModel) {
+  private ArtifactCoordinates getDeployableProjectArtifactCoordinates(Model pomModel) {
     ApplicationGAVModel deployableGAVModel =
         new ApplicationGAVModel(pomModel.getGroupId(), pomModel.getArtifactId(), pomModel.getVersion());
-    deployableArtifactCoordinates = getDeployableArtifactCoordinates(pomModel, deployableGAVModel);
+    return getDeployableArtifactCoordinates(pomModel, deployableGAVModel);
   }
 
   /**
@@ -254,6 +252,13 @@ public class MavenDeployableProjectModelBuilder
                 .map(artifact -> createBundleDependencyFromPackagerDependency(getDeployableArtifactRepositoryUriResolver())
                     .apply(artifact))
                 .collect(toList())));
+
+    deployableBundleDependencies = deployableBundleDependencies
+        .stream()
+        .map(dbd -> new org.mule.runtime.module.artifact.api.descriptor.BundleDependency.Builder(dbd)
+            .setTransitiveDependencies(pluginsBundleDependencies.get(dbd.getDescriptor()))
+            .build())
+        .collect(toList());
   }
 
   private Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> toPluginDependencies(Map<BundleDependency, List<BundleDependency>> pluginsAndDependencies) {
