@@ -10,7 +10,6 @@ import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArti
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.File;
@@ -32,7 +31,6 @@ public final class DeployableProjectModel {
 
   private final List<String> packages;
   private final List<String> resources;
-  private final Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies;
   private final ArtifactCoordinates artifactCoordinates;
   private final File projectFolder;
   private final List<BundleDependency> deployableBundleDependencies;
@@ -41,9 +39,21 @@ public final class DeployableProjectModel {
   private final BundleDescriptor bundleDescriptor;
   private final Map<BundleDescriptor, List<BundleDependency>> pluginsBundleDependencies;
 
+  /**
+   * Creates a new instance with the provided parameters.
+   * 
+   * @param packages                          See {@link #getPackages()}
+   * @param resources                         See {@link #getResources()}
+   * @param artifactCoordinates
+   * @param projectFolder
+   * @param deployableBundleDependencies
+   * @param sharedDeployableBundleDescriptors
+   * @param additionalPluginDependencies
+   * @param bundleDescriptor
+   * @param pluginsBundleDependencies
+   */
   public DeployableProjectModel(List<String> packages,
                                 List<String> resources,
-                                Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies,
                                 ArtifactCoordinates artifactCoordinates,
                                 File projectFolder,
                                 List<BundleDependency> deployableBundleDependencies,
@@ -53,7 +63,6 @@ public final class DeployableProjectModel {
                                 Map<BundleDescriptor, List<BundleDependency>> pluginsBundleDependencies) {
     this.packages = ImmutableList.copyOf(packages);
     this.resources = ImmutableList.copyOf(resources);
-    this.pluginsDependencies = ImmutableMap.copyOf(pluginsDependencies);
     this.artifactCoordinates = artifactCoordinates;
     this.projectFolder = projectFolder;
     this.deployableBundleDependencies = ImmutableList.copyOf(deployableBundleDependencies);
@@ -63,18 +72,33 @@ public final class DeployableProjectModel {
     this.pluginsBundleDependencies = ImmutableMap.copyOf(pluginsBundleDependencies);
   }
 
+  /**
+   * These are the packages containing java classes in the modeled project.
+   * <p>
+   * This does not take into account the java packages of this project's dependencies.
+   * 
+   * @return the java packages of the project.
+   */
   public List<String> getPackages() {
     return packages;
   }
 
+  /**
+   * These are the resources in the modeled project.
+   * <p>
+   * This does not take into account the resources of this project's dependencies.
+   * 
+   * @return the resources of the project.
+   */
   public List<String> getResources() {
     return resources;
   }
 
-  public Map<ArtifactCoordinates, List<Artifact>> getPluginsDependencies() {
-    return pluginsDependencies;
-  }
-
+  /**
+   * This is the GAV of the modeled project.
+   * 
+   * @return the coordinates of the artifact for this project.
+   */
   public ArtifactCoordinates getArtifactCoordinates() {
     return artifactCoordinates;
   }

@@ -170,7 +170,7 @@ public class MavenDeployableProjectModelBuilder
     }
 
     return new DeployableProjectModel(packages, resources,
-                                      pluginsArtifactDependencies, deployableArtifactCoordinates,
+                                      deployableArtifactCoordinates,
                                       projectFolder, deployableBundleDependencies,
                                       sharedDeployableBundleDescriptors, additionalPluginDependencies,
                                       buildBundleDescriptor(deployableArtifactCoordinates), pluginsBundleDependencies);

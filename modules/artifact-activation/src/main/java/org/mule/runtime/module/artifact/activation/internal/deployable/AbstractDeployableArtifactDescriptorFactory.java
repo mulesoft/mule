@@ -31,7 +31,6 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
-import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.BufferedInputStream;
@@ -47,6 +46,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -188,15 +188,17 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
               .warn(format("Plugin '%s' is declared as 'provided' which means that it will not be added to the artifact's classpath",
                            bundleDescriptor));
         } else {
-          Map.Entry<ArtifactCoordinates, List<Artifact>> pluginDependencies =
-              deployableProjectModel.getPluginsDependencies().entrySet().stream()
-                  .filter(pluginDependenciesEntry -> StringUtils
-                      .equals(bundleDescriptor.getArtifactId(), pluginDependenciesEntry.getKey().getArtifactId())
-                      && StringUtils.equals(bundleDescriptor.getGroupId(), pluginDependenciesEntry.getKey().getGroupId())
-                      && StringUtils.equals(bundleDescriptor.getVersion(), pluginDependenciesEntry.getKey().getVersion()))
-                  .findFirst()
-                  .orElseThrow(() -> new ArtifactActivationException(createStaticMessage(format("Class loader model for plugin '%s' not found",
-                                                                                                bundleDescriptor))));
+          BundleDescriptor pluginDescriptor = deployableProjectModel.getDeployableBundleDependencies()
+              .stream()
+              .map(BundleDependency::getDescriptor)
+              .filter(dependencyDescriptor -> "mule-plugin".equals(dependencyDescriptor.getClassifier().orElse(null)))
+              .filter(pluginDependencyDescriptor -> StringUtils
+                  .equals(bundleDescriptor.getArtifactId(), pluginDependencyDescriptor.getArtifactId())
+                  && StringUtils.equals(bundleDescriptor.getGroupId(), pluginDependencyDescriptor.getGroupId())
+                  && StringUtils.equals(bundleDescriptor.getVersion(), pluginDependencyDescriptor.getVersion()))
+              .findFirst()
+              .orElseThrow(() -> new ArtifactActivationException(createStaticMessage(format("Class loader model for plugin '%s' not found",
+                                                                                            bundleDescriptor))));
 
           List<BundleDependency> bundleDependencies = deployableProjectModel.getPluginsBundleDependencies().get(bundleDescriptor);
           pluginDescriptors
@@ -205,7 +207,9 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
                                                  pluginModelResolver.resolve(bundlePluginDependency),
                                                  descriptor,
                                                  bundleDependencies,
-                                                 pluginDependencies.getKey(),
+                                                 new ArtifactCoordinates(pluginDescriptor.getGroupId(),
+                                                                         pluginDescriptor.getArtifactId(),
+                                                                         pluginDescriptor.getVersion()),
                                                  deployableProjectModel.getDeployableBundleDependencies(),
                                                  deployableProjectModel.getSharedDeployableBundleDescriptors())));
         }
