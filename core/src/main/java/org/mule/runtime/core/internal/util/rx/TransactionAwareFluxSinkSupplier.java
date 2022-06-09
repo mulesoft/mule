@@ -9,9 +9,6 @@ package org.mule.runtime.core.internal.util.rx;
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.isTxActiveByContext;
-
-import java.util.function.Supplier;
-
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
@@ -29,14 +26,14 @@ import reactor.util.context.Context;
  */
 public class TransactionAwareFluxSinkSupplier<T> implements FluxSinkSupplier<T> {
 
-  private final Supplier<FluxSink<T>> newSinkFactory;
+  private final FluxSinkSupplier<T> newSinkFactory;
   private final FluxSinkSupplier<T> delegate;
   private final Cache<Thread, FluxSink<T>> sinks = Caffeine.newBuilder()
       .weakKeys()
       .removalListener((Thread key, FluxSink<T> value, RemovalCause cause) -> value.complete())
       .build();
 
-  public TransactionAwareFluxSinkSupplier(Supplier<FluxSink<T>> sinkFactory, FluxSinkSupplier<T> delegate) {
+  public TransactionAwareFluxSinkSupplier(FluxSinkSupplier<T> sinkFactory, FluxSinkSupplier<T> delegate) {
     this.newSinkFactory = sinkFactory;
     this.delegate = delegate;
   }
@@ -62,6 +59,7 @@ public class TransactionAwareFluxSinkSupplier<T> implements FluxSinkSupplier<T> 
 
   @Override
   public void dispose() {
+    newSinkFactory.dispose();
     delegate.dispose();
     sinks.invalidateAll();
   }

@@ -27,12 +27,12 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
+import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -86,15 +86,15 @@ public class CompositeSourcePolicy
     return getLastPolicy().getPolicyChain().getProcessingStrategy().onPipeline(super.getPolicyProcessor());
   }
 
-  private static final class SourceWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
+  private static final class SourceWithPoliciesFluxObjectFactory implements FluxSinkSupplier<CoreEvent> {
 
-    private final Reference<CompositeSourcePolicy> compositeSourcePolicy;
+    private CompositeSourcePolicy compositeSourcePolicy;
     private final PolicyTraceLogger policyTraceLogger = new PolicyTraceLogger();
 
     public SourceWithPoliciesFluxObjectFactory(CompositeSourcePolicy compositeSourcePolicy) {
-      // Avoid instances of this class from preventing the policy from being gc'd
-      // Break the circular reference between policy-sinkFactory-flux that may cause memory leaks in the policies caches
-      this.compositeSourcePolicy = new WeakReference<>(compositeSourcePolicy);
+      // Avoid instances of this class from preventing the policy from being garbage collected.
+      // Break the circular reference between policy-sinkFactory-flux that may cause memory leaks in the policies caches.
+      this.compositeSourcePolicy = compositeSourcePolicy;
     }
 
     @Override
@@ -103,7 +103,7 @@ public class CompositeSourcePolicy
 
       Flux<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> policyFlux =
           sinkRef.flux()
-              .transform(compositeSourcePolicy.get().getExecutionProcessor())
+              .transform(compositeSourcePolicy.getExecutionProcessor())
               .map(policiesResultEvent -> {
                 SourcePolicyContext ctx = from(policiesResultEvent);
                 return right(SourcePolicyFailureResult.class,
@@ -111,9 +111,8 @@ public class CompositeSourcePolicy
                                                            resolveSuccessResponseParameters(policiesResultEvent, ctx),
                                                            ctx.getResponseParametersProcessor()));
               })
-              .doOnNext(result -> {
-                compositeSourcePolicy.get().commonPolicy.finishFlowProcessing(result.getRight().getResult(), result);
-              })
+              .doOnNext(result -> compositeSourcePolicy.commonPolicy.finishFlowProcessing(result.getRight().getResult(),
+                                                                                          result))
               .doOnError(e -> !(e instanceof MessagingException), e -> LOGGER.error(e.getMessage(), e))
               .onErrorContinue(MessagingException.class, (t, e) -> {
                 MessagingException me = (MessagingException) t;
@@ -125,10 +124,10 @@ public class CompositeSourcePolicy
 
                 policyTraceLogger.logSourcePolicyFailureResult(result.getLeft());
 
-                compositeSourcePolicy.get().commonPolicy.finishFlowProcessing(me.getEvent(), result, me, ctx);
+                compositeSourcePolicy.commonPolicy.finishFlowProcessing(me.getEvent(), result, me, ctx);
               });
 
-      policyFlux.subscribe(null, e -> LOGGER.error("Exception reached subscriber for " + toString(), e));
+      policyFlux.subscribe(null, e -> LOGGER.error("Exception reached subscriber for " + this, e));
 
       return sinkRef.getFluxSink();
     }
@@ -137,7 +136,7 @@ public class CompositeSourcePolicy
                                                                            SourcePolicyContext ctx) {
       final Map<String, Object> originalResponseParameters = ctx.getOriginalResponseParameters();
 
-      return () -> compositeSourcePolicy.get().getParametersTransformer()
+      return () -> compositeSourcePolicy.getParametersTransformer()
           .map(parametersTransformer -> concatMaps(originalResponseParameters,
                                                    parametersTransformer
                                                        .fromMessageToSuccessResponseParameters(policiesResultEvent
@@ -148,11 +147,18 @@ public class CompositeSourcePolicy
     private Supplier<Map<String, Object>> resolveErrorResponseParameters(MessagingException e, SourcePolicyContext ctx) {
       final Map<String, Object> originalFailureResponseParameters = ctx.getOriginalFailureResponseParameters();
 
-      return () -> compositeSourcePolicy.get().getParametersTransformer()
+      return () -> compositeSourcePolicy.getParametersTransformer()
           .map(parametersTransformer -> concatMaps(originalFailureResponseParameters,
                                                    parametersTransformer
                                                        .fromMessageToErrorResponseParameters(e.getEvent().getMessage())))
           .orElse(originalFailureResponseParameters);
+    }
+
+    @Override
+    public void dispose() {
+      // Avoid instances of this class from preventing the policy from being garbage collected.
+      // Break the circular reference between policy-sinkFactory-flux that may cause memory leaks in the policies caches.
+      compositeSourcePolicy = null;
     }
   }
 
@@ -213,6 +219,11 @@ public class CompositeSourcePolicy
                       MessageSourceResponseParametersProcessor respParamProcessor,
                       CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> callback) {
     commonPolicy.process(sourceEvent, respParamProcessor, callback);
+  }
+
+  @Override
+  public void drain(Consumer<SourcePolicy> whenDrained) {
+    commonPolicy.drain(commonSourcePolicy -> whenDrained.accept(this));
   }
 
   private static Map<String, Object> concatMaps(Map<String, Object> originalResponseParameters,

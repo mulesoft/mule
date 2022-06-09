@@ -14,8 +14,10 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.functional.Either;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
@@ -64,12 +66,21 @@ public class CommonSourcePolicyTestCase extends AbstractMuleTestCase {
    * @return A {@link CommonSourcePolicy}.
    */
   private CommonSourcePolicy getCommonSourcePolicy(List<FluxSink> fluxSinks) {
-    CommonSourcePolicy commonSourcePolicy = new CommonSourcePolicy(() -> {
-      FluxSink fluxSinkMock = mock(FluxSink.class);
-      fluxSinks.add(fluxSinkMock);
-      return fluxSinkMock;
-    });
-    return commonSourcePolicy;
+    FluxSinkSupplier<CoreEvent> sinkSupplier = new FluxSinkSupplier<CoreEvent>() {
+
+      @Override
+      public FluxSink<CoreEvent> get() {
+        FluxSink fluxSinkMock = mock(FluxSink.class);
+        fluxSinks.add(fluxSinkMock);
+        return fluxSinkMock;
+      }
+
+      @Override
+      public void dispose() {
+        // Nothing to do
+      }
+    };
+    return new CommonSourcePolicy(sinkSupplier);
   }
 
 }

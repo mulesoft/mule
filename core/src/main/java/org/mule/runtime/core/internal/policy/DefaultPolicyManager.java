@@ -142,13 +142,19 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
       Caffeine.newBuilder()
           .build();
 
-  // These next caches cache the actual composite policies for a given parameters. Since many parameters combinations may result
+  // These next caches contain the actual composite policies for a given parameters. Since many parameters combinations may result
   // in a same set of policies to be applied, many entries of this cache may reference the same composite policy instance.
 
   private Cache<Pair<String, PolicyPointcutParameters>, SourcePolicy> sourcePolicyOuterCache =
       Caffeine.newBuilder()
           .expireAfterAccess(60, SECONDS)
+          .removalListener((key, value, cause) -> {
+            if (value != null) {
+              ((SourcePolicy) value).drain(sourcePolicy -> disposeIfNeeded(sourcePolicy, LOGGER));
+            }
+          })
           .build();
+
   private Cache<Pair<ComponentIdentifier, PolicyPointcutParameters>, OperationPolicy> operationPolicyOuterCache =
       Caffeine.newBuilder()
           .expireAfterAccess(60, SECONDS)
@@ -474,6 +480,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
         .build();
   }
 
+  // Testing purposes
   int getActivePoliciesCount() {
     return activePolicies.size();
   }
@@ -495,8 +502,8 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
     }
 
     /*
-     * MULE-18929: since outer cache has an expiring time but inner cache doesn't, we are could be creating a new weak reference
-     * for the same policy. This will make that the activePolicies set will increase its size for expired policies, unnecessary.
+     * MULE-18929: since outer cache has an expiring time but inner cache doesn't, we could be creating a new weak reference for
+     * the same policy. This will make that the activePolicies set will increase its size for expired policies, unnecessary.
      * Hence, overriding hashCode and equals methods to avoid having more than one weak reference in the set
      */
     @Override

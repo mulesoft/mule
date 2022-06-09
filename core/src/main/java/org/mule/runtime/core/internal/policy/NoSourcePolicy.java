@@ -20,14 +20,13 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
-import java.util.function.Supplier;
-
+import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.slf4j.Logger;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
+
+import java.util.function.Consumer;
 
 /**
  * {@link SourcePolicy} created when no policies have to be applied.
@@ -44,21 +43,19 @@ public class NoSourcePolicy implements SourcePolicy, Disposable, DeferredDisposa
     commonPolicy = new CommonSourcePolicy(new SourceFluxObjectFactory(this, flowExecutionProcessor));
   }
 
-  private static final class SourceFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
+  private static final class SourceFluxObjectFactory implements FluxSinkSupplier<CoreEvent> {
 
-    // private final Reference<NoSourcePolicy> noSourcePolicy;
-    private final NoSourcePolicy noSourcePolicy;
+    private NoSourcePolicy noSourcePolicy;
     private final ReactiveProcessor flowExecutionProcessor;
 
     public SourceFluxObjectFactory(NoSourcePolicy noSourcePolicy, ReactiveProcessor flowExecutionProcessor) {
-      // Avoid instances of this class from preventing the policy from being gc'd
-      // Break the circular reference between policy-sinkFactory-flux that may cause memory leaks in the policies caches
       this.noSourcePolicy = noSourcePolicy;
       this.flowExecutionProcessor = flowExecutionProcessor;
     }
 
     @Override
     public FluxSink<CoreEvent> get() {
+
       final FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
 
       Flux<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> policyFlux =
@@ -99,6 +96,12 @@ public class NoSourcePolicy implements SourcePolicy, Disposable, DeferredDisposa
       return sinkRef.getFluxSink();
     }
 
+    @Override
+    public void dispose() {
+      // Avoid instances of this class from preventing the policy from being garbage collected.
+      // Break the circular reference between policy-sinkFactory-flux that may cause memory leaks in the policies caches.
+      noSourcePolicy = null;
+    }
   }
 
   @Override
@@ -106,6 +109,11 @@ public class NoSourcePolicy implements SourcePolicy, Disposable, DeferredDisposa
                       MessageSourceResponseParametersProcessor respParamProcessor,
                       CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> callback) {
     commonPolicy.process(sourceEvent, respParamProcessor, callback);
+  }
+
+  @Override
+  public void drain(Consumer<SourcePolicy> whenDrained) {
+    commonPolicy.drain(commonSourcePolicy -> whenDrained.accept(this));
   }
 
   @Override

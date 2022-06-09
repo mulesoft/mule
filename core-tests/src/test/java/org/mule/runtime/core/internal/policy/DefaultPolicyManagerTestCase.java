@@ -60,6 +60,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import io.qameta.allure.Issue;
@@ -541,6 +542,11 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     public void process(CoreEvent sourceEvent, MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor,
                         CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> callback) {
       // nothing to do
+    }
+
+    @Override
+    public void drain(Consumer<SourcePolicy> whenDrained) {
+      whenDrained.accept(this);
     }
 
     @Override
