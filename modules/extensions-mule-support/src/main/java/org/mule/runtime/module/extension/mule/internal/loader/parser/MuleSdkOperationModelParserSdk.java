@@ -35,6 +35,7 @@ import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.extension.internal.property.ComposedOperationModelProperty;
 import org.mule.runtime.extension.internal.property.NoStreamingConfigurationModelProperty;
 import org.mule.runtime.extension.internal.property.NoTransactionalActionModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
@@ -89,7 +90,8 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
                                           MuleSdkOperationodelParserUtils::isIgnoredComponentForTx);
 
   private final List<ModelProperty> additionalModelProperties =
-      asList(new NoStreamingConfigurationModelProperty(), new NoTransactionalActionModelProperty());
+      asList(new NoStreamingConfigurationModelProperty(), new NoTransactionalActionModelProperty(),
+             new ComposedOperationModelProperty());
 
   private String name;
 
