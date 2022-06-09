@@ -188,7 +188,7 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
               .warn(format("Plugin '%s' is declared as 'provided' which means that it will not be added to the artifact's classpath",
                            bundleDescriptor));
         } else {
-          BundleDescriptor pluginDescriptor = deployableProjectModel.getDeployableBundleDependencies()
+          BundleDescriptor pluginDescriptor = deployableProjectModel.getDependencies()
               .stream()
               .map(BundleDependency::getDescriptor)
               .filter(dependencyDescriptor -> "mule-plugin".equals(dependencyDescriptor.getClassifier().orElse(null)))
@@ -199,7 +199,6 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
               .findFirst()
               .orElseThrow(() -> new ArtifactActivationException(createStaticMessage(format("Class loader model for plugin '%s' not found",
                                                                                             bundleDescriptor))));
-
           List<BundleDependency> bundleDependencies = deployableProjectModel.getPluginsBundleDependencies().get(bundleDescriptor);
           pluginDescriptors
               .add(pluginDescriptorResolver.resolve(emptySet(), bundleDescriptor)
@@ -210,8 +209,8 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
                                                  new ArtifactCoordinates(pluginDescriptor.getGroupId(),
                                                                          pluginDescriptor.getArtifactId(),
                                                                          pluginDescriptor.getVersion()),
-                                                 deployableProjectModel.getDeployableBundleDependencies(),
-                                                 deployableProjectModel.getSharedDeployableBundleDescriptors())));
+                                                 deployableProjectModel.getDependencies(),
+                                                 deployableProjectModel.getSharedLibraries())));
         }
       }
     }

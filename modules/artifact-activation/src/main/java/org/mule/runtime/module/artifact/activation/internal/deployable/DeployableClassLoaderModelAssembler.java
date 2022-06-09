@@ -33,8 +33,8 @@ public class DeployableClassLoaderModelAssembler<M extends MuleDeployableModel> 
   public DeployableClassLoaderModelAssembler(DeployableProjectModel model,
                                              MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
     super(model.getArtifactCoordinates(),
-          model.getDeployableBundleDependencies(),
-          model.getSharedDeployableBundleDescriptors(),
+          model.getDependencies(),
+          model.getSharedLibraries(),
           model.getPackages(),
           model.getResources(),
           muleArtifactLoaderDescriptor);

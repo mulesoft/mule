@@ -33,8 +33,8 @@ public final class DeployableProjectModel {
   private final List<String> resources;
   private final ArtifactCoordinates artifactCoordinates;
   private final File projectFolder;
-  private final List<BundleDependency> deployableBundleDependencies;
-  private final Set<BundleDescriptor> sharedDeployableBundleDescriptors;
+  private final List<BundleDependency> dependencies;
+  private final Set<BundleDescriptor> sharedLibraries;
   private final Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies;
   private final BundleDescriptor bundleDescriptor;
   private final Map<BundleDescriptor, List<BundleDependency>> pluginsBundleDependencies;
@@ -42,13 +42,13 @@ public final class DeployableProjectModel {
   /**
    * Creates a new instance with the provided parameters.
    * 
-   * @param packages                          See {@link #getPackages()}
-   * @param resources                         See {@link #getResources()}
-   * @param artifactCoordinates
+   * @param packages                     See {@link #getPackages()}
+   * @param resources                    See {@link #getResources()}
+   * @param artifactCoordinates          See {@link #getArtifactCoordinates()}
    * @param projectFolder
-   * @param deployableBundleDependencies
-   * @param sharedDeployableBundleDescriptors
-   * @param additionalPluginDependencies
+   * @param dependencies
+   * @param sharedLibraries              See {@link #getSharedLibraries()}
+   * @param additionalPluginDependencies See {@link #additionalPluginDependencies}
    * @param bundleDescriptor
    * @param pluginsBundleDependencies
    */
@@ -56,8 +56,8 @@ public final class DeployableProjectModel {
                                 List<String> resources,
                                 ArtifactCoordinates artifactCoordinates,
                                 File projectFolder,
-                                List<BundleDependency> deployableBundleDependencies,
-                                Set<BundleDescriptor> sharedDeployableBundleDescriptors,
+                                List<BundleDependency> dependencies,
+                                Set<BundleDescriptor> sharedLibraries,
                                 Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies,
                                 BundleDescriptor bundleDescriptor,
                                 Map<BundleDescriptor, List<BundleDependency>> pluginsBundleDependencies) {
@@ -65,8 +65,8 @@ public final class DeployableProjectModel {
     this.resources = ImmutableList.copyOf(resources);
     this.artifactCoordinates = artifactCoordinates;
     this.projectFolder = projectFolder;
-    this.deployableBundleDependencies = ImmutableList.copyOf(deployableBundleDependencies);
-    this.sharedDeployableBundleDescriptors = ImmutableSet.copyOf(sharedDeployableBundleDescriptors);
+    this.dependencies = ImmutableList.copyOf(dependencies);
+    this.sharedLibraries = ImmutableSet.copyOf(sharedLibraries);
     this.additionalPluginDependencies = ImmutableMap.copyOf(additionalPluginDependencies);
     this.bundleDescriptor = bundleDescriptor;
     this.pluginsBundleDependencies = ImmutableMap.copyOf(pluginsBundleDependencies);
@@ -107,14 +107,36 @@ public final class DeployableProjectModel {
     return projectFolder;
   }
 
-  public List<BundleDependency> getDeployableBundleDependencies() {
-    return deployableBundleDependencies;
+  /**
+   * This are the dependencies of the modeled project, regardless of the classifier.
+   * 
+   * @return the dependencies of the artifact for this project
+   */
+  public List<BundleDependency> getDependencies() {
+    return dependencies;
   }
 
-  public Set<BundleDescriptor> getSharedDeployableBundleDescriptors() {
-    return sharedDeployableBundleDescriptors;
+  /**
+   * These are the descriptors of the dependencies of the modeled project that are visible to the plugins of this project.
+   * <p>
+   * Elements contained in this set must exist in the {@link BundleDependency#getDescriptor()} of the {@link #getDependencies()
+   * dependencies}.
+   * 
+   * @return the shared libraries of the artifact for this project.
+   */
+  public Set<BundleDescriptor> getSharedLibraries() {
+    return sharedLibraries;
   }
 
+  /**
+   * These are dependencies that are added for each plugins.
+   * <p>
+   * In each entry of this map, the dependencies in the value will be added to the plugin represented by the key.
+   * <p>
+   * Keys of this map must exist in the {@link BundleDependency#getDescriptor()} of the {@link #getDependencies() dependencies}.
+   * 
+   * @return the additional dependencies for the plugins of this project.
+   */
   public Map<BundleDescriptor, List<BundleDependency>> getAdditionalPluginDependencies() {
     return additionalPluginDependencies;
   }

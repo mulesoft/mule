@@ -35,7 +35,7 @@ public class DeployableClassLoaderConfigurationAssembler<M extends MuleDeployabl
 
   @Override
   protected List<BundleDependency> getBundleDependencies() {
-    return deployableProjectModel.getDeployableBundleDependencies();
+    return deployableProjectModel.getDependencies();
   }
 
   @Override
