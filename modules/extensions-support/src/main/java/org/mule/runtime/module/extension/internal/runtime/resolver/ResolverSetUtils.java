@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static com.google.common.collect.ImmutableBiMap.of;
 import static java.util.Collections.emptySet;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
@@ -199,6 +200,7 @@ public class ResolverSetUtils {
                                                       getExpressionSupport(metadataType), false, modelProperties));
       }
     });
+    initialiseIfNeeded(resolverReference.get(), muleContext);
     return resolverReference.get();
   }
 
@@ -222,7 +224,7 @@ public class ResolverSetUtils {
                                                                       muleContext, valueResolverFactory));
         }
       }
-
+      initialiseIfNeeded(objectBuilder, muleContext);
 
       return new ValueResolver() {
 
@@ -272,16 +274,19 @@ public class ResolverSetUtils {
     Class mapClass = mapClassOptional.get();
 
     MetadataType valueType = type.getOpenRestriction().orElse(null);
-    Function<Object, ValueResolver<Object>> valueValueResolverFunction = valueType != null
-        ? (value -> {
-          try {
-            return getParameterValueResolver(parameterName, valueType, value, emptySet(), reflectionCache,
-                                             muleContext, valueResolverFactory);
-          } catch (MuleException e) {
-            throw new MuleRuntimeException(e);
-          }
-        })
-        : value -> new StaticValueResolver<>(value);
+    Function<Object, ValueResolver<Object>> valueValueResolverFunction;
+    if (valueType != null) {
+      valueValueResolverFunction = value -> {
+        try {
+          return getParameterValueResolver(parameterName, valueType, value, emptySet(), reflectionCache,
+                                           muleContext, valueResolverFactory);
+        } catch (MuleException e) {
+          throw new MuleRuntimeException(e);
+        }
+      };
+    } else {
+      valueValueResolverFunction = value -> new StaticValueResolver<>(value);
+    }
 
     List<ValueResolver<Object>> keyResolvers = new ArrayList<>();
     List<ValueResolver<Object>> valueResolvers = new ArrayList<>();

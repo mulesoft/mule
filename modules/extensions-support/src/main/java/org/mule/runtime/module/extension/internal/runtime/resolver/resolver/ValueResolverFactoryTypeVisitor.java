@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.resolver.resolver;
 
 import static java.lang.String.format;
 import static java.time.Instant.ofEpochMilli;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
@@ -57,7 +59,6 @@ import org.joda.time.format.ISODateTimeFormat;
  */
 public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFactoryTypeVisitor {
 
-  private final Map<Predicate<MetadataType>, Function<String, ValueResolver>> valueResolverDelegates = new HashMap<>();
   private final Function<String, ValueResolver> defaultValueResolver = key -> new RegistryLookupValueResolver<>(key);
 
   private final DslSyntaxResolver dslSyntaxResolver;
@@ -70,15 +71,6 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
     this.dslSyntaxResolver = dslSyntaxResolver;
     this.defaultValue = defaultValue;
     this.acceptsReferences = acceptsReferences;
-    initializeValueResolverDelegates();
-  }
-
-  private void initializeValueResolverDelegates() {
-    valueResolverDelegates.put(metadataType -> MediaType.class.equals(getType(metadataType)),
-                               key -> new StaticValueResolver<>(DataType.builder().mediaType(key).build().getMediaType()));
-    valueResolverDelegates
-        .put(metadataType -> ExtensionMetadataTypeUtils.getType(metadataType).map(Charset.class::equals).orElse(false),
-             key -> new StaticValueResolver<>(parseCharset(key)));
   }
 
   @Override
@@ -99,7 +91,7 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
     }
 
     ValueResolver valueResolver;
-    Optional<Function<String, ValueResolver>> delegate = locateValueResolver(objectType);
+    Optional<Function<String, ValueResolver>> delegate = getCustomValueResolver(objectType);
     Optional<DslElementSyntax> typeDsl = dslSyntaxResolver.resolve(objectType);
 
     if (delegate.isPresent() && typeDsl.isPresent()) {
@@ -113,14 +105,9 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
     setResolver(valueResolver);
   }
 
-  private Optional<Function<String, ValueResolver>> locateValueResolver(MetadataType metadataType) {
-    return valueResolverDelegates.entrySet().stream().filter(entry -> entry.getKey().test(metadataType))
-        .map(entry -> entry.getValue()).findAny();
-  }
-
   @Override
   protected void defaultVisit(MetadataType metadataType) {
-    ValueResolver delegateResolver = locateValueResolver(metadataType)
+    ValueResolver delegateResolver = getCustomValueResolver(metadataType)
         .map(delegate -> delegate.apply(getValue().toString()))
         .orElseGet(() -> acceptsReferences
             ? defaultValueResolver.apply(getValue().toString())
@@ -144,6 +131,15 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
     }
 
     return doParseDate(value, type);
+  }
+
+  private Optional<Function<String, ValueResolver>> getCustomValueResolver(MetadataType metadataType) {
+    if (MediaType.class.equals(getType(metadataType))) {
+      return of(key -> new StaticValueResolver<>(DataType.builder().mediaType(key).build().getMediaType()));
+    } else if (ExtensionMetadataTypeUtils.getType(metadataType).map(Charset.class::equals).orElse(false)) {
+      return of(key -> new StaticValueResolver<>(parseCharset(key)));
+    }
+    return empty();
   }
 
   private ValueResolver doParseDate(Object value, Class<?> type) {
