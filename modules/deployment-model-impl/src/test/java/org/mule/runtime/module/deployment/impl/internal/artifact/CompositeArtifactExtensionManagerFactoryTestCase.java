@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
-import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.extension.internal.manager.CompositeArtifactExtensionManager;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;

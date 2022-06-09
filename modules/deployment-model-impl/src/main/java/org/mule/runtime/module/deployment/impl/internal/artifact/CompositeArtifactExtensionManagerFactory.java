@@ -13,9 +13,9 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_M
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
-import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.policy.ArtifactExtensionManagerFactory;
 import org.mule.runtime.module.extension.internal.manager.CompositeArtifactExtensionManager;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;

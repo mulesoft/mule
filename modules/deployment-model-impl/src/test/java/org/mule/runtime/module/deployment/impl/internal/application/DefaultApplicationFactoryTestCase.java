@@ -29,7 +29,7 @@ import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
-import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilder;
 import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.domain.Domain;
