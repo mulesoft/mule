@@ -41,6 +41,14 @@ public class DefaultDeployableArtifactDescriptorFactory implements DeployableArt
   }
 
   @Override
+  public ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model, Map<String, String> deploymentProperties,
+                                                           PluginModelResolver pluginModelResolver,
+                                                           PluginDescriptorResolver pluginDescriptorResolver) {
+    return createApplicationDescriptor(model, deploymentProperties, pluginModelResolver, pluginDescriptorResolver,
+                                       noDomainDescriptorResolver());
+  }
+
+  @Override
   public ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
                                                            Map<String, String> deploymentProperties,
                                                            DomainDescriptorResolver domainDescriptorResolver) {
