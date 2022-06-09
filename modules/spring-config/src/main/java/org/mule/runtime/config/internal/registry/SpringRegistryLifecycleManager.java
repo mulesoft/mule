@@ -8,10 +8,10 @@ package org.mule.runtime.config.internal.registry;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_USE_LEGACY_LIFECYCLE_OBJECT_SORTER;
 import static org.mule.runtime.config.internal.context.MuleArtifactContext.INNER_BEAN_PREFIX;
+import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.REUSE_GLOBAL_ERROR_HANDLER;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
-import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.REUSE_GLOBAL_ERROR_HANDLER;
 
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
