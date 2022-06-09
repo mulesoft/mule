@@ -6,6 +6,11 @@
  */
 package org.mule.runtime.core.privileged.exception;
 
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
+
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -23,8 +28,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
-import static java.util.Optional.empty;
-
 /**
  * A {@link ProcessingStrategy} used for {@link org.mule.runtime.core.internal.exception.GlobalErrorHandler}. The resolution of
  * the processing strategy is done in runtime depending on the flow location where the error that is being handled was thrown.
@@ -34,6 +37,8 @@ import static java.util.Optional.empty;
 public class OnRuntimeProcessingStrategy implements ProcessingStrategy {
 
   private static final Logger logger = LoggerFactory.getLogger(OnRuntimeProcessingStrategy.class);
+  private static final ComponentIdentifier FLOW_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(FLOW_ELEMENT_IDENTIFIER).build();;
 
   private final ConfigurationComponentLocator locator;
 
@@ -50,27 +55,25 @@ public class OnRuntimeProcessingStrategy implements ProcessingStrategy {
   public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
     return publisher -> Flux.from(publisher)
         .flatMap(e -> {
-          Optional<ProcessingStrategy> processingStrategy = getProcessingStrategy(getParentFlowNameForErrorHandler(e));
+          Optional<ProcessingStrategy> processingStrategy =
+              getParentFlowNameForErrorHandler(e).flatMap(this::getProcessingStrategy);
           return Mono.just(e).transform(processingStrategy.map(ps -> ps.onProcessor(processor))
               .orElse(processor));
         });
   }
 
-  private String getParentFlowNameForErrorHandler(CoreEvent e) {
-    FlowStackElement element = e.getFlowCallStack().peek();
-    if (element == null) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Parent flow couldn't be resolved.");
-      }
-      return null;
+  private Optional<String> getParentFlowNameForErrorHandler(CoreEvent e) {
+    Optional<String> parentFlowName = e.getFlowCallStack().getElements().stream()
+        .filter(element -> element.getChainIdentifier().equals(FLOW_IDENTIFIER))
+        .findFirst()
+        .map(FlowStackElement::getFlowName);
+    if (!parentFlowName.isPresent() && logger.isDebugEnabled()) {
+      logger.debug("Parent flow couldn't be resolved.");
     }
-    return element.getFlowName();
+    return parentFlowName;
   }
 
   public Optional<ProcessingStrategy> getProcessingStrategy(String location) {
-    if (location == null) {
-      return empty();
-    }
     Optional<ProcessingStrategy> processingStrategy = MessageProcessors.getProcessingStrategy(locator, Location.builder()
         .globalName(location)
         .build());

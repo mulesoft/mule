@@ -6,16 +6,18 @@
  */
 package org.mule.functional.api.flow;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
-import static org.mockito.Mockito.spy;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.fromGroupCorrelation;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+
+import static org.mockito.Mockito.spy;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.ItemSequenceInfo;

@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.core.internal.context.notification;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_FLOW_STACK_MAX_DEPTH;
+
 import static java.lang.Integer.getInteger;
 import static java.lang.System.lineSeparator;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_FLOW_STACK_MAX_DEPTH;
 
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;

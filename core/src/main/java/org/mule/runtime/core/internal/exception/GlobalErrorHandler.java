@@ -6,6 +6,11 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_HANDLER_PROPERTY;
+
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -16,10 +21,6 @@ import org.reactivestreams.Publisher;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.System.getProperty;
-import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_HANDLER_PROPERTY;
 
 public class GlobalErrorHandler extends ErrorHandler {
 
