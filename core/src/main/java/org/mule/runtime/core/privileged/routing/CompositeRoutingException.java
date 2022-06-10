@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.privileged.routing;
 
+import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.message.Message.of;
 
 import static java.lang.System.lineSeparator;
@@ -21,7 +22,6 @@ import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.core.internal.config.ExceptionHelper;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.runtime.core.privileged.processor.Router;
 
@@ -45,8 +45,8 @@ import org.slf4j.LoggerFactory;
  */
 public final class CompositeRoutingException extends MuleException implements ComposedErrorException, ErrorMessageAwareException {
 
-  private static final String MESSAGE_TITLE = "Exception/Error(s) were found for route(s):";
-  private static final String MESSAGE_SUB_TITLE = "Detailed Exception/Error(s) for route(s):";
+  private static final String MESSAGE_TITLE = "Error(s) were found for route(s):";
+  private static final String MESSAGE_SUB_TITLE = "Detailed Error(s) for route(s):";
   private static final String LEGACY_MESSAGE_TITLE = "Exception(s) were found for route(s): ";
 
   private static final long serialVersionUID = -4421728527040579605L;
@@ -77,7 +77,7 @@ public final class CompositeRoutingException extends MuleException implements Co
       // get detailed information about exceptions that make up composite exception
       builder.append(lineSeparator()).append(MESSAGE_SUB_TITLE).append(lineSeparator());
       for (Entry<String, Pair<Error, EventProcessingException>> entry : detailedFailures.entrySet()) {
-        MuleException muleException = entry.getValue().getSecond();
+        MuleException muleException = getRootMuleException(entry.getValue().getSecond());
         Throwable exception = entry.getValue().getFirst().getCause();
         appendMessageForExceptions(builder, entry.getKey(), exception, muleException);
       }
@@ -89,7 +89,7 @@ public final class CompositeRoutingException extends MuleException implements Co
     StringBuilder builder = new StringBuilder();
     builder.append(LEGACY_MESSAGE_TITLE).append(lineSeparator());
     for (Entry<String, Error> entry : routingResult.getFailures().entrySet()) {
-      MuleException muleException = ExceptionHelper.getRootMuleException(entry.getValue().getCause());
+      MuleException muleException = getRootMuleException(entry.getValue().getCause());
       Throwable exception = entry.getValue().getCause();
       appendMessageForExceptions(builder, entry.getKey(), exception, muleException);
     }
@@ -124,7 +124,8 @@ public final class CompositeRoutingException extends MuleException implements Co
     StringBuilder builder = new StringBuilder();
     for (Entry<String, Error> routeResult : routingResult.getFailures().entrySet()) {
       Throwable routeException = routeResult.getValue().getCause();
-      builder.append(lineSeparator() + "\t").append(routeResult.getKey()).append(": ").append(routeException.getClass().getName())
+      builder.append(lineSeparator() + "\t").append("Route ").append(routeResult.getKey()).append(": ")
+          .append(routeException.getClass().getName())
           .append(": ").append(routeException.getMessage());
     }
     if (!routingResult.getFailuresWithExceptionInfo().isEmpty()) {
