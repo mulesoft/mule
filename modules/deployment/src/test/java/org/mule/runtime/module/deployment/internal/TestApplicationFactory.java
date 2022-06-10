@@ -20,7 +20,7 @@ import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepositoryFactory;
-import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver;

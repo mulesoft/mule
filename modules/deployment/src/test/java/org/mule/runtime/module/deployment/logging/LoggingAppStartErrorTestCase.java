@@ -11,8 +11,6 @@ import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRu
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DEPLOYMENT_FAILED;
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.LoggerStory.LOGGER;
-import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
-import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.ERROR_REPORTING;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -22,7 +20,6 @@ import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -45,7 +42,7 @@ import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
-import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
