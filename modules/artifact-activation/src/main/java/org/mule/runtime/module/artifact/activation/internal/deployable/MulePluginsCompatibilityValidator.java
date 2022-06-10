@@ -19,8 +19,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The goal of this class is to check for if a list of Dependencies are compatible amongst them self Compatibility is defined by
- * semantic versioning
+ * The goal of this class is to check for if a list of Dependencies are compatible amongst themselves.
+ * <p>
+ * Compatibility is defined by semantic versioning, considering different major versions as incompatible, and different
+ * minor/patch within the same major as compatible
  */
 public class MulePluginsCompatibilityValidator {
 
@@ -28,8 +30,7 @@ public class MulePluginsCompatibilityValidator {
    * Validates a list of dependencies to check for incompatibilities
    *
    * @param mulePlugins List of mule plugins dependencies
-   * @return
-   * @throws org.mule.tools.api.exception.ValidationException if the list of mule plugins contains incompatibilities
+   * @return a map containing the incompatible versions, with a key with format {@code groupId:artifactId}.
    */
   public Map<String, List<BundleDescriptor>> validate(List<BundleDescriptor> mulePlugins) {
     return buildDependencyMap(mulePlugins).entrySet()

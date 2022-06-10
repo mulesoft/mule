@@ -8,6 +8,7 @@ package org.mule.runtime.module.artifact.activation.internal.classloader.model;
 
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -19,7 +20,6 @@ import org.mule.tools.api.classloader.model.ClassLoaderModel;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Assembles the class loader model for an artifact given all its pieces.
@@ -99,17 +99,17 @@ public class ClassLoaderModelAssembler {
    * Converts a {@link List<BundleDependency>} to a {@link List<Artifact>}.
    *
    * @param dependencies the bundle dependency list to be converted.
-   * @return the corresponding artifact list, each one with normalized version.
+   * @return the corresponding artifact list.
    */
   protected List<Artifact> toArtifacts(List<BundleDependency> dependencies) {
-    return dependencies.stream().map(this::toArtifact).collect(Collectors.toList());
+    return dependencies.stream().map(this::toArtifact).collect(toList());
   }
 
   /**
    * Convert a {@link BundleDescriptor} instance to {@link ArtifactCoordinates}.
    *
    * @param bundleDescriptor the bundle descriptor to be converted.
-   * @return the corresponding artifact coordinates with normalized version.
+   * @return the corresponding artifact coordinates.
    */
   private ArtifactCoordinates toArtifactCoordinates(BundleDescriptor bundleDescriptor) {
     return new ArtifactCoordinates(bundleDescriptor.getGroupId(), bundleDescriptor.getArtifactId(),

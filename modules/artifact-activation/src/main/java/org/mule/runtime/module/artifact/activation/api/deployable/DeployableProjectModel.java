@@ -6,15 +6,11 @@
  */
 package org.mule.runtime.module.artifact.activation.api.deployable;
 
-import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
-
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
-import org.mule.runtime.module.artifact.activation.internal.deployable.MulePluginsCompatibilityValidator;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -56,7 +52,7 @@ public final class DeployableProjectModel {
    * @param descriptor                   See {@link #getDescriptor()}
    * @param artifactCoordinates          See {@link #getArtifactCoordinates()}
    * @param projectFolder
-   * @param dependencies                 See {@link #getDependencies()}D
+   * @param dependencies                 See {@link #getDependencies()}
    * @param sharedLibraries              See {@link #getSharedLibraries()}
    * @param additionalPluginDependencies See {@link #additionalPluginDependencies}
    * @throws IllegalArgumentException if there are consistency problems with the provided parameters.
@@ -88,17 +84,18 @@ public final class DeployableProjectModel {
       }
     }
 
-    new MulePluginsCompatibilityValidator()
-        .validate(dependencies.stream()
-            .map(BundleDependency::getDescriptor)
-            .filter(dependencyDescriptor -> MULE_PLUGIN_CLASSIFIER
-                .equals(dependencyDescriptor.getClassifier().orElse(null)))
-            .collect(toList()))
-        .entrySet()
-        .forEach(result -> validationMessages
-            .add(format("Mule Plugin '%s' is depended upon in the project with incompatible versions ('%s') in the dependency graph.",
-                        result.getKey(),
-                        result.getValue().stream().map(BundleDescriptor::getVersion).collect(joining(", ")))));
+    // TODO W-11202204 review this
+    // new MulePluginsCompatibilityValidator()
+    // .validate(dependencies.stream()
+    // .map(BundleDependency::getDescriptor)
+    // .filter(dependencyDescriptor -> MULE_PLUGIN_CLASSIFIER
+    // .equals(dependencyDescriptor.getClassifier().orElse(null)))
+    // .collect(toList()))
+    // .entrySet()
+    // .forEach(result -> validationMessages
+    // .add(format("Mule Plugin '%s' is depended upon in the project with incompatible versions ('%s') in the dependency graph.",
+    // result.getKey(),
+    // result.getValue().stream().map(BundleDescriptor::getVersion).collect(joining(", ")))));
 
     if (!validationMessages.isEmpty()) {
       throw new IllegalArgumentException(validationMessages.stream()
