@@ -28,10 +28,14 @@ import static org.mule.tools.api.classloader.model.ArtifactCoordinates.DEFAULT_A
 import static java.lang.String.format;
 import static java.nio.file.Paths.get;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static org.codehaus.plexus.util.xml.Xpp3DomUtils.mergeXpp3Dom;
 
 import org.mule.maven.client.api.MavenClientProvider;
@@ -47,7 +51,6 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.tools.api.classloader.model.ApplicationGAVModel;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
-import org.mule.tools.api.classloader.model.Plugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,6 +62,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -97,12 +101,11 @@ public class MavenDeployableProjectModelBuilder
   private final MavenConfiguration mavenConfiguration;
   private List<String> packages = emptyList();
   private List<String> resources = emptyList();
-  private List<Artifact> deployableArtifactDependencies;
   private List<BundleDependency> deployableMavenBundleDependencies;
-  private List<Plugin> additionalPluginDependencies;
   private Map<ArtifactCoordinates, List<Artifact>> pluginsArtifactDependencies;
-  private ArtifactCoordinates deployableArtifactCoordinates;
   private List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> deployableBundleDependencies;
+  private Set<org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor> sharedDeployableBundleDescriptors;
+  private Map<org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> additionalPluginDependencies;
   private Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> pluginsBundleDependencies;
   private File deployableArtifactRepositoryFolder;
 
@@ -147,7 +150,7 @@ public class MavenDeployableProjectModelBuilder
 
     deployableArtifactRepositoryFolder = this.mavenConfiguration.getLocalMavenRepositoryLocation();
 
-    getDeployableProjectArtifactCoordinates(pomModel);
+    ArtifactCoordinates deployableArtifactCoordinates = getDeployableProjectArtifactCoordinates(pomModel);
 
     AetherMavenClient aetherMavenClient = new AetherMavenClient(mavenConfiguration);
     List<String> activeProfiles = mavenConfiguration.getActiveProfiles().orElse(emptyList());
@@ -165,16 +168,16 @@ public class MavenDeployableProjectModelBuilder
       throw new ArtifactActivationException(createStaticMessage("Couldn't search exported packages and resources"), e);
     }
 
-    return new DeployableProjectModel(packages, resources, deployableArtifactDependencies,
-                                      additionalPluginDependencies, pluginsArtifactDependencies, deployableArtifactCoordinates,
+    return new DeployableProjectModel(packages, resources,
+                                      buildBundleDescriptor(deployableArtifactCoordinates),
                                       projectFolder, deployableBundleDependencies,
-                                      buildBundleDescriptor(deployableArtifactCoordinates), pluginsBundleDependencies);
+                                      sharedDeployableBundleDescriptors, additionalPluginDependencies);
   }
 
-  private void getDeployableProjectArtifactCoordinates(Model pomModel) {
+  private ArtifactCoordinates getDeployableProjectArtifactCoordinates(Model pomModel) {
     ApplicationGAVModel deployableGAVModel =
         new ApplicationGAVModel(pomModel.getGroupId(), pomModel.getArtifactId(), pomModel.getVersion());
-    deployableArtifactCoordinates = getDeployableArtifactCoordinates(pomModel, deployableGAVModel);
+    return getDeployableArtifactCoordinates(pomModel, deployableGAVModel);
   }
 
   /**
@@ -194,7 +197,7 @@ public class MavenDeployableProjectModelBuilder
     deployableMavenBundleDependencies = deployableDependencyResolver.resolveDeployableDependencies(pom, false, empty());
 
     // Get the dependencies as Artifacts, accounting for the shared libraries configuration
-    deployableArtifactDependencies =
+    List<Artifact> deployableArtifactDependencies =
         updateArtifactsSharedState(deployableMavenBundleDependencies,
                                    updatePackagesResources(toApplicationModelArtifacts(deployableMavenBundleDependencies)),
                                    pomModel, activeProfiles);
@@ -205,6 +208,15 @@ public class MavenDeployableProjectModelBuilder
             .map(artifact -> createBundleDependencyFromPackagerDependency(getDeployableArtifactRepositoryUriResolver())
                 .apply(artifact))
             .collect(toList());
+
+    sharedDeployableBundleDescriptors =
+        deployableBundleDependencies.stream()
+            .filter(bd -> deployableArtifactDependencies.stream()
+                .anyMatch(artifact -> artifact.isShared()
+                    && bd.getDescriptor().getGroupId().equals(artifact.getArtifactCoordinates().getGroupId())
+                    && bd.getDescriptor().getArtifactId().equals(artifact.getArtifactCoordinates().getArtifactId())))
+            .map(org.mule.runtime.module.artifact.api.descriptor.BundleDependency::getDescriptor)
+            .collect(toSet());
   }
 
   private void resolveAdditionalPluginDependencies(AetherMavenClient aetherMavenClient, Model pomModel,
@@ -240,21 +252,35 @@ public class MavenDeployableProjectModelBuilder
                 .map(artifact -> createBundleDependencyFromPackagerDependency(getDeployableArtifactRepositoryUriResolver())
                     .apply(artifact))
                 .collect(toList())));
+
+    deployableBundleDependencies = deployableBundleDependencies
+        .stream()
+        .map(dbd -> new org.mule.runtime.module.artifact.api.descriptor.BundleDependency.Builder(dbd)
+            .setTransitiveDependencies(pluginsBundleDependencies.get(dbd.getDescriptor()))
+            .build())
+        .collect(toList());
   }
 
-  private List<Plugin> toPluginDependencies(Map<BundleDependency, List<BundleDependency>> pluginsAndDependencies) {
-    return pluginsAndDependencies.entrySet().stream().map(
-                                                          pluginEntry -> {
-                                                            Plugin plugin = new Plugin();
-                                                            plugin.setArtifactId(pluginEntry.getKey().getDescriptor()
-                                                                .getArtifactId());
-                                                            plugin.setGroupId(pluginEntry.getKey().getDescriptor().getGroupId());
-                                                            plugin.setAdditionalDependencies(
-                                                                                             updatePackagesResources(toApplicationModelArtifacts(pluginEntry
-                                                                                                 .getValue())));
-                                                            return plugin;
-                                                          })
-        .collect(toList());
+  private Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> toPluginDependencies(Map<BundleDependency, List<BundleDependency>> pluginsAndDependencies) {
+    return pluginsAndDependencies.entrySet()
+        .stream()
+        .collect(toMap(entry -> deployableBundleDependencies.stream()
+            .filter(bd -> bd.getDescriptor().getGroupId().equals(entry.getKey().getDescriptor().getGroupId())
+                && bd.getDescriptor().getArtifactId().equals(entry.getKey().getDescriptor().getArtifactId()))
+            .map(org.mule.runtime.module.artifact.api.descriptor.BundleDependency::getDescriptor)
+            .findAny()
+            .get(),
+                       entry -> {
+                         // Get the dependencies as Artifacts, accounting for the shared libraries configuration
+                         List<Artifact> deployableArtifactDependencies =
+                             updatePackagesResources(toApplicationModelArtifacts(entry.getValue()));
+
+                         // Prepare bundle dependencies as expected by the project model
+                         return deployableArtifactDependencies.stream()
+                             .map(artifact -> createBundleDependencyFromPackagerDependency(getDeployableArtifactRepositoryUriResolver())
+                                 .apply(artifact))
+                             .collect(toList());
+                       }));
   }
 
   private BundleDescriptor buildBundleDescriptor(ArtifactCoordinates artifactCoordinates) {
@@ -331,6 +357,8 @@ public class MavenDeployableProjectModelBuilder
                              .setBaseVersion(d.getArtifactCoordinates().getVersion())
                              .build())
           .setBundleUri(bundle)
+          .setPackages(d.getPackages() == null ? emptySet() : newHashSet(d.getPackages()))
+          .setResources(d.getResources() == null ? emptySet() : newHashSet(d.getResources()))
           .build();
     };
   }

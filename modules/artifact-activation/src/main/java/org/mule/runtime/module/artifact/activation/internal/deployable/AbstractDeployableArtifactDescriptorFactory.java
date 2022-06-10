@@ -8,6 +8,7 @@ package org.mule.runtime.module.artifact.activation.internal.deployable;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
@@ -31,7 +32,6 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
-import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.BufferedInputStream;
@@ -47,6 +47,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,7 +155,7 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
 
   @Override
   protected BundleDescriptor getBundleDescriptor() {
-    return deployableProjectModel.getBundleDescriptor();
+    return deployableProjectModel.getDescriptor();
   }
 
   protected BundlePluginDependenciesResolver getPluginDependenciesResolver() {
@@ -188,23 +189,30 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
               .warn(format("Plugin '%s' is declared as 'provided' which means that it will not be added to the artifact's classpath",
                            bundleDescriptor));
         } else {
-          Map.Entry<ArtifactCoordinates, List<Artifact>> pluginDependencies =
-              deployableProjectModel.getPluginsDependencies().entrySet().stream()
-                  .filter(pluginDependenciesEntry -> StringUtils
-                      .equals(bundleDescriptor.getArtifactId(), pluginDependenciesEntry.getKey().getArtifactId())
-                      && StringUtils.equals(bundleDescriptor.getGroupId(), pluginDependenciesEntry.getKey().getGroupId())
-                      && StringUtils.equals(bundleDescriptor.getVersion(), pluginDependenciesEntry.getKey().getVersion()))
-                  .findFirst()
-                  .orElseThrow(() -> new ArtifactActivationException(createStaticMessage(format("Class loader model for plugin '%s' not found",
-                                                                                                bundleDescriptor))));
+          BundleDescriptor pluginDescriptor = deployableProjectModel.getDependencies()
+              .stream()
+              .map(BundleDependency::getDescriptor)
+              .filter(dependencyDescriptor -> MULE_PLUGIN_CLASSIFIER.equals(dependencyDescriptor.getClassifier().orElse(null)))
+              .filter(pluginDependencyDescriptor -> StringUtils
+                  .equals(bundleDescriptor.getArtifactId(), pluginDependencyDescriptor.getArtifactId())
+                  && StringUtils.equals(bundleDescriptor.getGroupId(), pluginDependencyDescriptor.getGroupId())
+                  && StringUtils.equals(bundleDescriptor.getVersion(), pluginDependencyDescriptor.getVersion()))
+              .findFirst()
+              .orElseThrow(() -> new ArtifactActivationException(createStaticMessage(format("Dependency for plugin '%s' not found",
+                                                                                            bundleDescriptor))));
 
-          List<BundleDependency> bundleDependencies = deployableProjectModel.getPluginsBundleDependencies().get(bundleDescriptor);
+          List<BundleDependency> bundleDependencies = bundlePluginDependency.getTransitiveDependenciesList();
           pluginDescriptors
               .add(pluginDescriptorResolver.resolve(emptySet(), bundleDescriptor)
                   .orElse(createPluginDescriptor(bundlePluginDependency,
-                                                 pluginModelResolver.resolve(bundlePluginDependency), descriptor,
+                                                 pluginModelResolver.resolve(bundlePluginDependency),
+                                                 descriptor,
                                                  bundleDependencies,
-                                                 pluginDependencies.getKey(), pluginDependencies.getValue())));
+                                                 new ArtifactCoordinates(pluginDescriptor.getGroupId(),
+                                                                         pluginDescriptor.getArtifactId(),
+                                                                         pluginDescriptor.getVersion()),
+                                                 deployableProjectModel.getDependencies(),
+                                                 deployableProjectModel.getSharedLibraries())));
         }
       }
     }
@@ -221,7 +229,9 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
    * @param ownerDescriptor           descriptor of the artifact that owns the plugin.
    * @param bundleDependencies        plugin dependencies on a bundle.
    * @param pluginArtifactCoordinates plugin coordinates.
-   * @param pluginDependencies        resolved plugin dependencies as artifacts.
+   * @param pluginDependencies        the dependencies on the deployable artifact.
+   * @param sharedPluginDependencies  the dependencies on the deployable artifact that are shared to plugins.
+   * 
    * @return a descriptor for a plugin.
    */
   private ArtifactPluginDescriptor createPluginDescriptor(BundleDependency bundleDependency,
@@ -229,9 +239,16 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
                                                           DeployableArtifactDescriptor ownerDescriptor,
                                                           List<BundleDependency> bundleDependencies,
                                                           ArtifactCoordinates pluginArtifactCoordinates,
-                                                          List<Artifact> pluginDependencies) {
-    return new ArtifactPluginDescriptorFactory(bundleDependency, pluginModel, ownerDescriptor,
-                                               bundleDependencies, pluginArtifactCoordinates, pluginDependencies,
-                                               ArtifactDescriptorValidatorBuilder.builder()).create();
+                                                          List<BundleDependency> pluginDependencies,
+                                                          Set<BundleDescriptor> sharedPluginDependencies) {
+    return new ArtifactPluginDescriptorFactory(bundleDependency,
+                                               pluginModel,
+                                               ownerDescriptor,
+                                               bundleDependencies,
+                                               pluginArtifactCoordinates,
+                                               pluginDependencies,
+                                               sharedPluginDependencies,
+                                               ArtifactDescriptorValidatorBuilder.builder())
+                                                   .create();
   }
 }

@@ -19,7 +19,6 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
-import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.File;
@@ -28,6 +27,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Assembles the class loader configuration for a plugin.
@@ -40,12 +40,16 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
   private final DeployableArtifactDescriptor ownerDescriptor;
 
   public PluginClassLoaderConfigurationAssembler(ArtifactCoordinates artifactCoordinates,
-                                                 List<Artifact> dependencies,
-                                                 File artifactLocation, MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor,
-                                                 List<BundleDependency> bundleDependencies, BundleDescriptor bundleDescriptor,
+                                                 List<BundleDependency> projectDependencies,
+                                                 Set<BundleDescriptor> sharedProjectDependencies,
+                                                 File artifactLocation,
+                                                 MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor,
+                                                 List<BundleDependency> bundleDependencies,
+                                                 BundleDescriptor bundleDescriptor,
                                                  DeployableArtifactDescriptor ownerDescriptor) {
-    super(new ClassLoaderModelAssembler(artifactCoordinates, dependencies, muleArtifactLoaderDescriptor)
-        .createClassLoaderModel());
+    super(new ClassLoaderModelAssembler(artifactCoordinates, projectDependencies,
+                                        sharedProjectDependencies, muleArtifactLoaderDescriptor)
+                                            .createClassLoaderModel());
     this.artifactLocation = artifactLocation;
     this.bundleDependencies = bundleDependencies;
     this.bundleDescriptor = bundleDescriptor;

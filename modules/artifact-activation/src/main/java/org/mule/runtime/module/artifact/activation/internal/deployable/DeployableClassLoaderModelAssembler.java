@@ -6,15 +6,21 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
+import static java.util.stream.Collectors.toList;
+
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.classloader.model.ClassLoaderModelAssembler;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.tools.api.classloader.model.AppClassLoaderModel;
+import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 import org.mule.tools.api.classloader.model.ClassLoaderModel;
 import org.mule.tools.api.classloader.model.Plugin;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Assembles the class loader model for a deployable artifact.
@@ -23,12 +29,18 @@ import java.util.List;
  */
 public class DeployableClassLoaderModelAssembler<M extends MuleDeployableModel> extends ClassLoaderModelAssembler {
 
-  private final List<Plugin> additionalPluginDependencies;
+  private final Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies;
 
   public DeployableClassLoaderModelAssembler(DeployableProjectModel model,
                                              MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
-    super(model.getArtifactCoordinates(), model.getProjectDependencies(), model.getPackages(),
-          model.getResources(), muleArtifactLoaderDescriptor);
+    super(new ArtifactCoordinates(model.getDescriptor().getGroupId(),
+                                  model.getDescriptor().getArtifactId(),
+                                  model.getDescriptor().getVersion()),
+          model.getDependencies(),
+          model.getSharedLibraries(),
+          model.getPackages(),
+          model.getResources(),
+          muleArtifactLoaderDescriptor);
     additionalPluginDependencies = model.getAdditionalPluginDependencies();
   }
 
@@ -36,7 +48,16 @@ public class DeployableClassLoaderModelAssembler<M extends MuleDeployableModel> 
   public ClassLoaderModel createClassLoaderModel() {
     AppClassLoaderModel deployableModel = new AppClassLoaderModel(CLASS_LOADER_MODEL_VERSION, getArtifactCoordinates());
     assembleClassLoaderModel(deployableModel);
-    deployableModel.setAdditionalPluginDependencies(additionalPluginDependencies);
+
+    deployableModel.setAdditionalPluginDependencies(additionalPluginDependencies.entrySet().stream()
+        .map(pluginEntry -> {
+          Plugin plugin = new Plugin();
+          plugin.setArtifactId(pluginEntry.getKey().getArtifactId());
+          plugin.setGroupId(pluginEntry.getKey().getGroupId());
+          plugin.setAdditionalDependencies(toArtifacts(pluginEntry.getValue()));
+          return plugin;
+        })
+        .collect(toList()));
 
     return deployableModel;
   }

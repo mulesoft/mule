@@ -6,20 +6,24 @@
  */
 package org.mule.runtime.module.artifact.activation.api.deployable;
 
+import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
+import static java.util.stream.Collectors.joining;
+
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.tools.api.classloader.model.Artifact;
-import org.mule.tools.api.classloader.model.ArtifactCoordinates;
-import org.mule.tools.api.classloader.model.Plugin;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Represents the structure of a project, providing what is needed in order to create its {@link ArtifactDescriptor} with a
@@ -31,71 +35,149 @@ public final class DeployableProjectModel {
 
   private final List<String> packages;
   private final List<String> resources;
-  private final List<Artifact> dependencies;
-  private final List<Plugin> additionalPluginDependencies;
-  private final Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies;
-  private final ArtifactCoordinates artifactCoordinates;
+  private final BundleDescriptor descriptor;
   private final File projectFolder;
-  private final List<BundleDependency> deployableBundleDependencies;
-  private final BundleDescriptor bundleDescriptor;
-  private final Map<BundleDescriptor, List<BundleDependency>> pluginsBundleDependencies;
+  private final List<BundleDependency> dependencies;
+  private final Set<BundleDescriptor> sharedLibraries;
+  private final Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies;
 
-  public DeployableProjectModel(List<String> packages, List<String> resources, List<Artifact> dependencies,
-                                List<Plugin> additionalPluginDependencies,
-                                Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies,
-                                ArtifactCoordinates artifactCoordinates, File projectFolder,
-                                List<BundleDependency> deployableBundleDependencies, BundleDescriptor bundleDescriptor,
-                                Map<BundleDescriptor, List<BundleDependency>> pluginsBundleDependencies) {
+  /**
+   * Creates a new instance with the provided parameters.
+   * <p>
+   * Performs a validation of consistency of the provided parameters. If any validation fails, an {@link IllegalArgumentException}
+   * is thrown indication the situation that caused it.
+   * 
+   * @param packages                     See {@link #getPackages()}
+   * @param resources                    See {@link #getResources()}
+   * @param descriptor                   See {@link #getDescriptor()}
+   * @param artifactCoordinates          See {@link #getArtifactCoordinates()}
+   * @param projectFolder
+   * @param dependencies                 See {@link #getDependencies()}
+   * @param sharedLibraries              See {@link #getSharedLibraries()}
+   * @param additionalPluginDependencies See {@link #additionalPluginDependencies}
+   * @throws IllegalArgumentException if there are consistency problems with the provided parameters.
+   */
+  public DeployableProjectModel(List<String> packages,
+                                List<String> resources,
+                                BundleDescriptor descriptor,
+                                File projectFolder,
+                                List<BundleDependency> dependencies,
+                                Set<BundleDescriptor> sharedLibraries,
+                                Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies)
+      throws IllegalArgumentException {
+    List<String> validationMessages = new ArrayList<>();
+
+    for (BundleDescriptor sharedLibDescriptor : sharedLibraries) {
+      if (dependencies.stream()
+          .noneMatch(dep -> dep.getDescriptor().equals(sharedLibDescriptor))) {
+        validationMessages.add(format("Artifact '%s' is declared as a sharedLibrary but is not a dependency of the project",
+                                      sharedLibDescriptor.getGroupId() + ":" + sharedLibDescriptor.getArtifactId()));
+      }
+    }
+
+    for (BundleDescriptor pluginDescriptor : additionalPluginDependencies.keySet()) {
+      if (dependencies.stream()
+          .noneMatch(dep -> dep.getDescriptor().equals(pluginDescriptor))) {
+        validationMessages
+            .add(format("Mule Plugin '%s' is declared in additionalPluginDependencies but is not a dependency of the project",
+                        pluginDescriptor.getGroupId() + ":" + pluginDescriptor.getArtifactId()));
+      }
+    }
+
+    // TODO W-11202204 review this
+    // new MulePluginsCompatibilityValidator()
+    // .validate(dependencies.stream()
+    // .map(BundleDependency::getDescriptor)
+    // .filter(dependencyDescriptor -> MULE_PLUGIN_CLASSIFIER
+    // .equals(dependencyDescriptor.getClassifier().orElse(null)))
+    // .collect(toList()))
+    // .entrySet()
+    // .forEach(result -> validationMessages
+    // .add(format("Mule Plugin '%s' is depended upon in the project with incompatible versions ('%s') in the dependency graph.",
+    // result.getKey(),
+    // result.getValue().stream().map(BundleDescriptor::getVersion).collect(joining(", ")))));
+
+    if (!validationMessages.isEmpty()) {
+      throw new IllegalArgumentException(validationMessages.stream()
+          .collect(joining(" * ", lineSeparator() + " * ", lineSeparator())));
+    }
+
     this.packages = ImmutableList.copyOf(packages);
     this.resources = ImmutableList.copyOf(resources);
-    this.dependencies = ImmutableList.copyOf(dependencies);
-    this.additionalPluginDependencies = ImmutableList.copyOf(additionalPluginDependencies);
-    this.pluginsDependencies = ImmutableMap.copyOf(pluginsDependencies);
-    this.artifactCoordinates = artifactCoordinates;
+    this.descriptor = descriptor;
     this.projectFolder = projectFolder;
-    this.deployableBundleDependencies = ImmutableList.copyOf(deployableBundleDependencies);
-    this.bundleDescriptor = bundleDescriptor;
-    this.pluginsBundleDependencies = ImmutableMap.copyOf(pluginsBundleDependencies);
+    this.dependencies = ImmutableList.copyOf(dependencies);
+    this.sharedLibraries = ImmutableSet.copyOf(sharedLibraries);
+    this.additionalPluginDependencies = ImmutableMap.copyOf(additionalPluginDependencies);
   }
 
+  /**
+   * These are the packages containing java classes in the modeled project.
+   * <p>
+   * This does not take into account the java packages of this project's dependencies.
+   * 
+   * @return the java packages of the project.
+   */
   public List<String> getPackages() {
     return packages;
   }
 
+  /**
+   * These are the resources in the modeled project.
+   * <p>
+   * This does not take into account the resources of this project's dependencies.
+   * 
+   * @return the resources of the project.
+   */
   public List<String> getResources() {
     return resources;
   }
 
-  public List<Artifact> getProjectDependencies() {
-    return dependencies;
-  }
-
-  public Map<ArtifactCoordinates, List<Artifact>> getPluginsDependencies() {
-    return pluginsDependencies;
-  }
-
-  public List<Plugin> getAdditionalPluginDependencies() {
-    return additionalPluginDependencies;
-  }
-
-  public ArtifactCoordinates getArtifactCoordinates() {
-    return artifactCoordinates;
+  /**
+   * This contains the GAV of the modeled project.
+   * 
+   * @return the descriptor of the artifact for this project.
+   */
+  public BundleDescriptor getDescriptor() {
+    return descriptor;
   }
 
   public File getProjectFolder() {
     return projectFolder;
   }
 
-  public List<BundleDependency> getDeployableBundleDependencies() {
-    return deployableBundleDependencies;
+  /**
+   * These are the dependencies of the modeled project, regardless of the classifier.
+   * 
+   * @return the dependencies of the artifact for this project
+   */
+  public List<BundleDependency> getDependencies() {
+    return dependencies;
   }
 
-  public BundleDescriptor getBundleDescriptor() {
-    return bundleDescriptor;
+  /**
+   * These are the descriptors of the dependencies of the modeled project that are visible to the plugins of this project.
+   * <p>
+   * Elements contained in this set must exist in the {@link BundleDependency#getDescriptor()} of the {@link #getDependencies()
+   * dependencies}.
+   * 
+   * @return the shared libraries of the artifact for this project.
+   */
+  public Set<BundleDescriptor> getSharedLibraries() {
+    return sharedLibraries;
   }
 
-  public Map<BundleDescriptor, List<BundleDependency>> getPluginsBundleDependencies() {
-    return pluginsBundleDependencies;
+  /**
+   * These are dependencies that are added for each plugins.
+   * <p>
+   * In each entry of this map, the dependencies in the value will be added to the plugin represented by the key.
+   * <p>
+   * Keys of this map must exist in the {@link BundleDependency#getDescriptor()} of the {@link #getDependencies() dependencies}.
+   * 
+   * @return the additional dependencies for the plugins of this project.
+   */
+  public Map<BundleDescriptor, List<BundleDependency>> getAdditionalPluginDependencies() {
+    return additionalPluginDependencies;
   }
 
 }
