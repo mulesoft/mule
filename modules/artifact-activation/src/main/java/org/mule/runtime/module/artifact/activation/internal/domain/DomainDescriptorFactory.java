@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.domain;
 
+import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.domainModelResolver;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 
 import static java.util.Collections.emptySet;
 
 import org.mule.runtime.api.deployment.meta.MuleDomainModel;
-import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
-import org.mule.runtime.api.deployment.persistence.MuleDomainModelJsonSerializer;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
@@ -37,8 +36,8 @@ public class DomainDescriptorFactory extends AbstractDeployableArtifactDescripto
   }
 
   @Override
-  protected AbstractMuleArtifactModelJsonSerializer<MuleDomainModel> getMuleArtifactModelJsonSerializer() {
-    return new MuleDomainModelJsonSerializer();
+  protected MuleDomainModel createArtifactModel() {
+    return domainModelResolver().resolve(getArtifactLocation());
   }
 
   @Override
@@ -54,6 +53,7 @@ public class DomainDescriptorFactory extends AbstractDeployableArtifactDescripto
 
   @Override
   protected DomainDescriptor doCreateArtifactDescriptor() {
-    return new DomainDescriptor(getArtifactLocation().getName(), getDeploymentProperties());
+    throw new RuntimeException("A!");
+    // return new DomainDescriptor(getArtifactLocation().getName(), getDeploymentProperties());
   }
 }

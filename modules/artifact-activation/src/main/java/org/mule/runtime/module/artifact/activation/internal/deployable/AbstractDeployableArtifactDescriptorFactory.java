@@ -7,7 +7,6 @@
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 
 import static java.lang.String.format;
@@ -17,8 +16,6 @@ import static java.util.Optional.of;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
-import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
@@ -34,11 +31,6 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -95,59 +87,6 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
   }
 
   @Override
-  protected final M createArtifactModel() {
-    // TODO W-11203071 - the model needs to be completed, when the app is packaged every field is present in the output
-    // mule-artifact.json, but here we don't have that
-    final File artifactJsonFile = new File(getArtifactLocation(), getDescriptorFileName());
-    if (!artifactJsonFile.exists()) {
-      throw new ArtifactActivationException(createStaticMessage("Couldn't find model file " + artifactJsonFile));
-    }
-
-    return loadModelFromJson(getDescriptorContent(artifactJsonFile));
-  }
-
-  private String getDescriptorContent(File jsonFile) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Loading artifact descriptor from '{}'..." + jsonFile.getAbsolutePath());
-    }
-
-    try (InputStream stream = new BufferedInputStream(new FileInputStream(jsonFile))) {
-      return IOUtils.toString(stream);
-    } catch (IOException e) {
-      throw new IllegalArgumentException(format("Could not read extension describer on artifact '%s'",
-                                                jsonFile.getAbsolutePath()),
-                                         e);
-    }
-  }
-
-  /**
-   * Generates an artifact model from a given JSON descriptor
-   *
-   * @param jsonString artifact descriptor in JSON format
-   * @return the artifact model matching the provided JSON content.
-   */
-  private M loadModelFromJson(String jsonString) {
-    try {
-      return deserializeArtifactModel(jsonString);
-    } catch (IOException e) {
-      throw new IllegalArgumentException("Cannot deserialize artifact descriptor from: " + jsonString);
-    }
-  }
-
-  private M deserializeArtifactModel(String jsonString) throws IOException {
-    return getMuleArtifactModelJsonSerializer().deserialize(jsonString);
-  }
-
-  /**
-   * @return the serializer for the artifact model.
-   */
-  protected abstract AbstractMuleArtifactModelJsonSerializer<M> getMuleArtifactModelJsonSerializer();
-
-  private String getDescriptorFileName() {
-    return MULE_ARTIFACT_JSON_DESCRIPTOR;
-  }
-
-  @Override
   protected ClassLoaderModel getClassLoaderModel(MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
     return new DeployableClassLoaderConfigurationAssembler<>(deployableProjectModel, muleArtifactLoaderDescriptor)
         .createClassLoaderModel();
@@ -164,7 +103,7 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
 
   @Override
   protected void doDescriptorConfig(T descriptor) {
-    descriptor.setArtifactLocation(getArtifactLocation());
+    // descriptor.setArtifactLocation(getArtifactLocation());
     descriptor.setRedeploymentEnabled(getArtifactModel().isRedeploymentEnabled());
 
     Set<String> configs = getArtifactModel().getConfigs();
