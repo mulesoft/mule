@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import com.google.common.collect.ImmutableSet;
+
 import org.slf4j.Logger;
 
 /**
@@ -99,7 +100,7 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
 
     // TODO W-11202141 - consider artifact patches for the case this is run within a Runtime
 
-    dependenciesArtifactsUrls.add(getUrl(artifactFile, artifactFile));
+    // dependenciesArtifactsUrls.add(getUrl(artifactFile, artifactFile));
 
     dependenciesArtifactsUrls.addAll(addArtifactSpecificClassLoaderConfiguration(classLoaderConfigurationBuilder));
     dependenciesArtifactsUrls.addAll(addDependenciesToClasspathUrls(artifactFile, dependencies));
