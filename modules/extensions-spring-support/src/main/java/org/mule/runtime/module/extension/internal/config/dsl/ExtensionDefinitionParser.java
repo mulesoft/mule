@@ -94,13 +94,13 @@ import org.mule.runtime.module.extension.internal.config.dsl.parameter.Anonymous
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTypeParameterParser;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.TopLevelParameterObjectFactory;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.TypedInlineParameterGroupParser;
-import org.mule.runtime.module.extension.internal.config.dsl.resolver.ValueResolverFactory;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NativeQueryParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ProcessorChainValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.resolver.ValueResolverFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
