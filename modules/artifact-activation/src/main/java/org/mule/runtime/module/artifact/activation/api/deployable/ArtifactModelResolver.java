@@ -15,15 +15,34 @@ import org.mule.runtime.module.artifact.activation.internal.deployable.JsonDeser
 
 import java.io.File;
 
+/**
+ * Provides a way to obtain a {@link MuleDeployableModel} serialized in a JSON file.
+ *
+ * @param <M> the concrete type of model (application or model) to resolve.
+ * 
+ * @since 4.5
+ */
 public interface ArtifactModelResolver<M extends MuleDeployableModel> {
 
+  /**
+   * @return a default resolver for applications.
+   */
   public static ArtifactModelResolver<MuleApplicationModel> applicationModelResolver() {
     return new JsonDeserializingArtifactModelResolver<>(new MuleApplicationModelJsonSerializer());
   }
 
+  /**
+   * @return a default resolver for domains.
+   */
   public static ArtifactModelResolver<MuleDomainModel> domainModelResolver() {
     return new JsonDeserializingArtifactModelResolver<>(new MuleDomainModelJsonSerializer());
   }
 
+  /**
+   * Loads and deserializes a {@code mule-artifact.json} file.
+   * 
+   * @param artifactLocation the folder containing the {@code mule-artifact.json} file to deserialize.
+   * @return the deserialized {@link MuleDeployableModel}.
+   */
   M resolve(File artifactLocation);
 }

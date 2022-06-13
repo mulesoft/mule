@@ -28,7 +28,7 @@ import java.io.InputStream;
 import org.slf4j.Logger;
 
 /**
- * Defines a template method for loading deployableModels for differnet kinds of deployable artifacts.
+ * Defines a template method for loading deployableModels for different kinds of deployable artifacts.
  * 
  * @param <M> the concrete type of model to resolve
  */
