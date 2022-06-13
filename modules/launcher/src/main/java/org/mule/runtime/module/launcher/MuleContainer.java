@@ -138,6 +138,7 @@ public class MuleContainer {
   }
 
   public MuleContainer(String[] args) throws InitialisationException {
+    System.out.println("Entered MuleContainer const");
     init(args);
 
     this.serviceManager = artifactResourcesRegistry.getServiceManager();
@@ -147,6 +148,7 @@ public class MuleContainer {
     this.deploymentService = new MuleDeploymentService(artifactResourcesRegistry.getDomainFactory(),
                                                        artifactResourcesRegistry.getApplicationFactory(),
                                                        () -> findSchedulerService(serviceManager));
+    System.out.println("deploymentService created");
     this.troubleshootingService = new DefaultTroubleshootingService(deploymentService);
     this.repositoryService = new RepositoryServiceFactory().createRepositoryService();
 
@@ -158,9 +160,11 @@ public class MuleContainer {
                                                                           new ClasspathMuleCoreExtensionDiscoverer(artifactResourcesRegistry
                                                                               .getContainerClassLoader()),
                                                                           new ReflectionMuleCoreExtensionDependencyResolver());
+    System.out.println("coreExtensionManager created");
     this.muleLockFactory = artifactResourcesRegistry.getRuntimeLockFactory();
 
     artifactResourcesRegistry.getContainerClassLoader().dispose();
+    System.out.println("Exit MuleContainer const");
   }
 
   public MuleContainer(DeploymentService deploymentService, RepositoryService repositoryService, ToolingService toolingService,
@@ -192,6 +196,7 @@ public class MuleContainer {
   }
 
   protected void init(String[] args) throws IllegalArgumentException, InitialisationException {
+    System.out.println("Entered init");
     // TODO(pablo.kraan): move initialization of others classes outside this method
     Map<String, Object> commandlineOptions = getCommandLineOptions(args);
 
@@ -217,6 +222,7 @@ public class MuleContainer {
     artifactResourcesRegistry.getMemoryManagementService().initialise();
     artifactResourcesRegistry.inject(artifactResourcesRegistry.getContainerProfilingService());
     initialiseIfNeeded(artifactResourcesRegistry.getContainerProfilingService());
+    System.out.println("Exit init");
   }
 
   /**
