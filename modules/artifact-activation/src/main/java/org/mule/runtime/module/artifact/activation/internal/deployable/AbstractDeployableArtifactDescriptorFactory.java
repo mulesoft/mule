@@ -97,13 +97,17 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
     return deployableProjectModel.getDescriptor();
   }
 
+  protected M getDeployableModel() {
+    return (M) deployableProjectModel.getDeployableModel();
+  }
+
   protected BundlePluginDependenciesResolver getPluginDependenciesResolver() {
     return pluginDependenciesResolver;
   }
 
   @Override
   protected void doDescriptorConfig(T descriptor) {
-    // descriptor.setArtifactLocation(getArtifactLocation());
+    descriptor.setArtifactLocation(getArtifactLocation());
     descriptor.setRedeploymentEnabled(getArtifactModel().isRedeploymentEnabled());
 
     Set<String> configs = getArtifactModel().getConfigs();

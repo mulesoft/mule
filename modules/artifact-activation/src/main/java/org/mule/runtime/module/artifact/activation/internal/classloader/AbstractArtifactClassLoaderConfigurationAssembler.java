@@ -100,8 +100,7 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
 
     // TODO W-11202141 - consider artifact patches for the case this is run within a Runtime
 
-    // dependenciesArtifactsUrls.add(getUrl(artifactFile, artifactFile));
-
+    dependenciesArtifactsUrls.add(getUrl(artifactFile));
     dependenciesArtifactsUrls.addAll(addArtifactSpecificClassLoaderConfiguration(classLoaderConfigurationBuilder));
     dependenciesArtifactsUrls.addAll(addDependenciesToClasspathUrls(artifactFile, dependencies));
 
@@ -127,7 +126,8 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
         .filter(dependency -> dependency.getBundleUri() != null)
         .filter(dependency -> !validateMuleRuntimeSharedLibrary(dependency.getDescriptor().getGroupId(),
                                                                 dependency.getDescriptor().getArtifactId(),
-                                                                artifactFile.getName()))
+                                                                packagerClassLoaderModel.getArtifactCoordinates()
+                                                                    .getArtifactId()))
         .forEach(dependency -> {
           final URL dependencyArtifactUrl;
           try {
@@ -141,12 +141,12 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
     return dependenciesArtifactsUrls;
   }
 
-  private URL getUrl(File artifactFile, File file) {
+  private URL getUrl(File artifactFile) {
     try {
-      return file.toURI().toURL();
+      return artifactFile.toURI().toURL();
     } catch (MalformedURLException e) {
-      throw new ArtifactActivationException(createStaticMessage(format("There was an exception obtaining the URL for the artifact [%s], file [%s]",
-                                                                       artifactFile.getAbsolutePath(), file.getAbsolutePath())),
+      throw new ArtifactActivationException(createStaticMessage(format("There was an exception obtaining the URL for the artifact [%s]",
+                                                                       artifactFile.getAbsolutePath())),
                                             e);
     }
   }
@@ -154,9 +154,10 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
   private boolean validateMuleRuntimeSharedLibrary(String groupId, String artifactId, String artifactFileName) {
     if (MULE_RUNTIME_GROUP_ID.equals(groupId)
         || MULE_RUNTIME_MODULES_GROUP_ID.equals(groupId)) {
-      LOGGER
-          .warn("Shared library '{}:{}' is a Mule Runtime dependency. It will not be used by '{}' in order to avoid classloading issues. Please consider removing it, or at least not putting it as a sharedLibrary.",
-                groupId, artifactId, artifactFileName != null ? artifactFileName : "the app");
+      LOGGER.warn("Shared library '{}:{}' is a Mule Runtime dependency."
+          + " It will not be used by '{}' in order to avoid classloading issues."
+          + " Please consider removing it, or at least not putting it as a sharedLibrary.",
+                  groupId, artifactId, artifactFileName);
       return true;
     } else {
       return false;

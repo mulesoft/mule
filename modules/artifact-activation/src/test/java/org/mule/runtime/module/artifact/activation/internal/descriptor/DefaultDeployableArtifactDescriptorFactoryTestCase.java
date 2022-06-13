@@ -210,7 +210,7 @@ public class DefaultDeployableArtifactDescriptorFactoryTestCase extends Abstract
 
     assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(), hasSize(4));
     assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(),
-               hasItem(hasProperty("descriptor", hasProperty("artifactId", equalTo("test-domain")))));
+               hasItem(hasProperty("descriptor", hasProperty("artifactId", equalTo("basic")))));
 
     assertThat(applicationDescriptor.getPlugins(), hasSize(2));
     assertThat(applicationDescriptor.getPlugins(), hasItem(hasProperty("name", equalTo("HTTP"))));

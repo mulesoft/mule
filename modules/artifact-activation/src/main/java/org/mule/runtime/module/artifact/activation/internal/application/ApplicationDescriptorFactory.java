@@ -7,7 +7,6 @@
 package org.mule.runtime.module.artifact.activation.internal.application;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.applicationModelResolver;
 import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
@@ -59,7 +58,7 @@ public class ApplicationDescriptorFactory
 
   @Override
   protected MuleApplicationModel createArtifactModel() {
-    return applicationModelResolver().resolve(getArtifactLocation());
+    return getDeployableModel();
   }
 
   @Override
@@ -147,6 +146,7 @@ public class ApplicationDescriptorFactory
 
   @Override
   protected ApplicationDescriptor doCreateArtifactDescriptor() {
-    return new ApplicationDescriptor(getBundleDescriptor().getArtifactId(), getDeploymentProperties());
+    return new ApplicationDescriptor(getBundleDescriptor().getArtifactId() + "-" + getBundleDescriptor().getVersion()
+        + "-mule-application", getDeploymentProperties());
   }
 }

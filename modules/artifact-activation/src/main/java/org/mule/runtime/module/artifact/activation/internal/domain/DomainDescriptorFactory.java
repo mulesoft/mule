@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.domain;
 
-import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.domainModelResolver;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 
 import static java.util.Collections.emptySet;
@@ -37,7 +36,7 @@ public class DomainDescriptorFactory extends AbstractDeployableArtifactDescripto
 
   @Override
   protected MuleDomainModel createArtifactModel() {
-    return domainModelResolver().resolve(getArtifactLocation());
+    return getDeployableModel();
   }
 
   @Override
@@ -53,6 +52,12 @@ public class DomainDescriptorFactory extends AbstractDeployableArtifactDescripto
 
   @Override
   protected DomainDescriptor doCreateArtifactDescriptor() {
-    return new DomainDescriptor(getBundleDescriptor().getArtifactId(), getDeploymentProperties());
+    DomainDescriptor domainDescriptor =
+        new DomainDescriptor(getBundleDescriptor().getArtifactId() + "-" + getBundleDescriptor().getVersion() + "-mule-domain",
+                             getDeploymentProperties());
+    if (getArtifactLocation().isDirectory()) {
+      domainDescriptor.setRootFolder(getArtifactLocation());
+    }
+    return domainDescriptor;
   }
 }
