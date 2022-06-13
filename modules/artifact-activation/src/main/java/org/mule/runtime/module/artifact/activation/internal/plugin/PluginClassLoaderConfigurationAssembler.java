@@ -76,8 +76,8 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
                                                                                        dependencyArtifactUrl = uri.toURL();
                                                                                      } catch (MalformedURLException e) {
                                                                                        throw new ArtifactActivationException(createStaticMessage(format("There was an exception obtaining the URL for the artifact [%s], file [%s]",
-                                                                                                                                                        artifactLocation
-                                                                                                                                                            .getAbsolutePath(),
+                                                                                                                                                        bundleDescriptor
+                                                                                                                                                            .getArtifactFileName(),
                                                                                                                                                         uri)),
                                                                                                                              e);
                                                                                      }

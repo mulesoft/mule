@@ -53,7 +53,6 @@ public class DomainDescriptorFactory extends AbstractDeployableArtifactDescripto
 
   @Override
   protected DomainDescriptor doCreateArtifactDescriptor() {
-    throw new RuntimeException("A!");
-    // return new DomainDescriptor(getArtifactLocation().getName(), getDeploymentProperties());
+    return new DomainDescriptor(getBundleDescriptor().getArtifactId(), getDeploymentProperties());
   }
 }

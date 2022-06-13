@@ -147,7 +147,6 @@ public class ApplicationDescriptorFactory
 
   @Override
   protected ApplicationDescriptor doCreateArtifactDescriptor() {
-    throw new RuntimeException("A!");
-    // return new ApplicationDescriptor(getArtifactLocation().getName(), getDeploymentProperties());
+    return new ApplicationDescriptor(getBundleDescriptor().getArtifactId(), getDeploymentProperties());
   }
 }
