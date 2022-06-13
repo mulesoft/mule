@@ -35,7 +35,7 @@ public class DeployableClassLoaderConfigurationBuilder extends ClassLoaderModel.
   public DeployableClassLoaderConfigurationBuilder(org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
                                                    File artifactFolder) {
     this.packagerClassLoaderModel = packagerClassLoaderModel;
-    this.artifactFolder = null;
+    this.artifactFolder = artifactFolder;
   }
 
   @Override
