@@ -17,6 +17,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
@@ -49,8 +50,6 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
   private PoolingProfile poolingProfile = null;
   private ReconnectionConfig reconnectionConfig = ReconnectionConfig.getDefault();
 
-  private DslSyntaxResolver dslSyntaxResolver;
-
   @Inject
   private ConfigurationProperties properties;
 
@@ -59,6 +58,9 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
 
   @Inject
   private MuleContext muleContext;
+
+  private LazyValue<DslSyntaxResolver> dslSyntaxResolver;
+
 
   public ConnectionProviderObjectFactory(ConnectionProviderModel providerModel,
                                          ExtensionModel extensionModel,
@@ -72,8 +74,8 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
     this.authCodeHandler = authCodeHandler;
     this.clientCredentialsHandler = clientCredentialsHandler;
     this.platformManagedOAuthHandler = platformManagedOAuthHandler;
-    dslSyntaxResolver = DslSyntaxResolver.getDefault(extensionModel,
-                                                     DslResolvingContext.getDefault(extensionManager.getExtensions()));
+    dslSyntaxResolver = new LazyValue<>(() -> DslSyntaxResolver
+        .getDefault(extensionModel, DslResolvingContext.getDefault(extensionManager.getExtensions())));
   }
 
   @Override
@@ -104,7 +106,7 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
                                               expressionManager,
                                               reflectionCache,
                                               getRepresentation(),
-                                              dslSyntaxResolver,
+                                              dslSyntaxResolver.get(),
                                               muleContext);
     } catch (MuleException e) {
       throw new MuleRuntimeException(e);
