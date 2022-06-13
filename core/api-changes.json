@@ -174,6 +174,24 @@
           "classSimpleName": "PrivilegedProfilingService",
           "elementKind": "interface",
           "justification": "W-10890449: export privileged profiling api"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.util.Map<java.lang.String, org.mule.runtime.api.util.Pair<org.mule.runtime.api.message.Error, org.mule.runtime.core.privileged.exception.EventProcessingException>> org.mule.runtime.core.privileged.routing.RoutingResult::getFailuresWithExceptionInfo()",
+          "package": "org.mule.runtime.core.privileged.routing",
+          "classSimpleName": "RoutingResult",
+          "methodName": "getFailuresWithExceptionInfo",
+          "elementKind": "method",
+          "justification": "W-10965130: to provide more detailed log for CompositeRoutingExceptions"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.core.privileged.routing.RoutingResult org.mule.runtime.core.privileged.routing.RoutingResult::routingResultWithException(java.util.Map<java.lang.String, org.mule.runtime.api.message.Message>, java.util.Map<java.lang.String, org.mule.runtime.api.util.Pair<org.mule.runtime.api.message.Error, org.mule.runtime.core.privileged.exception.EventProcessingException>>)",
+          "package": "org.mule.runtime.core.privileged.routing",
+          "classSimpleName": "RoutingResult",
+          "methodName": "routingResultWithException",
+          "elementKind": "method",
+          "justification": "W-10965130: to provide more detailed log for CompositeRoutingExceptions"
         }
       ]
     }
@@ -265,6 +283,24 @@
           "classSimpleName": "ReactiveInterceptor",
           "elementKind": "interface",
           "justification": "MULE-18177: This should have neven been made privileged"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.util.Map<java.lang.String, org.mule.runtime.api.util.Pair<org.mule.runtime.api.message.Error, org.mule.runtime.core.privileged.exception.EventProcessingException>> org.mule.runtime.core.privileged.routing.RoutingResult::getFailuresWithExceptionInfo()",
+          "package": "org.mule.runtime.core.privileged.routing",
+          "classSimpleName": "RoutingResult",
+          "methodName": "getFailuresWithExceptionInfo",
+          "elementKind": "method",
+          "justification": "W-10965130: to provide more detailed log for CompositeRoutingExceptions"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.core.privileged.routing.RoutingResult org.mule.runtime.core.privileged.routing.RoutingResult::routingResultWithException(java.util.Map<java.lang.String, org.mule.runtime.api.message.Message>, java.util.Map<java.lang.String, org.mule.runtime.api.util.Pair<org.mule.runtime.api.message.Error, org.mule.runtime.core.privileged.exception.EventProcessingException>>)",
+          "package": "org.mule.runtime.core.privileged.routing",
+          "classSimpleName": "RoutingResult",
+          "methodName": "routingResultWithException",
+          "elementKind": "method",
+          "justification": "W-10965130: to provide more detailed log for CompositeRoutingExceptions"
         }
       ]
     }
