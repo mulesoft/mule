@@ -39,6 +39,8 @@ import org.mule.test.metadata.extension.query.MetadataExtensionEntityResolver;
 import org.mule.test.metadata.extension.query.MetadataExtensionQueryTranslator;
 import org.mule.test.metadata.extension.query.NativeQueryOutputResolver;
 import org.mule.test.metadata.extension.resolver.AnyJsonTypeStaticResolver;
+import org.mule.test.metadata.extension.resolver.SdkTestOutputAnyTypeResolver;
+import org.mule.test.metadata.extension.resolver.SdkTestOutputAttributesResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestAttributesResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestBooleanMetadataResolver;
 import org.mule.test.metadata.extension.resolver.TestEnumMetadataResolver;
@@ -67,6 +69,14 @@ public class MetadataOperations {
   public Object contentMetadataWithKeyId(@Config Object object, @Connection MetadataConnection connection,
                                          @MetadataKeyId(TestInputResolverWithKeyResolver.class) String type,
                                          @Content @TypeResolver(TestInputResolverWithKeyResolver.class) Object content) {
+    return null;
+  }
+
+  @org.mule.sdk.api.annotation.metadata.OutputResolver(output = SdkTestOutputAnyTypeResolver.class)
+  @MediaType(value = ANY, strict = false)
+  public Object sdkContentMetadataWithKeyId(@Config Object object, @Connection MetadataConnection connection,
+                                            @MetadataKeyId(TestInputResolverWithKeyResolver.class) String type,
+                                            @Content @TypeResolver(TestInputResolverWithKeyResolver.class) Object content) {
     return null;
   }
 
@@ -232,6 +242,13 @@ public class MetadataOperations {
       attributes = TestOutputAttributesResolverWithKeyResolver.class)
   public Result<Object, AbstractOutputAttributes> outputAttributesWithDynamicMetadata(
                                                                                       @MetadataKeyId(TestOutputAttributesResolverWithKeyResolver.class) String type) {
+    return null;
+  }
+
+  @org.mule.sdk.api.annotation.metadata.OutputResolver(output = SdkTestOutputAttributesResolverWithKeyResolver.class,
+      attributes = SdkTestOutputAttributesResolverWithKeyResolver.class)
+  public Result<Object, AbstractOutputAttributes> sdkOutputAttributesWithDynamicMetadata(
+                                                                                         @MetadataKeyId(TestOutputAttributesResolverWithKeyResolver.class) String type) {
     return null;
   }
 

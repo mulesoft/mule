@@ -140,6 +140,10 @@
         <metadata:output-attributes-with-dynamic-metadata type="PERSON"/>
     </flow>
 
+    <flow name="sdkOutputAttributesWithDynamicMetadata">
+        <metadata:sdk-output-attributes-with-dynamic-metadata type="PERSON"/>
+    </flow>
+
     <flow name="outputAndMultipleInputWithKeyId">
         <metadata:output-and-multiple-input-with-key-id config-ref="config" type="PERSON"/>
     </flow>

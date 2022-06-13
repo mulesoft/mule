@@ -26,6 +26,11 @@ import java.util.Optional;
  */
 public class JavaOutputResolverModelParserUtils {
 
+  public static boolean hasOutputResolverAnnotation(MethodElement<?> methodElement) {
+    return methodElement.isAnnotatedWith(org.mule.runtime.extension.api.annotation.metadata.OutputResolver.class) ||
+        methodElement.isAnnotatedWith(OutputResolver.class);
+  }
+
   public static JavaOutputResolverModelParser parseOutputResolverModelParser(MethodElement<?> methodElement) {
     return mapReduceSingleAnnotation(methodElement, "operation", methodElement.getName(),
                                      org.mule.runtime.extension.api.annotation.metadata.OutputResolver.class,

@@ -112,7 +112,7 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
   protected static final String RESOLVER_WITH_DYNAMIC_CONFIG = "resolverWithDynamicConfig";
   protected static final String RESOLVER_WITH_IMPLICIT_DYNAMIC_CONFIG = "resolverWithImplicitDynamicConfig";
   protected static final String RESOLVER_WITH_IMPLICIT_STATIC_CONFIG = "resolverWithImplicitStaticConfig";
-  protected static final String OUTPUT_ATTRIBUTES_WITH_DYNAMIC_METADATA = "outputAttributesWithDynamicMetadata";
+  protected static final String OUTPUT_ATTRIBUTES_WITH_DYNAMIC_METADATA = "sdkOutputAttributesWithDynamicMetadata";
   protected static final String OUTPUT_ATTRIBUTES_WITH_DECLARED_SUBTYPES_METADATA =
       "outputAttributesWithDeclaredSubtypesMetadata";
   protected static final String RESOLVER_CONTENT_WITH_CONTEXT_CLASSLOADER = "resolverContentWithContextClassLoader";
