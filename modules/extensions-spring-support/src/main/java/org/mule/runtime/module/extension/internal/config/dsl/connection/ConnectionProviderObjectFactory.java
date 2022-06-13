@@ -28,7 +28,6 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.cli
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.runtime.module.extension.internal.runtime.property.SoapExtensionModelProperty;
 import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.SoapConnectionProviderObjectBuilder;
 
@@ -74,7 +73,7 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
     this.clientCredentialsHandler = clientCredentialsHandler;
     this.platformManagedOAuthHandler = platformManagedOAuthHandler;
     dslSyntaxResolver = DslSyntaxResolver.getDefault(extensionModel,
-        DslResolvingContext.getDefault(extensionManager.getExtensions()));
+                                                     DslResolvingContext.getDefault(extensionManager.getExtensions()));
   }
 
   @Override
@@ -82,31 +81,31 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
 
     if (extensionModel.getModelProperty(SoapExtensionModelProperty.class).isPresent()) {
       ResolverSet resolverSet = withContextClassLoader(getClassLoader(extensionModel),
-          () -> getParametersResolver().getParametersAsResolverSet(providerModel, muleContext));
+                                                       () -> getParametersResolver().getParametersAsResolverSet(providerModel,
+                                                                                                                muleContext));
 
       SoapConnectionProviderObjectBuilder builder = new SoapConnectionProviderObjectBuilder(
-          providerModel,
-          resolverSet,
-          poolingProfile,
-          reconnectionConfig,
-          extensionModel,
-          expressionManager,
-          muleContext);
+                                                                                            providerModel,
+                                                                                            resolverSet,
+                                                                                            poolingProfile,
+                                                                                            reconnectionConfig,
+                                                                                            extensionModel,
+                                                                                            expressionManager,
+                                                                                            muleContext);
 
       return new ConnectionProviderResolver<>(builder, resolverSet, muleContext);
     }
 
     try {
       return createConnectionProviderResolver(
-          extensionModel,
-          getConnectionProviderSettings(),
-          properties,
-          expressionManager,
-          reflectionCache,
-          getRepresentation(),
-          dslSyntaxResolver,
-          muleContext
-      );
+                                              extensionModel,
+                                              getConnectionProviderSettings(),
+                                              properties,
+                                              expressionManager,
+                                              reflectionCache,
+                                              getRepresentation(),
+                                              dslSyntaxResolver,
+                                              muleContext);
     } catch (MuleException e) {
       throw new MuleRuntimeException(e);
     }
@@ -114,14 +113,13 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
 
   private ConnectionProviderSettings getConnectionProviderSettings() {
     return new ConnectionProviderSettings(
-        providerModel,
-        parameters,
-        poolingProfile,
-        reconnectionConfig,
-        authCodeHandler,
-        clientCredentialsHandler,
-        platformManagedOAuthHandler
-    );
+                                          providerModel,
+                                          parameters,
+                                          poolingProfile,
+                                          reconnectionConfig,
+                                          authCodeHandler,
+                                          clientCredentialsHandler,
+                                          platformManagedOAuthHandler);
   }
 
   public void setPoolingProfile(PoolingProfile poolingProfile) {

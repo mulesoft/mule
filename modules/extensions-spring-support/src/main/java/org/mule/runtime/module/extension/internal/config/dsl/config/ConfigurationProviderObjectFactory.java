@@ -67,26 +67,26 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
 
   private ConfigurationProvider createInnerInstance() throws ConfigurationException {
     return ConfigurationCreationUtils.createConfigurationProvider(
-        extensionModel,
-        configurationModel,
-        configName.get(),
-        parameters,
-        ofNullable(expirationPolicy),
-        connectionProviderResolver,
-        configurationProviderFactory,
-        expressionManager,
-        reflectionCache,
-        getRepresentation(),
-        null,
-        getExtensionClassLoader(),
-        muleContext
-    );
+                                                                  extensionModel,
+                                                                  configurationModel,
+                                                                  configName.get(),
+                                                                  parameters,
+                                                                  ofNullable(expirationPolicy),
+                                                                  connectionProviderResolver,
+                                                                  configurationProviderFactory,
+                                                                  expressionManager,
+                                                                  reflectionCache,
+                                                                  getRepresentation(),
+                                                                  null,
+                                                                  getExtensionClassLoader(),
+                                                                  muleContext);
   }
 
   private ClassLoader getExtensionClassLoader() {
     return extensionModel.getModelProperty(ClassLoaderModelProperty.class).map(ClassLoaderModelProperty::getClassLoader)
         .orElse(currentThread().getContextClassLoader());
   }
+
   private String getName() {
     return configurationModel.getAllParameterModels().stream()
         .filter(ParameterModel::isComponentId)

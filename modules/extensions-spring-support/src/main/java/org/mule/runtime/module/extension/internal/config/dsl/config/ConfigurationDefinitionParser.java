@@ -65,7 +65,7 @@ public final class ConfigurationDefinitionParser extends ExtensionDefinitionPars
   private Builder parseConnectionProvider(Builder definitionBuilder) {
     if (supportsConnectivity(extensionModel, configurationModel)) {
       return definitionBuilder.withSetterParameterDefinition("connectionProviderResolver",
-          fromChildConfiguration(ConnectionProviderResolver.class).build());
+                                                             fromChildConfiguration(ConnectionProviderResolver.class).build());
     } else {
       return definitionBuilder;
     }

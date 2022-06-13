@@ -35,7 +35,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.property.Exte
 import org.mule.runtime.module.extension.internal.resources.manifest.DefaultClassPackageFinder;
 import org.mule.runtime.module.extension.internal.resources.manifest.ExportedPackagesCollector;
 import org.mule.runtime.module.extension.internal.resources.manifest.ProcessingEnvironmentClassPackageFinder;
-import org.mule.runtime.module.extension.internal.runtime.property.SoapExtensionModelProperty;
+import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
 
 import java.util.Optional;
 

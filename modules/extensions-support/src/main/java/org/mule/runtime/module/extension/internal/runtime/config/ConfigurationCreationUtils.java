@@ -49,37 +49,37 @@ import java.util.Optional;
 public final class ConfigurationCreationUtils {
 
   public static <C> ConnectionProviderResolver<C> createConnectionProviderResolver(
-      ExtensionModel extensionModel,
-      ConnectionProviderSettings settings,
-      ConfigurationProperties configurationProperties,
-      ExpressionManager expressionManager,
-      ReflectionCache reflectionCache,
-      String parametersOwner,
-      DslSyntaxResolver dslSyntaxResolver,
-      MuleContext muleContext) throws MuleException {
+                                                                                   ExtensionModel extensionModel,
+                                                                                   ConnectionProviderSettings settings,
+                                                                                   ConfigurationProperties configurationProperties,
+                                                                                   ExpressionManager expressionManager,
+                                                                                   ReflectionCache reflectionCache,
+                                                                                   String parametersOwner,
+                                                                                   DslSyntaxResolver dslSyntaxResolver,
+                                                                                   MuleContext muleContext)
+      throws MuleException {
 
     final ConnectionProviderModel providerModel = settings.getConnectionProviderModel();
     final ResolverSet resolverSet = getResolverSetFromStaticValues(providerModel,
-        settings.getParameters(),
-        muleContext,
-        false,
-        reflectionCache,
-        expressionManager,
-        parametersOwner,
-        dslSyntaxResolver
-    );
+                                                                   settings.getParameters(),
+                                                                   muleContext,
+                                                                   false,
+                                                                   reflectionCache,
+                                                                   expressionManager,
+                                                                   parametersOwner,
+                                                                   dslSyntaxResolver);
 
     ConnectionProviderObjectBuilder builder;
     if (providerModel.getModelProperty(OAuthModelProperty.class).isPresent()) {
       builder = resolveOAuthBuilder(extensionModel, providerModel, settings, resolverSet,
-          configurationProperties, expressionManager, muleContext);
+                                    configurationProperties, expressionManager, muleContext);
     } else {
       builder = new DefaultConnectionProviderObjectBuilder(providerModel, resolverSet,
-          settings.getPoolingProfile().orElse(null),
-          settings.getReconnectionConfig().orElse(null),
-          extensionModel,
-          expressionManager,
-          muleContext);
+                                                           settings.getPoolingProfile().orElse(null),
+                                                           settings.getReconnectionConfig().orElse(null),
+                                                           extensionModel,
+                                                           expressionManager,
+                                                           muleContext);
     }
 
     return new ConnectionProviderResolver<>(builder, resolverSet, muleContext);
@@ -103,41 +103,41 @@ public final class ConfigurationCreationUtils {
       @Override
       public void visit(AuthorizationCodeGrantType grantType) {
         builder.set(new AuthorizationCodeConnectionProviderObjectBuilder(providerModel,
-            resolverSet,
-            settings.getPoolingProfile().orElse(null),
-            settings.getReconnectionConfig().orElse(null),
-            grantType,
-            settings.getAuthorizationCodeOAuthHandler(),
-            extensionModel,
-            expressionManager,
-            muleContext));
+                                                                         resolverSet,
+                                                                         settings.getPoolingProfile().orElse(null),
+                                                                         settings.getReconnectionConfig().orElse(null),
+                                                                         grantType,
+                                                                         settings.getAuthorizationCodeOAuthHandler(),
+                                                                         extensionModel,
+                                                                         expressionManager,
+                                                                         muleContext));
       }
 
       @Override
       public void visit(ClientCredentialsGrantType grantType) {
         builder.set(new ClientCredentialsConnectionProviderObjectBuilder(providerModel,
-            resolverSet,
-            settings.getPoolingProfile().orElse(null),
-            settings.getReconnectionConfig().orElse(null),
-            grantType,
-            settings.getClientCredentialsOAuthHandler(),
-            extensionModel,
-            expressionManager,
-            muleContext));
+                                                                         resolverSet,
+                                                                         settings.getPoolingProfile().orElse(null),
+                                                                         settings.getReconnectionConfig().orElse(null),
+                                                                         grantType,
+                                                                         settings.getClientCredentialsOAuthHandler(),
+                                                                         extensionModel,
+                                                                         expressionManager,
+                                                                         muleContext));
       }
 
       @Override
       public void visit(PlatformManagedOAuthGrantType grantType) {
         builder.set(new PlatformManagedOAuthConnectionProviderObjectBuilder(providerModel,
-            resolverSet,
-            settings.getPoolingProfile().orElse(null),
-            settings.getReconnectionConfig().orElse(null),
-            grantType,
-            settings.getPlatformManagedOAuthHandler(),
-            configurationProperties,
-            extensionModel,
-            expressionManager,
-            muleContext));
+                                                                            resolverSet,
+                                                                            settings.getPoolingProfile().orElse(null),
+                                                                            settings.getReconnectionConfig().orElse(null),
+                                                                            grantType,
+                                                                            settings.getPlatformManagedOAuthHandler(),
+                                                                            configurationProperties,
+                                                                            extensionModel,
+                                                                            expressionManager,
+                                                                            muleContext));
       }
     });
 
@@ -159,18 +159,23 @@ public final class ConfigurationCreationUtils {
                                                                   MuleContext muleContext) {
     return withContextClassLoader(extensionClassLoader, () -> {
       ResolverSet resolverSet = getResolverSetFromStaticValues(
-          configurationModel,
-          parameters,
-          muleContext,
-          false,
-          reflectionCache,
-          expressionManager,
-          parametersOwner,
-          dslSyntaxResolver
-      );
+                                                               configurationModel,
+                                                               parameters,
+                                                               muleContext,
+                                                               false,
+                                                               reflectionCache,
+                                                               expressionManager,
+                                                               parametersOwner,
+                                                               dslSyntaxResolver);
 
       final ConnectionProviderValueResolver connectionProviderValueResolver = getConnectionProviderResolver(
-          connectionProviderResolver, extensionModel, configurationModel, configName, reflectionCache, expressionManager, muleContext);
+                                                                                                            connectionProviderResolver,
+                                                                                                            extensionModel,
+                                                                                                            configurationModel,
+                                                                                                            configName,
+                                                                                                            reflectionCache,
+                                                                                                            expressionManager,
+                                                                                                            muleContext);
 
       connectionProviderValueResolver.getResolverSet()
           .ifPresent((CheckedConsumer) resolver -> initialiseIfNeeded(resolver, true, muleContext));
@@ -180,58 +185,58 @@ public final class ConfigurationCreationUtils {
         if (resolverSet.isDynamic() || connectionProviderValueResolver.isDynamic()) {
           configurationProvider =
               configurationProviderFactory.createDynamicConfigurationProvider(configName, extensionModel,
-                  configurationModel,
-                  resolverSet,
-                  connectionProviderValueResolver,
-                  getActingExpirationPolicy(expirationPolicy, muleContext),
-                  reflectionCache,
-                  expressionManager,
-                  muleContext);
+                                                                              configurationModel,
+                                                                              resolverSet,
+                                                                              connectionProviderValueResolver,
+                                                                              getActingExpirationPolicy(expirationPolicy,
+                                                                                                        muleContext),
+                                                                              reflectionCache,
+                                                                              expressionManager,
+                                                                              muleContext);
         } else {
           configurationProvider = configurationProviderFactory
               .createStaticConfigurationProvider(configName,
-                  extensionModel,
-                  configurationModel,
-                  resolverSet,
-                  connectionProviderValueResolver,
-                  reflectionCache,
-                  expressionManager,
-                  muleContext);
+                                                 extensionModel,
+                                                 configurationModel,
+                                                 resolverSet,
+                                                 connectionProviderValueResolver,
+                                                 reflectionCache,
+                                                 expressionManager,
+                                                 muleContext);
         }
       } catch (Exception e) {
         throw new MuleRuntimeException(
-            createStaticMessage(format("Could not create an implicit configuration '%s' for the extension '%s'",
-                configurationModel.getName(), extensionModel.getName())),
-            e);
+                                       createStaticMessage(format("Could not create an implicit configuration '%s' for the extension '%s'",
+                                                                  configurationModel.getName(), extensionModel.getName())),
+                                       e);
       }
       return configurationProvider;
     });
   }
 
-  private static ExpirationPolicy getActingExpirationPolicy(Optional<ExpirationPolicy> expirationPolicy, MuleContext muleContext) {
-    return expirationPolicy.orElseGet(() ->
-        muleContext.getConfiguration().getDynamicConfigExpiration().getExpirationPolicy());
+  private static ExpirationPolicy getActingExpirationPolicy(Optional<ExpirationPolicy> expirationPolicy,
+                                                            MuleContext muleContext) {
+    return expirationPolicy.orElseGet(() -> muleContext.getConfiguration().getDynamicConfigExpiration().getExpirationPolicy());
   }
 
   private static ConnectionProviderValueResolver getConnectionProviderResolver(
-      Optional<ConnectionProviderValueResolver> connectionProviderResolver,
-      ExtensionModel extensionModel,
-      ConfigurationModel configurationModel,
-      String configName,
-      ReflectionCache reflectionCache,
-      ExpressionManager expressionManager,
-      MuleContext muleContext) {
+                                                                               Optional<ConnectionProviderValueResolver> connectionProviderResolver,
+                                                                               ExtensionModel extensionModel,
+                                                                               ConfigurationModel configurationModel,
+                                                                               String configName,
+                                                                               ReflectionCache reflectionCache,
+                                                                               ExpressionManager expressionManager,
+                                                                               MuleContext muleContext) {
 
     return connectionProviderResolver.orElseGet(() -> {
       if (supportsConnectivity(extensionModel, configurationModel)) {
         return new ImplicitConnectionProviderValueResolver(configName, extensionModel, configurationModel, reflectionCache,
-            expressionManager, muleContext);
+                                                           expressionManager, muleContext);
       } else {
         return new StaticConnectionProviderResolver<>(null, null);
       }
     });
   }
 
-  private ConfigurationCreationUtils() {
-  }
+  private ConfigurationCreationUtils() {}
 }
