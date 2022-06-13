@@ -11,8 +11,6 @@ import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.D
 import static java.util.Collections.emptySet;
 
 import org.mule.runtime.api.deployment.meta.MuleDomainModel;
-import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
-import org.mule.runtime.api.deployment.persistence.MuleDomainModelJsonSerializer;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
@@ -37,8 +35,8 @@ public class DomainDescriptorFactory extends AbstractDeployableArtifactDescripto
   }
 
   @Override
-  protected AbstractMuleArtifactModelJsonSerializer<MuleDomainModel> getMuleArtifactModelJsonSerializer() {
-    return new MuleDomainModelJsonSerializer();
+  protected MuleDomainModel createArtifactModel() {
+    return getDeployableModel();
   }
 
   @Override
@@ -54,6 +52,12 @@ public class DomainDescriptorFactory extends AbstractDeployableArtifactDescripto
 
   @Override
   protected DomainDescriptor doCreateArtifactDescriptor() {
-    return new DomainDescriptor(getArtifactLocation().getName(), getDeploymentProperties());
+    DomainDescriptor domainDescriptor =
+        new DomainDescriptor(getBundleDescriptor().getArtifactId() + "-" + getBundleDescriptor().getVersion() + "-mule-domain",
+                             getDeploymentProperties());
+    if (getArtifactLocation().isDirectory()) {
+      domainDescriptor.setRootFolder(getArtifactLocation());
+    }
+    return domainDescriptor;
   }
 }

@@ -8,8 +8,11 @@ package org.mule.runtime.module.artifact.activation.api.deployable;
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 
+import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -20,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -36,6 +40,7 @@ public final class DeployableProjectModel {
   private final List<String> packages;
   private final List<String> resources;
   private final BundleDescriptor descriptor;
+  private final Supplier<MuleDeployableModel> deployableModelSupplier;
   private final File projectFolder;
   private final List<BundleDependency> dependencies;
   private final Set<BundleDescriptor> sharedLibraries;
@@ -51,7 +56,8 @@ public final class DeployableProjectModel {
    * @param resources                    See {@link #getResources()}
    * @param descriptor                   See {@link #getDescriptor()}
    * @param artifactCoordinates          See {@link #getArtifactCoordinates()}
-   * @param projectFolder
+   * @param deployableModelSupplier      See {@link #getDeployableModel()}
+   * @param projectFolder                See {@link #getProjectFolder()}
    * @param dependencies                 See {@link #getDependencies()}
    * @param sharedLibraries              See {@link #getSharedLibraries()}
    * @param additionalPluginDependencies See {@link #additionalPluginDependencies}
@@ -60,6 +66,7 @@ public final class DeployableProjectModel {
   public DeployableProjectModel(List<String> packages,
                                 List<String> resources,
                                 BundleDescriptor descriptor,
+                                Supplier<MuleDeployableModel> deployableModelSupplier,
                                 File projectFolder,
                                 List<BundleDependency> dependencies,
                                 Set<BundleDescriptor> sharedLibraries,
@@ -104,8 +111,9 @@ public final class DeployableProjectModel {
 
     this.packages = ImmutableList.copyOf(packages);
     this.resources = ImmutableList.copyOf(resources);
-    this.descriptor = descriptor;
-    this.projectFolder = projectFolder;
+    this.descriptor = requireNonNull(descriptor);
+    this.deployableModelSupplier = new LazyValue<>(requireNonNull(deployableModelSupplier));
+    this.projectFolder = requireNonNull(projectFolder);
     this.dependencies = ImmutableList.copyOf(dependencies);
     this.sharedLibraries = ImmutableSet.copyOf(sharedLibraries);
     this.additionalPluginDependencies = ImmutableMap.copyOf(additionalPluginDependencies);
@@ -142,6 +150,23 @@ public final class DeployableProjectModel {
     return descriptor;
   }
 
+  /**
+   * Mule projects contain additional model information within the project itself (i.e.: mule-artifact.json file). Calling this
+   * getter will trigger the loading of that additional data from within the project.
+   * 
+   * @return the additional model information from this project.
+   */
+  public MuleDeployableModel getDeployableModel() {
+    return deployableModelSupplier.get();
+  }
+
+  /**
+   * This folder will be used to create the classloader for the deployable project.
+   * <p>
+   * Temporary files related to this project will also be created within this directory.
+   * 
+   * @return the folder where this deployable project is located.
+   */
   public File getProjectFolder() {
     return projectFolder;
   }

@@ -43,9 +43,6 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
   public T create() {
     artifactModel = createArtifactModel();
     final T descriptor = doCreateArtifactDescriptor();
-    if (artifactLocation.isDirectory()) {
-      descriptor.setRootFolder(artifactLocation);
-    }
 
     BundleDescriptor bundleDescriptor = getBundleDescriptor();
     descriptor.setBundleDescriptor(bundleDescriptor);

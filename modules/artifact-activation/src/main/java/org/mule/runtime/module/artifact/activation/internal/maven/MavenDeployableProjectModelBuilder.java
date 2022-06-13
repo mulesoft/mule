@@ -11,6 +11,8 @@ import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigu
 import static org.mule.maven.client.internal.util.MavenUtils.getPomModelFromFile;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.applicationModelResolver;
+import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.domainModelResolver;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.getDeployableArtifactCoordinates;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.toApplicationModelArtifacts;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updateArtifactsSharedState;
@@ -19,6 +21,8 @@ import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMav
 import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMavenPlugin.MULE_EXTENSIONS_PLUGIN_GROUP_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
+import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
+import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.tools.api.classloader.Constants.ADDITIONAL_PLUGIN_DEPENDENCIES_FIELD;
 import static org.mule.tools.api.classloader.Constants.PLUGIN_DEPENDENCIES_FIELD;
 import static org.mule.tools.api.classloader.Constants.PLUGIN_DEPENDENCY_FIELD;
@@ -43,6 +47,7 @@ import org.mule.maven.client.api.SettingsSupplierFactory;
 import org.mule.maven.client.api.model.BundleDependency;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.internal.AetherMavenClient;
+import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModelBuilder;
@@ -170,8 +175,19 @@ public class MavenDeployableProjectModelBuilder
 
     return new DeployableProjectModel(packages, resources,
                                       buildBundleDescriptor(deployableArtifactCoordinates),
+                                      getModelResolver(deployableArtifactCoordinates),
                                       projectFolder, deployableBundleDependencies,
                                       sharedDeployableBundleDescriptors, additionalPluginDependencies);
+  }
+
+  protected Supplier<MuleDeployableModel> getModelResolver(ArtifactCoordinates deployableArtifactCoordinates) {
+    if (deployableArtifactCoordinates.getClassifier().equals(MULE_APPLICATION_CLASSIFIER)) {
+      return () -> applicationModelResolver().resolve(projectFolder);
+    } else if (deployableArtifactCoordinates.getClassifier().equals(MULE_DOMAIN_CLASSIFIER)) {
+      return () -> domainModelResolver().resolve(projectFolder);
+    } else {
+      throw new IllegalStateException("project is not a " + MULE_APPLICATION_CLASSIFIER + " or " + MULE_DOMAIN_CLASSIFIER);
+    }
   }
 
   private ArtifactCoordinates getDeployableProjectArtifactCoordinates(Model pomModel) {

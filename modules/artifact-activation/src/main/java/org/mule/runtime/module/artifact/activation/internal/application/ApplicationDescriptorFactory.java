@@ -17,8 +17,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
-import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
-import org.mule.runtime.api.deployment.persistence.MuleApplicationModelJsonSerializer;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DomainDescriptorResolutionException;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DomainDescriptorResolver;
@@ -59,8 +57,8 @@ public class ApplicationDescriptorFactory
   }
 
   @Override
-  protected AbstractMuleArtifactModelJsonSerializer<MuleApplicationModel> getMuleArtifactModelJsonSerializer() {
-    return new MuleApplicationModelJsonSerializer();
+  protected MuleApplicationModel createArtifactModel() {
+    return getDeployableModel();
   }
 
   @Override
@@ -148,6 +146,7 @@ public class ApplicationDescriptorFactory
 
   @Override
   protected ApplicationDescriptor doCreateArtifactDescriptor() {
-    return new ApplicationDescriptor(getArtifactLocation().getName(), getDeploymentProperties());
+    return new ApplicationDescriptor(getBundleDescriptor().getArtifactId() + "-" + getBundleDescriptor().getVersion()
+        + "-mule-application", getDeploymentProperties());
   }
 }
