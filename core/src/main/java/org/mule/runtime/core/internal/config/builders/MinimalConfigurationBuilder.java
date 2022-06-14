@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.config.builders;
 
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
@@ -50,11 +49,14 @@ import static org.mule.runtime.core.internal.interception.InterceptorManager.INT
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultPersistentObjectStore;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.SchedulerContainerPoolsConfig;
@@ -189,15 +191,18 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     registerObject(OBJECT_CONNECTION_MANAGER, new DefaultConnectionManager(muleContext), muleContext);
   }
 
-  protected void registerExpressionManager(MuleContext muleContext, MuleRegistry registry) throws RegistrationException {
+  protected void registerExpressionManager(MuleContext muleContext, MuleRegistry registry) throws MuleException {
     registerObject(OBJECT_EXPRESSION_MANAGER, getExpressionManager(muleContext, registry), muleContext);
   }
 
   protected ExtendedExpressionManager getExpressionManager(MuleContext muleContext, MuleRegistry registry)
-      throws RegistrationException {
+      throws MuleException {
     DefaultExpressionManager expressionManager = new DefaultExpressionManager();
     DefaultExpressionLanguageFactoryService service = getExpressionLanguageFactoryService(registry);
     expressionManager.setExpressionLanguage(new DataWeaveExpressionLanguageAdaptor(muleContext, null, service, null));
+
+    muleContext.getInjector().inject(expressionManager);
+
     return expressionManager;
   }
 
