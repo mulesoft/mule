@@ -57,11 +57,12 @@ import reactor.core.publisher.FluxSink;
  */
 public class CompositeOperationPolicy
     extends AbstractCompositePolicy<OperationPolicyParametersTransformer>
-    implements OperationPolicy, Disposable, DeferredDisposable {
+    implements OperationPolicy, Disposable, Draineable<OperationPolicy>, DeferredPolicy<OperationPolicy> {
 
   private static final Logger LOGGER = getLogger(CompositeOperationPolicy.class);
 
   private final Component operation;
+
   private final OperationPolicyProcessorFactory operationPolicyProcessorFactory;
 
   private final LoadingCache<String, FluxSinkSupplier<CoreEvent>> policySinks;
@@ -126,7 +127,7 @@ public class CompositeOperationPolicy
             from(me.getEvent()).getOperationCallerCallback().error(me);
           });
 
-      policyFlux.subscribe(null, e -> LOGGER.error("Exception reached subscriber for " + toString(), e));
+      policyFlux.subscribe(null, e -> LOGGER.error("Exception reached subscriber for " + this, e));
 
       return sinkRef.getFluxSink();
     }
@@ -137,6 +138,7 @@ public class CompositeOperationPolicy
       // Break the circular reference between policy-sinkFactory-flux that may cause memory leaks in the policies caches.
       compositeOperationPolicy = null;
     }
+
   }
 
   /**
@@ -166,6 +168,7 @@ public class CompositeOperationPolicy
   private static final class OperationDispatcher implements Consumer<CoreEvent> {
 
     private final FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder;
+
     private final Optional<OperationPolicyParametersTransformer> parametersTransformer;
     private final Component operation;
 
@@ -207,6 +210,7 @@ public class CompositeOperationPolicy
                                            }
                                          });
     }
+
   }
 
   private static Map<String, Object> resolveOperationParameters(CoreEvent event,
@@ -279,5 +283,15 @@ public class CompositeOperationPolicy
       policySinks.invalidateAll();
       completionCallbackScheduler.stop();
     };
+  }
+
+  @Override
+  public void drain(Consumer<OperationPolicy> whenDrained) {
+    whenDrained.accept(this);
+  }
+
+  @Override
+  public Draineable<OperationPolicy> deferredDrain() {
+    return whenDrained -> whenDrained.accept(this);
   }
 }

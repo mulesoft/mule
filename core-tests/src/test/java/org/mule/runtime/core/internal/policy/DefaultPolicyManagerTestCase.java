@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.policy;
 import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.instanceOf;
@@ -18,11 +19,14 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.RETURNS_MOCKS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
+import static org.mule.runtime.api.functional.Either.left;
+import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
@@ -59,6 +63,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -146,7 +152,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
   public void sourceNoPoliciesPresent() {
     when(policyProvider.isSourcePoliciesAvailable()).thenReturn(false);
     when(policyProvider.findSourceParameterizedPolicies(any())).thenReturn(emptyList());
-    policiesChangeCallbackCaptor.getValue().run();
+    clearPolicyManagerCaches();
 
     final SourcePolicy policy1 = policyManager.createSourcePolicyInstance(flowOne, mock(CoreEvent.class), ePub -> ePub,
                                                                           mock(MessageSourceResponseParametersProcessor.class));
@@ -170,7 +176,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
 
     when(policyProvider.findSourceParameterizedPolicies(policyParams1)).thenReturn(asList(policy));
     when(policyProvider.findSourceParameterizedPolicies(policyParams2)).thenReturn(asList(policy));
-    policiesChangeCallbackCaptor.getValue().run();
+    clearPolicyManagerCaches();
 
     final InternalEvent event1 = mock(InternalEvent.class);
 
@@ -203,7 +209,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     when(policyChain.onChainError(any())).thenReturn(policyChain);
 
     when(policyProvider.findSourceParameterizedPolicies(policyParams)).thenReturn(asList(policy));
-    policiesChangeCallbackCaptor.getValue().run();
+    clearPolicyManagerCaches();
 
     final InternalEvent event = mock(InternalEvent.class);
     SourcePolicyContext ctx = mock(SourcePolicyContext.class);
@@ -225,7 +231,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
   public void operationNoPoliciesPresent() {
     when(policyProvider.isOperationPoliciesAvailable()).thenReturn(false);
     when(policyProvider.findOperationParameterizedPolicies(any())).thenReturn(emptyList());
-    policiesChangeCallbackCaptor.getValue().run();
+    clearPolicyManagerCaches();
 
     final OperationPolicy policy1 = policyManager.createOperationPolicy(testOperationOne, mock(CoreEvent.class),
                                                                         mock(OperationParametersProcessor.class));
@@ -245,7 +251,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
 
     when(policyProvider.findOperationParameterizedPolicies(any(PolicyPointcutParameters.class)))
         .thenReturn(asList(policy));
-    policiesChangeCallbackCaptor.getValue().run();
+    clearPolicyManagerCaches();
 
     final OperationPolicy operationPolicy1 = policyManager.createOperationPolicy(testOperationOne, mock(InternalEvent.class),
                                                                                  mock(OperationParametersProcessor.class));
@@ -267,7 +273,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     when(policyProvider.findOperationParameterizedPolicies(any(PolicyPointcutParameters.class)))
         .thenReturn(asList(policy1))
         .thenReturn(asList(policy2));
-    policiesChangeCallbackCaptor.getValue().run();
+    clearPolicyManagerCaches();
 
     final PolicyPointcutParameters sourcePolicyParams1 = mock(PolicyPointcutParameters.class);
     final PolicyPointcutParameters sourcePolicyParams2 = mock(PolicyPointcutParameters.class);
@@ -300,7 +306,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
 
     when(policyProvider.findOperationParameterizedPolicies(any(PolicyPointcutParameters.class)))
         .thenReturn(asList(policy));
-    policiesChangeCallbackCaptor.getValue().run();
+    clearPolicyManagerCaches();
 
     final OperationPolicy operationPolicy1 = policyManager.createOperationPolicy(testOperationOne, mock(InternalEvent.class),
                                                                                  mock(OperationParametersProcessor.class));
@@ -315,70 +321,132 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void sourcePolicyAcceptsWhileAvailable() throws MuleException {
+  public void sourcePolicyDisposeWithNoInflightEvents() throws MuleException {
     startIfNeeded(policyManager);
+    clearPolicyManagerCaches();
 
-    AtomicBoolean sourcePolicydisposed = new AtomicBoolean(false);
+    // Boolean that will be true if the policy gets disposed.
+    AtomicBoolean isSourcePolicyDisposed = new AtomicBoolean(false);
+    trackPolicyDisposal(isSourcePolicyDisposed);
 
-    policyManager.setCompositePolicyFactory(new CompositePolicyFactory() {
+    // Creating a policy through the policy manager.
+    SourcePolicy sourcePolicy = createSourcePolicy();
 
-      @Override
-      public SourcePolicy createSourcePolicy(List<Policy> innerKey, ReactiveProcessor flowExecutionProcessor,
-                                             Optional<SourcePolicyParametersTransformer> lookupSourceParametersTransformer,
-                                             SourcePolicyProcessorFactory sourcePolicyProcessorFactory,
-                                             Function<MessagingException, MessagingException> resolver) {
-        final SourcePolicy sourcePolicy =
-            super.createSourcePolicy(innerKey, flowExecutionProcessor, lookupSourceParametersTransformer,
-                                     sourcePolicyProcessorFactory, resolver);
-        final Disposable deferredDispose = ((DeferredDisposable) sourcePolicy).deferredDispose();
+    // Clearing the policy manager caches should not dispose the policy since there are still references to it.
+    clearPolicyManagerCaches();
+    System.gc();
+    assertThat(isSourcePolicyDisposed.get(), is(false));
 
-        return new DisposeListenerSourcePolicy(sourcePolicy, () -> {
-          deferredDispose.dispose();
-          sourcePolicydisposed.set(true);
-        });
-      }
-    });
+    // Dereference of the policy should trigger its disposal.
+    sourcePolicy = null;
+    System.gc();
+    verifyPolicyDisposal(isSourcePolicyDisposed);
 
-    final Policy policy = mockPolicy();
+    stopIfNeeded(policyManager);
+  }
 
-    when(policyProvider.findSourceParameterizedPolicies(any())).thenReturn(asList(policy));
-
-    policiesChangeCallbackCaptor.getValue().run();
-
-    final InternalEvent event = mock(InternalEvent.class);
-
+  private InternalEvent getEventMock() {
+    InternalEvent event = mock(InternalEvent.class);
     SourcePolicyContext ctx = mock(SourcePolicyContext.class);
     when(ctx.getPointcutParameters()).thenReturn(mock(PolicyPointcutParameters.class));
     when(event.getSourcePolicyContext()).thenReturn((EventInternalContext) ctx);
+    return event;
+  }
 
-    SourcePolicy policyInstance =
-        policyManager.createSourcePolicyInstance(flowOne, event, ePub -> ePub,
-                                                 mock(MessageSourceResponseParametersProcessor.class));
+  @Test
+  public void sourcePolicyDisposeWithInflightEvents() throws MuleException {
+    startIfNeeded(policyManager);
+    clearPolicyManagerCaches();
 
-    // Clear the caches of the policyManager...
-    policiesChangeCallbackCaptor.getValue().run();
+    // Boolean that will be true if the policy gets disposed.
+    AtomicBoolean isSourcePolicyDisposed = new AtomicBoolean(false);
 
+    // An inflight event should prevent the policy disposal.
+    CountDownLatch inflightEventsCount = new CountDownLatch(1);
+    trackPolicyDisposal(isSourcePolicyDisposed, inflightEventsCount);
+
+    // Creating a policy through the policy manager.
+    SourcePolicy sourcePolicy = createSourcePolicy();
+
+    // Since there are inflight events, clearing the policy manager caches and de-referencing the policy should not trigger its
+    // dispose.
+    clearPolicyManagerCaches();
+    sourcePolicy = null;
     System.gc();
-    // Verify that the previously obtained policyInstance is still good
-    assertThat(sourcePolicydisposed.get(), is(false));
+    assertThat(isSourcePolicyDisposed.get(), is(false));
 
-    policyInstance = null;
-
-    // Verify that dispose is called when the policy is no longer being used
-    new PollingProber(GC_POLLING_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      System.gc();
-      return sourcePolicydisposed.get();
-    }));
+    // No more inflight events should trigger the policy disposal.
+    inflightEventsCount.countDown();
+    verifyPolicyDisposal(isSourcePolicyDisposed);
 
     stopIfNeeded(policyManager);
+  }
+
+  private void clearPolicyManagerCaches() {
+    policiesChangeCallbackCaptor.getValue().run();
+  }
+
+  private SourcePolicy createSourcePolicy() {
+    Policy policy = mockPolicy();
+    when(policyProvider.findSourceParameterizedPolicies(any())).thenReturn(singletonList(policy));
+    return policyManager.createSourcePolicyInstance(flowOne, getEventMock(), publisher -> publisher,
+                                                    mock(MessageSourceResponseParametersProcessor.class));
   }
 
   @Test
   public void operationPolicyAcceptsWhileAvailable() throws MuleException {
     startIfNeeded(policyManager);
 
-    AtomicBoolean operationPolicydisposed = new AtomicBoolean(false);
+    AtomicBoolean isOperationPolicyDisposed = new AtomicBoolean(false);
 
+    trackPolicyDisposal(isOperationPolicyDisposed, new CountDownLatch(0));
+
+    final Policy policy = mockPolicy();
+
+    when(policyProvider.findOperationParameterizedPolicies(any())).thenReturn(asList(policy));
+
+    clearPolicyManagerCaches();
+
+    final InternalEvent event = mock(InternalEvent.class);
+
+    OperationPolicyContext ctx = mock(OperationPolicyContext.class);
+    when(event.getOperationPolicyContext()).thenReturn((EventInternalContext) ctx);
+
+    OperationPolicy policyInstance =
+        policyManager.createOperationPolicy(flowOne, event, mock(OperationParametersProcessor.class));
+
+    clearPolicyManagerCaches();
+
+    System.gc();
+
+    // Verify that the previously obtained policyInstance is still good
+    assertThat(isOperationPolicyDisposed.get(), is(false));
+
+    policyInstance = null;
+
+    verifyPolicyDisposal(isOperationPolicyDisposed);
+
+    stopIfNeeded(policyManager);
+  }
+
+  /**
+   * Same as {@link #trackPolicyDisposal(AtomicBoolean, CountDownLatch)} but with no inflight events latch.
+   * 
+   * @param isPolicyDisposed Boolean that will be true once the obtained policy is disposed.
+   */
+  private void trackPolicyDisposal(AtomicBoolean isPolicyDisposed) {
+    this.trackPolicyDisposal(isPolicyDisposed, new CountDownLatch(0));
+  }
+
+  /**
+   * Overrides the policy factory in oder to track the disposal of a single policy obtained through the policy manager
+   * 
+   * @param isPolicyDisposed Boolean that will be true once the obtained policy is disposed.
+   * @see PolicyManager#createOperationPolicy(Component, CoreEvent, OperationParametersProcessor)
+   * @see PolicyManager#createSourcePolicyInstance(Component, CoreEvent, ReactiveProcessor,
+   *      MessageSourceResponseParametersProcessor)
+   */
+  private void trackPolicyDisposal(AtomicBoolean isPolicyDisposed, CountDownLatch inflightEvents) {
     policyManager.setCompositePolicyFactory(new CompositePolicyFactory() {
 
       @Override
@@ -390,46 +458,71 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
             super.createOperationPolicy(operation, innerKey, paramsTransformer, operationPolicyProcessorFactory, shutdownTimeout,
                                         scheduler);
 
-        final Disposable deferredDispose = ((DeferredDisposable) operationPolicy).deferredDispose();
+        return new DisposeListenerPolicy(operationPolicy, new DeferredPolicy<OperationPolicy>() {
 
-        return new DisposeListenerSourcePolicy(operationPolicy, () -> {
-          deferredDispose.dispose();
-          scheduler.stop();
-          operationPolicydisposed.set(true);
+          @Override
+          public Disposable deferredDispose() {
+            return () -> {
+              isPolicyDisposed.set(true);
+              ((DeferredDisposable) operationPolicy).deferredDispose().dispose();
+            };
+          }
+
+          @Override
+          public Draineable<OperationPolicy> deferredDrain() {
+            return whenDrained -> {
+              try {
+                inflightEvents.await();
+              } catch (InterruptedException e) {
+                throw new RuntimeException("Interrupted while emulating inflight events.");
+              }
+              whenDrained.accept(operationPolicy);
+            };
+          }
+        });
+      }
+
+      @Override
+      public SourcePolicy createSourcePolicy(List<Policy> innerKey, ReactiveProcessor flowExecutionProcessor,
+                                             Optional<SourcePolicyParametersTransformer> lookupSourceParametersTransformer,
+                                             SourcePolicyProcessorFactory sourcePolicyProcessorFactory,
+                                             Function<MessagingException, MessagingException> resolver) {
+        final SourcePolicy sourcePolicy =
+            super.createSourcePolicy(innerKey, flowExecutionProcessor, lookupSourceParametersTransformer,
+                                     sourcePolicyProcessorFactory, resolver);
+
+        return new DisposeListenerPolicy(sourcePolicy, new DeferredPolicy<SourcePolicy>() {
+
+          @Override
+          public Disposable deferredDispose() {
+            return () -> {
+              isPolicyDisposed.set(true);
+              ((DeferredDisposable) sourcePolicy).deferredDispose().dispose();
+            };
+          }
+
+          @Override
+          public Draineable<SourcePolicy> deferredDrain() {
+            return whenDrained -> {
+              try {
+                inflightEvents.await();
+              } catch (InterruptedException e) {
+                throw new RuntimeException("Interrupted while emulating inflight events.");
+              }
+              whenDrained.accept(sourcePolicy);
+            };
+          }
         });
       }
     });
+  }
 
-    final Policy policy = mockPolicy();
-
-    when(policyProvider.findOperationParameterizedPolicies(any())).thenReturn(asList(policy));
-
-    policiesChangeCallbackCaptor.getValue().run();
-
-    final InternalEvent event = mock(InternalEvent.class);
-
-    OperationPolicyContext ctx = mock(OperationPolicyContext.class);
-    when(event.getOperationPolicyContext()).thenReturn((EventInternalContext) ctx);
-
-    OperationPolicy policyInstance =
-        policyManager.createOperationPolicy(flowOne, event, mock(OperationParametersProcessor.class));
-
-    // Clear the caches of the policyManager...
-    policiesChangeCallbackCaptor.getValue().run();
-
-    System.gc();
-    // Verify that the previously obtained policyInstance is still good
-    assertThat(operationPolicydisposed.get(), is(false));
-
-    policyInstance = null;
-
+  private void verifyPolicyDisposal(AtomicBoolean isPolicyDisposed) {
     // Verify that dispose is called when the policy is no longer being used
     new PollingProber(GC_POLLING_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       System.gc();
-      return operationPolicydisposed.get();
+      return isPolicyDisposed.get();
     }));
-
-    stopIfNeeded(policyManager);
   }
 
   @Test
@@ -437,7 +530,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     final Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
     when(policyProvider.isSourcePoliciesAvailable()).thenReturn(true);
     when(policyProvider.findSourceParameterizedPolicies(any())).thenReturn(asList(policy));
-    policiesChangeCallbackCaptor.getValue().run();
+    clearPolicyManagerCaches();
 
     InternalEvent event = mock(InternalEvent.class);
     SourcePolicyContext ctx = mock(SourcePolicyContext.class);
@@ -459,7 +552,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
       try {
         lookingForPoliciesLatch.await();
         when(policyProvider.isSourcePoliciesAvailable()).thenReturn(false);
-        policiesChangeCallbackCaptor.getValue().run();
+        clearPolicyManagerCaches();
         cacheEvictedLatch.countDown();
       } catch (InterruptedException e) {
         throw new AssertionError(e);
@@ -482,7 +575,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     final Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
     when(policyProvider.isSourcePoliciesAvailable()).thenReturn(true);
     when(policyProvider.findSourceParameterizedPolicies(any())).thenReturn(asList(policy));
-    policiesChangeCallbackCaptor.getValue().run();
+    clearPolicyManagerCaches();
 
     policyManager.setOuterCachesExpireTime(1, SECONDS);
 
@@ -518,42 +611,64 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     return policy;
   }
 
-  private static class DisposeListenerSourcePolicy implements SourcePolicy, OperationPolicy, Disposable, DeferredDisposable {
+  private static class DisposeListenerPolicy implements SourcePolicy, OperationPolicy, DeferredPolicy, Disposable, Draineable {
 
-    private final Object reference;
-    private final Disposable onDispose;
+    private final Either<SourcePolicy, OperationPolicy> policy;
+    private DeferredPolicy deferredPolicy;
 
-    public DisposeListenerSourcePolicy(Object reference, Disposable onDispose) {
-      this.reference = reference;
-      this.onDispose = onDispose;
+    public DisposeListenerPolicy(SourcePolicy sourcePolicy, DeferredPolicy deferredPolicy) {
+      policy = left(sourcePolicy);
+      this.deferredPolicy = deferredPolicy;
     }
 
-    @Override
-    public void dispose() {
-      onDispose.dispose();
-    }
-
-    @Override
-    public Disposable deferredDispose() {
-      return onDispose;
+    public DisposeListenerPolicy(OperationPolicy operationPolicy, DeferredPolicy deferredPolicy) {
+      policy = right(operationPolicy);
+      this.deferredPolicy = deferredPolicy;
     }
 
     @Override
     public void process(CoreEvent sourceEvent, MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor,
                         CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> callback) {
-      // nothing to do
-    }
-
-    @Override
-    public void drain(Consumer<SourcePolicy> whenDrained) {
-      whenDrained.accept(this);
+      policy.applyLeft(sourcePolicy -> sourcePolicy.process(sourceEvent, messageSourceResponseParametersProcessor, callback));
     }
 
     @Override
     public void process(CoreEvent operationEvent, OperationExecutionFunction operationExecutionFunction,
                         OperationParametersProcessor parametersProcessor, ComponentLocation componentLocation,
                         ExecutorCallback callback) {
-      // nothing to do
+      policy.applyRight(operationPolicy -> operationPolicy.process(operationEvent, operationExecutionFunction,
+                                                                   parametersProcessor, componentLocation, callback));
+    }
+
+    private static class PolicyExecutor {
+
+      private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+      private static void execute(SourcePolicy sourcePolicy, CoreEvent event) {
+        executorService.submit(() -> sourcePolicy.process(event, mock(MessageSourceResponseParametersProcessor.class),
+                                                          mock(CompletableCallback.class, RETURNS_MOCKS)));
+      }
+    }
+
+    @Override
+    public Disposable deferredDispose() {
+      return deferredPolicy.deferredDispose();
+    }
+
+    @Override
+    public Draineable deferredDrain() {
+      return deferredPolicy.deferredDrain();
+    }
+
+    @Override
+    public void dispose() {
+      deferredPolicy.deferredDispose().dispose();
+    }
+
+    @Override
+    public void drain(Consumer whenDrained) {
+      deferredPolicy.deferredDrain().drain(whenDrained);
     }
   }
 }
+

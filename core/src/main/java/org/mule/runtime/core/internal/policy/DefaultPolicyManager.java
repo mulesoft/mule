@@ -49,7 +49,6 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -58,6 +57,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
@@ -116,8 +116,8 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
   private final AtomicBoolean isSourcePoliciesAvailable = new AtomicBoolean(false);
   private final AtomicBoolean isOperationPoliciesAvailable = new AtomicBoolean(false);
 
-  // This set holds the references that are needed to do the dispose after the referenced policy is no longer used.
-  private final ReferenceQueue<DeferredDisposable> stalePoliciesQueue = new ReferenceQueue<>();
+  // This set holds the references that are needed to dispose the referenced policies once they are no longer in use.
+  private final ReferenceQueue<Object> stalePoliciesQueue = new ReferenceQueue<>();
 
   private final Set<DeferredDisposableWeakReference> activePolicies = new HashSet<>();
 
@@ -133,7 +133,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
       Caffeine.newBuilder()
           .build();
 
-  // These next caches contain the Composite Policies for a given sequence of policies to be applied.
+  // These next caches contain the composite policies for a given sequence of policies to be applied.
 
   private final Cache<Pair<String, List<Policy>>, SourcePolicy> sourcePolicyInnerCache =
       Caffeine.newBuilder()
@@ -142,17 +142,14 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
       Caffeine.newBuilder()
           .build();
 
-  // These next caches contain the actual composite policies for a given parameters. Since many parameters combinations may result
-  // in a same set of policies to be applied, many entries of this cache may reference the same composite policy instance.
+  // These next caches contain the same composite policies but for a given parameters. Since many parameters combinations may
+  // result
+  // in the same composition of policies to be applied, many entries of this cache may reference a single composite policy
+  // instance of the previous inner caches.
 
   private Cache<Pair<String, PolicyPointcutParameters>, SourcePolicy> sourcePolicyOuterCache =
       Caffeine.newBuilder()
           .expireAfterAccess(60, SECONDS)
-          .removalListener((key, value, cause) -> {
-            if (value != null) {
-              ((SourcePolicy) value).drain(sourcePolicy -> disposeIfNeeded(sourcePolicy, LOGGER));
-            }
-          })
           .build();
 
   private Cache<Pair<ComponentIdentifier, PolicyPointcutParameters>, OperationPolicy> operationPolicyOuterCache =
@@ -215,7 +212,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
                                                                    .resolve(exception, errorTypeLocator,
                                                                             exceptionContextProviders))));
 
-      activePolicies.add(new DeferredDisposableWeakReference((DeferredDisposable) sourcePolicy, stalePoliciesQueue));
+      activePolicies.add(new DeferredDisposableWeakReference(sourcePolicy, stalePoliciesQueue));
 
       return sourcePolicy;
     } finally {
@@ -277,7 +274,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
                                                                                   + ".policy.flux.")))));
 
       if (operationPolicy instanceof DeferredDisposable) {
-        activePolicies.add(new DeferredDisposableWeakReference((DeferredDisposable) operationPolicy, stalePoliciesQueue));
+        activePolicies.add(new DeferredDisposableWeakReference(operationPolicy, stalePoliciesQueue));
       }
 
       return operationPolicy;
@@ -416,11 +413,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
   }
 
   private void clearActive(@NonNull Object policy) {
-    for (Iterator<DeferredDisposableWeakReference> iterator = activePolicies.iterator(); iterator.hasNext();) {
-      if (policy == iterator.next().get()) {
-        iterator.remove();
-      }
-    }
+    activePolicies.removeIf(objectWeakReference -> policy == objectWeakReference.get());
   }
 
   private void evictCaches() {
@@ -458,7 +451,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
       try {
         DeferredDisposableWeakReference stalePolicy = (DeferredDisposableWeakReference) stalePoliciesQueue.remove(POLL_INTERVAL);
         if (stalePolicy != null) {
-          disposeIfNeeded(stalePolicy, LOGGER);
+          stalePolicy.drain(o -> stalePolicy.dispose());
           activePolicies.remove(stalePolicy);
         }
       } catch (InterruptedException e) {
@@ -485,20 +478,35 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
     return activePolicies.size();
   }
 
-  private static final class DeferredDisposableWeakReference extends WeakReference<DeferredDisposable> implements Disposable {
+  private static final class DeferredDisposableWeakReference extends WeakReference<Object> implements Disposable, Draineable {
 
     private final Disposable deferredDispose;
+    private final Draineable deferredDrain;
+
     private final int hash;
 
-    public DeferredDisposableWeakReference(DeferredDisposable referent, ReferenceQueue<? super DeferredDisposable> q) {
-      super(referent, q);
-      this.deferredDispose = referent.deferredDispose();
-      this.hash = referent.hashCode();
+    public DeferredDisposableWeakReference(SourcePolicy sourcePolicy, ReferenceQueue<Object> stalePoliciesQueue) {
+      super(sourcePolicy, stalePoliciesQueue);
+      this.deferredDispose = ((DeferredPolicy) sourcePolicy).deferredDispose();
+      this.deferredDrain = ((DeferredPolicy) sourcePolicy).deferredDrain();
+      this.hash = sourcePolicy.hashCode();
+    }
+
+    public DeferredDisposableWeakReference(OperationPolicy operationPolicy, ReferenceQueue<Object> stalePoliciesQueue) {
+      super(operationPolicy, stalePoliciesQueue);
+      this.deferredDispose = ((DeferredPolicy) operationPolicy).deferredDispose();
+      this.deferredDrain = ((DeferredPolicy) operationPolicy).deferredDrain();
+      this.hash = operationPolicy.hashCode();
     }
 
     @Override
     public void dispose() {
-      deferredDispose.dispose();
+      disposeIfNeeded(deferredDispose, LOGGER);
+    }
+
+    @Override
+    public void drain(Consumer whenDrained) {
+      deferredDrain.drain(whenDrained);
     }
 
     /*
@@ -525,14 +533,13 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
       if (!(o instanceof DeferredDisposableWeakReference)) {
         return false;
       }
-      DeferredDisposable referent = this.get();
-      DeferredDisposable otherReferent = ((DeferredDisposableWeakReference) o).get();
+      Object referent = this.get();
+      Object otherReferent = ((DeferredDisposableWeakReference) o).get();
       if (referent != null) {
         return referent.equals(otherReferent);
       } else {
         return otherReferent == null;
       }
     }
-
   }
 }

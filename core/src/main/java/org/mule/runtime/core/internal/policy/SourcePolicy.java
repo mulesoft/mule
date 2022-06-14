@@ -11,8 +11,6 @@ import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
-import java.util.function.Consumer;
-
 /**
  * Interceptor of a {@link Processor} that executes logic before and after it. It allows to modify the content of the response (if
  * any) to be sent by a {@link org.mule.runtime.core.api.source.MessageSource}
@@ -36,7 +34,5 @@ public interface SourcePolicy {
   void process(CoreEvent sourceEvent,
                MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor,
                CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> callback);
-
-  void drain(Consumer<SourcePolicy> whenDrained);
 
 }
