@@ -23,7 +23,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import org.mule.metadata.api.TypeLoader;
-import org.mule.metadata.api.model.BinaryType;
 import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -212,7 +211,8 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public boolean supportsStreaming() {
-    return this.getOutputType().getType() instanceof BinaryType;
+    // TODO(W-11293645): Discussion for more accurate implementation
+    return false;
   }
 
   @Override
