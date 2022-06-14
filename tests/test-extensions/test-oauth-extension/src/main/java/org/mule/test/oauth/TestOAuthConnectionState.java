@@ -110,6 +110,10 @@ public class TestOAuthConnectionState {
   @Optional
   private MyPojo externalPojo;
 
+  @Parameter
+  @Optional
+  private ParameterResolver<TypedValue<MyPojo>> stackedTypePojoParameter;
+
   private AuthorizationCodeState state;
 
   public Double getApiVersion() {
@@ -194,5 +198,9 @@ public class TestOAuthConnectionState {
 
   public MyPojo getExternalPojo() {
     return externalPojo;
+  }
+
+  public ParameterResolver<TypedValue<MyPojo>> getStackedTypePojoParameter() {
+    return stackedTypePojoParameter;
   }
 }

@@ -22,6 +22,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -191,13 +192,22 @@ public class ResolverSetUtils {
           } catch (MuleException e) {
             throw new MuleRuntimeException(e);
           }
+          resolverReference.set(getValueResolverFor(parameterName, objectType, resolverReference.get(), getDefaultValue(type),
+                                                    getExpressionSupport(objectType), false, modelProperties));
         }
       }
 
       @Override
       protected void defaultVisit(MetadataType metadataType) {
-        resolverReference.set(valueResolverFactory.of(parameterName, metadataType, value, getDefaultValue(type),
-                                                      getExpressionSupport(metadataType), false, modelProperties));
+        resolverReference.set(getValueResolverFor(parameterName, metadataType, value, getDefaultValue(type),
+                                                  getExpressionSupport(metadataType), false, modelProperties));
+      }
+
+      private ValueResolver getValueResolverFor(String parameterName, MetadataType metadataType, Object value,
+                                                Object defaultValue, ExpressionSupport expressionSupport, boolean required,
+                                                Set<ModelProperty> modelProperties) {
+        return valueResolverFactory.of(parameterName, metadataType, value, defaultValue,
+                                       expressionSupport, required, modelProperties);
       }
     });
     initialiseIfNeeded(resolverReference.get(), muleContext);
