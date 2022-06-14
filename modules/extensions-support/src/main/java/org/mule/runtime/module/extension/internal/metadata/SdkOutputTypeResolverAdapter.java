@@ -29,7 +29,6 @@ public class SdkOutputTypeResolverAdapter implements OutputTypeResolver {
     }
   }
 
-
   @Override
   public String getCategoryName() {
     return delegate.getCategoryName();
@@ -45,7 +44,4 @@ public class SdkOutputTypeResolverAdapter implements OutputTypeResolver {
     return delegate.getResolverName();
   }
 
-  public org.mule.runtime.api.metadata.resolving.OutputTypeResolver getDelegate() {
-    return delegate;
-  }
 }

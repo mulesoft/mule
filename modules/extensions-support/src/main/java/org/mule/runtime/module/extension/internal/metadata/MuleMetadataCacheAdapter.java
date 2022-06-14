@@ -14,6 +14,11 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Adapter of {@link org.mule.runtime.api.metadata.MetadataCache} to {@link MuleMetadataCacheAdapter}
+ *
+ * @since 4.5.0
+ */
 public class MuleMetadataCacheAdapter implements org.mule.runtime.api.metadata.MetadataCache {
 
   private final MetadataCache delegate;

@@ -17,8 +17,6 @@ import org.mule.sdk.api.metadata.resolving.OutputTypeResolver;
  */
 public interface OutputResolverModelParser {
 
-  boolean isMuleResolver();
-
   boolean hasOutputResolver();
 
   OutputTypeResolver<?> getOutputResolver();

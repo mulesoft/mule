@@ -28,7 +28,7 @@ public class MuleAttributesTypeResolverAdapter implements AttributesTypeResolver
   public static AttributesTypeResolver from(Object resolver) {
     checkArgument(resolver != null, "Cannot adapt null resolver");
 
-    if (resolver instanceof OutputTypeResolver) {
+    if (resolver instanceof AttributesTypeResolver) {
       return (AttributesTypeResolver) resolver;
     } else if (resolver instanceof NullMetadataResolver) {
       return new org.mule.runtime.extension.api.metadata.NullMetadataResolver();

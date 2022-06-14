@@ -17,9 +17,6 @@ import org.mule.sdk.api.metadata.resolving.AttributesTypeResolver;
  */
 public interface AttributesResolverModelParser {
 
-
-  boolean isMuleResolver();
-
   boolean hasAttributesResolver();
 
   AttributesTypeResolver<?> getAttributesResolver();

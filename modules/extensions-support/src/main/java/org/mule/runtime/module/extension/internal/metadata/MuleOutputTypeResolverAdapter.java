@@ -14,9 +14,13 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
-import org.mule.sdk.api.error.ErrorTypeDefinition;
 import org.mule.sdk.api.metadata.NullMetadataResolver;
 
+/**
+ * Adapter of {@link org.mule.sdk.api.metadata.resolving.OutputTypeResolver} to {@link OutputTypeResolver}
+ *
+ * @since 4.5.0
+ */
 public class MuleOutputTypeResolverAdapter implements OutputTypeResolver {
 
   private final org.mule.sdk.api.metadata.resolving.OutputTypeResolver delegate;

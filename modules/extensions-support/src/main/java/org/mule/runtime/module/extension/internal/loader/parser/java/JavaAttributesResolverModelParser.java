@@ -16,6 +16,11 @@ import org.mule.runtime.module.extension.internal.metadata.SdkAttributesTypeReso
 import org.mule.sdk.api.metadata.NullMetadataResolver;
 import org.mule.sdk.api.metadata.resolving.AttributesTypeResolver;
 
+/**
+ * {@link AttributesResolverModelParser} for Java based syntax
+ *
+ * @since 4.5.0
+ */
 public class JavaAttributesResolverModelParser implements AttributesResolverModelParser {
 
   private final Class<?> attributesTypeResolverDeclarationClass;
@@ -24,10 +29,6 @@ public class JavaAttributesResolverModelParser implements AttributesResolverMode
   public JavaAttributesResolverModelParser(Class<?> attributesTypeResolverDeclarationClass, boolean muleResolver) {
     this.attributesTypeResolverDeclarationClass = attributesTypeResolverDeclarationClass;
     this.muleResolver = muleResolver;
-  }
-
-  public boolean isMuleResolver() {
-    return muleResolver;
   }
 
   public boolean hasAttributesResolver() {

@@ -11,11 +11,17 @@ import static org.mule.runtime.core.api.util.ClassUtils.getClassName;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OutputResolverModelParser;
 import org.mule.runtime.module.extension.internal.metadata.SdkOutputTypeResolverAdapter;
 import org.mule.sdk.api.metadata.NullMetadataResolver;
 import org.mule.sdk.api.metadata.resolving.OutputTypeResolver;
 
+/**
+ * {@link OutputResolverModelParser} for Java based syntax
+ *
+ * @since 4.5.0
+ */
 public class JavaOutputResolverModelParser implements OutputResolverModelParser {
 
   private final Class<?> outputTypeResolverDeclarationClass;
@@ -28,10 +34,6 @@ public class JavaOutputResolverModelParser implements OutputResolverModelParser 
 
   public Class<?> getOutputTypeResolverDeclarationClass() {
     return outputTypeResolverDeclarationClass;
-  }
-
-  public boolean isMuleResolver() {
-    return muleResolver;
   }
 
   public boolean hasOutputResolver() {
