@@ -18,6 +18,7 @@ import static java.util.function.Function.identity;
 import static java.util.regex.Pattern.compile;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
@@ -107,7 +108,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   @Inject
   private ConfigurationProperties configurationProperties;
 
-  protected Optional<Location> flowLocation = empty();
+  protected Optional<String> flowLocation = empty();
   private MessageProcessorChain configuredMessageProcessors;
 
   protected Optional<String> when = empty();
@@ -293,7 +294,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     this.location = this.getLocation();
     Optional<ProcessingStrategy> processingStrategy = empty();
     if (flowLocation.isPresent()) {
-      processingStrategy = getProcessingStrategy(locator, flowLocation.get());
+      Location location = builderFromStringRepresentation(flowLocation.get()).build();
+      processingStrategy = getProcessingStrategy(locator, location);
     } else if (location != null) {
       processingStrategy = getProcessingStrategy(locator, this);
     }
@@ -484,8 +486,16 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     updateRootContainerName(rootContainerName, this);
   }
 
-  public void setFlowLocation(Location location) {
-    this.flowLocation = ofNullable(location);
+  public void setFlowLocation(ComponentLocation location) {
+    this.flowLocation = ofNullable(location).map(this::normalizeLocation);
+  }
+
+  private String normalizeLocation(ComponentLocation loc) {
+    String location = loc.getLocation();
+    if (location.endsWith("errorHandler")) {
+      return location.substring(0, location.lastIndexOf('/'));
+    }
+    return location;
   }
 
   /**
@@ -500,12 +510,12 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
    *
    * @since 4.3.0
    */
-  public abstract TemplateOnErrorHandler duplicateFor(Location location);
+  public abstract TemplateOnErrorHandler duplicateFor(ComponentLocation location);
 
 
   private boolean isTransactionInGlobalErrorHandler(TransactionAdapter transaction) {
-    String transactionContainerName = transaction.getComponentLocation().get().getRootContainerName();
-    return flowLocation.isPresent() && transactionContainerName.equals(flowLocation.get().getGlobalName());
+    String transactionLocation = transaction.getComponentLocation().get().getLocation();
+    return flowLocation.filter(transactionLocation::equals).isPresent();
   }
 
   protected boolean isOwnedTransaction() {
@@ -515,6 +525,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     }
 
     if (inDefaultErrorHandler()) {
+      // This case is for an implicit error handler, if we are in a configured default error handler then
+      // it will be the same as the global error handler case.
       return defaultErrorHandlerOwnsTransaction(transaction);
     } else if (isTransactionInGlobalErrorHandler((transaction))) {
       // We are in a GlobalErrorHandler that is defined for the container (Flow or TryScope) that created the tx
@@ -549,7 +561,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     if (flowLocation.isPresent()) {
       // We are in a default error handler for a TryScope, which must have been replicated to match the tx location
       // to rollback it
-      return transactionLocation.equals(flowLocation.get().toString());
+      return transactionLocation.equals(flowLocation.get());
     } else {
       // We are in a default error handler of a Flow
       return sameRootContainerLocation(transaction);
