@@ -85,6 +85,7 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
     return deploymentProperties;
   }
 
+  @Override
   protected ClassLoaderModel getClassLoaderModel(MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
     return new DeployableClassLoaderConfigurationAssembler(deployableProjectModel, muleArtifactLoaderDescriptor)
         .createClassLoaderModel();
