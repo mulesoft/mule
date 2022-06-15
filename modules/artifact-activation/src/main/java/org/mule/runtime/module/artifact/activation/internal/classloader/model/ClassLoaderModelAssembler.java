@@ -34,34 +34,16 @@ public class ClassLoaderModelAssembler {
   private final ArtifactCoordinates artifactCoordinates;
   private final List<BundleDependency> projectDependencies;
   private final Set<BundleDescriptor> sharedProjectDependencies;
-  private final List<String> availablePackages;
-  private final List<String> availableResources;
   private final MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor;
 
   public ClassLoaderModelAssembler(ArtifactCoordinates artifactCoordinates,
                                    List<BundleDependency> projectDependencies,
                                    Set<BundleDescriptor> sharedProjectDependencies,
-                                   List<String> availablePackages,
-                                   List<String> availableResources,
                                    MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
     this.artifactCoordinates = requireNonNull(artifactCoordinates);
     this.projectDependencies = requireNonNull(projectDependencies);
     this.sharedProjectDependencies = requireNonNull(sharedProjectDependencies);
-    this.availablePackages = requireNonNull(availablePackages);
-    this.availableResources = requireNonNull(availableResources);
     this.muleArtifactLoaderDescriptor = requireNonNull(muleArtifactLoaderDescriptor);
-  }
-
-  public ClassLoaderModelAssembler(ArtifactCoordinates artifactCoordinates,
-                                   List<BundleDependency> projectDependencies,
-                                   Set<BundleDescriptor> sharedProjectDependencies,
-                                   MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
-    this(artifactCoordinates,
-         projectDependencies,
-         sharedProjectDependencies,
-         emptyList(),
-         emptyList(),
-         muleArtifactLoaderDescriptor);
   }
 
   public ClassLoaderModel createClassLoaderModel() {

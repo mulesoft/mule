@@ -9,7 +9,6 @@ package org.mule.runtime.module.artifact.activation.internal.deployable;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
-import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.classloader.model.ClassLoaderModelAssembler;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -24,10 +23,8 @@ import java.util.Map;
 
 /**
  * Assembles the class loader model for a deployable artifact.
- *
- * @param <M> type of the model of the artifact owning the class loader model.
  */
-public class DeployableClassLoaderModelAssembler<M extends MuleDeployableModel> extends ClassLoaderModelAssembler {
+public class DeployableClassLoaderModelAssembler extends ClassLoaderModelAssembler {
 
   private final Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies;
 
@@ -38,8 +35,6 @@ public class DeployableClassLoaderModelAssembler<M extends MuleDeployableModel> 
                                   model.getDescriptor().getVersion()),
           model.getDependencies(),
           model.getSharedLibraries(),
-          model.getPackages(),
-          model.getResources(),
           muleArtifactLoaderDescriptor);
     additionalPluginDependencies = model.getAdditionalPluginDependencies();
   }

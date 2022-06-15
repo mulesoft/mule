@@ -13,7 +13,6 @@ import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.of;
 
-import org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModelBuilder;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -87,7 +86,7 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
   }
 
   protected ClassLoaderModel getClassLoaderModel(MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
-    return new DeployableClassLoaderConfigurationAssembler<>(deployableProjectModel, muleArtifactLoaderDescriptor)
+    return new DeployableClassLoaderConfigurationAssembler(deployableProjectModel, muleArtifactLoaderDescriptor)
         .createClassLoaderModel();
   }
 
