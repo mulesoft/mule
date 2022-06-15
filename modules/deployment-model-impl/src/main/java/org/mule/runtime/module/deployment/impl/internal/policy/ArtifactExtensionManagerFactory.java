@@ -11,19 +11,16 @@ import static org.mule.runtime.module.artifact.activation.api.extension.discover
 import static org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer.discoverRuntimeExtensionModels;
 
 import static java.util.Collections.emptySet;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionDiscoveryRequest;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
-import org.mule.runtime.module.artifact.api.Artifact;
+import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderSupplier;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
@@ -33,11 +30,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 /**
  * Creates {@link ExtensionManager} for mule artifacts that own a {@link MuleContext}
  */
 public class ArtifactExtensionManagerFactory implements ExtensionManagerFactory {
+
+  private static BiFunction<PluginClassLoaderSupplier, ExtensionModelLoaderRepository, ExtensionModelDiscoverer> EXT_MODEL_DISCOVERER_FACTORY =
+      (pcl, eml) -> defaultExtensionModelDiscoverer(pcl, eml);
 
   private final Set<ArtifactPluginDescriptor> artifactPluginsDescriptors;
   private final ExtensionManagerFactory extensionManagerFactory;
@@ -60,7 +61,7 @@ public class ArtifactExtensionManagerFactory implements ExtensionManagerFactory 
                        (x, y) -> y, LinkedHashMap::new));
     this.artifactPluginsDescriptors = artifactPluginsClassLoaders.keySet();
     this.extensionModelDiscoverer =
-        defaultExtensionModelDiscoverer(artifactPluginsClassLoaders::get, extensionModelLoaderRepository);
+        EXT_MODEL_DISCOVERER_FACTORY.apply(artifactPluginsClassLoaders::get, extensionModelLoaderRepository);
   }
 
   /**
