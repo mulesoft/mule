@@ -480,7 +480,15 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   }
 
   public void setFlowLocation(ComponentLocation location) {
-    this.flowLocation = ofNullable(location).map(loc -> loc.getLocation().substring(0, loc.getLocation().lastIndexOf('/')));
+    this.flowLocation = ofNullable(location).map(this::normalizeLocation);
+  }
+
+  private String normalizeLocation(ComponentLocation loc) {
+    String location = loc.getLocation();
+    if (location.endsWith("errorHandler")) {
+      return location.substring(0, location.lastIndexOf('/'));
+    }
+    return location;
   }
 
   /**
@@ -510,6 +518,8 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
     }
 
     if (inDefaultErrorHandler()) {
+      // This case is for an implicit error handler, if we are in a configured default error handler then
+      // it will be the same as the global error handler case.
       return defaultErrorHandlerOwnsTransaction(transaction);
     } else if (isTransactionInGlobalErrorHandler((transaction))) {
       // We are in a GlobalErrorHandler that is defined for the container (Flow or TryScope) that created the tx
