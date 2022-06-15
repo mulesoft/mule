@@ -19,7 +19,7 @@ import static org.mule.runtime.core.internal.component.ComponentAnnotations.upda
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING;
 import static reactor.core.publisher.Mono.error;
 
-import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -202,9 +202,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
     initialiseIfNeeded(acceptsAllOnErrorPropagate, muleContext);
 
     if (this.getLocation() != null && shouldAddLocationToDefaultErrorHandler()) {
-      String location = this.getLocation().getLocation();
-      String containerLocation = location.substring(0, location.length() - ERROR_HANDLER.length() - 1);
-      acceptsAllOnErrorPropagate.setFlowLocation(builderFromStringRepresentation(containerLocation).build());
+      acceptsAllOnErrorPropagate.setFlowLocation(this.getLocation());
     }
     this.exceptionListeners.add(acceptsAllOnErrorPropagate);
   }
@@ -272,7 +270,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
     }
   }
 
-  public void setExceptionListenersLocation(Location flowLocation) {
+  public void setExceptionListenersLocation(ComponentLocation flowLocation) {
     List<MessagingExceptionHandlerAcceptor> listeners =
         this.getExceptionListeners().stream().map(exceptionListener -> (exceptionListener instanceof TemplateOnErrorHandler)
             ? ((TemplateOnErrorHandler) exceptionListener).duplicateFor(flowLocation)

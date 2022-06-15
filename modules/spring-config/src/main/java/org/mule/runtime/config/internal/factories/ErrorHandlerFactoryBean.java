@@ -27,7 +27,7 @@ public class ErrorHandlerFactoryBean extends AbstractComponentFactory<ErrorHandl
   @Override
   public ErrorHandler doGetObject() throws Exception {
     if (delegate != null) {
-      return delegate.createLocalErrorHandler(this.getRootContainerLocation());
+      return delegate.createLocalErrorHandler(this.getLocation());
     }
 
     ErrorHandler errorHandler;

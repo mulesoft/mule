@@ -182,7 +182,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
       messagingExceptionHandler = muleContext.getDefaultErrorHandler(of(getRootContainerLocation().toString()));
       if (messagingExceptionHandler instanceof ErrorHandler) {
         ((ErrorHandler) messagingExceptionHandler)
-            .setExceptionListenersLocation(builderFromStringRepresentation(this.getLocation().getLocation()).build());
+            .setExceptionListenersLocation(this.getLocation());
       }
     }
     this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, this), processors,
