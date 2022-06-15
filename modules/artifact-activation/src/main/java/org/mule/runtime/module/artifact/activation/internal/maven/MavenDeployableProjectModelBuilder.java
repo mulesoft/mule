@@ -11,8 +11,6 @@ import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigu
 import static org.mule.maven.client.internal.util.MavenUtils.getPomModelFromFile;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.applicationModelResolver;
-import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.domainModelResolver;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.getDeployableArtifactCoordinates;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.toApplicationModelArtifacts;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updateArtifactsSharedState;
@@ -48,10 +46,15 @@ import org.mule.maven.client.api.model.BundleDependency;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.internal.AetherMavenClient;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
+import org.mule.runtime.api.deployment.persistence.MuleApplicationModelJsonSerializer;
+import org.mule.runtime.api.deployment.persistence.MuleDomainModelJsonSerializer;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModelBuilder;
+import org.mule.runtime.module.artifact.activation.internal.application.ApplicationJsonDeserializingIncompleteArtifactModelResolver;
+import org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils;
 import org.mule.runtime.module.artifact.activation.internal.deployable.DeployablePluginsDependenciesResolver;
+import org.mule.runtime.module.artifact.activation.internal.domain.DomainJsonDeserializingIncompleteArtifactModelResolver;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.tools.api.classloader.model.ApplicationGAVModel;
 import org.mule.tools.api.classloader.model.Artifact;
@@ -109,6 +112,7 @@ public class MavenDeployableProjectModelBuilder
   private List<BundleDependency> deployableMavenBundleDependencies;
   private Map<ArtifactCoordinates, List<Artifact>> pluginsArtifactDependencies;
   private List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> deployableBundleDependencies;
+  private List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> deployableMuleRuntimeDependencies;
   private Set<org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor> sharedDeployableBundleDescriptors;
   private Map<org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> additionalPluginDependencies;
   private Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> pluginsBundleDependencies;
@@ -173,18 +177,30 @@ public class MavenDeployableProjectModelBuilder
       throw new ArtifactActivationException(createStaticMessage("Couldn't search exported packages and resources"), e);
     }
 
+    BundleDescriptor modelBundleDescriptor = buildBundleDescriptor(deployableArtifactCoordinates);
+
     return new DeployableProjectModel(packages, resources,
-                                      buildBundleDescriptor(deployableArtifactCoordinates),
-                                      getModelResolver(deployableArtifactCoordinates),
-                                      projectFolder, deployableBundleDependencies,
+                                      modelBundleDescriptor,
+                                      getModelResolver(modelBundleDescriptor),
+                                      projectFolder, deployableBundleDependencies, deployableMuleRuntimeDependencies,
                                       sharedDeployableBundleDescriptors, additionalPluginDependencies);
   }
 
-  protected Supplier<MuleDeployableModel> getModelResolver(ArtifactCoordinates deployableArtifactCoordinates) {
-    if (deployableArtifactCoordinates.getClassifier().equals(MULE_APPLICATION_CLASSIFIER)) {
-      return () -> applicationModelResolver().resolve(projectFolder);
-    } else if (deployableArtifactCoordinates.getClassifier().equals(MULE_DOMAIN_CLASSIFIER)) {
-      return () -> domainModelResolver().resolve(projectFolder);
+  protected Supplier<MuleDeployableModel> getModelResolver(BundleDescriptor modelBundleDescriptor) {
+    if (modelBundleDescriptor.getClassifier().map(MULE_APPLICATION_CLASSIFIER::equals).orElse(false)) {
+      return () -> new ApplicationJsonDeserializingIncompleteArtifactModelResolver(new MuleApplicationModelJsonSerializer(),
+                                                                                   DEFAULT_MULE_DIRECTORY,
+                                                                                   modelBundleDescriptor,
+                                                                                   deployableBundleDependencies,
+                                                                                   deployableMuleRuntimeDependencies, packages,
+                                                                                   resources).resolve(projectFolder);
+    } else if (modelBundleDescriptor.getClassifier().map(MULE_DOMAIN_CLASSIFIER::equals).orElse(false)) {
+      return () -> new DomainJsonDeserializingIncompleteArtifactModelResolver(new MuleDomainModelJsonSerializer(),
+                                                                              DEFAULT_MULE_DIRECTORY,
+                                                                              modelBundleDescriptor,
+                                                                              deployableBundleDependencies,
+                                                                              deployableMuleRuntimeDependencies, packages,
+                                                                              resources).resolve(projectFolder);
     } else {
       throw new IllegalStateException("project is not a " + MULE_APPLICATION_CLASSIFIER + " or " + MULE_DOMAIN_CLASSIFIER);
     }
@@ -224,6 +240,14 @@ public class MavenDeployableProjectModelBuilder
             .map(artifact -> createBundleDependencyFromPackagerDependency(getDeployableArtifactRepositoryUriResolver())
                 .apply(artifact))
             .collect(toList());
+
+    // Resolve the Maven bundle dependencies that will be provided by the environment
+    List<BundleDependency> deployableMavenMuleRuntimeDependencies =
+        deployableDependencyResolver.resolveDeployableProvidedDependencies(pom, false, empty());
+
+    // Prepare mule runtime bundle dependencies (dependencies with "provided" scope) as expected by the project model
+    deployableMuleRuntimeDependencies =
+        deployableMavenMuleRuntimeDependencies.stream().map(ArtifactUtils::mavenToMuleDependency).collect(toList());
 
     sharedDeployableBundleDescriptors =
         deployableBundleDependencies.stream()

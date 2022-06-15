@@ -29,14 +29,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
 @Feature(CLASSLOADING_ISOLATION)
 @Story(ARTIFACT_DESCRIPTORS)
@@ -84,7 +83,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                () -> null,
                                new File("."),
                                dependencies,
-                               sharedLibraries,
+                               emptyList(), sharedLibraries,
                                emptyMap());
   }
 
@@ -109,7 +108,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                () -> null,
                                new File("."),
                                dependencies,
-                               sharedLibraries,
+                               emptyList(), sharedLibraries,
                                emptyMap());
   }
 
@@ -147,7 +146,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                () -> null,
                                new File("."),
                                dependencies,
-                               emptySet(),
+                               emptyList(), emptySet(),
                                additionalPluginDependencies);
   }
 
@@ -179,7 +178,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                () -> null,
                                new File("."),
                                dependencies,
-                               emptySet(),
+                               emptyList(), emptySet(),
                                additionalPluginDependencies);
   }
 
@@ -214,7 +213,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                () -> null,
                                new File("."),
                                dependencies,
-                               emptySet(),
+                               emptyList(), emptySet(),
                                emptyMap());
   }
 
@@ -244,8 +243,9 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                () -> null,
                                new File("."),
                                dependencies,
-                               emptySet(),
+                               emptyList(), emptySet(),
                                emptyMap());
 
   }
+
 }

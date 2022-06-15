@@ -26,6 +26,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import org.mule.maven.client.api.model.BundleDependency;
 import org.mule.maven.client.api.model.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
 import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
 import org.mule.tools.api.classloader.model.ApplicationGAVModel;
@@ -117,7 +118,6 @@ public class ArtifactUtils {
    * Converts a {@link Dependency} instance to a {@link BundleDescriptor} instance.
    *
    * @return the corresponding {@link BundleDescriptor} instance.
-   * @since 3.2.0
    */
   public static BundleDescriptor toBundleDescriptor(Dependency dependency) {
     return new BundleDescriptor.Builder()
@@ -219,7 +219,7 @@ public class ArtifactUtils {
   }
 
 
-  protected static String getAttribute(org.codehaus.plexus.util.xml.Xpp3Dom tag, String attributeName) {
+  private static String getAttribute(org.codehaus.plexus.util.xml.Xpp3Dom tag, String attributeName) {
     org.codehaus.plexus.util.xml.Xpp3Dom attributeDom = tag.getChild(attributeName);
     checkState(attributeDom != null, format("'%s' element not declared at '%s' in the pom file",
                                             attributeName, tag));
@@ -258,6 +258,29 @@ public class ArtifactUtils {
         .setVersion(appGAVModel.getVersion())
         .setBaseVersion(appGAVModel.getVersion())
         .setType(POM_TYPE)
+        .build();
+  }
+
+  public static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor mavenToMuleDescriptor(BundleDescriptor mavenBundleDescriptor) {
+    return new org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.Builder()
+        .setGroupId(mavenBundleDescriptor.getGroupId())
+        .setArtifactId(mavenBundleDescriptor.getArtifactId())
+        .setVersion(mavenBundleDescriptor.getVersion())
+        .setBaseVersion(mavenBundleDescriptor.getBaseVersion())
+        .setType(mavenBundleDescriptor.getType())
+        .setClassifier(mavenBundleDescriptor.getClassifier().orElse(null))
+        .build();
+  }
+
+  public static org.mule.runtime.module.artifact.api.descriptor.BundleDependency mavenToMuleDependency(BundleDependency mavenBundleDependency) {
+    return new org.mule.runtime.module.artifact.api.descriptor.BundleDependency.Builder()
+        .setDescriptor(mavenToMuleDescriptor(mavenBundleDependency.getDescriptor()))
+        .setScope(BundleScope.valueOf(mavenBundleDependency.getScope().name()))
+        .setBundleUri(mavenBundleDependency.getBundleUri())
+        .setTransitiveDependencies(mavenBundleDependency.getTransitiveDependencies()
+            .stream()
+            .map(ArtifactUtils::mavenToMuleDependency)
+            .collect(toList()))
         .build();
   }
 

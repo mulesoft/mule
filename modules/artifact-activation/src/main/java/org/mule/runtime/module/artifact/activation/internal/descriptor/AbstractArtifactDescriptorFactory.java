@@ -42,6 +42,8 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
 
   public T create() {
     artifactModel = createArtifactModel();
+    artifactModel.validateModel(artifactLocation.getName());
+
     final T descriptor = doCreateArtifactDescriptor();
 
     BundleDescriptor bundleDescriptor = getBundleDescriptor();
@@ -62,7 +64,7 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
 
   protected void doValidation(T descriptor) {
     // TODO W-11203071 - uncomment once the model is guaranteed to be completed with all the necessary information
-    // artifactDescriptorValidator.validate(descriptor);
+    artifactDescriptorValidator.validate(descriptor);
   }
 
   protected M getArtifactModel() {

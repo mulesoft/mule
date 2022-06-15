@@ -29,7 +29,7 @@ public class DeployableDependencyResolver {
   }
 
   /**
-   * Resolve the deployable dependencies, excluding mule domains.
+   * Resolve the deployable dependencies.
    *
    * @param pomFile                 pom file
    * @param includeTestDependencies true if the test dependencies must be included, false otherwise.
@@ -43,6 +43,24 @@ public class DeployableDependencyResolver {
         .stream()
         .filter(d -> !(d.getScope() == BundleScope.PROVIDED)
             || d.getDescriptor().getClassifier().map(MULE_DOMAIN_CLASSIFIER::equals).orElse(false))
+        .collect(toList());
+  }
+
+  /**
+   * Resolve the deployable dependencies that will be provided by the environment, except for domains.
+   *
+   * @param pomFile                 pom file
+   * @param includeTestDependencies true if the test dependencies must be included, false otherwise.
+   * @param mavenReactorResolver    {@link MavenReactorResolver}
+   */
+  public List<BundleDependency> resolveDeployableProvidedDependencies(File pomFile, boolean includeTestDependencies,
+                                                                      Optional<MavenReactorResolver> mavenReactorResolver) {
+
+    return muleMavenPluginClient
+        .resolveArtifactDependencies(pomFile, includeTestDependencies, true, empty(), mavenReactorResolver, empty())
+        .stream()
+        .filter(d -> d.getScope() == BundleScope.PROVIDED
+            && !d.getDescriptor().getClassifier().map(MULE_DOMAIN_CLASSIFIER::equals).orElse(false))
         .collect(toList());
   }
 

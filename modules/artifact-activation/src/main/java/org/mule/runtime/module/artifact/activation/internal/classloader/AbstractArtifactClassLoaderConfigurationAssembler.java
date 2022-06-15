@@ -31,7 +31,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import com.google.common.collect.ImmutableSet;
-
 import org.slf4j.Logger;
 
 /**

@@ -27,14 +27,14 @@ public interface ArtifactModelResolver<M extends MuleDeployableModel> {
   /**
    * @return a default resolver for applications.
    */
-  public static ArtifactModelResolver<MuleApplicationModel> applicationModelResolver() {
+  static ArtifactModelResolver<MuleApplicationModel> applicationModelResolver() {
     return new JsonDeserializingArtifactModelResolver<>(new MuleApplicationModelJsonSerializer());
   }
 
   /**
    * @return a default resolver for domains.
    */
-  public static ArtifactModelResolver<MuleDomainModel> domainModelResolver() {
+  static ArtifactModelResolver<MuleDomainModel> domainModelResolver() {
     return new JsonDeserializingArtifactModelResolver<>(new MuleDomainModelJsonSerializer());
   }
 

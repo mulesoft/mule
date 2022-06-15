@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader.model;
 
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
@@ -46,7 +49,7 @@ public class ClassLoaderModelAssembler {
     this.sharedProjectDependencies = requireNonNull(sharedProjectDependencies);
     this.availablePackages = requireNonNull(availablePackages);
     this.availableResources = requireNonNull(availableResources);
-    this.muleArtifactLoaderDescriptor = muleArtifactLoaderDescriptor;
+    this.muleArtifactLoaderDescriptor = requireNonNull(muleArtifactLoaderDescriptor);
   }
 
   public ClassLoaderModelAssembler(ArtifactCoordinates artifactCoordinates,
@@ -71,8 +74,8 @@ public class ClassLoaderModelAssembler {
 
   protected final void assembleClassLoaderModel(ClassLoaderModel classLoaderModel) {
     classLoaderModel.setDependencies(toArtifacts(projectDependencies));
-    classLoaderModel.setPackages(getExportedAttribute("exportedPackages", availablePackages));
-    classLoaderModel.setResources(getExportedAttribute("exportedResources", availableResources));
+    classLoaderModel.setPackages(getExportedAttribute(EXPORTED_PACKAGES));
+    classLoaderModel.setResources(getExportedAttribute(EXPORTED_RESOURCES));
   }
 
   /**
@@ -117,23 +120,16 @@ public class ClassLoaderModelAssembler {
                                    bundleDescriptor.getType(), bundleDescriptor.getClassifier().orElse(null));
   }
 
-  private String[] getExportedAttribute(String exportedAttributeName, List<String> availableAttribute) {
-    List<String> exportedAttribute = availableAttribute;
-    if (muleArtifactLoaderDescriptor != null) {
-      Map<String, Object> originalAttributes = muleArtifactLoaderDescriptor.getAttributes();
-      if (originalAttributes != null && originalAttributes.get(exportedAttributeName) != null) {
-        exportedAttribute = (List<String>) originalAttributes.get(exportedAttributeName);
-      }
+  private String[] getExportedAttribute(String exportedAttributeName) {
+    Map<String, Object> originalAttributes = muleArtifactLoaderDescriptor.getAttributes();
+    if (originalAttributes != null && originalAttributes.get(exportedAttributeName) != null) {
+      return ((List<String>) originalAttributes.get(exportedAttributeName)).toArray(new String[0]);
     }
 
-    return exportedAttribute.toArray(new String[0]);
+    return new String[0];
   }
 
   protected ArtifactCoordinates getArtifactCoordinates() {
     return artifactCoordinates;
-  }
-
-  protected List<BundleDependency> getProjectDependencies() {
-    return projectDependencies;
   }
 }

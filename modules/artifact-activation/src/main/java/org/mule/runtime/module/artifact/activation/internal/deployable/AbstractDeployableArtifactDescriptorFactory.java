@@ -13,6 +13,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.of;
 
+import org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModelBuilder;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -39,7 +40,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * @param <M> type of the artifact model that owns the descriptor.
  * @param <T> type of descriptor being created.
  */
-public abstract class AbstractDeployableArtifactDescriptorFactory<M extends MuleDeployableModel, T extends DeployableArtifactDescriptor>
+public abstract class AbstractDeployableArtifactDescriptorFactory<M extends MuleDeployableModel, B extends AbstractMuleArtifactModelBuilder<B, M>, T extends DeployableArtifactDescriptor>
     extends AbstractArtifactDescriptorFactory<M, T> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDeployableArtifactDescriptorFactory.class);
@@ -86,7 +86,6 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
     return deploymentProperties;
   }
 
-  @Override
   protected ClassLoaderModel getClassLoaderModel(MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
     return new DeployableClassLoaderConfigurationAssembler<>(deployableProjectModel, muleArtifactLoaderDescriptor)
         .createClassLoaderModel();

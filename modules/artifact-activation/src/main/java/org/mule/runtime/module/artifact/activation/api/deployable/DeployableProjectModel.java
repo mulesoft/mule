@@ -43,6 +43,7 @@ public final class DeployableProjectModel {
   private final Supplier<MuleDeployableModel> deployableModelSupplier;
   private final File projectFolder;
   private final List<BundleDependency> dependencies;
+  private final List<BundleDependency> muleRuntimeDependencies;
   private final Set<BundleDescriptor> sharedLibraries;
   private final Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies;
 
@@ -51,14 +52,14 @@ public final class DeployableProjectModel {
    * <p>
    * Performs a validation of consistency of the provided parameters. If any validation fails, an {@link IllegalArgumentException}
    * is thrown indication the situation that caused it.
-   * 
+   *
    * @param packages                     See {@link #getPackages()}
    * @param resources                    See {@link #getResources()}
    * @param descriptor                   See {@link #getDescriptor()}
-   * @param artifactCoordinates          See {@link #getArtifactCoordinates()}
    * @param deployableModelSupplier      See {@link #getDeployableModel()}
    * @param projectFolder                See {@link #getProjectFolder()}
    * @param dependencies                 See {@link #getDependencies()}
+   * @param muleRuntimeDependencies      See {@link #getMuleRuntimeDependencies()}
    * @param sharedLibraries              See {@link #getSharedLibraries()}
    * @param additionalPluginDependencies See {@link #additionalPluginDependencies}
    * @throws IllegalArgumentException if there are consistency problems with the provided parameters.
@@ -69,6 +70,7 @@ public final class DeployableProjectModel {
                                 Supplier<MuleDeployableModel> deployableModelSupplier,
                                 File projectFolder,
                                 List<BundleDependency> dependencies,
+                                List<BundleDependency> muleRuntimeDependencies,
                                 Set<BundleDescriptor> sharedLibraries,
                                 Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies)
       throws IllegalArgumentException {
@@ -115,6 +117,7 @@ public final class DeployableProjectModel {
     this.deployableModelSupplier = new LazyValue<>(requireNonNull(deployableModelSupplier));
     this.projectFolder = requireNonNull(projectFolder);
     this.dependencies = ImmutableList.copyOf(dependencies);
+    this.muleRuntimeDependencies = muleRuntimeDependencies;
     this.sharedLibraries = ImmutableSet.copyOf(sharedLibraries);
     this.additionalPluginDependencies = ImmutableMap.copyOf(additionalPluginDependencies);
   }
@@ -173,11 +176,20 @@ public final class DeployableProjectModel {
 
   /**
    * These are the dependencies of the modeled project, regardless of the classifier.
-   * 
+   *
    * @return the dependencies of the artifact for this project
    */
   public List<BundleDependency> getDependencies() {
     return dependencies;
+  }
+
+  /**
+   * These are the dependencies of the modeled project that will be provided by the environment, except for domains.
+   *
+   * @return the dependencies of the artifact for this project that will be provided by the environment.
+   */
+  public List<BundleDependency> getMuleRuntimeDependencies() {
+    return muleRuntimeDependencies;
   }
 
   /**
@@ -193,7 +205,7 @@ public final class DeployableProjectModel {
   }
 
   /**
-   * These are dependencies that are added for each plugins.
+   * These are dependencies that are added for each plugin.
    * <p>
    * In each entry of this map, the dependencies in the value will be added to the plugin represented by the key.
    * <p>
@@ -204,5 +216,4 @@ public final class DeployableProjectModel {
   public Map<BundleDescriptor, List<BundleDependency>> getAdditionalPluginDependencies() {
     return additionalPluginDependencies;
   }
-
 }
