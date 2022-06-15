@@ -78,6 +78,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Resource;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
@@ -98,9 +99,10 @@ public class MavenDeployableProjectModelBuilder
 
   private static final String CLASS_PATH_SEPARATOR = "/";
 
-  private static final String DEFAULT_SOURCES_DIRECTORY = "src/main/java";
-  private static final String DEFAULT_RESOURCES_DIRECTORY = "src/main/resources";
-  private static final String DEFAULT_MULE_DIRECTORY = "src/main/mule";
+  private static final String DEFAULT_SOURCES_DIRECTORY = "src/main";
+  private static final String DEFAULT_SOURCES_JAVA_DIRECTORY = "/java";
+  private static final String DEFAULT_RESOURCES_DIRECTORY = "/resources";
+  private static final String DEFAULT_MULE_DIRECTORY = "/mule";
 
   private final File projectFolder;
   private final MavenConfiguration mavenConfiguration;
@@ -168,7 +170,7 @@ public class MavenDeployableProjectModelBuilder
 
     // Get exported resources and packages
     try {
-      getAvailablePackagesAndResources();
+      getAvailablePackagesAndResources(pomModel.getBuild());
     } catch (IOException e) {
       throw new ArtifactActivationException(createStaticMessage("Couldn't search exported packages and resources"), e);
     }
@@ -310,9 +312,9 @@ public class MavenDeployableProjectModelBuilder
         .build();
   }
 
-  private void getAvailablePackagesAndResources() throws IOException {
-    // TODO W-11203279 - search the POM for a custom source directory under the tag <sourceDirectory>
-    Path javaDirectory = get(projectFolder.getAbsolutePath(), DEFAULT_SOURCES_DIRECTORY);
+  private void getAvailablePackagesAndResources(Build build) throws IOException {
+    String sourceDirectory = build.getSourceDirectory() != null ? build.getSourceDirectory() : DEFAULT_SOURCES_DIRECTORY;
+    Path javaDirectory = get(projectFolder.getAbsolutePath(), sourceDirectory.concat(DEFAULT_SOURCES_JAVA_DIRECTORY));
     // look for all the sources under the java directory
     List<Path> allJavaFiles = Files.walk(javaDirectory)
         .filter(Files::isRegularFile)
@@ -331,9 +333,19 @@ public class MavenDeployableProjectModelBuilder
         .distinct()
         .collect(toList());
 
-    // TODO W-11203279 - search the POM for resource directories under <resources> tag
-    resources = getResourcesInFolder(DEFAULT_RESOURCES_DIRECTORY);
-    resources.addAll(getResourcesInFolder(DEFAULT_MULE_DIRECTORY));
+    if (build.getResources().isEmpty()) {
+      resources = getResourcesInFolder(sourceDirectory.concat(DEFAULT_RESOURCES_DIRECTORY));
+    } else {
+      resources = build.getResources().stream()
+          .flatMap(r -> {
+            try {
+              return getResourcesInFolder(r.getDirectory()).stream();
+            } catch (IOException e) {
+              throw new IllegalStateException("Cannot load files from" + r.getDirectory());
+            }
+          }).collect(toList());
+    }
+    resources.addAll(getResourcesInFolder(sourceDirectory.concat(DEFAULT_MULE_DIRECTORY)));
 
     // TODO W-11203142 - add test resources
   }

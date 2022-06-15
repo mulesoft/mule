@@ -9,6 +9,7 @@ package org.mule.runtime.module.artifact.activation.internal.descriptor;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
 
+import static java.util.Arrays.stream;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 
@@ -66,6 +67,28 @@ public class DefaultDeployableArtifactDescriptorFactoryTestCase extends Abstract
     assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), contains("org.test"));
     assertThat(applicationDescriptor.getClassLoaderModel().getExportedResources(),
                containsInAnyOrder("test-script.dwl", "app.xml"));
+
+    assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(), hasSize(3));
+  }
+
+  @Test
+  public void createBasicApplicationDescriptorWithDifferentSource() throws Exception {
+    ApplicationDescriptor applicationDescriptor = createApplicationDescriptor("apps/basicWithDifferentSourceDirectory");
+
+    assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), contains("org.test"));
+    assertThat(applicationDescriptor.getClassLoaderModel().getExportedResources(),
+               containsInAnyOrder("test-script.dwl", "app.xml"));
+
+    assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(), hasSize(3));
+  }
+
+  @Test
+  public void createBasicApplicationDescriptorWithCustomResources() throws Exception {
+    ApplicationDescriptor applicationDescriptor = createApplicationDescriptor("apps/basicWithResources");
+
+    assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), contains("org.test"));
+    assertThat(applicationDescriptor.getClassLoaderModel().getExportedResources(),
+               containsInAnyOrder("test-script.dwl", "app.xml", "test-script2.dwl"));
 
     assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(), hasSize(3));
   }
