@@ -71,6 +71,7 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 import static org.apache.commons.lang3.SystemUtils.JAVA_VERSION;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -941,7 +942,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
       if (rootContainerName.isPresent()) {
         defaultErrorHandler = ((GlobalErrorHandler) defaultErrorHandler)
-            .createLocalErrorHandler(Location.builder().globalName(rootContainerName.get()).build());
+            .createLocalErrorHandler(from(rootContainerName.get()));
       } else {
         try {
           defaultErrorHandler = new ErrorHandlerFactory().createDefault(getRegistry().lookupObject(NotificationDispatcher.class));

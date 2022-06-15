@@ -12,12 +12,11 @@ import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
 import static org.mule.runtime.core.api.transaction.TransactionUtils.profileTransactionAction;
 
-import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
-import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -95,9 +94,11 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
   /**
    * {@inheritDoc}
+   * 
+   * @param buildFor
    */
   @Override
-  public TemplateOnErrorHandler duplicateFor(Location buildFor) {
+  public TemplateOnErrorHandler duplicateFor(ComponentLocation buildFor) {
     OnErrorPropagateHandler cpy = new OnErrorPropagateHandler();
     cpy.setFlowLocation(buildFor);
     when.ifPresent(expr -> cpy.setWhen(expr));

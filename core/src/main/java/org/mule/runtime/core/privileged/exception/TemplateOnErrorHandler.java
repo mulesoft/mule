@@ -7,6 +7,7 @@
 package org.mule.runtime.core.privileged.exception;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
@@ -38,6 +39,7 @@ import static reactor.core.publisher.Flux.from;
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -104,7 +106,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   @Inject
   private ConfigurationProperties configurationProperties;
 
-  protected Optional<Location> flowLocation = empty();
+  protected Optional<String> flowLocation = empty();
   private MessageProcessorChain configuredMessageProcessors;
 
   protected Optional<String> when = empty();
@@ -282,7 +284,8 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
     super.doInitialise();
     Optional<ProcessingStrategy> processingStrategy = empty();
     if (flowLocation.isPresent()) {
-      processingStrategy = getProcessingStrategy(locator, flowLocation.get());
+      Location location = builderFromStringRepresentation(flowLocation.get()).build();
+      processingStrategy = getProcessingStrategy(locator, location);
     } else if (getLocation() != null) {
       processingStrategy = getProcessingStrategy(locator, this);
     }
@@ -476,8 +479,8 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
     updateRootContainerName(rootContainerName, this);
   }
 
-  public void setFlowLocation(Location location) {
-    this.flowLocation = ofNullable(location);
+  public void setFlowLocation(ComponentLocation location) {
+    this.flowLocation = ofNullable(location).map(loc -> loc.getLocation().substring(0, loc.getLocation().lastIndexOf('/')));
   }
 
   /**
@@ -492,12 +495,12 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
    *
    * @since 4.3.0
    */
-  public abstract TemplateOnErrorHandler duplicateFor(Location location);
+  public abstract TemplateOnErrorHandler duplicateFor(ComponentLocation location);
 
 
   private boolean isTransactionInGlobalErrorHandler(TransactionAdapter transaction) {
-    String transactionContainerName = transaction.getComponentLocation().get().getRootContainerName();
-    return flowLocation.isPresent() && transactionContainerName.equals(flowLocation.get().getGlobalName());
+    String transactionLocation = transaction.getComponentLocation().get().getLocation();
+    return flowLocation.filter(transactionLocation::equals).isPresent();
   }
 
   protected boolean isOwnedTransaction() {
@@ -541,7 +544,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
     if (flowLocation.isPresent()) {
       // We are in a default error handler for a TryScope, which must have been replicated to match the tx location
       // to rollback it
-      return transactionLocation.equals(flowLocation.get().toString());
+      return transactionLocation.equals(flowLocation.get());
     } else {
       // We are in a default error handler of a Flow
       return sameRootContainerLocation(transaction);

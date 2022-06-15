@@ -12,7 +12,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static java.lang.String.format;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
@@ -86,9 +86,11 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
 
   /**
    * {@inheritDoc}
+   * 
+   * @param buildFor
    */
   @Override
-  public TemplateOnErrorHandler duplicateFor(Location buildFor) {
+  public TemplateOnErrorHandler duplicateFor(ComponentLocation buildFor) {
     OnErrorContinueHandler cpy = new OnErrorContinueHandler();
     cpy.setFlowLocation(buildFor);
     when.ifPresent(expr -> cpy.setWhen(expr));
