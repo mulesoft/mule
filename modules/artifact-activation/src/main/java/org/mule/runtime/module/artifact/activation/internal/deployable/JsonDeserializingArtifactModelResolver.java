@@ -45,8 +45,6 @@ public final class JsonDeserializingArtifactModelResolver<M extends MuleDeployab
 
   @Override
   public M resolve(File artifactLocation) {
-    // TODO W-11203071 - the model needs to be completed, when the app is packaged every field is present in the output
-    // mule-artifact.json, but here we don't have that
     final File artifactJsonFile = new File(artifactLocation, MULE_ARTIFACT_JSON_DESCRIPTOR);
     if (!artifactJsonFile.exists()) {
       throw new ArtifactActivationException(createStaticMessage("Couldn't find model file " + artifactJsonFile));
