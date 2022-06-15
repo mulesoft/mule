@@ -83,7 +83,8 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                () -> null,
                                new File("."),
                                dependencies,
-                               emptyList(), sharedLibraries,
+                               emptyList(),
+                               sharedLibraries,
                                emptyMap());
   }
 
@@ -108,7 +109,8 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                () -> null,
                                new File("."),
                                dependencies,
-                               emptyList(), sharedLibraries,
+                               emptyList(),
+                               sharedLibraries,
                                emptyMap());
   }
 
@@ -146,7 +148,8 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                () -> null,
                                new File("."),
                                dependencies,
-                               emptyList(), emptySet(),
+                               emptyList(),
+                               emptySet(),
                                additionalPluginDependencies);
   }
 
@@ -178,7 +181,8 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                () -> null,
                                new File("."),
                                dependencies,
-                               emptyList(), emptySet(),
+                               emptyList(),
+                               emptySet(),
                                additionalPluginDependencies);
   }
 
@@ -213,7 +217,8 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                () -> null,
                                new File("."),
                                dependencies,
-                               emptyList(), emptySet(),
+                               emptyList(),
+                               emptySet(),
                                emptyMap());
   }
 
@@ -243,7 +248,8 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                () -> null,
                                new File("."),
                                dependencies,
-                               emptyList(), emptySet(),
+                               emptyList(),
+                               emptySet(),
                                emptyMap());
 
   }
