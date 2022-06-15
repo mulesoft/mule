@@ -9,7 +9,6 @@ package org.mule.runtime.module.artifact.activation.internal.descriptor;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
 
-import static java.util.Arrays.stream;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 

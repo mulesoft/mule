@@ -78,7 +78,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Resource;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
