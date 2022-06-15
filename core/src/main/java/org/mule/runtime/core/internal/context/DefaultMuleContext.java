@@ -66,16 +66,15 @@ import static org.mule.runtime.core.internal.profiling.AbstractProfilingService.
 import static org.mule.runtime.core.internal.transformer.simple.ObjectToString.configureToStringTransformerTransformIteratorElements;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 import static org.apache.commons.lang3.SystemUtils.JAVA_VERSION;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
-import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;

@@ -66,6 +66,7 @@ public class OnErrorCheckLogHandler extends TemplateOnErrorHandler
 
   /**
    * {@inheritDoc}
+   * 
    * @param buildFor
    */
   @Override
