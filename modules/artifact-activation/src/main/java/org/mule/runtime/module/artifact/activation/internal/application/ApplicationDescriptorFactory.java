@@ -43,7 +43,7 @@ import java.util.Set;
  */
 public class ApplicationDescriptorFactory
     extends
-    AbstractDeployableArtifactDescriptorFactory<MuleApplicationModel, MuleApplicationModel.MuleApplicationModelBuilder, ApplicationDescriptor> {
+    AbstractDeployableArtifactDescriptorFactory<MuleApplicationModel, ApplicationDescriptor> {
 
   private final DomainDescriptorResolver domainDescriptorResolver;
 

@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * @param <M> type of the artifact model that owns the descriptor.
  * @param <T> type of descriptor being created.
  */
-public abstract class AbstractDeployableArtifactDescriptorFactory<M extends MuleDeployableModel, B extends AbstractMuleArtifactModelBuilder<B, M>, T extends DeployableArtifactDescriptor>
+public abstract class AbstractDeployableArtifactDescriptorFactory<M extends MuleDeployableModel, T extends DeployableArtifactDescriptor>
     extends AbstractArtifactDescriptorFactory<M, T> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDeployableArtifactDescriptorFactory.class);

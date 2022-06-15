@@ -25,7 +25,7 @@ import java.util.Map;
  * Creates an artifact descriptor for a domain.
  */
 public class DomainDescriptorFactory extends
-    AbstractDeployableArtifactDescriptorFactory<MuleDomainModel, MuleDomainModel.MuleDomainModelBuilder, DomainDescriptor> {
+    AbstractDeployableArtifactDescriptorFactory<MuleDomainModel, DomainDescriptor> {
 
   public DomainDescriptorFactory(DeployableProjectModel deployableProjectModel,
                                  Map<String, String> deploymentProperties, PluginModelResolver pluginModelResolver,
