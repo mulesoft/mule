@@ -39,11 +39,10 @@ import org.slf4j.Logger;
  * @param <B> the concrete type of builder to generate the complete model including default values.
  */
 public abstract class AbstractJsonDeserializingIncompleteArtifactModelResolver<M extends MuleDeployableModel, B extends AbstractMuleArtifactModelBuilder<B, M>>
-    implements ArtifactModelResolver<M> {
+    extends JsonDeserializingArtifactModelResolver<M> {
 
   private static final Logger LOGGER = getLogger(AbstractJsonDeserializingIncompleteArtifactModelResolver.class);
 
-  private final AbstractMuleArtifactModelJsonSerializer<M> jsonDeserializer;
   private final String modelConfigsDirectory;
   private final BundleDescriptor modelBundleDescriptor;
   private final List<BundleDependency> modelDependencies;
@@ -69,7 +68,7 @@ public abstract class AbstractJsonDeserializingIncompleteArtifactModelResolver<M
                                                                   List<BundleDependency> modelMuleRuntimeDependencies,
                                                                   List<String> modelPackages,
                                                                   List<String> modelResources) {
-    this.jsonDeserializer = jsonDeserializer;
+    super(jsonDeserializer);
     this.modelConfigsDirectory = modelConfigsDirectory;
     this.modelBundleDescriptor = modelBundleDescriptor;
     this.modelDependencies = modelDependencies;
@@ -99,44 +98,5 @@ public abstract class AbstractJsonDeserializingIncompleteArtifactModelResolver<M
                                                                                                                        List<BundleDependency> modelMuleRuntimeDependencies,
                                                                                                                        List<String> modelPackages,
                                                                                                                        List<String> modelResources);
-
-  private String getDescriptorContent(File jsonFile) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Loading artifact descriptor from '{}'..." + jsonFile.getAbsolutePath());
-    }
-
-    try (InputStream stream = new BufferedInputStream(new FileInputStream(jsonFile))) {
-      return IOUtils.toString(stream);
-    } catch (IOException e) {
-      throw new IllegalArgumentException(format("Could not read extension describer on artifact '%s'",
-                                                jsonFile.getAbsolutePath()),
-                                         e);
-    }
-  }
-
-  /**
-   * Generates an artifact model from a given JSON descriptor
-   *
-   * @param jsonString artifact descriptor in JSON format
-   * @return the artifact model matching the provided JSON content.
-   */
-  private M loadModelFromJson(String jsonString) {
-    try {
-      return deserializeArtifactModel(jsonString);
-    } catch (IOException e) {
-      throw new IllegalArgumentException("Cannot deserialize artifact descriptor from: " + jsonString);
-    }
-  }
-
-  private M deserializeArtifactModel(String jsonString) throws IOException {
-    return getMuleArtifactModelJsonSerializer().deserialize(jsonString);
-  }
-
-  /**
-   * @return the serializer for the artifact model.
-   */
-  private AbstractMuleArtifactModelJsonSerializer<M> getMuleArtifactModelJsonSerializer() {
-    return jsonDeserializer;
-  }
 
 }

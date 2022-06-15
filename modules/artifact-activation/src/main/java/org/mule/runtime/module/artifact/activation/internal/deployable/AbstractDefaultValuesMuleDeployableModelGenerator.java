@@ -12,6 +12,7 @@ import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.COMPILE;
 
 import static java.lang.String.format;
+import static java.nio.file.Files.exists;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -97,7 +98,7 @@ public abstract class AbstractDefaultValuesMuleDeployableModelGenerator<M extend
                                                            List<String> modelPackages,
                                                            List<String> modelResources,
                                                            B builder) {
-    if (!Files.exists(artifactLocation.toPath().resolve(modelConfigsDirectory))) {
+    if (!exists(artifactLocation.toPath().resolve(modelConfigsDirectory))) {
       throw new IllegalArgumentException(format("Configurations directory '%s' doesn't exist in project location '%s'.",
                                                 modelConfigsDirectory, artifactLocation));
     }
@@ -138,6 +139,9 @@ public abstract class AbstractDefaultValuesMuleDeployableModelGenerator<M extend
 
   protected abstract void doSetBuilderWithConfigFile(String logConfigFile);
 
+  /**
+   * Generates the values that correspond only to the specific mule model type.
+   */
   protected void doSpecificConfiguration() {
     // Do nothing
   }
@@ -151,7 +155,7 @@ public abstract class AbstractDefaultValuesMuleDeployableModelGenerator<M extend
   }
 
   /**
-   * Sets all the required values in the builder.
+   * Sets the builder with all the required values, i.e. those that must always be present in a mule model.
    */
   private void setBuilderWithRequiredValues() {
     builder.setMinMuleVersion(originalMuleDeployableModel.getMinMuleVersion());

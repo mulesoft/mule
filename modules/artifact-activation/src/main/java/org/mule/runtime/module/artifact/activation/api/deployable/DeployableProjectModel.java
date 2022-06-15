@@ -117,7 +117,7 @@ public final class DeployableProjectModel {
     this.deployableModelSupplier = new LazyValue<>(requireNonNull(deployableModelSupplier));
     this.projectFolder = requireNonNull(projectFolder);
     this.dependencies = ImmutableList.copyOf(dependencies);
-    this.muleRuntimeDependencies = muleRuntimeDependencies;
+    this.muleRuntimeDependencies = ImmutableList.copyOf(muleRuntimeDependencies);
     this.sharedLibraries = ImmutableSet.copyOf(sharedLibraries);
     this.additionalPluginDependencies = ImmutableMap.copyOf(additionalPluginDependencies);
   }
@@ -184,9 +184,9 @@ public final class DeployableProjectModel {
   }
 
   /**
-   * These are the dependencies of the modeled project that will be provided by the environment, except for domains.
+   * These are the dependencies of the modeled project that will be provided by the Mule Runtime.
    *
-   * @return the dependencies of the artifact for this project that will be provided by the environment.
+   * @return the dependencies of the artifact for this project that will be provided by the Mule Runtime.
    */
   public List<BundleDependency> getMuleRuntimeDependencies() {
     return muleRuntimeDependencies;

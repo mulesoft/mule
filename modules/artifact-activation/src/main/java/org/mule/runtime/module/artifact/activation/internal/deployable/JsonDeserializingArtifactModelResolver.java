@@ -32,7 +32,7 @@ import org.slf4j.Logger;
  * 
  * @param <M> the concrete type of model to resolve
  */
-public final class JsonDeserializingArtifactModelResolver<M extends MuleDeployableModel>
+public class JsonDeserializingArtifactModelResolver<M extends MuleDeployableModel>
     implements ArtifactModelResolver<M> {
 
   private static final Logger LOGGER = getLogger(JsonDeserializingArtifactModelResolver.class);
@@ -53,7 +53,7 @@ public final class JsonDeserializingArtifactModelResolver<M extends MuleDeployab
     return loadModelFromJson(getDescriptorContent(artifactJsonFile));
   }
 
-  private String getDescriptorContent(File jsonFile) {
+  protected String getDescriptorContent(File jsonFile) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Loading artifact descriptor from '{}'..." + jsonFile.getAbsolutePath());
     }
@@ -73,7 +73,7 @@ public final class JsonDeserializingArtifactModelResolver<M extends MuleDeployab
    * @param jsonString artifact descriptor in JSON format
    * @return the artifact model matching the provided JSON content.
    */
-  private M loadModelFromJson(String jsonString) {
+  protected M loadModelFromJson(String jsonString) {
     try {
       return deserializeArtifactModel(jsonString);
     } catch (IOException e) {
