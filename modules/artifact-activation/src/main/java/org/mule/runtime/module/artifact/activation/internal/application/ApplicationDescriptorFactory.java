@@ -42,8 +42,7 @@ import java.util.Set;
  * Creates an artifact descriptor for an application.
  */
 public class ApplicationDescriptorFactory
-    extends
-    AbstractDeployableArtifactDescriptorFactory<MuleApplicationModel, ApplicationDescriptor> {
+    extends AbstractDeployableArtifactDescriptorFactory<MuleApplicationModel, ApplicationDescriptor> {
 
   private final DomainDescriptorResolver domainDescriptorResolver;
 
