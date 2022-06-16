@@ -10,6 +10,7 @@ import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
 import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDefaultValuesMuleDeployableModelGenerator;
 import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractJsonDeserializingIncompleteArtifactModelResolver;
+import org.mule.runtime.module.artifact.activation.internal.descriptor.ConfigurationsResolver;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
@@ -27,10 +28,11 @@ public class ApplicationJsonDeserializingIncompleteArtifactModelResolver extends
                                                                      BundleDescriptor modelBundleDescriptor,
                                                                      List<BundleDependency> modelDependencies,
                                                                      List<BundleDependency> modelMuleRuntimeDependencies,
-                                                                     List<String> modelPackages, List<String> modelResources) {
+                                                                     List<String> modelPackages, List<String> modelResources,
+                                                                     ConfigurationsResolver configurationsResolver) {
     super(jsonDeserializer, modelConfigsDirectory, modelBundleDescriptor, modelDependencies, modelMuleRuntimeDependencies,
           modelPackages,
-          modelResources);
+          modelResources, configurationsResolver);
   }
 
   @Override
@@ -41,11 +43,13 @@ public class ApplicationJsonDeserializingIncompleteArtifactModelResolver extends
                                                                                                                                                                                 List<BundleDependency> modelDependencies,
                                                                                                                                                                                 List<BundleDependency> modelMuleRuntimeDependencies,
                                                                                                                                                                                 List<String> modelPackages,
-                                                                                                                                                                                List<String> modelResources) {
+                                                                                                                                                                                List<String> modelResources,
+                                                                                                                                                                                ConfigurationsResolver configurationsResolver) {
     return new ApplicationDefaultValuesMuleDeployableModelGenerator(originalMuleDeployableModel, artifactLocation,
                                                                     modelConfigsDirectory, modelBundleDescriptor,
                                                                     modelDependencies,
                                                                     modelMuleRuntimeDependencies, modelPackages, modelResources,
+                                                                    configurationsResolver,
                                                                     new MuleApplicationModel.MuleApplicationModelBuilder());
   }
 

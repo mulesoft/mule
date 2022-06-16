@@ -36,7 +36,8 @@ public class DomainDefaultValuesMuleDeployableModelGeneratorTestCase
                                           List<String> modelResources) {
     return new DomainDefaultValuesMuleDeployableModelGenerator(originalModel, artifactLocation, modelConfigsDirectory,
                                                                domainDescriptor, modelDependencies, modelMuleRuntimeDependencies,
-                                                               modelPackages, modelResources, getBuilder()).generate();
+                                                               modelPackages, modelResources, new XmlConfigurationsResolver(),
+                                                               getBuilder()).generate();
   }
 
   @Override

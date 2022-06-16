@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -204,12 +205,12 @@ public abstract class AbstractDefaultValuesMuleDeployableModelGeneratorTestCase<
 
     List<String> nonConfigResources = singletonList("not-a-config.xml");
     List<String> newConfigs = singletonList("config.xml");
-    addResources(nonConfigResources, emptyList(), newConfigs);
+    addResources(nonConfigResources, newConfigs, new ArrayList<>(configs));
 
     M model =
         completeModel(originalModel, temporaryFolder.getRoot(), DEFAULT_CONFIGS_DIRECTORY,
                       emptyList(), emptyList(), emptyList(),
-                      getResources(nonConfigResources, newConfigs));
+                      getResources(nonConfigResources, new ArrayList<>(configs), newConfigs));
     assertThat(model.getConfigs(), notNullValue());
     assertThat(model.getConfigs(), contains(originalConfig));
     assertThat(model.getClassLoaderModelLoaderDescriptor().getAttributes(),
@@ -271,12 +272,11 @@ public abstract class AbstractDefaultValuesMuleDeployableModelGeneratorTestCase<
 
   protected abstract BundleDescriptor getDescriptor();
 
-  private List<String> getResources(List<String> nonConfigResources, List<String> configs) {
-    List<String> resources = new ArrayList<>();
-    resources.addAll(nonConfigResources);
-    resources.addAll(configs);
+  private List<String> getResources(List<String>... resources) {
+    List<String> allResources = new ArrayList<>();
+    Arrays.stream(resources).forEach(allResources::addAll);
 
-    return resources;
+    return allResources;
   }
 
   private void addResources(List<String> resources, List<String> muleConfigs) throws IOException {

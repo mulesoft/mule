@@ -56,6 +56,7 @@ public class ApplicationDefaultValuesMuleDeployableModelGeneratorTestCase
     return new ApplicationDefaultValuesMuleDeployableModelGenerator(originalModel, artifactLocation, modelConfigsDirectory,
                                                                     appDescriptor, modelDependencies,
                                                                     modelMuleRuntimeDependencies, modelPackages, modelResources,
+                                                                    new XmlConfigurationsResolver(),
                                                                     getBuilder()).generate();
   }
 

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
-import static org.mule.runtime.internal.dsl.DslConstants.EE_NAMESPACE;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.COMPILE;
@@ -15,7 +14,7 @@ import static java.lang.String.format;
 import static java.nio.file.Files.exists;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -26,6 +25,8 @@ import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
+import org.mule.runtime.module.artifact.activation.internal.descriptor.ConfigurationsResolver;
+import org.mule.runtime.module.artifact.activation.internal.descriptor.ConfigurationsResolver.DeployableConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
@@ -34,8 +35,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,22 +44,13 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 /**
  * Generates default values for any non-defined fields in a {@link MuleDeployableModel}.
  */
 public abstract class AbstractDefaultValuesMuleDeployableModelGenerator<M extends MuleDeployableModel, B extends AbstractMuleArtifactModelBuilder<B, M>> {
 
-  private static final String CONFIG_FILE_EXTENSION = ".xml";
   private static final String MULE_ID = "mule";
   private static final MulePluginModelJsonSerializer serializer = new MulePluginModelJsonSerializer();
 
@@ -72,6 +62,7 @@ public abstract class AbstractDefaultValuesMuleDeployableModelGenerator<M extend
   private final List<BundleDependency> modelMuleRuntimeDependencies;
   private final List<String> modelPackages;
   private final List<String> modelResources;
+  private final ConfigurationsResolver configurationsResolver;
   private final B builder;
 
   /**
@@ -97,6 +88,7 @@ public abstract class AbstractDefaultValuesMuleDeployableModelGenerator<M extend
                                                            List<BundleDependency> modelMuleRuntimeDependencies,
                                                            List<String> modelPackages,
                                                            List<String> modelResources,
+                                                           ConfigurationsResolver configurationsResolver,
                                                            B builder) {
     if (!exists(artifactLocation.toPath().resolve(modelConfigsDirectory))) {
       throw new IllegalArgumentException(format("Configurations directory '%s' doesn't exist in project location '%s'.",
@@ -111,6 +103,7 @@ public abstract class AbstractDefaultValuesMuleDeployableModelGenerator<M extend
     this.modelMuleRuntimeDependencies = modelMuleRuntimeDependencies;
     this.modelPackages = modelPackages;
     this.modelResources = modelResources;
+    this.configurationsResolver = configurationsResolver;
     this.builder = builder;
   }
 
@@ -120,7 +113,7 @@ public abstract class AbstractDefaultValuesMuleDeployableModelGenerator<M extend
     setBuilderWithDefaultSecureProperties();
     setBuilderWithDefaultRedeploymentEnabled();
 
-    Map<String, Document> configs = getConfigs();
+    List<DeployableConfiguration> configs = getConfigs();
     setBuilderWithDefaultConfigsValue(configs);
     setBuilderWithDefaultRequiredProduct(configs);
 
@@ -197,11 +190,11 @@ public abstract class AbstractDefaultValuesMuleDeployableModelGenerator<M extend
   /**
    * Sets the builder with the configurations obtained from the model and the {@code originalMuleDeployableModel}, and the test
    * configs.
-   * 
+   *
    * @param configs configurations to set in the builder.
    */
-  private void setBuilderWithDefaultConfigsValue(Map<String, Document> configs) {
-    Set<String> defaultConfigs = configs.keySet();
+  private void setBuilderWithDefaultConfigsValue(List<DeployableConfiguration> configs) {
+    Set<String> defaultConfigs = configs.stream().map(DeployableConfiguration::getName).collect(toSet());
     // TODO W-11203142 - add test configs
     doSetBuilderWithDefaultConfigsValue(defaultConfigs);
   }
@@ -212,51 +205,32 @@ public abstract class AbstractDefaultValuesMuleDeployableModelGenerator<M extend
    * Resolves the configurations to use taking the ones from the {@code originalMuleDeployableModel} if present, or calculates the
    * ones available in the model.
    * 
-   * @return a {@link Map} with the configuration file names as {@code keys} and their associated {@link Document}s as
-   *         {@code values}.
+   * @return a {@link List} with the project configurations.
    */
-  private Map<String, Document> getConfigs() {
+  private List<DeployableConfiguration> getConfigs() {
     if (originalMuleDeployableModel.getConfigs() != null) {
-      Map<String, Document> configs = new HashMap<>();
-      originalMuleDeployableModel.getConfigs()
-          .forEach(configFileName -> configs.put(configFileName, generateDocument(artifactLocation.getAbsoluteFile().toPath()
-              .resolve(modelConfigsDirectory).resolve(configFileName))));
-      return configs;
+      return configurationsResolver
+          .resolve(resolveCandidateConfigsPaths(new ArrayList<>(originalMuleDeployableModel.getConfigs())));
     } else {
-      return getAvailableConfigs();
+      return configurationsResolver.resolve(resolveCandidateConfigsPaths(modelResources));
     }
   }
 
-  /**
-   * Resolves the configurations available in the model.
-   * 
-   * @return a {@link Map} with the configuration file names as {@code keys} and their associated {@link Document}s as
-   *         {@code values}.
-   */
-  private Map<String, Document> getAvailableConfigs() {
-    List<String> candidateConfigsFileNames =
-        modelResources.stream().filter(resource -> resource.endsWith(CONFIG_FILE_EXTENSION)).collect(toList());
-
-    Map<String, Document> availableCandidateConfigs = new HashMap<>();
-
-    candidateConfigsFileNames.forEach(candidateConfigFileName -> availableCandidateConfigs
-        .put(candidateConfigFileName, generateDocument(artifactLocation.getAbsoluteFile().toPath()
-            .resolve(modelConfigsDirectory).resolve(candidateConfigFileName))));
-
-    return availableCandidateConfigs.entrySet().stream().filter(entry -> hasMuleAsRootElement(entry.getValue()))
-        .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+  private List<File> resolveCandidateConfigsPaths(List<String> candidateConfigsFileNames) {
+    return candidateConfigsFileNames.stream().map(candidateConfigFileName -> artifactLocation.getAbsoluteFile().toPath()
+        .resolve(modelConfigsDirectory).resolve(candidateConfigFileName).toFile()).collect(toList());
   }
 
   /**
    * Sets the builder with the default required {@link Product}.
-   * 
-   * @param availableConfigs configurations available in the project.
+   *
+   * @param configs project configurations.
    */
-  private void setBuilderWithDefaultRequiredProduct(Map<String, Document> availableConfigs) {
+  private void setBuilderWithDefaultRequiredProduct(List<DeployableConfiguration> configs) {
     Product requiredProduct = originalMuleDeployableModel.getRequiredProduct();
     if (requiredProduct == null) {
       requiredProduct = Product.MULE;
-      if (doesSomeConfigRequireEE(availableConfigs)
+      if (doesSomeConfigRequireEE(configs)
           || anyMulePluginInDependenciesRequiresEE()
           || anyProvidedDependencyRequiresEE()) {
         requiredProduct = Product.MULE_EE;
@@ -266,90 +240,8 @@ public abstract class AbstractDefaultValuesMuleDeployableModelGenerator<M extend
     builder.setRequiredProduct(requiredProduct);
   }
 
-  private boolean doesSomeConfigRequireEE(Map<String, Document> availableConfigs) {
-    return availableConfigs.values().stream().filter(this::hasMuleAsRootElement).anyMatch(this::containsEENamespace);
-  }
-
-  private boolean hasMuleAsRootElement(Document doc) {
-    if (doc != null && doc.getDocumentElement() != null) {
-      String rootElementName = doc.getDocumentElement().getTagName();
-      return StringUtils.equals(rootElementName, "mule") || StringUtils.equals(rootElementName, "domain:mule-domain");
-    }
-    return false;
-  }
-
-  private Document generateDocument(Path filePath) {
-    javax.xml.parsers.DocumentBuilderFactory factory = createSecureDocumentBuilderFactory();
-
-    try {
-      return factory.newDocumentBuilder().parse(filePath.toFile());
-    } catch (IOException | ParserConfigurationException | SAXException e) {
-      return null;
-    }
-  }
-
-  private boolean containsEENamespace(Document doc) {
-    if (doc == null) {
-      return false;
-    }
-    org.w3c.dom.Element root = doc.getDocumentElement();
-    if (root.getNamespaceURI() != null && root.getNamespaceURI().contains(EE_NAMESPACE)) {
-      return true;
-    }
-    if (root.getAttributes() != null) {
-      NamedNodeMap attributes = root.getAttributes();
-      for (int i = 0; i < attributes.getLength(); ++i) {
-        Node uri = root.getAttributes().item(i);
-        if (uri.getNodeValue() != null && uri.getNodeValue().contains(EE_NAMESPACE)) {
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }
-
-  /**
-   * Creates a document builder factory.
-   *
-   * @return the factory created
-   */
-  private DocumentBuilderFactory createSecureDocumentBuilderFactory() {
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    try {
-      // Configuration based on
-      // https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.md#xpathexpression
-
-      // This is the PRIMARY defense. If DTDs (doctypes) are disallowed, almost all
-      // XML entity attacks are prevented
-      // Xerces 2 only - http://xerces.apache.org/xerces2-j/features.html#disallow-doctype-decl
-      String feature = "http://apache.org/xml/features/disallow-doctype-decl";
-      factory.setFeature(feature, true);
-
-      // If you can't completely disable DTDs, then at least do the following:
-      // Xerces 1 - http://xerces.apache.org/xerces-j/features.html#external-general-entities
-      // Xerces 2 - http://xerces.apache.org/xerces2-j/features.html#external-general-entities
-      // JDK7+ - http://xml.org/sax/features/external-general-entities
-      feature = "http://xml.org/sax/features/external-general-entities";
-      factory.setFeature(feature, false);
-
-      // Xerces 1 - http://xerces.apache.org/xerces-j/features.html#external-parameter-entities
-      // Xerces 2 - http://xerces.apache.org/xerces2-j/features.html#external-parameter-entities
-      // JDK7+ - http://xml.org/sax/features/external-parameter-entities
-      feature = "http://xml.org/sax/features/external-parameter-entities";
-      factory.setFeature(feature, false);
-
-      // Disable external DTDs as well
-      feature = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
-      factory.setFeature(feature, false);
-
-      // and these as well, per Timothy Morgan's 2014 paper: "XML Schema, DTD, and Entity Attacks"
-      factory.setXIncludeAware(false);
-      factory.setExpandEntityReferences(false);
-      return factory;
-    } catch (ParserConfigurationException e) {
-      throw new IllegalStateException(e);// should never happen
-    }
+  private boolean doesSomeConfigRequireEE(List<DeployableConfiguration> configs) {
+    return configs.stream().anyMatch(config -> config.getRequiredProduct().equals(Product.MULE_EE));
   }
 
   private boolean anyMulePluginInDependenciesRequiresEE() {

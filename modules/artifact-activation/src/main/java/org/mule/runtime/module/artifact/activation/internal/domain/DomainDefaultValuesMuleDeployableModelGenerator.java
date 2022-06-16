@@ -8,6 +8,7 @@ package org.mule.runtime.module.artifact.activation.internal.domain;
 
 import org.mule.runtime.api.deployment.meta.MuleDomainModel;
 import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDefaultValuesMuleDeployableModelGenerator;
+import org.mule.runtime.module.artifact.activation.internal.descriptor.ConfigurationsResolver;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
@@ -29,10 +30,11 @@ public class DomainDefaultValuesMuleDeployableModelGenerator
                                                          List<BundleDependency> modelMuleRuntimeDependencies,
                                                          List<String> modelPackages,
                                                          List<String> modelResources,
+                                                         ConfigurationsResolver configurationsResolver,
                                                          MuleDomainModel.MuleDomainModelBuilder builder) {
     super(originalMuleDeployableModel, artifactLocation, configsDirectory, modelBundleDescriptor, modelDependencies,
           modelMuleRuntimeDependencies,
-          modelPackages, modelResources, builder);
+          modelPackages, modelResources, configurationsResolver, builder);
   }
 
   @Override

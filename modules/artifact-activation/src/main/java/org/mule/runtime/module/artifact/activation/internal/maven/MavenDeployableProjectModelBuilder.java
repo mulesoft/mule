@@ -54,6 +54,7 @@ import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProj
 import org.mule.runtime.module.artifact.activation.internal.application.ApplicationJsonDeserializingIncompleteArtifactModelResolver;
 import org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils;
 import org.mule.runtime.module.artifact.activation.internal.deployable.DeployablePluginsDependenciesResolver;
+import org.mule.runtime.module.artifact.activation.internal.descriptor.XmlConfigurationsResolver;
 import org.mule.runtime.module.artifact.activation.internal.domain.DomainJsonDeserializingIncompleteArtifactModelResolver;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.tools.api.classloader.model.ApplicationGAVModel;
@@ -193,14 +194,16 @@ public class MavenDeployableProjectModelBuilder
                                                                                    modelBundleDescriptor,
                                                                                    deployableBundleDependencies,
                                                                                    deployableMuleRuntimeDependencies, packages,
-                                                                                   resources).resolve(projectFolder);
+                                                                                   resources, new XmlConfigurationsResolver())
+                                                                                       .resolve(projectFolder);
     } else if (modelBundleDescriptor.getClassifier().map(MULE_DOMAIN_CLASSIFIER::equals).orElse(false)) {
       return () -> new DomainJsonDeserializingIncompleteArtifactModelResolver(new MuleDomainModelJsonSerializer(),
                                                                               DEFAULT_MULE_DIRECTORY,
                                                                               modelBundleDescriptor,
                                                                               deployableBundleDependencies,
                                                                               deployableMuleRuntimeDependencies, packages,
-                                                                              resources).resolve(projectFolder);
+                                                                              resources, new XmlConfigurationsResolver())
+                                                                                  .resolve(projectFolder);
     } else {
       throw new IllegalStateException("project is not a " + MULE_APPLICATION_CLASSIFIER + " or " + MULE_DOMAIN_CLASSIFIER);
     }

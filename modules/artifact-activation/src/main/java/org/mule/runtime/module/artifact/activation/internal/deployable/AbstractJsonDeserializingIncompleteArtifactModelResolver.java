@@ -9,24 +9,17 @@ package org.mule.runtime.module.artifact.activation.internal.deployable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 
-import static java.lang.String.format;
-
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModelBuilder;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
-import org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver;
+import org.mule.runtime.module.artifact.activation.internal.descriptor.ConfigurationsResolver;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -49,6 +42,7 @@ public abstract class AbstractJsonDeserializingIncompleteArtifactModelResolver<M
   private final List<BundleDependency> modelMuleRuntimeDependencies;
   private final List<String> modelPackages;
   private final List<String> modelResources;
+  private final ConfigurationsResolver configurationsResolver;
 
   /**
    * Creates a new instance with the provided parameters.
@@ -67,7 +61,8 @@ public abstract class AbstractJsonDeserializingIncompleteArtifactModelResolver<M
                                                                   List<BundleDependency> modelDependencies,
                                                                   List<BundleDependency> modelMuleRuntimeDependencies,
                                                                   List<String> modelPackages,
-                                                                  List<String> modelResources) {
+                                                                  List<String> modelResources,
+                                                                  ConfigurationsResolver configurationsResolver) {
     super(jsonDeserializer);
     this.modelConfigsDirectory = modelConfigsDirectory;
     this.modelBundleDescriptor = modelBundleDescriptor;
@@ -75,6 +70,7 @@ public abstract class AbstractJsonDeserializingIncompleteArtifactModelResolver<M
     this.modelMuleRuntimeDependencies = modelMuleRuntimeDependencies;
     this.modelPackages = modelPackages;
     this.modelResources = modelResources;
+    this.configurationsResolver = configurationsResolver;
   }
 
   @Override
@@ -87,7 +83,7 @@ public abstract class AbstractJsonDeserializingIncompleteArtifactModelResolver<M
     return getDefaultValuesMuleArtifactJsonGenerator(loadModelFromJson(getDescriptorContent(artifactJsonFile)), artifactLocation,
                                                      modelConfigsDirectory, modelBundleDescriptor, modelDependencies,
                                                      modelMuleRuntimeDependencies,
-                                                     modelPackages, modelResources).generate();
+                                                     modelPackages, modelResources, configurationsResolver).generate();
   }
 
   protected abstract AbstractDefaultValuesMuleDeployableModelGenerator<M, B> getDefaultValuesMuleArtifactJsonGenerator(M originalMuleDeployableModel,
@@ -97,6 +93,7 @@ public abstract class AbstractJsonDeserializingIncompleteArtifactModelResolver<M
                                                                                                                        List<BundleDependency> modelDependencies,
                                                                                                                        List<BundleDependency> modelMuleRuntimeDependencies,
                                                                                                                        List<String> modelPackages,
-                                                                                                                       List<String> modelResources);
+                                                                                                                       List<String> modelResources,
+                                                                                                                       ConfigurationsResolver configurationsResolver);
 
 }
