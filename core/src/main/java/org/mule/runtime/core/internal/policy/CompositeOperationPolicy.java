@@ -38,13 +38,10 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -60,18 +57,18 @@ import reactor.core.publisher.FluxSink;
  */
 public class CompositeOperationPolicy
     extends AbstractCompositePolicy<OperationPolicyParametersTransformer>
-    implements OperationPolicy, Disposable, DeferredDisposable {
+    implements OperationPolicy, Disposable, Draineable<OperationPolicy>, DeferredPolicy<OperationPolicy> {
 
   private static final Logger LOGGER = getLogger(CompositeOperationPolicy.class);
 
   private final Component operation;
+
   private final OperationPolicyProcessorFactory operationPolicyProcessorFactory;
 
   private final LoadingCache<String, FluxSinkSupplier<CoreEvent>> policySinks;
 
   private final long shutdownTimeout;
   private final Scheduler completionCallbackScheduler;
-  private final PolicyTraceLogger policyTraceLogger = new PolicyTraceLogger();
 
   /**
    * Creates a new composite policy.
@@ -101,24 +98,21 @@ public class CompositeOperationPolicy
     this.completionCallbackScheduler = completionCallbackScheduler;
     initProcessor();
 
-    Supplier<FluxSink<CoreEvent>> factory = new OperationWithPoliciesFluxObjectFactory(this);
+    FluxSinkSupplier<CoreEvent> factory = new OperationWithPoliciesFluxObjectFactory(this);
     this.policySinks = newBuilder()
-        .removalListener((String key, FluxSinkSupplier<CoreEvent> value, RemovalCause cause) -> {
-          value.dispose();
-        })
-        .build(componentLocation -> {
-          return new TransactionAwareFluxSinkSupplier<>(factory,
-                                                        new RoundRobinFluxSinkSupplier<>(getRuntime().availableProcessors(),
-                                                                                         factory));
-        });
+        .removalListener((String key, FluxSinkSupplier<CoreEvent> value, RemovalCause cause) -> value.dispose())
+        .build(componentLocation -> new TransactionAwareFluxSinkSupplier<>(factory,
+                                                                           new RoundRobinFluxSinkSupplier<>(getRuntime()
+                                                                               .availableProcessors(),
+                                                                                                            factory)));
   }
 
-  private static final class OperationWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
+  private static final class OperationWithPoliciesFluxObjectFactory implements FluxSinkSupplier<CoreEvent> {
 
-    private final Reference<CompositeOperationPolicy> compositeOperationPolicy;
+    private CompositeOperationPolicy compositeOperationPolicy;
 
     public OperationWithPoliciesFluxObjectFactory(CompositeOperationPolicy compositeOperationPolicy) {
-      this.compositeOperationPolicy = new WeakReference<>(compositeOperationPolicy);
+      this.compositeOperationPolicy = compositeOperationPolicy;
     }
 
     @Override
@@ -126,17 +120,25 @@ public class CompositeOperationPolicy
       final FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
 
       Flux<CoreEvent> policyFlux = sinkRef.flux()
-          .transform(compositeOperationPolicy.get().getExecutionProcessor())
+          .transform(compositeOperationPolicy.getExecutionProcessor())
           .doOnNext(result -> from(result).getOperationCallerCallback().complete(result))
           .onErrorContinue(MessagingException.class, (t, e) -> {
             final MessagingException me = (MessagingException) t;
             from(me.getEvent()).getOperationCallerCallback().error(me);
           });
 
-      policyFlux.subscribe(null, e -> LOGGER.error("Exception reached subscriber for " + toString(), e));
+      policyFlux.subscribe(null, e -> LOGGER.error("Exception reached subscriber for " + this, e));
 
       return sinkRef.getFluxSink();
     }
+
+    @Override
+    public void dispose() {
+      // Avoid instances of this class from preventing the policy from being garbage collected.
+      // Break the circular reference between policy-sinkFactory-flux that may cause memory leaks in the policies caches.
+      compositeOperationPolicy = null;
+    }
+
   }
 
   /**
@@ -166,6 +168,7 @@ public class CompositeOperationPolicy
   private static final class OperationDispatcher implements Consumer<CoreEvent> {
 
     private final FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder;
+
     private final Optional<OperationPolicyParametersTransformer> parametersTransformer;
     private final Component operation;
 
@@ -207,6 +210,7 @@ public class CompositeOperationPolicy
                                            }
                                          });
     }
+
   }
 
   private static Map<String, Object> resolveOperationParameters(CoreEvent event,
@@ -279,5 +283,15 @@ public class CompositeOperationPolicy
       policySinks.invalidateAll();
       completionCallbackScheduler.stop();
     };
+  }
+
+  @Override
+  public void drain(Consumer<OperationPolicy> whenDrained) {
+    whenDrained.accept(this);
+  }
+
+  @Override
+  public Draineable<OperationPolicy> deferredDrain() {
+    return whenDrained -> whenDrained.accept(this);
   }
 }

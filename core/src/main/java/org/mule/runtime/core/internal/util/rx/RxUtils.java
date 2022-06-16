@@ -391,7 +391,18 @@ public class RxUtils {
    */
   public static <T> FluxSinkSupplier<T> createRoundRobinFluxSupplier(Function<Flux<T>, Flux<?>> configurer, int size) {
     final Supplier<FluxSink<T>> factory = createFluxSupplier(configurer);
-    return new TransactionAwareFluxSinkSupplier<>(factory,
+    return new TransactionAwareFluxSinkSupplier<>(new FluxSinkSupplier<T>() {
+
+      @Override
+      public FluxSink<T> get() {
+        return factory.get();
+      }
+
+      @Override
+      public void dispose() {
+        // Nothing to do
+      }
+    },
                                                   new RoundRobinFluxSinkSupplier<>(size, factory));
   }
 

@@ -24,6 +24,7 @@ import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.pus
 import static reactor.util.context.Context.empty;
 
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 
@@ -44,14 +45,25 @@ public class TransactionAwareFluxSinkSupplierTestCase {
 
   private static final int THREAD_TEST = 10;
 
-  private FluxSinkSupplier mockSupplier = mock(FluxSinkSupplier.class);
-  private FluxSink mockSink = mock(FluxSink.class);
-  private FluxSinkSupplier<FluxSink> txSupplier;
+  private final FluxSinkSupplier mockSupplier = mock(FluxSinkSupplier.class);
+  private final FluxSink mockSink = mock(FluxSink.class);
+  private TransactionAwareFluxSinkSupplier txSupplier;
 
   @Before
   public void setUp() {
     when(mockSupplier.get()).thenReturn(mockSink);
-    txSupplier = new TransactionAwareFluxSinkSupplier(() -> mock(FluxSink.class), mockSupplier);
+    txSupplier = new TransactionAwareFluxSinkSupplier(new FluxSinkSupplier() {
+
+      @Override
+      public void dispose() {
+        // Nothing to do
+      }
+
+      @Override
+      public FluxSink<CoreEvent> get() {
+        return mock(FluxSink.class);
+      }
+    }, mockSupplier);
   }
 
   @Test
