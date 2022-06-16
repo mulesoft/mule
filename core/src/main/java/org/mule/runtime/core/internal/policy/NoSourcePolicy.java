@@ -77,15 +77,13 @@ public class NoSourcePolicy implements SourcePolicy, Disposable, DeferredDisposa
               .doOnNext(result -> result.apply(spfr -> {
                 CoreEvent event = spfr.getMessagingException().getEvent();
                 SourcePolicyContext ctx = from(event);
-                NoSourcePolicy strongReference = noSourcePolicy.get();
-                if (strongReference != null) {
-                  strongReference.commonPolicy.finishFlowProcessing(event, result, spfr.getMessagingException(), ctx);
-                }
+                // Having a null reference here means that we are dropping an error response (will not reach the source), so no
+                // null check.
+                noSourcePolicy.get().commonPolicy.finishFlowProcessing(event, result, spfr.getMessagingException(), ctx);
               }, spsr -> {
-                NoSourcePolicy strongReference = noSourcePolicy.get();
-                if (strongReference != null) {
-                  strongReference.commonPolicy.finishFlowProcessing(spsr.getResult(), result);
-                }
+                // Having a null reference here means that we are dropping a response (will not reach the source), so no null
+                // check.
+                noSourcePolicy.get().commonPolicy.finishFlowProcessing(spsr.getResult(), result);
               }))
               .onErrorContinue(MessagingException.class, (t, e) -> {
                 final MessagingException me = (MessagingException) t;
@@ -114,7 +112,7 @@ public class NoSourcePolicy implements SourcePolicy, Disposable, DeferredDisposa
   public void process(CoreEvent sourceEvent,
                       MessageSourceResponseParametersProcessor respParamProcessor,
                       CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> callback) {
-    commonPolicy.process(sourceEvent, respParamProcessor, callback);
+    commonPolicy.process(this, sourceEvent, respParamProcessor, callback);
   }
 
   @Override
