@@ -47,6 +47,8 @@ public class SourcePolicyContext implements EventInternalContext<SourcePolicyCon
   private Map<String, Object> originalFailureResponseParameters;
   private Optional<SourcePolicyParametersTransformer> parametersTransformer = empty();
   private Map<String, Map<String, TypedValue<?>>> variables = new SmallMap<>();
+  // Setting this property prevents the policy being garbage collected while it still has inflight events.
+  private SourcePolicy pinnedSourcePolicy;
 
   public SourcePolicyContext(PolicyPointcutParameters pointcutParameters) {
     this.pointcutParameters = pointcutParameters;
@@ -101,6 +103,10 @@ public class SourcePolicyContext implements EventInternalContext<SourcePolicyCon
 
   public void setParametersTransformer(Optional<SourcePolicyParametersTransformer> parametersTransformer) {
     this.parametersTransformer = parametersTransformer;
+  }
+
+  public void setPinnedSourcePolicy(SourcePolicy pinnedSourcePolicy) {
+    this.pinnedSourcePolicy = pinnedSourcePolicy;
   }
 
   public Optional<SourcePolicyParametersTransformer> getParametersTransformer() {

@@ -35,13 +35,16 @@ class CommonSourcePolicy {
                                                new RoundRobinFluxSinkSupplier<>(getRuntime().availableProcessors(), sinkFactory));
   }
 
-  public void process(CoreEvent sourceEvent,
+  public void process(SourcePolicy sourcePolicy, CoreEvent sourceEvent,
                       MessageSourceResponseParametersProcessor respParamProcessor,
                       CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> callback) {
 
     SourcePolicyContext ctx = from(sourceEvent);
     if (ctx != null) {
       ctx.configure(respParamProcessor, callback);
+      // This prevents the source policy from being garbage collected when it still has inflight events.
+      // See PolicyManager class for details.
+      ctx.setPinnedSourcePolicy(sourcePolicy);
     }
 
     policySink.get().next(sourceEvent);
