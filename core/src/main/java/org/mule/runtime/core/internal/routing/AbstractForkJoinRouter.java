@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.internal.routing;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.TIMEOUT;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
@@ -18,6 +19,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
@@ -60,6 +62,9 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
 
   @Inject
   private ErrorTypeRepository errorTypeRepository;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   private ForkJoinStrategyFactory forkJoinStrategyFactory;
   private ForkJoinStrategy forkJoinStrategy;
@@ -118,10 +123,12 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
     timeoutErrorType = errorTypeRepository.getErrorType(TIMEOUT).get();
     maxConcurrency = maxConcurrency != null ? maxConcurrency : getDefaultMaxConcurrency();
     forkJoinStrategyFactory = forkJoinStrategyFactory != null ? forkJoinStrategyFactory : getDefaultForkJoinStrategyFactory();
-
+    boolean isDetailedCompositeRoutingExceptionLogEnabled =
+        featureFlaggingService.isEnabled(MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG);
     forkJoinStrategy =
         forkJoinStrategyFactory.createForkJoinStrategy(resolveProcessingStrategy(), maxConcurrency,
-                                                       isDelayErrors(), timeout, timeoutScheduler, timeoutErrorType);
+                                                       isDelayErrors(), timeout, timeoutScheduler, timeoutErrorType,
+                                                       isDetailedCompositeRoutingExceptionLogEnabled);
   }
 
   protected ProcessingStrategy resolveProcessingStrategy() {
