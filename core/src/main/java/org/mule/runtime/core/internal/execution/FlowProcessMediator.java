@@ -250,10 +250,6 @@ public class FlowProcessMediator implements Initialisable {
       sourcePolicy.process(event, ctx.template,
                            new CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>() {
 
-                             // This reference prevents the policy disposal while it still has inflight events.
-                             // (this callback is later stored
-                             private SourcePolicy pinnedSourcePolicy = sourcePolicy;
-
                              @Override
                              public void complete(Either<SourcePolicyFailureResult, SourcePolicySuccessResult> value) {
                                dispatchResponse(flowConstruct, ctx, value);
