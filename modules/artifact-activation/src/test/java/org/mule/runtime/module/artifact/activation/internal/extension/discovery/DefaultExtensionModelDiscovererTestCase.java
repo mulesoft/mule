@@ -7,6 +7,7 @@
 package org.mule.runtime.module.artifact.activation.internal.extension.discovery;
 
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
+import static org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer.discoverRuntimeExtensionModels;
 import static org.mule.test.allure.AllureConstants.ExtensionModelDiscoveryFeature.EXTENSION_MODEL_DISCOVERY;
 
 import static java.util.Collections.emptySet;
@@ -14,6 +15,7 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -32,10 +34,11 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.junit.Test;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
-import org.junit.Test;
 
 @Feature(EXTENSION_MODEL_DISCOVERY)
 public class DefaultExtensionModelDiscovererTestCase extends AbstractMuleTestCase {
@@ -88,9 +91,11 @@ public class DefaultExtensionModelDiscovererTestCase extends AbstractMuleTestCas
                                                                                                                                                                  false,
                                                                                                                                                                  false));
     assertThat(extensionDeclared.get(), is(true));
-    assertThat(extensionModels.size(), is(1));
-    assertThat((extensionModels.stream().collect(toList())).get(0).getArtifactCoordinates().get(),
-               is(descriptor.getBundleDescriptor()));
+    assertThat(extensionModels.size(), is(1 + discoverRuntimeExtensionModels().size()));
+    assertThat((extensionModels.stream()
+        .map(ExtensionModel::getArtifactCoordinates)
+        .collect(toList())),
+               hasItem(of(descriptor.getBundleDescriptor())));
   }
 
 }
