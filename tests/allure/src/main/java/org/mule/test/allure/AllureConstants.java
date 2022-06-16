@@ -1029,9 +1029,4 @@ public interface AllureConstants {
 
     String CUSTOM_OBJECT_SERIALIZER = "Custom object serializer";
   }
-
-  interface ExecutionContextFeature {
-
-    String EXECUTION_CONTEXT = "Execution context";
-  }
 }
