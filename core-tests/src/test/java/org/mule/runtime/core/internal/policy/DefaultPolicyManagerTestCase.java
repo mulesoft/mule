@@ -380,7 +380,6 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     SourcePolicyContext sourcePolicyContext = new SourcePolicyContext(policyPointcutParameters);
     when(event.getSourcePolicyContext()).thenReturn((EventInternalContext) sourcePolicyContext);
     when(event.getVariables()).thenReturn(mock(CaseInsensitiveHashMap.class));
-    when(event.getParameters()).thenReturn(mock(CaseInsensitiveHashMap.class));
 
     // The event is sent through the policy, becoming an inflight one.
     sourcePolicy.process(event, mock(MessageSourceResponseParametersProcessor.class), mock(CompletableCallback.class));
