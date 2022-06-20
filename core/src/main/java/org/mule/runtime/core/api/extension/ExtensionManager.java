@@ -145,6 +145,8 @@ public interface ExtensionManager {
    */
   void registerConfigurationProvider(ConfigurationProvider configurationProvider);
 
+  void unregisterConfigurationProvider(ConfigurationProvider configurationProvider);
+
   /**
    * Performs actions related to the disposal of the configuration in the extension manager
    *

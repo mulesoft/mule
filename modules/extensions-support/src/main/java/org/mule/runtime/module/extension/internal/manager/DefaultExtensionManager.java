@@ -155,12 +155,18 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     extensionRegistry.registerConfigurationProvider(configurationProvider, muleContext);
   }
 
+  @Override
+  public void unregisterConfigurationProvider(ConfigurationProvider configurationProvider) {
+    extensionRegistry.unregisterConfigurationProvider(configurationProvider, muleContext);
+  }
+
   /**
    * {@inheritDoc}
    */
   @Override
   public ConfigurationInstance getConfiguration(String configurationProviderName, CoreEvent muleEvent) {
-    return getConfigurationProvider(configurationProviderName).map(provider -> provider.get(muleEvent))
+    return getConfigurationProvider(configurationProviderName)
+        .map(provider -> provider.get(muleEvent))
         .orElseThrow(() -> new IllegalArgumentException(format("There is no registered configurationProvider under name '%s'",
                                                                configurationProviderName)));
   }
