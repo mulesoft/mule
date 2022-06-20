@@ -162,11 +162,11 @@ final class ExtensionRegistry {
       unregisterObject(muleContext, configurationProvider.getName());
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(createStaticMessage(format("Found exception while unregistering configuration provider '%s'",
-          configurationProvider.getName())),
-          e);
+                                                                configurationProvider.getName())),
+                                     e);
     }
 
-    //TODO: This entire data structure and its invalidation criteria seem very inefficient. Review in different ticket
+    // TODO: This entire data structure and its invalidation criteria seem very inefficient. Review in different ticket
     providersByExtension.invalidate(configurationProvider.getExtensionModel());
   }
 
