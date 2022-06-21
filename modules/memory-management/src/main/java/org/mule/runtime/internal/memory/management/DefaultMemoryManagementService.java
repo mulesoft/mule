@@ -9,6 +9,7 @@ package org.mule.runtime.internal.memory.management;
 import static org.mule.runtime.internal.memory.bytebuffer.ByteBufferProviderBuilder.buildByteBufferProviderFrom;
 
 import static java.lang.String.format;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
@@ -22,6 +23,8 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+
 /**
  * A Default Implementation of {@link MemoryManagementService}
  */
@@ -30,6 +33,7 @@ public class DefaultMemoryManagementService implements ProfiledMemoryManagementS
   public static final String DUPLICATE_BYTE_BUFFER_PROVIDER_NAME = "A ByteBuffer Provider is already registered with name '%s'.";
 
   private static final DefaultMemoryManagementService INSTANCE = new DefaultMemoryManagementService();
+  private static final Logger LOGGER = getLogger(DefaultMemoryManagementService.class);
 
   private final Map<String, ByteBufferProvider<ByteBuffer>> byteBufferProviders = new HashMap<>();
   private ProfilingService profilingService = new NoOpMemoryProfilingService();
@@ -79,7 +83,12 @@ public class DefaultMemoryManagementService implements ProfiledMemoryManagementS
 
   @Override
   public synchronized void disposeByteBufferProvider(String name) {
-    byteBufferProviders.remove(name).dispose();
+    ByteBufferProvider<ByteBuffer> bufferProvider = byteBufferProviders.remove(name);
+    if (bufferProvider != null) {
+      bufferProvider.dispose();
+    } else {
+      LOGGER.warn("Unable to dispose not present ByteBufferProvider " + name);
+    }
   }
 
   @Override
