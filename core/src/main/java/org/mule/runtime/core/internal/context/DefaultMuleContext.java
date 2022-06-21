@@ -51,7 +51,7 @@ import static org.mule.runtime.core.api.util.UUID.getClusterUUID;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -911,7 +911,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
       if (rootContainerName.isPresent()) {
         defaultErrorHandler = ((GlobalErrorHandler) defaultErrorHandler)
-            .createLocalErrorHandler(from(rootContainerName.get()));
+            .createLocalErrorHandler(fromSingleComponent(rootContainerName.get()));
       } else {
         try {
           defaultErrorHandler = new ErrorHandlerFactory().createDefault(getRegistry().lookupObject(NotificationDispatcher.class));
