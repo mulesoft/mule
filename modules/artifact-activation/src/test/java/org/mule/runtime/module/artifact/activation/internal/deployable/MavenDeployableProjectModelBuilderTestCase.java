@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.contains;
@@ -24,8 +27,12 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.io.File;
 import java.net.URISyntaxException;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Test;
 
+@Feature(CLASSLOADING_ISOLATION)
+@Story(ARTIFACT_DESCRIPTORS)
 public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
