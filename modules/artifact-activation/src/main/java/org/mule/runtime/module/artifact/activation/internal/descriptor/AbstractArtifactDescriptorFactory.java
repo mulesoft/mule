@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
+import static org.mule.runtime.module.artifact.activation.internal.ExecutionContext.isMuleFramework;
+
 import org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -42,6 +44,7 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
 
   public T create() {
     artifactModel = createArtifactModel();
+    validateModel(artifactModel);
     final T descriptor = doCreateArtifactDescriptor();
 
     BundleDescriptor bundleDescriptor = getBundleDescriptor();
@@ -60,9 +63,16 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
     return descriptor;
   }
 
+  private void validateModel(M artifactModel) {
+    if (!isMuleFramework()) {
+      artifactModel.validateModel(artifactLocation.getName());
+    }
+  }
+
   protected void doValidation(T descriptor) {
-    // TODO W-11203071 - uncomment once the model is guaranteed to be completed with all the necessary information
-    // artifactDescriptorValidator.validate(descriptor);
+    if (!isMuleFramework()) {
+      artifactDescriptorValidator.validate(descriptor);
+    }
   }
 
   protected M getArtifactModel() {
