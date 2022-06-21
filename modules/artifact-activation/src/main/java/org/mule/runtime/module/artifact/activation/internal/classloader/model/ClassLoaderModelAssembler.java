@@ -6,8 +6,13 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader.model;
 
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -19,6 +24,7 @@ import org.mule.tools.api.classloader.model.ClassLoaderModel;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -71,8 +77,8 @@ public class ClassLoaderModelAssembler {
 
   protected final void assembleClassLoaderModel(ClassLoaderModel classLoaderModel) {
     classLoaderModel.setDependencies(toArtifacts(projectDependencies));
-    classLoaderModel.setPackages(getExportedAttribute("exportedPackages", availablePackages));
-    classLoaderModel.setResources(getExportedAttribute("exportedResources", availableResources));
+    classLoaderModel.setPackages(getExportedAttribute("exportedPackages", availablePackages, false));
+    classLoaderModel.setResources(getExportedAttribute("exportedResources", availableResources, true));
   }
 
   /**
@@ -117,16 +123,17 @@ public class ClassLoaderModelAssembler {
                                    bundleDescriptor.getType(), bundleDescriptor.getClassifier().orElse(null));
   }
 
-  private String[] getExportedAttribute(String exportedAttributeName, List<String> availableAttribute) {
-    List<String> exportedAttribute = availableAttribute;
+  private String[] getExportedAttribute(String exportedAttributeName, List<String> defaultValue, boolean alwaysProvideDefault) {
     if (muleArtifactLoaderDescriptor != null) {
       Map<String, Object> originalAttributes = muleArtifactLoaderDescriptor.getAttributes();
       if (originalAttributes != null && originalAttributes.get(exportedAttributeName) != null) {
-        exportedAttribute = (List<String>) originalAttributes.get(exportedAttributeName);
+        return ((List<String>) originalAttributes.get(exportedAttributeName)).toArray(new String[0]);
+      } else if (!alwaysProvideDefault) {
+        return new String[0];
       }
     }
 
-    return exportedAttribute.toArray(new String[0]);
+    return defaultValue.toArray(new String[0]);
   }
 
   protected ArtifactCoordinates getArtifactCoordinates() {

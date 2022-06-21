@@ -63,31 +63,9 @@ public class DefaultDeployableArtifactDescriptorFactoryTestCase extends Abstract
   public void createBasicApplicationDescriptor() throws Exception {
     ApplicationDescriptor applicationDescriptor = createApplicationDescriptor("apps/basic");
 
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), contains("org.test"));
+    assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), hasSize(0));
     assertThat(applicationDescriptor.getClassLoaderModel().getExportedResources(),
                containsInAnyOrder("test-script.dwl", "app.xml"));
-
-    assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(), hasSize(3));
-  }
-
-  @Test
-  public void createBasicApplicationDescriptorWithDifferentSource() throws Exception {
-    ApplicationDescriptor applicationDescriptor = createApplicationDescriptor("apps/basicWithDifferentSourceDirectory");
-
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), contains("org.test"));
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedResources(),
-               containsInAnyOrder("test-script.dwl", "app.xml"));
-
-    assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(), hasSize(3));
-  }
-
-  @Test
-  public void createBasicApplicationDescriptorWithCustomResources() throws Exception {
-    ApplicationDescriptor applicationDescriptor = createApplicationDescriptor("apps/basicWithResources");
-
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), contains("org.test"));
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedResources(),
-               containsInAnyOrder("test-script.dwl", "app.xml", "test-script2.dwl"));
 
     assertThat(applicationDescriptor.getClassLoaderModel().getDependencies(), hasSize(3));
   }
@@ -226,7 +204,7 @@ public class DefaultDeployableArtifactDescriptorFactoryTestCase extends Abstract
       return domainDescriptor;
     });
 
-    assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), contains("org.test"));
+    assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), hasSize(0));
     assertThat(applicationDescriptor.getClassLoaderModel().getExportedResources(),
                containsInAnyOrder("test-script.dwl", "app.xml"));
 

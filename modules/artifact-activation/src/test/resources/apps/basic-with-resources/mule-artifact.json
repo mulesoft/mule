@@ -1,9 +1,14 @@
 {
-  "name": "basic",
+  "name": "test-app",
   "minMuleVersion": "4.4.0",
   "requiredProduct": "MULE",
   "classLoaderModelLoaderDescriptor": {
-    "id": "mule"
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [
+        "org.test"
+      ]
+    }
   },
   "bundleDescriptorLoader": {
     "id": "mule",
