@@ -4,6 +4,7 @@
   <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
   <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"></xs:import>
   <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
+  <xs:import namespace="http://www.mulesoft.org/schema/mule/values" schemaLocation="http://www.mulesoft.org/schema/mule/values/current/mule-values.xsd"></xs:import>
   <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="auth-code-config">
     <xs:complexType>
       <xs:complexContent>
@@ -67,6 +68,13 @@
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="external-pojo">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
               <xs:complexType>
                 <xs:complexContent>
@@ -89,6 +97,7 @@
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="optional" name="profileConnectionProperties"></xs:attribute>
                     <xs:attribute type="mule:expressionInt" use="optional" name="profileLevel"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" name="profileDescription"></xs:attribute>
                   </xs:extension>
                 </xs:complexContent>
               </xs:complexType>
@@ -196,6 +205,11 @@
           <xs:attribute type="mule:expressionList" use="optional" name="someConnectionNumbers"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="someMapOfConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="securityLevel"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="typedSecurityLevel"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="literalSecurityDescription"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="resolverConnectionDisplayName"></xs:attribute>
+          <xs:attribute type="mule:expressionDateTime" use="optional" name="connectionTime"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="externalPojo"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
@@ -205,8 +219,21 @@
   <xs:complexType name="org.mule.test.oauth.ConnectionProperties">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="imported-pojo">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
         <xs:attribute type="mule:expressionString" use="optional" name="connectionDescription"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="connectionPropertyGrade"></xs:attribute>
+        <xs:attribute type="mule:expressionDateTime" use="optional" name="connectionTime"></xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/test-oauth" type="org.mule.test.oauth.ConnectionTypeEnumType" use="optional" name="connectionType"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="extensionManager"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="importedPojo"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -264,6 +291,13 @@
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="external-pojo">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
               <xs:complexType>
                 <xs:complexContent>
@@ -286,6 +320,7 @@
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="optional" name="profileConnectionProperties"></xs:attribute>
                     <xs:attribute type="mule:expressionInt" use="optional" name="profileLevel"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" name="profileDescription"></xs:attribute>
                   </xs:extension>
                 </xs:complexContent>
               </xs:complexType>
@@ -393,6 +428,11 @@
           <xs:attribute type="mule:expressionList" use="optional" name="someConnectionNumbers"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="someMapOfConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="securityLevel"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="typedSecurityLevel"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="literalSecurityDescription"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="resolverConnectionDisplayName"></xs:attribute>
+          <xs:attribute type="mule:expressionDateTime" use="optional" name="connectionTime"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="externalPojo"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
@@ -445,6 +485,13 @@
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="external-pojo">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
               <xs:complexType>
                 <xs:complexContent>
@@ -467,6 +514,7 @@
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="optional" name="profileConnectionProperties"></xs:attribute>
                     <xs:attribute type="mule:expressionInt" use="optional" name="profileLevel"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" name="profileDescription"></xs:attribute>
                   </xs:extension>
                 </xs:complexContent>
               </xs:complexType>
@@ -574,6 +622,11 @@
           <xs:attribute type="mule:expressionList" use="optional" name="someConnectionNumbers"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="someMapOfConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="securityLevel"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="typedSecurityLevel"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="literalSecurityDescription"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="resolverConnectionDisplayName"></xs:attribute>
+          <xs:attribute type="mule:expressionDateTime" use="optional" name="connectionTime"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="externalPojo"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
@@ -626,6 +679,13 @@
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="external-pojo">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
               <xs:complexType>
                 <xs:complexContent>
@@ -648,6 +708,7 @@
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="optional" name="profileConnectionProperties"></xs:attribute>
                     <xs:attribute type="mule:expressionInt" use="optional" name="profileLevel"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" name="profileDescription"></xs:attribute>
                   </xs:extension>
                 </xs:complexContent>
               </xs:complexType>
@@ -755,6 +816,11 @@
           <xs:attribute type="mule:expressionList" use="optional" name="someConnectionNumbers"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="someMapOfConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="securityLevel"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="typedSecurityLevel"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="literalSecurityDescription"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="resolverConnectionDisplayName"></xs:attribute>
+          <xs:attribute type="mule:expressionDateTime" use="optional" name="connectionTime"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="externalPojo"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
@@ -807,6 +873,13 @@
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="external-pojo">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
               <xs:complexType>
                 <xs:complexContent>
@@ -829,6 +902,7 @@
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="optional" name="profileConnectionProperties"></xs:attribute>
                     <xs:attribute type="mule:expressionInt" use="optional" name="profileLevel"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" name="profileDescription"></xs:attribute>
                   </xs:extension>
                 </xs:complexContent>
               </xs:complexType>
@@ -936,6 +1010,11 @@
           <xs:attribute type="mule:expressionList" use="optional" name="someConnectionNumbers"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="someMapOfConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="securityLevel"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="typedSecurityLevel"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="literalSecurityDescription"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="resolverConnectionDisplayName"></xs:attribute>
+          <xs:attribute type="mule:expressionDateTime" use="optional" name="connectionTime"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="externalPojo"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
@@ -988,6 +1067,13 @@
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="external-pojo">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
               <xs:complexType>
                 <xs:complexContent>
@@ -1010,6 +1096,7 @@
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="optional" name="profileConnectionProperties"></xs:attribute>
                     <xs:attribute type="mule:expressionInt" use="optional" name="profileLevel"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" name="profileDescription"></xs:attribute>
                   </xs:extension>
                 </xs:complexContent>
               </xs:complexType>
@@ -1117,6 +1204,11 @@
           <xs:attribute type="mule:expressionList" use="optional" name="someConnectionNumbers"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="someMapOfConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="securityLevel"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="typedSecurityLevel"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="literalSecurityDescription"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="resolverConnectionDisplayName"></xs:attribute>
+          <xs:attribute type="mule:expressionDateTime" use="optional" name="connectionTime"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="externalPojo"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="withAlias"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="defaultPlacement"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="queryParam"></xs:attribute>
@@ -1524,6 +1616,13 @@
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="external-pojo">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="random-headers">
               <xs:complexType>
                 <xs:sequence>
@@ -1558,6 +1657,7 @@
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="optional" name="profileConnectionProperties"></xs:attribute>
                     <xs:attribute type="mule:expressionInt" use="optional" name="profileLevel"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" name="profileDescription"></xs:attribute>
                   </xs:extension>
                 </xs:complexContent>
               </xs:complexType>
@@ -1616,6 +1716,11 @@
           <xs:attribute type="mule:expressionList" use="optional" name="someConnectionNumbers"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="someMapOfConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="securityLevel"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="typedSecurityLevel"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="literalSecurityDescription"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="resolverConnectionDisplayName"></xs:attribute>
+          <xs:attribute type="mule:expressionDateTime" use="optional" name="connectionTime"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="externalPojo"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="knownCustomHeader"></xs:attribute>
           <xs:attribute type="mule:substitutableName" use="optional" name="randomHeaders"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
@@ -1705,6 +1810,13 @@
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="external-pojo">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
               <xs:complexType>
                 <xs:complexContent>
@@ -1727,6 +1839,7 @@
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="optional" name="profileConnectionProperties"></xs:attribute>
                     <xs:attribute type="mule:expressionInt" use="optional" name="profileLevel"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" name="profileDescription"></xs:attribute>
                   </xs:extension>
                 </xs:complexContent>
               </xs:complexType>
@@ -1834,6 +1947,11 @@
           <xs:attribute type="mule:expressionList" use="optional" name="someConnectionNumbers"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="someMapOfConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="securityLevel"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="typedSecurityLevel"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="literalSecurityDescription"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="resolverConnectionDisplayName"></xs:attribute>
+          <xs:attribute type="mule:expressionDateTime" use="optional" name="connectionTime"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="externalPojo"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
@@ -1903,6 +2021,13 @@
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="external-pojo">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
               <xs:complexType>
                 <xs:complexContent>
@@ -1925,6 +2050,7 @@
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="optional" name="profileConnectionProperties"></xs:attribute>
                     <xs:attribute type="mule:expressionInt" use="optional" name="profileLevel"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" name="profileDescription"></xs:attribute>
                   </xs:extension>
                 </xs:complexContent>
               </xs:complexType>
@@ -2032,6 +2158,11 @@
           <xs:attribute type="mule:expressionList" use="optional" name="someConnectionNumbers"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="someMapOfConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="securityLevel"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="typedSecurityLevel"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="literalSecurityDescription"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="resolverConnectionDisplayName"></xs:attribute>
+          <xs:attribute type="mule:expressionDateTime" use="optional" name="connectionTime"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="externalPojo"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>

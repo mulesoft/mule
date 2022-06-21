@@ -17,10 +17,38 @@
         }
       },
       "nodeMappings": {
+        "MyPojo": {
+          "mapping": {
+            "pojoId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "pojoName": {
+              "range": "string",
+              "mandatory": false
+            },
+            "pojoBoolean": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "pojoNumber": {
+              "range": "number",
+              "mandatory": false
+            }
+          }
+        },
         "ConnectionProperties": {
           "mapping": {
+            "connectionPropertyGrade": {
+              "range": "string",
+              "mandatory": false
+            },
             "connectionDescription": {
               "range": "string",
+              "mandatory": false
+            },
+            "importedPojo": {
+              "range": "MyPojo",
               "mandatory": false
             },
             "connectionType": {
@@ -35,16 +63,16 @@
               "range": "ConnectionProperties",
               "mandatory": false
             },
-            "before": {
+            "resolverConnectionDisplayName": {
               "range": "string",
               "mandatory": false
             },
-            "display": {
+            "profileDescription": {
               "range": "string",
-              "mandatory": true
+              "mandatory": false
             },
-            "anotherConnectionProperties": {
-              "range": "ConnectionProperties",
+            "before": {
+              "range": "string",
               "mandatory": false
             },
             "detailsPriority": {
@@ -60,8 +88,8 @@
               "range": "string",
               "mandatory": false
             },
-            "oauthConnectionType": {
-              "range": "string",
+            "externalPojo": {
+              "range": "MyPojo",
               "mandatory": false
             },
             "securityLevel": {
@@ -77,10 +105,6 @@
               "range": "number",
               "mandatory": false
             },
-            "authorizationUrl": {
-              "range": "string",
-              "mandatory": false
-            },
             "callbackPath": {
               "propertyTerm": "apiContract.path",
               "range": "string",
@@ -88,10 +112,6 @@
             },
             "objectStore": {
               "range": "string",
-              "mandatory": false
-            },
-            "immediate": {
-              "range": "boolean",
               "mandatory": false
             },
             "accessTokenUrl": {
@@ -102,7 +122,44 @@
               "range": "ConnectionProperties",
               "mandatory": false
             },
+            "after": {
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerKey": {
+              "propertyTerm": "connectivity.clientId",
+              "range": "string",
+              "mandatory": true
+            },
+            "display": {
+              "range": "string",
+              "mandatory": true
+            },
+            "typedSecurityLevel": {
+              "range": "number",
+              "mandatory": false
+            },
+            "anotherConnectionProperties": {
+              "range": "ConnectionProperties",
+              "mandatory": false
+            },
+            "oauthConnectionType": {
+              "range": "string",
+              "mandatory": false
+            },
+            "authorizationUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "immediate": {
+              "range": "boolean",
+              "mandatory": false
+            },
             "resourceOwnerId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "literalSecurityDescription": {
               "range": "string",
               "mandatory": false
             },
@@ -113,15 +170,6 @@
             "scopes": {
               "range": "string",
               "mandatory": false
-            },
-            "after": {
-              "range": "string",
-              "mandatory": false
-            },
-            "consumerKey": {
-              "propertyTerm": "connectivity.clientId",
-              "range": "string",
-              "mandatory": true
             },
             "prompt": {
               "range": "boolean",
@@ -166,10 +214,38 @@
         }
       },
       "nodeMappings": {
+        "MyPojo": {
+          "mapping": {
+            "pojoId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "pojoName": {
+              "range": "string",
+              "mandatory": false
+            },
+            "pojoBoolean": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "pojoNumber": {
+              "range": "number",
+              "mandatory": false
+            }
+          }
+        },
         "ConnectionProperties": {
           "mapping": {
+            "connectionPropertyGrade": {
+              "range": "string",
+              "mandatory": false
+            },
             "connectionDescription": {
               "range": "string",
+              "mandatory": false
+            },
+            "importedPojo": {
+              "range": "MyPojo",
               "mandatory": false
             },
             "connectionType": {
@@ -184,16 +260,16 @@
               "range": "ConnectionProperties",
               "mandatory": false
             },
-            "before": {
+            "resolverConnectionDisplayName": {
               "range": "string",
               "mandatory": false
             },
-            "display": {
+            "profileDescription": {
               "range": "string",
-              "mandatory": true
+              "mandatory": false
             },
-            "anotherConnectionProperties": {
-              "range": "ConnectionProperties",
+            "before": {
+              "range": "string",
               "mandatory": false
             },
             "detailsPriority": {
@@ -209,8 +285,8 @@
               "range": "string",
               "mandatory": false
             },
-            "oauthConnectionType": {
-              "range": "string",
+            "externalPojo": {
+              "range": "MyPojo",
               "mandatory": false
             },
             "securityLevel": {
@@ -226,10 +302,6 @@
               "range": "number",
               "mandatory": false
             },
-            "authorizationUrl": {
-              "range": "string",
-              "mandatory": false
-            },
             "callbackPath": {
               "propertyTerm": "apiContract.path",
               "range": "string",
@@ -237,10 +309,6 @@
             },
             "objectStore": {
               "range": "string",
-              "mandatory": false
-            },
-            "immediate": {
-              "range": "boolean",
               "mandatory": false
             },
             "accessTokenUrl": {
@@ -251,7 +319,44 @@
               "range": "ConnectionProperties",
               "mandatory": false
             },
+            "after": {
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerKey": {
+              "propertyTerm": "connectivity.clientId",
+              "range": "string",
+              "mandatory": true
+            },
+            "display": {
+              "range": "string",
+              "mandatory": true
+            },
+            "typedSecurityLevel": {
+              "range": "number",
+              "mandatory": false
+            },
+            "anotherConnectionProperties": {
+              "range": "ConnectionProperties",
+              "mandatory": false
+            },
+            "oauthConnectionType": {
+              "range": "string",
+              "mandatory": false
+            },
+            "authorizationUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "immediate": {
+              "range": "boolean",
+              "mandatory": false
+            },
             "resourceOwnerId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "literalSecurityDescription": {
               "range": "string",
               "mandatory": false
             },
@@ -262,15 +367,6 @@
             "scopes": {
               "range": "string",
               "mandatory": false
-            },
-            "after": {
-              "range": "string",
-              "mandatory": false
-            },
-            "consumerKey": {
-              "propertyTerm": "connectivity.clientId",
-              "range": "string",
-              "mandatory": true
             },
             "prompt": {
               "range": "boolean",
@@ -315,10 +411,38 @@
         }
       },
       "nodeMappings": {
+        "MyPojo": {
+          "mapping": {
+            "pojoId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "pojoName": {
+              "range": "string",
+              "mandatory": false
+            },
+            "pojoBoolean": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "pojoNumber": {
+              "range": "number",
+              "mandatory": false
+            }
+          }
+        },
         "ConnectionProperties": {
           "mapping": {
+            "connectionPropertyGrade": {
+              "range": "string",
+              "mandatory": false
+            },
             "connectionDescription": {
               "range": "string",
+              "mandatory": false
+            },
+            "importedPojo": {
+              "range": "MyPojo",
               "mandatory": false
             },
             "connectionType": {
@@ -333,16 +457,16 @@
               "range": "ConnectionProperties",
               "mandatory": false
             },
-            "before": {
+            "resolverConnectionDisplayName": {
               "range": "string",
               "mandatory": false
             },
-            "display": {
+            "profileDescription": {
               "range": "string",
-              "mandatory": true
+              "mandatory": false
             },
-            "anotherConnectionProperties": {
-              "range": "ConnectionProperties",
+            "before": {
+              "range": "string",
               "mandatory": false
             },
             "detailsPriority": {
@@ -358,8 +482,8 @@
               "range": "string",
               "mandatory": false
             },
-            "oauthConnectionType": {
-              "range": "string",
+            "externalPojo": {
+              "range": "MyPojo",
               "mandatory": false
             },
             "securityLevel": {
@@ -375,10 +499,6 @@
               "range": "number",
               "mandatory": false
             },
-            "authorizationUrl": {
-              "range": "string",
-              "mandatory": false
-            },
             "callbackPath": {
               "propertyTerm": "apiContract.path",
               "range": "string",
@@ -386,10 +506,6 @@
             },
             "objectStore": {
               "range": "string",
-              "mandatory": false
-            },
-            "immediate": {
-              "range": "boolean",
               "mandatory": false
             },
             "accessTokenUrl": {
@@ -400,7 +516,44 @@
               "range": "ConnectionProperties",
               "mandatory": false
             },
+            "after": {
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerKey": {
+              "propertyTerm": "connectivity.clientId",
+              "range": "string",
+              "mandatory": true
+            },
+            "display": {
+              "range": "string",
+              "mandatory": true
+            },
+            "typedSecurityLevel": {
+              "range": "number",
+              "mandatory": false
+            },
+            "anotherConnectionProperties": {
+              "range": "ConnectionProperties",
+              "mandatory": false
+            },
+            "oauthConnectionType": {
+              "range": "string",
+              "mandatory": false
+            },
+            "authorizationUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "immediate": {
+              "range": "boolean",
+              "mandatory": false
+            },
             "resourceOwnerId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "literalSecurityDescription": {
               "range": "string",
               "mandatory": false
             },
@@ -411,15 +564,6 @@
             "scopes": {
               "range": "string",
               "mandatory": false
-            },
-            "after": {
-              "range": "string",
-              "mandatory": false
-            },
-            "consumerKey": {
-              "propertyTerm": "connectivity.clientId",
-              "range": "string",
-              "mandatory": true
             },
             "prompt": {
               "range": "boolean",
@@ -464,10 +608,38 @@
         }
       },
       "nodeMappings": {
+        "MyPojo": {
+          "mapping": {
+            "pojoId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "pojoName": {
+              "range": "string",
+              "mandatory": false
+            },
+            "pojoBoolean": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "pojoNumber": {
+              "range": "number",
+              "mandatory": false
+            }
+          }
+        },
         "ConnectionProperties": {
           "mapping": {
+            "connectionPropertyGrade": {
+              "range": "string",
+              "mandatory": false
+            },
             "connectionDescription": {
               "range": "string",
+              "mandatory": false
+            },
+            "importedPojo": {
+              "range": "MyPojo",
               "mandatory": false
             },
             "connectionType": {
@@ -482,16 +654,16 @@
               "range": "ConnectionProperties",
               "mandatory": false
             },
-            "before": {
+            "resolverConnectionDisplayName": {
               "range": "string",
               "mandatory": false
             },
-            "display": {
+            "profileDescription": {
               "range": "string",
-              "mandatory": true
+              "mandatory": false
             },
-            "anotherConnectionProperties": {
-              "range": "ConnectionProperties",
+            "before": {
+              "range": "string",
               "mandatory": false
             },
             "detailsPriority": {
@@ -507,8 +679,8 @@
               "range": "string",
               "mandatory": false
             },
-            "oauthConnectionType": {
-              "range": "string",
+            "externalPojo": {
+              "range": "MyPojo",
               "mandatory": false
             },
             "securityLevel": {
@@ -524,10 +696,6 @@
               "range": "number",
               "mandatory": false
             },
-            "authorizationUrl": {
-              "range": "string",
-              "mandatory": false
-            },
             "callbackPath": {
               "propertyTerm": "apiContract.path",
               "range": "string",
@@ -535,10 +703,6 @@
             },
             "objectStore": {
               "range": "string",
-              "mandatory": false
-            },
-            "immediate": {
-              "range": "boolean",
               "mandatory": false
             },
             "accessTokenUrl": {
@@ -549,7 +713,44 @@
               "range": "ConnectionProperties",
               "mandatory": false
             },
+            "after": {
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerKey": {
+              "propertyTerm": "connectivity.clientId",
+              "range": "string",
+              "mandatory": true
+            },
+            "display": {
+              "range": "string",
+              "mandatory": true
+            },
+            "typedSecurityLevel": {
+              "range": "number",
+              "mandatory": false
+            },
+            "anotherConnectionProperties": {
+              "range": "ConnectionProperties",
+              "mandatory": false
+            },
+            "oauthConnectionType": {
+              "range": "string",
+              "mandatory": false
+            },
+            "authorizationUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "immediate": {
+              "range": "boolean",
+              "mandatory": false
+            },
             "resourceOwnerId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "literalSecurityDescription": {
               "range": "string",
               "mandatory": false
             },
@@ -560,15 +761,6 @@
             "scopes": {
               "range": "string",
               "mandatory": false
-            },
-            "after": {
-              "range": "string",
-              "mandatory": false
-            },
-            "consumerKey": {
-              "propertyTerm": "connectivity.clientId",
-              "range": "string",
-              "mandatory": true
             },
             "prompt": {
               "range": "boolean",
@@ -613,10 +805,38 @@
         }
       },
       "nodeMappings": {
+        "MyPojo": {
+          "mapping": {
+            "pojoId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "pojoName": {
+              "range": "string",
+              "mandatory": false
+            },
+            "pojoBoolean": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "pojoNumber": {
+              "range": "number",
+              "mandatory": false
+            }
+          }
+        },
         "ConnectionProperties": {
           "mapping": {
+            "connectionPropertyGrade": {
+              "range": "string",
+              "mandatory": false
+            },
             "connectionDescription": {
               "range": "string",
+              "mandatory": false
+            },
+            "importedPojo": {
+              "range": "MyPojo",
               "mandatory": false
             },
             "connectionType": {
@@ -631,16 +851,16 @@
               "range": "ConnectionProperties",
               "mandatory": false
             },
-            "before": {
+            "resolverConnectionDisplayName": {
               "range": "string",
               "mandatory": false
             },
-            "display": {
+            "profileDescription": {
               "range": "string",
-              "mandatory": true
+              "mandatory": false
             },
-            "anotherConnectionProperties": {
-              "range": "ConnectionProperties",
+            "before": {
+              "range": "string",
               "mandatory": false
             },
             "detailsPriority": {
@@ -656,8 +876,8 @@
               "range": "string",
               "mandatory": false
             },
-            "oauthConnectionType": {
-              "range": "string",
+            "externalPojo": {
+              "range": "MyPojo",
               "mandatory": false
             },
             "securityLevel": {
@@ -673,10 +893,6 @@
               "range": "number",
               "mandatory": false
             },
-            "authorizationUrl": {
-              "range": "string",
-              "mandatory": false
-            },
             "callbackPath": {
               "propertyTerm": "apiContract.path",
               "range": "string",
@@ -684,10 +900,6 @@
             },
             "objectStore": {
               "range": "string",
-              "mandatory": false
-            },
-            "immediate": {
-              "range": "boolean",
               "mandatory": false
             },
             "accessTokenUrl": {
@@ -698,7 +910,44 @@
               "range": "ConnectionProperties",
               "mandatory": false
             },
+            "after": {
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerKey": {
+              "propertyTerm": "connectivity.clientId",
+              "range": "string",
+              "mandatory": true
+            },
+            "display": {
+              "range": "string",
+              "mandatory": true
+            },
+            "typedSecurityLevel": {
+              "range": "number",
+              "mandatory": false
+            },
+            "anotherConnectionProperties": {
+              "range": "ConnectionProperties",
+              "mandatory": false
+            },
+            "oauthConnectionType": {
+              "range": "string",
+              "mandatory": false
+            },
+            "authorizationUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "immediate": {
+              "range": "boolean",
+              "mandatory": false
+            },
             "resourceOwnerId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "literalSecurityDescription": {
               "range": "string",
               "mandatory": false
             },
@@ -709,15 +958,6 @@
             "scopes": {
               "range": "string",
               "mandatory": false
-            },
-            "after": {
-              "range": "string",
-              "mandatory": false
-            },
-            "consumerKey": {
-              "propertyTerm": "connectivity.clientId",
-              "range": "string",
-              "mandatory": true
             },
             "prompt": {
               "range": "boolean",
@@ -762,10 +1002,38 @@
         }
       },
       "nodeMappings": {
+        "MyPojo": {
+          "mapping": {
+            "pojoId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "pojoName": {
+              "range": "string",
+              "mandatory": false
+            },
+            "pojoBoolean": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "pojoNumber": {
+              "range": "number",
+              "mandatory": false
+            }
+          }
+        },
         "ConnectionProperties": {
           "mapping": {
+            "connectionPropertyGrade": {
+              "range": "string",
+              "mandatory": false
+            },
             "connectionDescription": {
               "range": "string",
+              "mandatory": false
+            },
+            "importedPojo": {
+              "range": "MyPojo",
               "mandatory": false
             },
             "connectionType": {
@@ -778,6 +1046,14 @@
           "mapping": {
             "connectionProperties": {
               "range": "ConnectionProperties",
+              "mandatory": false
+            },
+            "resolverConnectionDisplayName": {
+              "range": "string",
+              "mandatory": false
+            },
+            "profileDescription": {
+              "range": "string",
               "mandatory": false
             },
             "before": {
@@ -795,6 +1071,10 @@
             "externalCallbackUrl": {
               "propertyTerm": "core.urlTemplate",
               "range": "string",
+              "mandatory": false
+            },
+            "externalPojo": {
+              "range": "MyPojo",
               "mandatory": false
             },
             "securityLevel": {
@@ -844,6 +1124,10 @@
               "range": "string",
               "mandatory": true
             },
+            "typedSecurityLevel": {
+              "range": "number",
+              "mandatory": false
+            },
             "anotherConnectionProperties": {
               "range": "ConnectionProperties",
               "mandatory": false
@@ -869,6 +1153,10 @@
               "mandatory": true
             },
             "resourceOwnerId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "literalSecurityDescription": {
               "range": "string",
               "mandatory": false
             },
@@ -927,10 +1215,38 @@
         }
       },
       "nodeMappings": {
+        "MyPojo": {
+          "mapping": {
+            "pojoId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "pojoName": {
+              "range": "string",
+              "mandatory": false
+            },
+            "pojoBoolean": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "pojoNumber": {
+              "range": "number",
+              "mandatory": false
+            }
+          }
+        },
         "ConnectionProperties": {
           "mapping": {
+            "connectionPropertyGrade": {
+              "range": "string",
+              "mandatory": false
+            },
             "connectionDescription": {
               "range": "string",
+              "mandatory": false
+            },
+            "importedPojo": {
+              "range": "MyPojo",
               "mandatory": false
             },
             "connectionType": {
@@ -954,9 +1270,21 @@
               "range": "string",
               "mandatory": false
             },
+            "resolverConnectionDisplayName": {
+              "range": "string",
+              "mandatory": false
+            },
+            "profileDescription": {
+              "range": "string",
+              "mandatory": false
+            },
             "display": {
               "range": "string",
               "mandatory": true
+            },
+            "typedSecurityLevel": {
+              "range": "number",
+              "mandatory": false
             },
             "anotherConnectionProperties": {
               "range": "ConnectionProperties",
@@ -964,6 +1292,10 @@
             },
             "detailsPriority": {
               "range": "number",
+              "mandatory": false
+            },
+            "externalPojo": {
+              "range": "MyPojo",
               "mandatory": false
             },
             "oauthConnectionType": {
@@ -994,6 +1326,10 @@
               "propertyTerm": "connectivity.clientSecret",
               "range": "string",
               "mandatory": true
+            },
+            "literalSecurityDescription": {
+              "range": "string",
+              "mandatory": false
             },
             "profileLevel": {
               "range": "number",
@@ -1046,10 +1382,38 @@
         }
       },
       "nodeMappings": {
+        "MyPojo": {
+          "mapping": {
+            "pojoId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "pojoName": {
+              "range": "string",
+              "mandatory": false
+            },
+            "pojoBoolean": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "pojoNumber": {
+              "range": "number",
+              "mandatory": false
+            }
+          }
+        },
         "ConnectionProperties": {
           "mapping": {
+            "connectionPropertyGrade": {
+              "range": "string",
+              "mandatory": false
+            },
             "connectionDescription": {
               "range": "string",
+              "mandatory": false
+            },
+            "importedPojo": {
+              "range": "MyPojo",
               "mandatory": false
             },
             "connectionType": {
@@ -1064,16 +1428,16 @@
               "range": "ConnectionProperties",
               "mandatory": false
             },
-            "before": {
+            "resolverConnectionDisplayName": {
               "range": "string",
               "mandatory": false
             },
-            "display": {
+            "profileDescription": {
               "range": "string",
-              "mandatory": true
+              "mandatory": false
             },
-            "anotherConnectionProperties": {
-              "range": "ConnectionProperties",
+            "before": {
+              "range": "string",
               "mandatory": false
             },
             "detailsPriority": {
@@ -1089,8 +1453,8 @@
               "range": "string",
               "mandatory": false
             },
-            "oauthConnectionType": {
-              "range": "string",
+            "externalPojo": {
+              "range": "MyPojo",
               "mandatory": false
             },
             "securityLevel": {
@@ -1106,10 +1470,6 @@
               "range": "number",
               "mandatory": false
             },
-            "authorizationUrl": {
-              "range": "string",
-              "mandatory": false
-            },
             "callbackPath": {
               "propertyTerm": "apiContract.path",
               "range": "string",
@@ -1117,10 +1477,6 @@
             },
             "objectStore": {
               "range": "string",
-              "mandatory": false
-            },
-            "immediate": {
-              "range": "boolean",
               "mandatory": false
             },
             "accessTokenUrl": {
@@ -1131,7 +1487,44 @@
               "range": "ConnectionProperties",
               "mandatory": false
             },
+            "after": {
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerKey": {
+              "propertyTerm": "connectivity.clientId",
+              "range": "string",
+              "mandatory": true
+            },
+            "display": {
+              "range": "string",
+              "mandatory": true
+            },
+            "typedSecurityLevel": {
+              "range": "number",
+              "mandatory": false
+            },
+            "anotherConnectionProperties": {
+              "range": "ConnectionProperties",
+              "mandatory": false
+            },
+            "oauthConnectionType": {
+              "range": "string",
+              "mandatory": false
+            },
+            "authorizationUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "immediate": {
+              "range": "boolean",
+              "mandatory": false
+            },
             "resourceOwnerId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "literalSecurityDescription": {
               "range": "string",
               "mandatory": false
             },
@@ -1142,15 +1535,6 @@
             "scopes": {
               "range": "string",
               "mandatory": false
-            },
-            "after": {
-              "range": "string",
-              "mandatory": false
-            },
-            "consumerKey": {
-              "propertyTerm": "connectivity.clientId",
-              "range": "string",
-              "mandatory": true
             },
             "prompt": {
               "range": "boolean",
@@ -1195,10 +1579,38 @@
         }
       },
       "nodeMappings": {
+        "MyPojo": {
+          "mapping": {
+            "pojoId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "pojoName": {
+              "range": "string",
+              "mandatory": false
+            },
+            "pojoBoolean": {
+              "range": "boolean",
+              "mandatory": false
+            },
+            "pojoNumber": {
+              "range": "number",
+              "mandatory": false
+            }
+          }
+        },
         "ConnectionProperties": {
           "mapping": {
+            "connectionPropertyGrade": {
+              "range": "string",
+              "mandatory": false
+            },
             "connectionDescription": {
               "range": "string",
+              "mandatory": false
+            },
+            "importedPojo": {
+              "range": "MyPojo",
               "mandatory": false
             },
             "connectionType": {
@@ -1213,16 +1625,16 @@
               "range": "ConnectionProperties",
               "mandatory": false
             },
-            "before": {
+            "resolverConnectionDisplayName": {
               "range": "string",
               "mandatory": false
             },
-            "display": {
+            "profileDescription": {
               "range": "string",
-              "mandatory": true
+              "mandatory": false
             },
-            "anotherConnectionProperties": {
-              "range": "ConnectionProperties",
+            "before": {
+              "range": "string",
               "mandatory": false
             },
             "detailsPriority": {
@@ -1238,8 +1650,8 @@
               "range": "string",
               "mandatory": false
             },
-            "oauthConnectionType": {
-              "range": "string",
+            "externalPojo": {
+              "range": "MyPojo",
               "mandatory": false
             },
             "securityLevel": {
@@ -1255,10 +1667,6 @@
               "range": "number",
               "mandatory": false
             },
-            "authorizationUrl": {
-              "range": "string",
-              "mandatory": false
-            },
             "callbackPath": {
               "propertyTerm": "apiContract.path",
               "range": "string",
@@ -1266,10 +1674,6 @@
             },
             "objectStore": {
               "range": "string",
-              "mandatory": false
-            },
-            "immediate": {
-              "range": "boolean",
               "mandatory": false
             },
             "accessTokenUrl": {
@@ -1280,7 +1684,44 @@
               "range": "ConnectionProperties",
               "mandatory": false
             },
+            "after": {
+              "range": "string",
+              "mandatory": false
+            },
+            "consumerKey": {
+              "propertyTerm": "connectivity.clientId",
+              "range": "string",
+              "mandatory": true
+            },
+            "display": {
+              "range": "string",
+              "mandatory": true
+            },
+            "typedSecurityLevel": {
+              "range": "number",
+              "mandatory": false
+            },
+            "anotherConnectionProperties": {
+              "range": "ConnectionProperties",
+              "mandatory": false
+            },
+            "oauthConnectionType": {
+              "range": "string",
+              "mandatory": false
+            },
+            "authorizationUrl": {
+              "range": "string",
+              "mandatory": false
+            },
+            "immediate": {
+              "range": "boolean",
+              "mandatory": false
+            },
             "resourceOwnerId": {
+              "range": "string",
+              "mandatory": false
+            },
+            "literalSecurityDescription": {
               "range": "string",
               "mandatory": false
             },
@@ -1291,15 +1732,6 @@
             "scopes": {
               "range": "string",
               "mandatory": false
-            },
-            "after": {
-              "range": "string",
-              "mandatory": false
-            },
-            "consumerKey": {
-              "propertyTerm": "connectivity.clientId",
-              "range": "string",
-              "mandatory": true
             },
             "prompt": {
               "range": "boolean",

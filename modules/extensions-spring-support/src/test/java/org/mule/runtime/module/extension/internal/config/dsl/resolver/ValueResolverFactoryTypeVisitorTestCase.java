@@ -17,6 +17,7 @@ import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
+import org.mule.runtime.module.extension.internal.runtime.resolver.resolver.ValueResolverFactoryTypeVisitor;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;

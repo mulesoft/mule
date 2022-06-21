@@ -4,14 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.config.dsl.resolver;
+package org.mule.runtime.module.extension.internal.runtime.resolver.resolver;
 
-import static com.google.common.collect.ImmutableList.of;
 import static java.lang.String.format;
 import static java.time.Instant.ofEpochMilli;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
-import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.locateParsingDelegate;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 
@@ -20,19 +21,19 @@ import org.mule.metadata.api.model.DateType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
-import org.mule.runtime.module.extension.internal.config.dsl.object.CharsetValueResolverParsingDelegate;
-import org.mule.runtime.module.extension.internal.config.dsl.object.DefaultValueResolverParsingDelegate;
-import org.mule.runtime.module.extension.internal.config.dsl.object.MediaTypeValueResolverParsingDelegate;
-import org.mule.runtime.module.extension.internal.config.dsl.object.ParsingDelegate;
-import org.mule.runtime.module.extension.internal.config.dsl.object.ValueResolverParsingDelegate;
+import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.config.resolver.BasicTypeValueResolverFactoryTypeVisitor;
+import org.mule.runtime.module.extension.internal.runtime.resolver.RegistryLookupValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
+import java.nio.charset.Charset;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,8 +42,11 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
@@ -55,9 +59,7 @@ import org.joda.time.format.ISODateTimeFormat;
  */
 public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFactoryTypeVisitor {
 
-  private final List<ValueResolverParsingDelegate> valueResolverParsingDelegates =
-      of(new CharsetValueResolverParsingDelegate(), new MediaTypeValueResolverParsingDelegate());
-  private final ValueResolverParsingDelegate defaultValueResolverParsingDelegate = new DefaultValueResolverParsingDelegate();
+  private final Function<String, ValueResolver> defaultValueResolver = key -> new RegistryLookupValueResolver<>(key);
 
   private final DslSyntaxResolver dslSyntaxResolver;
   private final Object defaultValue;
@@ -89,14 +91,14 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
     }
 
     ValueResolver valueResolver;
-    Optional<? extends ParsingDelegate> delegate = locateParsingDelegate(valueResolverParsingDelegates, objectType);
+    Optional<Function<String, ValueResolver>> delegate = getCustomValueResolver(objectType);
     Optional<DslElementSyntax> typeDsl = dslSyntaxResolver.resolve(objectType);
 
     if (delegate.isPresent() && typeDsl.isPresent()) {
-      valueResolver = (ValueResolver) delegate.get().parse(getValue().toString(), objectType, typeDsl.get());
+      valueResolver = delegate.get().apply(getValue().toString());
     } else {
       valueResolver = acceptsReferences
-          ? defaultValueResolverParsingDelegate.parse(getValue().toString(), objectType, null)
+          ? defaultValueResolver.apply(getValue().toString())
           : new StaticValueResolver<>(getValue());
     }
 
@@ -105,10 +107,10 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
 
   @Override
   protected void defaultVisit(MetadataType metadataType) {
-    ValueResolver delegateResolver = locateParsingDelegate(valueResolverParsingDelegates, metadataType)
-        .map(delegate -> delegate.parse(getValue().toString(), metadataType, null))
+    ValueResolver delegateResolver = getCustomValueResolver(metadataType)
+        .map(delegate -> delegate.apply(getValue().toString()))
         .orElseGet(() -> acceptsReferences
-            ? defaultValueResolverParsingDelegate.parse(getValue().toString(), metadataType, null)
+            ? defaultValueResolver.apply(getValue().toString())
             : new TypeSafeValueResolverWrapper(new StaticValueResolver<>(getValue()), getExpectedClass()));
 
     setResolver(delegateResolver);
@@ -129,6 +131,15 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
     }
 
     return doParseDate(value, type);
+  }
+
+  private Optional<Function<String, ValueResolver>> getCustomValueResolver(MetadataType metadataType) {
+    if (MediaType.class.equals(getType(metadataType))) {
+      return of(key -> new StaticValueResolver<>(DataType.builder().mediaType(key).build().getMediaType()));
+    } else if (ExtensionMetadataTypeUtils.getType(metadataType).map(Charset.class::equals).orElse(false)) {
+      return of(key -> new StaticValueResolver<>(parseCharset(key)));
+    }
+    return empty();
   }
 
   private ValueResolver doParseDate(Object value, Class<?> type) {
