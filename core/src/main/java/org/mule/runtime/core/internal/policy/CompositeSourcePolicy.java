@@ -57,7 +57,6 @@ public class CompositeSourcePolicy
   private final SourcePolicyProcessorFactory sourcePolicyProcessorFactory;
   private final ReactiveProcessor flowExecutionProcessor;
   private final Optional<Function<MessagingException, MessagingException>> resolver;
-  private final PolicyTraceLogger policyTraceLogger = new PolicyTraceLogger();
 
   /**
    * Creates a new source policy composed by several {@link Policy} that will be chain together.
@@ -193,6 +192,7 @@ public class CompositeSourcePolicy
   @Override
   protected Publisher<CoreEvent> applyPolicy(Policy policy, ReactiveProcessor nextProcessor, Publisher<CoreEvent> eventPub) {
     final ReactiveProcessor createSourcePolicy = sourcePolicyProcessorFactory.createSourcePolicy(policy, nextProcessor);
+    final PolicyTraceLogger policyTraceLogger = new PolicyTraceLogger();
     return from(eventPub)
         .doOnNext(event -> policyTraceLogger.logSourcePolicyStart(policy, event))
         .transform(createSourcePolicy)
@@ -212,7 +212,7 @@ public class CompositeSourcePolicy
   public void process(CoreEvent sourceEvent,
                       MessageSourceResponseParametersProcessor respParamProcessor,
                       CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> callback) {
-    commonPolicy.process(sourceEvent, respParamProcessor, callback);
+    commonPolicy.process(this, sourceEvent, respParamProcessor, callback);
   }
 
   private static Map<String, Object> concatMaps(Map<String, Object> originalResponseParameters,
