@@ -194,7 +194,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
 
     Optional<ConfigurationModel> configurationModel =
         selectImplicitConfigurationModel(extensionModel, getConfigurationForComponent(extensionModel,
-                                                                                       componentModel));
+                                                                                      componentModel));
 
     return configurationModel.map(c -> createImplicitConfiguration(extensionModel, c, muleEvent));
   }
