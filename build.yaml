@@ -3,7 +3,7 @@ upstreamProjects:
   Mule-runtime/mule-profiling-api/master,
   Mule-runtime/mule-api/master-JULY-2022,
   Mule-runtime/mule-extensions-api/master,
-  Mule-runtime/mule-artifact-ast/master,
+  Mule-runtime/mule-artifact-ast/master-JULY-2022,
   Mule-runtime/mule-properties-api/master,
   DataWeave/data-weave/master,
   Mule-runtime/mule-maven-client/master
