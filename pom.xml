@@ -5,7 +5,7 @@
     <groupId>org.mule.runtime</groupId>
     <artifactId>mule</artifactId>
     <packaging>pom</packaging>
-    <version>4.2.2-HF-SNAPSHOT</version>
+    <version>4.2.2-20220622</version>
 
     <!-- Organization -->
     <organization>
