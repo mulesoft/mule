@@ -58,7 +58,6 @@ public class ActiveMQResourceReleaser implements ResourceReleaser {
       }
 
       for (Thread thread : threads) {
-
         if (isActiveMQInactivityMonitorTimerThread(classLoader, thread)) {
           clearReferencesStopTimerThread(thread);
           thread.interrupt();
