@@ -81,4 +81,10 @@ public class DefaultMemoryManagementServiceTestCase extends AbstractMuleTestCase
     memoryManagementService.getByteBufferProvider(TEST_BYTE_BUFFER, HEAP);
     memoryManagementService.getByteBufferProvider(TEST_BYTE_BUFFER, DIRECT);
   }
+
+  @Test
+  @Description("When disposing a not present bytebuffer provider, no exceptions should be raised.")
+  public void disposingByteBufferProviderNotPresent() {
+    memoryManagementService.disposeByteBufferProvider("notPresentByteBuffer");
+  }
 }

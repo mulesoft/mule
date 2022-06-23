@@ -87,7 +87,7 @@ public class DefaultMemoryManagementService implements ProfiledMemoryManagementS
     if (bufferProvider != null) {
       bufferProvider.dispose();
     } else {
-      LOGGER.warn("Unable to dispose not present ByteBufferProvider " + name);
+      LOGGER.warn("Unable to dispose not present ByteBufferProvider '{}'", name);
     }
   }
 
