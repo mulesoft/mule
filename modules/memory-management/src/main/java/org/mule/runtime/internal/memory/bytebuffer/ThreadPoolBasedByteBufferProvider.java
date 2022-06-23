@@ -62,11 +62,11 @@ public abstract class ThreadPoolBasedByteBufferProvider implements ByteBufferPro
     }
 
     if (numberOfPools < 0) {
-      throw new IllegalArgumentException("baseByteBufferSize must be greater than zero");
+      throw new IllegalArgumentException("numberOfPools must be greater than zero");
     }
 
     if (!isPowerOfTwo(baseByteBufferSize) || !isPowerOfTwo(growthFactor)) {
-      throw new IllegalArgumentException("minBufferSize and growthFactor must be a power of two");
+      throw new IllegalArgumentException("baseByteBufferSize and growthFactor must be a power of two");
     }
 
     this.maxBufferSize = maxBufferSize;
