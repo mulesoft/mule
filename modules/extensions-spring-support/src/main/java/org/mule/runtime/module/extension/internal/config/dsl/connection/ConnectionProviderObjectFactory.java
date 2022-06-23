@@ -7,30 +7,36 @@
 package org.mule.runtime.module.extension.internal.config.dsl.connection;
 
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.module.extension.internal.runtime.config.ConfigurationCreationUtils.createConnectionProviderResolver;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.PoolingProfile;
-import org.mule.runtime.api.dsl.DslResolvingContext;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
-import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
+import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
+import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
+import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantTypeVisitor;
+import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
+import org.mule.runtime.extension.api.connectivity.oauth.PlatformManagedOAuthGrantType;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionProviderSettings;
+import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.config.DefaultConnectionProviderObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeOAuthHandler;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials.ClientCredentialsConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials.ClientCredentialsOAuthHandler;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.SoapConnectionProviderObjectBuilder;
+
+import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 
@@ -54,13 +60,7 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
   private ConfigurationProperties properties;
 
   @Inject
-  private ExtensionManager extensionManager;
-
-  @Inject
   private MuleContext muleContext;
-
-  private LazyValue<DslSyntaxResolver> dslSyntaxResolver;
-
 
   public ConnectionProviderObjectFactory(ConnectionProviderModel providerModel,
                                          ExtensionModel extensionModel,
@@ -74,54 +74,84 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
     this.authCodeHandler = authCodeHandler;
     this.clientCredentialsHandler = clientCredentialsHandler;
     this.platformManagedOAuthHandler = platformManagedOAuthHandler;
-    dslSyntaxResolver = new LazyValue<>(() -> DslSyntaxResolver
-        .getDefault(extensionModel, DslResolvingContext.getDefault(extensionManager.getExtensions())));
   }
 
   @Override
   public ConnectionProviderResolver doGetObject() {
+    Callable<ResolverSet> callable = () -> getParametersResolver().getParametersAsResolverSet(providerModel, muleContext);
+    ResolverSet resolverSet = withContextClassLoader(getClassLoader(extensionModel), callable);
 
+    ConnectionProviderObjectBuilder builder;
     if (extensionModel.getModelProperty(SoapExtensionModelProperty.class).isPresent()) {
-      ResolverSet resolverSet = withContextClassLoader(getClassLoader(extensionModel),
-                                                       () -> getParametersResolver().getParametersAsResolverSet(providerModel,
-                                                                                                                muleContext));
-
-      SoapConnectionProviderObjectBuilder builder = new SoapConnectionProviderObjectBuilder(
-                                                                                            providerModel,
-                                                                                            resolverSet,
-                                                                                            poolingProfile,
-                                                                                            reconnectionConfig,
-                                                                                            extensionModel,
-                                                                                            expressionManager,
-                                                                                            muleContext);
-
-      return new ConnectionProviderResolver<>(builder, resolverSet, muleContext);
+      builder = new SoapConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile,
+                                                        reconnectionConfig,
+                                                        extensionModel,
+                                                        expressionManager,
+                                                        muleContext);
+    } else if (providerModel.getModelProperty(OAuthModelProperty.class).isPresent()) {
+      builder = resolveOAuthBuilder(resolverSet);
+    } else {
+      builder = new DefaultConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile,
+                                                           reconnectionConfig,
+                                                           extensionModel,
+                                                           expressionManager,
+                                                           muleContext);
     }
 
-    try {
-      return createConnectionProviderResolver(
-                                              extensionModel,
-                                              getConnectionProviderSettings(),
-                                              properties,
-                                              expressionManager,
-                                              reflectionCache,
-                                              getRepresentation(),
-                                              dslSyntaxResolver.get(),
-                                              muleContext);
-    } catch (MuleException e) {
-      throw new MuleRuntimeException(e);
-    }
+    return new ConnectionProviderResolver<>(builder, resolverSet, muleContext);
   }
 
-  private ConnectionProviderSettings getConnectionProviderSettings() {
-    return new ConnectionProviderSettings(
-                                          providerModel,
-                                          parameters,
-                                          poolingProfile,
-                                          reconnectionConfig,
-                                          authCodeHandler,
-                                          clientCredentialsHandler,
-                                          platformManagedOAuthHandler);
+  private ConnectionProviderObjectBuilder resolveOAuthBuilder(ResolverSet resolverSet) {
+    OAuthGrantType grantType = providerModel.getModelProperty(OAuthModelProperty.class)
+        .map(OAuthModelProperty::getGrantTypes)
+        .get().get(0);
+
+    Reference<ConnectionProviderObjectBuilder> builder = new Reference<>();
+
+    grantType.accept(new OAuthGrantTypeVisitor() {
+
+      @Override
+      public void visit(AuthorizationCodeGrantType grantType) {
+        builder.set(new AuthorizationCodeConnectionProviderObjectBuilder(providerModel,
+                                                                         resolverSet,
+                                                                         poolingProfile,
+                                                                         reconnectionConfig,
+                                                                         grantType,
+                                                                         authCodeHandler,
+                                                                         extensionModel,
+                                                                         expressionManager,
+                                                                         muleContext));
+      }
+
+      @Override
+      public void visit(ClientCredentialsGrantType grantType) {
+        builder.set(new ClientCredentialsConnectionProviderObjectBuilder(providerModel,
+                                                                         resolverSet,
+                                                                         poolingProfile,
+                                                                         reconnectionConfig,
+                                                                         grantType,
+                                                                         clientCredentialsHandler,
+                                                                         extensionModel,
+                                                                         expressionManager,
+                                                                         muleContext));
+      }
+
+      @Override
+      public void visit(PlatformManagedOAuthGrantType grantType) {
+        builder.set(new PlatformManagedOAuthConnectionProviderObjectBuilder(providerModel,
+                                                                            resolverSet,
+                                                                            poolingProfile,
+                                                                            reconnectionConfig,
+                                                                            grantType,
+                                                                            platformManagedOAuthHandler,
+                                                                            properties,
+                                                                            extensionModel,
+                                                                            expressionManager,
+                                                                            muleContext));
+      }
+    });
+
+    return builder.get();
   }
 
   public void setPoolingProfile(PoolingProfile poolingProfile) {
