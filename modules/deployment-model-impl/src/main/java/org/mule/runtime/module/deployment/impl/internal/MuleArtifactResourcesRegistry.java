@@ -172,7 +172,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
         moduleRepository = MODULE_REPOSITORY;
         containerClassLoader = CONTAINER_CLASS_LOADER;
       } else {
-        containerClassLoader = createContainerClassLoader(moduleRepository, getClass().getClassLoader());
+        containerClassLoader = createContainerClassLoader(moduleRepository);
       }
 
       try {

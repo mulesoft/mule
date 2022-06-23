@@ -31,6 +31,6 @@ public class ArtifactClassLoaderResolverConstants {
    * An {@link ArtifactClassLoader} for the Mule Container with the modules available in {@link #MODULE_REPOSITORY}.
    */
   public static final ArtifactClassLoader CONTAINER_CLASS_LOADER =
-      createContainerClassLoader(MODULE_REPOSITORY, ArtifactClassLoaderResolver.class.getClassLoader());
+      createContainerClassLoader(MODULE_REPOSITORY);
 
 }

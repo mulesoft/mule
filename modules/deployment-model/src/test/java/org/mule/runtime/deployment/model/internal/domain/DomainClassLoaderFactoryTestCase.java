@@ -97,9 +97,7 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
 
     ModuleRepository moduleRepository = mock(ModuleRepository.class);
     DefaultArtifactClassLoaderResolver artifactClassLoaderResolver =
-        new DefaultArtifactClassLoaderResolver(createContainerClassLoader(moduleRepository,
-                                                                          DomainClassLoaderFactoryTestCase.class
-                                                                              .getClassLoader()),
+        new DefaultArtifactClassLoaderResolver(createContainerClassLoader(moduleRepository),
                                                moduleRepository,
                                                new DefaultNativeLibraryFinderFactory(name -> getAppDataFolder(name)));
     DefaultDomainClassLoaderBuilder domainClassLoaderBuilder = new DefaultDomainClassLoaderBuilder(artifactClassLoaderResolver);

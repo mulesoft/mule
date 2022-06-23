@@ -79,8 +79,7 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
           .setVersion("1.0").setClassifier("mule-plugin").build();
 
   private final ModuleRepository moduleRepository = mock(ModuleRepository.class);
-  private final ArtifactClassLoader containerClassLoader =
-      createContainerClassLoader(moduleRepository, DefaultRegionPluginClassLoadersFactoryTestCase.class.getClassLoader());
+  private final ArtifactClassLoader containerClassLoader = createContainerClassLoader(moduleRepository);
   private final DefaultRegionPluginClassLoadersFactory factory =
       new DefaultRegionPluginClassLoadersFactory(new DefaultArtifactClassLoaderResolver(containerClassLoader,
                                                                                         moduleRepository, null));

@@ -96,9 +96,7 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
         new DefaultArtifactDescriptorFactoryProvider().createBundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
 
     DefaultArtifactClassLoaderResolver artifactClassLoaderResolver =
-        new DefaultArtifactClassLoaderResolver(createContainerClassLoader(moduleRepository,
-                                                                          TestApplicationFactory.class
-                                                                              .getClassLoader()),
+        new DefaultArtifactClassLoaderResolver(createContainerClassLoader(moduleRepository),
                                                moduleRepository,
                                                new DefaultNativeLibraryFinderFactory(name -> getAppDataFolder(name)));
     ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory =

@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader;
 
+import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleLibFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.runtime.module.artifact.activation.internal.classloader.ArtifactClassLoaderResolverConstants.CONTAINER_CLASS_LOADER;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver.getApplicationId;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver.getDomainId;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
@@ -125,8 +125,8 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
 
   @Before
   public void setup() {
-    artifactClassLoaderResolver =
-        spy(new DefaultArtifactClassLoaderResolver(CONTAINER_CLASS_LOADER, moduleRepository, nativeLibraryFinderFactory));
+    artifactClassLoaderResolver = spy(new DefaultArtifactClassLoaderResolver(createContainerClassLoader(moduleRepository),
+                                                                             moduleRepository, nativeLibraryFinderFactory));
 
     plugin1Descriptor.setBundleDescriptor(PLUGIN1_BUNDLE_DESCRIPTOR);
     plugin2Descriptor.setBundleDescriptor(PLUGIN2_BUNDLE_DESCRIPTOR);
@@ -184,6 +184,10 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
     final String repeatedPackageName = "module&domain-package";
     when(muleModule.getExportedPackages()).thenReturn(singleton(repeatedPackageName));
     when(moduleRepository.getModules()).thenReturn(singletonList(muleModule));
+    // refresh the artifactClassLoaderResolver with the updated modules in the moduleRepository
+    artifactClassLoaderResolver = spy(new DefaultArtifactClassLoaderResolver(createContainerClassLoader(moduleRepository),
+                                                                             moduleRepository, nativeLibraryFinderFactory));
+
     final String onlyDomainPackageName = "domain-package";
 
     final MuleDeployableArtifactClassLoader domainClassLoader =
@@ -289,6 +293,10 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
     final String repeatedPackageName = "module&app-package";
     when(muleModule.getExportedPackages()).thenReturn(singleton(repeatedPackageName));
     when(moduleRepository.getModules()).thenReturn(singletonList(muleModule));
+    // refresh the artifactClassLoaderResolver with the updated modules in the moduleRepository
+    artifactClassLoaderResolver = spy(new DefaultArtifactClassLoaderResolver(createContainerClassLoader(moduleRepository),
+                                                                             moduleRepository, nativeLibraryFinderFactory));
+
     final String onlyAppPackageName = "app-package";
 
     final MuleDeployableArtifactClassLoader applicationClassLoader =
@@ -381,6 +389,9 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
     when(privilegedModule.getPrivilegedArtifacts()).thenReturn(singleton(PLUGIN_ARTIFACT_ID1));
     when(privilegedModule.getPrivilegedExportedPackages()).thenReturn(singleton(PRIVILEGED_PACKAGE));
     when(moduleRepository.getModules()).thenReturn(singletonList(privilegedModule));
+    // refresh the artifactClassLoaderResolver with the updated modules in the moduleRepository
+    artifactClassLoaderResolver = spy(new DefaultArtifactClassLoaderResolver(createContainerClassLoader(moduleRepository),
+                                                                             moduleRepository, nativeLibraryFinderFactory));
 
     final MuleArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
         .createMulePluginClassLoader(applicationClassLoader, plugin1Descriptor,
@@ -466,6 +477,9 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
     final String package2Name = "org.mule.sdk.api.package";
     when(muleModule.getExportedPackages()).thenReturn(Stream.of(package1Name, package2Name).collect(toSet()));
     when(moduleRepository.getModules()).thenReturn(singletonList(muleModule));
+    // refresh the artifactClassLoaderResolver with the updated modules in the moduleRepository
+    artifactClassLoaderResolver = spy(new DefaultArtifactClassLoaderResolver(createContainerClassLoader(moduleRepository),
+                                                                             moduleRepository, nativeLibraryFinderFactory));
 
     MuleDeployableArtifactClassLoader applicationClassLoader = getTestApplicationClassLoader(emptyList());
 

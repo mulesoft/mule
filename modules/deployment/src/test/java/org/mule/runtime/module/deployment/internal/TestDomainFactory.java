@@ -79,9 +79,7 @@ public class TestDomainFactory extends DefaultDomainFactory {
 
     ArtifactClassLoaderResolver artifactClassLoaderResolver =
         new TrackingArtifactClassLoaderResolverDecorator(artifactClassLoaderManager,
-                                                         new DefaultArtifactClassLoaderResolver(createContainerClassLoader(moduleRepository,
-                                                                                                                           TestDomainFactory.class
-                                                                                                                               .getClassLoader()),
+                                                         new DefaultArtifactClassLoaderResolver(createContainerClassLoader(moduleRepository),
                                                                                                 moduleRepository,
                                                                                                 new DefaultNativeLibraryFinderFactory(name -> getAppDataFolder(name))));
 
