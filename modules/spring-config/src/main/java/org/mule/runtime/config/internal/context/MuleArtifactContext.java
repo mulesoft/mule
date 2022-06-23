@@ -628,6 +628,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                                     getConfigurationProperties(),
                                                     artifactProperties,
                                                     getArtifactType(),
+                                                    getApplicationModel(),
                                                     getOptionalObjectsController(),
                                                     beanFactory,
                                                     getServiceDiscoverer(),

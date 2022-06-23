@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.config;
+package org.mule.runtime.config.internal.registry;
 
 import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertSame;

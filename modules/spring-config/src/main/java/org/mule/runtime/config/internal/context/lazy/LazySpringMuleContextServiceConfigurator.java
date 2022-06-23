@@ -31,6 +31,7 @@ import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.util.ResourceLocator;
 import org.mule.runtime.api.value.ValueProviderService;
+import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.config.internal.bean.lazy.LazyConnectivityTestingService;
 import org.mule.runtime.config.internal.bean.lazy.LazyMetadataService;
 import org.mule.runtime.config.internal.bean.lazy.LazySampleDataService;
@@ -77,12 +78,14 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
                                                   MuleFunctionsBindingContextProvider coreFunctionsProvider,
                                                   ConfigurationProperties configurationProperties,
                                                   ArtifactType artifactType,
+                                                  ArtifactAst artifactAst,
                                                   OptionalObjectsController optionalObjectsController,
                                                   BeanDefinitionRegistry beanDefinitionRegistry,
                                                   Registry serviceLocator,
                                                   ResourceLocator resourceLocator,
                                                   MemoryManagementService memoryManagementService) {
     super(muleContext, coreFunctionsProvider, configurationProperties, artifactProperties, artifactType,
+          artifactAst,
           optionalObjectsController,
           beanDefinitionRegistry,
           serviceLocator, resourceLocator, memoryManagementService);

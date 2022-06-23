@@ -239,6 +239,7 @@ public class MuleProperties {
   public static final String OBJECT_TRANSACTION_FACTORY_LOCATOR = "_muleTransactionFactoryLocator";
   public static final String OBJECT_STATISTICS = "_muleStatistics";
   public static final String OBJECT_RESOURCE_LOCATOR = "_muleResourceLocator";
+  public static final String OBJECT_ARTIFACT_AST = "_muleArtifactAst";
   public static final String COMPATIBILITY_PLUGIN_INSTALLED = "_compatibilityPluginInstalled";
   public static final String MULE_PROFILING_SERVICE_KEY = "_muleProfilingService";
   public static final String SERVER_NOTIFICATION_MANAGER = "_serverNotificationManager";

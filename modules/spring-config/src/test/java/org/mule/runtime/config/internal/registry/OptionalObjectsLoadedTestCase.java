@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config;
+package org.mule.runtime.config.internal.registry;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
