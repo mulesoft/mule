@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
 
@@ -15,6 +16,7 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasItem;
@@ -40,7 +42,10 @@ import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
@@ -187,6 +192,35 @@ public class DefaultDeployableArtifactDescriptorFactoryTestCase extends Abstract
 
     assertThat(applicationDescriptor.getClassLoaderModel().getExportedPackages(), contains("org.exported-test"));
     assertThat(applicationDescriptor.getClassLoaderModel().getExportedResources(), contains("exported-test-script.dwl"));
+  }
+
+  @Test
+  public void createApplicationDescriptorWithPatchedPlugins() throws URISyntaxException, IOException {
+    final String appFolder = "apps/with-patched-artifacts";
+
+    System.getProperties().setProperty(MULE_HOME_DIRECTORY_PROPERTY, getDeployableFolder(appFolder).getCanonicalPath());
+    ApplicationDescriptor applicationDescriptor = createApplicationDescriptor(appFolder);
+
+    ArtifactPluginDescriptor httpPlugin = applicationDescriptor.getPlugins()
+        .stream()
+        .filter(p -> p.getName().equals("HTTP"))
+        .findFirst()
+        .get();
+
+    assertThat(Arrays.stream(httpPlugin.getClassLoaderModel().getUrls()).map(URL::toString).collect(toList()),
+               hasItem(endsWith("http-patch.jar")));
+
+    ArtifactPluginDescriptor dbPlugin = applicationDescriptor.getPlugins()
+        .stream()
+        .filter(p -> p.getName().equals("Database"))
+        .findFirst()
+        .get();
+
+    assertThat(Arrays.stream(dbPlugin.getClassLoaderModel().getUrls()).map(URL::toString).collect(toList()),
+               not(hasItem(endsWith("db-patch.jar"))));
+
+    // Unset the mule home folder so other tests don't get affected by it
+    System.getProperties().setProperty(MULE_HOME_DIRECTORY_PROPERTY, "");
   }
 
   @Test

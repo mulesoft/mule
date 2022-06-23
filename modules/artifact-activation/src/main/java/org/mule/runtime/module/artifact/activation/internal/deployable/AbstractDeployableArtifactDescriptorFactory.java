@@ -153,7 +153,9 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
                                                  bundleDependencies,
                                                  new ArtifactCoordinates(pluginDescriptor.getGroupId(),
                                                                          pluginDescriptor.getArtifactId(),
-                                                                         pluginDescriptor.getVersion()),
+                                                                         pluginDescriptor.getVersion(),
+                                                                         pluginDescriptor.getType(),
+                                                                         pluginDescriptor.getClassifier().orElse(null)),
                                                  deployableProjectModel.getDependencies(),
                                                  deployableProjectModel.getSharedLibraries())));
         }
