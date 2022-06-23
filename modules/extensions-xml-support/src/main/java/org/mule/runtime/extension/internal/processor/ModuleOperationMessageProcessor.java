@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.extension.internal.processor;
 
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
@@ -17,7 +18,10 @@ import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
+import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
 import static org.mule.runtime.core.internal.message.InternalMessage.builder;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.KEY_ON_NEXT_ERROR_STRATEGY;
@@ -30,6 +34,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PAR
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.MODULE_CONFIG_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.MODULE_OPERATION_CONFIG_REF;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
@@ -47,6 +52,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.DataType;
@@ -70,7 +76,14 @@ import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.internal.config.dsl.XmlSdkConfigurationProvider;
+import org.mule.runtime.module.extension.internal.runtime.resolver.RegistryLookupValueResolverWrapper;
+import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeValueResolverWrapper;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -119,12 +132,14 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   private Collection<ExceptionContextProvider> exceptionContextProviders;
 
   private final ExtensionManager extensionManager;
+  private final OperationModel operationModel;
 
   private MessageProcessorChain nestedChain;
   private List<Processor> processors;
 
   private final List<ParameterModel> allProperties;
   private final Map<String, Pair<Object, MetadataType>> properties;
+  private final Optional<ValueResolver<ConfigurationProvider>> configurationProviderResolver;
   private final Map<String, Pair<Object, MetadataType>> parameters;
   private final boolean returnsVoid;
   private final Optional<String> target;
@@ -145,15 +160,18 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
     this.target = parameters.containsKey(TARGET_PARAMETER_NAME) ? of((String) parameters.remove(TARGET_PARAMETER_NAME)) : empty();
     this.targetValue = (String) parameters.remove(TARGET_VALUE_PARAMETER_NAME);
     this.errorMappings = errorMappings;
+    this.configurationProviderResolver = getConfigurationProviderResolver(parameters);
+    this.operationModel = operationModel;
   }
 
   public Map<String, String> getProperties(Map<String, Object> parameters) {
     // `properties` in the scope of a Xml-Sdk operation means the parameters of the config.
-    if (parameters.containsKey(MODULE_OPERATION_CONFIG_REF)) {
-      return createPropertiesFromConfigName((String) parameters.get(MODULE_OPERATION_CONFIG_REF));
-    } else {
-      return emptyMap();
+    String configRefParameter = (String) parameters.get(MODULE_OPERATION_CONFIG_REF);
+    if (configRefParameter != null && !isExpression(configRefParameter)) {
+      return createPropertiesFromConfigName(configRefParameter);
     }
+
+    return emptyMap();
   }
 
   private Map<String, String> createPropertiesFromConfigName(final String configName) {
@@ -360,7 +378,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
 
     // If this operation is called from an outer operation, we need to obtain the config from the previous caller in order to
     // populate the event variables as expected.
-    Map<String, Pair<Object, MetadataType>> resolvedProperties = properties;
+    Map<String, Pair<Object, MetadataType>> resolvedProperties = getResolvedProperties(event);
     TypedValue<?> configRef = event.getVariables().get(MODULE_OPERATION_CONFIG_REF);
     if (configRef != null) {
       builder.addVariable(MODULE_OPERATION_CONFIG_REF, configRef.getValue());
@@ -379,6 +397,55 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
     InternalEvent newEvent = builder.build();
     newEvent.setSourcePolicyContext(((InternalEvent) event).getSourcePolicyContext());
     return newEvent;
+  }
+
+  private Map<String, Pair<Object, MetadataType>> getResolvedProperties(CoreEvent event) {
+    if (configurationProviderResolver.isPresent()) {
+      ConfigurationProvider cp = resolveConfigurationProvider(event);
+      validateConfigurationProvider(cp);
+
+      if (cp instanceof XmlSdkConfigurationProvider) {
+        return parseParameters(((XmlSdkConfigurationProvider) cp).getParameters(), allProperties);
+      }
+    }
+
+    return properties;
+  }
+
+  private Optional<ValueResolver<ConfigurationProvider>> getConfigurationProviderResolver(Map<String, Object> parameters) {
+    String configRefParameter = (String) parameters.get(MODULE_OPERATION_CONFIG_REF);
+    if (isExpression(configRefParameter)) {
+      ValueResolver<String> keyResolver =
+          new TypeSafeExpressionValueResolver<>(configRefParameter, String.class, fromType(String.class));
+      return of(new TypeSafeValueResolverWrapper<>(new RegistryLookupValueResolverWrapper<>(keyResolver),
+                                                   ConfigurationProvider.class));
+    }
+    return empty();
+  }
+
+  private ConfigurationProvider resolveConfigurationProvider(CoreEvent event) {
+    ValueResolvingContext valueResolvingContext = ValueResolvingContext.builder(event)
+        .withExpressionManager(expressionManager)
+        .build();
+    try {
+      return configurationProviderResolver.get().resolve(valueResolvingContext);
+    } catch (MuleException e) {
+      throw new IllegalModelDefinitionException(format("Error resolving configuration for component '%s'",
+                                                       getLocation().getRootContainerName()),
+                                                e);
+    }
+  }
+
+  private void validateConfigurationProvider(ConfigurationProvider configurationProvider) {
+    ConfigurationModel configurationModel = configurationProvider.getConfigurationModel();
+    if (!configurationModel.getOperationModel(operationModel.getName()).isPresent() &&
+        !configurationProvider.getExtensionModel().getOperationModel(operationModel.getName()).isPresent()) {
+      throw new IllegalArgumentException(format(
+                                                "Root component '%s' defines an usage of operation '%s' which points to configuration '%s'. "
+                                                    + "The selected config does not support that operation.",
+                                                getLocation().getRootContainerName(), operationModel.getName(),
+                                                configurationProvider.getName()));
+    }
   }
 
   private void addVariables(CoreEvent event, CoreEvent.Builder builder,
@@ -439,11 +506,13 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
     if (targetValue != null) {
       targetValueExpression = compile(targetValue, expressionManager);
     }
+    initialiseIfNeeded(configurationProviderResolver, muleContext);
   }
 
   @Override
   public void dispose() {
     LOGGER.debug("Disposing {} {}...", this.getClass().getSimpleName(), getLocation().getLocation());
+    disposeIfNeeded(configurationProviderResolver, LOGGER);
     super.dispose();
   }
 

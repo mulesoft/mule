@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:marvel="http://www.mulesoft.org/schema/mule/marvel"
+      xmlns:module-properties="http://www.mulesoft.org/schema/mule/module-properties"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/marvel http://www.mulesoft.org/schema/mule/marvel/current/mule-marvel.xsd
+       http://www.mulesoft.org/schema/mule/module-properties http://www.mulesoft.org/schema/mule/module-properties/current/mule-module-properties.xsd">
+
+    <module-properties:config name="some-config"  configParam="#['some config-value-parameter']" />
+    <module-properties:config name="some-other-config"  configParam="some other config-value-parameter" />
+
+    <object name="some-non-config" class="org.mule.test.functional.ExpressionsOnConfigRefTestCase$SomeTestProcessor"/>
+
+    <marvel:iron-man-config name="some-incompatible-config" />
+
+    <flow name="setPayloadWithReference">
+        <module-properties:set-payload-config-param-value config-ref="some-config" />
+    </flow>
+
+    <flow name="setPayloadWithExpression">
+        <module-properties:set-payload-config-param-value config-ref="#[vars.configName ++ '-config']"/>
+    </flow>
+
+    <flow name="setPayloadWithExpressionResolvingToNonConfig">
+        <module-properties:set-payload-config-param-value config-ref="#['some-non-config']"/>
+    </flow>
+
+    <flow name="setPayloadWithExpressionResolvingToIncompatibleConfig">
+        <module-properties:set-payload-config-param-value config-ref="#['some-incompatible-config']"/>
+    </flow>
+
+    <flow name="setPayloadWithExpressionResolvingToEmptyString">
+        <module-properties:set-payload-config-param-value config-ref="#['']"/>
+    </flow>
+
+</mule>
