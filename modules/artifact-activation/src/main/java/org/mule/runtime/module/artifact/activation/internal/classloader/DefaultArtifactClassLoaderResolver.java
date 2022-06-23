@@ -26,7 +26,6 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
-import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
@@ -71,12 +70,15 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
 
   public static final String PLUGIN_CLASSLOADER_IDENTIFIER = "/plugin/";
 
+  private final ArtifactClassLoader containerClassLoader;
   private final ModuleRepository moduleRepository;
   private final NativeLibraryFinderFactory nativeLibraryFinderFactory;
   private final MuleDeployableArtifactClassLoader defaultDomainClassloader;
 
-  public DefaultArtifactClassLoaderResolver(ModuleRepository moduleRepository,
+  public DefaultArtifactClassLoaderResolver(ArtifactClassLoader containerClassLoader,
+                                            ModuleRepository moduleRepository,
                                             NativeLibraryFinderFactory nativeLibraryFinderFactory) {
+    this.containerClassLoader = containerClassLoader;
     this.moduleRepository = moduleRepository;
     this.nativeLibraryFinderFactory = nativeLibraryFinderFactory;
     defaultDomainClassloader = createDomainClassLoader(new DomainDescriptor(DEFAULT_DOMAIN_NAME));
@@ -90,15 +92,13 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
   @Override
   public MuleDeployableArtifactClassLoader createDomainClassLoader(DomainDescriptor descriptor,
                                                                    PluginClassLoaderResolver pluginClassLoaderResolver) {
-    ArtifactClassLoader parentClassLoader =
-        new ContainerClassLoaderFactory(moduleRepository).createContainerClassLoader(this.getClass().getClassLoader());
     String artifactId = getDomainId(descriptor.getName());
 
-    ClassLoaderLookupPolicy parentLookupPolicy = getDomainParentLookupPolicy(parentClassLoader);
+    ClassLoaderLookupPolicy parentLookupPolicy = getDomainParentLookupPolicy(containerClassLoader);
 
     RegionClassLoader regionClassLoader = new RegionClassLoader(artifactId,
                                                                 descriptor,
-                                                                parentClassLoader.getClassLoader(),
+                                                                containerClassLoader.getClassLoader(),
                                                                 parentLookupPolicy);
 
     ArtifactClassLoaderFilter artifactClassLoaderFilter = createArtifactClassLoaderFilter(descriptor, parentLookupPolicy);

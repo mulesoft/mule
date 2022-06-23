@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.deployment.model.internal.domain;
 
+import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleLibFolder;
@@ -94,8 +95,12 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
     descriptor.setRootFolder(new File("unexistent"));
 
 
+    ModuleRepository moduleRepository = mock(ModuleRepository.class);
     DefaultArtifactClassLoaderResolver artifactClassLoaderResolver =
-        new DefaultArtifactClassLoaderResolver(mock(ModuleRepository.class),
+        new DefaultArtifactClassLoaderResolver(createContainerClassLoader(moduleRepository,
+                                                                          DomainClassLoaderFactoryTestCase.class
+                                                                              .getClassLoader()),
+                                               moduleRepository,
                                                new DefaultNativeLibraryFinderFactory(name -> getAppDataFolder(name)));
     DefaultDomainClassLoaderBuilder domainClassLoaderBuilder = new DefaultDomainClassLoaderBuilder(artifactClassLoaderResolver);
 

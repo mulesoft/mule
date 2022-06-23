@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
@@ -20,9 +21,9 @@ import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepositoryFactory;
-import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
@@ -94,8 +95,12 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
     PluginDependenciesResolver pluginDependenciesResolver =
         new DefaultArtifactDescriptorFactoryProvider().createBundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
 
-    DefaultArtifactClassLoaderResolver artifactClassLoaderResolver = new DefaultArtifactClassLoaderResolver(moduleRepository,
-                                                                                                            new DefaultNativeLibraryFinderFactory(name -> getAppDataFolder(name)));
+    DefaultArtifactClassLoaderResolver artifactClassLoaderResolver =
+        new DefaultArtifactClassLoaderResolver(createContainerClassLoader(moduleRepository,
+                                                                          TestApplicationFactory.class
+                                                                              .getClassLoader()),
+                                               moduleRepository,
+                                               new DefaultNativeLibraryFinderFactory(name -> getAppDataFolder(name)));
     ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory =
         new ApplicationClassLoaderBuilderFactory(artifactClassLoaderResolver);
 
