@@ -43,7 +43,7 @@ public class MuleArtifactPatchingModel {
         loadedModelByJar.put(key, artifactPatchingModel);
         return artifactPatchingModel;
       })
-          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("Invalid jar file %s. It does not contain descriptor %s",
+          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("Invalid jar file '%s'. It does not contain descriptor '%s'",
                                                                                  pluginPatchJarFile,
                                                                                  MULE_ARTIFACT_PATCH_JSON_FILE_NAME))));
     }
