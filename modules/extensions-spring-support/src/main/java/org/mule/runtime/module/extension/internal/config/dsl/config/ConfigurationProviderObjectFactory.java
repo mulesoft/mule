@@ -54,7 +54,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   private boolean requiresConnection = false;
   private LazyValue<String> configName = new LazyValue<>(this::getName);
 
-  private LazyValue<DslSyntaxResolver> dslSyntaxResolver;
+  private DslSyntaxResolver dslSyntaxResolver;
 
   ConfigurationProviderObjectFactory(ExtensionModel extensionModel,
                                      ConfigurationModel configurationModel,
@@ -62,9 +62,8 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
     super(muleContext);
     this.extensionModel = extensionModel;
     this.configurationModel = configurationModel;
-    dslSyntaxResolver = new LazyValue<>(() -> DslSyntaxResolver.getDefault(extensionModel,
-                                                                           DslResolvingContext
-                                                                               .getDefault(extensionManager.getExtensions())));
+    dslSyntaxResolver = DslSyntaxResolver.getDefault(extensionModel,
+                                                     DslResolvingContext.getDefault(extensionManager.getExtensions()));
   }
 
   @Override
@@ -87,7 +86,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
                                        expressionManager,
                                        reflectionCache,
                                        getRepresentation(),
-                                       dslSyntaxResolver.get(),
+                                       dslSyntaxResolver,
                                        getExtensionClassLoader(),
                                        muleContext);
   }

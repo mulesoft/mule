@@ -155,6 +155,15 @@ final class ExtensionRegistry {
     providersByExtension.invalidate(configurationProvider.getExtensionModel());
   }
 
+  /**
+   * Unregisters the given {@code configurationProvider} from the underlying {@link #registry}.
+   *
+   * @param configurationProvider a {@link ConfigurationProvider} to be registered
+   * @param muleContext           the owner of the registry to register the configurationProvider in.
+   * @throws IllegalArgumentException if {@code configurationProvider} is {@code null}
+   * @throws MuleRuntimeException     if the {@code configurationProvider} could not be unregistered
+   * @since 4.5.0
+   */
   void unregisterConfigurationProvider(ConfigurationProvider configurationProvider, MuleContext muleContext) {
     checkArgument(configurationProvider != null, "Cannot unregister a null configurationProvider");
 
@@ -166,7 +175,7 @@ final class ExtensionRegistry {
                                      e);
     }
 
-    // TODO: This entire data structure and its invalidation criteria seem very inefficient. Review in different ticket
+    // TODO: W-11341683 This entire data structure and its invalidation criteria seem very inefficient.
     providersByExtension.invalidate(configurationProvider.getExtensionModel());
   }
 

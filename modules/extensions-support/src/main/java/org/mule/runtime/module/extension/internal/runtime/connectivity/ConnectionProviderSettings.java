@@ -10,6 +10,7 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.config.PoolingProfile;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeOAuthHandler;
@@ -19,6 +20,11 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Groups configurations elements for {@link ConnectionProvider connection providers}
+ *
+ * @since 4.5.0
+ */
 public class ConnectionProviderSettings {
 
   private final ConnectionProviderModel connectionProviderModel;

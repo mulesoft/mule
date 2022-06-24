@@ -8,6 +8,8 @@ package org.mule.runtime.core.api.extension;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.event.Event;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -145,6 +147,15 @@ public interface ExtensionManager {
    */
   void registerConfigurationProvider(ConfigurationProvider configurationProvider);
 
+  /**
+   * Unregisters the given {@code configurationProvider} which must have previously registered through the
+   * {@link #registerExtension(ExtensionModel)} method. {@link Stoppable} and {@link Disposable} lifecycle phases might be
+   * executed on the provider depending on the Mule's current lifecycle state.
+   *
+   * @param configurationProvider a {@link ConfigurationProvider}
+   * @throws IllegalArgumentException if {@code configurationProvider} is {@code null}
+   * @since 4.5.0
+   */
   void unregisterConfigurationProvider(ConfigurationProvider configurationProvider);
 
   /**
