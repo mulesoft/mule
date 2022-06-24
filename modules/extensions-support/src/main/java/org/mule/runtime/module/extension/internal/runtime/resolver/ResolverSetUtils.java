@@ -165,7 +165,7 @@ public class ResolverSetUtils {
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
-        boolean finalAcceptReferences = acceptsReferences;
+        boolean actualAcceptReferences = acceptsReferences;
         ValueResolver resolver;
         try {
           if (value instanceof Collection) {
@@ -173,14 +173,14 @@ public class ResolverSetUtils {
             resolver = getParameterValueResolverForCollection(parameterName, arrayType, (Collection) value,
                                                               reflectionCache, muleContext,
                                                               valueResolverFactory);
-            finalAcceptReferences = false;
+            actualAcceptReferences = false;
           } else {
             resolver = new StaticValueResolver(value);
           }
           resolverReference
               .set(getValueResolverFor(parameterName, arrayType, resolveAndinjectIfStatic(resolver, muleContext),
                                        getDefaultValue(type),
-                                       getExpressionSupport(arrayType), false, modelProperties, finalAcceptReferences));
+                                       getExpressionSupport(arrayType), false, modelProperties, actualAcceptReferences));
         } catch (MuleException e) {
           throw new MuleRuntimeException(e);
         }
@@ -188,14 +188,14 @@ public class ResolverSetUtils {
 
       @Override
       public void visitObject(ObjectType objectType) {
-        boolean finalAcceptReferences = acceptsReferences;
+        boolean actualAcceptReferences = acceptsReferences;
         ValueResolver resolver;
         try {
           if (isMap(objectType)) {
             if (value instanceof Map) {
               resolver = getParameterValueResolverForMap(parameterName, objectType, (Map) value, reflectionCache,
                                                          muleContext, valueResolverFactory);
-              finalAcceptReferences = false;
+              actualAcceptReferences = false;
             } else {
               resolver = new StaticValueResolver(value);
             }
@@ -205,7 +205,7 @@ public class ResolverSetUtils {
                                               muleContext, valueResolverFactory);
             if (pojoResolver.isPresent()) {
               resolver = pojoResolver.get();
-              finalAcceptReferences = false;
+              actualAcceptReferences = false;
             } else {
               resolver = new StaticValueResolver(value);
             }
@@ -213,7 +213,7 @@ public class ResolverSetUtils {
           resolverReference
               .set(getValueResolverFor(parameterName, objectType, resolveAndinjectIfStatic(resolver, muleContext),
                                        getDefaultValue(type),
-                                       getExpressionSupport(objectType), false, modelProperties, finalAcceptReferences));
+                                       getExpressionSupport(objectType), false, modelProperties, actualAcceptReferences));
         } catch (MuleException e) {
           throw new MuleRuntimeException(e);
         }
