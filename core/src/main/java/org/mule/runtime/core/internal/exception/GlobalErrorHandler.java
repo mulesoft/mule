@@ -6,15 +6,9 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
-import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.reactivestreams.Publisher;
-
-import java.util.List;
-
-import static java.util.stream.Collectors.toList;
 
 public class GlobalErrorHandler extends ErrorHandler {
 
@@ -23,7 +17,7 @@ public class GlobalErrorHandler extends ErrorHandler {
     throw new IllegalStateException("GlobalErrorHandlers should be used only as template for local ErrorHandlers");
   }
 
-  public ErrorHandler createLocalErrorHandler(Location flowLocation) {
+  public ErrorHandler createLocalErrorHandler(ComponentLocation flowLocation) {
     ErrorHandler local = new ErrorHandler();
     local.setName(this.name);
     local.setExceptionListeners(this.getExceptionListeners());

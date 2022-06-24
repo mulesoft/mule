@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
@@ -73,9 +73,11 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
   /**
    * {@inheritDoc}
+   *
+   * @param buildFor
    */
   @Override
-  public TemplateOnErrorHandler duplicateFor(Location buildFor) {
+  public TemplateOnErrorHandler duplicateFor(ComponentLocation buildFor) {
     OnErrorPropagateHandler cpy = new OnErrorPropagateHandler();
     cpy.setFlowLocation(buildFor);
     when.ifPresent(expr -> cpy.setWhen(expr));
