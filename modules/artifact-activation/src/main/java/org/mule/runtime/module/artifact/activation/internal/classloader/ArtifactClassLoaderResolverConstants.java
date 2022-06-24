@@ -11,7 +11,6 @@ import static org.mule.runtime.container.api.ContainerClassLoaderProvider.create
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
-import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
 /**
@@ -25,7 +24,7 @@ public class ArtifactClassLoaderResolverConstants {
    * A {@link ModuleRepository} for the modules available in the same classpath as this class.
    */
   public static final ModuleRepository MODULE_REPOSITORY =
-      new DefaultModuleRepository(new ContainerModuleDiscoverer(ArtifactClassLoaderResolver.class.getClassLoader()));
+      new DefaultModuleRepository(new ContainerModuleDiscoverer(ArtifactClassLoaderResolverConstants.class.getClassLoader()));
 
   /**
    * An {@link ArtifactClassLoader} for the Mule Container with the modules available in {@link #MODULE_REPOSITORY}.
