@@ -11,14 +11,13 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.Assert.assertThat;
+import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.test.allure.AllureConstants.Sdk.Parameters.EXPRESSIONS_ON_CONFIG_REF;
 import static org.mule.test.allure.AllureConstants.Sdk.SDK;
 
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.PetStoreConnector;
@@ -66,9 +65,11 @@ public class PetStoreExpressionConfigRefTestCase extends AbstractExtensionFuncti
   @Test
   @Description("When using an expression resolving to a global element that is not a config it fails (in runtime) with a proper error message")
   public void getPetsWithExpressionResolvingToNonConfigFails() throws Exception {
-    String expectedPattern = "The value .* of type .* could not be transformed to the desired type \\S*\\.ConfigurationProvider";
+    String expectedMessage = "Error resolving configuration for component 'getPetsWithExpressionResolvingToNonConfig'";
+    String expectedCauseMessage = "There is no registered configurationProvider under name 'some-non-config'";
     flowRunner("getPetsWithExpressionResolvingToNonConfig")
-        .runExpectingException(allOf(instanceOf(TransformerException.class), hasMessage(matchesPattern(expectedPattern))));
+        .runExpectingException(allOf(instanceOf(IllegalArgumentException.class), hasMessage(expectedMessage),
+                                     hasCause(hasMessage(expectedCauseMessage))));
   }
 
   @Test
@@ -84,7 +85,7 @@ public class PetStoreExpressionConfigRefTestCase extends AbstractExtensionFuncti
   @Test
   @Description("When using an expression resolving to an empty string it fails (in runtime) with a proper error message")
   public void getPetsWithExpressionResolvingToEmptyStringFails() throws Exception {
-    String expectedMessage = "A null or empty key was provided. Registry lookup cannot be performed with a blank key";
+    String expectedMessage = "cannot get configuration from a blank provider name";
     flowRunner("getPetsWithExpressionResolvingToEmptyString")
         .runExpectingException(allOf(instanceOf(IllegalArgumentException.class), hasMessage(expectedMessage)));
   }

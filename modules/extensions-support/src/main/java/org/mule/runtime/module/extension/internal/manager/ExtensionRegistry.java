@@ -128,7 +128,7 @@ final class ExtensionRegistry {
    * @return a {@link ConfigurationProvider}
    */
   Optional<ConfigurationProvider> getConfigurationProvider(String key) {
-    return registry.lookupByName(key);
+    return registry.lookupByName(key).filter(cp -> cp instanceof ConfigurationProvider).map(cp -> (ConfigurationProvider) cp);
   }
 
   /**

@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.resolver.resolver;
 import static java.lang.String.format;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
-import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty.getStackedTypesModelProperty;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isLiteral;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
@@ -29,15 +28,14 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExclusiveOptionalModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionBasedParameterResolverValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionTypedValueValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverValueResolverWrapper;
-import org.mule.runtime.module.extension.internal.runtime.resolver.RegistryLookupValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.RequiredParameterValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticLiteralValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.sdk.api.runtime.parameter.Literal;
@@ -73,9 +71,11 @@ public class ValueResolverFactory {
 
     final Class<?> expectedClass = ExtensionMetadataTypeUtils.getType(expectedType).orElse(Object.class);
 
-    if (isExpression(value)) {
+    if (expectedClass.equals(ConfigurationProvider.class)) {
+      resolver = (ValueResolver<T>) new ConfigurationProviderValueResolver((String) value);
+    } else if (isExpression(value)) {
       final String expression = (String) value;
-      resolver = getExpressionBasedValueResolver(expectedType, expression, modelProperties, acceptsReferences, expectedClass);
+      resolver = getExpressionBasedValueResolver(expectedType, expression, modelProperties, expectedClass);
       if (required || isRequiredByExclusiveOptional(modelProperties)) {
         resolver = new RequiredParameterValueResolverWrapper<>(resolver, parameterName, expression);
       }
@@ -103,7 +103,7 @@ public class ValueResolverFactory {
    * Generates the {@link ValueResolver} for expression based values
    */
   private ValueResolver getExpressionBasedValueResolver(MetadataType expectedType, String value,
-                                                        Set<ModelProperty> modelProperties, boolean acceptsReferences,
+                                                        Set<ModelProperty> modelProperties,
                                                         Class<?> expectedClass) {
     ValueResolver resolver;
     Optional<StackedTypesModelProperty> stackedTypesModelProperty = getStackedTypesModelProperty(modelProperties);
@@ -117,15 +117,6 @@ public class ValueResolverFactory {
       resolver = new ExpressionTypedValueValueResolver<>(value, expectedClass);
     } else if (isLiteral(expectedType) || isTargetParameter(modelProperties)) {
       resolver = new StaticLiteralValueResolver<>(value, expectedClass);
-    } else if (acceptsReferences && expectedClass.equals(ConfigurationProvider.class)) {
-      // This case is for expressions support in config-refs, the idea is that the expression will resolve to a string
-      // reference, and we will take care of performing the lookup for the global configuration provider.
-      // TODO W-11272333: also support expressions returning a ConfigurationProvider directly
-      // TODO W-11272350: use ExtensionManager to resolve from String to ConfigurationProvider instead of the application
-      // registry.
-      // make sure to also change it for static references
-      ValueResolver<String> keyResolver = new TypeSafeExpressionValueResolver<>(value, String.class, fromType(String.class));
-      return new TypeSafeValueResolverWrapper<>(new RegistryLookupValueResolverWrapper<>(keyResolver), expectedClass);
     } else {
       resolver = new TypeSafeExpressionValueResolver<>(value, expectedClass, toDataType(expectedType));
     }

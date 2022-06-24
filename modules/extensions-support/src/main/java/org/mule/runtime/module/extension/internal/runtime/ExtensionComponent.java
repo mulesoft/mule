@@ -265,10 +265,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
           configurationProvider = resolveConfigurationProvider(configurationProviderResolver.get(), event);
           validateDynamicOperationConfiguration(configurationProvider);
         } catch (MuleException e) {
-          throw new IllegalModelDefinitionException(format(
-                                                           "Error resolving configuration for component '%s'",
-                                                           getLocation().getRootContainerName()),
-                                                    e);
+          throw new IllegalArgumentException(format("Error resolving configuration for component '%s'",
+                                                    getLocation().getRootContainerName()),
+                                             e);
         }
         return resolveConfigFromProvider(configurationProvider, event);
       };
