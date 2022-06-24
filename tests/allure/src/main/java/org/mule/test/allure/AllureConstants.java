@@ -215,6 +215,7 @@ public interface AllureConstants {
     interface EventContextStory {
 
       String RESPONSE_AND_COMPLETION_PUBLISHERS = "Response and completion publishers";
+      String DISTRIBUTED_TRACE_CONTEXT = "Distributed Trace Context";
     }
   }
 
