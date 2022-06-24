@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
@@ -78,7 +79,8 @@ public class TestDomainFactory extends DefaultDomainFactory {
 
     ArtifactClassLoaderResolver artifactClassLoaderResolver =
         new TrackingArtifactClassLoaderResolverDecorator(artifactClassLoaderManager,
-                                                         new DefaultArtifactClassLoaderResolver(moduleRepository,
+                                                         new DefaultArtifactClassLoaderResolver(createContainerClassLoader(moduleRepository),
+                                                                                                moduleRepository,
                                                                                                 new DefaultNativeLibraryFinderFactory(name -> getAppDataFolder(name))));
 
     DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory =

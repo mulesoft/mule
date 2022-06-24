@@ -16,6 +16,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.SERVER_NOTIFICATIO
 import static org.mule.runtime.core.internal.profiling.AbstractProfilingService.configureEnableProfilingService;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
+import static org.mule.runtime.module.artifact.activation.internal.classloader.ArtifactClassLoaderResolverConstants.CONTAINER_CLASS_LOADER;
+import static org.mule.runtime.module.artifact.activation.internal.classloader.ArtifactClassLoaderResolverConstants.MODULE_REPOSITORY;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 
 import static java.lang.Thread.currentThread;
@@ -31,8 +33,6 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.artifact.activation.internal.TrackingArtifactClassLoaderResolverDecorator;
 import org.mule.runtime.container.api.ModuleRepository;
-import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
-import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.core.api.config.FeatureContext;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
@@ -167,12 +167,16 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
      * @return a new {@link MuleArtifactResourcesRegistry} with the provided configuration.
      */
     public MuleArtifactResourcesRegistry build() {
+      ArtifactClassLoader containerClassLoader;
       if (moduleRepository == null) {
-        moduleRepository = new DefaultModuleRepository(new ContainerModuleDiscoverer(getClass().getClassLoader()));
+        moduleRepository = MODULE_REPOSITORY;
+        containerClassLoader = CONTAINER_CLASS_LOADER;
+      } else {
+        containerClassLoader = createContainerClassLoader(moduleRepository);
       }
 
       try {
-        return new MuleArtifactResourcesRegistry(moduleRepository, artifactConfigurationProcessor);
+        return new MuleArtifactResourcesRegistry(containerClassLoader, moduleRepository, artifactConfigurationProcessor);
       } catch (RegistrationException e) {
         throw new MuleRuntimeException(e);
       }
@@ -182,7 +186,8 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
   /**
    * Creates a repository for resources required for mule artifacts.
    */
-  private MuleArtifactResourcesRegistry(ModuleRepository moduleRepository,
+  private MuleArtifactResourcesRegistry(ArtifactClassLoader containerClassLoader,
+                                        ModuleRepository moduleRepository,
                                         ArtifactConfigurationProcessor artifactConfigurationProcessor)
       throws RegistrationException {
     // Creates a registry to be used as an injector.
@@ -207,7 +212,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
 
     runtimeLockFactory = new ServerLockFactory();
 
-    containerClassLoader = createContainerClassLoader(moduleRepository, getClass().getClassLoader());
+    this.containerClassLoader = containerClassLoader;
     artifactClassLoaderManager = new DefaultClassLoaderManager();
     LicenseValidator licenseValidator = discoverLicenseValidator(currentThread().getContextClassLoader());
 
@@ -231,7 +236,8 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
 
     ArtifactClassLoaderResolver artifactClassLoaderResolver =
         new TrackingArtifactClassLoaderResolverDecorator(artifactClassLoaderManager,
-                                                         new DefaultArtifactClassLoaderResolver(moduleRepository,
+                                                         new DefaultArtifactClassLoaderResolver(containerClassLoader,
+                                                                                                moduleRepository,
                                                                                                 new DefaultNativeLibraryFinderFactory(name -> getAppDataFolder(name))));
 
     pluginClassLoadersFactory = new DefaultRegionPluginClassLoadersFactory(artifactClassLoaderResolver);

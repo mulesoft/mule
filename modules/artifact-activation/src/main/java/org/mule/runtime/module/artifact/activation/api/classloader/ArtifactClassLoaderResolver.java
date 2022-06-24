@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.module.artifact.activation.api.classloader;
 
+import static org.mule.runtime.module.artifact.activation.internal.classloader.ArtifactClassLoaderResolverConstants.CONTAINER_CLASS_LOADER;
+import static org.mule.runtime.module.artifact.activation.internal.classloader.ArtifactClassLoaderResolverConstants.MODULE_REPOSITORY;
+
 import static java.nio.file.Files.createTempDirectory;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.container.api.ModuleRepository;
-import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
-import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver;
@@ -40,8 +41,8 @@ import java.util.function.Supplier;
 public interface ArtifactClassLoaderResolver {
 
   static ArtifactClassLoaderResolver defaultClassLoaderResolver() {
-    return classLoaderResolver(new DefaultModuleRepository(new ContainerModuleDiscoverer(ArtifactClassLoaderResolver.class
-        .getClassLoader())),
+    return classLoaderResolver(CONTAINER_CLASS_LOADER,
+                               MODULE_REPOSITORY,
                                name -> {
                                  try {
                                    return createTempDirectory("nativeLibs_" + name).toFile();
@@ -51,9 +52,11 @@ public interface ArtifactClassLoaderResolver {
                                });
   }
 
-  static ArtifactClassLoaderResolver classLoaderResolver(ModuleRepository moduleRepository,
+  static ArtifactClassLoaderResolver classLoaderResolver(ArtifactClassLoader containerClassLoader,
+                                                         ModuleRepository moduleRepository,
                                                          Function<String, File> tempFolderChildFunction) {
-    return new DefaultArtifactClassLoaderResolver(moduleRepository,
+    return new DefaultArtifactClassLoaderResolver(containerClassLoader,
+                                                  moduleRepository,
                                                   new DefaultNativeLibraryFinderFactory(tempFolderChildFunction));
   }
 

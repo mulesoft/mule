@@ -177,7 +177,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   @Override
   protected ClassLoader getExecutionClassLoader() {
     if (!isDisposeContextPerClass() || executionClassLoader == null) {
-      executionClassLoader = createContainerClassLoader(new FunctionalTestModuleRepository(), getClass().getClassLoader());
+      executionClassLoader = createContainerClassLoader(new FunctionalTestModuleRepository());
     }
 
     return executionClassLoader.getClassLoader();
