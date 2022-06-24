@@ -7,7 +7,6 @@
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.PATCHED_ARTIFACT_DESCRIPTORS;
 
 import static java.util.Arrays.stream;
@@ -26,12 +25,11 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Stories({@Story(ARTIFACT_DESCRIPTORS), @Story(PATCHED_ARTIFACT_DESCRIPTORS)})
+@Story(PATCHED_ARTIFACT_DESCRIPTORS)
 public class DeployableDescriptorsWithPatchedPluginsTestCase extends AbstractDeployableArtifactDescriptorFactoryTestCase {
 
   private static final String deployableProjectModelFolder = "apps/with-patched-artifacts";
