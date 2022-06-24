@@ -68,8 +68,6 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
 
     List<BundleDependency> bundleDependencies = getProcessedBundleDependencies();
 
-    // includePatches(classLoaderConfigurationBuilder);
-
     final List<URL> dependenciesArtifactsUrls =
         loadUrls(getProjectFolder(), bundleDependencies, classLoaderConfigurationBuilder);
     dependenciesArtifactsUrls.forEach(classLoaderConfigurationBuilder::containing);
@@ -82,76 +80,6 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
 
     return classLoaderConfigurationBuilder.build();
   }
-
-  // private void includePatches(ClassLoaderModelBuilder classLoaderConfigurationBuilder) {
-  // if (!isMuleFramework()) {
-  // // TODO W-11202141 - consider artifact patches for the case this is run within a Runtime
-  // getArtifactPatches().forEach(classLoaderConfigurationBuilder::containing);
-  // }
-  // }
-
-  // private List<URL> getArtifactPatches() {
-  // List<URL> patches = new ArrayList<>();
-  // ArtifactCoordinates currentArtifactCoordinates = packagerClassLoaderModel.getArtifactCoordinates();
-  // String artifactId = currentArtifactCoordinates.getGroupId() + ":"
-  // + currentArtifactCoordinates.getArtifactId() + ":" + currentArtifactCoordinates.getVersion();
-  // try {
-  // File muleArtifactPatchesFolder = new File(getMuleHomeFolder(), MULE_ARTIFACT_PATCHES_LOCATION);
-  // if (muleArtifactPatchesFolder.exists()) {
-  // String[] patchFiles = muleArtifactPatchesFolder.list((dir, name) -> name != null && name.endsWith(PATCH_FILES_EXTENSION));
-  // if (patchFiles == null) {
-  // LOGGER.warn("No patches available in patches folder for artifact {}",
-  // currentArtifactCoordinates.getGroupId() + ":" + currentArtifactCoordinates.getArtifactId());
-  // return emptyList();
-  // }
-  // for (String patchFile : patchFiles) {
-  // MuleArtifactPatchingModel muleArtifactPatchingModel = MuleArtifactPatchingModel.loadModel(patchFile);
-  // GenericVersionScheme genericVersionScheme = new GenericVersionScheme();
-  // Version thisArtifactCoordinatesVersion;
-  // try {
-  // thisArtifactCoordinatesVersion = genericVersionScheme.parseVersion(currentArtifactCoordinates.getVersion());
-  // } catch (Exception e) {
-  // LOGGER.warn("Error parsing version {} for artifact {}, patches against this artifact will not be applied",
-  // currentArtifactCoordinates.getVersion(),
-  // currentArtifactCoordinates.getGroupId() + ":" + currentArtifactCoordinates.getArtifactId());
-  // return emptyList();
-  // }
-  // ArtifactCoordinates patchedArtifactCoordinates = muleArtifactPatchingModel.getArtifactCoordinates();
-  // if (patchedArtifactCoordinates.getGroupId().equals(currentArtifactCoordinates.getGroupId()) &&
-  // patchedArtifactCoordinates.getArtifactId().equals(currentArtifactCoordinates.getArtifactId()) &&
-  // patchedArtifactCoordinates.getClassifier().equals(currentArtifactCoordinates.getClassifier())) {
-  // if (muleArtifactPatchingModel.getAffectedVersions()
-  // .stream()
-  // .anyMatch(affectedVersion -> {
-  // try {
-  // VersionConstraint versionConstraint = genericVersionScheme.parseVersionConstraint(affectedVersion);
-  // return versionConstraint.containsVersion(thisArtifactCoordinatesVersion);
-  // } catch (InvalidVersionSpecificationException e) {
-  // throw new MuleRuntimeException(createStaticMessage("Could not parse plugin patch affect version: "
-  // + affectedVersion), e);
-  // }
-  // })) {
-  // try {
-  // patches.add(new File(getMuleHomeFolder(),
-  // Paths.get(MULE_ARTIFACT_PATCHES_LOCATION, patchFile).toString())
-  // .toURL());
-  // LOGGER.info("Patching artifact {} with patch file {}", artifactId, patchFile);
-  // } catch (MalformedURLException e) {
-  // throw new MuleRuntimeException(e);
-  // }
-  // }
-  // }
-  // }
-  // }
-  // } catch (Exception e) {
-  // throw new MuleRuntimeException(createStaticMessage(format("There was an error processing the patches in %s file for artifact
-  // %s",
-  // MULE_ARTIFACT_PATCHES_LOCATION, artifactId)),
-  // e);
-  // }
-  //
-  // return patches;
-  // }
 
   protected abstract ClassLoaderModelBuilder getClassLoaderConfigurationBuilder();
 
