@@ -178,6 +178,19 @@
           "classSimpleName": "PayloadStatistics",
           "elementKind": "class",
           "justification": "Should have been annotated as experimental to start with. It is deprecated now and will be removed soon."
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::duplicateFor(===org.mule.runtime.api.component.location.Location===)",
+          "new": "parameter org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::duplicateFor(===org.mule.runtime.api.component.location.ComponentLocation===)",
+          "oldType": "org.mule.runtime.api.component.location.Location",
+          "newType": "org.mule.runtime.api.component.location.ComponentLocation",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "duplicateFor",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "W-10992817: Changed to be able to rollback transactions in a nested try scope"
         }
       ]
     }

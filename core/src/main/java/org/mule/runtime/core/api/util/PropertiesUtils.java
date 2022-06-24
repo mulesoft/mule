@@ -9,6 +9,8 @@ package org.mule.runtime.core.api.util;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 
+import static java.lang.String.format;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
@@ -289,7 +291,13 @@ public final class PropertiesUtils {
 
     List<Properties> result = new LinkedList<>();
 
-    Enumeration<URL> allPropertiesResources = classLoader.getResources(resource);
+    Enumeration<URL> allPropertiesResources;
+    try {
+      allPropertiesResources = classLoader.getResources(resource);
+    } catch (IOException e) {
+      throw new IOException(format("Error getting resources '%s' from classLoader '%s'", resource, classLoader.toString()), e);
+    }
+
     while (allPropertiesResources.hasMoreElements()) {
       URL propertiesResource = allPropertiesResources.nextElement();
       if (logger.isDebugEnabled()) {
@@ -299,6 +307,8 @@ public final class PropertiesUtils {
 
       try (InputStream resourceStream = new BufferedInputStream(propertiesResource.openStream())) {
         properties.load(resourceStream);
+      } catch (IOException e) {
+        throw new IOException(format("Error loading properties from '%s'", propertiesResource.toString()), e);
       }
 
       result.add(properties);

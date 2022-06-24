@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.exception;
 
 import static org.mule.runtime.api.component.location.Location.ERROR_HANDLER;
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.REUSE_GLOBAL_ERROR_HANDLER;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -22,7 +21,7 @@ import static java.util.stream.Collectors.toList;
 
 import static reactor.core.publisher.Mono.error;
 
-import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -190,12 +189,8 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
       return;
     }
 
-    boolean inDefaultErrorHandler = false;
     String defaultErrorHandlerName = getMuleContext().getConfiguration().getDefaultErrorHandlerName();
     if (defaultErrorHandlerName != null && defaultErrorHandlerName.equals(name)) {
-      if (featureFlaggingService.isEnabled(REUSE_GLOBAL_ERROR_HANDLER)) {
-        inDefaultErrorHandler = true;
-      }
       logger
           .warn("Default 'error-handler' should include a final \"catch-all\" 'on-error-propagate'. Attempting implicit injection.");
     }
@@ -206,10 +201,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
     initialiseIfNeeded(acceptsAllOnErrorPropagate, muleContext);
 
     if (this.getLocation() != null && shouldAddLocationToDefaultErrorHandler()) {
-      String location = this.getLocation().getLocation();
-      String containerLocation =
-          inDefaultErrorHandler ? location : location.substring(0, location.length() - ERROR_HANDLER.length() - 1);
-      acceptsAllOnErrorPropagate.setFlowLocation(builderFromStringRepresentation(containerLocation).build());
+      acceptsAllOnErrorPropagate.setFlowLocation(this.getLocation());
     }
     this.exceptionListeners.add(acceptsAllOnErrorPropagate);
   }
@@ -280,7 +272,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
     }
   }
 
-  public void setExceptionListenersLocation(Location flowLocation) {
+  public void setExceptionListenersLocation(ComponentLocation flowLocation) {
     List<MessagingExceptionHandlerAcceptor> listeners =
         this.getExceptionListeners().stream().map(exceptionListener -> (exceptionListener instanceof TemplateOnErrorHandler)
             ? ((TemplateOnErrorHandler) exceptionListener).duplicateFor(flowLocation)

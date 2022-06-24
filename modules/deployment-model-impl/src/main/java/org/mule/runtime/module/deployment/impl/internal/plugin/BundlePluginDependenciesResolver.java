@@ -241,6 +241,7 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
                                           dependency.getDescriptor(), pluginDescriptor.getBundleDescriptor(),
                                           dependency.getDescriptor()));
                     }
+                    // This mechanism is needed for tooling as stated in MULE-10874
                     ArtifactPluginDescriptor artifactPluginDescriptor =
                         artifactDescriptorFactory
                             .create(mulePluginLocation,

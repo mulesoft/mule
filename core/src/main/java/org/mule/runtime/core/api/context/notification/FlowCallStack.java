@@ -21,13 +21,6 @@ import java.util.List;
 public interface FlowCallStack extends Serializable, Cloneable {
 
   /**
-   * @return the object at the top of this stack without removing it from the stack or null if the stack is empty.
-   */
-  default FlowStackElement peek() {
-    return getElements().isEmpty() ? null : getElements().get(0);
-  }
-
-  /**
    * @return the current elements of this stack as a list, ordered from top to bottom.
    */
   List<FlowStackElement> getElements();

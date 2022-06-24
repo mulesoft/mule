@@ -8,13 +8,15 @@ package org.mule.runtime.module.artifact.activation.api.extension.discovery;
 
 import static java.util.Collections.emptySet;
 
+import org.mule.api.annotation.NoImplement;
+import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.module.artifact.activation.internal.extension.discovery.DefaultExtensionDiscoveryRequest;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -23,6 +25,7 @@ import java.util.Set;
  * 
  * @since 4.5
  */
+@NoImplement
 public interface ExtensionDiscoveryRequest {
 
   /**
@@ -35,7 +38,7 @@ public interface ExtensionDiscoveryRequest {
   /**
    * @return {@link ArtifactPluginDescriptor}s for artifact plugins deployed inside the artifact. Non-null.
    */
-  List<ArtifactPluginDescriptor> getArtifactPluginDescriptors();
+  Collection<ArtifactPluginDescriptor> getArtifactPluginDescriptors();
 
   /**
    * @return {@link Set} of {@link ExtensionModel} to also take into account when parsing extensions
@@ -59,14 +62,15 @@ public interface ExtensionDiscoveryRequest {
    */
   boolean isEnrichDescriptions();
 
+  @NoInstantiate
   final class ExtensionDiscoveryRequestBuilder {
 
-    private List<ArtifactPluginDescriptor> artifactPlugins;
+    private Collection<ArtifactPluginDescriptor> artifactPlugins;
     private Set<ExtensionModel> parentArtifactExtensions = emptySet();
     private boolean parallelDiscovery = false;
     private boolean enrichDescriptions = true;
 
-    public ExtensionDiscoveryRequestBuilder setArtifactPlugins(List<ArtifactPluginDescriptor> artifactPlugins) {
+    public ExtensionDiscoveryRequestBuilder setArtifactPlugins(Collection<ArtifactPluginDescriptor> artifactPlugins) {
       this.artifactPlugins = artifactPlugins;
       return this;
     }

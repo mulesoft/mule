@@ -33,7 +33,6 @@
                     <raise-error type="MULE:ANY" description="payload or attributes not null"/>
                 </when>
             </choice>
-            
             <set-payload
                     value="#['$(params.greeting) $(params.prefix) $(params.receiver) $(if(params.suffix == null) '' else params.suffix)']"/>
         </operation:body>
@@ -238,6 +237,32 @@
         </operation:output>
         <operation:body>
             <set-payload value="Some deprecated value" />
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="operationWithDeprecatedParameter">
+        <operation:parameters>
+            <operation:parameter name="deprecatedParameter" type="string" summary="Some deprecated param">
+                <operation:deprecated since="1.1.0"
+                                      message="Some deprecation message"
+                                      toRemoveIn="2.0.0" />
+            </operation:parameter>
+        </operation:parameters>
+        <operation:output>
+            <operation:payload-type type="void"/>
+        </operation:output>
+        <operation:body>
+            <logger />
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="emit">
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <test-components:fire-notification integer="52" />
+            <set-payload value="Notification fired" />
         </operation:body>
     </operation:def>
 </mule>

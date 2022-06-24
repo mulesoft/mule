@@ -10,9 +10,11 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
@@ -90,6 +92,8 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
    */
   private static class SubFlowMessageProcessorChain extends DefaultMessageProcessorChain {
 
+    public static final ComponentIdentifier SUBFLOW = buildFromStringRepresentation("subflow");
+
     private final String subFlowName;
 
     SubFlowMessageProcessorChain(String name, List<Processor> processors,
@@ -100,7 +104,8 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
     }
 
     private void pushSubFlowFlowStackElement(CoreEvent event) {
-      ((DefaultFlowCallStack) event.getFlowCallStack()).push(new FlowStackElement(subFlowName, null));
+      ((DefaultFlowCallStack) event.getFlowCallStack())
+          .push(new FlowStackElement(subFlowName, SUBFLOW, null));
     }
 
     private void popSubFlowFlowStackElement(CoreEvent event) {

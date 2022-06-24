@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
+import static org.mule.runtime.core.api.type.catalog.SpecialTypesTypeLoader.VOID;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
-import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -41,20 +42,20 @@ import java.util.Set;
  */
 public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelParser implements ParameterModelParser {
 
-  protected final ComponentAst parameter;
+  protected final ComponentAst parameterAst;
   private final TypeLoader typeLoader;
 
   private String name;
 
-  public MuleSdkParameterModelParserSdk(ComponentAst parameter, TypeLoader typeLoader) {
-    this.parameter = parameter;
+  public MuleSdkParameterModelParserSdk(ComponentAst parameterAst, TypeLoader typeLoader) {
+    this.parameterAst = parameterAst;
     this.typeLoader = typeLoader;
 
     parseStructure();
   }
 
   private void parseStructure() {
-    name = getParameter(parameter, "name");
+    name = getParameter(parameterAst, "name");
   }
 
   @Override
@@ -69,15 +70,24 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
 
   @Override
   public String getDescription() {
-    return this.<String>getOptionalParameter(parameter, "description").orElse("");
+    return this.<String>getOptionalParameter(parameterAst, "description").orElse("");
   }
 
   @Override
   public MetadataType getType() {
-    final String type = getParameter(parameter, "type");
-    return typeLoader.load(type).orElseThrow(() -> new IllegalModelDefinitionException(
-                                                                                       format("Parameter '%s' references unknown type '%s'",
-                                                                                              getName(), type)));
+    final String type = getParameter(parameterAst, "type");
+    if (VOID.equals(type)) {
+      throw new IllegalModelDefinitionException(voidParameterIsForbidden());
+    }
+    return typeLoader.load(type).orElseThrow(() -> new IllegalModelDefinitionException(unknownType(type)));
+  }
+
+  private String unknownType(String type) {
+    return format("Parameter '%s' references unknown type '%s'", getName(), type);
+  }
+
+  private String voidParameterIsForbidden() {
+    return format("Parameter '%s' references type '%s', which is forbidden for parameters", getName(), VOID);
   }
 
   @Override
@@ -97,7 +107,7 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
 
   @Override
   public ExpressionSupport getExpressionSupport() {
-    return ExpressionSupport.valueOf(getParameter(parameter, "expressionSupport"));
+    return ExpressionSupport.valueOf(getParameter(parameterAst, "expressionSupport"));
   }
 
   @Override
@@ -117,7 +127,7 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
 
   @Override
   public boolean isConfigOverride() {
-    return getParameter(parameter, "configOverride");
+    return getParameter(parameterAst, "configOverride");
   }
 
   @Override
@@ -132,12 +142,12 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
 
   @Override
   public Optional<DeprecationModel> getDeprecationModel() {
-    return empty();
+    return getSingleChild(parameterAst, DEPRECATED_CONSTRUCT_NAME).map(this::buildDeprecationModel);
   }
 
   @Override
   public Optional<DisplayModel> getDisplayModel() {
-    String summary = getParameter(parameter, "summary");
+    String summary = getParameter(parameterAst, "summary");
     if (!isBlank(summary)) {
       return of(DisplayModel.builder().summary(summary).build());
     }

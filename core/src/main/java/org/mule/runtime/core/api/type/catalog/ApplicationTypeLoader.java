@@ -21,11 +21,17 @@ import java.util.Optional;
  */
 public class ApplicationTypeLoader implements TypeLoader {
 
-  private TypeLoader primitivesTypeLoader = new PrimitiveTypesTypeLoader();
+  private final TypeLoader primitivesTypeLoader = new PrimitiveTypesTypeLoader();
+  private final TypeLoader specialTypesLoader = new SpecialTypesTypeLoader();
 
   @Override
   public Optional<MetadataType> load(String typeIdentifier) {
     // TODO: MULE-20071 - implement app type catalog lookup.
-    return primitivesTypeLoader.load(typeIdentifier);
+    Optional<MetadataType> primitive = primitivesTypeLoader.load(typeIdentifier);
+    if (primitive.isPresent()) {
+      return primitive;
+    } else {
+      return specialTypesLoader.load(typeIdentifier);
+    }
   }
 }

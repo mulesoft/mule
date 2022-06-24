@@ -21,4 +21,13 @@
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-values-extension</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+        </dependency>
+    </dependencies>
+
 </project>

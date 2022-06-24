@@ -177,8 +177,10 @@
         <!-- The tests/test-components artifacts is in the mule repo but as has the mule-modules-parent as parent
          its version is not changed by the versions:set plugin -->
         <muleTestComponentsVersion>4.5.0-SNAPSHOT</muleTestComponentsVersion>
+        <muleTxExtVersion>4.5.0-SNAPSHOT</muleTxExtVersion>
 
         <!-- Test Extensions -->
+        <muleTestingProcessingStrategiesExtensionVersion>1.0.0-SNAPSHOT</muleTestingProcessingStrategiesExtensionVersion>
 
         <!--Maven plugins versions-->
         <dependency.plugin.version>3.1.2</dependency.plugin.version>

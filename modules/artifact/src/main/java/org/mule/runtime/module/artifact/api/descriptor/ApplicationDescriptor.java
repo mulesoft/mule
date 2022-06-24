@@ -79,8 +79,10 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
       synchronized (this) {
         if (domainDescriptor == null) {
           Optional<BundleDependency> domain =
-              getClassLoaderModel().getDependencies().stream().filter(d -> d.getDescriptor().getClassifier().isPresent()
-                  && d.getDescriptor().getClassifier().get().equals(MULE_DOMAIN_CLASSIFIER)).findFirst();
+              getClassLoaderModel().getDependencies().stream()
+                  .filter(d -> d.getDescriptor().getClassifier().isPresent()
+                      && d.getDescriptor().getClassifier().get().equals(MULE_DOMAIN_CLASSIFIER))
+                  .findFirst();
           domainDescriptor = domain.map(BundleDependency::getDescriptor);
         }
       }

@@ -34,6 +34,7 @@ import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
+import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
@@ -74,6 +75,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * {@link OperationModelParser} for Java based syntax
@@ -422,14 +425,14 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   }
 
   @Override
-  public List<String> getEmittedNotifications() {
+  public Stream<NotificationModel> getEmittedNotificationsStream(Function<String, Optional<NotificationModel>> notificationMapper) {
     List<String> notifications =
         NotificationModelParserUtils.getEmittedNotifications(operationElement, getComponentTypeName(), getName());
     if (notifications.isEmpty()) {
       notifications = NotificationModelParserUtils.getEmittedNotifications(operationContainer, getComponentTypeName(), getName());
     }
 
-    return notifications;
+    return notifications.stream().map(notificationMapper).filter(Optional::isPresent).map(Optional::get);
   }
 
   private void checkOperationIsNotAnExtension() {

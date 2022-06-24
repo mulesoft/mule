@@ -6,14 +6,22 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
+import static java.lang.String.format;
+
+import static org.slf4j.LoggerFactory.getLogger;
+
 import java.io.Serializable;
 import java.util.Collection;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract queue delegate implementation that forces common queue behaviour
  */
 public abstract class AbstractQueueStoreDelegate implements QueueStoreDelegate {
 
+  private final Logger logger = getLogger(AbstractQueueStoreDelegate.class);
   private final int capacity;
 
   public AbstractQueueStoreDelegate(int capacity) {
@@ -45,6 +53,9 @@ public abstract class AbstractQueueStoreDelegate implements QueueStoreDelegate {
             this.wait(0);
           } else {
             if (l2 <= 0L) {
+              logger
+                  .warn(format("Timeout of %d milliseconds reached, object could not be queued. Queue capacity of %d full.",
+                               timeout, capacity));
               return false;
             }
             this.wait(l2);

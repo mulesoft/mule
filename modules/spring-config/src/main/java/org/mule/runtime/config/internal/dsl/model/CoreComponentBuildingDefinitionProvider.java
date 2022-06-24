@@ -8,7 +8,6 @@
 package org.mule.runtime.config.internal.dsl.model;
 
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
-import static org.mule.runtime.api.util.MuleSystemProperties.REVERT_SIGLETON_ERROR_HANDLER_PROPERTY;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.PARALLEL_FOREACH_ELEMENT;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.SCATTER_GATHER_ELEMENT;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.createNewInstance;
@@ -53,8 +52,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEME
 import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
 
 import static org.apache.commons.lang3.ArrayUtils.addAll;
-
-import static java.lang.Boolean.getBoolean;
 
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.notification.Notification;
@@ -242,18 +239,15 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(onErrorBaseBuilder.withIdentifier(ON_ERROR_PROPAGATE)
         .withTypeDefinition(fromType(OnErrorPropagateHandler.class))
         .asPrototype().build());
-
-    Builder errorHandlerBuilder = baseDefinition.withIdentifier(ERROR_HANDLER)
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier(ERROR_HANDLER)
         .withTypeDefinition(fromType(ErrorHandler.class))
         .withObjectFactoryType(ErrorHandlerFactoryBean.class)
         .withSetterParameterDefinition("delegate", fromSimpleReferenceParameter("ref").build())
         .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build())
         .withSetterParameterDefinition("exceptionListeners",
-                                       fromChildCollectionConfiguration(FlowExceptionHandler.class).build());
-    if (getBoolean(REVERT_SIGLETON_ERROR_HANDLER_PROPERTY)) {
-      errorHandlerBuilder.asPrototype();
-    }
-    componentBuildingDefinitions.add(errorHandlerBuilder.build());
+                                       fromChildCollectionConfiguration(FlowExceptionHandler.class).build())
+        .asPrototype()
+        .build());
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(SET_PAYLOAD).withTypeDefinition(fromType(SetPayloadMessageProcessor.class))
             .withSetterParameterDefinition("value", fromSimpleParameter("value").build())

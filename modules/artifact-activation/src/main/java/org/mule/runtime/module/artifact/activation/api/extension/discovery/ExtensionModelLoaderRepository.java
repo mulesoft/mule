@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.artifact.activation.api.extension.discovery;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.artifact.activation.internal.extension.discovery.DefaultExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.api.plugin.LoaderDescriber;
@@ -20,7 +21,17 @@ import java.util.function.Supplier;
  *
  * @since 4.0, moved to api in 4.5
  */
+@NoImplement
 public interface ExtensionModelLoaderRepository {
+
+  /**
+   * @return a repository that manages the lifecycle of the {@link ExtensionModelLoader} available in the
+   *         {@link ExtensionModelLoaderRepository}.
+   * @since 4.5
+   */
+  static ExtensionModelLoaderRepository getExtensionModelLoaderManager() {
+    return new DefaultExtensionModelLoaderRepository(ExtensionModelLoaderRepository.class.getClassLoader());
+  }
 
   /**
    * @return a repository that manages the lifecycle of the {@link ExtensionModelLoader} available in the

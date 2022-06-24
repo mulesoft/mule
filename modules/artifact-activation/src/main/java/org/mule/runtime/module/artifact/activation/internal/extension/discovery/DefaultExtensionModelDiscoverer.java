@@ -6,22 +6,22 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.extension.discovery;
 
-import static java.lang.Thread.currentThread;
-import static java.util.Collections.unmodifiableSet;
+import static org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer.discoverRuntimeExtensionModels;
+
 import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Stream.concat;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
-import org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionDiscoveryRequest;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer;
 import org.mule.runtime.module.artifact.activation.internal.PluginsDependenciesProcessor;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Default implementation of {@link ExtensionModelDiscoverer}.
@@ -37,17 +37,9 @@ public class DefaultExtensionModelDiscoverer implements ExtensionModelDiscoverer
   }
 
   @Override
-  public Set<ExtensionModel> discoverRuntimeExtensionModels() {
-    return unmodifiableSet(new SpiServiceRegistry()
-        .lookupProviders(RuntimeExtensionModelProvider.class, currentThread().getContextClassLoader())
-        .stream()
-        .map(RuntimeExtensionModelProvider::createExtensionModel)
-        .collect(toSet()));
-  }
-
-  @Override
   public Set<ExtensionModel> discoverPluginsExtensionModels(ExtensionDiscoveryRequest discoveryRequest) {
-    return unmodifiableSet(new HashSet<>(PluginsDependenciesProcessor
+    Set<ExtensionModel> runtimeExtensionModels = discoverRuntimeExtensionModels();
+    List<ExtensionModel> pluginDependenciesExtensionModels = PluginsDependenciesProcessor
         .process(discoveryRequest.getArtifactPluginDescriptors(), discoveryRequest.isParallelDiscovery(),
                  (extensions, artifactPlugin) -> {
                    Set<ExtensionModel> dependencies = new HashSet<>();
@@ -57,7 +49,7 @@ public class DefaultExtensionModelDiscoverer implements ExtensionModelDiscoverer
                    if (!dependencies.contains(MuleExtensionModelProvider.getExtensionModel())) {
                      dependencies = ImmutableSet.<ExtensionModel>builder()
                          .addAll(extensions)
-                         .addAll(discoverRuntimeExtensionModels())
+                         .addAll(runtimeExtensionModels)
                          .build();
                    }
 
@@ -66,6 +58,8 @@ public class DefaultExtensionModelDiscoverer implements ExtensionModelDiscoverer
                    if (extension != null) {
                      extensions.add(extension);
                    }
-                 })));
+                 });
+
+    return concat(runtimeExtensionModels.stream(), pluginDependenciesExtensionModels.stream()).collect(toSet());
   }
 }

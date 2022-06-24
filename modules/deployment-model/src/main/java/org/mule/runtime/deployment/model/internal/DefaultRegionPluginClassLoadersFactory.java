@@ -8,6 +8,7 @@
 package org.mule.runtime.deployment.model.internal;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver.pluginDescriptorResolver;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.of;
@@ -57,7 +58,7 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
               .createMulePluginClassLoader((MuleDeployableArtifactClassLoader) ((RegionClassLoader) regionClassLoader)
                   .getOwnerClassLoader(),
                                            artifactPluginDescriptor,
-                                           bundleDescriptor -> artifactPluginDescriptors
+                                           (pluginDescriptors, bundleDescriptor) -> artifactPluginDescriptors
                                                .stream()
                                                .filter(apd -> apd.getBundleDescriptor()
                                                    .getArtifactId()

@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.ClassUtils.isPrimitiveWrapper;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
-import static org.mule.runtime.module.extension.internal.loader.java.validation.ModelValidationUtils.isCompiletime;
+import static org.mule.runtime.module.extension.internal.loader.java.validation.JavaModelValidationUtils.isCompiletime;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BooleanType;

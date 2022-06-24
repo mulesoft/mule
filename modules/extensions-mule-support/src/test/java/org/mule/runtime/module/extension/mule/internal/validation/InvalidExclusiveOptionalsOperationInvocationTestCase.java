@@ -9,8 +9,6 @@ package org.mule.runtime.module.extension.mule.internal.validation;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERATIONS;
 
-import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 
 import io.qameta.allure.Description;
@@ -22,17 +20,10 @@ import org.junit.rules.ExpectedException;
 
 @Feature(REUSE)
 @Story(OPERATIONS)
-public class InvalidExclusiveOptionalsOperationInvocationTestCase extends MuleArtifactFunctionalTestCase {
-
-  private String configFile;
+public class InvalidExclusiveOptionalsOperationInvocationTestCase extends AbstractConfigFileValidationTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
-
-  @Override
-  protected String getConfigFile() {
-    return configFile;
-  }
 
   @Test
   @Description("Tries to load a configuration file which calls an operation with conflicting exclusive parameters and verifies the error message")
@@ -54,25 +45,5 @@ public class InvalidExclusiveOptionalsOperationInvocationTestCase extends MuleAr
         .expectMessage("[validation/salutation-exclusive-parameters-required-operation.xml:11]: "
             + "Element <General> requires that one of its optional parameters must be set, but all of them are missing. One of the following must be set: [city, country].");
     parseConfig("validation/salutation-exclusive-parameters-required-operation.xml");
-  }
-
-  @Override
-  protected MuleContext createMuleContext() {
-    // Disables MuleContext creation on setup, so we can do it on demand inside each test.
-    return null;
-  }
-
-  @Override
-  protected boolean doTestClassInjection() {
-    return false;
-  }
-
-  protected void parseConfig(String configFile) throws Exception {
-    this.configFile = configFile;
-    try {
-      super.createMuleContext();
-    } finally {
-      this.configFile = null;
-    }
   }
 }

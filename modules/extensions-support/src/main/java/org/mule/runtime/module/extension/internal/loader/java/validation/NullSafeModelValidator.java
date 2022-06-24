@@ -15,7 +15,7 @@ import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
-import static org.mule.runtime.module.extension.internal.loader.java.validation.ModelValidationUtils.isCompiletime;
+import static org.mule.runtime.module.extension.internal.loader.java.validation.JavaModelValidationUtils.isCompiletime;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 
 import org.mule.metadata.api.TypeLoader;

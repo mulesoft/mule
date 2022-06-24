@@ -6,10 +6,6 @@
  */
 package org.mule.runtime.module.artifact.activation.api.ast;
 
-import static java.util.Collections.unmodifiableSet;
-import static java.util.EnumSet.of;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.ast.api.ArtifactType.APPLICATION;
@@ -20,15 +16,21 @@ import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_LOADER_
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_TYPE_LOADER_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
+
+import static java.util.Collections.unmodifiableSet;
+import static java.util.EnumSet.of;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ArtifactType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.type.catalog.ApplicationTypeLoader;
 import org.mule.runtime.dsl.api.ConfigResource;

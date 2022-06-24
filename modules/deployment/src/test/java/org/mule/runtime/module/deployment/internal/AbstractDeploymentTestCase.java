@@ -489,6 +489,9 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
           .definedBy("dummy-app-several-flows.xml").configuredWith("myCustomProp", "someValue")
           .dependingOn(callbackExtensionPlugin)
           .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
+  protected final ApplicationFileBuilder dummyErrorAppOnStartDescriptorFileBuilder =
+      new ApplicationFileBuilder("dummy-error-app-start")
+          .definedBy("dummy-error-app-start.xml").configuredWith("myCustomProp", "someValue");
 
   // Domain file builders
   protected DomainFileBuilder dummyDomainFileBuilder =

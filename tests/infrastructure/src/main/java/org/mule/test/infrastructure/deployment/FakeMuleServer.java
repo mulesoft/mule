@@ -316,7 +316,7 @@ public class FakeMuleServer {
    */
   private void addAppArchive(URL url, String targetFile) throws IOException, URISyntaxException {
     // copy is not atomic, copy to a temp file and rename instead (rename is atomic)
-    final String tempFileName = (targetFile == null ? new File(url.toURI()) : new File(targetFile)).getPath() + ".part";
+    final String tempFileName = (targetFile == null ? new File(url.toURI()) : new File(targetFile)).getName() + ".part";
     final File tempFile = new File(appsDir, tempFileName);
     copyURLToFile(url, tempFile);
     boolean renamed = tempFile.renameTo(new File(removeEnd(tempFile.getAbsolutePath(), ".part")));

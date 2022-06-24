@@ -72,7 +72,7 @@ import org.junit.Test;
 
 public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
-  private static final String CONTENT_METADATA_WITH_KEY_ID = "contentMetadataWithKeyId";
+  private static final String CONTENT_METADATA_WITH_KEY_ID = "sdkContentMetadataWithKeyId";
   private ExtensionDeclaration declaration;
 
   @Before
@@ -100,7 +100,7 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
     MetadataType outputMetadataType = IntrospectionUtils.getReturnType(new TypeWrapper(Object.class, TYPE_LOADER));
     MetadataType objectParameterMetadataType = (new ParameterTypeWrapper(Object.class, TYPE_LOADER)).asMetadataType();
 
-    OperationDeclaration dynamicContent = getDeclaration(operations, "contentMetadataWithKeyId");
+    OperationDeclaration dynamicContent = getDeclaration(operations, CONTENT_METADATA_WITH_KEY_ID);
     assertOutputType(dynamicContent.getOutput(), outputMetadataType, true);
     assertOutputType(dynamicContent.getOutputAttributes(), toMetadataType(void.class), false);
     params = dynamicContent.getAllParameters();
@@ -122,7 +122,7 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
     assertParameterType(getDeclaration(params, "content"), objectParameterMetadataType);
 
     operations = declaration.getOperations();
-    OperationDeclaration dynamicOutputAndAttributes = getDeclaration(operations, "outputAttributesWithDynamicMetadata");
+    OperationDeclaration dynamicOutputAndAttributes = getDeclaration(operations, "sdkOutputAttributesWithDynamicMetadata");
     assertOutputType(dynamicOutputAndAttributes.getOutput(), toMetadataType(Object.class), true);
     assertOutputType(dynamicOutputAndAttributes.getOutputAttributes(), toMetadataType(AbstractOutputAttributes.class), true);
     params = dynamicOutputAndAttributes.getAllParameters();
@@ -184,7 +184,7 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
   public void declaresTypeResolverInformationForDynamicResolver() throws Exception {
     List<OperationDeclaration> operations = declaration.getConfigurations().get(0).getOperations();
 
-    OperationDeclaration dynamicContent = getDeclaration(operations, "contentMetadataWithKeyId");
+    OperationDeclaration dynamicContent = getDeclaration(operations, CONTENT_METADATA_WITH_KEY_ID);
     assertCategoryInfo(dynamicContent, METADATA_EXTENSION_RESOLVER);
     assertOutputResolverInfo(dynamicContent, of(TEST_OUTPUT_ANY_TYPE_RESOLVER));
     assertAttributesResolverInfo(dynamicContent, empty());

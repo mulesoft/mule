@@ -24,6 +24,7 @@ import java.util.stream.Stream;
  */
 abstract class BaseMuleSdkExtensionModelParser {
 
+  protected static final String DEPRECATED_CONSTRUCT_NAME = "deprecated";
   private static final String MESSAGE_PARAMETER = "message";
   private static final String SINCE_PARAMETER = "since";
   private static final String TO_REMOVE_IN_PARAMETER = "toRemoveIn";

@@ -61,9 +61,6 @@ import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
@@ -71,6 +68,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -216,7 +216,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
 
     final MuleArtifactClassLoader plugin2ClassLoader = artifactClassLoaderResolver
         .createMulePluginClassLoader(domainClassLoader, plugin2Descriptor,
-                                     d -> empty());
+                                     (apds, d) -> empty());
 
     domainClassLoader =
         artifactClassLoaderResolver.createDomainClassLoader(newDomainDescriptor,
@@ -242,7 +242,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
   }
 
   @Test
-  public void createApplicationClassLoader() {
+  public void createApplicationClassLoaderWithDomainClassLoader() {
     final String applicationName = "app";
 
     final MuleDeployableArtifactClassLoader domainClassLoader = getTestDomainClassLoader(emptyList());
@@ -257,6 +257,26 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
 
     final MuleApplicationClassLoader applicationClassLoader = (MuleApplicationClassLoader) artifactClassLoader;
     assertThat(applicationClassLoader.getParent().getParent(), is(domainClassLoader.getClassLoader()));
+    assertThat(applicationClassLoader.getArtifactId(), is(artifactId));
+  }
+
+  @Test
+  @Issue("W-11214775")
+  public void createApplicationClassLoaderWithoutDomainClassLoader() {
+    final String applicationName = "app";
+
+    ApplicationDescriptor descriptor = new ApplicationDescriptor(applicationName);
+    descriptor.setArtifactLocation(new File(muleHomeFolder, applicationName));
+    final ArtifactClassLoader artifactClassLoader = artifactClassLoaderResolver
+        .createApplicationClassLoader(descriptor);
+
+    assertThat(artifactClassLoader.getClassLoader(), instanceOf(MuleApplicationClassLoader.class));
+
+    final MuleApplicationClassLoader applicationClassLoader = (MuleApplicationClassLoader) artifactClassLoader;
+    final MuleDeployableArtifactClassLoader domainClassLoader =
+        (MuleDeployableArtifactClassLoader) applicationClassLoader.getParent().getParent();
+    final String artifactId = getApplicationId(domainClassLoader.getArtifactId(), applicationName);
+    assertThat(domainClassLoader.getArtifactDescriptor().getName(), is(DEFAULT_DOMAIN_NAME));
     assertThat(applicationClassLoader.getArtifactId(), is(artifactId));
   }
 
@@ -302,7 +322,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
 
     final MuleArtifactClassLoader plugin2ClassLoader = artifactClassLoaderResolver
         .createMulePluginClassLoader(applicationClassLoader, plugin2Descriptor,
-                                     d -> empty());
+                                     (apds, d) -> empty());
 
     applicationClassLoader =
         artifactClassLoaderResolver.createApplicationClassLoader(newApplicationDescriptor,
@@ -344,7 +364,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
 
     final MuleArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
         .createMulePluginClassLoader(applicationClassLoader, plugin1Descriptor,
-                                     d -> of(plugin2Descriptor));
+                                     (apds, d) -> of(plugin2Descriptor));
 
     assertThat(pluginClassLoader.getParent(), is(applicationClassLoader.getParent()));
     assertThat(pluginClassLoader.getClassLoaderLookupPolicy().getPackageLookupStrategy(plugin2ExportedPackage), is(PARENT_FIRST));
@@ -361,7 +381,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
 
     final MuleArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
         .createMulePluginClassLoader(applicationClassLoader, plugin1Descriptor,
-                                     d -> empty());
+                                     (apds, d) -> empty());
 
     assertThat(pluginClassLoader.getClassLoaderLookupPolicy().getPackageLookupStrategy(PRIVILEGED_PACKAGE),
                instanceOf(ContainerOnlyLookupStrategy.class));
@@ -384,7 +404,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
 
     final MuleArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
         .createMulePluginClassLoader(applicationClassLoader, plugin1Descriptor,
-                                     d -> of(plugin2Descriptor));
+                                     (apds, d) -> of(plugin2Descriptor));
 
     assertThat(pluginClassLoader.getClassLoaderLookupPolicy().getPackageLookupStrategy(PRIVILEGED_PACKAGE),
                instanceOf(DelegateOnlyLookupStrategy.class));
@@ -407,7 +427,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
 
     artifactClassLoaderResolver
         .createMulePluginClassLoader(applicationClassLoader, plugin1Descriptor,
-                                     d -> of(plugin2Descriptor));
+                                     (apds, d) -> of(plugin2Descriptor));
   }
 
   @Test
@@ -429,7 +449,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
 
     final MuleArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
         .createMulePluginClassLoader(applicationClassLoader, plugin1Descriptor,
-                                     d -> of(plugin2Descriptor));
+                                     (apds, d) -> of(plugin2Descriptor));
 
     // The local package should have precedence over the ones exported by other artifacts
     assertThat(pluginClassLoader.getClassLoaderLookupPolicy().getPackageLookupStrategy(pluginPackage),
@@ -452,7 +472,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
 
     final MuleArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
         .createMulePluginClassLoader(applicationClassLoader, plugin1Descriptor,
-                                     d -> empty());
+                                     (apds, d) -> empty());
 
     assertThat(pluginClassLoader.getClassLoaderLookupPolicy().getPackageLookupStrategy(package1Name),
                instanceOf(ContainerOnlyLookupStrategy.class));
@@ -478,11 +498,12 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
 
     final MuleArtifactClassLoader plugin2ClassLoader = artifactClassLoaderResolver
         .createMulePluginClassLoader(domainClassLoader, plugin2Descriptor,
-                                     d -> empty());
+                                     (apds, d) -> empty());
 
     MuleArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver.createMulePluginClassLoader(domainClassLoader,
                                                                                                         plugin1Descriptor,
-                                                                                                        d -> of(plugin2Descriptor),
+                                                                                                        (apds,
+                                                                                                         d) -> of(plugin2Descriptor),
                                                                                                         (ownerClassLoader,
                                                                                                          pluginDescriptor) -> {
                                                                                                           if (pluginDescriptor

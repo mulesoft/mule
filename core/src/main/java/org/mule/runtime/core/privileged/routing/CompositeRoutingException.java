@@ -7,9 +7,12 @@
 
 package org.mule.runtime.core.privileged.routing;
 
-import static java.lang.System.lineSeparator;
-import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.message.Message.of;
+
+import static java.lang.System.lineSeparator;
+import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.exception.ComposedErrorException;
 import org.mule.runtime.api.exception.ErrorMessageAwareException;
@@ -18,11 +21,18 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.internal.config.ExceptionHelper;
+import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.runtime.core.privileged.processor.Router;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link MuleException} used to aggregate exceptions thrown by several routes in the context of a single {@link Router}. This
@@ -35,11 +45,14 @@ import java.util.Map.Entry;
  */
 public final class CompositeRoutingException extends MuleException implements ComposedErrorException, ErrorMessageAwareException {
 
-  private static final String MESSAGE_TITLE = "Exception(s) were found for route(s): ";
+  private static final String MESSAGE_TITLE = "Error(s) were found for route(s):";
+  private static final String MESSAGE_SUB_TITLE = "Detailed Error(s) for route(s):";
+  private static final String LEGACY_MESSAGE_TITLE = "Exception(s) were found for route(s): ";
 
   private static final long serialVersionUID = -4421728527040579605L;
 
   private final RoutingResult routingResult;
+  private static final Logger LOGGER = LoggerFactory.getLogger(CompositeRoutingException.class);
 
   /**
    * Constructs a new {@link CompositeRoutingException}
@@ -53,37 +66,83 @@ public final class CompositeRoutingException extends MuleException implements Co
 
   @Override
   public String getDetailedMessage() {
-    StringBuilder builder = new StringBuilder();
-    builder.append(MESSAGE_TITLE).append(lineSeparator());
+    Map<String, Pair<Error, EventProcessingException>> detailedFailures = getDetailedFailures();
 
-    for (Entry<String, Error> entry : routingResult.getFailures().entrySet()) {
-      String routeSubtitle = String.format("Route %s: ", entry.getKey());
-      MuleException muleException = ExceptionHelper.getRootMuleException(entry.getValue().getCause());
-      if (muleException != null) {
-        builder.append(routeSubtitle).append(muleException.getDetailedMessage());
-      } else {
-        builder.append(routeSubtitle)
-            .append("Caught exception in Exception Strategy: " + entry.getValue().getCause().getMessage());
+    if (detailedFailures.isEmpty()) {
+      return getLegacyDetailedMessage();
+    } else {
+      StringBuilder builder = new StringBuilder();
+      // provide information about the composite exception itself
+      builder.append(super.getDetailedMessage());
+      // get detailed information about exceptions that make up composite exception
+      builder.append(lineSeparator()).append(MESSAGE_SUB_TITLE).append(lineSeparator());
+      for (Entry<String, Pair<Error, EventProcessingException>> entry : detailedFailures.entrySet()) {
+        MuleException muleException = getRootMuleException(entry.getValue().getSecond());
+        Throwable exception = entry.getValue().getFirst().getCause();
+        appendMessageForExceptions(builder, entry.getKey(), exception, muleException);
       }
+      return builder.toString();
+    }
+  }
+
+  private String getLegacyDetailedMessage() {
+    StringBuilder builder = new StringBuilder();
+    builder.append(LEGACY_MESSAGE_TITLE).append(lineSeparator());
+    for (Entry<String, Error> entry : routingResult.getFailures().entrySet()) {
+      MuleException muleException = getRootMuleException(entry.getValue().getCause());
+      Throwable exception = entry.getValue().getCause();
+      appendMessageForExceptions(builder, entry.getKey(), exception, muleException);
     }
     return builder.toString();
+  }
+
+  private void appendMessageForExceptions(StringBuilder builder, String route, Throwable exception, MuleException muleException) {
+    String routeSubtitle = String.format("Route %s: ", route);
+    builder.append(lineSeparator());
+    if (muleException != null) {
+      builder.append(routeSubtitle).append(muleException.getDetailedMessage());
+    } else {
+      builder.append(routeSubtitle)
+          .append("Caught exception in Exception Strategy: " + exception.getMessage());
+    }
+  }
+
+  private Map<String, Pair<Error, EventProcessingException>> getDetailedFailures() {
+    Method getDetailedFailuresMethod = null;
+    Map<String, Pair<Error, EventProcessingException>> detailedFailures = emptyMap();
+    try {
+      getDetailedFailuresMethod = RoutingResult.class.getMethod("getFailuresWithExceptionInfo");
+      detailedFailures =
+          (Map<String, Pair<Error, EventProcessingException>>) getDetailedFailuresMethod.invoke(routingResult);
+    } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+      LOGGER.warn("Invalid Invocation, Expected method {} doesn't exist", getDetailedFailuresMethod.getName());
+    }
+    return detailedFailures;
   }
 
   private static I18nMessage buildExceptionMessage(RoutingResult routingResult) {
     StringBuilder builder = new StringBuilder();
     for (Entry<String, Error> routeResult : routingResult.getFailures().entrySet()) {
       Throwable routeException = routeResult.getValue().getCause();
-      builder.append(lineSeparator() + "\t").append(routeResult.getKey()).append(": ").append(routeException.getClass().getName())
+      builder.append(lineSeparator() + "\t").append("Route ").append(routeResult.getKey()).append(": ")
+          .append(routeException.getClass().getName())
           .append(": ").append(routeException.getMessage());
     }
-
-    builder.insert(0, MESSAGE_TITLE);
+    if (!routingResult.getFailuresWithExceptionInfo().isEmpty()) {
+      builder.insert(0, MESSAGE_TITLE);
+    } else {
+      builder.insert(0, LEGACY_MESSAGE_TITLE);
+    }
     return I18nMessageFactory.createStaticMessage(builder.toString());
   }
 
   @Override
   public List<Error> getErrors() {
-    return routingResult.getFailures().values().stream().collect(toList());
+    if (!routingResult.getFailures().isEmpty()) {
+      return routingResult.getFailures().values().stream().collect(toList());
+    } else {
+      return routingResult.getFailuresWithExceptionInfo().values().stream().map(pair -> pair.getFirst()).collect(toList());
+    }
   }
 
   @Override
