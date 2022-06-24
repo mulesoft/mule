@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static com.google.common.collect.ImmutableBiMap.of;
 import static java.util.Collections.emptySet;
+import static java.util.Optional.empty;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getExpressionSupport;
@@ -47,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 /**
@@ -163,37 +165,53 @@ public class ResolverSetUtils {
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
-        if (value instanceof Collection) {
-          try {
+        boolean finalAcceptReferences = acceptsReferences;
+        try {
+          if (value instanceof Collection) {
+
             resolverReference.set(getParameterValueResolverForCollection(parameterName, arrayType, (Collection) value,
                                                                          reflectionCache, muleContext,
                                                                          valueResolverFactory, false));
-          } catch (MuleException e) {
-            throw new MuleRuntimeException(e);
+            finalAcceptReferences = false;
+          } else {
+            resolverReference.set(new StaticValueResolver(value));
           }
-        } else {
-          defaultVisit(arrayType);
+          resolverReference
+              .set(getValueResolverFor(parameterName, arrayType, resolveAndinjectIfStatic(resolverReference.get(), muleContext),
+                                       getDefaultValue(type),
+                                       getExpressionSupport(arrayType), false, modelProperties, finalAcceptReferences));
+        } catch (MuleException e) {
+          throw new MuleRuntimeException(e);
         }
       }
 
       @Override
       public void visitObject(ObjectType objectType) {
+        boolean finalAcceptReferences = acceptsReferences;
         try {
           if (isMap(objectType)) {
             if (value instanceof Map) {
               resolverReference.set(getParameterValueResolverForMap(parameterName, objectType, (Map) value, reflectionCache,
                                                                     muleContext, valueResolverFactory, false));
+              finalAcceptReferences = false;
             } else {
-              defaultVisit(objectType);
+              resolverReference.set(new StaticValueResolver(value));
             }
           } else {
-            resolverReference.set(getPojoParameterValueResolver(parameterName, objectType, value, reflectionCache,
-                                                                muleContext, valueResolverFactory, acceptsReferences));
+            Optional<ValueResolver> pojoResolver =
+                getPojoParameterValueResolver(parameterName, objectType, value, reflectionCache,
+                                              muleContext, valueResolverFactory);
+            if (pojoResolver.isPresent()) {
+              resolverReference.set(pojoResolver.get());
+              finalAcceptReferences = false;
+            } else {
+              resolverReference.set(new StaticValueResolver(value));
+            }
           }
           resolverReference
               .set(getValueResolverFor(parameterName, objectType, resolveAndinjectIfStatic(resolverReference.get(), muleContext),
                                        getDefaultValue(type),
-                                       getExpressionSupport(objectType), false, modelProperties, acceptsReferences));
+                                       getExpressionSupport(objectType), false, modelProperties, finalAcceptReferences));
         } catch (MuleException e) {
           throw new MuleRuntimeException(e);
         }
@@ -230,9 +248,9 @@ public class ResolverSetUtils {
     }
   }
 
-  private static ValueResolver getPojoParameterValueResolver(String parameterName, ObjectType objectType, Object value,
-                                                             ReflectionCache reflectionCache, MuleContext muleContext,
-                                                             ValueResolverFactory valueResolverFactory, boolean acceptReferences)
+  private static Optional<ValueResolver> getPojoParameterValueResolver(String parameterName, ObjectType objectType, Object value,
+                                                                       ReflectionCache reflectionCache, MuleContext muleContext,
+                                                                       ValueResolverFactory valueResolverFactory)
       throws MuleException {
 
     Optional<Class<Object>> pojoClass = getType(objectType);
@@ -252,9 +270,9 @@ public class ResolverSetUtils {
       }
 
       ObjectBuilderValueResolver objectBuilderValueResolver = new ObjectBuilderValueResolver(objectBuilder, muleContext);
-      return objectBuilderValueResolver;
+      return Optional.of(objectBuilderValueResolver);
     } else {
-      return new StaticValueResolver<>(value);
+      return empty();
     }
   }
 
