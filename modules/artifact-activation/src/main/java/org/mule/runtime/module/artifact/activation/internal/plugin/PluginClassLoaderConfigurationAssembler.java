@@ -13,6 +13,7 @@ import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
+import org.mule.runtime.module.artifact.activation.api.plugin.PluginPatchesResolver;
 import org.mule.runtime.module.artifact.activation.internal.classloader.AbstractArtifactClassLoaderConfigurationAssembler;
 import org.mule.runtime.module.artifact.activation.internal.classloader.model.ClassLoaderModelAssembler;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -38,6 +39,7 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
   private final List<BundleDependency> bundleDependencies;
   private final BundleDescriptor bundleDescriptor;
   private final DeployableArtifactDescriptor ownerDescriptor;
+  private final PluginPatchesResolver pluginPatchesResolver;
 
   public PluginClassLoaderConfigurationAssembler(ArtifactCoordinates artifactCoordinates,
                                                  List<BundleDependency> projectDependencies,
@@ -46,7 +48,8 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
                                                  MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor,
                                                  List<BundleDependency> bundleDependencies,
                                                  BundleDescriptor bundleDescriptor,
-                                                 DeployableArtifactDescriptor ownerDescriptor) {
+                                                 DeployableArtifactDescriptor ownerDescriptor,
+                                                 PluginPatchesResolver pluginPatchesResolver) {
     super(new ClassLoaderModelAssembler(artifactCoordinates, projectDependencies,
                                         sharedProjectDependencies, muleArtifactLoaderDescriptor)
                                             .createClassLoaderModel());
@@ -54,10 +57,16 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
     this.bundleDependencies = bundleDependencies;
     this.bundleDescriptor = bundleDescriptor;
     this.ownerDescriptor = ownerDescriptor;
+    this.pluginPatchesResolver = pluginPatchesResolver;
   }
 
   @Override
   protected List<URL> addArtifactSpecificClassLoaderConfiguration(ClassLoaderModelBuilder classLoaderConfigurationBuilder) {
+    // Patches resolution is done just for plugins because this should be the use case, but in the implementation currently used
+    // in the Runtime (AbstractMavenClassLoaderModelLoader), it's done for deployables (applications and domains) as well
+    pluginPatchesResolver.resolve(packagerClassLoaderModel.getArtifactCoordinates())
+        .forEach(classLoaderConfigurationBuilder::containing);
+
     final List<URL> dependenciesArtifactsUrls = new ArrayList<>();
 
     if (ownerDescriptor != null) {

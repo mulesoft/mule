@@ -6,17 +6,13 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
 
-import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasItem;
@@ -28,10 +24,6 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.Is.is;
 
 import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
-import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
-import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
-import org.mule.runtime.module.artifact.activation.api.descriptor.DomainDescriptorResolver;
-import org.mule.runtime.module.artifact.activation.internal.maven.MavenDeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
@@ -39,28 +31,18 @@ import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Test;
-
 import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
+import org.junit.Test;
 
-@Feature(CLASSLOADING_ISOLATION)
 @Story(ARTIFACT_DESCRIPTORS)
-public class DefaultDeployableArtifactDescriptorFactoryTestCase extends AbstractMuleTestCase {
+public class DefaultDeployableArtifactDescriptorFactoryTestCase extends AbstractDeployableArtifactDescriptorFactoryTestCase {
 
-  private static final DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory =
-      new DefaultDeployableArtifactDescriptorFactory();
   private static final ArtifactClassLoaderResolver artifactClassLoaderResolver =
       ArtifactClassLoaderResolver.defaultClassLoaderResolver();
 
@@ -195,35 +177,6 @@ public class DefaultDeployableArtifactDescriptorFactoryTestCase extends Abstract
   }
 
   @Test
-  public void createApplicationDescriptorWithPatchedPlugins() throws URISyntaxException, IOException {
-    final String appFolder = "apps/with-patched-artifacts";
-
-    System.getProperties().setProperty(MULE_HOME_DIRECTORY_PROPERTY, getDeployableFolder(appFolder).getCanonicalPath());
-    ApplicationDescriptor applicationDescriptor = createApplicationDescriptor(appFolder);
-
-    ArtifactPluginDescriptor httpPlugin = applicationDescriptor.getPlugins()
-        .stream()
-        .filter(p -> p.getName().equals("HTTP"))
-        .findFirst()
-        .get();
-
-    assertThat(Arrays.stream(httpPlugin.getClassLoaderModel().getUrls()).map(URL::toString).collect(toList()),
-               hasItem(endsWith("http-patch.jar")));
-
-    ArtifactPluginDescriptor dbPlugin = applicationDescriptor.getPlugins()
-        .stream()
-        .filter(p -> p.getName().equals("Database"))
-        .findFirst()
-        .get();
-
-    assertThat(Arrays.stream(dbPlugin.getClassLoaderModel().getUrls()).map(URL::toString).collect(toList()),
-               not(hasItem(endsWith("db-patch.jar"))));
-
-    // Unset the mule home folder so other tests don't get affected by it
-    System.getProperties().setProperty(MULE_HOME_DIRECTORY_PROPERTY, "");
-  }
-
-  @Test
   @Issue("W-11261035")
   @Description("Tests whenever a domain has a dependency that is also present in an application either as a dependency " +
       "or a transitive dependency, the application class loader can be correctly created.")
@@ -294,35 +247,6 @@ public class DefaultDeployableArtifactDescriptorFactoryTestCase extends Abstract
 
     assertThat(regionClassLoader.getArtifactPluginClassLoaders().stream().map(ArtifactClassLoader::getArtifactDescriptor)
         .collect(toList()), hasItems(hasProperty("name", equalTo("HTTP")), hasProperty("name", equalTo("Sockets"))));
-  }
-
-  private DomainDescriptor createDomainDescriptor(String domainPath) throws URISyntaxException {
-    DeployableProjectModel model = getDeployableProjectModel(domainPath);
-
-    return deployableArtifactDescriptorFactory.createDomainDescriptor(model, emptyMap());
-  }
-
-  private ApplicationDescriptor createApplicationDescriptor(String appPath) throws URISyntaxException {
-    return createApplicationDescriptor(appPath, null);
-  }
-
-  private ApplicationDescriptor createApplicationDescriptor(String appPath, DomainDescriptorResolver domainDescriptorResolver)
-      throws URISyntaxException {
-    DeployableProjectModel model = getDeployableProjectModel(appPath);
-
-    return deployableArtifactDescriptorFactory.createApplicationDescriptor(model, emptyMap(),
-                                                                           domainDescriptorResolver);
-  }
-
-  private DeployableProjectModel getDeployableProjectModel(String deployablePath) throws URISyntaxException {
-    MavenDeployableProjectModelBuilder modelFactory =
-        new MavenDeployableProjectModelBuilder(getDeployableFolder(deployablePath));
-
-    return modelFactory.build();
-  }
-
-  protected File getDeployableFolder(String appPath) throws URISyntaxException {
-    return new File(getClass().getClassLoader().getResource(appPath).toURI());
   }
 
 }

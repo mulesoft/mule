@@ -30,6 +30,7 @@ import static org.mule.tools.api.classloader.Constants.PLUGIN_FIELD;
 import static org.mule.tools.api.classloader.model.ArtifactCoordinates.DEFAULT_ARTIFACT_TYPE;
 
 import static java.lang.String.format;
+import static java.nio.file.Files.walk;
 import static java.nio.file.Paths.get;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
@@ -40,6 +41,7 @@ import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 
 import static com.google.common.collect.Sets.newHashSet;
+import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.codehaus.plexus.util.xml.Xpp3DomUtils.mergeXpp3Dom;
 
 import org.mule.maven.client.api.MavenClientProvider;
@@ -73,7 +75,6 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
@@ -315,10 +316,10 @@ public class MavenDeployableProjectModelBuilder
     String sourceDirectory = build.getSourceDirectory() != null ? build.getSourceDirectory() : DEFAULT_SOURCES_DIRECTORY;
     Path javaDirectory = get(projectFolder.getAbsolutePath(), sourceDirectory.concat(DEFAULT_SOURCES_JAVA_DIRECTORY));
     // look for all the sources under the java directory
-    List<Path> allJavaFiles = Files.walk(javaDirectory)
+    List<Path> allJavaFiles = walk(javaDirectory)
         .filter(Files::isRegularFile)
         .collect(toList());
-    Predicate<Path> isJavaFile = path -> FilenameUtils.getExtension(path.toString()).endsWith(JAVA_EXTENSION);
+    Predicate<Path> isJavaFile = path -> getExtension(path.toString()).endsWith(JAVA_EXTENSION);
     packages = allJavaFiles.stream()
         .filter(isJavaFile)
         .map(path -> {
@@ -352,7 +353,7 @@ public class MavenDeployableProjectModelBuilder
   private List<String> getResourcesInFolder(String resourcesDirectoryName) throws IOException {
     Path resourcesDirectory = get(projectFolder.getAbsolutePath(), resourcesDirectoryName);
     // look for all the sources under the resources directory
-    List<Path> allResourcesFiles = Files.walk(resourcesDirectory)
+    List<Path> allResourcesFiles = walk(resourcesDirectory)
         .filter(Files::isRegularFile)
         .collect(toList());
 

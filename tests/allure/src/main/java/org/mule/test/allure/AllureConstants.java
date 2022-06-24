@@ -121,6 +121,7 @@ public interface AllureConstants {
     interface ClassloadingIsolationStory {
 
       String ARTIFACT_DESCRIPTORS = "Artifact descriptors";
+      String PATCHED_ARTIFACT_DESCRIPTORS = "Artifact descriptors with patched plugins";
       String CLASSLOADER_MODEL = "ClassLoader model";
       String CLASSLOADER_GENERATION = "ClassLoader generation";
     }
