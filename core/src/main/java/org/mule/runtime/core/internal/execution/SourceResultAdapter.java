@@ -11,9 +11,12 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.internal.util.mediatype.PayloadMediaTypeResolver;
 import org.mule.sdk.api.runtime.operation.Result;
+import org.mule.sdk.api.runtime.source.SdkDistributedTraceContextMapGetter;
 
 import java.util.List;
 import java.util.Optional;
+
+import static org.mule.sdk.api.runtime.source.SdkDistributedTraceContextMapGetter.emptyTraceContextMapGetter;
 
 /**
  * Contains the output of a message source
@@ -109,5 +112,14 @@ public class SourceResultAdapter {
    */
   public PayloadMediaTypeResolver getPayloadMediaTypeResolver() {
     return payloadMediaTypeResolver;
+  }
+
+  /**
+   * @return the {@link SdkDistributedTraceContextMapGetter} used to retrieve the distributed trace context.
+   *
+   * @since 4.5.0
+   */
+  public SdkDistributedTraceContextMapGetter getSdkDistributedTraceContextMapGetter() {
+    return emptyTraceContextMapGetter();
   }
 }

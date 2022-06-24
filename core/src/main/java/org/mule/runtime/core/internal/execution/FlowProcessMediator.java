@@ -98,6 +98,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
+import org.mule.sdk.api.runtime.source.SdkDistributedTraceContextMapGetter;
 import org.slf4j.Logger;
 
 /**
@@ -534,7 +535,8 @@ public class FlowProcessMediator implements Initialisable {
 
     SourceResultAdapter adapter = template.getSourceMessage();
     Builder eventBuilder =
-        createEventBuilder(source.getLocation(), responseCompletion, flowConstruct, resolveSourceCorrelationId(adapter));
+        createEventBuilder(source.getLocation(), responseCompletion, flowConstruct, resolveSourceCorrelationId(adapter),
+                           adapter.getSdkDistributedTraceContextMapGetter());
 
     return eventBuilder.message(eventCtx -> {
       final Result<?, ?> result = adapter.getResult();
@@ -561,8 +563,10 @@ public class FlowProcessMediator implements Initialisable {
   }
 
   private Builder createEventBuilder(ComponentLocation sourceLocation, CompletableFuture<Void> responseCompletion,
-                                     FlowConstruct flowConstruct, String correlationId) {
-    return InternalEvent.builder(create(flowConstruct, sourceLocation, correlationId, Optional.of(responseCompletion)));
+                                     FlowConstruct flowConstruct, String correlationId,
+                                     SdkDistributedTraceContextMapGetter sdkDistributedTraceContextMapGetter) {
+    return InternalEvent.builder(create(flowConstruct, sourceLocation, correlationId, Optional.of(responseCompletion),
+                                        sdkDistributedTraceContextMapGetter));
   }
 
   /**

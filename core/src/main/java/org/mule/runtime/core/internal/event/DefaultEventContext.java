@@ -13,10 +13,12 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.event.DistributedTraceContext.emptyDistributedEventContext;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.event.DistributedTraceContext;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -40,6 +42,7 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import org.mule.sdk.api.runtime.source.SdkDistributedTraceContextMapGetter;
 import org.slf4j.Logger;
 
 /**
@@ -52,6 +55,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   private static final Logger LOGGER = getLogger(DefaultEventContext.class);
 
   private static final long serialVersionUID = -3664490832964509653L;
+  private final DistributedTraceContext distributedTraceContext;
 
   /**
    * Builds a new child execution context from a parent context. A child context delegates all getters to the parent context but
@@ -173,6 +177,37 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   /**
    * Builds a new execution context with the given parameters.
    *
+   * @param flow                    the flow that processes events of this context.
+   * @param location                the location of the component that received the first message for this context.
+   * @param correlationId           the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent}
+   *                                of this context, if available.
+   * @param externalCompletion      future that completes when source completes enabling termination of {@link BaseEventContext}
+   *                                to depend on completion of source.
+   * @param distributedTraceContext the {@link DistributedTraceContext} associated to the event.
+   * 
+   */
+  public DefaultEventContext(FlowConstruct flow, ComponentLocation location, String correlationId,
+                             Optional<CompletableFuture<Void>> externalCompletion,
+                             DistributedTraceContext distributedTraceContext) {
+    super(NullExceptionHandler.getInstance(), 0, externalCompletion);
+    this.id = flow.getUniqueIdString();
+    this.serverId = flow.getServerId();
+    this.location = location;
+    this.processingTime = ProcessingTime.newInstance(flow);
+    this.correlationId = correlationId;
+    this.distributedTraceContext = distributedTraceContext;
+
+    // Only generate flowStack dump information for when the eventContext is created for a flow.
+    if (flow != null && flow.getMuleContext() != null) {
+      eventContextMaintain(flow.getMuleContext().getEventContextService());
+    }
+    this.flowCallStack = new DefaultFlowCallStack();
+    createStreamingState();
+  }
+
+  /**
+   * Builds a new execution context with the given parameters.
+   *
    * @param flow               the flow that processes events of this context.
    * @param location           the location of the component that received the first message for this context.
    * @param correlationId      the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of
@@ -182,19 +217,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    */
   public DefaultEventContext(FlowConstruct flow, ComponentLocation location, String correlationId,
                              Optional<CompletableFuture<Void>> externalCompletion) {
-    super(NullExceptionHandler.getInstance(), 0, externalCompletion);
-    this.id = flow.getUniqueIdString();
-    this.serverId = flow.getServerId();
-    this.location = location;
-    this.processingTime = ProcessingTime.newInstance(flow);
-    this.correlationId = correlationId;
-
-    // Only generate flowStack dump information for when the eventContext is created for a flow.
-    if (flow != null && flow.getMuleContext() != null) {
-      eventContextMaintain(flow.getMuleContext().getEventContextService());
-    }
-    this.flowCallStack = new DefaultFlowCallStack();
-    createStreamingState();
+    this(flow, location, correlationId, externalCompletion, emptyDistributedEventContext());
   }
 
   /**
@@ -217,6 +240,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     this.location = location;
     this.processingTime = ProcessingTime.newInstance(flow);
     this.correlationId = correlationId;
+    this.distributedTraceContext = emptyDistributedEventContext();
 
     // Only generate flowStack dump information for when the eventContext is created for a flow.
     if (flow != null && flow.getMuleContext() != null) {
@@ -267,6 +291,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     this.processingTime = null;
     this.correlationId = correlationId;
     this.flowCallStack = new DefaultFlowCallStack();
+    this.distributedTraceContext = emptyDistributedEventContext();
     createStreamingState();
   }
 
@@ -317,15 +342,20 @@ public final class DefaultEventContext extends AbstractEventContext implements S
         + getOriginatingLocation().getRootContainerName() + " }";
   }
 
+  @Override
+  public DistributedTraceContext getDistributedTraceContext() {
+    return distributedTraceContext;
+  }
+
   private static class ChildEventContext extends AbstractEventContext implements Serializable {
 
     private static final long serialVersionUID = 1054412872901205234L;
-
     private transient BaseEventContext root;
     private final BaseEventContext parent;
     private final ComponentLocation componentLocation;
     private final String id;
     private final String correlationId;
+    private final DistributedTraceContext distributedTracingContext;
     private final String rootId;
 
     private ChildEventContext(BaseEventContext parent, ComponentLocation componentLocation,
@@ -340,6 +370,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
           : Integer.toString(identityHashCode(this));
       this.correlationId = correlationId != null ? correlationId : parent.getCorrelationId();
       this.rootId = root.getRootId();
+      this.distributedTracingContext = parent.getDistributedTraceContext();
     }
 
     private ChildEventContext(BaseEventContext parent, ComponentLocation componentLocation,
@@ -360,6 +391,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     @Override
     public String getCorrelationId() {
       return correlationId;
+    }
+
+    @Override
+    public DistributedTraceContext getDistributedTraceContext() {
+      return distributedTracingContext;
     }
 
     @Override

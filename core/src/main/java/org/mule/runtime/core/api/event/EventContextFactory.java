@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.api.event;
 
+import static org.mule.runtime.core.internal.event.trace.EventDistributedTraceContext.builder;
+import static org.mule.sdk.api.runtime.source.SdkDistributedTraceContextMapGetter.emptyTraceContextMapGetter;
+
 import static java.util.Optional.empty;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -14,6 +17,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.sdk.api.runtime.source.SdkDistributedTraceContextMapGetter;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -84,6 +88,24 @@ public interface EventContextFactory {
   /**
    * Builds a new execution context with the given parameters.
    *
+   * @param flow                                the flow that processes events of this context.
+   * @param location                            the location of the component that received the first message for this context.
+   * @param correlationId                       See {@link EventContext#getCorrelationId()}.
+   * @param externalCompletion                  future that completes when source completes enabling termination of
+   *                                            {@link BaseEventContext} to depend on completion of source.
+   * @param sdkDistributedTraceContextMapGetter the {@link SdkDistributedTraceContextMapGetter} used to retrieve the distributed
+   *                                            trace context.
+   */
+  static EventContext create(FlowConstruct flow, ComponentLocation location, String correlationId,
+                             Optional<CompletableFuture<Void>> externalCompletion,
+                             SdkDistributedTraceContextMapGetter sdkDistributedTraceContextMapGetter) {
+    return new DefaultEventContext(flow, location, correlationId, externalCompletion,
+                                   builder().withGetter(sdkDistributedTraceContextMapGetter).build());
+  }
+
+  /**
+   * Builds a new execution context with the given parameters.
+   *
    * @param flow               the flow that processes events of this context.
    * @param location           the location of the component that received the first message for this context.
    * @param correlationId      See {@link EventContext#getCorrelationId()}.
@@ -92,7 +114,7 @@ public interface EventContextFactory {
    */
   static EventContext create(FlowConstruct flow, ComponentLocation location, String correlationId,
                              Optional<CompletableFuture<Void>> externalCompletion) {
-    return new DefaultEventContext(flow, location, correlationId, externalCompletion);
+    return create(flow, location, correlationId, externalCompletion, emptyTraceContextMapGetter());
   }
 
   /**
