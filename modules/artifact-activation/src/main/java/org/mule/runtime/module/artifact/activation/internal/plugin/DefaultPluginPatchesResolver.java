@@ -61,7 +61,7 @@ public class DefaultPluginPatchesResolver implements PluginPatchesResolver {
     try {
       pluginArtifactCoordinatesVersion = genericVersionScheme.parseVersion(pluginArtifactCoordinates.getVersion());
     } catch (Exception e) {
-      LOGGER.warn("Error parsing version {} for artifact {}, patches against this artifact will not be applied",
+      LOGGER.warn("Error parsing version '{}' for artifact '{}', patches against this artifact will not be applied",
                   pluginArtifactCoordinates.getVersion(), artifactId);
 
       return emptyList();
@@ -87,12 +87,13 @@ public class DefaultPluginPatchesResolver implements PluginPatchesResolver {
                           VersionConstraint versionConstraint = genericVersionScheme.parseVersionConstraint(affectedVersion);
                           return versionConstraint.containsVersion(pluginArtifactCoordinatesVersion);
                         } catch (InvalidVersionSpecificationException e) {
-                          throw new MuleRuntimeException(createStaticMessage("Could not parse plugin patch affect version: "
-                              + affectedVersion), e);
+                          throw new MuleRuntimeException(createStaticMessage(format("Could not parse plugin patch affect version '%s'",
+                                                                                    affectedVersion)),
+                                                         e);
                         }
                       })) {
                     try {
-                      LOGGER.info("Patching artifact {} with patch file {}", artifactId, patchFilePath);
+                      LOGGER.info("Patching artifact '{}' with patch file '{}'", artifactId, patchFilePath);
 
                       return new File(getMuleHomeFolder(),
                                       patchFilePath.toString())
@@ -103,7 +104,7 @@ public class DefaultPluginPatchesResolver implements PluginPatchesResolver {
                   }
                 }
               } catch (IOException e) {
-                throw new MuleRuntimeException(createStaticMessage(format("There was an error processing the patch in %s file",
+                throw new MuleRuntimeException(createStaticMessage(format("There was an error processing the patch in '%s' file",
                                                                           patchFilePath)),
                                                e);
               }
@@ -114,7 +115,7 @@ public class DefaultPluginPatchesResolver implements PluginPatchesResolver {
             .collect(toList());
       }
     } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage(format("There was an error processing the patches in %s",
+      throw new MuleRuntimeException(createStaticMessage(format("There was an error processing the patches in '%s'",
                                                                 muleArtifactPatchesFolder)),
                                      e);
     }
