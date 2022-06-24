@@ -15,6 +15,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
@@ -54,7 +55,8 @@ public final class ConfigurationDefinitionParser extends ExtensionDefinitionPars
             .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
             .withConstructorParameterDefinition(fromFixedValue(configurationModel).build())
             .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
-            .withSetterParameterDefinition("expirationPolicy", fromChildConfiguration(ExpirationPolicy.class).build());
+            .withSetterParameterDefinition("expirationPolicy", fromChildConfiguration(ExpirationPolicy.class).build())
+            .withSetterParameterDefinition("extensionManager", fromReferenceObject(ExtensionManager.class).build());
 
     parseParameters(configurationModel);
     finalBuilder = parseConnectionProvider(finalBuilder);
