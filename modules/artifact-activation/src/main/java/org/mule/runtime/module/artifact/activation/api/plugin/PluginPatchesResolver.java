@@ -19,6 +19,7 @@ import java.util.List;
  *
  * @since 4.5
  */
+// TODO W-11086310 - move out of this module as part of the migration of the Runtime to use the descriptors generation API
 public interface PluginPatchesResolver {
 
   static PluginPatchesResolver noOpPluginPatchesResolver() {
