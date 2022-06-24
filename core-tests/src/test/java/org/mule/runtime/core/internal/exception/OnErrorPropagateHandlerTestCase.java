@@ -147,6 +147,7 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
     when(mockException.getEvent()).thenReturn(muleEvent);
     ComponentLocation location = mock(ComponentLocation.class);
     when(location.getRootContainerName()).thenReturn("");
+    when(location.getLocation()).thenReturn("");
     when(mockTransaction.getComponentLocation()).thenReturn(ofNullable(location));
     initialiseIfNeeded(onErrorPropagateHandler, muleContext);
     startIfNeeded(onErrorPropagateHandler);

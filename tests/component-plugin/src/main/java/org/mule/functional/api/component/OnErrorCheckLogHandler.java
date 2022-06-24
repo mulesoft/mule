@@ -9,7 +9,7 @@ package org.mule.functional.api.component;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.fail;
 import static org.mule.tck.processor.FlowAssert.addAssertion;
-import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
@@ -62,9 +62,11 @@ public class OnErrorCheckLogHandler extends TemplateOnErrorHandler
 
   /**
    * {@inheritDoc}
+   *
+   * @param buildFor
    */
   @Override
-  public TemplateOnErrorHandler duplicateFor(Location buildFor) {
+  public TemplateOnErrorHandler duplicateFor(ComponentLocation buildFor) {
     OnErrorCheckLogHandler cpy = new OnErrorCheckLogHandler();
     cpy.setFlowLocation(buildFor);
     cpy.propagate = this.propagate;
