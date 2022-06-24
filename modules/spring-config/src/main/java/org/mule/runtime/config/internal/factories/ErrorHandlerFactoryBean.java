@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.internal.factories;
 
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
@@ -27,7 +29,7 @@ public class ErrorHandlerFactoryBean extends AbstractComponentFactory<ErrorHandl
   @Override
   public ErrorHandler doGetObject() throws Exception {
     if (delegate != null) {
-      return delegate.createLocalErrorHandler(this.getLocation());
+      return delegate.createLocalErrorHandler(from(this.getRootContainerLocation().getGlobalName()));
     }
 
     ErrorHandler errorHandler;
