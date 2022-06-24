@@ -9,6 +9,7 @@ package org.mule.runtime.module.artifact.activation.internal.descriptor;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.PATCHED_ARTIFACT_DESCRIPTORS;
 
+import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 
@@ -17,34 +18,54 @@ import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 
-import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collection;
 
 import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 @Story(PATCHED_ARTIFACT_DESCRIPTORS)
+@RunWith(Parameterized.class)
 public class DeployableDescriptorsWithPatchedPluginsTestCase extends AbstractDeployableArtifactDescriptorFactoryTestCase {
 
-  private static final String deployableProjectModelFolder = "apps/with-patched-artifacts";
+  private final String deployableProjectFolder;
+  private final Boolean isApplication;
 
   @Rule
-  public final SystemProperty muleHomeSystemProperty =
-      new SystemProperty(MULE_HOME_DIRECTORY_PROPERTY, getDeployableFolder(deployableProjectModelFolder).getCanonicalPath());
+  public final SystemProperty muleHomeSystemProperty;
 
-  public DeployableDescriptorsWithPatchedPluginsTestCase() throws URISyntaxException, IOException {}
+  @Parameters(name = "deployableProjectFolder: {0}, isApplication: {1}")
+  public static Collection<Pair<String, Boolean>> deployableArtifactDescriptors() {
+    return asList(
+                  new Pair<>("apps/with-patched-artifacts", true),
+                  new Pair<>("domains/with-patched-artifacts", false));
+  }
+
+  public DeployableDescriptorsWithPatchedPluginsTestCase(Pair<String, Boolean> deployableProjectInfo)
+      throws URISyntaxException, IOException {
+    deployableProjectFolder = deployableProjectInfo.getFirst();
+    isApplication = deployableProjectInfo.getSecond();
+
+    muleHomeSystemProperty =
+        new SystemProperty(MULE_HOME_DIRECTORY_PROPERTY, getDeployableFolder(deployableProjectFolder).getCanonicalPath());
+  }
 
   @Test
   public void createApplicationDescriptorWithPatchedPlugins() throws URISyntaxException {
-    ApplicationDescriptor applicationDescriptor = createApplicationDescriptor(deployableProjectModelFolder);
+    DeployableArtifactDescriptor deployableArtifactDescriptor = getDeployableArtifactDescriptor();
 
-    ArtifactPluginDescriptor httpPlugin = applicationDescriptor.getPlugins()
+    ArtifactPluginDescriptor httpPlugin = deployableArtifactDescriptor.getPlugins()
         .stream()
         .filter(p -> p.getName().equals("HTTP"))
         .findFirst()
@@ -53,7 +74,7 @@ public class DeployableDescriptorsWithPatchedPluginsTestCase extends AbstractDep
     assertThat(stream(httpPlugin.getClassLoaderModel().getUrls()).map(URL::toString).collect(toList()),
                hasItem(endsWith("http-patch.jar")));
 
-    ArtifactPluginDescriptor dbPlugin = applicationDescriptor.getPlugins()
+    ArtifactPluginDescriptor dbPlugin = deployableArtifactDescriptor.getPlugins()
         .stream()
         .filter(p -> p.getName().equals("Database"))
         .findFirst()
@@ -61,6 +82,14 @@ public class DeployableDescriptorsWithPatchedPluginsTestCase extends AbstractDep
 
     assertThat(stream(dbPlugin.getClassLoaderModel().getUrls()).map(URL::toString).collect(toList()),
                not(hasItem(endsWith("db-patch.jar"))));
+  }
+
+  private DeployableArtifactDescriptor getDeployableArtifactDescriptor() throws URISyntaxException {
+    if (isApplication) {
+      return createApplicationDescriptor(deployableProjectFolder);
+    } else {
+      return createDomainDescriptor(deployableProjectFolder);
+    }
   }
 
 }
