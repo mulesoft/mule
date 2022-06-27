@@ -74,6 +74,36 @@
                 </xs:complexContent>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-pojo-parameter">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-array-parameters">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="stacked-type-array-parameter">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-map-parameters">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="stacked-type-map-parameter">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
               <xs:complexType>
                 <xs:complexContent>
@@ -209,6 +239,9 @@
           <xs:attribute type="mule:expressionString" use="optional" name="resolverConnectionDisplayName"></xs:attribute>
           <xs:attribute type="mule:expressionDateTime" use="optional" name="connectionTime"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="externalPojo"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="stackedTypePojoParameter"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
@@ -297,6 +330,36 @@
                 </xs:complexContent>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-pojo-parameter">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-array-parameters">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="stacked-type-array-parameter">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-map-parameters">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="stacked-type-map-parameter">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
               <xs:complexType>
                 <xs:complexContent>
@@ -432,6 +495,9 @@
           <xs:attribute type="mule:expressionString" use="optional" name="resolverConnectionDisplayName"></xs:attribute>
           <xs:attribute type="mule:expressionDateTime" use="optional" name="connectionTime"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="externalPojo"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="stackedTypePojoParameter"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
@@ -491,6 +557,36 @@
                 </xs:complexContent>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-pojo-parameter">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-array-parameters">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="stacked-type-array-parameter">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-map-parameters">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="stacked-type-map-parameter">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
               <xs:complexType>
                 <xs:complexContent>
@@ -626,6 +722,9 @@
           <xs:attribute type="mule:expressionString" use="optional" name="resolverConnectionDisplayName"></xs:attribute>
           <xs:attribute type="mule:expressionDateTime" use="optional" name="connectionTime"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="externalPojo"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="stackedTypePojoParameter"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
@@ -685,6 +784,36 @@
                 </xs:complexContent>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-pojo-parameter">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-array-parameters">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="stacked-type-array-parameter">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-map-parameters">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="stacked-type-map-parameter">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
               <xs:complexType>
                 <xs:complexContent>
@@ -820,6 +949,9 @@
           <xs:attribute type="mule:expressionString" use="optional" name="resolverConnectionDisplayName"></xs:attribute>
           <xs:attribute type="mule:expressionDateTime" use="optional" name="connectionTime"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="externalPojo"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="stackedTypePojoParameter"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
@@ -877,6 +1009,36 @@
                 <xs:complexContent>
                   <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
                 </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-pojo-parameter">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-array-parameters">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="stacked-type-array-parameter">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-map-parameters">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="stacked-type-map-parameter">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
               </xs:complexType>
             </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
@@ -1014,6 +1176,9 @@
           <xs:attribute type="mule:expressionString" use="optional" name="resolverConnectionDisplayName"></xs:attribute>
           <xs:attribute type="mule:expressionDateTime" use="optional" name="connectionTime"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="externalPojo"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="stackedTypePojoParameter"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
@@ -1071,6 +1236,36 @@
                 <xs:complexContent>
                   <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
                 </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-pojo-parameter">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-array-parameters">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="stacked-type-array-parameter">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-map-parameters">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="stacked-type-map-parameter">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
               </xs:complexType>
             </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
@@ -1208,6 +1403,9 @@
           <xs:attribute type="mule:expressionString" use="optional" name="resolverConnectionDisplayName"></xs:attribute>
           <xs:attribute type="mule:expressionDateTime" use="optional" name="connectionTime"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="externalPojo"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="stackedTypePojoParameter"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="withAlias"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="defaultPlacement"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="queryParam"></xs:attribute>
@@ -1647,6 +1845,36 @@
                 </xs:complexContent>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-pojo-parameter">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-array-parameters">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="stacked-type-array-parameter">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-map-parameters">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="stacked-type-map-parameter">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="random-headers">
               <xs:complexType>
                 <xs:sequence>
@@ -1745,6 +1973,9 @@
           <xs:attribute type="mule:expressionString" use="optional" name="resolverConnectionDisplayName"></xs:attribute>
           <xs:attribute type="mule:expressionDateTime" use="optional" name="connectionTime"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="externalPojo"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="stackedTypePojoParameter"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="knownCustomHeader"></xs:attribute>
           <xs:attribute type="mule:substitutableName" use="optional" name="randomHeaders"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
@@ -1841,6 +2072,36 @@
                 </xs:complexContent>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-pojo-parameter">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-array-parameters">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="stacked-type-array-parameter">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-map-parameters">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="stacked-type-map-parameter">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
               <xs:complexType>
                 <xs:complexContent>
@@ -1976,6 +2237,9 @@
           <xs:attribute type="mule:expressionString" use="optional" name="resolverConnectionDisplayName"></xs:attribute>
           <xs:attribute type="mule:expressionDateTime" use="optional" name="connectionTime"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="externalPojo"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="stackedTypePojoParameter"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
@@ -2052,6 +2316,36 @@
                 </xs:complexContent>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-pojo-parameter">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-array-parameters">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="stacked-type-array-parameter">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-map-parameters">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="stacked-type-map-parameter">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
               <xs:complexType>
                 <xs:complexContent>
@@ -2187,6 +2481,9 @@
           <xs:attribute type="mule:expressionString" use="optional" name="resolverConnectionDisplayName"></xs:attribute>
           <xs:attribute type="mule:expressionDateTime" use="optional" name="connectionTime"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="externalPojo"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="stackedTypePojoParameter"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>

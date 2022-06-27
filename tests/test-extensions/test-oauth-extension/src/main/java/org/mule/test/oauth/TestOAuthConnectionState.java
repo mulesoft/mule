@@ -110,6 +110,18 @@ public class TestOAuthConnectionState {
   @Optional
   private MyPojo externalPojo;
 
+  @Parameter
+  @Optional
+  private ParameterResolver<TypedValue<MyPojo>> stackedTypePojoParameter;
+
+  @Parameter
+  @Optional
+  private ParameterResolver<TypedValue<List<Integer>>> stackedTypeArrayParameters;
+
+  @Parameter
+  @Optional
+  private ParameterResolver<TypedValue<Map<String, Integer>>> stackedTypeMapParameter;
+
   private AuthorizationCodeState state;
 
   public Double getApiVersion() {
@@ -194,5 +206,17 @@ public class TestOAuthConnectionState {
 
   public MyPojo getExternalPojo() {
     return externalPojo;
+  }
+
+  public ParameterResolver<TypedValue<MyPojo>> getStackedTypePojoParameter() {
+    return stackedTypePojoParameter;
+  }
+
+  public ParameterResolver<TypedValue<List<Integer>>> getStackedTypeArrayParameters() {
+    return stackedTypeArrayParameters;
+  }
+
+  public ParameterResolver<TypedValue<Map<String, Integer>>> getStackedTypeMapParameter() {
+    return stackedTypeMapParameter;
   }
 }
