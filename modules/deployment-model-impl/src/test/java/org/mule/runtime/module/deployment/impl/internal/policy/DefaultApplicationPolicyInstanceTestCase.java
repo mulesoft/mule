@@ -27,6 +27,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -49,26 +50,23 @@ import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
-import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionDiscoveryRequest;
-import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelDiscoverer;
-import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
-import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderSupplier;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionDiscoveryRequest;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.policy.api.PolicyPointcut;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.List;
-import java.util.function.BiFunction;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -93,8 +91,10 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
     return new Boolean[] {false, true};
   }
 
+  public boolean enablePolicyIsolation;
+
   @Rule
-  public SystemProperty enablePolicyIsolation;
+  public SystemProperty enablePolicyIsolationRule;
 
   private final ServiceRepository serviceRepository = mock(ServiceRepository.class);
 
@@ -106,7 +106,9 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
   private MuleRegistry policyRegistry;
 
   public DefaultApplicationPolicyInstanceTestCase(boolean enablePolicyIsolationPropertyValue) {
-    this.enablePolicyIsolation = new SystemProperty(ENABLE_POLICY_ISOLATION_PROPERTY, TEST_PAYLOAD);
+    this.enablePolicyIsolation = enablePolicyIsolationPropertyValue;
+    this.enablePolicyIsolationRule =
+        new SystemProperty(ENABLE_POLICY_ISOLATION_PROPERTY, Boolean.toString(enablePolicyIsolationPropertyValue));
   }
 
   @Before
@@ -183,23 +185,27 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
         .when(policyTemplate).getOwnArtifactPlugins();
 
     ExtensionModelDiscoverer extModelDiscoverer = mock(ExtensionModelDiscoverer.class);
-    setExtModelDiscovererFactory(extModelDiscoverer);
 
     PolicyExtensionManagerFactory policyExtensionManagerFactory =
-        new PolicyExtensionManagerFactory(application, policyTemplate, mock(ExtensionModelLoaderRepository.class));
+        new PolicyExtensionManagerFactory(application, policyTemplate, mock(ExtensionModelLoaderRepository.class),
+                                          enablePolicyIsolation, (pcl, eml) -> extModelDiscoverer);
 
     policyExtensionManagerFactory.create(policyMuleContext);
 
-    ArgumentCaptor<ExtensionDiscoveryRequest> extDiscoveryRequestCaptor =
-        ArgumentCaptor.forClass(ExtensionDiscoveryRequest.class);
+    ArgumentCaptor<ExtensionDiscoveryRequest> extDiscoveryRequestCaptor = forClass(ExtensionDiscoveryRequest.class);
     verify(extModelDiscoverer).discoverPluginsExtensionModels(extDiscoveryRequestCaptor.capture());
 
     List<String> policyExtensionNames = extDiscoveryRequestCaptor.getValue().getArtifactPluginDescriptors().stream()
         .map(em -> em.getName())
         .collect(toList());;
 
-    // ... the policy does not have itself http or sockets becuase it uses the ones form the app
-    assertThat(policyExtensionNames.toString(), policyExtensionNames, not(hasItems("HTTP", "Sockets")));
+    if (enablePolicyIsolation) {
+      // ... the policy has itself http and sockets because it doesn't use the ones form the app
+      assertThat(policyExtensionNames.toString(), policyExtensionNames, hasItems("HTTP", "Sockets"));
+    } else {
+      // ... the policy does not have itself http or sockets because it uses the ones form the app
+      assertThat(policyExtensionNames.toString(), policyExtensionNames, not(hasItems("HTTP", "Sockets")));
+    }
   }
 
   @Test
@@ -218,23 +224,27 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
         .when(policyTemplate).getOwnArtifactPlugins();
 
     ExtensionModelDiscoverer extModelDiscoverer = mock(ExtensionModelDiscoverer.class);
-    setExtModelDiscovererFactory(extModelDiscoverer);
 
     PolicyExtensionManagerFactory policyExtensionManagerFactory =
-        new PolicyExtensionManagerFactory(application, policyTemplate, mock(ExtensionModelLoaderRepository.class));
+        new PolicyExtensionManagerFactory(application, policyTemplate, mock(ExtensionModelLoaderRepository.class),
+                                          enablePolicyIsolation, (pcl, eml) -> extModelDiscoverer);
 
     policyExtensionManagerFactory.create(policyMuleContext);
 
-    ArgumentCaptor<ExtensionDiscoveryRequest> extDiscoveryRequestCaptor =
-        ArgumentCaptor.forClass(ExtensionDiscoveryRequest.class);
+    ArgumentCaptor<ExtensionDiscoveryRequest> extDiscoveryRequestCaptor = forClass(ExtensionDiscoveryRequest.class);
     verify(extModelDiscoverer).discoverPluginsExtensionModels(extDiscoveryRequestCaptor.capture());
 
     List<String> policyExtensionNames = extDiscoveryRequestCaptor.getValue().getArtifactPluginDescriptors().stream()
         .map(em -> em.getName())
         .collect(toList());;
 
-    // ... the policy has itself http but not sockets
-    assertThat(policyExtensionNames.toString(), policyExtensionNames, allOf(hasItem("HTTP"), not(hasItem("Sockets"))));
+    if (enablePolicyIsolation) {
+      // ... the policy has itself http and sockets because it doesn't use the ones form the app
+      assertThat(policyExtensionNames.toString(), policyExtensionNames, hasItems("HTTP", "Sockets"));
+    } else {
+      // ... the policy has itself http but not sockets
+      assertThat(policyExtensionNames.toString(), policyExtensionNames, allOf(hasItem("HTTP"), not(hasItem("Sockets"))));
+    }
   }
 
   private ArtifactPlugin mockArtifactPlugin(String name) {
@@ -259,14 +269,5 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
     when(extModel.getName()).thenReturn(name);
 
     return extModel;
-  }
-
-  private void setExtModelDiscovererFactory(ExtensionModelDiscoverer extModelDiscoverer) throws Exception {
-    BiFunction<PluginClassLoaderSupplier, ExtensionModelLoaderRepository, ExtensionModelDiscoverer> extModelDiscovererFactory =
-        (pcl, eml) -> extModelDiscoverer;
-
-    Field extModelDiscovererField = ArtifactExtensionManagerFactory.class.getDeclaredField("EXT_MODEL_DISCOVERER_FACTORY");
-    extModelDiscovererField.setAccessible(true);
-    extModelDiscovererField.set(null, extModelDiscovererFactory);
   }
 }

@@ -7,7 +7,6 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
-import static org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer.defaultExtensionModelDiscoverer;
 import static org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer.discoverRuntimeExtensionModels;
 
 import static java.util.Collections.emptySet;
@@ -37,8 +36,8 @@ import java.util.function.BiFunction;
  */
 public class ArtifactExtensionManagerFactory implements ExtensionManagerFactory {
 
-  private static BiFunction<PluginClassLoaderSupplier, ExtensionModelLoaderRepository, ExtensionModelDiscoverer> EXT_MODEL_DISCOVERER_FACTORY =
-      (pcl, eml) -> defaultExtensionModelDiscoverer(pcl, eml);
+  public static final BiFunction<PluginClassLoaderSupplier, ExtensionModelLoaderRepository, ExtensionModelDiscoverer> EXT_MODEL_DISCOVERER =
+      ExtensionModelDiscoverer::defaultExtensionModelDiscoverer;
 
   private final Set<ArtifactPluginDescriptor> artifactPluginsDescriptors;
   private final ExtensionManagerFactory extensionManagerFactory;
@@ -54,6 +53,22 @@ public class ArtifactExtensionManagerFactory implements ExtensionManagerFactory 
   public ArtifactExtensionManagerFactory(List<ArtifactPlugin> artifactPlugins,
                                          ExtensionModelLoaderRepository extensionModelLoaderRepository,
                                          ExtensionManagerFactory extensionManagerFactory) {
+    this(artifactPlugins, extensionModelLoaderRepository, extensionManagerFactory,
+         EXT_MODEL_DISCOVERER);
+  }
+
+  /**
+   * Creates a extensionManager factory
+   *
+   * @param artifactPlugins                artifact plugins deployed inside the artifact. Non null.
+   * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
+   * @param extensionManagerFactory        creates the {@link ExtensionManager} for the artifact. Non null
+   * @param extModelDiscoverer             generate the extension models for plugins in a class loader.
+   */
+  public ArtifactExtensionManagerFactory(List<ArtifactPlugin> artifactPlugins,
+                                         ExtensionModelLoaderRepository extensionModelLoaderRepository,
+                                         ExtensionManagerFactory extensionManagerFactory,
+                                         BiFunction<PluginClassLoaderSupplier, ExtensionModelLoaderRepository, ExtensionModelDiscoverer> extModelDiscoverer) {
     this.extensionManagerFactory = extensionManagerFactory;
     Map<ArtifactPluginDescriptor, ArtifactClassLoader> artifactPluginsClassLoaders = artifactPlugins
         .stream()
@@ -61,7 +76,7 @@ public class ArtifactExtensionManagerFactory implements ExtensionManagerFactory 
                        (x, y) -> y, LinkedHashMap::new));
     this.artifactPluginsDescriptors = artifactPluginsClassLoaders.keySet();
     this.extensionModelDiscoverer =
-        EXT_MODEL_DISCOVERER_FACTORY.apply(artifactPluginsClassLoaders::get, extensionModelLoaderRepository);
+        extModelDiscoverer.apply(artifactPluginsClassLoaders::get, extensionModelLoaderRepository);
   }
 
   /**

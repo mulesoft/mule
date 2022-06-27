@@ -15,12 +15,15 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
+import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderSupplier;
 import org.mule.runtime.module.deployment.impl.internal.policy.ArtifactExtensionManagerFactory;
-import org.mule.runtime.module.extension.internal.manager.CompositeArtifactExtensionManager;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
+import org.mule.runtime.module.extension.internal.manager.CompositeArtifactExtensionManager;
 
 import java.util.List;
+import java.util.function.BiFunction;
 
 /**
  * Creates extension managers for {@link PolicyTemplate} artifacts
@@ -41,7 +44,25 @@ public class CompositeArtifactExtensionManagerFactory extends ArtifactExtensionM
                                                   ExtensionModelLoaderRepository extensionModelLoaderRepository,
                                                   List<ArtifactPlugin> artifactPlugins,
                                                   ExtensionManagerFactory extensionManagerFactory) {
-    super(artifactPlugins, extensionModelLoaderRepository, extensionManagerFactory);
+    this(parentArtifact, extensionModelLoaderRepository, artifactPlugins, extensionManagerFactory,
+         EXT_MODEL_DISCOVERER);
+  }
+
+  /**
+   * Creates a new factory
+   *
+   * @param parentArtifact                 application on which the policies are applied. Non null.
+   * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
+   * @param artifactPlugins                artifact plugins deployed inside the artifact. Non null.
+   * @param extensionManagerFactory        creates the {@link ExtensionManager} for the artifact. Non null
+   * @param extModelDiscoverer             generate the extension models for plugins in a class loader.
+   */
+  public CompositeArtifactExtensionManagerFactory(DeployableArtifact parentArtifact,
+                                                  ExtensionModelLoaderRepository extensionModelLoaderRepository,
+                                                  List<ArtifactPlugin> artifactPlugins,
+                                                  ExtensionManagerFactory extensionManagerFactory,
+                                                  BiFunction<PluginClassLoaderSupplier, ExtensionModelLoaderRepository, ExtensionModelDiscoverer> extModelDiscoverer) {
+    super(artifactPlugins, extensionModelLoaderRepository, extensionManagerFactory, extModelDiscoverer);
 
     checkArgument(parentArtifact != null, "application cannot be null");
     this.parentArtifact = parentArtifact;

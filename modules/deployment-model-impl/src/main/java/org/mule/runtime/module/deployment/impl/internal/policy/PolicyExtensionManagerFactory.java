@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
+import static org.mule.runtime.module.deployment.impl.internal.policy.ArtifactExtensionManagerFactory.EXT_MODEL_DISCOVERER;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -17,9 +18,11 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
+import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderSupplier;
 import org.mule.runtime.module.deployment.impl.internal.artifact.CompositeArtifactExtensionManagerFactory;
 import org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
@@ -27,6 +30,7 @@ import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 /**
  * {@link ExtensionManagerFactory} that defers the decision of the {@link ExtensionManager} implementation until the MuleContext
@@ -40,14 +44,24 @@ class PolicyExtensionManagerFactory implements ExtensionManagerFactory {
   private final PolicyTemplate template;
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
   private final boolean enablePolicyIsolation;
+  private final BiFunction<PluginClassLoaderSupplier, ExtensionModelLoaderRepository, ExtensionModelDiscoverer> extModelDiscoverer;
 
   public PolicyExtensionManagerFactory(Application application, PolicyTemplate template,
                                        ExtensionModelLoaderRepository extensionModelLoaderRepository,
                                        boolean enablePolicyIsolation) {
+    this(application, template, extensionModelLoaderRepository, enablePolicyIsolation,
+         EXT_MODEL_DISCOVERER);
+  }
+
+  public PolicyExtensionManagerFactory(Application application, PolicyTemplate template,
+                                       ExtensionModelLoaderRepository extensionModelLoaderRepository,
+                                       boolean enablePolicyIsolation,
+                                       BiFunction<PluginClassLoaderSupplier, ExtensionModelLoaderRepository, ExtensionModelDiscoverer> extModelDiscoverer) {
     this.application = application;
     this.template = template;
     this.extensionModelLoaderRepository = extensionModelLoaderRepository;
     this.enablePolicyIsolation = enablePolicyIsolation;
+    this.extModelDiscoverer = extModelDiscoverer;
   }
 
   @Override
@@ -57,7 +71,8 @@ class PolicyExtensionManagerFactory implements ExtensionManagerFactory {
         // The policy will not share extension models and configuration providers with the application that is being applied to.
         ArtifactExtensionManagerFactory artifactExtensionManagerFactory =
             new ArtifactExtensionManagerFactory(template.getOwnArtifactPlugins(), extensionModelLoaderRepository,
-                                                new DefaultExtensionManagerFactory());
+                                                new DefaultExtensionManagerFactory(),
+                                                extModelDiscoverer);
         return artifactExtensionManagerFactory.create(muleContext, getInheritedExtensionModels());
       } else {
         // The policy will share extension models and configuration providers with the application that is being applied to...
@@ -65,7 +80,8 @@ class PolicyExtensionManagerFactory implements ExtensionManagerFactory {
                                                             // even if http/sockets are declared as dependency of the policy, if
                                                             // they are included in the app they must be used from there.
                                                             nonInheritedOwnArtifactPlugins(),
-                                                            new DefaultExtensionManagerFactory()).create(muleContext);
+                                                            new DefaultExtensionManagerFactory(),
+                                                            extModelDiscoverer).create(muleContext);
       }
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
