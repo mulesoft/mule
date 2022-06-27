@@ -49,16 +49,16 @@ import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
+import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionDiscoveryRequest;
+import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelDiscoverer;
+import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
-import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionDiscoveryRequest;
-import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer;
-import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderSupplier;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.policy.api.PolicyPointcut;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -166,7 +166,7 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
 
   @Test
   @Issue("W-11233266")
-  public void policyWithHtsitpOnAppWithHttpUsesHttpFromTheApp() throws Exception {
+  public void policyWithHttpOnAppWithHttpUsesHttpFromTheApp() throws Exception {
     // add http and sockets as dependencies in the app...
     ExtensionManager appExtensionManager = mock(ExtensionManager.class);
     ExtensionModel appHttpExtModel = mockExtensionModel("HTTP");

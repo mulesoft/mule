@@ -37,11 +37,11 @@ import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
+import org.mule.runtime.deployment.model.api.artifact.extension.ExtensionModelLoaderRepository;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.internal.memory.management.ArtifactMemoryManagementService;
 import org.mule.runtime.internal.memory.management.DefaultMemoryManagementService;
-import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
@@ -112,7 +112,9 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
             .setClassLoaderRepository(classLoaderRepository)
             .setArtifactPlugins(getFeatureFlaggedArtifactPlugins(template.getDescriptor()))
             .setParentArtifact(application)
-            .setExtensionManagerFactory(new PolicyExtensionManagerFactory(application, template, extensionModelLoaderRepository))
+            .setExtensionManagerFactory(new PolicyExtensionManagerFactory(application, template, extensionModelLoaderRepository,
+                                                                          isFeatureEnabled(ENABLE_POLICY_ISOLATION,
+                                                                                           template.getDescriptor())))
             .setMuleContextListener(muleContextListener)
             .setArtifactCoordinates(template.getDescriptor().getBundleDescriptor())
             .setMemoryManagementService(new ArtifactMemoryManagementService(DefaultMemoryManagementService.getInstance()));
