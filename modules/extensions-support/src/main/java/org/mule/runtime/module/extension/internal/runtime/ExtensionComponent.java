@@ -258,38 +258,58 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     // check for implicit provider
     findConfigurationProviderResolver().ifPresent(configurationProviderResolver::set);
 
-    if (doesConfigurationDependOnEvent()) {
-      configurationResolver = event -> {
-        ConfigurationProvider configurationProvider;
-        try {
-          configurationProvider = resolveConfigurationProvider(configurationProviderResolver.get(), event);
-          validateDynamicOperationConfiguration(configurationProvider);
-        } catch (MuleException e) {
-          throw new IllegalArgumentException(format("Error resolving configuration for component '%s'",
-                                                    getLocation().getRootContainerName()),
-                                             e);
-        }
-        return resolveConfigFromProvider(configurationProvider, event);
-      };
-      return;
-    }
-
     Optional<ConfigurationInstance> staticConfiguration = getStaticConfiguration();
     if (staticConfiguration.isPresent()) {
       configurationResolver = event -> staticConfiguration;
       return;
     }
 
-    if (isConfigurationSpecified()) {
-      // the config is dynamic
-      // the optional should be always present at this point because we already checked dependsOnEvent
-      configurationResolver = event -> resolveConfigFromProvider(getConfigurationProvider().get(), event);
-    } else {
+    if (!isConfigurationSpecified()) {
       // obtain implicit instance
       configurationResolver = event -> extensionManager.getConfiguration(extensionModel, componentModel, event);
+      return;
     }
+
+    if (doesConfigurationDependOnEvent()) {
+      // the config reference is dynamic, the config can be either dynamic or static
+      configurationResolver = this::resolveConfigFromDynamicResolver;
+      return;
+    }
+
+    // the optional should be always present at this point because we already checked dependsOnEvent
+    // we can cache the resolution of the provider at this point because the reference is static
+    final ConfigurationProvider configurationProvider = getConfigurationProvider().get();
+
+    // the config provider is dynamic (we already checked for static at the beginning)
+    configurationResolver = event -> resolveConfigFromProvider(configurationProvider, event);
   }
 
+  /**
+   * First resolves the configuration provider (which can be either static or dynamic) and then gets the configuration instance
+   * from it.
+   * <p>
+   * Even though this method would work if the provider resolver is static, it only makes sense to use it when it is dynamic,
+   * otherwise it is best to cache the resolution of the provider.
+   */
+  private Optional<ConfigurationInstance> resolveConfigFromDynamicResolver(CoreEvent event) {
+    ConfigurationProvider configurationProvider;
+    try {
+      configurationProvider = resolveConfigurationProvider(configurationProviderResolver.get(), event);
+      validateDynamicOperationConfiguration(configurationProvider);
+    } catch (MuleException e) {
+      throw new IllegalArgumentException(format("Error resolving configuration for component '%s'",
+                                                getLocation().getRootContainerName()),
+                                         e);
+    }
+
+    // the config provider at this point can be either static or dynamic, it doesn't matter, we need to resolve the
+    // config anyway
+    return resolveConfigFromProvider(configurationProvider, event);
+  }
+
+  /**
+   * Resolves a configuration instance from a given provider (which can be either static or dynamic).
+   */
   private Optional<ConfigurationInstance> resolveConfigFromProvider(ConfigurationProvider configurationProvider,
                                                                     CoreEvent event) {
     ConfigurationInstance instance = configurationProvider.get(event);
