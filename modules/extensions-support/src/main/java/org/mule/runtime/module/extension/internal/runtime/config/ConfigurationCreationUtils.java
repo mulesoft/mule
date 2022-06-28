@@ -45,7 +45,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Utilities for creating {@link ConfigurationProvider} instances and their associated {@link ConnectionProviderResolver}\
+ * Utilities for creating {@link ConfigurationProvider} instances and their associated {@link ConnectionProviderResolver}
  *
  * @since 4.5.0
  */
