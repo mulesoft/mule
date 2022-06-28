@@ -10,6 +10,8 @@ import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_POLICY_ISOLA
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.NULL_CLASSLOADER_MODEL;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PolicyExtensionManagerFactory.HTTP_EXTENSION_NAME;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PolicyExtensionManagerFactory.SOCKETS_EXTENSION_NAME;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POLICY_DEPLOYMENT;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DeploymentSuccessfulStory.POLICY_ISOLATION;
@@ -171,17 +173,17 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
   public void policyWithHttpOnAppWithHttpUsesHttpFromTheApp() throws Exception {
     // add http and sockets as dependencies in the app...
     ExtensionManager appExtensionManager = mock(ExtensionManager.class);
-    ExtensionModel appHttpExtModel = mockExtensionModel("HTTP");
-    ExtensionModel appSocketsExtModel = mockExtensionModel("Sockets");
-    doReturn(of(appHttpExtModel)).when(appExtensionManager).getExtension("HTTP");
-    doReturn(of(appSocketsExtModel)).when(appExtensionManager).getExtension("Sockets");
+    ExtensionModel appHttpExtModel = mockExtensionModel(HTTP_EXTENSION_NAME);
+    ExtensionModel appSocketsExtModel = mockExtensionModel(SOCKETS_EXTENSION_NAME);
+    doReturn(of(appHttpExtModel)).when(appExtensionManager).getExtension(HTTP_EXTENSION_NAME);
+    doReturn(of(appSocketsExtModel)).when(appExtensionManager).getExtension(SOCKETS_EXTENSION_NAME);
     doReturn(new HashSet<>(asList(appHttpExtModel, appSocketsExtModel))).when(appExtensionManager)
         .getExtensions();
 
     doReturn(of(appExtensionManager)).when(appRegistry).lookupByName(OBJECT_EXTENSION_MANAGER);
 
     // add http and sockets as plugin dependencies declared in the policies...
-    doReturn(asList(mockArtifactPlugin("HTTP"), mockArtifactPlugin("Sockets")))
+    doReturn(asList(mockArtifactPlugin(HTTP_EXTENSION_NAME), mockArtifactPlugin(SOCKETS_EXTENSION_NAME)))
         .when(policyTemplate).getOwnArtifactPlugins();
 
     ExtensionModelDiscoverer extModelDiscoverer = mock(ExtensionModelDiscoverer.class);
@@ -201,10 +203,12 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
 
     if (enablePolicyIsolation) {
       // ... the policy has itself http and sockets because it doesn't use the ones form the app
-      assertThat(policyExtensionNames.toString(), policyExtensionNames, hasItems("HTTP", "Sockets"));
+      assertThat(policyExtensionNames.toString(), policyExtensionNames,
+                 hasItems(HTTP_EXTENSION_NAME, SOCKETS_EXTENSION_NAME));
     } else {
       // ... the policy does not have itself http or sockets because it uses the ones form the app
-      assertThat(policyExtensionNames.toString(), policyExtensionNames, not(hasItems("HTTP", "Sockets")));
+      assertThat(policyExtensionNames.toString(), policyExtensionNames,
+                 not(hasItems(HTTP_EXTENSION_NAME, SOCKETS_EXTENSION_NAME)));
     }
   }
 
@@ -213,14 +217,14 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
   public void policyWithHttpOnAppWithoutHttpUsesHttpFromThePolicy() throws Exception {
     // do NOT add http as dependencies in the app...
     ExtensionManager appExtensionManager = mock(ExtensionManager.class);
-    ExtensionModel appSocketsExtModel = mockExtensionModel("Sockets");
-    doReturn(of(appSocketsExtModel)).when(appExtensionManager).getExtension("Sockets");
+    ExtensionModel appSocketsExtModel = mockExtensionModel(SOCKETS_EXTENSION_NAME);
+    doReturn(of(appSocketsExtModel)).when(appExtensionManager).getExtension(SOCKETS_EXTENSION_NAME);
     doReturn(singleton(appSocketsExtModel)).when(appExtensionManager).getExtensions();
 
     doReturn(of(appExtensionManager)).when(appRegistry).lookupByName(OBJECT_EXTENSION_MANAGER);
 
     // add http and sockets as plugin dependencies declared in the policies...
-    doReturn(asList(mockArtifactPlugin("HTTP"), mockArtifactPlugin("Sockets")))
+    doReturn(asList(mockArtifactPlugin(HTTP_EXTENSION_NAME), mockArtifactPlugin(SOCKETS_EXTENSION_NAME)))
         .when(policyTemplate).getOwnArtifactPlugins();
 
     ExtensionModelDiscoverer extModelDiscoverer = mock(ExtensionModelDiscoverer.class);
@@ -240,10 +244,12 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
 
     if (enablePolicyIsolation) {
       // ... the policy has itself http and sockets because it doesn't use the ones form the app
-      assertThat(policyExtensionNames.toString(), policyExtensionNames, hasItems("HTTP", "Sockets"));
+      assertThat(policyExtensionNames.toString(), policyExtensionNames,
+                 hasItems(HTTP_EXTENSION_NAME, SOCKETS_EXTENSION_NAME));
     } else {
       // ... the policy has itself http but not sockets
-      assertThat(policyExtensionNames.toString(), policyExtensionNames, allOf(hasItem("HTTP"), not(hasItem("Sockets"))));
+      assertThat(policyExtensionNames.toString(), policyExtensionNames,
+                 allOf(hasItem(HTTP_EXTENSION_NAME), not(hasItem(SOCKETS_EXTENSION_NAME))));
     }
   }
 

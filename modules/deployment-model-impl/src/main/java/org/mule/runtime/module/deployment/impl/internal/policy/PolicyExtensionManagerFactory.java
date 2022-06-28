@@ -7,8 +7,8 @@
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
-import static org.mule.runtime.module.deployment.impl.internal.policy.ArtifactExtensionManagerFactory.EXT_MODEL_DISCOVERER;
 
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -29,6 +29,7 @@ import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 
@@ -40,17 +41,19 @@ import java.util.function.BiFunction;
  */
 class PolicyExtensionManagerFactory implements ExtensionManagerFactory {
 
+  static final String SOCKETS_EXTENSION_NAME = "Sockets";
+  static final String HTTP_EXTENSION_NAME = "HTTP";
+
   private final Application application;
   private final PolicyTemplate template;
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
   private final boolean enablePolicyIsolation;
-  private final BiFunction<PluginClassLoaderSupplier, ExtensionModelLoaderRepository, ExtensionModelDiscoverer> extModelDiscoverer;
+  private final Optional<BiFunction<PluginClassLoaderSupplier, ExtensionModelLoaderRepository, ExtensionModelDiscoverer>> extModelDiscovererOverride;
 
   public PolicyExtensionManagerFactory(Application application, PolicyTemplate template,
                                        ExtensionModelLoaderRepository extensionModelLoaderRepository,
                                        boolean enablePolicyIsolation) {
-    this(application, template, extensionModelLoaderRepository, enablePolicyIsolation,
-         EXT_MODEL_DISCOVERER);
+    this(application, template, extensionModelLoaderRepository, enablePolicyIsolation, null);
   }
 
   public PolicyExtensionManagerFactory(Application application, PolicyTemplate template,
@@ -61,7 +64,7 @@ class PolicyExtensionManagerFactory implements ExtensionManagerFactory {
     this.template = template;
     this.extensionModelLoaderRepository = extensionModelLoaderRepository;
     this.enablePolicyIsolation = enablePolicyIsolation;
-    this.extModelDiscoverer = extModelDiscoverer;
+    this.extModelDiscovererOverride = ofNullable(extModelDiscoverer);
   }
 
   @Override
@@ -72,16 +75,18 @@ class PolicyExtensionManagerFactory implements ExtensionManagerFactory {
         ArtifactExtensionManagerFactory artifactExtensionManagerFactory =
             new ArtifactExtensionManagerFactory(template.getOwnArtifactPlugins(), extensionModelLoaderRepository,
                                                 new DefaultExtensionManagerFactory(),
-                                                extModelDiscoverer);
+                                                extModelDiscovererOverride);
         return artifactExtensionManagerFactory.create(muleContext, getInheritedExtensionModels());
       } else {
         // The policy will share extension models and configuration providers with the application that is being applied to...
-        return new CompositeArtifactExtensionManagerFactory(application, extensionModelLoaderRepository,
-                                                            // even if http/sockets are declared as dependency of the policy, if
-                                                            // they are included in the app they must be used from there.
-                                                            nonInheritedOwnArtifactPlugins(),
-                                                            new DefaultExtensionManagerFactory(),
-                                                            extModelDiscoverer).create(muleContext);
+        CompositeArtifactExtensionManagerFactory artifactExtensionManagerFactory =
+            new CompositeArtifactExtensionManagerFactory(application, extensionModelLoaderRepository,
+                                                         // even if http/sockets are declared as dependency of the policy, if
+                                                         // they are included in the app they must be used from there.
+                                                         nonInheritedOwnArtifactPlugins(),
+                                                         new DefaultExtensionManagerFactory(),
+                                                         extModelDiscovererOverride);
+        return artifactExtensionManagerFactory.create(muleContext);
       }
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
@@ -90,15 +95,14 @@ class PolicyExtensionManagerFactory implements ExtensionManagerFactory {
 
   private List<ArtifactPlugin> nonInheritedOwnArtifactPlugins() {
     Set<String> inheritedExtensionModelNames = getInheritedExtensionModels().stream()
-        .map(em -> em.getName())
+        .map(ExtensionModel::getName)
         .collect(toSet());
 
-    List<ArtifactPlugin> filteredOwnArtifactPlugins = template.getOwnArtifactPlugins()
+    return template.getOwnArtifactPlugins()
         .stream()
         .filter(ownAP -> !inheritedExtensionModelNames
             .contains(ownAP.getDescriptor().getName()))
         .collect(toList());
-    return filteredOwnArtifactPlugins;
   }
 
   /**
@@ -110,9 +114,9 @@ class PolicyExtensionManagerFactory implements ExtensionManagerFactory {
   private Set<ExtensionModel> getInheritedExtensionModels() {
     Set<ExtensionModel> inheritedExtensionModels = new HashSet<>(2);
     ExtensionManager extensionManager = application.getRegistry().<ExtensionManager>lookupByName(OBJECT_EXTENSION_MANAGER).get();
-    extensionManager.getExtension("HTTP")
+    extensionManager.getExtension(HTTP_EXTENSION_NAME)
         .ifPresent(inheritedExtensionModels::add);
-    extensionManager.getExtension("Sockets")
+    extensionManager.getExtension(SOCKETS_EXTENSION_NAME)
         .ifPresent(inheritedExtensionModels::add);
     return inheritedExtensionModels;
   }
