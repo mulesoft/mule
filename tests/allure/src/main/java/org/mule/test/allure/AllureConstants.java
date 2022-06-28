@@ -78,6 +78,7 @@ public interface AllureConstants {
     interface DeploymentSuccessfulStory {
 
       String DEPLOYMENT_SUCCESS = "Deployment Success";
+      String POLICY_ISOLATION = "Policy Isolation from App";
 
     }
 
