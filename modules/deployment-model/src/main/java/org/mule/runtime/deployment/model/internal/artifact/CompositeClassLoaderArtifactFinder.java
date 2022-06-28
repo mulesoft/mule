@@ -7,8 +7,8 @@
 package org.mule.runtime.deployment.model.internal.artifact;
 
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
 /**
  * Finds the first {@link ClassLoader} in an {@link CompositeClassLoader} that should be used when loading classes and resources
