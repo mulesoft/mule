@@ -29,6 +29,10 @@ public class SdkOutputTypeResolverAdapter implements OutputTypeResolver {
     }
   }
 
+  public org.mule.runtime.api.metadata.resolving.OutputTypeResolver getDelegate() {
+    return delegate;
+  }
+
   @Override
   public String getCategoryName() {
     return delegate.getCategoryName();
