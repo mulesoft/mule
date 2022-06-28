@@ -98,11 +98,9 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
                              ClassLoaderModelBuilder classLoaderConfigurationBuilder) {
     final List<URL> dependenciesArtifactsUrls = new ArrayList<>();
 
-    // TODO W-11202141 - consider artifact patches for the case this is run within a Runtime
-
     dependenciesArtifactsUrls.add(getUrl(artifactFile));
     dependenciesArtifactsUrls.addAll(addArtifactSpecificClassLoaderConfiguration(classLoaderConfigurationBuilder));
-    dependenciesArtifactsUrls.addAll(addDependenciesToClasspathUrls(artifactFile, dependencies));
+    dependenciesArtifactsUrls.addAll(addDependenciesToClasspathUrls(dependencies));
 
     return dependenciesArtifactsUrls;
   }
@@ -117,8 +115,7 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
     return emptyList();
   }
 
-  private List<URL> addDependenciesToClasspathUrls(File artifactFile,
-                                                   List<BundleDependency> dependencies) {
+  private List<URL> addDependenciesToClasspathUrls(List<BundleDependency> dependencies) {
     final List<URL> dependenciesArtifactsUrls = new ArrayList<>();
 
     dependencies.stream()

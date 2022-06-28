@@ -11,12 +11,15 @@ import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
+import org.mule.runtime.module.artifact.activation.api.plugin.PluginPatchesResolver;
 import org.mule.runtime.module.artifact.activation.internal.descriptor.DefaultDeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
+import java.net.URL;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,6 +41,7 @@ public interface DeployableArtifactDescriptorFactory {
    * @param model                    model describing the structure of the domain with all the necessary information to build its
    *                                 descriptor.
    * @param deploymentProperties     properties that affect how the artifact is deployed.
+   * @param pluginPatchesResolver    resolves what patches should be applied to the deployable's plugins, if any.
    * @param pluginModelResolver      resolves {@link MulePluginModel} from a dependency. Default implementation is
    *                                 {@link PluginModelResolver#pluginModelResolver()}.
    * @param pluginDescriptorResolver a wrapper function around the logic to extract an {@link ArtifactPluginDescriptor} from the
@@ -46,6 +50,7 @@ public interface DeployableArtifactDescriptorFactory {
    */
   DomainDescriptor createDomainDescriptor(DeployableProjectModel model,
                                           Map<String, String> deploymentProperties,
+                                          PluginPatchesResolver pluginPatchesResolver,
                                           PluginModelResolver pluginModelResolver,
                                           PluginDescriptorResolver pluginDescriptorResolver);
 
@@ -66,6 +71,7 @@ public interface DeployableArtifactDescriptorFactory {
    * @param model                    model describing the structure of the application with all the necessary information to build
    *                                 its descriptor.
    * @param deploymentProperties     properties that affect how the artifact is deployed.
+   * @param pluginPatchesResolver    resolves what patches should be applied to the deployable's plugins, if any.
    * @param pluginModelResolver      resolves {@link MulePluginModel} from a dependency. Default implementation is
    *                                 {@link PluginModelResolver#pluginModelResolver()}.
    * @param pluginDescriptorResolver a wrapper function around the logic to extract an {@link ArtifactPluginDescriptor} from the
@@ -75,6 +81,7 @@ public interface DeployableArtifactDescriptorFactory {
    */
   ApplicationDescriptor createApplicationDescriptor(DeployableProjectModel model,
                                                     Map<String, String> deploymentProperties,
+                                                    PluginPatchesResolver pluginPatchesResolver,
                                                     PluginModelResolver pluginModelResolver,
                                                     PluginDescriptorResolver pluginDescriptorResolver,
                                                     DomainDescriptorResolver domainDescriptorResolver);

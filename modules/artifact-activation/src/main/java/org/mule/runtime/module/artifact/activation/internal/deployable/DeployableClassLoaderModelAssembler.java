@@ -35,7 +35,9 @@ public class DeployableClassLoaderModelAssembler<M extends MuleDeployableModel> 
                                              MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
     super(new ArtifactCoordinates(model.getDescriptor().getGroupId(),
                                   model.getDescriptor().getArtifactId(),
-                                  model.getDescriptor().getVersion()),
+                                  model.getDescriptor().getVersion(),
+                                  model.getDescriptor().getType(),
+                                  model.getDescriptor().getClassifier().orElse(null)),
           model.getDependencies(),
           model.getSharedLibraries(),
           model.getPackages(),
