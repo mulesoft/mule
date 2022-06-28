@@ -64,6 +64,8 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
     this.expressionExecutor = service.create(ExpressionLanguageConfiguration.builder()
         .defaultEncoding(getDefaultEncoding(muleContext))
         .featureFlaggingService(featureFlaggingService)
+        .appId(muleContext.getConfiguration().getId())
+        .minMuleVersion(muleContext.getConfiguration().getMinMuleVersion())
         .build());
     this.muleContext = muleContext;
     registerGlobalBindings(registry);
