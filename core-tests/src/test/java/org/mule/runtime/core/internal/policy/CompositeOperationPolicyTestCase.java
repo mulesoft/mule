@@ -42,6 +42,8 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.SourcePolicyTestUtils;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -52,6 +54,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Flux;
@@ -80,8 +84,25 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
 
   private Scheduler fluxCompleteScheduler;
 
-  public CompositeOperationPolicyTestCase(boolean policyChangeThread, boolean processChangeThread) {
+  private final boolean applyFeatureFlags;
+
+  public CompositeOperationPolicyTestCase(boolean policyChangeThread, boolean processChangeThread, boolean applyFeatureFlags) {
     super(policyChangeThread, processChangeThread);
+    this.applyFeatureFlags = applyFeatureFlags;
+  }
+
+  @Parameterized.Parameters(name = "Policy NB: {0}; Processor NB: {1}; Apply Feature flags: {2}")
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {
+        {false, false, true},
+        {false, false, false},
+        {true, false, true},
+        {true, false, false},
+        {false, true, true},
+        {false, true, false},
+        {true, true, true},
+        {true, true, false}
+    });
   }
 
   @Before
@@ -143,7 +164,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory,
                                                             muleContext.getConfiguration().getShutdownTimeout(),
-                                                            fluxCompleteScheduler);
+                                                            fluxCompleteScheduler, feature -> applyFeatureFlags);
 
     CoreEvent result = block(callback -> compositeOperationPolicy
         .process(initialEvent, operationExecutionFunction, operationParametersProcessor, operationLocation, callback));
@@ -161,7 +182,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory,
                                                             muleContext.getConfiguration().getShutdownTimeout(),
-                                                            fluxCompleteScheduler);
+                                                            fluxCompleteScheduler, feature -> applyFeatureFlags);
 
     CoreEvent result =
         block(callback -> compositeOperationPolicy.process(initialEvent, operationExecutionFunction, operationParametersProcessor,
@@ -181,7 +202,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory,
                                                             muleContext.getConfiguration().getShutdownTimeout(),
-                                                            fluxCompleteScheduler);
+                                                            fluxCompleteScheduler, feature -> applyFeatureFlags);
   }
 
   @Test
@@ -203,7 +224,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory,
                                                             muleContext.getConfiguration().getShutdownTimeout(),
-                                                            fluxCompleteScheduler);
+                                                            fluxCompleteScheduler, feature -> applyFeatureFlags);
     expectedException.expect(MuleException.class);
     expectedException.expectCause(is(policyException));
     try {
@@ -238,7 +259,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory,
                                                             muleContext.getConfiguration().getShutdownTimeout(),
-                                                            fluxCompleteScheduler);
+                                                            fluxCompleteScheduler, feature -> applyFeatureFlags);
     expectedException.expect(MuleException.class);
     expectedException.expectCause(is(policyException));
     try {
@@ -257,7 +278,8 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
         new InvocationsRecordingCompositeOperationPolicy(operation, asList(firstPolicy),
                                                          operationPolicyParametersTransformer,
                                                          operationPolicyProcessorFactory,
-                                                         fluxCompleteScheduler);
+                                                         fluxCompleteScheduler,
+                                                         applyFeatureFlags);
 
     assertThat(operationPolicy.getNextOperationCount(), is(0));
     assertThat(operationPolicy.getPolicyCount(), is(0));
@@ -279,10 +301,11 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     public InvocationsRecordingCompositeOperationPolicy(Component operation, List<Policy> parameterizedPolicies,
                                                         Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer,
                                                         OperationPolicyProcessorFactory operationPolicyProcessorFactory,
-                                                        Scheduler completionCallbackScheduler) {
+                                                        Scheduler completionCallbackScheduler,
+                                                        boolean applyFeatureFlags) {
       super(operation, parameterizedPolicies, operationPolicyParametersTransformer, operationPolicyProcessorFactory,
             muleContext.getConfiguration().getShutdownTimeout(),
-            completionCallbackScheduler);
+            completionCallbackScheduler, feature -> applyFeatureFlags);
     }
 
     public static void reset() {

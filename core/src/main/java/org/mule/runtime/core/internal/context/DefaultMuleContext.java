@@ -22,6 +22,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_REQUIRED_EX
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.APPLY_OPERATION_ERROR_MAPPINGS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
@@ -331,6 +332,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureEnableByteBuddyObjectCreation();
       configureValidateAppModelWithRegionClassloader();
       configurePrintDetailedCompositeExceptionLog();
+      configureApplyOperationErrorMappings();
     }
   }
 
@@ -1454,6 +1456,17 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configurePrintDetailedCompositeExceptionLog() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG,
+                                                minMuleVersion("4.5.0"));
+  }
+
+  /**
+   * Configures the {@link MuleRuntimeFeature#APPLY_OPERATION_ERROR_MAPPINGS} feature flag.
+   *
+   * @since 4.5.0
+   */
+  private static void configureApplyOperationErrorMappings() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(APPLY_OPERATION_ERROR_MAPPINGS,
                                                 minMuleVersion("4.5.0"));
   }
 

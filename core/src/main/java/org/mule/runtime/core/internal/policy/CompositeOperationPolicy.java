@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.policy;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.lang.Runtime.getRuntime;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.APPLY_OPERATION_ERROR_MAPPINGS;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
@@ -19,20 +20,16 @@ import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.message.Error;
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.rx.Exceptions;
-import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
-import org.mule.runtime.core.internal.exception.ErrorMappingsAware;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
@@ -78,6 +75,8 @@ public class CompositeOperationPolicy
   private final Scheduler completionCallbackScheduler;
   private final PolicyTraceLogger policyTraceLogger = new PolicyTraceLogger();
 
+  private FeatureFlaggingService featureFlaggingService;
+
   /**
    * Creates a new composite policy.
    * <p>
@@ -98,15 +97,17 @@ public class CompositeOperationPolicy
   public CompositeOperationPolicy(Component operation, List<Policy> parameterizedPolicies,
                                   Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer,
                                   OperationPolicyProcessorFactory operationPolicyProcessorFactory,
-                                  long shutdownTimeout, Scheduler completionCallbackScheduler) {
+                                  long shutdownTimeout, Scheduler completionCallbackScheduler,
+                                  FeatureFlaggingService featureFlaggingService) {
     super(parameterizedPolicies, operationPolicyParametersTransformer);
     this.operation = operation;
     this.operationPolicyProcessorFactory = operationPolicyProcessorFactory;
     this.shutdownTimeout = shutdownTimeout;
     this.completionCallbackScheduler = completionCallbackScheduler;
+    this.featureFlaggingService = featureFlaggingService;
     initProcessor();
 
-    Supplier<FluxSink<CoreEvent>> factory = new OperationWithPoliciesFluxObjectFactory(this);
+    Supplier<FluxSink<CoreEvent>> factory = new OperationWithPoliciesFluxObjectFactory(this, featureFlaggingService);
     this.policySinks = newBuilder()
         .removalListener((String key, FluxSinkSupplier<CoreEvent> value, RemovalCause cause) -> {
           value.dispose();
@@ -121,9 +122,12 @@ public class CompositeOperationPolicy
   private static final class OperationWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
 
     private final Reference<CompositeOperationPolicy> compositeOperationPolicy;
+    private FeatureFlaggingService featureFlaggingService;
 
-    public OperationWithPoliciesFluxObjectFactory(CompositeOperationPolicy compositeOperationPolicy) {
+    public OperationWithPoliciesFluxObjectFactory(CompositeOperationPolicy compositeOperationPolicy,
+                                                  FeatureFlaggingService featureFlaggingService) {
       this.compositeOperationPolicy = new WeakReference<>(compositeOperationPolicy);
+      this.featureFlaggingService = featureFlaggingService;
     }
 
     @Override
@@ -135,11 +139,13 @@ public class CompositeOperationPolicy
           .doOnNext(result -> from(result).getOperationCallerCallback().complete(result))
           .onErrorContinue(MessagingException.class, (t, e) -> {
             final MessagingException me = (MessagingException) t;
-            // Nullyfing error so that the error is resolved again by the operation's execution logic and its error mappings
-            // (W-11147961)
-            final CoreEvent event = CoreEvent.builder(me.getEvent()).error(null)
-                .build();
-            me.setProcessedEvent(event);
+            if (featureFlaggingService.isEnabled(APPLY_OPERATION_ERROR_MAPPINGS)) {
+              // Nullyfing error so that the error is resolved again by the operation's execution logic and its error mappings
+              // (W-11147961)
+              final CoreEvent event = CoreEvent.builder(me.getEvent()).error(null)
+                  .build();
+              me.setProcessedEvent(event);
+            }
             from(me.getEvent()).getOperationCallerCallback().error(me);
           });
 
