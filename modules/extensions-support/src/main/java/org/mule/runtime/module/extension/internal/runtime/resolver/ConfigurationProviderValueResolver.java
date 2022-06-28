@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.metadata.DataType.fromType;
+import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 
@@ -45,7 +45,7 @@ public class ConfigurationProviderValueResolver implements ValueResolver<Configu
   public ConfigurationProviderValueResolver(String configurationProviderReference) {
     if (isExpression(configurationProviderReference)) {
       configurationProviderNameResolver =
-          new TypeSafeExpressionValueResolver<>(configurationProviderReference, String.class, fromType(String.class));
+          new TypeSafeExpressionValueResolver<>(configurationProviderReference, String.class, STRING);
     } else {
       configurationProviderNameResolver = new StaticValueResolver<>(configurationProviderReference);
     }
@@ -90,7 +90,7 @@ public class ConfigurationProviderValueResolver implements ValueResolver<Configu
 
   @Override
   public void initialise() throws InitialisationException {
-    initialiseIfNeeded(configurationProviderNameResolver, muleContext);
+    initialiseIfNeeded(configurationProviderNameResolver, true, muleContext);
   }
 
   @Override
