@@ -105,7 +105,6 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
   private Registry appRegistry;
 
   private MuleContextWithRegistry policyMuleContext;
-  private MuleRegistry policyRegistry;
 
   public DefaultApplicationPolicyInstanceTestCase(boolean enablePolicyIsolationPropertyValue) {
     this.enablePolicyIsolation = enablePolicyIsolationPropertyValue;
@@ -130,7 +129,7 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
 
     doReturn(appRegistry).when(application).getRegistry();
 
-    policyRegistry = mock(MuleRegistry.class);
+    MuleRegistry policyRegistry = mock(MuleRegistry.class);
     when(policyRegistry.lookupObject(FeatureFlaggingService.class)).thenReturn(mock(FeatureFlaggingService.class));
 
     policyMuleContext = mock(MuleContextWithRegistry.class);
@@ -140,7 +139,7 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
 
   @Test
   @Issue("MULE-14289")
-  public void correctArtifactTypeForPolicies() throws Exception {
+  public void correctArtifactTypeForPolicies() {
     MuleContextListener muleContextListener = mock(MuleContextListener.class);
     ArgumentCaptor<MuleContext> muleContextCaptor = ArgumentCaptor.forClass(MuleContext.class);
 
@@ -170,7 +169,7 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
 
   @Test
   @Issue("W-11233266")
-  public void policyWithHttpOnAppWithHttpUsesHttpFromTheApp() throws Exception {
+  public void policyWithHttpOnAppWithHttpUsesHttpFromTheApp() {
     // add http and sockets as dependencies in the app...
     ExtensionManager appExtensionManager = mock(ExtensionManager.class);
     ExtensionModel appHttpExtModel = mockExtensionModel(HTTP_EXTENSION_NAME);
@@ -198,8 +197,8 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
     verify(extModelDiscoverer).discoverPluginsExtensionModels(extDiscoveryRequestCaptor.capture());
 
     List<String> policyExtensionNames = extDiscoveryRequestCaptor.getValue().getArtifactPluginDescriptors().stream()
-        .map(em -> em.getName())
-        .collect(toList());;
+        .map(ArtifactPluginDescriptor::getName)
+        .collect(toList());
 
     if (enablePolicyIsolation) {
       // ... the policy has itself http and sockets because it doesn't use the ones form the app
@@ -214,7 +213,7 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
 
   @Test
   @Issue("W-11233266")
-  public void policyWithHttpOnAppWithoutHttpUsesHttpFromThePolicy() throws Exception {
+  public void policyWithHttpOnAppWithoutHttpUsesHttpFromThePolicy() {
     // do NOT add http as dependencies in the app...
     ExtensionManager appExtensionManager = mock(ExtensionManager.class);
     ExtensionModel appSocketsExtModel = mockExtensionModel(SOCKETS_EXTENSION_NAME);
@@ -239,8 +238,8 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
     verify(extModelDiscoverer).discoverPluginsExtensionModels(extDiscoveryRequestCaptor.capture());
 
     List<String> policyExtensionNames = extDiscoveryRequestCaptor.getValue().getArtifactPluginDescriptors().stream()
-        .map(em -> em.getName())
-        .collect(toList());;
+        .map(ArtifactPluginDescriptor::getName)
+        .collect(toList());
 
     if (enablePolicyIsolation) {
       // ... the policy has itself http and sockets because it doesn't use the ones form the app
