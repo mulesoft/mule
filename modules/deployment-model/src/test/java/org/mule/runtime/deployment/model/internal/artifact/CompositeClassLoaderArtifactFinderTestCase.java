@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.deployment.model.internal.artifact;
 
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
+import static org.mule.runtime.deployment.model.internal.artifact.CompositeClassLoaderArtifactFinder.findClassLoader;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
-import static org.mule.runtime.deployment.model.internal.artifact.CompositeClassLoaderArtifactFinder.findClassLoader;
 
-import org.junit.Test;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
@@ -22,12 +22,45 @@ import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactCl
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.size.SmallTest;
 
+import org.junit.Test;
+
 @SmallTest
 public class CompositeClassLoaderArtifactFinderTestCase {
 
-  private static final ArtifactDescriptor pluginDescriptor = new ArtifactPluginDescriptor("my-plugin");
-  private static final ArtifactDescriptor appDescriptor = new ApplicationDescriptor("my-app");
-  private static final ArtifactDescriptor domainDescriptor = new DomainDescriptor("my-domain");
+  private static final ArtifactDescriptor pluginDescriptorOld = new ArtifactPluginDescriptor("my-plugin-old");
+  private static final ArtifactDescriptor appDescriptorOld = new ApplicationDescriptor("my-app-old");
+  private static final ArtifactDescriptor domainDescriptorOld = new DomainDescriptor("my-domain-old");
+
+  private static final ArtifactDescriptor pluginDescriptor =
+      new org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor("my-plugin");
+  private static final ArtifactDescriptor appDescriptor =
+      new org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor("my-app");
+  private static final ArtifactDescriptor domainDescriptor =
+      new org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor("my-domain");
+
+  @Test
+  public void appClassLoaderOld() {
+    ClassLoader appClassLoader = mockArtifactClassLoader(appDescriptorOld);
+    CompositeClassLoader compositeClassLoader = from(mockArtifactClassLoader(pluginDescriptorOld), appClassLoader);
+
+    assertThat(findClassLoader(compositeClassLoader), equalTo(appClassLoader));
+  }
+
+  @Test
+  public void domainClassLoaderOld() {
+    ClassLoader domainClassLoader = mockArtifactClassLoader(domainDescriptorOld);
+    CompositeClassLoader compositeClassLoader = from(mockArtifactClassLoader(pluginDescriptorOld), domainClassLoader);
+
+    assertThat(findClassLoader(compositeClassLoader), equalTo(domainClassLoader));
+  }
+
+  @Test
+  public void firstDelegateIfNoArtifactOldClassLoaderFound() {
+    ClassLoader pluginClassLoader = mockArtifactClassLoader(pluginDescriptorOld);
+    CompositeClassLoader compositeClassLoader = from(pluginClassLoader);
+
+    assertThat(findClassLoader(compositeClassLoader), equalTo(pluginClassLoader));
+  }
 
   @Test
   public void appClassLoader() {
