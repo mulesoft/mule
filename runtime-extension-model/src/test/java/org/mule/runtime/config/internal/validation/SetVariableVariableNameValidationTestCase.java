@@ -26,7 +26,7 @@ public class SetVariableVariableNameValidationTestCase extends AbstractCoreValid
   }
 
   @Test
-  public void invalidParameterWithExpression() {
+  public void variableNameSupportsExpressionsSoNoValidationShouldArise() {
     final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
         "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\" xmlns:doc=\"http://www.mulesoft.org/schema/mule/documentation\"\n"
         +
