@@ -22,7 +22,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_REQUIRED_EX
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.APPLY_OPERATION_ERROR_MAPPINGS_WHEN_INSIDE_OPERATION_POLICY;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
@@ -1460,13 +1460,13 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   }
 
   /**
-   * Configures the {@link MuleRuntimeFeature#APPLY_OPERATION_ERROR_MAPPINGS_WHEN_INSIDE_OPERATION_POLICY} feature flag.
+   * Configures the {@link MuleRuntimeFeature#HONOR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION} feature flag.
    *
    * @since 4.5.0
    */
   private static void configureApplyOperationErrorMappings() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(APPLY_OPERATION_ERROR_MAPPINGS_WHEN_INSIDE_OPERATION_POLICY,
+    featureFlaggingRegistry.registerFeatureFlag(HONOR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION,
                                                 minMuleVersion("4.5.0"));
   }
 
