@@ -100,10 +100,10 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
   private Component testOperationTwo;
   private Component differentTestOperation;
 
-  private final boolean applyFeatureFlags;
+  private final boolean featureFlagsEnabled;
 
-  public DefaultPolicyManagerTestCase(boolean applyFeatureFlags) {
-    this.applyFeatureFlags = applyFeatureFlags;
+  public DefaultPolicyManagerTestCase(boolean featureFlagsEnabled) {
+    this.featureFlagsEnabled = featureFlagsEnabled;
   }
 
   @Parameterized.Parameters(name = "Apply Feature flags: {0}")
@@ -493,7 +493,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
                                                    FeatureFlaggingService featureFlaggingService) {
         final OperationPolicy operationPolicy =
             super.createOperationPolicy(operation, innerKey, paramsTransformer, operationPolicyProcessorFactory, shutdownTimeout,
-                                        scheduler, feature -> applyFeatureFlags);
+                                        scheduler, feature -> featureFlagsEnabled);
 
         return new DisposeListenerPolicy(operationPolicy, () -> {
           isPolicyDisposed.set(true);
