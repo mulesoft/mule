@@ -54,9 +54,9 @@ public final class ConfigurationDefinitionParser extends ExtensionDefinitionPars
             .withObjectFactoryType(ConfigurationProviderObjectFactory.class)
             .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
             .withConstructorParameterDefinition(fromFixedValue(configurationModel).build())
+            .withConstructorParameterDefinition(fromReferenceObject(ExtensionManager.class).build())
             .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
-            .withSetterParameterDefinition("expirationPolicy", fromChildConfiguration(ExpirationPolicy.class).build())
-            .withSetterParameterDefinition("extensionManager", fromReferenceObject(ExtensionManager.class).build());
+            .withSetterParameterDefinition("expirationPolicy", fromChildConfiguration(ExpirationPolicy.class).build());
 
     parseParameters(configurationModel);
     finalBuilder = parseConnectionProvider(finalBuilder);

@@ -46,8 +46,6 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   private final ConfigurationModel configurationModel;
   private final ConfigurationProviderFactory configurationProviderFactory = new DefaultConfigurationProviderFactory();
 
-  private ExtensionManager extensionManager;
-
   private ExpirationPolicy expirationPolicy;
   private ConnectionProviderValueResolver connectionProviderResolver;
   private ConfigurationProvider instance;
@@ -58,6 +56,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
 
   ConfigurationProviderObjectFactory(ExtensionModel extensionModel,
                                      ConfigurationModel configurationModel,
+                                     ExtensionManager extensionManager,
                                      MuleContext muleContext) {
     super(muleContext);
     this.extensionModel = extensionModel;
@@ -134,9 +133,5 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
 
   public void setRequiresConnection(boolean requiresConnection) {
     this.requiresConnection = requiresConnection;
-  }
-
-  public void setExtensionManager(ExtensionManager extensionManager) {
-    this.extensionManager = extensionManager;
   }
 }
