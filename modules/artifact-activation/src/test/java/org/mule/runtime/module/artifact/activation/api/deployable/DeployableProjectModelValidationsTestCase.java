@@ -17,6 +17,7 @@ import static java.util.Collections.emptySet;
 
 import static org.junit.rules.ExpectedException.none;
 
+import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -76,7 +78,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
         .setVersion("0.0.1")
         .build());
 
-    expected.expect(IllegalArgumentException.class);
+    expected.expect(ArtifactActivationException.class);
     expected
         .expectMessage(" * Artifact 'org.mule.sample:test-dep-b' is declared as a sharedLibrary but is not a dependency of the project");
     new DeployableProjectModel(emptyList(), emptyList(),
@@ -85,7 +87,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                new File("."),
                                dependencies,
                                sharedLibraries,
-                               emptyMap());
+                               emptyMap()).validate();
   }
 
   @Test
@@ -110,7 +112,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                new File("."),
                                dependencies,
                                sharedLibraries,
-                               emptyMap());
+                               emptyMap()).validate();
   }
 
   @Test
@@ -139,7 +141,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                 .build())
             .build()));
 
-    expected.expect(IllegalArgumentException.class);
+    expected.expect(ArtifactActivationException.class);
     expected
         .expectMessage(" * Mule Plugin 'org.mule.sample:test-plugin-a' is declared in additionalPluginDependencies but is not a dependency of the project");
     new DeployableProjectModel(emptyList(), emptyList(),
@@ -148,7 +150,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                new File("."),
                                dependencies,
                                emptySet(),
-                               additionalPluginDependencies);
+                               additionalPluginDependencies).validate();
   }
 
   @Test
@@ -180,12 +182,11 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                new File("."),
                                dependencies,
                                emptySet(),
-                               additionalPluginDependencies);
+                               additionalPluginDependencies).validate();
   }
 
   @Test
-  // TODO W-11202204 review this
-  @Ignore("W-11202204")
+  @Issue("W-11202204")
   public void conflictingPluginVersions() {
     List<BundleDependency> dependencies = new ArrayList<>();
 
@@ -201,21 +202,21 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
         .setDescriptor(new BundleDescriptor.Builder()
             .setGroupId("org.mule.sample")
             .setArtifactId("test-plugin-a")
-            .setVersion("1.1.1")
+            .setVersion("0.1.0")
             .setClassifier(MULE_PLUGIN_CLASSIFIER)
             .build())
         .build());
 
-    expected.expect(IllegalArgumentException.class);
+    expected.expect(ArtifactActivationException.class);
     expected
-        .expectMessage(" * Mule Plugin 'org.mule.sample:test-plugin-a' is depended upon in the project with incompatible versions ('0.0.1, 1.1.1') in the dependency graph.");
+        .expectMessage(" * Mule Plugin 'org.mule.sample:test-plugin-a' is depended upon in the project with multiple versions ('0.0.1, 0.1.0') in the dependency graph.");
     new DeployableProjectModel(emptyList(), emptyList(),
                                appDescriptor,
                                () -> null,
                                new File("."),
                                dependencies,
                                emptySet(),
-                               emptyMap());
+                               emptyMap()).validate();
   }
 
   @Test
@@ -245,7 +246,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                new File("."),
                                dependencies,
                                emptySet(),
-                               emptyMap());
+                               emptyMap()).validate();
 
   }
 }

@@ -39,6 +39,8 @@ public class DefaultDeployableArtifactDescriptorFactory implements DeployableArt
                                                            PluginModelResolver pluginModelResolver,
                                                            PluginDescriptorResolver pluginDescriptorResolver,
                                                            DomainDescriptorResolver domainDescriptorResolver) {
+    model.validate();
+
     return new ApplicationDescriptorFactory(model, deploymentProperties, pluginPatchesResolver, pluginModelResolver,
                                             pluginDescriptorResolver,
                                             ArtifactDescriptorValidatorBuilder.builder(), domainDescriptorResolver).create();
@@ -73,6 +75,8 @@ public class DefaultDeployableArtifactDescriptorFactory implements DeployableArt
                                                  PluginPatchesResolver pluginPatchesResolver,
                                                  PluginModelResolver pluginModelResolver,
                                                  PluginDescriptorResolver pluginDescriptorResolver) {
+    model.validate();
+
     return new DomainDescriptorFactory(model, deploymentProperties, pluginPatchesResolver, pluginModelResolver,
                                        pluginDescriptorResolver,
                                        ArtifactDescriptorValidatorBuilder.builder()).create();

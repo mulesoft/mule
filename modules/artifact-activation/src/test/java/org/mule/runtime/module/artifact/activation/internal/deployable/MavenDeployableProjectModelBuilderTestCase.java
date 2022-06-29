@@ -135,10 +135,11 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
   }
 
   private DeployableProjectModel getDeployableProjectModel(String deployablePath) throws URISyntaxException {
-    MavenDeployableProjectModelBuilder modelFactory =
-        new MavenDeployableProjectModelBuilder(getDeployableFolder(deployablePath));
+    DeployableProjectModel model = new MavenDeployableProjectModelBuilder(getDeployableFolder(deployablePath)).build();
 
-    return modelFactory.build();
+    model.validate();
+
+    return model;
   }
 
   protected File getDeployableFolder(String appPath) throws URISyntaxException {

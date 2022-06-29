@@ -6,13 +6,17 @@
  */
 package org.mule.runtime.module.artifact.activation.api.deployable;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toMap;
 
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -20,6 +24,8 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,21 +54,17 @@ public final class DeployableProjectModel {
 
   /**
    * Creates a new instance with the provided parameters.
-   * <p>
-   * Performs a validation of consistency of the provided parameters. If any validation fails, an {@link IllegalArgumentException}
-   * is thrown indication the situation that caused it.
    * 
    * @param packages                     See {@link #getPackages()}
    * @param resources                    See {@link #getResources()}
    * @param descriptor                   See {@link #getDescriptor()}
-   * @param artifactCoordinates          See {@link #getArtifactCoordinates()}
    * @param deployableModelSupplier      See {@link #getDeployableModel()}
    * @param projectFolder                See {@link #getProjectFolder()}
    * @param dependencies                 See {@link #getDependencies()}
    * @param sharedLibraries              See {@link #getSharedLibraries()}
    * @param additionalPluginDependencies See {@link #additionalPluginDependencies}
-   * @throws IllegalArgumentException if there are consistency problems with the provided parameters.
    */
+
   public DeployableProjectModel(List<String> packages,
                                 List<String> resources,
                                 BundleDescriptor descriptor,
@@ -70,8 +72,25 @@ public final class DeployableProjectModel {
                                 File projectFolder,
                                 List<BundleDependency> dependencies,
                                 Set<BundleDescriptor> sharedLibraries,
-                                Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies)
-      throws IllegalArgumentException {
+                                Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies) {
+
+    this.packages = ImmutableList.copyOf(packages);
+    this.resources = ImmutableList.copyOf(resources);
+    this.descriptor = requireNonNull(descriptor);
+    this.deployableModelSupplier = new LazyValue<>(requireNonNull(deployableModelSupplier));
+    this.projectFolder = requireNonNull(projectFolder);
+    this.dependencies = ImmutableList.copyOf(dependencies);
+    this.sharedLibraries = ImmutableSet.copyOf(sharedLibraries);
+    this.additionalPluginDependencies = ImmutableMap.copyOf(additionalPluginDependencies);
+  }
+
+  /**
+   * Performs a validation of consistency of the model fields. If any validation fails, an {@link ArtifactActivationException} is
+   * thrown indicating the situation that caused it.
+   *
+   * @throws ArtifactActivationException if there are consistency problems with the model fields.
+   */
+  public void validate() throws ArtifactActivationException {
     List<String> validationMessages = new ArrayList<>();
 
     for (BundleDescriptor sharedLibDescriptor : sharedLibraries) {
@@ -91,32 +110,28 @@ public final class DeployableProjectModel {
       }
     }
 
-    // TODO W-11202204 review this
-    // new MulePluginsCompatibilityValidator()
-    // .validate(dependencies.stream()
-    // .map(BundleDependency::getDescriptor)
-    // .filter(dependencyDescriptor -> MULE_PLUGIN_CLASSIFIER
-    // .equals(dependencyDescriptor.getClassifier().orElse(null)))
-    // .collect(toList()))
-    // .entrySet()
-    // .forEach(result -> validationMessages
-    // .add(format("Mule Plugin '%s' is depended upon in the project with incompatible versions ('%s') in the dependency graph.",
-    // result.getKey(),
-    // result.getValue().stream().map(BundleDescriptor::getVersion).collect(joining(", ")))));
+    getRepeatedDependencies(dependencies).forEach((key, value) -> validationMessages
+        .add(format("Mule Plugin '%s' is depended upon in the project with multiple versions ('%s') in the dependency graph.",
+                    key, value.stream().map(BundleDescriptor::getVersion).collect(joining(", ")))));
 
     if (!validationMessages.isEmpty()) {
-      throw new IllegalArgumentException(validationMessages.stream()
-          .collect(joining(" * ", lineSeparator() + " * ", lineSeparator())));
+      throw new ArtifactActivationException(createStaticMessage(validationMessages.stream()
+          .collect(joining(" * ", lineSeparator() + " * ", lineSeparator()))));
+    }
+  }
+
+  private Map<String, List<BundleDescriptor>> getRepeatedDependencies(List<BundleDependency> dependencies) {
+    Map<String, List<BundleDescriptor>> repeatedDependencies = new HashMap<>();
+
+    for (BundleDependency dependency : dependencies) {
+      BundleDescriptor descriptor = dependency.getDescriptor();
+      String pluginKey = descriptor.getGroupId() + ":" + descriptor.getArtifactId();
+      repeatedDependencies.computeIfAbsent(pluginKey, k -> new ArrayList<>());
+      repeatedDependencies.get(pluginKey).add(descriptor);
     }
 
-    this.packages = ImmutableList.copyOf(packages);
-    this.resources = ImmutableList.copyOf(resources);
-    this.descriptor = requireNonNull(descriptor);
-    this.deployableModelSupplier = new LazyValue<>(requireNonNull(deployableModelSupplier));
-    this.projectFolder = requireNonNull(projectFolder);
-    this.dependencies = ImmutableList.copyOf(dependencies);
-    this.sharedLibraries = ImmutableSet.copyOf(sharedLibraries);
-    this.additionalPluginDependencies = ImmutableMap.copyOf(additionalPluginDependencies);
+    return repeatedDependencies.entrySet().stream().filter(entry -> entry.getValue().size() > 1)
+        .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
   /**
