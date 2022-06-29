@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -184,8 +185,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
   }
 
   @Test
-  // TODO W-11202204 review this
-  @Ignore("W-11202204")
+  @Issue("W-11202204")
   public void conflictingPluginVersions() {
     List<BundleDependency> dependencies = new ArrayList<>();
 
@@ -201,14 +201,14 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
         .setDescriptor(new BundleDescriptor.Builder()
             .setGroupId("org.mule.sample")
             .setArtifactId("test-plugin-a")
-            .setVersion("1.1.1")
+            .setVersion("0.1.0")
             .setClassifier(MULE_PLUGIN_CLASSIFIER)
             .build())
         .build());
 
     expected.expect(IllegalArgumentException.class);
     expected
-        .expectMessage(" * Mule Plugin 'org.mule.sample:test-plugin-a' is depended upon in the project with incompatible versions ('0.0.1, 1.1.1') in the dependency graph.");
+        .expectMessage(" * Mule Plugin 'org.mule.sample:test-plugin-a' is depended upon in the project with multiple versions ('0.0.1, 0.1.0') in the dependency graph.");
     new DeployableProjectModel(emptyList(), emptyList(),
                                appDescriptor,
                                () -> null,
