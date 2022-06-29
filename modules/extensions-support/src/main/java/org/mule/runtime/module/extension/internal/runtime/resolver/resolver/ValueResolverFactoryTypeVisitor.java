@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver.resolver;
 
-import static java.lang.String.format;
-import static java.time.Instant.ofEpochMilli;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
+
+import static java.lang.String.format;
+import static java.time.Instant.ofEpochMilli;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.metadata.api.model.DateTimeType;
 import org.mule.metadata.api.model.DateType;
@@ -42,11 +43,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
@@ -95,7 +93,8 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
     Optional<DslElementSyntax> typeDsl = dslSyntaxResolver.resolve(objectType);
 
     if (delegate.isPresent() && typeDsl.isPresent()) {
-      valueResolver = delegate.get().apply(getValue().toString());
+      // valueResolver = delegate.get().apply(getValue().toString());
+      valueResolver = null;
     } else {
       valueResolver = acceptsReferences
           ? defaultValueResolver.apply(getValue().toString())
