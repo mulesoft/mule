@@ -75,7 +75,6 @@ import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.internal.config.dsl.XmlSdkConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationProviderValueResolver;
@@ -424,9 +423,9 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
     try {
       return configurationProviderResolver.get().resolve(valueResolvingContext);
     } catch (MuleException e) {
-      throw new IllegalModelDefinitionException(format("Error resolving configuration for component '%s'",
-                                                       getLocation().getRootContainerName()),
-                                                e);
+      throw new IllegalArgumentException(format("Error resolving configuration for component '%s'",
+                                                getLocation().getRootContainerName()),
+                                         e);
     }
   }
 
