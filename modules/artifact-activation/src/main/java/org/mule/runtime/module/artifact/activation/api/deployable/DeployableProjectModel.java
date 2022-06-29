@@ -54,9 +54,6 @@ public final class DeployableProjectModel {
 
   /**
    * Creates a new instance with the provided parameters.
-   * <p>
-   * Performs a validation of consistency of the provided parameters. If any validation fails, an {@link IllegalArgumentException}
-   * is thrown indication the situation that caused it.
    * 
    * @param packages                     See {@link #getPackages()}
    * @param resources                    See {@link #getResources()}
@@ -66,8 +63,8 @@ public final class DeployableProjectModel {
    * @param dependencies                 See {@link #getDependencies()}
    * @param sharedLibraries              See {@link #getSharedLibraries()}
    * @param additionalPluginDependencies See {@link #additionalPluginDependencies}
-   * @throws IllegalArgumentException if there are consistency problems with the provided parameters.
    */
+
   public DeployableProjectModel(List<String> packages,
                                 List<String> resources,
                                 BundleDescriptor descriptor,
@@ -75,8 +72,25 @@ public final class DeployableProjectModel {
                                 File projectFolder,
                                 List<BundleDependency> dependencies,
                                 Set<BundleDescriptor> sharedLibraries,
-                                Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies)
-      throws IllegalArgumentException {
+                                Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies) {
+
+    this.packages = ImmutableList.copyOf(packages);
+    this.resources = ImmutableList.copyOf(resources);
+    this.descriptor = requireNonNull(descriptor);
+    this.deployableModelSupplier = new LazyValue<>(requireNonNull(deployableModelSupplier));
+    this.projectFolder = requireNonNull(projectFolder);
+    this.dependencies = ImmutableList.copyOf(dependencies);
+    this.sharedLibraries = ImmutableSet.copyOf(sharedLibraries);
+    this.additionalPluginDependencies = ImmutableMap.copyOf(additionalPluginDependencies);
+  }
+
+  /**
+   * Performs a validation of consistency of the model fields. If any validation fails, an {@link ArtifactActivationException} is
+   * thrown indicating the situation that caused it.
+   *
+   * @throws ArtifactActivationException if there are consistency problems with the model fields.
+   */
+  public void validate() throws ArtifactActivationException {
     List<String> validationMessages = new ArrayList<>();
 
     for (BundleDescriptor sharedLibDescriptor : sharedLibraries) {
@@ -101,18 +115,9 @@ public final class DeployableProjectModel {
                     key, value.stream().map(BundleDescriptor::getVersion).collect(joining(", ")))));
 
     if (!validationMessages.isEmpty()) {
-      throw new IllegalArgumentException(validationMessages.stream()
-          .collect(joining(" * ", lineSeparator() + " * ", lineSeparator())));
+      throw new ArtifactActivationException(createStaticMessage(validationMessages.stream()
+          .collect(joining(" * ", lineSeparator() + " * ", lineSeparator()))));
     }
-
-    this.packages = ImmutableList.copyOf(packages);
-    this.resources = ImmutableList.copyOf(resources);
-    this.descriptor = requireNonNull(descriptor);
-    this.deployableModelSupplier = new LazyValue<>(requireNonNull(deployableModelSupplier));
-    this.projectFolder = requireNonNull(projectFolder);
-    this.dependencies = ImmutableList.copyOf(dependencies);
-    this.sharedLibraries = ImmutableSet.copyOf(sharedLibraries);
-    this.additionalPluginDependencies = ImmutableMap.copyOf(additionalPluginDependencies);
   }
 
   private Map<String, List<BundleDescriptor>> getRepeatedDependencies(List<BundleDependency> dependencies) {

@@ -17,6 +17,7 @@ import static java.util.Collections.emptySet;
 
 import static org.junit.rules.ExpectedException.none;
 
+import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -77,7 +78,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
         .setVersion("0.0.1")
         .build());
 
-    expected.expect(IllegalArgumentException.class);
+    expected.expect(ArtifactActivationException.class);
     expected
         .expectMessage(" * Artifact 'org.mule.sample:test-dep-b' is declared as a sharedLibrary but is not a dependency of the project");
     new DeployableProjectModel(emptyList(), emptyList(),
@@ -86,7 +87,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                new File("."),
                                dependencies,
                                sharedLibraries,
-                               emptyMap());
+                               emptyMap()).validate();
   }
 
   @Test
@@ -111,7 +112,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                new File("."),
                                dependencies,
                                sharedLibraries,
-                               emptyMap());
+                               emptyMap()).validate();
   }
 
   @Test
@@ -140,7 +141,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                 .build())
             .build()));
 
-    expected.expect(IllegalArgumentException.class);
+    expected.expect(ArtifactActivationException.class);
     expected
         .expectMessage(" * Mule Plugin 'org.mule.sample:test-plugin-a' is declared in additionalPluginDependencies but is not a dependency of the project");
     new DeployableProjectModel(emptyList(), emptyList(),
@@ -149,7 +150,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                new File("."),
                                dependencies,
                                emptySet(),
-                               additionalPluginDependencies);
+                               additionalPluginDependencies).validate();
   }
 
   @Test
@@ -181,7 +182,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                new File("."),
                                dependencies,
                                emptySet(),
-                               additionalPluginDependencies);
+                               additionalPluginDependencies).validate();
   }
 
   @Test
@@ -206,7 +207,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
             .build())
         .build());
 
-    expected.expect(IllegalArgumentException.class);
+    expected.expect(ArtifactActivationException.class);
     expected
         .expectMessage(" * Mule Plugin 'org.mule.sample:test-plugin-a' is depended upon in the project with multiple versions ('0.0.1, 0.1.0') in the dependency graph.");
     new DeployableProjectModel(emptyList(), emptyList(),
@@ -215,7 +216,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                new File("."),
                                dependencies,
                                emptySet(),
-                               emptyMap());
+                               emptyMap()).validate();
   }
 
   @Test
@@ -245,7 +246,7 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                new File("."),
                                dependencies,
                                emptySet(),
-                               emptyMap());
+                               emptyMap()).validate();
 
   }
 }

@@ -48,10 +48,7 @@ public class AbstractDeployableArtifactDescriptorFactoryTestCase extends Abstrac
   }
 
   protected DeployableProjectModel getDeployableProjectModel(String deployablePath) throws URISyntaxException {
-    MavenDeployableProjectModelBuilder modelFactory =
-        new MavenDeployableProjectModelBuilder(getDeployableFolder(deployablePath));
-
-    return modelFactory.build();
+    return new MavenDeployableProjectModelBuilder(getDeployableFolder(deployablePath)).build();
   }
 
   protected File getDeployableFolder(String appPath) throws URISyntaxException {
