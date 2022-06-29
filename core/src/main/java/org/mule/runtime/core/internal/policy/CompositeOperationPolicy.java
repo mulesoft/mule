@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.policy;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.lang.Runtime.getRuntime;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.APPLY_OPERATION_ERROR_MAPPINGS;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.APPLY_OPERATION_ERROR_MAPPINGS_WHEN_INSIDE_OPERATION_POLICY;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
@@ -139,7 +139,7 @@ public class CompositeOperationPolicy
           .doOnNext(result -> from(result).getOperationCallerCallback().complete(result))
           .onErrorContinue(MessagingException.class, (t, e) -> {
             final MessagingException me = (MessagingException) t;
-            if (featureFlaggingService.isEnabled(APPLY_OPERATION_ERROR_MAPPINGS)) {
+            if (featureFlaggingService.isEnabled(APPLY_OPERATION_ERROR_MAPPINGS_WHEN_INSIDE_OPERATION_POLICY)) {
               // Nullyfing error so that the error is resolved again by the operation's execution logic and its error mappings
               // (W-11147961)
               final CoreEvent event = CoreEvent.builder(me.getEvent()).error(null)
