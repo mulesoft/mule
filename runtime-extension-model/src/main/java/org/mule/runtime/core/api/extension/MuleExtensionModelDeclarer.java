@@ -481,7 +481,7 @@ class MuleExtensionModelDeclarer {
     setVariable.onDefaultParameterGroup()
         .withOptionalParameter("variableName")
         .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED)
+        .withExpressionSupport(SUPPORTED)
         .describedAs("The name of the variable.");
 
     setVariable.onDefaultParameterGroup()
