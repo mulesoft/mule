@@ -18,7 +18,6 @@ import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
-import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -79,9 +78,7 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.internal.config.dsl.XmlSdkConfigurationProvider;
-import org.mule.runtime.module.extension.internal.runtime.resolver.RegistryLookupValueResolverWrapper;
-import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeValueResolverWrapper;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
@@ -415,10 +412,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   private Optional<ValueResolver<ConfigurationProvider>> getConfigurationProviderResolver(Map<String, Object> parameters) {
     String configRefParameter = (String) parameters.get(MODULE_OPERATION_CONFIG_REF);
     if (isExpression(configRefParameter)) {
-      ValueResolver<String> keyResolver =
-          new TypeSafeExpressionValueResolver<>(configRefParameter, String.class, fromType(String.class));
-      return of(new TypeSafeValueResolverWrapper<>(new RegistryLookupValueResolverWrapper<>(keyResolver),
-                                                   ConfigurationProvider.class));
+      return of(new ConfigurationProviderValueResolver(configRefParameter));
     }
     return empty();
   }
