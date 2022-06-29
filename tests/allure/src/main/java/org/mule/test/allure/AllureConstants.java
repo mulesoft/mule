@@ -912,6 +912,18 @@ public interface AllureConstants {
 
   }
 
+  interface Sdk {
+
+    String SDK = "SDK";
+
+    interface Parameters {
+
+      String EXPRESSIONS_ON_CONFIG_REF = "Expressions on config-ref parameters";
+
+    }
+
+  }
+
   interface JavaSdk {
 
     String JAVA_SDK = "Java SDK";
