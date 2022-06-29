@@ -468,6 +468,7 @@ public class MacroExpansionModuleModel {
   private Map<String, String> extractProperties(Optional<String> configRefName) {
     Map<String, String> valuesMap = new HashMap<>();
     configRefName
+        // if the config-ref is an expression we can't macro-expand the properties, they'll need to be resolved in runtime
         .filter(configParameter -> !isExpression(configParameter) &&
             defaultGlobalElementName().map(defaultGlobalElementName -> !defaultGlobalElementName.equals(configParameter))
                 .orElse(true))

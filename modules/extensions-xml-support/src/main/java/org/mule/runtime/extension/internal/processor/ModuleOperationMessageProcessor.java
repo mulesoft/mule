@@ -372,9 +372,11 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
     InternalEvent.Builder builder = InternalEvent.builder(event.getContext());
     builder.message(builder().nullValue().build());
 
+    // The properties may not have been resolved yet if the config-ref was an expression, so we resolve them now
+    Map<String, Pair<Object, MetadataType>> resolvedProperties = getResolvedProperties(event);
+
     // If this operation is called from an outer operation, we need to obtain the config from the previous caller in order to
     // populate the event variables as expected.
-    Map<String, Pair<Object, MetadataType>> resolvedProperties = getResolvedProperties(event);
     TypedValue<?> configRef = event.getVariables().get(MODULE_OPERATION_CONFIG_REF);
     if (configRef != null) {
       builder.addVariable(MODULE_OPERATION_CONFIG_REF, configRef.getValue());
@@ -395,19 +397,32 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
     return newEvent;
   }
 
+  /**
+   *
+   * @param event A {@link CoreEvent} to resolve expression from.
+   * @return The resolved properties for the processing of the given event. Note that if the config reference was not an
+   *         expression, then the properties will not need any resolution at this point, we just return {@link #properties}.
+   */
   private Map<String, Pair<Object, MetadataType>> getResolvedProperties(CoreEvent event) {
     if (configurationProviderResolver.isPresent()) {
+      // Resolves the configuration provider and validates it
       ConfigurationProvider cp = resolveConfigurationProvider(event);
       validateConfigurationProvider(cp);
 
+      // Gets the properties from the configuration provider
       if (cp instanceof XmlSdkConfigurationProvider) {
         return parseParameters(((XmlSdkConfigurationProvider) cp).getParameters(), allProperties);
       }
     }
 
+    // No runtime resolution needed, we just return the properties resolved at the instantiation
     return properties;
   }
 
+  /**
+   * @param parameters The operation's parameters.
+   * @return An optional {@link ConfigurationProvider} {@link ValueResolver} only present if the config-ref is an expression.
+   */
   private Optional<ValueResolver<ConfigurationProvider>> getConfigurationProviderResolver(Map<String, Object> parameters) {
     String configRefParameter = (String) parameters.get(MODULE_OPERATION_CONFIG_REF);
     if (isExpression(configRefParameter)) {
@@ -421,6 +436,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
         .withExpressionManager(expressionManager)
         .build();
     try {
+      // We should have already checked if configurationProviderResolver is present before calling this method
       return configurationProviderResolver.get().resolve(valueResolvingContext);
     } catch (MuleException e) {
       throw new IllegalArgumentException(format("Error resolving configuration for component '%s'",
