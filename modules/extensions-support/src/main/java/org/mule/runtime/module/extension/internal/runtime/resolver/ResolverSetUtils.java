@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static com.google.common.collect.ImmutableBiMap.of;
-import static java.util.Collections.emptySet;
-import static java.util.Optional.empty;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getExpressionSupport;
@@ -16,6 +13,11 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver.fromValues;
+
+import static java.util.Collections.emptySet;
+import static java.util.Optional.empty;
+
+import static com.google.common.collect.ImmutableBiMap.of;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -33,8 +35,6 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.resolver.ValueResolverFactory;
@@ -48,7 +48,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 /**
@@ -77,11 +76,10 @@ public class ResolverSetUtils {
                                                            boolean disableValidations,
                                                            ReflectionCache reflectionCache,
                                                            ExpressionManager expressionManager,
-                                                           String parametersOwner,
-                                                           DslSyntaxResolver dslSyntaxResolver)
+                                                           String parametersOwner)
       throws MuleException {
     Map<String, ValueResolver> resolvers = new HashMap<>();
-    ValueResolverFactory valueResolverFactory = new ValueResolverFactory(dslSyntaxResolver);
+    ValueResolverFactory valueResolverFactory = new ValueResolverFactory();
 
     for (ParameterGroupModel parameterGroupModel : parameterizedModel.getParameterGroupModels()) {
       resolvers.putAll(getParameterGroupValueResolvers(parameterGroupModel, parameters, reflectionCache, muleContext,

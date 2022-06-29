@@ -6,11 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl;
 
-import static java.lang.Thread.currentThread;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
-import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -43,6 +38,12 @@ import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionPar
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.locateParsingDelegate;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContainerName;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
+
+import static java.lang.Thread.currentThread;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.AnyType;
@@ -162,7 +163,7 @@ public abstract class ExtensionDefinitionParser {
     this.definitionBuilder = definitionBuilder;
     this.dslResolver = dslResolver;
     this.parsingContext = ctx;
-    this.valueResolverFactory = new ValueResolverFactory(dslResolver);
+    this.valueResolverFactory = new ValueResolverFactory();
   }
 
   /**

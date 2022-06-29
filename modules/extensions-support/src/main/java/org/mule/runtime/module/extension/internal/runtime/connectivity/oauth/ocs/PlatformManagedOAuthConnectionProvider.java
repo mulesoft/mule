@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs;
 
-import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -17,14 +14,19 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.connection.ConnectionUtils.unwrap;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
-import static org.mule.runtime.core.internal.util.InjectionUtils.getInjectionTarget;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
+import static org.mule.runtime.core.internal.util.InjectionUtils.getInjectionTarget;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getCallbackValuesExtractors;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.updateOAuthParameters;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.validateOAuthConnection;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromStaticValues;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
+
+import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
+import static java.util.Optional.ofNullable;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.config.PoolingProfile;
@@ -33,7 +35,6 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.api.connection.PoolingListener;
-import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -59,7 +60,6 @@ import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantTypeVisitor;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
 import org.mule.runtime.extension.api.connectivity.oauth.PlatformManagedOAuthGrantType;
-import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultConnectionProviderObjectBuilder;
@@ -117,7 +117,6 @@ public class PlatformManagedOAuthConnectionProvider<C>
   private FieldSetter<Object, OAuthState> oauthStateFieldSetter;
   private PlatformManagedConnectionDescriptor descriptor;
   private PoolingListener<C> delegatePoolingListener;
-  private DslSyntaxResolver dslSyntaxResolver;
 
   public PlatformManagedOAuthConnectionProvider(PlatformManagedOAuthConfig oauthConfig,
                                                 PlatformManagedOAuthHandler oauthHandler,
@@ -156,7 +155,6 @@ public class PlatformManagedOAuthConnectionProvider<C>
     dancer = oauthHandler.register(oauthConfig);
 
     try {
-      dslSyntaxResolver = createDslSyntaxResolver();
       descriptor = fetchConnectionDescriptor();
       delegate = createDelegate(descriptor);
       unwrappedDelegate = unwrap(delegate);
@@ -249,14 +247,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
                                           false,
                                           new ReflectionCache(),
                                           expressionManager,
-                                          this.toString(),
-                                          dslSyntaxResolver);
-  }
-
-  private DslSyntaxResolver createDslSyntaxResolver() {
-    return DslSyntaxResolver
-        .getDefault(oauthConfig.getExtensionModel(),
-                    DslResolvingContext.getDefault(extensionManager.getExtensions()));
+                                          this.toString());
   }
 
   private PlatformManagedConnectionDescriptor fetchConnectionDescriptor() throws MuleException {

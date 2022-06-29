@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver.resolver;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty.getStackedTypesModelProperty;
@@ -17,13 +16,11 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 
-import java.util.Optional;
-import java.util.Set;
+import static java.lang.String.format;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ModelProperty;
-import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExclusiveOptionalModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
@@ -38,18 +35,15 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueVal
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.sdk.api.runtime.parameter.Literal;
 
+import java.util.Optional;
+import java.util.Set;
+
 /**
  * A Factory that creates different {@link ValueResolver} instances for different parameter types.
  *
  * @since 4.2
  */
 public class ValueResolverFactory {
-
-  private final DslSyntaxResolver dslResolver;
-
-  public ValueResolverFactory(DslSyntaxResolver dslResolver) {
-    this.dslResolver = dslResolver;
-  }
 
   public <T> ValueResolver<T> of(String parameterName, MetadataType expectedType, Object value, Object defaultValue,
                                  ExpressionSupport expressionSupport, boolean required,
@@ -164,7 +158,7 @@ public class ValueResolverFactory {
   private ValueResolver getValueResolverFromMetadataType(String paramName, MetadataType expected, Object value,
                                                          Object defaultValue, boolean acceptsReferences, Class<?> expectedClass) {
     ValueResolverFactoryTypeVisitor visitor =
-        new ValueResolverFactoryTypeVisitor(dslResolver, paramName, value, defaultValue, acceptsReferences,
+        new ValueResolverFactoryTypeVisitor(paramName, value, defaultValue, acceptsReferences,
                                             expectedClass);
     expected.accept(visitor);
     return visitor.getResolver();

@@ -15,7 +15,6 @@ import org.mule.metadata.api.builder.DateTimeBuilder;
 import org.mule.metadata.api.model.DateTimeType;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.resolver.ValueResolverFactoryTypeVisitor;
 
@@ -34,12 +33,10 @@ public class ValueResolverFactoryTypeVisitorTestCase {
   private static final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.parse("2021-04-28T14:30:35");
   private static final ZonedDateTime ZONED_DATE_TIME = ZonedDateTime.parse("2021-04-27T15:30:00Z");
 
-  private DslSyntaxResolver dslSyntaxResolver;
   private ValueResolvingContext valueResolvingContext;
 
   @Before
   public void setup() {
-    dslSyntaxResolver = mock(DslSyntaxResolver.class);
     valueResolvingContext = mock(ValueResolvingContext.class);
   }
 
@@ -84,7 +81,7 @@ public class ValueResolverFactoryTypeVisitorTestCase {
   }
 
   private ValueResolverFactoryTypeVisitor createValueResolverFactoryTypeVisitor(Object value, Class<?> expectedClass) {
-    return new ValueResolverFactoryTypeVisitor(dslSyntaxResolver, "parameter",
+    return new ValueResolverFactoryTypeVisitor("parameter",
                                                value, null, false, expectedClass);
   }
 

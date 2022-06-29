@@ -24,8 +24,6 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
-import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.config.resolver.BasicTypeValueResolverFactoryTypeVisitor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.RegistryLookupValueResolver;
@@ -59,14 +57,12 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
 
   private final Function<String, ValueResolver> defaultValueResolver = key -> new RegistryLookupValueResolver<>(key);
 
-  private final DslSyntaxResolver dslSyntaxResolver;
   private final Object defaultValue;
   private final boolean acceptsReferences;
 
-  public ValueResolverFactoryTypeVisitor(DslSyntaxResolver dslSyntaxResolver, String parameterName,
+  public ValueResolverFactoryTypeVisitor(String parameterName,
                                          Object value, Object defaultValue, boolean acceptsReferences, Class<?> expectedClass) {
     super(parameterName, value, expectedClass);
-    this.dslSyntaxResolver = dslSyntaxResolver;
     this.defaultValue = defaultValue;
     this.acceptsReferences = acceptsReferences;
   }
@@ -88,20 +84,9 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
       return;
     }
 
-    ValueResolver valueResolver;
-    Optional<Function<String, ValueResolver>> delegate = getCustomValueResolver(objectType);
-    Optional<DslElementSyntax> typeDsl = dslSyntaxResolver.resolve(objectType);
-
-    if (delegate.isPresent() && typeDsl.isPresent()) {
-      // valueResolver = delegate.get().apply(getValue().toString());
-      valueResolver = null;
-    } else {
-      valueResolver = acceptsReferences
-          ? defaultValueResolver.apply(getValue().toString())
-          : new StaticValueResolver<>(getValue());
-    }
-
-    setResolver(valueResolver);
+    setResolver(acceptsReferences
+        ? defaultValueResolver.apply(getValue().toString())
+        : new StaticValueResolver<>(getValue()));
   }
 
   @Override
