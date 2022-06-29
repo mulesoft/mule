@@ -107,11 +107,10 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
   }
 
   @Parameterized.Parameters(name = "Apply Feature flags: {0}")
-  public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[][] {
-        {true},
-        {false}
-    });
+  public static Collection<Boolean> data() {
+    return asList(
+                  true,
+                  false);
   }
 
   @Override

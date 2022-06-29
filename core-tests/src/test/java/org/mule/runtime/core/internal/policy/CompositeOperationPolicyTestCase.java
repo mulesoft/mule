@@ -6,10 +6,14 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+
 import static java.lang.Runtime.getRuntime;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
+
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
@@ -23,8 +27,6 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
 
@@ -42,7 +44,6 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.SourcePolicyTestUtils;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -56,7 +57,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -92,7 +92,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
 
   @Parameterized.Parameters(name = "Policy NB: {0}; Processor NB: {1}; Apply Feature flags: {2}")
   public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[][] {
+    return asList(new Object[][] {
         {false, false, true},
         {false, false, false},
         {true, false, true},
