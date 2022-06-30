@@ -51,8 +51,8 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class ExtensionModelJsonGeneratorTestCase extends FileGenerationParameterizedExtensionModelTestCase {
 
-  private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR =
-      getBoolean(SYSTEM_PROPERTY_PREFIX + "extensionModelJson.updateExpectedFilesOnError");
+  private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR = true;
+  // getBoolean(SYSTEM_PROPERTY_PREFIX + "extensionModelJson.updateExpectedFilesOnError");
 
   @Parameterized.Parameters(name = "{1}")
   public static Collection<Object[]> data() {
