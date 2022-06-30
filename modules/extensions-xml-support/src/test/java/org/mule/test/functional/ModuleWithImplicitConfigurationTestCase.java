@@ -7,12 +7,12 @@
 package org.mule.test.functional;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
 
 import org.mule.test.petstore.extension.PetStoreClient;
 
 import io.qameta.allure.Feature;
-import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
 @Feature(XML_SDK)
@@ -36,8 +36,8 @@ public class ModuleWithImplicitConfigurationTestCase extends AbstractCeXmlExtens
   private void assertGetClient(String flow) throws Exception {
     PetStoreClient client = (PetStoreClient) flowRunner(flow)
         .run().getMessage().getPayload().getValue();
-    MatcherAssert.assertThat(client.getUsername(), is("john"));
-    MatcherAssert.assertThat(client.getPassword(), is("notDoe"));
+    assertThat(client.getUsername(), is("john"));
+    assertThat(client.getPassword(), is("notDoe"));
   }
 
 }
