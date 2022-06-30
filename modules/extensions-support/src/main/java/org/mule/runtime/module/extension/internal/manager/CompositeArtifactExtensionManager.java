@@ -147,6 +147,11 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
   }
 
   @Override
+  public void unregisterConfigurationProvider(ConfigurationProvider configurationProvider) {
+    throw new UnsupportedOperationException("Composite extension manager cannot unregister extension providers");
+  }
+
+  @Override
   public void initialise() throws InitialisationException {
     initialiseIfNeeded(childExtensionManager);
   }

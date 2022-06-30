@@ -11,6 +11,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
+import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -23,6 +24,13 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.config.ExpirableConfigurationProvider;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -32,13 +40,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Hold the state related to registered {@link ExtensionModel extensionModels} and their instances.
@@ -151,6 +152,30 @@ final class ExtensionRegistry {
                                      e);
     }
 
+    providersByExtension.invalidate(configurationProvider.getExtensionModel());
+  }
+
+  /**
+   * Unregisters the given {@code configurationProvider} from the underlying {@link #registry}.
+   *
+   * @param configurationProvider a {@link ConfigurationProvider} to be registered
+   * @param muleContext           the owner of the registry to register the configurationProvider in.
+   * @throws IllegalArgumentException if {@code configurationProvider} is {@code null}
+   * @throws MuleRuntimeException     if the {@code configurationProvider} could not be unregistered
+   * @since 4.5.0
+   */
+  void unregisterConfigurationProvider(ConfigurationProvider configurationProvider, MuleContext muleContext) {
+    checkArgument(configurationProvider != null, "Cannot unregister a null configurationProvider");
+
+    try {
+      unregisterObject(muleContext, configurationProvider.getName());
+    } catch (RegistrationException e) {
+      throw new MuleRuntimeException(createStaticMessage(format("Found exception while unregistering configuration provider '%s'",
+                                                                configurationProvider.getName())),
+                                     e);
+    }
+
+    // TODO: W-11341683 This entire data structure and its invalidation criteria seem very inefficient.
     providersByExtension.invalidate(configurationProvider.getExtensionModel());
   }
 

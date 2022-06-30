@@ -10,6 +10,7 @@ package org.mule.runtime.module.extension.internal.manager;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -50,7 +51,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -155,12 +155,18 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     extensionRegistry.registerConfigurationProvider(configurationProvider, muleContext);
   }
 
+  @Override
+  public void unregisterConfigurationProvider(ConfigurationProvider configurationProvider) {
+    extensionRegistry.unregisterConfigurationProvider(configurationProvider, muleContext);
+  }
+
   /**
    * {@inheritDoc}
    */
   @Override
   public ConfigurationInstance getConfiguration(String configurationProviderName, CoreEvent muleEvent) {
-    return getConfigurationProvider(configurationProviderName).map(provider -> provider.get(muleEvent))
+    return getConfigurationProvider(configurationProviderName)
+        .map(provider -> provider.get(muleEvent))
         .orElseThrow(() -> new IllegalArgumentException(format("There is no registered configurationProvider under name '%s'",
                                                                configurationProviderName)));
   }
@@ -187,8 +193,8 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     }
 
     Optional<ConfigurationModel> configurationModel =
-        getConfigurationModelForExtension(extensionModel, getConfigurationForComponent(extensionModel,
-                                                                                       componentModel));
+        selectImplicitConfigurationModel(extensionModel, getConfigurationForComponent(extensionModel,
+                                                                                      componentModel));
 
     return configurationModel.map(c -> createImplicitConfiguration(extensionModel, c, muleEvent));
   }
@@ -197,7 +203,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   public Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel, ComponentModel componentModel) {
     Set<ConfigurationModel> configurationsForComponent = getConfigurationForComponent(extensionModel, componentModel);
     Optional<ConfigurationModel> extensionConfigurationModel =
-        getConfigurationModelForExtension(extensionModel, configurationsForComponent);
+        selectImplicitConfigurationModel(extensionModel, configurationsForComponent);
     if (!extensionConfigurationModel.isPresent() && requiresConfig(extensionModel, componentModel)) {
       throw new NoConfigRefFoundException(extensionModel, componentModel);
     }
@@ -242,10 +248,10 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     });
   }
 
-  private Optional<ConfigurationModel> getConfigurationModelForExtension(ExtensionModel extensionModel,
-                                                                         Set<ConfigurationModel> assignableConfigurationModels) {
+  private Optional<ConfigurationModel> selectImplicitConfigurationModel(ExtensionModel extensionModel,
+                                                                        Set<ConfigurationModel> assignableConfigurationModels) {
     List<ConfigurationModel> implicitConfigurationModels =
-        assignableConfigurationModels.stream().filter(ExtensionModelUtils::canBeUsedImplicitly).collect(Collectors.toList());
+        assignableConfigurationModels.stream().filter(ExtensionModelUtils::canBeUsedImplicitly).collect(toList());
 
     if (implicitConfigurationModels.isEmpty()) {
       return empty();

@@ -26,6 +26,7 @@ import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.privileged.util.TemplateParser;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.internal.client.ComplexParameter;
+import org.mule.runtime.module.extension.internal.policy.NoOpPolicyManager;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessorBuilder;
@@ -46,6 +47,7 @@ import java.util.Optional;
  */
 public abstract class AbstractExtensionsClientProcessorsStrategy implements ExtensionsClientProcessorsStrategy {
 
+  private static final PolicyManager DEFAULT_POLICY_MANAGER = new NoOpPolicyManager();
   protected final TemplateParser parser = TemplateParser.createMuleStyleParser();
 
   protected final ExtensionManager extensionManager;
@@ -65,7 +67,7 @@ public abstract class AbstractExtensionsClientProcessorsStrategy implements Exte
     this.extensionManager = extensionManager;
     this.registry = registry;
     this.muleContext = muleContext;
-    this.policyManager = policyManager;
+    this.policyManager = policyManager != null ? policyManager : DEFAULT_POLICY_MANAGER;
     this.reflectionCache = reflectionCache;
     this.event = event;
   }
