@@ -6,9 +6,7 @@
  */
 package org.mule.runtime.config.internal.factories;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.System.getProperty;
-import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_HANDLER_PROPERTY;
+import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.REUSE_GLOBAL_ERROR_HANDLER;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
 import org.mule.runtime.core.internal.exception.ErrorHandler;
@@ -32,7 +30,7 @@ public class ErrorHandlerFactoryBean extends AbstractComponentFactory<ErrorHandl
   @Override
   public ErrorHandler doGetObject() throws Exception {
     if (delegate != null) {
-      if (parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY))) {
+      if (REUSE_GLOBAL_ERROR_HANDLER) {
         return delegate;
       }
       return delegate.createLocalErrorHandler(from(this.getRootContainerLocation().getGlobalName()));

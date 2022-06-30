@@ -24,11 +24,13 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 
-import org.junit.Rule;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.ErrorHandlerTestCase.DefaultMessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
 
@@ -36,10 +38,8 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.tck.size.SmallTest;
 
 @SmallTest
 @Issue("W-11117613")

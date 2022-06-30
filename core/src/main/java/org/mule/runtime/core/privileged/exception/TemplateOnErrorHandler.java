@@ -317,6 +317,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
     }
   }
 
+  // Todo: we are evaluating if this is needed. If no propagation of the ps is needed we can avoid this (and the overhead involved).
   private Optional<ProcessingStrategy> getProcessingStrategyFromGlobalErrorHandler(ConfigurationComponentLocator locator) {
     return of(new OnRuntimeProcessingStrategy(locator));
   }

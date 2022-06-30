@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.core.internal.processor;
 
-import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
+import static java.lang.Thread.currentThread;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_COMMIT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
-import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_HANDLER_PROPERTY;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.errorInvokingMessageProcessorWithinTransaction;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createScopeTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -26,17 +27,11 @@ import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTr
 import static org.mule.runtime.core.api.transaction.TransactionUtils.profileTransactionAction;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.popTxFromSubscriberContext;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.pushTxToSubscriberContext;
+import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.REUSE_GLOBAL_ERROR_HANDLER;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
-
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.Thread.currentThread;
-import static java.lang.System.getProperty;
-import static java.util.Collections.singletonList;
-import static java.util.Optional.of;
-
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
@@ -63,12 +58,11 @@ import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 
-import java.util.List;
 import javax.inject.Inject;
+import java.util.List;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.util.context.Context;
 
 /**
@@ -221,7 +215,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   public void initialise() throws InitialisationException {
     if (messagingExceptionHandler == null) {
       messagingExceptionHandler = muleContext.getDefaultErrorHandler(of(getRootContainerLocation().toString()));
-      if (!parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY))) {
+      if (!REUSE_GLOBAL_ERROR_HANDLER) {
         if (messagingExceptionHandler instanceof ErrorHandler) {
           ((ErrorHandler) messagingExceptionHandler)
               .setExceptionListenersLocation(this.getLocation());

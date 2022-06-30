@@ -30,7 +30,6 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COM
 import static org.mule.runtime.api.config.MuleRuntimeFeature.VALIDATE_APPLICATION_MODEL_WITH_REGION_CLASSLOADER;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
-import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_HANDLER_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_COMPONENT_INITIAL_STATE_MANAGER;
@@ -68,11 +67,10 @@ import static org.mule.runtime.core.internal.profiling.AbstractProfilingService.
 import static org.mule.runtime.core.internal.transformer.simple.ObjectToString.configureToStringTransformerTransformIteratorElements;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
+import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.REUSE_GLOBAL_ERROR_HANDLER;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
-import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
-import static java.lang.System.getProperty;
 import static java.util.Objects.requireNonNull;
 
 import static org.apache.commons.lang3.SystemUtils.JAVA_VERSION;
@@ -944,7 +942,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
                                                                   config.getDefaultErrorHandlerName())));
       }
 
-      if (!parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY))) {
+      if (!REUSE_GLOBAL_ERROR_HANDLER) {
         if (rootContainerName.isPresent()) {
           defaultErrorHandler = ((GlobalErrorHandler) defaultErrorHandler)
               .createLocalErrorHandler(from(rootContainerName.get()));

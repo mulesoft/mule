@@ -6,10 +6,7 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_HANDLER_PROPERTY;
-
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.System.getProperty;
+import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.REUSE_GLOBAL_ERROR_HANDLER;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -17,10 +14,10 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
-import org.reactivestreams.Publisher;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.reactivestreams.Publisher;
 
 public class GlobalErrorHandler extends ErrorHandler {
 
@@ -34,7 +31,7 @@ public class GlobalErrorHandler extends ErrorHandler {
 
   @Override
   public void initialise() throws InitialisationException {
-    if (!reuseGlobalErrorHandler()) {
+    if (!REUSE_GLOBAL_ERROR_HANDLER) {
       super.initialise();
       return;
     }
@@ -44,13 +41,9 @@ public class GlobalErrorHandler extends ErrorHandler {
     }
   }
 
-  public static boolean reuseGlobalErrorHandler() {
-    return parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY));
-  }
-
   @Override
   public void start() throws MuleException {
-    if (!reuseGlobalErrorHandler()) {
+    if (!REUSE_GLOBAL_ERROR_HANDLER) {
       super.start();
       return;
     }
@@ -62,7 +55,7 @@ public class GlobalErrorHandler extends ErrorHandler {
 
   @Override
   public void stop() throws MuleException {
-    if (!reuseGlobalErrorHandler()) {
+    if (!REUSE_GLOBAL_ERROR_HANDLER) {
       super.stop();
       return;
     }
@@ -74,7 +67,7 @@ public class GlobalErrorHandler extends ErrorHandler {
 
   @Override
   public void dispose() {
-    if (!reuseGlobalErrorHandler()) {
+    if (!REUSE_GLOBAL_ERROR_HANDLER) {
       super.dispose();
       return;
     }
@@ -86,7 +79,7 @@ public class GlobalErrorHandler extends ErrorHandler {
 
   public void setFromGlobalErrorHandler() {
     this.getExceptionListeners().stream()
-        .filter(exceptionListener -> exceptionListener instanceof TemplateOnErrorHandler)
+        .filter(TemplateOnErrorHandler.class::isInstance)
         .forEach(exceptionListener -> ((TemplateOnErrorHandler) exceptionListener).setFromGlobalErrorHandler(true));
   }
 

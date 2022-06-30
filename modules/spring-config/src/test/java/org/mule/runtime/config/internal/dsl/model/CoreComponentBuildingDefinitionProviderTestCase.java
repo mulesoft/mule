@@ -46,19 +46,19 @@ public class CoreComponentBuildingDefinitionProviderTestCase extends AbstractMul
   public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @Rule
-  public SystemProperty reuseGlobalErrorHandler;
+  public SystemProperty reuseGlobalErrorHandlerRule;
 
   private CoreComponentBuildingDefinitionProvider provider;
 
-  private final boolean enableProperty;
+  private final boolean reuseGlobalErrorHandler;
 
-  public CoreComponentBuildingDefinitionProviderTestCase(String enableProperty) {
-    this.enableProperty = parseBoolean(enableProperty);
-    reuseGlobalErrorHandler = new SystemProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY, enableProperty);
+  public CoreComponentBuildingDefinitionProviderTestCase(String reuseGlobalErrorHandler) {
+    this.reuseGlobalErrorHandler = parseBoolean(reuseGlobalErrorHandler);
+    reuseGlobalErrorHandlerRule = new SystemProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY, reuseGlobalErrorHandler);
   }
 
   @Parameterized.Parameters(name = "enable system property: {0}")
-  public static Collection<String> params() {
+  public static Collection params() {
     return asList("true", "false");
   }
 
@@ -71,6 +71,6 @@ public class CoreComponentBuildingDefinitionProviderTestCase extends AbstractMul
   public void isPrototype() {
     ComponentBuildingDefinition buildingDefinition = provider.getErrorHandlerBuilder().build();
 
-    assertThat(buildingDefinition.isPrototype(), is(not(enableProperty)));
+    assertThat(buildingDefinition.isPrototype(), is(not(reuseGlobalErrorHandler)));
   }
 }

@@ -54,6 +54,8 @@ public class OnRuntimeProcessingStrategy implements ProcessingStrategy {
   @Override
   public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
     return publisher -> Flux.from(publisher)
+        // TODO: we are evaluating removing this processing strategy if we can avoid propagation of the processing strategy from
+        // the parent component and use the default instead. In W-11365733 we will investigate if this flatmap is affecting performance.
         .flatMap(e -> {
           Optional<ProcessingStrategy> processingStrategy =
               getParentFlowNameForErrorHandler(e).flatMap(this::getProcessingStrategy);
