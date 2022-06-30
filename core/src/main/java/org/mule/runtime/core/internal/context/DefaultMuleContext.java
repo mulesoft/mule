@@ -11,6 +11,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDL
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_BYTE_BUDDY_OBJECT_CREATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
@@ -297,6 +298,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureDefaultErrorHandlerNotRollbackingEveryTx();
       configureParallelForeachFlattenMessage();
       configureEnableByteBuddyObjectCreation();
+      configureApplyOperationErrorMappings();
     }
   }
 
@@ -1285,4 +1287,16 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
                                                     .filter(muleVersion -> muleVersion.atLeast("4.5.0")).isPresent());
   }
 
+  /**
+   * Configures the {@link MuleRuntimeFeature#HONOR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION} feature flag.
+   *
+   * @since 4.5.0
+   */
+  private static void configureApplyOperationErrorMappings() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(HONOR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION,
+        featureContext -> featureContext.getArtifactMinMuleVersion()
+            .filter(muleVersion -> muleVersion.atLeast("4.5.0")).isPresent());
+  }
+  
 }
