@@ -9,11 +9,14 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
+import org.mule.runtime.extension.api.annotation.SubTypeMapping;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
@@ -25,6 +28,7 @@ import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.vegan.extension.VeganCookBook;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -101,6 +105,21 @@ public class JavaExtensionModelParserTestCase {
     assertThat(exportedTypes.size(), is(1));
   }
 
+  // This behavior needs to be supported to maintain backwards compatibility
+  @Test
+  public void getSubtypesFromExtensionWithDuplicatedBaseTypes() {
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(contextClassLoader);
+    ExtensionTypeWrapper<SubTypesDuplication> extensionTypeWrapper =
+        new ExtensionTypeWrapper<>(SubTypesDuplication.class, typeLoader);
+    ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(contextClassLoader, getDefault(emptySet()));
+    JavaExtensionModelParser javaExtensionModelParser = new JavaExtensionModelParser(extensionTypeWrapper, ctx);
+
+    Map<MetadataType, List<MetadataType>> subTypes = javaExtensionModelParser.getSubTypes();
+    assertThat(subTypes.size(), is(1));
+    assertThat(subTypes.values().iterator().next(), hasSize(2));
+  }
+
   @Extension(name = "SimpleExtension")
   @Import(type = KnockeableDoor.class)
   @PrivilegedExport(packages = {"org.mule.runtime.module.extension.internal.loader.parser.java"})
@@ -118,6 +137,30 @@ public class JavaExtensionModelParserTestCase {
   @Import(type = KnockeableDoor.class)
   @org.mule.runtime.extension.api.annotation.Import(type = VeganCookBook.class)
   private static class SimpleMixedApiExtension {
+  }
+
+  @Extension(name = "SubTypesDuplication")
+  @SubTypeMapping(baseType = BaseInterface.class,
+      subTypes = {ImplementationOne.class, ImplementationTwo.class, ImplementationOne.class})
+  private static class SubTypesDuplication {
+  }
+
+  private interface BaseInterface {
+
+  }
+
+  private static class ImplementationOne implements BaseInterface {
+
+    @Parameter
+    private String parameterOne;
+
+  }
+
+  private static class ImplementationTwo implements BaseInterface {
+
+    @Parameter
+    private String parameterTwo;
+
   }
 
 }
