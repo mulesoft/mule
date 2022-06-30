@@ -468,8 +468,10 @@ public class MacroExpansionModuleModel {
   private Map<String, String> extractProperties(Optional<String> configRefName) {
     Map<String, String> valuesMap = new HashMap<>();
     configRefName
-        .filter(configParameter -> defaultGlobalElementName()
-            .map(defaultGlobalElementName -> !defaultGlobalElementName.equals(configParameter)).orElse(true))
+        // if the config-ref is an expression we can't macro-expand the properties, they'll need to be resolved in runtime
+        .filter(configParameter -> !isExpression(configParameter) &&
+            defaultGlobalElementName().map(defaultGlobalElementName -> !defaultGlobalElementName.equals(configParameter))
+                .orElse(true))
         .ifPresent(configParameter -> {
           ComponentAst configRefComponentModel = getComponentAst(applicationModel, configParameter);
           // as configParameter != null, a ConfigurationModel must exist
