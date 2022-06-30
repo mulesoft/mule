@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -30,6 +31,7 @@ import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
@@ -160,6 +162,9 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
 
   private PolicyPointcutParametersManager policyPointcutParametersManager;
 
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
+
   @Override
   public SourcePolicy createSourcePolicyInstance(Component source, CoreEvent sourceEvent,
                                                  ReactiveProcessor flowExecutionProcessor,
@@ -268,7 +273,8 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
                                                                           .ioScheduler(muleContext.getSchedulerBaseConfig()
                                                                               .withMaxConcurrentTasks(1)
                                                                               .withName(operation.getLocation().getLocation()
-                                                                                  + ".policy.flux.")))));
+                                                                                  + ".policy.flux.")),
+                                                                      featureFlaggingService)));
 
       if (operationPolicy instanceof DeferredDisposable) {
         activePolicies.add(new DeferredDisposableWeakReference((DeferredDisposable) operationPolicy, stalePoliciesQueue));
