@@ -12,7 +12,7 @@ import static org.mule.runtime.core.internal.event.trace.extractor.RuntimeEventT
 
 import static java.util.Optional.ofNullable;
 
-import org.mule.runtime.api.event.DistributedTraceContext;
+import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.core.internal.event.trace.extractor.TraceContextFieldExtractor;
 import org.mule.sdk.api.runtime.source.SdkDistributedTraceContextMapGetter;
 

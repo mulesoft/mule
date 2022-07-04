@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.api.event.DistributedTraceContext;
+import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.sdk.api.runtime.source.SdkDistributedTraceContextMapGetter;
 
 import io.qameta.allure.Feature;

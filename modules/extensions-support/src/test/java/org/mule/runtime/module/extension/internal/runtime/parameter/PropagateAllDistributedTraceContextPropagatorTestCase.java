@@ -14,7 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 
-import org.mule.runtime.api.event.DistributedTraceContext;
+import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.extension.api.runtime.parameter.DistributedTraceContextSetter;
 
 import java.util.Map;

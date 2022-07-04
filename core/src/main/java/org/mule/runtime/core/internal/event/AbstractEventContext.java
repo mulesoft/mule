@@ -24,6 +24,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.ArrayList;
@@ -287,6 +288,13 @@ abstract class AbstractEventContext implements BaseEventContext {
                    t);
     }
   }
+
+  /**
+   * @return the {@link DistributedTraceContext} associated with the event.
+   *
+   * @since 4.5.0
+   */
+  public abstract DistributedTraceContext getDistributedTraceContext();
 
   @Override
   public BaseEventContext getRootContext() {
