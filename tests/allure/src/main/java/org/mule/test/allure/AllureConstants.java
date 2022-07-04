@@ -206,6 +206,7 @@ public interface AllureConstants {
       String ON_ERROR_CONTINUE = "On Error Continue";
       String ON_ERROR_PROPAGATE = "On Error Propagate";
       String DEFAULT_ERROR_HANDLER = "Default Error Handler";
+      String GLOBAL_ERROR_HANDLER = "Global Error Handler";
       String RAISE_ERROR = "Raise Errors";
     }
   }

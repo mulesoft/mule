@@ -147,7 +147,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void defaultErrorHandler() throws InitialisationException {
+  public void defaultErrorHandler() {
     final ErrorHandler defaultHandler = new ErrorHandlerFactory().createDefault(mock(NotificationDispatcher.class));
 
     assertThat(defaultHandler.getExceptionListeners(), hasSize(1));
@@ -228,7 +228,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     when(errorTypeRepository.getAnyErrorType()).thenReturn(anyErrorType);
   }
 
-  class DefaultMessagingExceptionHandlerAcceptor implements MessagingExceptionHandlerAcceptor {
+  static class DefaultMessagingExceptionHandlerAcceptor implements MessagingExceptionHandlerAcceptor {
 
     @Override
     public boolean accept(CoreEvent event) {

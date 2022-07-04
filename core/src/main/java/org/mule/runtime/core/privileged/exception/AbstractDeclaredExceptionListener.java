@@ -60,8 +60,8 @@ public abstract class AbstractDeclaredExceptionListener extends AbstractMessageP
    * @throws InitialisationException
    */
   @Override
-  public final synchronized void initialise() throws InitialisationException {
-    if (!initialised.get()) {
+  public synchronized void initialise() throws InitialisationException {
+    if (!isInitialised()) {
       doInitialise();
       super.initialise();
       if (exceptionListener == null) {
@@ -72,6 +72,10 @@ public abstract class AbstractDeclaredExceptionListener extends AbstractMessageP
           + (getLocation() != null ? " @ " + getLocation().getLocation() : ""));
       initialised.set(true);
     }
+  }
+
+  public boolean isInitialised() {
+    return initialised.get();
   }
 
   protected void doInitialise() throws InitialisationException {
