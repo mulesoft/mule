@@ -80,7 +80,7 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
                                String initialState, FlowConstructStatistics statistics) {
     this.muleContext = muleContext;
     this.name = name;
-    this.exceptionListener = exceptionListener.orElse(muleContext.getDefaultErrorHandler(of(name)));
+    this.exceptionListener = exceptionListener.orElseGet(() -> muleContext.getDefaultErrorHandler(of(name)));
     this.initialState = initialState;
     try {
       this.lifecycleManager = new FlowConstructLifecycleManager(this, ((MuleContextWithRegistry) muleContext).getRegistry()

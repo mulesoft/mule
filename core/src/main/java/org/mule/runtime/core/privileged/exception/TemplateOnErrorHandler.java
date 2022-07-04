@@ -6,22 +6,13 @@
  */
 package org.mule.runtime.core.privileged.exception;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
-import static java.util.Arrays.stream;
-import static java.util.Collections.newSetFromMap;
-import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-import static java.util.function.Function.identity;
-import static java.util.regex.Pattern.compile;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_START;
+import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_HANDLER_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher.WILDCARD_TOKEN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -30,6 +21,21 @@ import static org.mule.runtime.core.internal.component.ComponentAnnotations.upda
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.addContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
+
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
+import static java.util.Arrays.stream;
+import static java.util.Collections.newSetFromMap;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+import static java.util.function.Function.identity;
+import static java.util.regex.Pattern.compile;
+import static java.util.stream.Collectors.toList;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
@@ -48,7 +54,6 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.DisjunctiveErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher;
@@ -78,7 +83,6 @@ import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
@@ -89,10 +93,15 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   private static final Logger LOGGER = getLogger(TemplateOnErrorHandler.class);
 
+  // To check the value of the system property use the method with the same name.
+  public static Boolean reuseGlobalErrorHandler;
+
   private static final Pattern ERROR_HANDLER_LOCATION_PATTERN = compile(".*/.*/.*");
 
   @Inject
   protected ConfigurationComponentLocator locator;
+
+  private boolean fromGlobalErrorHandler = false;
 
   @Inject
   private ExpressionManager expressionManager;
@@ -149,7 +158,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
           .doAfterTerminate(() -> fluxSinks.remove(sinkRef.getFluxSink()));
 
       if (processingStrategy.isPresent()) {
-        processingStrategy.get().registerInternalSink(onErrorFlux, "error handler '" + getLocation().getLocation() + "'");
+        String location = getLocation() != null ? getLocation().getLocation() : flowLocation.map(Object::toString).orElse("");
+        processingStrategy.get().registerInternalSink(onErrorFlux, "error handler '" + location + "'");
       } else {
         onErrorFlux.subscribe();
       }
@@ -219,7 +229,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       try {
         logger.error("Exception during exception strategy execution");
         resolveAndLogException(me);
-        if (isOwnedTransaction()) {
+        if (isOwnedTransaction(getException((CoreEvent) event))) {
           TransactionCoordination.getInstance().rollbackCurrentTransaction();
         }
       } catch (Exception ex) {
@@ -285,11 +295,13 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   protected void doInitialise() throws InitialisationException {
     super.doInitialise();
     this.location = this.getLocation();
-    Optional<ProcessingStrategy> processingStrategy = empty();
-    if (flowLocation.isPresent()) {
+    Optional<ProcessingStrategy> processingStrategy;
+    if (fromGlobalErrorHandler && reuseGlobalErrorHandler()) {
+      processingStrategy = getProcessingStrategyFromGlobalErrorHandler(locator);
+    } else if (flowLocation.isPresent()) {
       Location location = builderFromStringRepresentation(flowLocation.get()).build();
       processingStrategy = getProcessingStrategy(locator, location);
-    } else if (location != null) {
+    } else {
       processingStrategy = getProcessingStrategy(locator, this);
     }
     configuredMessageProcessors =
@@ -306,6 +318,12 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
         errorHandlerLocation = errorHandlerLocation.substring(0, errorHandlerLocation.lastIndexOf('/'));
       }
     }
+  }
+
+  // Todo: we are evaluating if this is needed. If no propagation of the ps is needed we can avoid this (and the overhead
+  // involved).
+  private Optional<ProcessingStrategy> getProcessingStrategyFromGlobalErrorHandler(ConfigurationComponentLocator locator) {
+    return of(new OnRuntimeProcessingStrategy(locator));
   }
 
   @Override
@@ -485,13 +503,16 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
    */
   public abstract TemplateOnErrorHandler duplicateFor(ComponentLocation location);
 
-
   private boolean isTransactionInGlobalErrorHandler(TransactionAdapter transaction) {
     String transactionLocation = transaction.getComponentLocation().get().getLocation();
     return flowLocation.filter(transactionLocation::equals).isPresent();
   }
 
   protected boolean isOwnedTransaction() {
+    return isOwnedTransaction(null);
+  }
+
+  protected boolean isOwnedTransaction(Exception exception) {
     TransactionAdapter transaction = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
     if (transaction == null || !transaction.getComponentLocation().isPresent()) {
       return false;
@@ -501,23 +522,30 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       // This case is for an implicit error handler, if we are in a configured default error handler then
       // it will be the same as the global error handler case.
       return defaultErrorHandlerOwnsTransaction(transaction);
-    } else if (isTransactionInGlobalErrorHandler((transaction))) {
-      // We are in a GlobalErrorHandler that is defined for the container (Flow or TryScope) that created the tx
-      return true;
-    } else if (flowLocation.isPresent()) {
-      // We are in a Global Error Handler, which is not the one that created the Tx
-      return false;
-    } else {
-      // We are in a simple scenario where the error handler's location ends with "/error-handler/1".
-      // We cannot use the RootContainerLocation, since in case of nested TryScopes (the outer one creating the tx)
-      // the RootContainerLocation will be the same for both, and we don't want the inner TryScope's OnErrorPropagate
-      // to rollback the tx.
-      if (!isLocalErrorHandlerLocation) {
-        return sameRootContainerLocation(transaction);
-      }
-      String transactionLocation = transaction.getComponentLocation().get().getLocation();
-      return (sameRootContainerLocation(transaction) && errorHandlerLocation.equals(transactionLocation));
     }
+
+    if (reuseGlobalErrorHandler() && fromGlobalErrorHandler && exception != null) {
+      String location = ((MessagingException) exception).getFailingComponent().getRootContainerLocation().getGlobalName();
+      return transaction.getComponentLocation().get().getRootContainerName().equals(location);
+    }
+
+    if (!reuseGlobalErrorHandler() && flowLocation.isPresent()) {
+      return isTransactionInGlobalErrorHandler(transaction);
+    }
+
+    return isOwnedTransactionByLocalErrorHandler(transaction);
+  }
+
+  private boolean isOwnedTransactionByLocalErrorHandler(TransactionAdapter transaction) {
+    // We are in a simple scenario where the error handler's location ends with "/error-handler/1".
+    // We cannot use the RootContainerLocation, since in case of nested TryScopes (the outer one creating the tx)
+    // the RootContainerLocation will be the same for both, and we don't want the inner TryScope's OnErrorPropagate
+    // to rollback the tx.
+    if (!isLocalErrorHandlerLocation) {
+      return sameRootContainerLocation(transaction);
+    }
+    String transactionLocation = transaction.getComponentLocation().get().getLocation();
+    return (sameRootContainerLocation(transaction) && errorHandlerLocation.equals(transactionLocation));
   }
 
   private boolean sameRootContainerLocation(TransactionAdapter transaction) {
@@ -543,5 +571,16 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   protected ErrorTypeRepository getErrorTypeRepository() {
     return errorTypeRepository;
+  }
+
+  public void setFromGlobalErrorHandler(boolean fromGlobalErrorHandler) {
+    this.fromGlobalErrorHandler = fromGlobalErrorHandler;
+  }
+
+  public static boolean reuseGlobalErrorHandler() {
+    if (reuseGlobalErrorHandler == null) {
+      reuseGlobalErrorHandler = parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY));
+    }
+    return reuseGlobalErrorHandler;
   }
 }

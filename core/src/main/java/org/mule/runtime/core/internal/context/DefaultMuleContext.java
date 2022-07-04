@@ -10,8 +10,8 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGA
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_BYTE_BUDDY_OBJECT_CREATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
@@ -52,6 +52,7 @@ import static org.mule.runtime.core.api.util.UUID.getClusterUUID;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
+import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.reuseGlobalErrorHandler;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import static java.lang.String.format;
@@ -155,7 +156,6 @@ import javax.inject.Inject;
 import javax.transaction.TransactionManager;
 
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMuleContext {
@@ -911,14 +911,17 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
                                                                   config.getDefaultErrorHandlerName())));
       }
 
-      if (rootContainerName.isPresent()) {
-        defaultErrorHandler = ((GlobalErrorHandler) defaultErrorHandler)
-            .createLocalErrorHandler(fromSingleComponent(rootContainerName.get()));
-      } else {
-        try {
-          defaultErrorHandler = new ErrorHandlerFactory().createDefault(getRegistry().lookupObject(NotificationDispatcher.class));
-        } catch (RegistrationException e) {
-          throw new MuleRuntimeException(e);
+      if (!reuseGlobalErrorHandler()) {
+        if (rootContainerName.isPresent()) {
+          defaultErrorHandler = ((GlobalErrorHandler) defaultErrorHandler)
+              .createLocalErrorHandler(fromSingleComponent(rootContainerName.get()));
+        } else {
+          try {
+            defaultErrorHandler =
+                new ErrorHandlerFactory().createDefault(getRegistry().lookupObject(NotificationDispatcher.class));
+          } catch (RegistrationException e) {
+            throw new MuleRuntimeException(e);
+          }
         }
       }
     } else {

@@ -71,4 +71,7 @@ public final class ComponentBuildingDefinitionUtils {
     return componentBuildingDefinitions;
   }
 
+  public static void setRuntimeComponentBuildingDefinitions(ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitions) {
+    ComponentBuildingDefinitionUtils.runtimeComponentBuildingDefinitions = runtimeComponentBuildingDefinitions;
+  }
 }

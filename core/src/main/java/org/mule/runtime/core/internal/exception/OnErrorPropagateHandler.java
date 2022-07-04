@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
@@ -16,13 +17,12 @@ import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
+import javax.inject.Inject;
 
 /**
  * Handler that will propagate errors and rollback transactions. Replaces the rollback-exception-strategy from Mule 3.
@@ -64,7 +64,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     return event -> {
       Exception exception = getException(event);
       event = super.beforeRouting().apply(event);
-      if (!isRedeliveryExhausted(exception) && isOwnedTransaction()) {
+      if (!isRedeliveryExhausted(exception) && isOwnedTransaction(exception)) {
         rollback(exception);
       }
       return event;
