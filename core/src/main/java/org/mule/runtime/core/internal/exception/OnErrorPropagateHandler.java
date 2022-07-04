@@ -77,7 +77,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     return event -> {
       Exception exception = getException(event);
       event = super.beforeRouting().apply(event);
-      if (!isRedeliveryExhausted(exception) && isOwnedTransaction()) {
+      if (!isRedeliveryExhausted(exception) && isOwnedTransaction(exception)) {
         profileTransactionAction(rollbackProducer, TX_ROLLBACK, getLocation());
         rollback(exception);
       } else {

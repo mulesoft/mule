@@ -36,6 +36,7 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.el.mvel.ExpressionLanguageExtension;
+import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.internal.lifecycle.EmptyLifecycleCallback;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleCallback;
@@ -52,6 +53,8 @@ import org.mule.runtime.core.privileged.routing.OutboundRouter;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.util.Map;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
@@ -172,14 +175,18 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
     public SpringContextDisposePhase() {
       super();
-      setIgnoredObjectTypes(new Class[] {
+      Class<?>[] ignoredObjects = new Class[] {
           Component.class,
           InterceptingMessageProcessor.class,
           OutboundRouter.class,
           MuleContext.class,
           ServerNotificationManager.class,
           Service.class
-      });
+      };
+      if (reuseGlobalErrorHandler()) {
+        ignoredObjects = ArrayUtils.add(ignoredObjects, GlobalErrorHandler.class);
+      }
+      setIgnoredObjectTypes(ignoredObjects);
     }
 
     @Override

@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.core.internal.context.notification;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_FLOW_STACK_MAX_DEPTH;
+
 import static java.lang.Integer.getInteger;
 import static java.lang.System.lineSeparator;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_FLOW_STACK_MAX_DEPTH;
 
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
@@ -18,8 +19,8 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.EmptyStackException;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 /**
@@ -69,7 +70,6 @@ public class DefaultFlowCallStack implements FlowCallStack {
    * Adds a message processor path to the list of processors that were invoked as part of the processing of this stack's event.
    *
    * @param processorPath the path to mark as invoked.
-   * @throws EmptyStackException if this stack is empty.
    */
   public void pushCurrentProcessorPath(String processorPath) {
     if (!innerStack.isEmpty()) {
@@ -83,7 +83,7 @@ public class DefaultFlowCallStack implements FlowCallStack {
    * Removes the top-most element from this stack.
    *
    * @return the top-most element of this stack.
-   * @throws EmptyStackException if this stack is empty.
+   * @throws NoSuchElementException if this stack is empty.
    */
   public FlowStackElement pop() {
     synchronized (innerStack) {
@@ -94,8 +94,7 @@ public class DefaultFlowCallStack implements FlowCallStack {
   /**
    * Retrieves, but does not remove, the top-most element from this stack.
    *
-   * @return the top-most element of this stack.
-   * @throws EmptyStackException if this stack is empty.
+   * @return the top-most element of this stack, or null if this stack is empty.
    */
   public FlowStackElement peek() {
     synchronized (innerStack) {
