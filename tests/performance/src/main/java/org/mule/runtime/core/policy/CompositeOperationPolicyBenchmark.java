@@ -15,8 +15,6 @@ import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.blo
 
 import org.mule.AbstractBenchmark;
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.api.config.Feature;
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.scheduler.Scheduler;

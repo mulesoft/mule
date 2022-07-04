@@ -7,8 +7,8 @@
 package org.mule.runtime.core.internal.policy;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;

@@ -1295,8 +1295,8 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureApplyOperationErrorMappings() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(HONOR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION,
-        featureContext -> featureContext.getArtifactMinMuleVersion()
-            .filter(muleVersion -> muleVersion.atLeast("4.5.0")).isPresent());
+                                                featureContext -> featureContext.getArtifactMinMuleVersion()
+                                                    .filter(muleVersion -> muleVersion.atLeast("4.5.0")).isPresent());
   }
-  
+
 }
