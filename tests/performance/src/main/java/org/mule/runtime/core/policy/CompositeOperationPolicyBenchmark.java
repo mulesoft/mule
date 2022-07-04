@@ -59,7 +59,7 @@ public class CompositeOperationPolicyBenchmark extends AbstractBenchmark {
       }
     }, "")), empty(), (policy, nextProcessor) -> nextProcessor,
                                            muleContext.getConfiguration().getShutdownTimeout(),
-                                           fluxCompleteScheduler, feature -> true);
+                                           fluxCompleteScheduler, feature -> false);
   }
 
   @TearDown(Level.Trial)
