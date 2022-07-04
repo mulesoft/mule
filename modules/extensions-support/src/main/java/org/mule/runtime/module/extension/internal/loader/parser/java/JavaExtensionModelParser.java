@@ -11,6 +11,7 @@ import static java.util.Collections.singletonList;
 import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceRepeatableAnnotation;
@@ -74,12 +75,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * {@link ExtensionModelParser} for Java based syntax
  *
  * @since 4.5.0
  */
 public class JavaExtensionModelParser extends AbstractJavaModelParser implements ExtensionModelParser {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(JavaExtensionModelParser.class);
 
   private Optional<XmlDslConfiguration> xmlDslConfiguration;
   private List<ErrorModelParser> errorModelParsers;
@@ -153,7 +159,10 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
       Map<Type, MetadataType> subTypesMetadataTypes = mapping.getSecond()
           .stream()
           .collect(toMap(identity(), Type::asMetadataType, (u, v) -> {
-            throw new IllegalStateException(format("Duplicate key %s", u));
+            LOGGER.debug("Definition of type {} for base type {} is duplicated. It will be defined only once.",
+                         getTypeId(u).orElse("Unknown"),
+                         getTypeId(baseMetadataType).orElse("Unknown"));
+            return u;
           }, LinkedHashMap::new));
 
       subTypes.put(baseMetadataType, new ArrayList<>(subTypesMetadataTypes.values()));
