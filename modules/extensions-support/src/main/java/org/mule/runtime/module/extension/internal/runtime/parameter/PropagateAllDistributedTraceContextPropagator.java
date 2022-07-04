@@ -7,7 +7,7 @@
 
 package org.mule.runtime.module.extension.internal.runtime.parameter;
 
-import org.mule.runtime.api.event.DistributedTraceContext;
+import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.extension.api.runtime.parameter.DistributedTraceContextPropagator;
 import org.mule.runtime.extension.api.runtime.parameter.DistributedTraceContextSetter;
 

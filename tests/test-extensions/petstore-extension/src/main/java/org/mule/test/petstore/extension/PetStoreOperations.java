@@ -19,7 +19,6 @@ import static org.mule.test.petstore.extension.PetstoreErrorTypeDefinition.PET_E
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.event.DistributedTraceContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.metadata.MetadataContext;
