@@ -67,7 +67,7 @@ import static org.mule.runtime.core.internal.profiling.AbstractProfilingService.
 import static org.mule.runtime.core.internal.transformer.simple.ObjectToString.configureToStringTransformerTransformIteratorElements;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
-import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.REUSE_GLOBAL_ERROR_HANDLER;
+import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.reuseGlobalErrorHandler;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
 import static java.lang.String.format;
@@ -942,7 +942,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
                                                                   config.getDefaultErrorHandlerName())));
       }
 
-      if (!REUSE_GLOBAL_ERROR_HANDLER) {
+      if (!reuseGlobalErrorHandler()) {
         if (rootContainerName.isPresent()) {
           defaultErrorHandler = ((GlobalErrorHandler) defaultErrorHandler)
               .createLocalErrorHandler(from(rootContainerName.get()));

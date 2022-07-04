@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.lifecycle.phases;
 
-import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.REUSE_GLOBAL_ERROR_HANDLER;
+import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.reuseGlobalErrorHandler;
 
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -68,7 +68,7 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase {
         Stoppable.class
     });
 
-    if (REUSE_GLOBAL_ERROR_HANDLER) {
+    if (reuseGlobalErrorHandler()) {
       ignoredObjects = ArrayUtils.add(ignoredObjects, GlobalErrorHandler.class);
     }
 

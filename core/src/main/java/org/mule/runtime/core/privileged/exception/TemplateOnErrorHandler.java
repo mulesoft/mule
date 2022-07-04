@@ -100,7 +100,8 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   private static final Logger LOGGER = getLogger(TemplateOnErrorHandler.class);
 
-  public static final boolean REUSE_GLOBAL_ERROR_HANDLER = parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY));
+  // To check the value of the system property use the method with the same name.
+  public static Boolean reuseGlobalErrorHandler;
 
   private static final Pattern ERROR_HANDLER_LOCATION_PATTERN = compile("[^/]*/[^/]*/[^/]*");
 
@@ -293,7 +294,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   protected void doInitialise() throws InitialisationException {
     super.doInitialise();
     Optional<ProcessingStrategy> processingStrategy;
-    if (fromGlobalErrorHandler && REUSE_GLOBAL_ERROR_HANDLER) {
+    if (fromGlobalErrorHandler && reuseGlobalErrorHandler()) {
       processingStrategy = getProcessingStrategyFromGlobalErrorHandler(locator);
     } else if (flowLocation.isPresent()) {
       Location location = builderFromStringRepresentation(flowLocation.get()).build();
@@ -544,12 +545,12 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       return defaultErrorHandlerOwnsTransaction(transaction);
     }
 
-    if (REUSE_GLOBAL_ERROR_HANDLER && fromGlobalErrorHandler && exception != null) {
+    if (reuseGlobalErrorHandler() && fromGlobalErrorHandler && exception != null) {
       String location = ((MessagingException) exception).getFailingComponent().getRootContainerLocation().getGlobalName();
       return transaction.getComponentLocation().get().getRootContainerName().equals(location);
     }
 
-    if (!REUSE_GLOBAL_ERROR_HANDLER && flowLocation.isPresent()) {
+    if (!reuseGlobalErrorHandler() && flowLocation.isPresent()) {
       return isTransactionInGlobalErrorHandler(transaction);
     }
 
@@ -595,5 +596,12 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   public void setFromGlobalErrorHandler(boolean fromGlobalErrorHandler) {
     this.fromGlobalErrorHandler = fromGlobalErrorHandler;
+  }
+
+  public static boolean reuseGlobalErrorHandler() {
+    if (reuseGlobalErrorHandler == null) {
+      reuseGlobalErrorHandler = parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY));
+    }
+    return reuseGlobalErrorHandler;
   }
 }

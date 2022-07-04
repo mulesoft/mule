@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_HANDLER_PROPERTY;
+import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.reuseGlobalErrorHandler;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.GLOBAL_ERROR_HANDLER;
 
@@ -17,11 +17,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
+import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.runners.Parameterized;
 import org.junit.Rule;
@@ -45,16 +46,10 @@ public class CoreComponentBuildingDefinitionProviderTestCase extends AbstractMul
   @Rule
   public MockitoRule mockitoRule = MockitoJUnit.rule();
 
-  @Rule
-  public SystemProperty reuseGlobalErrorHandlerRule;
-
   private CoreComponentBuildingDefinitionProvider provider;
 
-  private final boolean reuseGlobalErrorHandler;
-
   public CoreComponentBuildingDefinitionProviderTestCase(String reuseGlobalErrorHandler) {
-    this.reuseGlobalErrorHandler = parseBoolean(reuseGlobalErrorHandler);
-    reuseGlobalErrorHandlerRule = new SystemProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY, reuseGlobalErrorHandler);
+    TemplateOnErrorHandler.reuseGlobalErrorHandler = parseBoolean(reuseGlobalErrorHandler);
   }
 
   @Parameterized.Parameters(name = "enable system property: {0}")
@@ -65,6 +60,11 @@ public class CoreComponentBuildingDefinitionProviderTestCase extends AbstractMul
   @Before
   public void setUp() throws Exception {
     provider = new CoreComponentBuildingDefinitionProvider();
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    reuseGlobalErrorHandler = null;
   }
 
   @Test

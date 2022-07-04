@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_HANDLER_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.reuseGlobalErrorHandler;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.GLOBAL_ERROR_HANDLER;
@@ -29,7 +29,6 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.ErrorHandlerTestCase.DefaultMessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
@@ -37,8 +36,8 @@ import java.util.ArrayList;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
+import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
 @SmallTest
@@ -46,9 +45,6 @@ import org.junit.Test;
 @Feature(ERROR_HANDLING)
 @Story(GLOBAL_ERROR_HANDLER)
 public class GlobalErrorHandlerTestCase extends AbstractMuleTestCase {
-
-  @Rule
-  public SystemProperty reuseGlobalErrorHandler = new SystemProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY, "true");
 
   private GlobalErrorHandler globalErrorHandler;
 
@@ -61,12 +57,18 @@ public class GlobalErrorHandlerTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() throws Exception {
+    reuseGlobalErrorHandler = true;
     globalErrorHandler = new GlobalErrorHandler();
     when(onErrorHandler.isInitialised()).thenReturn(true);
     globalErrorHandler.setExceptionListeners(new ArrayList<>(asList(onErrorHandler)));
     when(mockMuleContext.getDefaultErrorHandler(empty())).thenReturn(defaultMessagingExceptionHandler);
     globalErrorHandler.setMuleContext(mockMuleContext);
     globalErrorHandler.setRootContainerName("root");
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    reuseGlobalErrorHandler = null;
   }
 
   @Test

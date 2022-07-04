@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.REUSE_GLOBAL_ERROR_HANDLER;
+import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.reuseGlobalErrorHandler;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -31,7 +31,7 @@ public class GlobalErrorHandler extends ErrorHandler {
 
   @Override
   public void initialise() throws InitialisationException {
-    if (!REUSE_GLOBAL_ERROR_HANDLER) {
+    if (!reuseGlobalErrorHandler()) {
       super.initialise();
       return;
     }
@@ -43,7 +43,7 @@ public class GlobalErrorHandler extends ErrorHandler {
 
   @Override
   public void start() throws MuleException {
-    if (!REUSE_GLOBAL_ERROR_HANDLER) {
+    if (!reuseGlobalErrorHandler()) {
       super.start();
       return;
     }
@@ -55,7 +55,7 @@ public class GlobalErrorHandler extends ErrorHandler {
 
   @Override
   public void stop() throws MuleException {
-    if (!REUSE_GLOBAL_ERROR_HANDLER) {
+    if (!reuseGlobalErrorHandler()) {
       super.stop();
       return;
     }
@@ -67,7 +67,7 @@ public class GlobalErrorHandler extends ErrorHandler {
 
   @Override
   public void dispose() {
-    if (!REUSE_GLOBAL_ERROR_HANDLER) {
+    if (!reuseGlobalErrorHandler()) {
       super.dispose();
       return;
     }
