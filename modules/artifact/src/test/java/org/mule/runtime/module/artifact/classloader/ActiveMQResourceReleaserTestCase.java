@@ -135,7 +135,6 @@ public class ActiveMQResourceReleaserTestCase extends AbstractMuleTestCase {
 
     CompositeClassLoader classLoader = from(artifactClassLoader);
     currentThread().setContextClassLoader(classLoader);
-
   }
 
   @Test
