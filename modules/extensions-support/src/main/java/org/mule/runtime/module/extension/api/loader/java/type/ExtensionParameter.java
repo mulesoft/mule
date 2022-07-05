@@ -27,7 +27,6 @@ import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.FlowListener;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
-import org.mule.runtime.extension.api.runtime.parameter.DistributedTraceContextPropagator;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.process.VoidCompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
@@ -38,6 +37,7 @@ import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 import org.mule.sdk.api.runtime.parameter.Literal;
 import org.mule.sdk.api.runtime.parameter.ParameterResolver;
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.Set;
@@ -77,7 +77,7 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
       .add(Chain.class)
       .add(org.mule.sdk.api.runtime.route.Chain.class)
       .add(CorrelationInfo.class)
-      .add(DistributedTraceContextPropagator.class)
+      .add(DistributedTraceContextManager.class)
       .add(org.mule.sdk.api.runtime.parameter.CorrelationInfo.class)
       .add(NotificationEmitter.class)
       .add(org.mule.sdk.api.notification.NotificationEmitter.class)

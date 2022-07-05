@@ -35,6 +35,7 @@ import org.mule.sdk.api.connectivity.TransactionalConnection;
 import org.mule.sdk.api.notification.NotificationActionDefinition;
 import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.sdk.api.runtime.source.SourceCallbackContext;
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 import javax.inject.Inject;
 import java.util.LinkedList;
@@ -64,6 +65,7 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
   private ProfilingService profilingService;
 
   private ProfilingDataProducer<TransactionProfilingEventContext, Object> startProducer;
+  private DistributedTraceContextManager sourceDistributedTraceContext;
 
   /**
    * Creates a new instance
@@ -219,6 +221,11 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
         return new DefaultExtensionNotification(event, component, action, data);
       }
     });
+  }
+
+  @Override
+  public DistributedTraceContextManager getDistributedSourceTraceContext() {
+    return sourceDistributedTraceContext;
   }
 
   /**

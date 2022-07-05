@@ -14,7 +14,6 @@ import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.core.internal.event.trace.extractor.TraceContextFieldExtractor;
-import org.mule.sdk.api.runtime.source.SdkDistributedTraceContextMapGetter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +36,7 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
 
   private EventDistributedTraceContext(TraceContextFieldExtractor tracingFieldExtractor,
                                        TraceContextFieldExtractor baggageItemsExtractor,
-                                       SdkDistributedTraceContextMapGetter getter) {
+                                       DistributedTraceContextGetter getter) {
     tracingFields.putAll(tracingFieldExtractor.extract(getter));
     baggageItems.putAll(baggageItemsExtractor.extract(getter));
   }
@@ -69,11 +68,11 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
    */
   public static final class EventDistributedContextBuilder {
 
-    private SdkDistributedTraceContextMapGetter sdkDistributedTraceContextMapGetter;
+    private DistributedTraceContextGetter sdkDistributedTraceContextMapGetter;
 
     private EventDistributedContextBuilder() {}
 
-    public EventDistributedContextBuilder withGetter(SdkDistributedTraceContextMapGetter sdkDistributedTraceContextMapGetter) {
+    public EventDistributedContextBuilder withGetter(DistributedTraceContextGetter sdkDistributedTraceContextMapGetter) {
       this.sdkDistributedTraceContextMapGetter = sdkDistributedTraceContextMapGetter;
       return this;
     }

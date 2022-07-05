@@ -24,7 +24,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
-import org.mule.sdk.api.runtime.source.SdkDistributedTraceContextMapGetter;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -43,14 +42,14 @@ public class EventDistributedTraceContextTestCase {
 
   @Test
   public void eventDistributedTraceContextBuilder() {
-    SdkDistributedTraceContextMapGetter sdkDistributedTraceContextMapGetter = mock(SdkDistributedTraceContextMapGetter.class);
-    when(sdkDistributedTraceContextMapGetter.get(any(String.class))).thenReturn(empty());
-    when(sdkDistributedTraceContextMapGetter.get(TRACEPARENT)).thenReturn(of(TRACEPARENT_VALUE));
-    when(sdkDistributedTraceContextMapGetter.get(TRACESTATE)).thenReturn(of(TRACESTATE_VALUE));
-    when(sdkDistributedTraceContextMapGetter.get(ANOTHER_KEY)).thenReturn(of(ANOTHER_FIELD_VALUE));
+    DistributedTraceContextGetter distributedTraceContextGetter = mock(DistributedTraceContextGetter.class);
+    when(distributedTraceContextGetter.get(any(String.class))).thenReturn(empty());
+    when(distributedTraceContextGetter.get(TRACEPARENT)).thenReturn(of(TRACEPARENT_VALUE));
+    when(distributedTraceContextGetter.get(TRACESTATE)).thenReturn(of(TRACESTATE_VALUE));
+    when(distributedTraceContextGetter.get(ANOTHER_KEY)).thenReturn(of(ANOTHER_FIELD_VALUE));
 
     DistributedTraceContext eventDistributedTraceContext =
-        EventDistributedTraceContext.builder().withGetter(sdkDistributedTraceContextMapGetter).build();
+        EventDistributedTraceContext.builder().withGetter(distributedTraceContextGetter).build();
 
     if (eventDistributedTraceContext.getTraceFieldValue(TRACEPARENT).isPresent()) {
       fail("No traceparent propagated!");

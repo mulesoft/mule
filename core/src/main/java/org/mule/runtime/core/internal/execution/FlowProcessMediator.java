@@ -24,6 +24,7 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhand
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
+import static org.mule.runtime.core.internal.event.trace.visitor.VisitableEventContext.visitableEventContextFrom;
 import static org.mule.runtime.core.internal.message.ErrorBuilder.builder;
 import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
@@ -40,6 +41,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.SourceRemoteConnectionException;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
@@ -65,6 +67,8 @@ import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.AbstractPipeline;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
+import org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter;
+import org.mule.runtime.core.internal.event.trace.visitor.SetIfPossibleDistributedTraceContextEventContextVisitor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
@@ -98,7 +102,6 @@ import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-import org.mule.sdk.api.runtime.source.SdkDistributedTraceContextMapGetter;
 import org.slf4j.Logger;
 
 /**
@@ -536,7 +539,7 @@ public class FlowProcessMediator implements Initialisable {
     SourceResultAdapter adapter = template.getSourceMessage();
     Builder eventBuilder =
         createEventBuilder(source.getLocation(), responseCompletion, flowConstruct, resolveSourceCorrelationId(adapter),
-                           adapter.getSdkDistributedTraceContextMapGetter());
+                           adapter.getDistributedTraceContextGetter());
 
     return eventBuilder.message(eventCtx -> {
       final Result<?, ?> result = adapter.getResult();
@@ -564,9 +567,16 @@ public class FlowProcessMediator implements Initialisable {
 
   private Builder createEventBuilder(ComponentLocation sourceLocation, CompletableFuture<Void> responseCompletion,
                                      FlowConstruct flowConstruct, String correlationId,
-                                     SdkDistributedTraceContextMapGetter sdkDistributedTraceContextMapGetter) {
-    return InternalEvent.builder(create(flowConstruct, sourceLocation, correlationId, Optional.of(responseCompletion),
-                                        sdkDistributedTraceContextMapGetter));
+                                     DistributedTraceContextGetter distributedTraceContextGetter) {
+    return InternalEvent.builder(getEventContext(sourceLocation, responseCompletion, flowConstruct, correlationId,
+                                                 distributedTraceContextGetter));
+  }
+
+  private EventContext getEventContext(ComponentLocation sourceLocation, CompletableFuture<Void> responseCompletion,
+                                       FlowConstruct flowConstruct, String correlationId,
+                                       DistributedTraceContextGetter distributedTraceContextGetter) {
+    return visitableEventContextFrom(create(flowConstruct, sourceLocation, correlationId, Optional.of(responseCompletion)))
+        .accept(new SetIfPossibleDistributedTraceContextEventContextVisitor(distributedTraceContextGetter));
   }
 
   /**

@@ -19,7 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.internal.event.trace.extractor.TraceContextFieldExtractor;
-import org.mule.sdk.api.runtime.source.SdkDistributedTraceContextMapGetter;
+import org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter;
 
 import java.util.Map;
 
@@ -32,7 +32,7 @@ public abstract class AbstractW3CTraceContextExtractorTestCase {
 
   @Test
   public void noOtherFieldsApartFromTraceParent() {
-    SdkDistributedTraceContextMapGetter sdkDistributedTraceContextMapGetter = mock(SdkDistributedTraceContextMapGetter.class);
+    DistributedTraceContextGetter sdkDistributedTraceContextMapGetter = mock(DistributedTraceContextGetter.class);
     when(sdkDistributedTraceContextMapGetter.get(any(String.class))).thenReturn(empty());
     when(sdkDistributedTraceContextMapGetter.get(getTraceField())).thenReturn(of(TEST_VALUE));
     when(sdkDistributedTraceContextMapGetter.get(ANOTHER_KEY)).thenReturn(of(ANOTHER_KEY));

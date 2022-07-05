@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.event.trace.extractor;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 
-import org.mule.sdk.api.runtime.source.SdkDistributedTraceContextMapGetter;
+import org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +26,7 @@ public class CorrelationIdTraceContextFieldExtractor implements TraceContextFiel
   public static final String MULE_CORRELATION_ID = MULE_CORRELATION_ID_PROPERTY.toLowerCase();
 
   @Override
-  public Map<String, String> extract(SdkDistributedTraceContextMapGetter sdkDistributedTraceContextMapGetter) {
+  public Map<String, String> extract(DistributedTraceContextGetter sdkDistributedTraceContextMapGetter) {
     Map<String, String> resultContext = new HashMap<>();
     Optional<String> xCorrelationId = sdkDistributedTraceContextMapGetter.get(X_CORRELATION_ID);
     Optional<String> muleCorrelationId = sdkDistributedTraceContextMapGetter.get(MULE_CORRELATION_ID);

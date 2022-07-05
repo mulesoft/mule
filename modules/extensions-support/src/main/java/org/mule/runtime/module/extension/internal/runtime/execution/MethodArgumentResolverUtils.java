@@ -10,11 +10,11 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
-import org.mule.runtime.extension.api.runtime.parameter.DistributedTraceContextPropagator;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
@@ -68,9 +68,8 @@ public class MethodArgumentResolverUtils {
         || org.mule.sdk.api.runtime.parameter.CorrelationInfo.class.equals(parameterType);
   }
 
-  public static boolean isDistributedTraceContextPropagatorType(Class<?> parameterType) {
-    return DistributedTraceContextPropagator.class.equals(parameterType);
+  public static boolean isDistributedTraceContextManagerType(Class<?> parameterType) {
+    return DistributedTraceContextManager.class.equals(parameterType);
   }
-
 
 }

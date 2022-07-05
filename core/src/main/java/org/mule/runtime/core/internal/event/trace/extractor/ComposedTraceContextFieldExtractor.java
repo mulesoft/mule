@@ -7,14 +7,13 @@
 
 package org.mule.runtime.core.internal.event.trace.extractor;
 
-import org.mule.sdk.api.runtime.source.SdkDistributedTraceContextMapGetter;
+import org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A composed {@link TraceContextFieldExtractor}. It extracts all the fields according to the passed extractors.
+ * A composed {@link TraceContextFieldExtractor}. It extracts all the fields extracted by the extractors passed as parameters.
  *
  * @since 4.5.0
  */
@@ -27,10 +26,13 @@ public class ComposedTraceContextFieldExtractor implements TraceContextFieldExtr
   }
 
   @Override
-  public Map<String, String> extract(SdkDistributedTraceContextMapGetter sdkDistributedTraceContextMapGetter) {
+  public Map<String, String> extract(DistributedTraceContextGetter sdkDistributedTraceContextMapGetter) {
     Map<String, String> result = new HashMap<>();
-    Arrays.stream(traceContextFieldExtractors).forEach(traceContextFieldExtractor -> result
-        .putAll(traceContextFieldExtractor.extract(sdkDistributedTraceContextMapGetter)));
+
+    for (TraceContextFieldExtractor traceContextFieldExtractor : traceContextFieldExtractors) {
+      result.putAll(traceContextFieldExtractor.extract(sdkDistributedTraceContextMapGetter));
+    }
+
     return result;
   }
 }

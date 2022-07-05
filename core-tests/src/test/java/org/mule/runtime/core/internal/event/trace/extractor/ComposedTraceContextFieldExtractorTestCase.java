@@ -21,7 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.sdk.api.runtime.source.SdkDistributedTraceContextMapGetter;
+import org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -46,7 +46,7 @@ public class ComposedTraceContextFieldExtractorTestCase {
 
   @Test
   public void composedTraceContextFieldsExtractorComposesAndOnlyRetrievesTheComposedExtractorFields() {
-    SdkDistributedTraceContextMapGetter sdkDistributedTraceContextMapGetter = mock(SdkDistributedTraceContextMapGetter.class);
+    DistributedTraceContextGetter sdkDistributedTraceContextMapGetter = mock(DistributedTraceContextGetter.class);
     when(sdkDistributedTraceContextMapGetter.get(any(String.class))).thenReturn(empty());
 
     when(sdkDistributedTraceContextMapGetter.get(TEST_TRACE_FIELD_KEY_1)).thenReturn(of(TEST_TRACE_FIELD_VALUE_1));
@@ -77,7 +77,7 @@ public class ComposedTraceContextFieldExtractorTestCase {
     }
 
     @Override
-    public Map<String, String> extract(SdkDistributedTraceContextMapGetter sdkDistributedTraceContextMapGetter) {
+    public Map<String, String> extract(DistributedTraceContextGetter sdkDistributedTraceContextMapGetter) {
       Map<String, String> resultMap = new HashMap<>();
       if (sdkDistributedTraceContextMapGetter.get(key).isPresent()) {
         resultMap.put(key, sdkDistributedTraceContextMapGetter.get(key).get());

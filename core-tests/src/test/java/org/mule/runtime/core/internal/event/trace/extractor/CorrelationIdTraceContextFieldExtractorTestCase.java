@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.sdk.api.runtime.source.SdkDistributedTraceContextMapGetter;
+import org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -40,7 +40,7 @@ public class CorrelationIdTraceContextFieldExtractorTestCase {
 
   @Test
   public void noFieldsExtractedWhenFieldsNoPresentInGetter() {
-    SdkDistributedTraceContextMapGetter sdkDistributedTraceContextMapGetter = mock(SdkDistributedTraceContextMapGetter.class);
+    DistributedTraceContextGetter sdkDistributedTraceContextMapGetter = mock(DistributedTraceContextGetter.class);
     when(sdkDistributedTraceContextMapGetter.get(any(String.class))).thenReturn(empty());
     CorrelationIdTraceContextFieldExtractor correlationIdTraceContextFieldExtractor =
         new CorrelationIdTraceContextFieldExtractor();
@@ -59,7 +59,7 @@ public class CorrelationIdTraceContextFieldExtractorTestCase {
 
   @Test
   public void xCorrelationIdSupersedesMuleCorrelationId() {
-    SdkDistributedTraceContextMapGetter sdkDistributedTraceContextMapGetter = mock(SdkDistributedTraceContextMapGetter.class);
+    DistributedTraceContextGetter sdkDistributedTraceContextMapGetter = mock(DistributedTraceContextGetter.class);
     when(sdkDistributedTraceContextMapGetter.get(any(String.class))).thenReturn(empty());
     when(sdkDistributedTraceContextMapGetter.get(X_CORRELATION_ID)).thenReturn(of(TEST_X_CORRELATION_ID));
     when(sdkDistributedTraceContextMapGetter.get(MULE_CORRELATION_ID)).thenReturn(of(TEST_MULE_CORRELATION_ID));
@@ -71,7 +71,7 @@ public class CorrelationIdTraceContextFieldExtractorTestCase {
   }
 
   private void testWithOnlyOneEntry(String key, String value) {
-    SdkDistributedTraceContextMapGetter sdkDistributedTraceContextMapGetter = mock(SdkDistributedTraceContextMapGetter.class);
+    DistributedTraceContextGetter sdkDistributedTraceContextMapGetter = mock(DistributedTraceContextGetter.class);
     when(sdkDistributedTraceContextMapGetter.get(any(String.class))).thenReturn(empty());
     when(sdkDistributedTraceContextMapGetter.get(key)).thenReturn(of(value));
     CorrelationIdTraceContextFieldExtractor correlationIdTraceContextFieldExtractor =

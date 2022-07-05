@@ -176,6 +176,7 @@ class MuleExtensionModelDeclarer {
 
     declareExportedTypes(extensionDeclarer);
 
+
     // constructs
     declareObject(extensionDeclarer);
     declareFlow(extensionDeclarer);

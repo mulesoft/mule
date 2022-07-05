@@ -22,7 +22,11 @@ public class VisitableEventContext implements EventContext {
 
   private final EventContext delegate;
 
-  public VisitableEventContext(EventContext delegate) {
+  public static VisitableEventContext visitableEventContextFrom(EventContext eventContext) {
+    return new VisitableEventContext(eventContext);
+  }
+
+  private VisitableEventContext(EventContext delegate) {
     this.delegate = delegate;
   }
 
@@ -52,11 +56,22 @@ public class VisitableEventContext implements EventContext {
   }
 
   /**
-   * @param eventContextVisitor the visitor to use
-   * @return the {@link DistributedTraceContext} resulting of visiting the {@link DistributedTraceContextEventContextVisitor}
+   * @param eventContextVisitor the visitor to use.
+   * @return the {@link DistributedTraceContext} resulting of visiting the {@link EventContextVisitor}
    */
-  public DistributedTraceContext acceptDistributedTraceContextVisitor(
-                                                                      DistributedTraceContextEventContextVisitor eventContextVisitor) {
-    return eventContextVisitor.visit(this);
+  public DistributedTraceContext accept(EventContextVisitorForDistributedEventContext eventContextVisitor) {
+    return eventContextVisitor.visit(this.getDelegate());
+  }
+
+  /**
+   * @param eventContextVisitor the visitor to use.
+   * @return the {@link EventContext} resulting of visiting the {@link EventContextVisitor}
+   */
+  public EventContext accept(EventContextVisitorForEventContext eventContextVisitor) {
+    return eventContextVisitor.visit(this.getDelegate());
+  }
+
+  public EventContext getDelegate() {
+    return delegate;
   }
 }

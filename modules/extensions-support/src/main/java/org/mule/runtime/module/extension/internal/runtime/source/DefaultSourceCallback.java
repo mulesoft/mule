@@ -33,6 +33,7 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.core.api.util.func.Once.RunOnce;
+import org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
@@ -253,10 +254,25 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
 
     SourceResultAdapter resultAdapter =
         new SourceResultAdapter(result, cursorProviderFactory, mediaType, returnsListOfMessages,
-                                context.getCorrelationId(), payloadMediaTypeResolver);
+                                context.getCorrelationId(), payloadMediaTypeResolver, getDistributedTraceContextGetter(context));
 
     executeFlow(context, messageProcessContext, resultAdapter);
     contextAdapter.dispatched();
+  }
+
+  private DistributedTraceContextGetter getDistributedTraceContextGetter(SourceCallbackContext context) {
+    return new DistributedTraceContextGetter() {
+
+      @Override
+      public Iterable<String> keys() {
+        return context.getDistributedSourceTraceContext().getRemoteTraceContextMap().keySet();
+      }
+
+      @Override
+      public Optional<String> get(String key) {
+        return Optional.ofNullable(context.getDistributedSourceTraceContext().getRemoteTraceContextMap().get(key));
+      }
+    };
   }
 
   private void validateNotifications(SourceCallbackContextAdapter contextAdapter) {

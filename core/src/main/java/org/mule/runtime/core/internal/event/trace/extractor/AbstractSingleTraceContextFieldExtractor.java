@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.internal.event.trace.extractor;
 
-import org.mule.sdk.api.runtime.source.SdkDistributedTraceContextMapGetter;
+import org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +20,7 @@ import java.util.Map;
 public abstract class AbstractSingleTraceContextFieldExtractor implements TraceContextFieldExtractor {
 
   @Override
-  public Map<String, String> extract(SdkDistributedTraceContextMapGetter sdkDistributedTraceContextMapGetter) {
+  public Map<String, String> extract(DistributedTraceContextGetter sdkDistributedTraceContextMapGetter) {
     Map<String, String> resultContext = new HashMap<>();
     sdkDistributedTraceContextMapGetter.get(getFieldKey()).ifPresent(value -> resultContext.put(getFieldKey(), value));
 

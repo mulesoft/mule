@@ -14,12 +14,21 @@ import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 
 /**
- * A {@link DistributedTraceContextEventContextVisitor} that retrieves the {@link DistributedTraceContext} if possible depending
- * on the type of the subtype of {@link EventContext} passed as parameter or else returns a default empty distributed trace context.
+ * A {@link EventContextVisitor} that retrieves the {@link DistributedTraceContext} if possible depending on the type of the
+ * subtype of {@link EventContext} passed as parameter or else returns a default empty distributed trace context.
  *
  * @since 4.5.0
  */
-public class GetOrDefaultDistributedTraceContextEventContextVisitor implements DistributedTraceContextEventContextVisitor {
+public class GetOrDefaultDistributedTraceContextEventContextVisitor implements EventContextVisitorForDistributedEventContext {
+
+  private static final EventContextVisitorForDistributedEventContext INSTANCE =
+      new GetOrDefaultDistributedTraceContextEventContextVisitor();
+
+  private GetOrDefaultDistributedTraceContextEventContextVisitor() {}
+
+  public static EventContextVisitorForDistributedEventContext getOrDefaultDistributedTraceContextEventContextVisitorInstance() {
+    return INSTANCE;
+  }
 
   @Override
   public DistributedTraceContext visit(DefaultEventContext eventContext) {
