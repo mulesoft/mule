@@ -39,6 +39,7 @@ import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
@@ -55,6 +56,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -66,8 +68,11 @@ import io.qameta.allure.Issue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.mockito.ArgumentCaptor;
 
+@RunWith(Parameterized.class)
 public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
 
   private static final int GC_POLLING_TIMEOUT = 10000;
@@ -81,6 +86,19 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
   private Component testOperationOne;
   private Component testOperationTwo;
   private Component differentTestOperation;
+
+  private final boolean featureFlagsEnabled;
+
+  public DefaultPolicyManagerTestCase(boolean featureFlagsEnabled) {
+    this.featureFlagsEnabled = featureFlagsEnabled;
+  }
+
+  @Parameterized.Parameters(name = "Apply Feature flags: {0}")
+  public static Collection<Boolean> data() {
+    return asList(
+                  true,
+                  false);
+  }
 
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
@@ -384,10 +402,11 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
       public OperationPolicy createOperationPolicy(Component operation, List<Policy> innerKey,
                                                    Optional<OperationPolicyParametersTransformer> paramsTransformer,
                                                    OperationPolicyProcessorFactory operationPolicyProcessorFactory,
-                                                   long shutdownTimeout, Scheduler scheduler) {
+                                                   long shutdownTimeout, Scheduler scheduler,
+                                                   FeatureFlaggingService featureFlaggingService) {
         final OperationPolicy operationPolicy =
             super.createOperationPolicy(operation, innerKey, paramsTransformer, operationPolicyProcessorFactory, shutdownTimeout,
-                                        scheduler);
+                                        scheduler, feature -> featureFlagsEnabled);
 
         final Disposable deferredDispose = ((DeferredDisposable) operationPolicy).deferredDispose();
 

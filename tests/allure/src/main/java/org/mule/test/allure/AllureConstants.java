@@ -758,4 +758,14 @@ public interface AllureConstants {
 
     String CUSTOM_OBJECT_SERIALIZER = "Custom object serializer";
   }
+
+  interface PoliciesEngineFeature {
+
+    String POLICIES_ENGINE = "Policies Engine";
+
+    interface OperationPolicyStory {
+
+      String OPERATION_POLICIES = "Operation policies";
+    }
+  }
 }

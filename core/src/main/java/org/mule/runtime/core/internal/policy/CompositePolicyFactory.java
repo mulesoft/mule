@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.policy;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
@@ -32,10 +33,11 @@ class CompositePolicyFactory {
   public OperationPolicy createOperationPolicy(Component operation, List<Policy> innerKey,
                                                Optional<OperationPolicyParametersTransformer> paramsTransformer,
                                                OperationPolicyProcessorFactory operationPolicyProcessorFactory,
-                                               long shutdownTimeout, Scheduler scheduler) {
+                                               long shutdownTimeout, Scheduler scheduler,
+                                               FeatureFlaggingService featureFlaggingService) {
     return new CompositeOperationPolicy(operation, innerKey, paramsTransformer,
                                         operationPolicyProcessorFactory,
-                                        shutdownTimeout, scheduler);
+                                        shutdownTimeout, scheduler, featureFlaggingService);
   }
 
 }
