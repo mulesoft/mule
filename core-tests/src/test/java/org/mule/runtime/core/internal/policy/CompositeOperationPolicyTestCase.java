@@ -6,10 +6,14 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+
 import static java.lang.Runtime.getRuntime;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
+
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
@@ -23,8 +27,6 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
 
@@ -42,6 +44,7 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.SourcePolicyTestUtils;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -52,8 +55,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -80,8 +83,25 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
 
   private Scheduler fluxCompleteScheduler;
 
-  public CompositeOperationPolicyTestCase(boolean policyChangeThread, boolean processChangeThread) {
+  private final boolean featureFlagsEnabled;
+
+  public CompositeOperationPolicyTestCase(boolean policyChangeThread, boolean processChangeThread, boolean featureFlagsEnabled) {
     super(policyChangeThread, processChangeThread);
+    this.featureFlagsEnabled = featureFlagsEnabled;
+  }
+
+  @Parameterized.Parameters(name = "Policy NB: {0}; Processor NB: {1}; Apply Feature flags: {2}")
+  public static Collection<Object[]> data() {
+    return asList(new Object[][] {
+        {false, false, true},
+        {false, false, false},
+        {true, false, true},
+        {true, false, false},
+        {false, true, true},
+        {false, true, false},
+        {true, true, true},
+        {true, true, false}
+    });
   }
 
   @Before
@@ -143,7 +163,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory,
                                                             muleContext.getConfiguration().getShutdownTimeout(),
-                                                            fluxCompleteScheduler);
+                                                            fluxCompleteScheduler, feature -> featureFlagsEnabled);
 
     CoreEvent result = block(callback -> compositeOperationPolicy
         .process(initialEvent, operationExecutionFunction, operationParametersProcessor, operationLocation, callback));
@@ -161,7 +181,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory,
                                                             muleContext.getConfiguration().getShutdownTimeout(),
-                                                            fluxCompleteScheduler);
+                                                            fluxCompleteScheduler, feature -> featureFlagsEnabled);
 
     CoreEvent result =
         block(callback -> compositeOperationPolicy.process(initialEvent, operationExecutionFunction, operationParametersProcessor,
@@ -181,7 +201,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory,
                                                             muleContext.getConfiguration().getShutdownTimeout(),
-                                                            fluxCompleteScheduler);
+                                                            fluxCompleteScheduler, feature -> featureFlagsEnabled);
   }
 
   @Test
@@ -203,7 +223,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory,
                                                             muleContext.getConfiguration().getShutdownTimeout(),
-                                                            fluxCompleteScheduler);
+                                                            fluxCompleteScheduler, feature -> featureFlagsEnabled);
     expectedException.expect(MuleException.class);
     expectedException.expectCause(is(policyException));
     try {
@@ -238,7 +258,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory,
                                                             muleContext.getConfiguration().getShutdownTimeout(),
-                                                            fluxCompleteScheduler);
+                                                            fluxCompleteScheduler, feature -> featureFlagsEnabled);
     expectedException.expect(MuleException.class);
     expectedException.expectCause(is(policyException));
     try {
@@ -257,7 +277,8 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
         new InvocationsRecordingCompositeOperationPolicy(operation, asList(firstPolicy),
                                                          operationPolicyParametersTransformer,
                                                          operationPolicyProcessorFactory,
-                                                         fluxCompleteScheduler);
+                                                         fluxCompleteScheduler,
+                                                         featureFlagsEnabled);
 
     assertThat(operationPolicy.getNextOperationCount(), is(0));
     assertThat(operationPolicy.getPolicyCount(), is(0));
@@ -279,10 +300,11 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     public InvocationsRecordingCompositeOperationPolicy(Component operation, List<Policy> parameterizedPolicies,
                                                         Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer,
                                                         OperationPolicyProcessorFactory operationPolicyProcessorFactory,
-                                                        Scheduler completionCallbackScheduler) {
+                                                        Scheduler completionCallbackScheduler,
+                                                        boolean applyFeatureFlags) {
       super(operation, parameterizedPolicies, operationPolicyParametersTransformer, operationPolicyProcessorFactory,
             muleContext.getConfiguration().getShutdownTimeout(),
-            completionCallbackScheduler);
+            completionCallbackScheduler, feature -> applyFeatureFlags);
     }
 
     public static void reset() {
