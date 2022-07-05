@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.exception;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
