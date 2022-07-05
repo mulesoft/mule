@@ -14,12 +14,12 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.extension.api.runtime.parameter.DistributedTraceContextPropagator;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
 import org.junit.Test;
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 @Feature(EVENT_CONTEXT)
 @Story(DISTRIBUTED_TRACE_CONTEXT)
@@ -32,10 +32,10 @@ public class DistributedTraceContextPropagationTestCase extends AbstractExtensio
 
   @Test
   public void defaultTraceContextPropagator() throws Exception {
-    final CoreEvent event = flowRunner("distributedTraceContextPropagator").run();
-    DistributedTraceContextPropagator distributedTraceContextPropagator =
-        (DistributedTraceContextPropagator) event.getMessage().getPayload().getValue();
-    assertThat(distributedTraceContextPropagator.getClass().getName(),
-               equalTo("org.mule.runtime.module.extension.internal.runtime.parameter.PropagateAllDistributedTraceContextPropagator"));
+    final CoreEvent event = flowRunner("distributedTraceContextManager").run();
+    DistributedTraceContextManager distributedTraceContextManager =
+        (DistributedTraceContextManager) event.getMessage().getPayload().getValue();
+    assertThat(distributedTraceContextManager.getClass().getName(),
+               equalTo("org.mule.runtime.module.extension.internal.runtime.parameter.PropagateAllDistributedTraceContextManager"));
   }
 }

@@ -44,11 +44,11 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.stereotype.AllowedStereotypes;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
-import org.mule.runtime.extension.api.runtime.parameter.DistributedTraceContextPropagator;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 import org.mule.runtime.extension.api.stereotype.ValidatorStereotype;
 import org.mule.sdk.api.annotation.param.RuntimeVersion;
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -251,8 +251,8 @@ public class PetStoreOperations {
   }
 
   @OutputResolver(output = DistributedContextPropagatorOutputResolver.class)
-  public DistributedTraceContextPropagator getPetTraceContextPropagator(DistributedTraceContextPropagator distributedTraceContextPropagator) {
-    return distributedTraceContextPropagator;
+  public DistributedTraceContextManager getPetTraceContextPropagator(DistributedTraceContextManager distributedTraceContextManager) {
+    return distributedTraceContextManager;
   }
 
   @OutputResolver(output = CorrelationInfoOutputResolver.class)
@@ -347,12 +347,12 @@ public class PetStoreOperations {
   }
 
   public static class DistributedContextPropagatorOutputResolver
-      implements OutputTypeResolver<DistributedTraceContextPropagator> {
+      implements OutputTypeResolver<DistributedTraceContextManager> {
 
     @Override
-    public MetadataType getOutputType(MetadataContext context, DistributedTraceContextPropagator key)
+    public MetadataType getOutputType(MetadataContext context, DistributedTraceContextManager key)
         throws MetadataResolvingException, ConnectionException {
-      return context.getTypeLoader().load(DistributedTraceContextPropagator.class);
+      return context.getTypeLoader().load(DistributedTraceContextManager.class);
     }
 
     @Override
