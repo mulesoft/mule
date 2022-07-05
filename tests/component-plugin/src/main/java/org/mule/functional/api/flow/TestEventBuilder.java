@@ -11,7 +11,7 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.fromGroupCorrelation;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -296,7 +296,7 @@ public class TestEventBuilder {
 
   private EventContext getEventContext(FlowConstruct flow) {
     EventContext eventContext;
-    DefaultComponentLocation location = ((DefaultComponentLocation) from(flow.getName())).appendProcessorsPart()
+    DefaultComponentLocation location = fromSingleComponent(flow.getName()).appendProcessorsPart()
         .appendLocationPart("0", of(builder()
             .type(OPERATION)
             .identifier(buildFromStringRepresentation("test"))
