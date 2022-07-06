@@ -18,7 +18,6 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.OUTP
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_USE_LEGACY_LIFECYCLE_OBJECT_SORTER;
 import static org.mule.runtime.api.util.MuleSystemProperties.SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.CLIENT_SECURITY;
@@ -82,7 +81,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 
-import static java.lang.Boolean.getBoolean;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
@@ -309,7 +307,7 @@ class MuleExtensionModelDeclarer {
    *   </scheduler>
    * }
    * </pre>
-   *
+   * <p>
    * If it were implemented as an {@link UnionType} (see MULE-19167) it would look like this, and it would break backwards:
    *
    * <pre>
@@ -320,7 +318,7 @@ class MuleExtensionModelDeclarer {
    *   </scheduler>
    * }
    * </pre>
-   *
+   * <p>
    * NOTE: This type is imported by the SDK in order to support polling sources at {@code PollingSourceDeclarationEnricher}.
    */
   private MetadataType buildSchedulingStrategyType(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
