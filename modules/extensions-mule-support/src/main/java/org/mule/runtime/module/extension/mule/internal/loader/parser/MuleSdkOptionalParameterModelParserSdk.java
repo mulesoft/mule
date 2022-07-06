@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 
 /**
@@ -19,8 +20,9 @@ public class MuleSdkOptionalParameterModelParserSdk extends MuleSdkParameterMode
 
   private Object defaultValue = null;
 
-  public MuleSdkOptionalParameterModelParserSdk(ComponentAst parameter, TypeLoader typeLoader) {
-    super(parameter, typeLoader);
+  public MuleSdkOptionalParameterModelParserSdk(ComponentAst parameter, TypeLoader typeLoader,
+                                                ExtensionModelHelper extensionModelHelper) {
+    super(parameter, typeLoader, extensionModelHelper);
 
     parseStructure();
   }

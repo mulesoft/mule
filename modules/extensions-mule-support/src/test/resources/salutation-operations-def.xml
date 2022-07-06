@@ -3,9 +3,11 @@
       xmlns:operation="http://www.mulesoft.org/schema/mule/operation"
       xmlns:this="http://www.mulesoft.org/schema/mule/this"
       xmlns:test-components="http://www.mulesoft.org/schema/mule/test-components"
+      xmlns:marvel="http://www.mulesoft.org/schema/mule/marvel"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/test-components http://www.mulesoft.org/schema/mule/test-components/current/mule-test-components.xsd
+        http://www.mulesoft.org/schema/mule/marvel http://www.mulesoft.org/schema/mule/marvel/current/mule-marvel.xsd
         http://www.mulesoft.org/schema/mule/operation http://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd
         http://www.mulesoft.org/schema/mule/this http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd">
 
@@ -263,6 +265,18 @@
         <operation:body>
             <test-components:fire-notification integer="52" />
             <set-payload value="Notification fired" />
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="saluteAggressively">
+        <operation:parameters>
+            <operation:parameter name="missileLauncherConfig" type="marvel:iron-man-config"/>
+        </operation:parameters>
+        <operation:output>
+            <operation:payload-type type="string"/>
+        </operation:output>
+        <operation:body>
+            <marvel:fire-missile at="#[%dw 2.0 import java!org::mule::test::marvel::model::Villain --- Villain::new()]" config-ref="#[params.missileLauncherConfig]"/>
         </operation:body>
     </operation:def>
 </mule>
