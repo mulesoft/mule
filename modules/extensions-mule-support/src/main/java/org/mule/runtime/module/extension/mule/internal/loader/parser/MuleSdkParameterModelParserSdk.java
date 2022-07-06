@@ -105,9 +105,8 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
    * <p>
    * The parameter's declared type will be of the form "extension_namespace:config_type_name".
    * <p>
-   * If a {@link ConfigurationModel} can be found, we will treat the parameter as a reference to a configuration.
-   * This means the type will be the string primitive and only the {@link ConfigurationModel}'s stereotype will be allowed for the
-   * reference.
+   * If a {@link ConfigurationModel} can be found, we will treat the parameter as a reference to a configuration. This means the
+   * type will be the string primitive and only the {@link ConfigurationModel}'s stereotype will be allowed for the reference.
    *
    * @param type The parameter's declared type.
    * @return {@code true} on success, {@code false} otherwise.

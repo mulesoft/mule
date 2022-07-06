@@ -6,29 +6,18 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.mockDeprecatedAst;
-import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.mockTypeLoader;
-import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.setMockAstChild;
-import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.stringParameterAst;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.PARAMETERS;
 
-import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
-import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -48,20 +37,14 @@ public class MuleSdkParameterModelParserSdkTestCase extends AbstractMuleTestCase
   @Rule
   public ExpectedException expected = none();
 
-  private MuleSdkParameterModelParserSdk parameterModelParser;
-  private ComponentAst componentAst;
+  private MuleSdkParameterModelParserSdkBuilder baseParameterParserBuilder;
   private MetadataType someValidMetadataType;
 
   @Before
   public void setUp() {
-    componentAst = mock(ComponentAst.class);
-    ComponentParameterAst parameterNameAst = stringParameterAst("someparam");
-    when(componentAst.getParameter(DEFAULT_GROUP_NAME, "name")).thenReturn(parameterNameAst);
-
     someValidMetadataType = mock(MetadataType.class);
-    TypeLoader typeLoader = mockTypeLoader(singletonMap("somevalid", someValidMetadataType));
-
-    parameterModelParser = new MuleSdkParameterModelParserSdk(componentAst, typeLoader, new ExtensionModelHelper(emptySet()));
+    baseParameterParserBuilder = new MuleSdkParameterModelParserSdkBuilder("someparam", "somevalid")
+        .withTypeLoaderTypes(singletonMap("somevalid", someValidMetadataType));
   }
 
   // ------------------------------- //
@@ -70,29 +53,21 @@ public class MuleSdkParameterModelParserSdkTestCase extends AbstractMuleTestCase
 
   @Test
   public void invalidParameterTypeRaisesException() {
-    ComponentParameterAst typeParameterAst = stringParameterAst("invalid");
-    when(componentAst.getParameter(DEFAULT_GROUP_NAME, "type")).thenReturn(typeParameterAst);
-
     expected.expect(IllegalModelDefinitionException.class);
     expected.expectMessage("Parameter 'someparam' references unknown type 'invalid'");
-    parameterModelParser.getType();
+    baseParameterParserBuilder.withType("invalid").build();
   }
 
   @Test
   public void parameterTypeCanNotBeVoid() {
-    ComponentParameterAst typeParameterAst = stringParameterAst("void");
-    when(componentAst.getParameter(DEFAULT_GROUP_NAME, "type")).thenReturn(typeParameterAst);
-
     expected.expect(IllegalModelDefinitionException.class);
     expected.expectMessage("Parameter 'someparam' references type 'void', which is forbidden for parameters");
-    parameterModelParser.getType();
+    baseParameterParserBuilder.withType("void").build();
   }
 
   @Test
   public void parameterTypeCanBeSomeValidParameterInTheApplicationTypeLoader() {
-    ComponentParameterAst typeParameterAst = stringParameterAst("somevalid");
-    when(componentAst.getParameter(DEFAULT_GROUP_NAME, "type")).thenReturn(typeParameterAst);
-
+    MuleSdkParameterModelParserSdk parameterModelParser = baseParameterParserBuilder.withType("somevalid").build();
     assertThat(parameterModelParser.getType(), is(someValidMetadataType));
   }
 
@@ -102,13 +77,15 @@ public class MuleSdkParameterModelParserSdkTestCase extends AbstractMuleTestCase
 
   @Test
   public void when_parameterAstHasNotDeprecationParameter_then_parserHasNotDeprecationModel() {
+    MuleSdkParameterModelParserSdk parameterModelParser = baseParameterParserBuilder.build();
     assertThat(parameterModelParser.getDeprecationModel().isPresent(), is(false));
   }
 
   @Test
   public void when_parameterAstHasDeprecationParameter_then_parserHasDeprecationModelWithCorrespondingValues() {
-    ComponentAst deprecatedAst = mockDeprecatedAst("1.1.0", "Some Message", "2.0.0");
-    setMockAstChild(componentAst, "deprecated", deprecatedAst);
+    MuleSdkParameterModelParserSdk parameterModelParser = baseParameterParserBuilder
+        .withDeprecationModel("1.1.0", "Some Message", "2.0.0")
+        .build();
 
     assertThat(parameterModelParser.getDeprecationModel().isPresent(), is(true));
 
@@ -120,8 +97,9 @@ public class MuleSdkParameterModelParserSdkTestCase extends AbstractMuleTestCase
 
   @Test
   public void when_toRemoveInParameterIsNotConfigured_then_theDeprecationModelReturnsAnEmptyOptional() {
-    ComponentAst deprecatedAst = mockDeprecatedAst("1.1.0", "Some Message", null);
-    setMockAstChild(componentAst, "deprecated", deprecatedAst);
+    MuleSdkParameterModelParserSdk parameterModelParser = baseParameterParserBuilder
+        .withDeprecationModel("1.1.0", "Some Message", null)
+        .build();
 
     assertThat(parameterModelParser.getDeprecationModel().isPresent(), is(true));
 
