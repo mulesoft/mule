@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.trace.DistributedTraceContext;
+import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ import reactor.core.publisher.MonoSink;
  *
  * @since 4.0
  */
-abstract class AbstractEventContext implements BaseEventContext {
+abstract class AbstractEventContext implements DistributedTraceContextAware, BaseEventContext {
 
   private static final byte STATE_READY = 0;
   private static final byte STATE_RESPONSE = 1;
@@ -288,13 +288,6 @@ abstract class AbstractEventContext implements BaseEventContext {
                    t);
     }
   }
-
-  /**
-   * @return the {@link DistributedTraceContext} associated with the event.
-   *
-   * @since 4.5.0
-   */
-  public abstract DistributedTraceContext getDistributedTraceContext();
 
   @Override
   public BaseEventContext getRootContext() {

@@ -6,7 +6,10 @@
  */
 package org.mule.test.petstore.extension;
 
+import static com.google.common.collect.ImmutableMap.of;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
+
+import com.google.common.collect.ImmutableMap;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -29,6 +32,7 @@ public class PetStoreListSource extends Source<List<Result<String, Object>>, Obj
   @Override
   public void onStart(SourceCallback<List<Result<String, Object>>, Object> sourceCallback) throws MuleException {
     SourceCallbackContext context = sourceCallback.createContext();
+    context.getDistributedSourceTraceContext().setRemoteTraceContextMap(of("X-Correlation-ID", "0000-0000"));
     context.setCorrelationId(breeder.getBirds());
     List<Result<String, Object>> listResult = new LinkedList<>();
     listResult.add(Result.<String, Object>builder().output("cat").build());

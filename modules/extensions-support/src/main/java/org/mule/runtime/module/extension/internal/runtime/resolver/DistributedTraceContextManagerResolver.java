@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static org.mule.runtime.core.internal.event.trace.visitor.GetOrDefaultDistributedTraceContextEventContextVisitor.getOrDefaultDistributedTraceContextEventContextVisitorInstance;
-import static org.mule.runtime.core.internal.event.trace.visitor.VisitableEventContext.visitableEventContextFrom;
+import static org.mule.runtime.core.internal.trace.DistributedTraceContext.emptyDistributedEventContext;
 
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -30,6 +30,10 @@ public class DistributedTraceContextManagerResolver implements ArgumentResolver<
   }
 
   private DistributedTraceContext getDistributedTraceContext(CoreEvent event) {
-    return visitableEventContextFrom(event.getContext()).accept(getOrDefaultDistributedTraceContextEventContextVisitorInstance());
+    if (event instanceof DistributedTraceContextAware) {
+      return ((DistributedTraceContextAware) event).getDistributedTraceContext();
+    }
+
+    return emptyDistributedEventContext();
   }
 }

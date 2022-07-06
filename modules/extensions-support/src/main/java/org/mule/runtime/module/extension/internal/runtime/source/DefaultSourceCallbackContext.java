@@ -29,6 +29,7 @@ import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.internal.execution.NotificationFunction;
 import org.mule.runtime.extension.api.tx.TransactionHandle;
 import org.mule.runtime.module.extension.internal.runtime.notification.DefaultExtensionNotification;
+import org.mule.runtime.module.extension.internal.runtime.source.trace.DefaultDistributedSourceTraceContext;
 import org.mule.runtime.module.extension.internal.runtime.transaction.DefaultTransactionHandle;
 import org.mule.runtime.module.extension.internal.runtime.transaction.NullTransactionHandle;
 import org.mule.sdk.api.connectivity.TransactionalConnection;
@@ -65,7 +66,7 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
   private ProfilingService profilingService;
 
   private ProfilingDataProducer<TransactionProfilingEventContext, Object> startProducer;
-  private DistributedTraceContextManager sourceDistributedTraceContext;
+  private DistributedTraceContextManager sourceDistributedTraceContext = new DefaultDistributedSourceTraceContext();
 
   /**
    * Creates a new instance

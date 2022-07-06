@@ -13,13 +13,12 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.internal.event.trace.visitor.GetOrDefaultDistributedTraceContextEventContextVisitor.getOrDefaultDistributedTraceContextEventContextVisitorInstance;
-import static org.mule.runtime.core.internal.event.trace.visitor.VisitableEventContext.visitableEventContextFrom;
 import static org.mule.runtime.core.internal.trace.DistributedTraceContext.emptyDistributedEventContext;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
@@ -338,7 +337,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     private final ComponentLocation componentLocation;
     private final String id;
     private final String correlationId;
-    private final DistributedTraceContext distributedTraceContext;
+    private DistributedTraceContext distributedTraceContext;
     private final String rootId;
 
     private ChildEventContext(BaseEventContext parent, ComponentLocation componentLocation,
@@ -353,11 +352,13 @@ public final class DefaultEventContext extends AbstractEventContext implements S
           : Integer.toString(identityHashCode(this));
       this.correlationId = correlationId != null ? correlationId : parent.getCorrelationId();
       this.rootId = root.getRootId();
-      this.distributedTraceContext = getParentDistributedTraceContext(parent);
+      if (parent instanceof DistributedTraceContextAware) {
+        this.distributedTraceContext = getParentDistributedTraceContext((DistributedTraceContextAware) parent);
+      }
     }
 
-    private DistributedTraceContext getParentDistributedTraceContext(BaseEventContext parent) {
-      return visitableEventContextFrom(parent).accept(getOrDefaultDistributedTraceContextEventContextVisitorInstance());
+    private DistributedTraceContext getParentDistributedTraceContext(DistributedTraceContextAware parent) {
+      return parent.getDistributedTraceContext();
     }
 
     private ChildEventContext(BaseEventContext parent, ComponentLocation componentLocation,
@@ -383,6 +384,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     @Override
     public DistributedTraceContext getDistributedTraceContext() {
       return distributedTraceContext;
+    }
+
+    @Override
+    public void setDistributedTraceContext(DistributedTraceContext distributedTraceContext) {
+      this.distributedTraceContext = distributedTraceContext;
     }
 
     @Override

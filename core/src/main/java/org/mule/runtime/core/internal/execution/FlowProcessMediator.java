@@ -24,7 +24,6 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhand
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
-import static org.mule.runtime.core.internal.event.trace.visitor.VisitableEventContext.visitableEventContextFrom;
 import static org.mule.runtime.core.internal.message.ErrorBuilder.builder;
 import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
@@ -68,8 +67,9 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.AbstractPipeline;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter;
-import org.mule.runtime.core.internal.event.trace.visitor.SetIfPossibleDistributedTraceContextEventContextVisitor;
+import org.mule.runtime.core.internal.event.trace.EventDistributedTraceContext;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -575,8 +575,16 @@ public class FlowProcessMediator implements Initialisable {
   private EventContext getEventContext(ComponentLocation sourceLocation, CompletableFuture<Void> responseCompletion,
                                        FlowConstruct flowConstruct, String correlationId,
                                        DistributedTraceContextGetter distributedTraceContextGetter) {
-    return visitableEventContextFrom(create(flowConstruct, sourceLocation, correlationId, Optional.of(responseCompletion)))
-        .accept(new SetIfPossibleDistributedTraceContextEventContextVisitor(distributedTraceContextGetter));
+    EventContext eventContext = create(flowConstruct, sourceLocation, correlationId, Optional.of(responseCompletion));
+
+    if (eventContext instanceof DistributedTraceContextAware) {
+      ((DistributedTraceContextAware) eventContext).setDistributedTraceContext(
+                                                                               EventDistributedTraceContext.builder()
+                                                                                   .withGetter(distributedTraceContextGetter)
+                                                                                   .build());
+    }
+
+    return eventContext;
   }
 
   /**
