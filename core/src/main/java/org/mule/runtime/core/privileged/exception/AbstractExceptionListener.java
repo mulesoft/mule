@@ -95,7 +95,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
    * @throws InitialisationException
    */
   @Override
-  public final synchronized void initialise() throws InitialisationException {
+  public synchronized void initialise() throws InitialisationException {
     if (!initialised.get()) {
       doInitialise();
       super.initialise();

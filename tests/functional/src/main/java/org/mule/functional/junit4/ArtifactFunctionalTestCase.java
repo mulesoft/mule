@@ -7,15 +7,17 @@
 
 package org.mule.functional.junit4;
 
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
+import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
+
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
-import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
 
 import org.mule.functional.services.NullPolicyProvider;
 import org.mule.runtime.api.exception.MuleException;
@@ -25,7 +27,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
-import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;

@@ -9,6 +9,7 @@ package org.mule.tck.util;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
@@ -88,6 +89,34 @@ public class FlowTraceUtils {
         } else {
           description.appendText("<").appendText(flowName).appendText("(").appendText(executingMessageProcessor).appendText("*)");
         }
+      }
+    };
+  }
+
+  public static Matcher<FlowStackElement> withChainIdentifier(final ComponentIdentifier chainIdentifier) {
+    return new TypeSafeMatcher<FlowStackElement>() {
+
+      @Override
+      protected boolean matchesSafely(FlowStackElement flowStackElement) {
+        return flowStackElement.getChainIdentifier().equals(chainIdentifier);
+      }
+
+      @Override
+      public void describeTo(Description description) {
+        description
+            .appendText("identifier with namespace ")
+            .appendValue(chainIdentifier.getNamespace())
+            .appendText(" and name ")
+            .appendValue(chainIdentifier.getName());
+      }
+
+      @Override
+      protected void describeMismatchSafely(FlowStackElement flowStackElement, Description mismatchDescription) {
+        mismatchDescription
+            .appendText("identifier with namespace ")
+            .appendValue(flowStackElement.getChainIdentifier().getNamespace())
+            .appendText(" and name ")
+            .appendValue(flowStackElement.getChainIdentifier().getName());
       }
     };
   }

@@ -3,6 +3,80 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.api.context.notification.FlowStackElement::<init>(java.lang.String, org.mule.runtime.api.component.ComponentIdentifier, java.lang.String)",
+          "package": "org.mule.runtime.core.api.context.notification",
+          "classSimpleName": "FlowStackElement",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "W-11117613: Duplicate application of lifecycle phases in Global Error Handlers."
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.api.component.ComponentIdentifier org.mule.runtime.core.api.context.notification.FlowStackElement::getChainIdentifier()",
+          "package": "org.mule.runtime.core.api.context.notification",
+          "classSimpleName": "FlowStackElement",
+          "methodName": "getChainIdentifier",
+          "elementKind": "method",
+          "justification": "W-11117613: Duplicate application of lifecycle phases in Global Error Handlers."
+        },
+        {
+          "code": "java.method.noLongerFinal",
+          "old": "method void org.mule.runtime.core.privileged.exception.AbstractExceptionListener::initialise() throws org.mule.runtime.api.lifecycle.InitialisationException",
+          "new": "method void org.mule.runtime.core.privileged.exception.AbstractExceptionListener::initialise() throws org.mule.runtime.api.lifecycle.InitialisationException",
+          "oldModifiers": "public final synchronized",
+          "newModifiers": "public synchronized",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "AbstractExceptionListener",
+          "methodName": "initialise",
+          "elementKind": "method",
+          "justification": "W-11117613: Duplicate application of lifecycle phases in Global Error Handlers."
+        },
+        {
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.core.privileged.exception.OnRuntimeProcessingStrategy",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "OnRuntimeProcessingStrategy",
+          "elementKind": "class",
+          "justification": "W-11117613: Duplicate application of lifecycle phases in Global Error Handlers."
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.reuseGlobalErrorHandler",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "fieldName": "reuseGlobalErrorHandler",
+          "elementKind": "field",
+          "justification": "W-11117613: Duplicate application of lifecycle phases in Global Error Handlers."
+        },
+        {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::isOwnedTransaction(java.lang.Exception)",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "isOwnedTransaction",
+          "elementKind": "method",
+          "justification": "W-11117613: Duplicate application of lifecycle phases in Global Error Handlers."
+        },
+        {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::reuseGlobalErrorHandler()",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "reuseGlobalErrorHandler",
+          "elementKind": "method",
+          "justification": "W-11117613: Duplicate application of lifecycle phases in Global Error Handlers."
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::setFromGlobalErrorHandler(boolean)",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "setFromGlobalErrorHandler",
+          "elementKind": "method",
+          "justification": "W-11117613: Duplicate application of lifecycle phases in Global Error Handlers."
+        },
+        {
           "code": "java.method.parameterTypeChanged",
           "old": "parameter org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::duplicateFor(===org.mule.runtime.api.component.location.Location===)",
           "new": "parameter org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::duplicateFor(===org.mule.runtime.api.component.location.ComponentLocation===)",
