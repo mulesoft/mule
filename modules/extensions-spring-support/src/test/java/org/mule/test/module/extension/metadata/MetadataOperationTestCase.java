@@ -702,6 +702,18 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     assertThat(continents, not(hasItem(metadataKeyWithId(EUROPE).withDisplayName(EUROPE).withPartName(CONTINENT))));
   }
 
+  @Test
+  public void outputMetadataWithoutKeysWithKeyIdWithConfig() throws Exception {
+    location =
+        Location.builder().globalName(OUTPUT_METADATA_WITH_KEY_ID_USING_CONFIG).addProcessorsPart().addIndexPart(0).build();
+    final ComponentMetadataDescriptor<OperationModel> metadataDescriptor =
+        getSuccessComponentDynamicMetadataWithKey(PERSON_METADATA_KEY);
+    final OperationModel typedModel = metadataDescriptor.getModel();
+    assertExpectedOutput(typedModel, personType, void.class);
+    assertExpectedType(getParameter(typedModel, "type"), String.class);
+
+  }
+
   private MetadataType getResolvedTypeFromList() {
     final MetadataResult<ComponentMetadataDescriptor<OperationModel>> result = metadataService.getOperationMetadata(location);
     assertSuccessResult(result);

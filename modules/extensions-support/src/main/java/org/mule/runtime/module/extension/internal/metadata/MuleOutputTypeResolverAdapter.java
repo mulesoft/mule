@@ -36,6 +36,8 @@ public class MuleOutputTypeResolverAdapter implements OutputTypeResolver {
       return (OutputTypeResolver) resolver;
     } else if (resolver instanceof NullMetadataResolver) {
       return new org.mule.runtime.extension.api.metadata.NullMetadataResolver();
+    } else if (resolver instanceof SdkOutputTypeResolverAdapter) {
+      return ((SdkOutputTypeResolverAdapter) resolver).getDelegate();
     } else if (resolver instanceof org.mule.sdk.api.metadata.resolving.OutputTypeResolver) {
       return new MuleOutputTypeResolverAdapter((org.mule.sdk.api.metadata.resolving.OutputTypeResolver) resolver);
     } else {

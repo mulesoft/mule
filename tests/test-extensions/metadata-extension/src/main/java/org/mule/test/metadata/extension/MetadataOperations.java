@@ -52,6 +52,7 @@ import org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestOutputAnyTypeResolver;
 import org.mule.test.metadata.extension.resolver.TestOutputAttributesResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestOutputResolverWithKeyResolver;
+import org.mule.test.metadata.extension.resolver.TestOutputResolverWithKeyResolverUsingConfig;
 import org.mule.test.metadata.extension.resolver.TestOutputResolverWithoutKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestPartialMultiLevelKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestResolverWithCache;
@@ -359,6 +360,14 @@ public class MetadataOperations {
   }
 
   public Result<Shape, AbstractOutputAttributes> outputAttributesWithDeclaredSubtypesMetadata() {
+    return null;
+  }
+
+  @OutputResolver(output = TestOutputResolverWithKeyResolverUsingConfig.class)
+  @MediaType(value = ANY, strict = false)
+  public Object outputMetadataWithKeyIdUsingConfig(@Connection MetadataConnection connection,
+                                                   @MetadataKeyId(TestOutputResolverWithKeyResolverUsingConfig.class) String type,
+                                                   @Optional @Content Object content) {
     return null;
   }
 }
