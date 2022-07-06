@@ -307,7 +307,7 @@ class MuleExtensionModelDeclarer {
    *   </scheduler>
    * }
    * </pre>
-   * <p>
+   *
    * If it were implemented as an {@link UnionType} (see MULE-19167) it would look like this, and it would break backwards:
    *
    * <pre>
@@ -318,7 +318,7 @@ class MuleExtensionModelDeclarer {
    *   </scheduler>
    * }
    * </pre>
-   * <p>
+   *
    * NOTE: This type is imported by the SDK in order to support polling sources at {@code PollingSourceDeclarationEnricher}.
    */
   private MetadataType buildSchedulingStrategyType(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
