@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.event;
 
+import static org.mule.runtime.core.internal.trace.DistributedTraceContext.emptyDistributedEventContext;
+import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
+
 import static java.lang.System.identityHashCode;
 import static java.lang.System.lineSeparator;
 import static java.time.Instant.now;
@@ -13,8 +16,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.internal.trace.DistributedTraceContext.emptyDistributedEventContext;
-import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
