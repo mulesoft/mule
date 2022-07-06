@@ -6,14 +6,13 @@
  */
 package org.mule.test.petstore.extension;
 
-import static com.google.common.collect.ImmutableMap.of;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 
-import com.google.common.collect.ImmutableMap;
+import static com.google.common.collect.ImmutableMap.of;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.sdk.api.runtime.source.Source;
 import org.mule.sdk.api.runtime.source.SourceCallback;
