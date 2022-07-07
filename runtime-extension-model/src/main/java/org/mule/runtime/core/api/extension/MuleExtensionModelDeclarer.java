@@ -82,8 +82,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 
 import static java.lang.Boolean.getBoolean;
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
@@ -161,12 +159,7 @@ class MuleExtensionModelDeclarer {
   final ErrorModel validationError = newError(VALIDATION).withParent(anyError).build();
   final ErrorModel duplicateMessageError = newError(DUPLICATE_MESSAGE).withParent(validationError).build();
 
-  private boolean REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE;
-
   ExtensionDeclarer createExtensionModel() {
-    REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE =
-        parseBoolean(getProperty(REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY, "false"));
-
     ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer()
         .named(MULE_NAME)
         .describedAs("Mule Runtime and Integration Platform: Core components")
@@ -486,7 +479,7 @@ class MuleExtensionModelDeclarer {
     setVariable.withOutput().ofType(VOID_TYPE);
     setVariable.withOutputAttributes().ofType(VOID_TYPE);
 
-    if (REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE) {
+    if (getBoolean(REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY)) {
       setVariable.onDefaultParameterGroup()
           .withOptionalParameter("variableName")
           .ofType(STRING_TYPE)
