@@ -18,7 +18,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.OUTP
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
-import static org.mule.runtime.api.util.MuleSystemProperties.SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY;
+import static org.mule.runtime.api.util.MuleSystemProperties.REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.CLIENT_SECURITY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.COMPOSITE_ROUTING;
@@ -81,6 +81,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
@@ -160,10 +161,11 @@ class MuleExtensionModelDeclarer {
   final ErrorModel validationError = newError(VALIDATION).withParent(anyError).build();
   final ErrorModel duplicateMessageError = newError(DUPLICATE_MESSAGE).withParent(validationError).build();
 
-  private static boolean SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE =
-      parseBoolean(getProperty(SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY, "true"));
+  private boolean REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE;
 
   ExtensionDeclarer createExtensionModel() {
+    REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE =
+        parseBoolean(getProperty(REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY, "false"));
 
     ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer()
         .named(MULE_NAME)
@@ -484,17 +486,17 @@ class MuleExtensionModelDeclarer {
     setVariable.withOutput().ofType(VOID_TYPE);
     setVariable.withOutputAttributes().ofType(VOID_TYPE);
 
-    if (SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE) {
+    if (REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE) {
       setVariable.onDefaultParameterGroup()
           .withOptionalParameter("variableName")
           .ofType(STRING_TYPE)
-          .withExpressionSupport(SUPPORTED)
+          .withExpressionSupport(NOT_SUPPORTED)
           .describedAs("The name of the variable.");
     } else {
       setVariable.onDefaultParameterGroup()
           .withOptionalParameter("variableName")
           .ofType(STRING_TYPE)
-          .withExpressionSupport(NOT_SUPPORTED)
+          .withExpressionSupport(SUPPORTED)
           .describedAs("The name of the variable.");
     }
 
@@ -1407,10 +1409,5 @@ class MuleExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The name of the encryption strategy to use. This should be configured using the "
             + "'password-encryption-strategy' element, inside a 'security-manager' element at the top level.");
-  }
-
-  public static void refreshSystemProperties() {
-    SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE =
-        parseBoolean(getProperty(SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY, "true"));
   }
 }

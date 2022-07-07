@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.extension;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY;
+import static org.mule.runtime.api.util.MuleSystemProperties.REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY;
 import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
 
@@ -42,23 +42,22 @@ public class MuleExtensionModelDeclarerTestCase {
   private String expectedResult;
 
   public MuleExtensionModelDeclarerTestCase(String supportExtressionsInVariableNameInSetVariable, String expectedResult) {
-    systemPropertyName = SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY;
+    systemPropertyName = REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY;
     systemPropertyValue = supportExtressionsInVariableNameInSetVariable;
     this.expectedResult = expectedResult;
   }
 
-  @Parameterized.Parameters(name = "Support expressions in variableName in SetVariable: {0}")
+  @Parameterized.Parameters(name = "Do not support expressions in variableName in SetVariable: {0}")
   public static Collection<Object[]> data() {
     return asList(new Object[][] {
-        {"true", "SUPPORTED"},
-        {"false", "NOT_SUPPORTED"}
+        {"true", "NOT_SUPPORTED"},
+        {"false", "SUPPORTED"}
     });
   }
 
   @Before
   public void setUp() {
     systemPropertyOldValue = System.setProperty(systemPropertyName, systemPropertyValue);
-    MuleExtensionModelDeclarer.refreshSystemProperties();
   }
 
   @After
@@ -68,12 +67,11 @@ public class MuleExtensionModelDeclarerTestCase {
     } else {
       System.setProperty(systemPropertyName, systemPropertyOldValue);
     }
-    MuleExtensionModelDeclarer.refreshSystemProperties();
   }
 
   @Test
   @Issue("W-10998630")
-  public void consistentWithManifest2() {
+  public void whenCreatingExtensionModelVariableNameShouldSupportExpressionsAccordingToSystemProperty() {
     MuleExtensionModelDeclarer muleExtensionModelDeclarer = new MuleExtensionModelDeclarer();
     ExtensionDeclarer extensionDeclarer = muleExtensionModelDeclarer.createExtensionModel();
     OperationDeclaration setVariableOperation = extensionDeclarer.getDeclaration().getOperations().stream()
