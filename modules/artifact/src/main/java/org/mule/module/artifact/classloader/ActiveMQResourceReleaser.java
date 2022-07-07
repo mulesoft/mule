@@ -13,12 +13,11 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
-import org.slf4j.Logger;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import org.slf4j.Logger;
 
 /**
  * A utility class to release all resources associated to Active MQ driver on un-deployment to prevent classloader leaks
