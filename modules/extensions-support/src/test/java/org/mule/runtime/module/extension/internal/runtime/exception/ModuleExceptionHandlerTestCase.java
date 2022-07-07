@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.exception;
 
 import static java.util.Collections.singleton;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -58,6 +59,8 @@ import io.qameta.allure.Story;
 @RunWith(MockitoJUnitRunner.class)
 public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
 
+  private static final String SPECIFIED_ERROR_MESSAGE = "This is the module exception message";
+  private static final String SPECIFIED_CAUSE_ERROR_MESSAGE = "This is the cause message";
   private static final String ERROR_NAMESPACE = "TEST-EXTENSION";
 
   @Mock
@@ -194,7 +197,58 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
                is(instanceOf(MessagingException.class)));
   }
 
+  @Test
+  @Issue("W-11192984")
+  @Story(ERROR_HANDLING)
+  public void useModuleExceptionMessageWhenCauseHasNoMessage() {
+    Set<ErrorModel> errors = new HashSet<>();
+    ErrorModel parent = newError(PARENT.getType(), ERROR_NAMESPACE).build();
+    errors.add(parent);
+
+    typeRepository.addErrorType(getIdentifier(parent), getCoreErrorTypeRepo().getAnyErrorType());
+
+    when(operationModel.getErrorModels()).thenReturn(errors);
+    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
+    ModuleException moduleException =
+        new ModuleException(SPECIFIED_ERROR_MESSAGE, PARENT, new SpecificRuntimeException());
+
+    Throwable throwable = handler.processException(moduleException);
+    assertThat(throwable, is(instanceOf(TypedException.class)));
+    assertThat(throwable.getMessage(), containsString(SPECIFIED_ERROR_MESSAGE));
+    assertThat(throwable.getCause().getCause(), instanceOf(SpecificRuntimeException.class));
+  }
+
+  @Test
+  @Issue("W-11192984")
+  @Story(ERROR_HANDLING)
+  public void useCauseMessageWhenCauseHasMessage() {
+    Set<ErrorModel> errors = new HashSet<>();
+    ErrorModel parent = newError(PARENT.getType(), ERROR_NAMESPACE).build();
+    errors.add(parent);
+
+    typeRepository.addErrorType(getIdentifier(parent), getCoreErrorTypeRepo().getAnyErrorType());
+
+    when(operationModel.getErrorModels()).thenReturn(errors);
+    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
+    ModuleException moduleException =
+        new ModuleException(SPECIFIED_ERROR_MESSAGE, PARENT, new SpecificRuntimeException(SPECIFIED_CAUSE_ERROR_MESSAGE));
+
+    Throwable throwable = handler.processException(moduleException);
+    assertThat(throwable, is(instanceOf(TypedException.class)));
+    assertThat(throwable.getMessage(), containsString(SPECIFIED_CAUSE_ERROR_MESSAGE));
+    assertThat(throwable.getCause(), instanceOf(SpecificRuntimeException.class));
+  }
+
   private ComponentIdentifier getIdentifier(ErrorModel parent) {
     return buildFromStringRepresentation(parent.getNamespace() + ":" + parent.getType());
+  }
+
+  public static class SpecificRuntimeException extends RuntimeException {
+
+    public SpecificRuntimeException() {}
+
+    public SpecificRuntimeException(String errorMessage) {
+      super(errorMessage);
+    }
   }
 }
