@@ -6,16 +6,19 @@
  */
 package org.mule.module.artifact.classloader;
 
-import static org.mule.module.artifact.classloader.ThreadCommonMethodsUtil.clearReferencesStopTimerThread;
-import static org.mule.module.artifact.classloader.ThreadCommonMethodsUtil.isThreadLoadedByDisposedApplication;
-import static org.mule.module.artifact.classloader.ThreadCommonMethodsUtil.isThreadLoadedByDisposedDomain;
 import static java.lang.Thread.activeCount;
 import static java.lang.Thread.enumerate;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 import org.slf4j.Logger;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * A utility class to release all resources associated to Active MQ driver on un-deployment to prevent classloader leaks
@@ -24,10 +27,11 @@ public class ActiveMQResourceReleaser implements ResourceReleaser {
 
   public static final String ACTIVEMQ_DRIVER_TIMER_THREAD_CLASS_NAME = "TimerThread";
   public static final String ACTIVEMQ_DRIVER_TIMER_THREAD_NAME = "ActiveMQ InactivityMonitor ReadCheckTimer";
+  public static final String COMPOSITE_CLASS_LOADER_CLASS_NAME = "CompositeClassLoader";
 
   private final ClassLoader classLoader;
-
   private static final Logger logger = getLogger(ActiveMQResourceReleaser.class);
+
 
   /**
    * Creates a new Instance of ActiveMQResourceReleaser
@@ -84,5 +88,81 @@ public class ActiveMQResourceReleaser implements ResourceReleaser {
         && thread.getName().equals(ACTIVEMQ_DRIVER_TIMER_THREAD_NAME)
         && (isThreadLoadedByDisposedApplication(artifactId, thread.getContextClassLoader())
             || isThreadLoadedByDisposedDomain(artifactId, thread.getContextClassLoader()));
+  }
+
+  private boolean isThreadLoadedByDisposedDomain(String undeployedArtifactId, ClassLoader threadContextClassLoader) {
+    try {
+
+      Class threadContextClassLoaderClass = threadContextClassLoader.getClass();
+      if (!threadContextClassLoaderClass.getSimpleName().equals(COMPOSITE_CLASS_LOADER_CLASS_NAME)) {
+        return false;
+      }
+
+
+      Method getDelegateClassLoadersMethod = threadContextClassLoaderClass.getMethod("getDelegates");
+      List<ClassLoader> classLoaderList = (List<ClassLoader>) getDelegateClassLoadersMethod.invoke(threadContextClassLoader);
+
+
+      for (ClassLoader classLoaderDelegate : classLoaderList) {
+        if (classLoaderDelegate instanceof ArtifactClassLoader) {
+          ArtifactClassLoader artifactClassLoader = (ArtifactClassLoader) classLoaderDelegate;
+          if (artifactClassLoader.getArtifactId().contains(undeployedArtifactId)) {
+            return true;
+          }
+        }
+      }
+
+    } catch (Exception e) {
+      logger.warn("Exception occurred while attempting to compare {} and {} artifactId.", threadContextClassLoader,
+                  threadContextClassLoader.getClass().getClassLoader());
+    }
+    return false;
+  }
+
+  private boolean isThreadLoadedByDisposedApplication(String undeployedArtifactId, ClassLoader threadContextClassLoader) {
+    try {
+      if (!(threadContextClassLoader instanceof MuleArtifactClassLoader)) {
+        return false;
+      }
+      String threadClassLoaderArtifactId = ((MuleArtifactClassLoader) threadContextClassLoader).getArtifactId();
+      return threadClassLoaderArtifactId != null && threadClassLoaderArtifactId.equals(undeployedArtifactId);
+    } catch (Exception e) {
+      logger.warn("Exception occurred while attempting to compare {} and {} artifact id.", threadContextClassLoader,
+                  threadContextClassLoader.getClass().getClassLoader());
+    }
+    return false;
+  }
+
+  private void clearReferencesStopTimerThread(Thread thread)
+      throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    // Need to get references to:
+    // in Sun/Oracle JDK:
+    // - newTasksMayBeScheduled field (in java.util.TimerThread)
+    // - queue field
+    // - queue.clear()
+    // in IBM JDK, Apache Harmony:
+    // - cancel() method (in java.util.Timer$TimerImpl)
+    try {
+      Field newTasksMayBeScheduledField =
+          thread.getClass().getDeclaredField("newTasksMayBeScheduled");
+      newTasksMayBeScheduledField.setAccessible(true);
+      Field queueField = thread.getClass().getDeclaredField("queue");
+      queueField.setAccessible(true);
+      Object queue = queueField.get(thread);
+      Method clearMethod = queue.getClass().getDeclaredMethod("clear");
+      clearMethod.setAccessible(true);
+      synchronized (queue) {
+        newTasksMayBeScheduledField.setBoolean(thread, false);
+        clearMethod.invoke(queue);
+        // In case queue was already empty. Should only be one
+        // thread waiting but use notifyAll() to be safe.
+        queue.notifyAll();
+      }
+    } catch (NoSuchFieldException noSuchFieldEx) {
+      logger.warn("Unable to clear timer references using 'clear' method. Attempting to use 'cancel' method.");
+      Method cancelMethod = thread.getClass().getDeclaredMethod("cancel");
+      cancelMethod.setAccessible(true);
+      cancelMethod.invoke(thread);
+    }
   }
 }
