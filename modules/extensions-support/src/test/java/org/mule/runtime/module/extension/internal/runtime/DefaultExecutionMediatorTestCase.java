@@ -192,7 +192,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   private final Object result = new Object();
   private final RetryPolicyTemplate retryPolicy;
   private final ConnectionException connectionException = new ConnectionException("Connection failure");
-  private final Exception exception = new Exception();
+  private final Exception exception = new Exception(ERROR);
   private InOrder inOrder;
   private List<Interceptor> orderedInterceptors;
   private ExecutionMediator mediator;
