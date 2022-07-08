@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.extension;
 
+import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
@@ -17,6 +18,7 @@ import static org.mule.runtime.api.meta.model.display.PathModel.Location.EMBEDDE
 import static org.mule.runtime.api.meta.model.display.PathModel.Type.FILE;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
+import static org.mule.runtime.api.util.MuleSystemProperties.REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.CLIENT_SECURITY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.COMPOSITE_ROUTING;
@@ -392,7 +394,7 @@ class MuleExtensionModelDeclarer {
     } else {
       setVariable.onDefaultParameterGroup()
           .withOptionalParameter("variableName")
-          .ofType(STRING_TYPE)
+          .ofType(typeLoader.load(String.class))
           .withExpressionSupport(SUPPORTED)
           .describedAs("The name of the variable.");
     }
