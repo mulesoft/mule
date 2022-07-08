@@ -22,7 +22,6 @@ import java.util.Optional;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.hamcrest.Matchers;
 import org.junit.Test;
 
 @Feature(MULE_DSL)
@@ -49,6 +48,6 @@ public class SetVariableVariableNameValidationTestCase extends AbstractCoreValid
         "   </flow>\n" +
         "</mule>");
 
-    assertThat(msg, Matchers.is(empty()));
+    assertThat(msg, is(empty()));
   }
 }
