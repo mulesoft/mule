@@ -678,7 +678,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     ParameterModel mimeType = setVariable.getAllParameterModels().get(3);
 
     assertThat(variableName.getName(), is("variableName"));
-    assertThat(variableName.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(variableName.getExpressionSupport(), is(SUPPORTED));
     assertThat(variableName.getType(), is(instanceOf(StringType.class)));
 
     assertThat(value.getName(), is("value"));

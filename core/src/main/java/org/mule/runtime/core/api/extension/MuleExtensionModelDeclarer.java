@@ -383,11 +383,19 @@ class MuleExtensionModelDeclarer {
     setVariable.withOutput().ofType(typeLoader.load(void.class));
     setVariable.withOutputAttributes().ofType(typeLoader.load(void.class));
 
-    setVariable.onDefaultParameterGroup()
-        .withOptionalParameter("variableName")
+    if (getBoolean(REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY)) {
+      setVariable.onDefaultParameterGroup()
+          .withOptionalParameter("variableName")
         .ofType(typeLoader.load(String.class))
-        .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("The name of the variable.");
+          .withExpressionSupport(NOT_SUPPORTED)
+          .describedAs("The name of the variable.");
+    } else {
+      setVariable.onDefaultParameterGroup()
+          .withOptionalParameter("variableName")
+          .ofType(STRING_TYPE)
+          .withExpressionSupport(SUPPORTED)
+          .describedAs("The name of the variable.");
+    }
 
     setVariable.onDefaultParameterGroup()
         .withRequiredParameter("value")
