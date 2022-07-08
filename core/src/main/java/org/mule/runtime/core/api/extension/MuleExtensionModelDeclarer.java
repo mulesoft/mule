@@ -388,7 +388,7 @@ class MuleExtensionModelDeclarer {
     if (getBoolean(REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY)) {
       setVariable.onDefaultParameterGroup()
           .withOptionalParameter("variableName")
-        .ofType(typeLoader.load(String.class))
+          .ofType(typeLoader.load(String.class))
           .withExpressionSupport(NOT_SUPPORTED)
           .describedAs("The name of the variable.");
     } else {
