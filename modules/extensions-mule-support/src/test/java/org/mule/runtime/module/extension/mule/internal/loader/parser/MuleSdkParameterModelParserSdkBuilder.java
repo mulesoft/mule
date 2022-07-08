@@ -148,7 +148,7 @@ class MuleSdkParameterModelParserSdkBuilder {
 
   private ExtensionModelLoadingRequest createLoadingRequest() {
     return ExtensionModelLoadingRequest
-        .builder(MuleSdkParameterModelParserSdkReferencesTestCase.class.getClassLoader(), new NullDslResolvingContext())
+        .builder(MuleSdkParameterModelParserSdkBuilder.class.getClassLoader(), new NullDslResolvingContext())
         .build();
   }
 
