@@ -23,7 +23,6 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
@@ -44,7 +43,7 @@ import org.junit.rules.ExpectedException;
 
 @Feature(REUSE)
 @Story(PARAMETERS)
-public class MuleSdkParameterModelParserSdkReferencesTestCase extends AbstractMuleTestCase {
+public class MuleSdkParameterModelParserSdkConfigNamesTestCase extends AbstractMuleTestCase {
 
   @Rule
   public ExpectedException expected = none();
@@ -85,14 +84,12 @@ public class MuleSdkParameterModelParserSdkReferencesTestCase extends AbstractMu
   }
 
   @Test
-  @Description("Checks that when the parameter type matches a configuration from an extension, it is treated as a reference")
+  @Description("Checks that when the parameter type matches a configuration from an extension, it is treated as a configuration name")
   public void parameterTypeMatchingConfigurationFromOtherExtensionIsTreatedAsReference() {
     StereotypeModel expectedStereotype = newStereotype("some-config", "SOME").withParent(CONFIG).build();
     MuleSdkParameterModelParserSdk parameterModelParser = baseParameterParserBuilder.withType("some:some-config").build();
     assertThat(parameterModelParser.getType(), is(PRIMITIVE_TYPES.get(STRING)));
     assertThat(parameterModelParser.getAllowedStereotypes(mock(StereotypeModelFactory.class)), contains(expectedStereotype));
-    assertThat(parameterModelParser.getDslConfiguration().map(ParameterDslConfiguration::allowsReferences).orElse(false),
-               is(true));
   }
 
   @Test
@@ -109,8 +106,6 @@ public class MuleSdkParameterModelParserSdkReferencesTestCase extends AbstractMu
     MuleSdkParameterModelParserSdk parameterModelParser =
         baseParameterParserBuilder.withType("some:some-config-colliding-with-type").build();
     assertThat(parameterModelParser.getType(), is(someValidMetadataType));
-    assertThat(parameterModelParser.getDslConfiguration().map(ParameterDslConfiguration::allowsReferences).orElse(false),
-               is(false));
   }
 
   @Test

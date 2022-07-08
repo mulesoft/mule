@@ -57,7 +57,6 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
   private String name;
   private MetadataType type;
   private List<StereotypeModel> allowedStereotypes = emptyList();
-  private Optional<ParameterDslConfiguration> parameterDslConfiguration = empty();
 
   public MuleSdkParameterModelParserSdk(ComponentAst parameterAst, TypeLoader typeLoader,
                                         ExtensionModelHelper extensionModelHelper) {
@@ -79,7 +78,7 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
       throw new IllegalModelDefinitionException(voidParameterIsForbidden());
     }
 
-    if (!parseTypeFromTypeLoader(type) && !parseTypeAsConfigurationReference(type)) {
+    if (!parseTypeFromTypeLoader(type) && !parseTypeAsConfigurationName(type)) {
       throw new IllegalModelDefinitionException(unknownType(type));
     }
   }
@@ -105,13 +104,13 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
    * <p>
    * The parameter's declared type will be of the form "extension_namespace:config_type_name".
    * <p>
-   * If a {@link ConfigurationModel} can be found, we will treat the parameter as a reference to a configuration. This means the
-   * type will be the string primitive and only the {@link ConfigurationModel}'s stereotype will be allowed for the reference.
+   * If a {@link ConfigurationModel} can be found, we will treat the parameter as a configuration name. This means the type will
+   * be the string primitive and only the {@link ConfigurationModel}'s stereotype will be allowed.
    *
    * @param type The parameter's declared type.
    * @return {@code true} on success, {@code false} otherwise.
    */
-  private boolean parseTypeAsConfigurationReference(String type) {
+  private boolean parseTypeAsConfigurationName(String type) {
     // Tries to find the configuration model from the extensions in context
     ComponentIdentifier componentIdentifier = buildFromStringRepresentation(type);
     Optional<ConfigurationModel> configurationModel = extensionModelHelper.findConfigurationModel(componentIdentifier);
@@ -122,7 +121,6 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
     // Sets the type as the string primitive and the allowed stereotype to the one from the configuration model
     this.type = PRIMITIVE_TYPES.get(STRING);
     this.allowedStereotypes = singletonList(configurationModel.get().getStereotype());
-    this.parameterDslConfiguration = of(ParameterDslConfiguration.builder().allowsReferences(true).build());
     return true;
   }
 
@@ -181,7 +179,7 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
 
   @Override
   public Optional<ParameterDslConfiguration> getDslConfiguration() {
-    return parameterDslConfiguration;
+    return empty();
   }
 
   @Override
