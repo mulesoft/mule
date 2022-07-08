@@ -7,6 +7,8 @@
 package org.mule.runtime.core.api.extension;
 
 import static com.google.common.collect.ImmutableSet.of;
+
+import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
@@ -21,6 +23,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.OUTP
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
+import static org.mule.runtime.api.util.MuleSystemProperties.REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.CLIENT_SECURITY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.COMPOSITE_ROUTING;
@@ -155,7 +158,6 @@ class MuleExtensionModelDeclarer {
   final ErrorModel duplicateMessageError = newError(DUPLICATE_MESSAGE).withParent(validationError).build();
 
   ExtensionDeclarer createExtensionModel() {
-
     ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer()
         .named(MULE_NAME)
         .describedAs("Mule Runtime and Integration Platform: Core components")
@@ -474,11 +476,19 @@ class MuleExtensionModelDeclarer {
     setVariable.withOutput().ofType(VOID_TYPE);
     setVariable.withOutputAttributes().ofType(VOID_TYPE);
 
-    setVariable.onDefaultParameterGroup()
-        .withOptionalParameter("variableName")
-        .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("The name of the variable.");
+    if (getBoolean(REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY)) {
+      setVariable.onDefaultParameterGroup()
+          .withOptionalParameter("variableName")
+          .ofType(STRING_TYPE)
+          .withExpressionSupport(NOT_SUPPORTED)
+          .describedAs("The name of the variable.");
+    } else {
+      setVariable.onDefaultParameterGroup()
+          .withOptionalParameter("variableName")
+          .ofType(STRING_TYPE)
+          .withExpressionSupport(SUPPORTED)
+          .describedAs("The name of the variable.");
+    }
 
     setVariable.onDefaultParameterGroup()
         .withRequiredParameter("value")
