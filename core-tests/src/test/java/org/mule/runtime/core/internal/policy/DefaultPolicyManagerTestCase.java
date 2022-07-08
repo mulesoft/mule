@@ -252,6 +252,33 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
+  public void sourceSamePolicyForDifferentFlowSameParams() {
+    final PolicyPointcutParameters policyParams = mock(PolicyPointcutParameters.class);
+
+    final Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
+    final PolicyChain policyChain = policy.getPolicyChain();
+    when(policyChain.onChainError(any())).thenReturn(policyChain);
+
+    when(policyProvider.findSourceParameterizedPolicies(policyParams)).thenReturn(asList(policy));
+    clearPolicyManagerCaches();
+
+    final InternalEvent event = mock(InternalEvent.class);
+    SourcePolicyContext ctx = mock(SourcePolicyContext.class);
+    when(event.getSourcePolicyContext()).thenReturn((EventInternalContext) ctx);
+    when(ctx.getPointcutParameters()).thenReturn(policyParams);
+
+    final SourcePolicy policy1 = policyManager.createSourcePolicyInstance(flowOne, event, ePub -> ePub,
+                                                                          mock(MessageSourceResponseParametersProcessor.class));
+    final SourcePolicy policy2 = policyManager.createSourcePolicyInstance(flowTwo, event, ePub -> ePub,
+                                                                          mock(MessageSourceResponseParametersProcessor.class));
+
+    assertThat(policy1, instanceOf(CompositeSourcePolicy.class));
+    assertThat(policy2, instanceOf(CompositeSourcePolicy.class));
+
+    assertThat(policy1, not(policy2));
+  }
+
+  @Test
   public void operationNoPoliciesPresent() {
     when(policyProvider.isOperationPoliciesAvailable()).thenReturn(false);
     when(policyProvider.findOperationParameterizedPolicies(any())).thenReturn(emptyList());
@@ -285,7 +312,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     assertThat(operationPolicy1, instanceOf(CompositeOperationPolicy.class));
     assertThat(operationPolicy2, instanceOf(CompositeOperationPolicy.class));
 
-    assertThat(operationPolicy1, sameInstance(operationPolicy2));
+    assertThat(operationPolicy1, not(operationPolicy2));
   }
 
   @Test
@@ -608,17 +635,17 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
 
   /**
    * Stubs a Policy, instead of mocking it. Mocking a policy would imply invocation interceptions of the form:
-   * 
+   *
    * <pre>
    * {@code
    * when(mockedCall).thenAnswer(invocation -> {
    *    // Invocation arguments access
    * }));}
    * </pre>
-   * 
+   *
    * This can be problematic given that references to that arguments are maintained at the mocks and the
    * {@link DefaultPolicyManager} functioning can be unexpectedly affected.
-   * 
+   *
    * @see DefaultPolicyManager
    * @return A {@link Policy} stub.
    */
