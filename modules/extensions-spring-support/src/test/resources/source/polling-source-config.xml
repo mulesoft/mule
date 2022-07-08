@@ -142,4 +142,20 @@
         </petstore:pet-filter-source>
         <logger level="INFO" message="#[payload]"/>
     </flow>
+
+    <flow name="oneItemPoll" initialState="stopped">
+        <petstore:watermarking-pet-adoption-source itemsPerPoll="1">
+            <scheduling-strategy>
+                <fixed-frequency frequency="100"/>
+            </scheduling-strategy>
+            <petstore:pets>
+                <petstore:pet value="Anibal" />
+            </petstore:pets>
+            <petstore:watermarks>
+                <petstore:watermark value="5" />
+            </petstore:watermarks>
+        </petstore:watermarking-pet-adoption-source>
+        <flow-ref name="adopt"/>
+    </flow>
+
 </mule>

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.execution;
 
+import static java.util.Optional.empty;
+
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
@@ -28,6 +30,7 @@ public class SourceResultAdapter {
   private final MediaType mediaType;
   private final Optional<String> correlationId;
   private final PayloadMediaTypeResolver payloadMediaTypeResolver;
+  private final Optional<Object> notification;
 
   /**
    * Creates a new instance
@@ -44,7 +47,7 @@ public class SourceResultAdapter {
                              MediaType mediaType,
                              boolean isCollection,
                              Optional<String> correlationId) {
-    this(result, cursorProviderFactory, mediaType, isCollection, correlationId, null);
+    this(result, cursorProviderFactory, mediaType, isCollection, correlationId, null, empty());
   }
 
   /**
@@ -62,13 +65,14 @@ public class SourceResultAdapter {
                              MediaType mediaType,
                              boolean isCollection,
                              Optional<String> correlationId,
-                             PayloadMediaTypeResolver payloadMediaTypeResolver) {
+                             PayloadMediaTypeResolver payloadMediaTypeResolver, Optional<Object> notification) {
     this.result = result;
     this.cursorProviderFactory = cursorProviderFactory;
     this.mediaType = mediaType;
     this.isCollection = isCollection;
     this.correlationId = correlationId;
     this.payloadMediaTypeResolver = payloadMediaTypeResolver;
+    this.notification = notification;
   }
 
   /**
@@ -109,5 +113,9 @@ public class SourceResultAdapter {
    */
   public PayloadMediaTypeResolver getPayloadMediaTypeResolver() {
     return payloadMediaTypeResolver;
+  }
+
+  public Optional<Object> getNotification() {
+    return notification;
   }
 }
