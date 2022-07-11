@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -30,7 +31,6 @@ import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
@@ -139,7 +139,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
   private final Cache<Pair<String, List<Policy>>, SourcePolicy> sourcePolicyInnerCache =
       Caffeine.newBuilder()
           .build();
-  private final Cache<Pair<ComponentIdentifier, List<Policy>>, OperationPolicy> operationPolicyInnerCache =
+  private final Cache<Pair<String, List<Policy>>, OperationPolicy> operationPolicyInnerCache =
       Caffeine.newBuilder()
           .build();
 
@@ -150,7 +150,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
       Caffeine.newBuilder()
           .expireAfterAccess(60, SECONDS)
           .build();
-  private Cache<Pair<ComponentIdentifier, PolicyPointcutParameters>, OperationPolicy> operationPolicyOuterCache =
+  private Cache<Pair<String, PolicyPointcutParameters>, OperationPolicy> operationPolicyOuterCache =
       Caffeine.newBuilder()
           .expireAfterAccess(60, SECONDS)
           .build();
@@ -241,9 +241,10 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
         policyPointcutParametersManager.createOperationPointcutParameters(operation, event,
                                                                           operationParameters.getOperationParameters());
 
+    final String operationLocation = operation.getLocation().getLocation();
     final ComponentIdentifier operationIdentifier = operation.getLocation().getComponentIdentifier().getIdentifier();
-    final Pair<ComponentIdentifier, PolicyPointcutParameters> policyKey =
-        new Pair<>(operationIdentifier, operationPointcutParameters);
+    final Pair<String, PolicyPointcutParameters> policyKey =
+        new Pair<>(operationLocation, operationPointcutParameters);
 
     final OperationPolicy policy = operationPolicyOuterCache.getIfPresent(policyKey);
     if (policy != null) {
@@ -261,11 +262,11 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
 
       OperationPolicy operationPolicy =
           operationPolicyOuterCache.get(policyKey, outerKey -> operationPolicyInnerCache
-              .get(new Pair<>(operationIdentifier, policyProvider.findOperationParameterizedPolicies(outerKey.getSecond())),
+              .get(new Pair<>(operationLocation, policyProvider.findOperationParameterizedPolicies(outerKey.getSecond())),
                    innerKey -> innerKey.getSecond().isEmpty()
                        ? NO_POLICY_OPERATION
                        : compositePolicyFactory.createOperationPolicy(operation, innerKey.getSecond(),
-                                                                      lookupOperationParametersTransformer(outerKey.getFirst()),
+                                                                      lookupOperationParametersTransformer(operationIdentifier),
                                                                       operationPolicyProcessorFactory,
                                                                       muleContext.getConfiguration().getShutdownTimeout(),
                                                                       muleContext.getSchedulerService()
@@ -499,23 +500,25 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
       deferredDispose.dispose();
     }
 
-    /* MULE-18929: since outer cache has an expiring time but inner cache doesn't, we are could be creating
-    * a new weak reference for the same policy. This will make that the activePolicies set will increase
-    * its size for expired policies, unnecessary. Hence, overriding hashCode and equals methods to avoid having
-    * more than one weak reference in the set */
+    /*
+     * MULE-18929: since outer cache has an expiring time but inner cache doesn't, we are could be creating a new weak reference
+     * for the same policy. This will make that the activePolicies set will increase its size for expired policies, unnecessary.
+     * Hence, overriding hashCode and equals methods to avoid having more than one weak reference in the set
+     */
     @Override
     public int hashCode() {
       return hash;
     }
 
-    /* Important consideration: if the referent object is collected, it will be equal to NULL. Possible problem:
-    *  if two collected referents had the same hash code (or simply generates a collision in the set) but where
-    *  different objects, since we lost the objects (== null) for us will be both equal. This could be a conceptual
-    *  problem since we would have "equivalent" different objects in a set, but considering our usage this won't be
-    *  a problem: we use it to maintain the weak reference to dispose them (deferredDispose). So, when we add
-    *  a weak reference to the set, its referent is obviously not null. When we remove them, if such collision happens,
-    *  we will simply remove one of them (since equivalence), and in the next iteration we will remove the other one,
-    *  independently of the hash implementation */
+    /*
+     * Important consideration: if the referent object is collected, it will be equal to NULL. Possible problem: if two collected
+     * referents had the same hash code (or simply generates a collision in the set) but where different objects, since we lost
+     * the objects (== null) for us will be both equal. This could be a conceptual problem since we would have "equivalent"
+     * different objects in a set, but considering our usage this won't be a problem: we use it to maintain the weak reference to
+     * dispose them (deferredDispose). So, when we add a weak reference to the set, its referent is obviously not null. When we
+     * remove them, if such collision happens, we will simply remove one of them (since equivalence), and in the next iteration we
+     * will remove the other one, independently of the hash implementation
+     */
     @Override
     public boolean equals(Object o) {
       if (!(o instanceof DeferredDisposableWeakReference)) {
