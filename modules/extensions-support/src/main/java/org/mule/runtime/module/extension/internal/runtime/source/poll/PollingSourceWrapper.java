@@ -81,8 +81,8 @@ import org.slf4j.Logger;
  */
 public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements Restartable {
 
-  public static final String REJECTED_ITEM_MESSAGE = "Item with id:[%s] is rejected with status:[%s]";
-  public static final String ACCEPTED_ITEM_MESSAGE = "Item with id:[%s] is accepted";
+  public static final String REJECTED_ITEM_MESSAGE = "Item with id:[{}] is rejected with status:[{}]";
+  public static final String ACCEPTED_ITEM_MESSAGE = "Item with id:[{}] is accepted";
   public static final String WATERMARK_SAVED_MESSAGE =
       "Watermark with key:[{}] and value:[{}] saved to the ObjectStore for flow:[{}]";
   public static final String WATERMARK_RETURNED_MESSAGE =
