@@ -139,7 +139,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
   private final Cache<Pair<String, List<Policy>>, SourcePolicy> sourcePolicyInnerCache =
       Caffeine.newBuilder()
           .build();
-  private final Cache<Pair<ComponentIdentifier, List<Policy>>, OperationPolicy> operationPolicyInnerCache =
+  private final Cache<Pair<String, List<Policy>>, OperationPolicy> operationPolicyInnerCache =
       Caffeine.newBuilder()
           .build();
 
@@ -150,7 +150,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
       Caffeine.newBuilder()
           .expireAfterAccess(60, SECONDS)
           .build();
-  private Cache<Pair<ComponentIdentifier, PolicyPointcutParameters>, OperationPolicy> operationPolicyOuterCache =
+  private Cache<Pair<String, PolicyPointcutParameters>, OperationPolicy> operationPolicyOuterCache =
       Caffeine.newBuilder()
           .expireAfterAccess(60, SECONDS)
           .build();
@@ -241,9 +241,10 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
         policyPointcutParametersManager.createOperationPointcutParameters(operation, event,
                                                                           operationParameters.getOperationParameters());
 
+    final String operationLocation = operation.getLocation().getLocation();
     final ComponentIdentifier operationIdentifier = operation.getLocation().getComponentIdentifier().getIdentifier();
-    final Pair<ComponentIdentifier, PolicyPointcutParameters> policyKey =
-        new Pair<>(operationIdentifier, operationPointcutParameters);
+    final Pair<String, PolicyPointcutParameters> policyKey =
+        new Pair<>(operationLocation, operationPointcutParameters);
 
     final OperationPolicy policy = operationPolicyOuterCache.getIfPresent(policyKey);
     if (policy != null) {
@@ -261,11 +262,11 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
 
       OperationPolicy operationPolicy =
           operationPolicyOuterCache.get(policyKey, outerKey -> operationPolicyInnerCache
-              .get(new Pair<>(operationIdentifier, policyProvider.findOperationParameterizedPolicies(outerKey.getSecond())),
+              .get(new Pair<>(operationLocation, policyProvider.findOperationParameterizedPolicies(outerKey.getSecond())),
                    innerKey -> innerKey.getSecond().isEmpty()
                        ? NO_POLICY_OPERATION
                        : compositePolicyFactory.createOperationPolicy(operation, innerKey.getSecond(),
-                                                                      lookupOperationParametersTransformer(outerKey.getFirst()),
+                                                                      lookupOperationParametersTransformer(operationIdentifier),
                                                                       operationPolicyProcessorFactory,
                                                                       muleContext.getConfiguration().getShutdownTimeout(),
                                                                       muleContext.getSchedulerService()
