@@ -247,7 +247,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     when(policyChain.onChainError(any())).thenReturn(policyChain);
 
     when(policyProvider.findSourceParameterizedPolicies(policyParams)).thenReturn(asList(policy));
-    clearPolicyManagerCaches();
+    policiesChangeCallbackCaptor.getValue().run();
 
     final InternalEvent event = mock(InternalEvent.class);
     SourcePolicyContext ctx = mock(SourcePolicyContext.class);
