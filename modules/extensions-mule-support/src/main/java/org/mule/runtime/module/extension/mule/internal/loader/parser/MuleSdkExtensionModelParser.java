@@ -27,6 +27,7 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
@@ -54,11 +55,14 @@ class MuleSdkExtensionModelParser implements ExtensionModelParser {
   private final ArtifactAst ast;
   private final TypeLoader typeLoader;
   private final List<OperationModelParser> operationModelParsers;
+  private final ExtensionModelHelper extensionModelHelper;
 
-  public MuleSdkExtensionModelParser(String extensionName, ArtifactAst ast, TypeLoader typeLoader) {
+  public MuleSdkExtensionModelParser(String extensionName, ArtifactAst ast, TypeLoader typeLoader,
+                                     ExtensionModelHelper extensionModelHelper) {
     this.extensionName = extensionName;
     this.ast = ast;
     this.typeLoader = typeLoader;
+    this.extensionModelHelper = extensionModelHelper;
     operationModelParsers = computeOperationModelParsers();
   }
 
@@ -179,7 +183,7 @@ class MuleSdkExtensionModelParser implements ExtensionModelParser {
     final Map<String, MuleSdkOperationModelParserSdk> operationParsersByName =
         ast.topLevelComponentsStream()
             .filter(c -> c.getComponentType() == OPERATION_DEF)
-            .map(c -> new MuleSdkOperationModelParserSdk(c, typeLoader))
+            .map(c -> new MuleSdkOperationModelParserSdk(c, typeLoader, extensionModelHelper))
             .collect(toMap(c -> getSanitizedElementName(c::getName), identity()));
 
     // Some characteristics of the operation model parsers require knowledge about the other operation model parsers
