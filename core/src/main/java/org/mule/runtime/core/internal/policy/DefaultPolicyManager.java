@@ -500,25 +500,21 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
       deferredDispose.dispose();
     }
 
-    /*
-     * MULE-18929: since outer cache has an expiring time but inner cache doesn't, we are could be creating a new weak reference
+    /* MULE-18929: since outer cache has an expiring time but inner cache doesn't, we are could be creating a new weak reference
      * for the same policy. This will make that the activePolicies set will increase its size for expired policies, unnecessary.
-     * Hence, overriding hashCode and equals methods to avoid having more than one weak reference in the set
-     */
+     * Hence, overriding hashCode and equals methods to avoid having more than one weak reference in the set */
     @Override
     public int hashCode() {
       return hash;
     }
 
-    /*
-     * Important consideration: if the referent object is collected, it will be equal to NULL. Possible problem: if two collected
-     * referents had the same hash code (or simply generates a collision in the set) but where different objects, since we lost
-     * the objects (== null) for us will be both equal. This could be a conceptual problem since we would have "equivalent"
-     * different objects in a set, but considering our usage this won't be a problem: we use it to maintain the weak reference to
-     * dispose them (deferredDispose). So, when we add a weak reference to the set, its referent is obviously not null. When we
-     * remove them, if such collision happens, we will simply remove one of them (since equivalence), and in the next iteration we
-     * will remove the other one, independently of the hash implementation
-     */
+    /* Important consideration: if the referent object is collected, it will be equal to NULL. Possible problem: if two collected
+     *  referents had the same hash code (or simply generates a collision in the set) but where different objects, since we lost
+     *  the objects (== null) for us will be both equal. This could be a conceptual problem since we would have "equivalent"
+     *  different objects in a set, but considering our usage this won't be a problem: we use it to maintain the weak reference to
+     *  dispose them (deferredDispose). So, when we add a weak reference to the set, its referent is obviously not null. When we
+     *  remove them, if such collision happens, we will simply remove one of them (since equivalence), and in the next iteration we
+     *  will remove the other one, independently of the hash implementation */
     @Override
     public boolean equals(Object o) {
       if (!(o instanceof DeferredDisposableWeakReference)) {
