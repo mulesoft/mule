@@ -7,10 +7,13 @@
 package org.mule.runtime.core.privileged.util;
 
 import static java.util.Arrays.copyOfRange;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -80,6 +83,7 @@ public class LoggingTestUtils {
   }
 
   private static String formatMessage(String message, Object... args) {
+    assertThat("Log messages must use '{}' instead of '%s'", message, not(containsString("%s")));
     String newMessage = message.replaceAll("\\{\\}", "%s");
     return String.format(newMessage, args);
   }
