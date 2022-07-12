@@ -20,7 +20,6 @@ import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.addContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.getDefaultProcessingStrategyFactory;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 
 import static java.lang.Boolean.FALSE;
@@ -294,10 +293,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   protected void doInitialise() throws InitialisationException {
     super.doInitialise();
     Optional<ProcessingStrategy> processingStrategy;
-    if (fromGlobalErrorHandler && reuseGlobalErrorHandler()) {
-      processingStrategy =
-          ofNullable(getDefaultProcessingStrategyFactory(muleContext).create(muleContext, getLocation().getRootContainerName()));
-    } else if (flowLocation.isPresent()) {
+    if (flowLocation.isPresent()) {
       Location location = builderFromStringRepresentation(flowLocation.get()).build();
       processingStrategy = getProcessingStrategy(locator, location);
     } else {
