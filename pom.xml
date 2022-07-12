@@ -5,7 +5,7 @@
     <groupId>org.mule.runtime</groupId>
     <artifactId>mule</artifactId>
     <packaging>pom</packaging>
-    <version>4.3.1-SNAPSHOT</version>
+    <version>4.5.0-SNAPSHOT</version>
 
     <!-- Organization -->
     <organization>
@@ -120,6 +120,7 @@
     </scm>
 
     <modules>
+        <module>runtime-extension-model</module>
         <module>core</module>
         <module>core-tests</module>
         <module>modules</module>
@@ -151,42 +152,48 @@
         -->
         <jdk8Name>JavaSE-${javaVersion}</jdk8Name>
 
-        <muleBomVersion>4.3.1-SNAPSHOT</muleBomVersion>
+        <muleBomVersion>4.5.0-SNAPSHOT</muleBomVersion>
 
         <activemqVersion>5.15.12</activemqVersion>
         <aspectjVersion>1.9.2</aspectjVersion>
         <derbyVersion>10.14.2.0</derbyVersion>
         <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
-        <weaveVersion>2.3.0-HF-SNAPSHOT</weaveVersion>
+        <weaveVersion>2.5.0-SNAPSHOT</weaveVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <muleDslApiVersion>1.3.1-SNAPSHOT</muleDslApiVersion>
-        <muleAstVersion>0.8.1-SNAPSHOT</muleAstVersion>
-        <muleExtensionsApiVersion>1.3.1-SNAPSHOT</muleExtensionsApiVersion>
-        <muleHttpPolicyApiVersion>1.3.1-SNAPSHOT</muleHttpPolicyApiVersion>
-        <muleMavenClientApi>1.5.2-SNAPSHOT</muleMavenClientApi>
-        <muleMavenClientImpl>1.5.2-SNAPSHOT</muleMavenClientImpl>
-        <muleMavenClientTest>1.5.2-SNAPSHOT</muleMavenClientTest>
-        <mulePolicyApiVersion>1.3.1-SNAPSHOT</mulePolicyApiVersion>
-        <muleApiVersion>1.3.1-SNAPSHOT</muleApiVersion>
-        <muleMetadataModelVersion>1.3.1-SNAPSHOT</muleMetadataModelVersion>
+        <mulePropertiesApiVersion>1.1.0-SNAPSHOT</mulePropertiesApiVersion>
+        <muleExtensionsApiVersion>1.5.0-SNAPSHOT</muleExtensionsApiVersion>
+        <muleConnectivityApiVersion>1.1.0-SNAPSHOT</muleConnectivityApiVersion>
+        <muleHttpPolicyApiVersion>1.5.0-SNAPSHOT</muleHttpPolicyApiVersion>
+        <muleMavenClientApi>1.7.0-SNAPSHOT</muleMavenClientApi>
+        <muleMavenClientImpl>1.7.0-SNAPSHOT</muleMavenClientImpl>
+        <muleMavenClientTest>1.7.0-SNAPSHOT</muleMavenClientTest>
+        <mulePolicyApiVersion>1.5.0-SNAPSHOT</mulePolicyApiVersion>
+        <muleApiVersion>1.5.0-SNAPSHOT</muleApiVersion>
+        <muleMetadataModelVersion>1.5.0-SNAPSHOT</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
+        <!-- The tests/test-components artifacts is in the mule repo but as has the mule-modules-parent as parent
+         its version is not changed by the versions:set plugin -->
+        <muleTestComponentsVersion>4.5.0-SNAPSHOT</muleTestComponentsVersion>
+        <muleTxExtVersion>4.5.0-SNAPSHOT</muleTxExtVersion>
+
         <!-- Test Extensions -->
+        <muleTestingProcessingStrategiesExtensionVersion>1.0.0-SNAPSHOT</muleTestingProcessingStrategiesExtensionVersion>
 
         <!--Maven plugins versions-->
-        <dependency.plugin.version>3.0.2</dependency.plugin.version>
+        <dependency.plugin.version>3.1.2</dependency.plugin.version>
         <deploy.plugin.version>2.8.2</deploy.plugin.version>
         <assembly.plugin.version>3.3.0</assembly.plugin.version>
         <jar.plugin.version>3.0.2</jar.plugin.version>
         <jxr.plugin.version>2.5</jxr.plugin.version>
-        <project.info.reports.plugin.version>2.9</project.info.reports.plugin.version>
+        <project.info.reports.plugin.version>3.0.0</project.info.reports.plugin.version>
         <rar.plugin.version>2.4</rar.plugin.version>
         <release.plugin.version>2.5.3</release.plugin.version>
-        <resources.plugin.version>3.0.2</resources.plugin.version>
+        <resources.plugin.version>3.1.0</resources.plugin.version>
         <site.plugin.version>3.8.2</site.plugin.version>
-        <source.plugin.version>3.0.1</source.plugin.version>
+        <source.plugin.version>3.1.0</source.plugin.version>
         <war.plugin.version>3.2.0</war.plugin.version>
         <shade.plugin.version>3.1.0</shade.plugin.version>
         <build.helper.maven.plugin.version>3.0.0</build.helper.maven.plugin.version>
@@ -194,34 +201,36 @@
         <antrun.plugin.version>1.8</antrun.plugin.version>
         <install.plugin.version>2.5.2</install.plugin.version>
         <checkstyle.plugin.version>2.17</checkstyle.plugin.version>
-        <javaFormatter.plugin.version>1.9.0</javaFormatter.plugin.version>
+        <javaFormatter.plugin.version>2.14.0</javaFormatter.plugin.version>
         <license.maven.plugin.version>2.11</license.maven.plugin.version>
         <gpg.plugin.version>1.6</gpg.plugin.version>
         <gmavenPluginVersion>1.5</gmavenPluginVersion>
-        <javadocPluginVersion>3.1.1</javadocPluginVersion>
+        <javadocPluginVersion>3.2.0</javadocPluginVersion>
         <mavenCompilerVersion>3.8.1</mavenCompilerVersion>
         <eclipsePluginVersion>2.10</eclipsePluginVersion>
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
 
-        <mule.module.maven.plugin.version>1.2.1-SNAPSHOT</mule.module.maven.plugin.version>
+        <mule.module.maven.plugin.version>1.4.0-SNAPSHOT</mule.module.maven.plugin.version>
         <revapi-maven-plugin.version>0.9.5</revapi-maven-plugin.version>
-        <muleRevapiExtensionVersion>1.3.1-SNAPSHOT</muleRevapiExtensionVersion>
-        <mule.extensions.maven.plugin.version>1.3.2-SNAPSHOT</mule.extensions.maven.plugin.version>
-        <mule.app.plugins.maven.plugin.version>1.3.2-SNAPSHOT</mule.app.plugins.maven.plugin.version>
+        <muleRevapiExtensionVersion>1.5.0-SNAPSHOT</muleRevapiExtensionVersion>
+        <mule.extensions.maven.plugin.version>1.5.0-SNAPSHOT</mule.extensions.maven.plugin.version>
+        <mule.app.plugins.maven.plugin.version>1.5.0-SNAPSHOT</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
         <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
 
         <powermockVersion>2.0.0</powermockVersion>
         <allureReportVersion>2.8.1</allureReportVersion>
         <allure.maven.plugin.version>2.9</allure.maven.plugin.version>
-        <jacoco.version>0.8.2</jacoco.version>
+        <jacoco.version>0.8.6</jacoco.version>
+        <awaitilityVersion>3.0.0</awaitilityVersion>
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <formatterGoal>validate</formatterGoal>
-        <oldMuleArtifactVersion>4.3.0</oldMuleArtifactVersion>
-
+        <oldMuleArtifactVersion>4.4.0</oldMuleArtifactVersion>
+        <revapi.failOnUnresolvedArtifacts>true</revapi.failOnUnresolvedArtifacts>
+        
         <surefire.args.base>-XX:+TieredCompilation -Dfile.encoding=UTF-8 -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'</surefire.args.base>
         <surefire.args>${surefire.args.base}</surefire.args>
 
@@ -370,7 +379,7 @@
                     <version>${checkstyle.plugin.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>com.marvinformatics.formatter</groupId>
+                    <groupId>net.revelc.code.formatter</groupId>
                     <artifactId>formatter-maven-plugin</artifactId>
                     <version>${javaFormatter.plugin.version}</version>
                     <configuration>
@@ -650,12 +659,6 @@
                     <extensions>true</extensions>
                 </plugin>
                 <plugin>
-                    <groupId>org.mule.runtime.plugins</groupId>
-                    <artifactId>mule-extensions-maven-plugin</artifactId>
-                    <version>${mule.extensions.maven.plugin.version}</version>
-                    <extensions>true</extensions>
-                </plugin>
-                <plugin>
                     <groupId>io.qameta.allure</groupId>
                     <artifactId>allure-maven</artifactId>
                     <version>${allure.maven.plugin.version}</version>
@@ -709,7 +712,7 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.marvinformatics.formatter</groupId>
+                <groupId>net.revelc.code.formatter</groupId>
                 <artifactId>formatter-maven-plugin</artifactId>
             </plugin>
             <plugin>
@@ -798,12 +801,18 @@
                         <!-- List dependencies in the MANIFEST.MF -->
                         <manifest>
                             <!-- Note that we do not generate a classpath into the manifest, since doing so
-                                 significnatly slows down compilations that use the jar -->
+                                 significantly slows down compilations that use the jar -->
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
                         <!-- Custom Entries -->
                         <manifestEntries>
+                            <!-- include repository revision from buildnumber plugin -->
+                            <Build-Revision>${buildNumber}</Build-Revision>
+                            <Build-Date>${timestamp}</Build-Date>
+                            <Dev-List-Email>${dev.list}</Dev-List-Email>
+                            <Supported-Jdks>[${javaVersion}.0,12)</Supported-Jdks>
+                            <Recommended-Jdks>[${javaVersion}.0_181,9),[11,12)</Recommended-Jdks>
                             <More-Info>For more information go to ${productUrl}</More-Info>
                             <Support>Get commercial support: ${project.organization.url}/support</Support>
                             <Description>Mule Runtime and Integration Platform</Description>
@@ -811,12 +820,12 @@
                             <Vendor-Url>${project.organization.url}</Vendor-Url>
                             <Product-Url>${productUrl}</Product-Url>
                             <Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date>
-                            <!-- include repository revision from buildnumber plugin -->
-                            <Build-Revision>${buildNumber}</Build-Revision>
-                            <Build-Date>${timestamp}</Build-Date>
-                            <Dev-List-Email>${dev.list}</Dev-List-Email>
-                            <Supported-Jdks>[${javaVersion}.0,12)</Supported-Jdks>
-                            <Recommended-Jdks>[${javaVersion}.0_181,9),[11,12)</Recommended-Jdks>
+                            <Git-tags>${git.tags}</Git-tags>
+                            <Git-branch>${git.branch}</Git-branch>
+                            <Git-remote-origin-url>${git.remote.origin.url}</Git-remote-origin-url>
+                            <Git-commit-id>${git.commit.id}</Git-commit-id>
+                            <Git-commit-id-describe>${git.commit.id.describe}</Git-commit-id-describe>
+                            <Git-commit-time>${git.commit.time}</Git-commit-time>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -826,7 +835,7 @@
                 <artifactId>allure-maven</artifactId>
             </plugin>
             <plugin>
-                <!-- Aggregate sources artifact must be explicitely required from the maven command -->
+                <!-- Aggregate sources artifact must be explicitly required from the maven command -->
                 <!-- Attempting to generate it automatically by configuring the execution here will cause issues when adding new modules -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -840,6 +849,23 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>4.0.4</version>
+                <executions>
+                    <execution>
+                        <id>get-the-git-infos</id>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <useNativeGit>true</useNativeGit>
+                    <injectAllReactorProjects>true</injectAllReactorProjects>
+                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -861,15 +887,22 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>${javadocPluginVersion}</version>
+                <reportSets>
+                    <reportSet>
+                        <id>aggregate</id>
+                        <inherited>false</inherited>
+                        <reports>
+                            <report>aggregate-no-fork</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
                 <configuration>
                     <minmemory>128m</minmemory>
                     <maxmemory>512m</maxmemory>
                     <charset>ISO-8859-1</charset>
                     <encoding>ISO-8859-1</encoding>
                     <source>${javaVersion}</source>
-                    <configuration>
-                        <doclint>none</doclint>
-                    </configuration>
+                    <doclint>none</doclint>
                     <!-- Link to the external online JavaDoc -->
                     <links>
                         <link>http://docs.oracle.com/javase/7/docs/api/</link>
@@ -927,7 +960,7 @@
                 <surefire.args>-agentpath:'${yourkit.agent.path}'=disablestacktelemetry,exceptions=disable,probe_disable=*,listen=all ${surefire.args.base}</surefire.args>
             </properties>
         </profile>
-        <profile>
+		<profile>
             <id>release</id>
             <properties>
                 <skipVerifications>false</skipVerifications>
@@ -973,6 +1006,9 @@
                                     <rules>
                                         <requireReleaseDeps>
                                             <message>No Snapshots Allowed in Deps!</message>
+                                            <excludes>
+                                                <exclude>org.mule.tests:test-components</exclude>
+                                            </excludes>
                                         </requireReleaseDeps>
                                         <requireReleaseVersion>
                                             <message>No Snapshots Allowed in Project Version!</message>
@@ -1015,11 +1051,14 @@
                                             <message>No Snapshots Allowed in Deps!</message>
                                             <excludes>
                                                 <exclude>org.mule.weave:*</exclude>
+                                                <exclude>org.mule.runtime:mule-dwb-api</exclude>
                                                 <exclude>org.mule.services:*</exclude>
                                                 <exclude>org.mule.tools.maven:mule-classloader-model</exclude>
 
                                                 <exclude>org.raml:raml-parser-2</exclude>
                                                 <exclude>org.raml:yagi</exclude>
+
+                                                <exclude>org.mule.tests:test-components</exclude>
                                             </excludes>
                                         </requireReleaseDeps>
                                     </rules>
@@ -1079,7 +1118,7 @@
                         </dependencies>
                         <configuration>
                             <oldVersion>${oldMuleArtifactVersion}</oldVersion>
-                            <failOnUnresolvedArtifacts>true</failOnUnresolvedArtifacts>
+                            <failOnUnresolvedArtifacts>{revapi.failOnUnresolvedArtifacts}</failOnUnresolvedArtifacts>
                             <failOnMissingConfigurationFiles>false</failOnMissingConfigurationFiles>
                             <analysisConfiguration><![CDATA[
                                 {
