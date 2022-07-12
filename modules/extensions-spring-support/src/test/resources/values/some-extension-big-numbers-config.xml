@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:some="http://www.mulesoft.org/schema/mule/some"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/some http://www.mulesoft.org/schema/mule/some/current/mule-some.xsd">
+
+    <flow name="sumBigDecimal">
+        <some:sum-big-decimal x="#[vars.x]" y="#[vars.y]"/>
+    </flow>
+
+    <flow name="sumBigDecimalList">
+        <some:sum-big-decimal-list numbers="#[[vars.x, vars.y]]"/>
+    </flow>
+
+    <flow name="sumBigInteger">
+        <some:sum-big-integer a="#[vars.x]" b="#[vars.y]"/>
+    </flow>
+
+    <flow name="sumBigIntegerList">
+        <some:sum-big-integer-list listNumbers="#[[vars.x, vars.y]]"/>
+    </flow>
+
+</mule>

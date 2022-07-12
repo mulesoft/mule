@@ -7,6 +7,7 @@
 
 package org.mule.test.some.extension;
 
+import static java.math.BigDecimal.valueOf;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -21,8 +22,12 @@ import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -154,6 +159,28 @@ public class SomeOps {
   @MediaType(value = TEXT_PLAIN)
   public String sayHiParameterGroupDsl(@ParameterGroup(name = "person-pg-dsl", showInDsl = true) PersonPojo personPojo) {
     return buildHelloMessage(personPojo.getName());
+  }
+
+  public BigDecimal sumBigDecimal(BigDecimal x, BigDecimal y) {
+    return x.add(y);
+  }
+
+  public BigDecimal sumBigDecimalList(BigDecimal[] numbers) {
+    if (numbers.length == 0) {
+      return valueOf(0);
+    }
+    return Arrays.stream(numbers).reduce(BigDecimal::add).get();
+  }
+
+  public BigInteger sumBigInteger(BigInteger a, BigInteger b) {
+    return a.add(b);
+  }
+
+  public BigInteger sumBigIntegerList(List<BigInteger> listNumbers) {
+    if (listNumbers.size() == 0) {
+      return BigInteger.valueOf(0);
+    }
+    return listNumbers.stream().reduce(BigInteger::add).get();
   }
 
   private String buildHelloMessage(String person) {
