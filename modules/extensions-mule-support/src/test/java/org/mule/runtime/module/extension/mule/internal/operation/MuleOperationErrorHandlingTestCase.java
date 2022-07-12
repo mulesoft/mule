@@ -10,23 +10,17 @@ import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERATIONS;
-import static org.junit.rules.ExpectedException.none;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 @Feature(REUSE)
 @Stories({@Story(OPERATIONS), @Story(ERROR_HANDLING)})
 public class MuleOperationErrorHandlingTestCase extends MuleArtifactFunctionalTestCase {
-
-  @Rule
-  public ExpectedException expected = none();
 
   @Override
   protected String getConfigFile() {
@@ -51,5 +45,10 @@ public class MuleOperationErrorHandlingTestCase extends MuleArtifactFunctionalTe
   @Test
   public void heisenbergCureCancer() throws Exception {
     flowRunner("heisenbergCureCancerFlow").runExpectingException(errorType("HEISENBERG", "HEALTH"));
+  }
+
+  @Test
+  public void errorMappingInInvocation() throws Exception {
+    flowRunner("errorMappingOnInvocationFlow").runExpectingException(errorType("MY", "MAPPED"));
   }
 }

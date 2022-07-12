@@ -9,7 +9,7 @@
           http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd
           http://www.mulesoft.org/schema/mule/this http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd">
 
-    <!-- Use case 1: Unmapped Error Within App-->
+    <!-- Use Case 1.1: Errors thrown by mule operations within the same app -->
 
     <flow name="raiseErrorWithinThisNamespace">
         <this:raise-this />
@@ -60,6 +60,23 @@
         </operation:output>
         <operation:body>
             <heisenberg:cure-cancer />
+        </operation:body>
+    </operation:def>
+
+    <!-- Use Case 1.2: Error mapping on invocation -->
+
+    <flow name="errorMappingOnInvocationFlow">
+        <this:raise-custom>
+            <error-mapping sourceType="MY:CUSTOM" targetType="MY:MAPPED"/>
+        </this:raise-custom>
+    </flow>
+
+    <operation:def name="raiseCustom" displayName="." summary=".">
+        <operation:output>
+            <operation:payload-type type="void"/>
+        </operation:output>
+        <operation:body>
+            <raise-error type="MY:CUSTOM" />
         </operation:body>
     </operation:def>
 </mule>
