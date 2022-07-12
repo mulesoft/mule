@@ -30,7 +30,6 @@ import static java.util.Arrays.asList;
 
 import static com.google.common.collect.ImmutableSet.of;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -57,8 +56,6 @@ import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.profiling.NoOpProfilingService;
 import org.mule.runtime.core.internal.profiling.consumer.ComponentProcessingStrategyDataConsumer;
 import org.mule.runtime.core.internal.profiling.consumer.annotations.RuntimeInternalProfilingDataConsumer;
-import org.mule.runtime.core.internal.profiling.consumer.tracing.span.builder.ComponentSpanIdentifier;
-import org.mule.runtime.core.internal.profiling.consumer.tracing.span.builder.FlowSpanIdentifier;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentProcessingStrategyProfilingEventContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -187,19 +184,10 @@ public class ProcessingStrategyDataConsumersTestCase extends AbstractMuleContext
         profilingEventType == STARTING_FLOW_EXECUTION || profilingEventType == FLOW_EXECUTED) {
       assertThat(profilingDataConsumerSpan, is(notNullValue()));
       SpanIdentifier identifier = profilingDataConsumerSpan.getIdentifier();
-      assertThat(identifier, instanceOf(getTestSpanIdentifierClass()));
       assertThat(identifier.getId(), equalTo(ARTIFACT_ID + "/" + LOCATION + "/" + CORRELATION_ID));
 
     } else {
       assertThat(profilingDataConsumerSpan, is(nullValue()));
-    }
-  }
-
-  private Class getTestSpanIdentifierClass() {
-    if (profilingEventType == STARTING_FLOW_EXECUTION || profilingEventType == FLOW_EXECUTED) {
-      return FlowSpanIdentifier.class;
-    } else {
-      return ComponentSpanIdentifier.class;
     }
   }
 

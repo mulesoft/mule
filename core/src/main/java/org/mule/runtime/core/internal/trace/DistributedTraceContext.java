@@ -11,6 +11,8 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 
 import org.mule.runtime.api.event.Event;
+import org.mule.runtime.core.internal.profiling.ContextSpanAware;
+import org.mule.runtime.core.internal.profiling.InternalSpan;
 
 import java.util.Map;
 import java.util.Optional;
@@ -25,7 +27,7 @@ import java.util.Optional;
  *
  * @since 1.5.0
  */
-public interface DistributedTraceContext {
+public interface DistributedTraceContext extends ContextSpanAware {
 
   /**
    * Returns the optional value for a trace context key. This is agnostic to the tracing standard that we are using (for example,
@@ -53,6 +55,13 @@ public interface DistributedTraceContext {
   Map<String, String> baggageItemsAsMap();
 
   /**
+   * @return a copy of the {@link DistributedTraceContext}
+   */
+  DistributedTraceContext copy();
+
+  void endCurrentContextSpan();
+
+  /**
    * @return a {@link DistributedTraceContext} that has no fields nor baggage set.
    */
   static DistributedTraceContext emptyDistributedEventContext() {
@@ -76,6 +85,24 @@ public interface DistributedTraceContext {
       @Override
       public Map<String, String> baggageItemsAsMap() {
         return emptyMap();
+      }
+
+      @Override
+      public DistributedTraceContext copy() {
+        return this;
+      }
+
+      @Override
+      public void endCurrentContextSpan() {
+
+      }
+
+      @Override
+      public void setContextCurrentSpan(InternalSpan span) {}
+
+      @Override
+      public Optional<InternalSpan> getContextCurrentSpan() {
+        return empty();
       }
     };
   }

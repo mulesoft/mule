@@ -13,7 +13,7 @@ import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 
 import java.util.function.Function;
 
-import org.mule.runtime.core.internal.profiling.consumer.tracing.span.SpanManager;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.MuleCoreEventTracer;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -58,6 +58,10 @@ public interface InternalProfilingService extends ProfilingService {
 
   <S> Flux<S> setCurrentExecutionContext(Flux<S> original, Function<S, ExecutionContext> executionContextSupplier);
 
-  SpanManager getSpanManager();
-
+  /**
+   * @return the {@link MuleCoreEventTracer}.
+   *
+   * @since 4.5.0
+   */
+  MuleCoreEventTracer getMuleCoreEventTracer();
 }

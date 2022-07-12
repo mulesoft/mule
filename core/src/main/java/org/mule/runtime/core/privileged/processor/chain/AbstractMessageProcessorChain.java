@@ -54,7 +54,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
-import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
@@ -74,6 +73,8 @@ import org.mule.runtime.core.internal.interception.ReactiveInterceptor;
 import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
 import org.mule.runtime.core.internal.processor.interceptor.ProcessorInterceptorFactoryAdapter;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.MuleCoreEventTracer;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadingProfilingEventContext;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
@@ -162,7 +163,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private StreamingManager streamingManager;
 
   @Inject
-  private ProfilingService profilingService;
+  private InternalProfilingService profilingService;
 
   @Inject
   private SchedulerService schedulerService;
@@ -171,6 +172,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private ProfilingDataProducer<org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext, CoreEvent> endOperationExecutionDataProducer;
 
   private Scheduler switchOnErrorScheduler;
+  private MuleCoreEventTracer muleEventTracer;
 
   AbstractMessageProcessorChain(String name,
                                 Optional<ProcessingStrategy> processingStrategyOptional,
@@ -388,7 +390,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private void beforeProcessorInSameThread(CoreEvent event, Processor processor) {
     currentMuleContext.set(muleContext);
     setCurrentEvent((PrivilegedEvent) event);
-    triggerStartingOperation(event, getLocationIfComponent(processor));
   }
 
   private void afterProcessorInSameThread(CoreEvent event, Processor processor) {
@@ -399,6 +400,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     try {
       postNotification(processor).accept(result);
       setCurrentEvent((PrivilegedEvent) result);
+      muleEventTracer.endCurrentExecutionSpan(result);
+
+
       // If the processor returns a CursorProvider, then have the StreamingManager manage it
       return updateEventForStreaming(streamingManager).apply(result);
     } finally {
@@ -415,6 +419,11 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     if (processorPath != null) {
       MDC.put("processorPath", processorPath);
     }
+    ComponentLocation componentLocation = getLocationIfComponent(processor);
+    if (processor instanceof Component) {
+      muleEventTracer.startComponentExecutionSpan(event, (Component) processor);
+    }
+    triggerStartingOperation(event, componentLocation);
     preNotification(event, processor);
   }
 
@@ -610,6 +619,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     if (switchOnErrorScheduler == null) {
       switchOnErrorScheduler = schedulerService.cpuLightScheduler();
     }
+
+    muleEventTracer = profilingService.getMuleCoreEventTracer();
   }
 
   @Override

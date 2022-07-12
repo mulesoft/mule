@@ -1017,6 +1017,8 @@ public interface AllureConstants {
     interface ProfilingServiceStory {
 
       String DEFAULT_PROFILING_SERVICE = "Default Profiling Service";
+
+      String DEFAULT_MULE_CORE_EVENT_TRACER = "Default Mule Core Event Tracer";
     }
   }
 

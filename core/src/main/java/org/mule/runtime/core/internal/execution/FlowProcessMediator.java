@@ -80,6 +80,9 @@ import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 import org.mule.runtime.core.internal.processor.interceptor.CompletableInterceptorSourceFailureCallbackAdapter;
 import org.mule.runtime.core.internal.processor.interceptor.CompletableInterceptorSourceSuccessCallbackAdapter;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
+import org.mule.runtime.core.internal.profiling.InternalSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.MuleCoreEventTracer;
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultCollection;
 import org.mule.runtime.core.internal.util.message.TransformingLegacyResultAdapterCollection;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -131,6 +134,9 @@ public class FlowProcessMediator implements Initialisable {
   @Inject
   private MuleContext muleContext;
 
+  @Inject
+  private InternalProfilingService profilingService;
+
   private final PolicyManager policyManager;
   private final PhaseResultNotifier phaseResultNotifier;
   private final List<CompletableInterceptorSourceSuccessCallbackAdapter> additionalSuccessInterceptors = new LinkedList<>();
@@ -143,6 +149,7 @@ public class FlowProcessMediator implements Initialisable {
   private NotificationHelper notificationHelper;
   private final List<SourceInterceptor> sourceInterceptors = new LinkedList<>();
   private Optional<CorrelationIdGenerator> correlationIdGenerator;
+  private MuleCoreEventTracer muleEventTracer;
 
   public FlowProcessMediator(PolicyManager policyManager, PhaseResultNotifier phaseResultNotifier) {
     this.policyManager = policyManager;
@@ -151,6 +158,7 @@ public class FlowProcessMediator implements Initialisable {
 
   @Override
   public void initialise() throws InitialisationException {
+    this.muleEventTracer = profilingService.getMuleCoreEventTracer();
     this.notificationHelper =
         new NotificationHelper(notificationManager, ConnectorMessageNotification.class, false);
 
@@ -249,6 +257,8 @@ public class FlowProcessMediator implements Initialisable {
     try {
       onMessageReceived(event, flowConstruct, ctx);
       flowConstruct.checkBackpressure(event);
+      InternalSpan span =
+          muleEventTracer.startComponentExecutionSpan(event, flowConstruct);
       ctx.template.getNotificationFunctions().forEach(notificationFunction -> notificationManager
           .fireNotification(notificationFunction.apply(event, flowConstruct.getSource())));
       sourcePolicy.process(event, ctx.template,
@@ -256,11 +266,13 @@ public class FlowProcessMediator implements Initialisable {
 
                              @Override
                              public void complete(Either<SourcePolicyFailureResult, SourcePolicySuccessResult> value) {
+                               span.end();
                                dispatchResponse(flowConstruct, ctx, value);
                              }
 
                              @Override
                              public void error(Throwable e) {
+                               span.end();
                                dispatchResponse(flowConstruct, ctx,
                                                 left(new SourcePolicyFailureResult(new MessagingException(event, e),
                                                                                    Collections::emptyMap)));
