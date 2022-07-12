@@ -86,17 +86,7 @@ public class ActiveMQResourceReleaserTestCase extends AbstractMuleTestCase {
       }
 
       @Override
-      public ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy) {
-        return null;
-      }
-
-      @Override
       public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies, boolean overwrite) {
-        return null;
-      }
-
-      @Override
-      public ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy, boolean overwrite) {
         return null;
       }
     };
