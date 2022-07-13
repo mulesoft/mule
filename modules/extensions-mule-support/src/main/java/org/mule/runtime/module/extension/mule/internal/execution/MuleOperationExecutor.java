@@ -9,14 +9,11 @@ package org.mule.runtime.module.extension.mule.internal.execution;
 import static org.mule.runtime.api.exception.ExceptionHelper.getExceptionsAsList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
-import static org.mule.runtime.core.api.util.ExceptionUtils.isUnknownMuleError;
 import static org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.from;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 
 import org.mule.runtime.api.component.execution.ComponentExecutionException;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -100,12 +97,7 @@ public class MuleOperationExecutor implements CompletableComponentExecutor<Compo
   private static Optional<ErrorType> getErrorType(Throwable exception) {
     List<Throwable> exceptionsAsList = getExceptionsAsList(exception);
     for (Throwable e : exceptionsAsList) {
-      if (e instanceof MuleException) {
-        ErrorType errorType = ((MuleException) e).getExceptionInfo().getErrorType();
-        if (!isUnknownMuleError(errorType)) {
-          return of(errorType);
-        }
-      } else if (e instanceof ComponentExecutionException) {
+      if (e instanceof ComponentExecutionException) {
         Optional<Error> optionalError = ((ComponentExecutionException) e).getEvent().getError();
         if (optionalError.isPresent()) {
           return optionalError.map(Error::getErrorType);
