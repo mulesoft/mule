@@ -68,19 +68,19 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
    */
   public static final class EventDistributedContextBuilder {
 
-    private DistributedTraceContextGetter sdkDistributedTraceContextMapGetter;
+    private DistributedTraceContextGetter distributedTraceContextMapGetter;
 
     private EventDistributedContextBuilder() {}
 
-    public EventDistributedContextBuilder withGetter(DistributedTraceContextGetter sdkDistributedTraceContextMapGetter) {
-      this.sdkDistributedTraceContextMapGetter = sdkDistributedTraceContextMapGetter;
+    public EventDistributedContextBuilder withGetter(DistributedTraceContextGetter distributedTraceContextMapGetter) {
+      this.distributedTraceContextMapGetter = distributedTraceContextMapGetter;
       return this;
     }
 
     public DistributedTraceContext build() {
       return new EventDistributedTraceContext(getDefaultTraceContextFieldsExtractor(),
                                               getDefaultBaggageExtractor(),
-                                              sdkDistributedTraceContextMapGetter);
+                                              distributedTraceContextMapGetter);
     }
   }
 }

@@ -6,10 +6,29 @@
  */
 package org.mule.runtime.core.internal.execution;
 
+import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
+import static org.mule.runtime.api.functional.Either.left;
+import static org.mule.runtime.api.functional.Either.right;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_SEND;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_GENERATE;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_SEND;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.onCallback;
+import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
+import static org.mule.tck.junit4.matcher.EitherMatcher.leftMatches;
+import static org.mule.tck.junit4.matcher.EitherMatcher.rightMatches;
+import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorType;
+import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventThat;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
+
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
@@ -24,24 +43,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
-import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
-import static org.mule.runtime.api.functional.Either.left;
-import static org.mule.runtime.api.functional.Either.right;
-import static org.mule.runtime.api.metadata.MediaType.ANY;
-import static org.mule.runtime.core.api.construct.BackPressureReason.MAX_CONCURRENCY_EXCEEDED;
-import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
-import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_SEND;
-import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_GENERATE;
-import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_SEND;
-import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.onCallback;
-import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
-import static org.mule.tck.junit4.matcher.EitherMatcher.leftMatches;
-import static org.mule.tck.junit4.matcher.EitherMatcher.rightMatches;
-import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorType;
-import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventThat;
 import static reactor.core.Exceptions.propagate;
 
 import org.mule.runtime.api.component.Component;
@@ -60,6 +61,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.AbstractPipeline;
 import org.mule.runtime.core.internal.construct.FlowBackPressureMaxConcurrencyExceededException;
+import org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter;
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
@@ -202,6 +204,9 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
 
     template = mock(FlowProcessTemplate.class);
     resultAdapter = mock(SourceResultAdapter.class);
+    DistributedTraceContextGetter distributedTraceContextGetter = mock(DistributedTraceContextGetter.class);
+    when(distributedTraceContextGetter.get(any(String.class))).thenReturn(empty());
+    when(resultAdapter.getDistributedTraceContextGetter()).thenReturn(distributedTraceContextGetter);
     when(resultAdapter.getResult()).thenReturn(Result.builder().build());
     when(resultAdapter.getMediaType()).thenReturn(ANY);
 
