@@ -51,4 +51,14 @@ public class MuleOperationErrorHandlingTestCase extends MuleArtifactFunctionalTe
   public void errorMappingInInvocation() throws Exception {
     flowRunner("errorMappingOnInvocationFlow").runExpectingException(errorType("MY", "MAPPED"));
   }
+
+  @Test
+  public void errorMappingInsideBody() throws Exception {
+    flowRunner("errorMappingInsideBodyFlow").runExpectingException(errorType("MY", "MAPPED"));
+  }
+
+  @Test
+  public void errorMappingInsideBodyAndInInvocation() throws Exception {
+    flowRunner("errorMappingInsideBodyAndInInvocationFlow").runExpectingException(errorType("MY", "MAPPED_TWICE"));
+  }
 }
