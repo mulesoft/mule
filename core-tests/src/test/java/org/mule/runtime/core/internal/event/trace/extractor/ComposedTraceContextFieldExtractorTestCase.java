@@ -77,10 +77,10 @@ public class ComposedTraceContextFieldExtractorTestCase {
     }
 
     @Override
-    public Map<String, String> extract(DistributedTraceContextGetter sdkDistributedTraceContextMapGetter) {
+    public Map<String, String> extract(DistributedTraceContextGetter distributedTraceContextMapGetter) {
       Map<String, String> resultMap = new HashMap<>();
-      if (sdkDistributedTraceContextMapGetter.get(key).isPresent()) {
-        resultMap.put(key, sdkDistributedTraceContextMapGetter.get(key).get());
+      if (distributedTraceContextMapGetter.get(key).isPresent()) {
+        resultMap.put(key, distributedTraceContextMapGetter.get(key).get());
       }
       return resultMap;
     }

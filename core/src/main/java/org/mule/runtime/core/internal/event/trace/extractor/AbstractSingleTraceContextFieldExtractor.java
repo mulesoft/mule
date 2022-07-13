@@ -20,9 +20,9 @@ import java.util.Map;
 public abstract class AbstractSingleTraceContextFieldExtractor implements TraceContextFieldExtractor {
 
   @Override
-  public Map<String, String> extract(DistributedTraceContextGetter sdkDistributedTraceContextMapGetter) {
+  public Map<String, String> extract(DistributedTraceContextGetter distributedTraceContextMapGetter) {
     Map<String, String> resultContext = new HashMap<>();
-    sdkDistributedTraceContextMapGetter.get(getFieldKey()).ifPresent(value -> resultContext.put(getFieldKey(), value));
+    distributedTraceContextMapGetter.get(getFieldKey()).ifPresent(value -> resultContext.put(getFieldKey(), value));
 
     return resultContext;
   }

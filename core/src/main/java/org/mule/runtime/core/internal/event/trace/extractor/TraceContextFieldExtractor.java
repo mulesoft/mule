@@ -19,9 +19,9 @@ import java.util.Map;
 public interface TraceContextFieldExtractor {
 
   /**
-   * @param sdkDistributedTraceContextMapGetter a {@link DistributedTraceContextGetter} through which the context is propagated.
+   * @param distributedTraceContextMapGetter a {@link DistributedTraceContextGetter} through which the context is propagated.
    *
    * @return the map containing the specific key/values.
    */
-  Map<String, String> extract(DistributedTraceContextGetter sdkDistributedTraceContextMapGetter);
+  Map<String, String> extract(DistributedTraceContextGetter distributedTraceContextMapGetter);
 }

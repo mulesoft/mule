@@ -26,10 +26,10 @@ public class CorrelationIdTraceContextFieldExtractor implements TraceContextFiel
   public static final String MULE_CORRELATION_ID = MULE_CORRELATION_ID_PROPERTY.toLowerCase();
 
   @Override
-  public Map<String, String> extract(DistributedTraceContextGetter sdkDistributedTraceContextMapGetter) {
+  public Map<String, String> extract(DistributedTraceContextGetter distributedTraceContextMapGetter) {
     Map<String, String> resultContext = new HashMap<>();
-    Optional<String> xCorrelationId = sdkDistributedTraceContextMapGetter.get(X_CORRELATION_ID);
-    Optional<String> muleCorrelationId = sdkDistributedTraceContextMapGetter.get(MULE_CORRELATION_ID);
+    Optional<String> xCorrelationId = distributedTraceContextMapGetter.get(X_CORRELATION_ID);
+    Optional<String> muleCorrelationId = distributedTraceContextMapGetter.get(MULE_CORRELATION_ID);
 
     if (xCorrelationId.isPresent()) {
       resultContext.put(X_CORRELATION_ID, xCorrelationId.get());

@@ -26,11 +26,11 @@ public class ComposedTraceContextFieldExtractor implements TraceContextFieldExtr
   }
 
   @Override
-  public Map<String, String> extract(DistributedTraceContextGetter sdkDistributedTraceContextMapGetter) {
+  public Map<String, String> extract(DistributedTraceContextGetter distributedTraceContextMapGetter) {
     Map<String, String> result = new HashMap<>();
 
     for (TraceContextFieldExtractor traceContextFieldExtractor : traceContextFieldExtractors) {
-      result.putAll(traceContextFieldExtractor.extract(sdkDistributedTraceContextMapGetter));
+      result.putAll(traceContextFieldExtractor.extract(distributedTraceContextMapGetter));
     }
 
     return result;
