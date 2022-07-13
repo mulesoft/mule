@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.supportsConnectivity;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromStaticValues;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -38,7 +39,9 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.cli
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ImplicitConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StaticConnectionProviderResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Map;
@@ -76,7 +79,7 @@ public final class ConfigurationCreationUtils {
                                                                   String configName,
                                                                   Map<String, Object> parameters,
                                                                   Optional<ExpirationPolicy> expirationPolicy,
-                                                                  ConnectionProviderValueResolver connectionProviderResolver,
+                                                                  Optional<ConnectionProviderValueResolver> connectionProviderResolver,
                                                                   ConfigurationProviderFactory configurationProviderFactory,
                                                                   ExpressionManager expressionManager,
                                                                   ReflectionCache reflectionCache,
@@ -95,17 +98,29 @@ public final class ConfigurationCreationUtils {
                                                                parametersOwner,
                                                                dslSyntaxResolver);
 
-      connectionProviderResolver.getResolverSet()
+      final ConnectionProviderValueResolver connectionResolver;
+      if (connectionProviderResolver.isPresent())  {
+        connectionResolver = connectionProviderResolver.get();
+      } else {
+        if (supportsConnectivity(extensionModel, configurationModel)) {
+          connectionResolver = new ImplicitConnectionProviderValueResolver(configName, extensionModel, configurationModel, reflectionCache,
+              expressionManager, muleContext);
+        } else {
+          connectionResolver = new StaticConnectionProviderResolver(null, null);
+        }
+      }
+
+      connectionResolver.getResolverSet()
           .ifPresent((CheckedConsumer) resolver -> initialiseIfNeeded(resolver, true, muleContext));
 
       ConfigurationProvider configurationProvider;
       try {
-        if (resolverSet.isDynamic() || connectionProviderResolver.isDynamic()) {
+        if (resolverSet.isDynamic() || connectionResolver.isDynamic()) {
           configurationProvider =
               configurationProviderFactory.createDynamicConfigurationProvider(configName, extensionModel,
                                                                               configurationModel,
                                                                               resolverSet,
-                                                                              connectionProviderResolver,
+                  connectionResolver,
                                                                               getActingExpirationPolicy(expirationPolicy,
                                                                                                         muleContext),
                                                                               reflectionCache,
@@ -117,7 +132,7 @@ public final class ConfigurationCreationUtils {
                                                  extensionModel,
                                                  configurationModel,
                                                  resolverSet,
-                                                 connectionProviderResolver,
+                  connectionResolver,
                                                  reflectionCache,
                                                  expressionManager,
                                                  muleContext);
