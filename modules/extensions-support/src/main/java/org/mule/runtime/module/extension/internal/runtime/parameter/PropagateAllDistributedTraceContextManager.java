@@ -12,6 +12,7 @@ import static java.util.Collections.unmodifiableMap;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -28,7 +29,9 @@ public class PropagateAllDistributedTraceContextManager implements DistributedTr
   }
 
   private void resolveContextMap(DistributedTraceContext distributedTraceContext) {
-    contextMap = unmodifiableMap(distributedTraceContext.baggageItemsAsMap());
+    Map<String, String> contextMapToBuild = new HashMap<>(distributedTraceContext.tracingFieldsAsMap());
+    contextMapToBuild.putAll(distributedTraceContext.baggageItemsAsMap());
+    contextMap = unmodifiableMap(contextMapToBuild);
   }
 
   @Override
