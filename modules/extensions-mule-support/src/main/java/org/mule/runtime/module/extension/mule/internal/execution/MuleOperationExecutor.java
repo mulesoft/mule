@@ -6,24 +6,32 @@
  */
 package org.mule.runtime.module.extension.mule.internal.execution;
 
-import static java.lang.String.format;
+import static org.mule.runtime.api.exception.ExceptionHelper.getExceptionsAsList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.from;
+import static java.lang.String.format;
+import static java.util.Optional.empty;
 
+import org.mule.runtime.api.component.execution.ComponentExecutionException;
+import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.module.extension.internal.runtime.operation.construct.Operation;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.operation.construct.Operation;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -67,7 +75,7 @@ public class MuleOperationExecutor implements CompletableComponentExecutor<Compo
 
     operation.execute(executionEvent).whenComplete((resultEvent, exception) -> {
       if (exception != null) {
-        callback.error(exception);
+        callback.error(tryCreateTypedExceptionFrom(exception));
       } else {
         callback.complete(builder(inputEvent)
             .message(resultEvent.getMessage())
@@ -80,5 +88,30 @@ public class MuleOperationExecutor implements CompletableComponentExecutor<Compo
     return from(inputEvent)
         .getOperationExecutionParams(ctx.getComponent().getLocation(), inputEvent.getContext().getId())
         .getParameters();
+  }
+
+  private static Throwable tryCreateTypedExceptionFrom(Throwable exception) {
+    return getErrorType(exception).map(errorType -> wrapInTyped(exception, errorType)).orElse(exception);
+  }
+
+  private static Optional<ErrorType> getErrorType(Throwable exception) {
+    List<Throwable> exceptionsAsList = getExceptionsAsList(exception);
+    for (Throwable e : exceptionsAsList) {
+      if (e instanceof ComponentExecutionException) {
+        Optional<Error> optionalError = ((ComponentExecutionException) e).getEvent().getError();
+        if (optionalError.isPresent()) {
+          return optionalError.map(Error::getErrorType);
+        }
+      }
+    }
+
+    return empty();
+  }
+
+  private static Throwable wrapInTyped(Throwable throwable, ErrorType errorType) {
+    if (throwable instanceof TypedException) {
+      return throwable;
+    }
+    return new TypedException(throwable, errorType);
   }
 }

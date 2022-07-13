@@ -332,6 +332,7 @@ public interface AllureConstants {
       String OPERATIONS = "Operations";
       String PARAMETERS = "Parameters";
       String TYPES_CATALOG = "Types Catalog";
+      String ERROR_HANDLING = "Error Handling";
     }
   }
 
