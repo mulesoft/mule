@@ -99,12 +99,13 @@ public final class ConfigurationCreationUtils {
                                                                dslSyntaxResolver);
 
       final ConnectionProviderValueResolver connectionResolver;
-      if (connectionProviderResolver.isPresent())  {
+      if (connectionProviderResolver.isPresent()) {
         connectionResolver = connectionProviderResolver.get();
       } else {
         if (supportsConnectivity(extensionModel, configurationModel)) {
-          connectionResolver = new ImplicitConnectionProviderValueResolver(configName, extensionModel, configurationModel, reflectionCache,
-              expressionManager, muleContext);
+          connectionResolver =
+              new ImplicitConnectionProviderValueResolver(configName, extensionModel, configurationModel, reflectionCache,
+                                                          expressionManager, muleContext);
         } else {
           connectionResolver = new StaticConnectionProviderResolver(null, null);
         }
@@ -120,7 +121,7 @@ public final class ConfigurationCreationUtils {
               configurationProviderFactory.createDynamicConfigurationProvider(configName, extensionModel,
                                                                               configurationModel,
                                                                               resolverSet,
-                  connectionResolver,
+                                                                              connectionResolver,
                                                                               getActingExpirationPolicy(expirationPolicy,
                                                                                                         muleContext),
                                                                               reflectionCache,
@@ -132,7 +133,7 @@ public final class ConfigurationCreationUtils {
                                                  extensionModel,
                                                  configurationModel,
                                                  resolverSet,
-                  connectionResolver,
+                                                 connectionResolver,
                                                  reflectionCache,
                                                  expressionManager,
                                                  muleContext);
