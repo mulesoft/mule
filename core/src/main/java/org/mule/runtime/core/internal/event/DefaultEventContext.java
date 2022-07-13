@@ -56,7 +56,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   private static final Logger LOGGER = getLogger(DefaultEventContext.class);
 
   private static final long serialVersionUID = -3664490832964509653L;
-  private transient DistributedTraceContext distributedTraceContext = emptyDistributedEventContext();
+  private transient DistributedTraceContext distributedTraceContext;
 
   /**
    * Builds a new child execution context from a parent context. A child context delegates all getters to the parent context but
@@ -322,7 +322,12 @@ public final class DefaultEventContext extends AbstractEventContext implements S
         + getOriginatingLocation().getRootContainerName() + " }";
   }
 
+  @Override
   public DistributedTraceContext getDistributedTraceContext() {
+    if (distributedTraceContext == null) {
+      distributedTraceContext = emptyDistributedEventContext();
+    }
+
     return distributedTraceContext;
   }
 
@@ -384,6 +389,10 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
     @Override
     public DistributedTraceContext getDistributedTraceContext() {
+      if (distributedTraceContext != null) {
+        distributedTraceContext = emptyDistributedEventContext();
+      }
+
       return distributedTraceContext;
     }
 
