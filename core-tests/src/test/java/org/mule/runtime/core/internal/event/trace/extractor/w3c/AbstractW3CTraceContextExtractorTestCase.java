@@ -32,11 +32,11 @@ public abstract class AbstractW3CTraceContextExtractorTestCase {
 
   @Test
   public void noOtherFieldsApartFromTraceParent() {
-    DistributedTraceContextGetter sdkDistributedTraceContextMapGetter = mock(DistributedTraceContextGetter.class);
-    when(sdkDistributedTraceContextMapGetter.get(any(String.class))).thenReturn(empty());
-    when(sdkDistributedTraceContextMapGetter.get(getTraceField())).thenReturn(of(TEST_VALUE));
-    when(sdkDistributedTraceContextMapGetter.get(ANOTHER_KEY)).thenReturn(of(ANOTHER_KEY));
-    Map<String, String> extractedValuesMap = getTraceContextFieldExtractor().extract(sdkDistributedTraceContextMapGetter);
+    DistributedTraceContextGetter distributedTraceContextMapGetter = mock(DistributedTraceContextGetter.class);
+    when(distributedTraceContextMapGetter.get(any(String.class))).thenReturn(empty());
+    when(distributedTraceContextMapGetter.get(getTraceField())).thenReturn(of(TEST_VALUE));
+    when(distributedTraceContextMapGetter.get(ANOTHER_KEY)).thenReturn(of(ANOTHER_KEY));
+    Map<String, String> extractedValuesMap = getTraceContextFieldExtractor().extract(distributedTraceContextMapGetter);
     assertThat(extractedValuesMap, aMapWithSize(1));
     assertThat(extractedValuesMap, hasEntry(equalTo(getTraceField()), equalTo(TEST_VALUE)));
   }

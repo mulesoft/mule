@@ -51,11 +51,11 @@ public class EventDistributedTraceContextTestCase {
     DistributedTraceContext eventDistributedTraceContext =
         EventDistributedTraceContext.builder().withGetter(distributedTraceContextGetter).build();
 
-    if (eventDistributedTraceContext.getTraceFieldValue(TRACEPARENT).isPresent()) {
+    if (!eventDistributedTraceContext.getTraceFieldValue(TRACEPARENT).isPresent()) {
       fail("No traceparent propagated!");
     }
 
-    if (eventDistributedTraceContext.getBaggageItem(TRACESTATE).isPresent()) {
+    if (!eventDistributedTraceContext.getBaggageItem(TRACESTATE).isPresent()) {
       fail("No tracestate propagated!");
     }
 

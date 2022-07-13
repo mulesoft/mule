@@ -40,11 +40,11 @@ public class CorrelationIdTraceContextFieldExtractorTestCase {
 
   @Test
   public void noFieldsExtractedWhenFieldsNoPresentInGetter() {
-    DistributedTraceContextGetter sdkDistributedTraceContextMapGetter = mock(DistributedTraceContextGetter.class);
-    when(sdkDistributedTraceContextMapGetter.get(any(String.class))).thenReturn(empty());
+    DistributedTraceContextGetter distributedTraceContextMapGetter = mock(DistributedTraceContextGetter.class);
+    when(distributedTraceContextMapGetter.get(any(String.class))).thenReturn(empty());
     CorrelationIdTraceContextFieldExtractor correlationIdTraceContextFieldExtractor =
         new CorrelationIdTraceContextFieldExtractor();
-    assertThat(correlationIdTraceContextFieldExtractor.extract(sdkDistributedTraceContextMapGetter), aMapWithSize(0));
+    assertThat(correlationIdTraceContextFieldExtractor.extract(distributedTraceContextMapGetter), aMapWithSize(0));
   }
 
   @Test
@@ -59,24 +59,24 @@ public class CorrelationIdTraceContextFieldExtractorTestCase {
 
   @Test
   public void xCorrelationIdSupersedesMuleCorrelationId() {
-    DistributedTraceContextGetter sdkDistributedTraceContextMapGetter = mock(DistributedTraceContextGetter.class);
-    when(sdkDistributedTraceContextMapGetter.get(any(String.class))).thenReturn(empty());
-    when(sdkDistributedTraceContextMapGetter.get(X_CORRELATION_ID)).thenReturn(of(TEST_X_CORRELATION_ID));
-    when(sdkDistributedTraceContextMapGetter.get(MULE_CORRELATION_ID)).thenReturn(of(TEST_MULE_CORRELATION_ID));
+    DistributedTraceContextGetter distributedTraceContextMapGetter = mock(DistributedTraceContextGetter.class);
+    when(distributedTraceContextMapGetter.get(any(String.class))).thenReturn(empty());
+    when(distributedTraceContextMapGetter.get(X_CORRELATION_ID)).thenReturn(of(TEST_X_CORRELATION_ID));
+    when(distributedTraceContextMapGetter.get(MULE_CORRELATION_ID)).thenReturn(of(TEST_MULE_CORRELATION_ID));
     CorrelationIdTraceContextFieldExtractor correlationIdTraceContextFieldExtractor =
         new CorrelationIdTraceContextFieldExtractor();
-    Map<String, String> extractedValuesMap = correlationIdTraceContextFieldExtractor.extract(sdkDistributedTraceContextMapGetter);
+    Map<String, String> extractedValuesMap = correlationIdTraceContextFieldExtractor.extract(distributedTraceContextMapGetter);
     assertThat(extractedValuesMap, aMapWithSize(1));
     assertThat(extractedValuesMap, hasEntry(equalTo(X_CORRELATION_ID), equalTo(TEST_X_CORRELATION_ID)));
   }
 
   private void testWithOnlyOneEntry(String key, String value) {
-    DistributedTraceContextGetter sdkDistributedTraceContextMapGetter = mock(DistributedTraceContextGetter.class);
-    when(sdkDistributedTraceContextMapGetter.get(any(String.class))).thenReturn(empty());
-    when(sdkDistributedTraceContextMapGetter.get(key)).thenReturn(of(value));
+    DistributedTraceContextGetter distributedTraceContextMapGetter = mock(DistributedTraceContextGetter.class);
+    when(distributedTraceContextMapGetter.get(any(String.class))).thenReturn(empty());
+    when(distributedTraceContextMapGetter.get(key)).thenReturn(of(value));
     CorrelationIdTraceContextFieldExtractor correlationIdTraceContextFieldExtractor =
         new CorrelationIdTraceContextFieldExtractor();
-    Map<String, String> extractedValuesMap = correlationIdTraceContextFieldExtractor.extract(sdkDistributedTraceContextMapGetter);
+    Map<String, String> extractedValuesMap = correlationIdTraceContextFieldExtractor.extract(distributedTraceContextMapGetter);
     assertThat(extractedValuesMap, aMapWithSize(1));
     assertThat(extractedValuesMap, hasEntry(equalTo(key), equalTo(value)));
   }

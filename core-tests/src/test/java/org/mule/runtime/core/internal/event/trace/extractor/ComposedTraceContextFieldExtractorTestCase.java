@@ -46,19 +46,19 @@ public class ComposedTraceContextFieldExtractorTestCase {
 
   @Test
   public void composedTraceContextFieldsExtractorComposesAndOnlyRetrievesTheComposedExtractorFields() {
-    DistributedTraceContextGetter sdkDistributedTraceContextMapGetter = mock(DistributedTraceContextGetter.class);
-    when(sdkDistributedTraceContextMapGetter.get(any(String.class))).thenReturn(empty());
+    DistributedTraceContextGetter distributedTraceContextMapGetter = mock(DistributedTraceContextGetter.class);
+    when(distributedTraceContextMapGetter.get(any(String.class))).thenReturn(empty());
 
-    when(sdkDistributedTraceContextMapGetter.get(TEST_TRACE_FIELD_KEY_1)).thenReturn(of(TEST_TRACE_FIELD_VALUE_1));
-    when(sdkDistributedTraceContextMapGetter.get(TEST_TRACE_FIELD_KEY_2)).thenReturn(of(TEST_TRACE_FIELD_VALUE_2));
-    when(sdkDistributedTraceContextMapGetter.get(TEST_TRACE_FIELD_KEY_NOT_EXTRACTED))
+    when(distributedTraceContextMapGetter.get(TEST_TRACE_FIELD_KEY_1)).thenReturn(of(TEST_TRACE_FIELD_VALUE_1));
+    when(distributedTraceContextMapGetter.get(TEST_TRACE_FIELD_KEY_2)).thenReturn(of(TEST_TRACE_FIELD_VALUE_2));
+    when(distributedTraceContextMapGetter.get(TEST_TRACE_FIELD_KEY_NOT_EXTRACTED))
         .thenReturn(of(TEST_TRACE_FIELD_VALUE_NOT_EXTRACTED));
 
     ComposedTraceContextFieldExtractor composedTraceContextFieldExtractor =
         new ComposedTraceContextFieldExtractor(new TestTraceContextExtractor(TEST_TRACE_FIELD_KEY_1),
                                                new TestTraceContextExtractor(TEST_TRACE_FIELD_KEY_2));
 
-    Map<String, String> extractedValuesMap = composedTraceContextFieldExtractor.extract(sdkDistributedTraceContextMapGetter);
+    Map<String, String> extractedValuesMap = composedTraceContextFieldExtractor.extract(distributedTraceContextMapGetter);
     assertThat(extractedValuesMap, aMapWithSize(2));
     assertThat(extractedValuesMap, hasEntry(equalTo(TEST_TRACE_FIELD_KEY_1), equalTo(TEST_TRACE_FIELD_VALUE_1)));
     assertThat(extractedValuesMap, hasEntry(equalTo(TEST_TRACE_FIELD_KEY_2), equalTo(TEST_TRACE_FIELD_VALUE_2)));
