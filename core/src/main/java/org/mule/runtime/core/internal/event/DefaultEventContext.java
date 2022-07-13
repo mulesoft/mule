@@ -389,7 +389,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
     @Override
     public DistributedTraceContext getDistributedTraceContext() {
-      if (distributedTraceContext != null) {
+      if (distributedTraceContext == null) {
         distributedTraceContext = emptyDistributedEventContext();
       }
 
