@@ -47,6 +47,7 @@ import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.AbstractPipeline;
+import org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter;
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.FlowProcessMediator;
@@ -88,6 +89,9 @@ public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleContextTes
   private SourceResultAdapter message;
 
   @Mock
+  private DistributedTraceContextGetter distributedTraceContextGetter;
+
+  @Mock
   private CoreEvent event;
 
   @Mock
@@ -114,6 +118,8 @@ public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleContextTes
 
   @Before
   public void before() throws Exception {
+    when(distributedTraceContextGetter.get(any(String.class))).thenReturn(empty());
+    when(message.getDistributedTraceContextGetter()).thenReturn(distributedTraceContextGetter);
     template = new ExtensionsFlowProcessingTemplate(message, messageProcessor, emptyList(), completionHandler);
     doAnswer(onCallback(callback -> callback.complete(null))).when(completionHandler).onCompletion(any(), any(), any());
     doAnswer(onCallback(callback -> callback.complete(null))).when(completionHandler).onFailure(any(), any(), any());
@@ -311,6 +317,7 @@ public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleContextTes
     SourceResultAdapter resultAdapter = mock(SourceResultAdapter.class);
     when(resultAdapter.getResult()).thenReturn(Result.builder().build());
     when(resultAdapter.getMediaType()).thenReturn(ANY);
+    when(resultAdapter.getDistributedTraceContextGetter()).thenReturn(distributedTraceContextGetter);
 
     template = new ExtensionsFlowProcessingTemplate(resultAdapter, messageProcessor, emptyList(), completionHandler);
   }

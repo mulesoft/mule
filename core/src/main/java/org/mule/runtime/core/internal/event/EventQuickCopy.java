@@ -7,12 +7,15 @@
 package org.mule.runtime.core.internal.event;
 
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
+import static org.mule.runtime.core.internal.trace.DistributedTraceContext.emptyDistributedEventContext;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
@@ -106,7 +109,7 @@ public final class EventQuickCopy {
     }
   }
 
-  private static class EventQuickCopyContextDecorator extends BaseEventDecorator {
+  private static class EventQuickCopyContextDecorator extends BaseEventDecorator implements DistributedTraceContextAware {
 
     private static final long serialVersionUID = -2674520914985642327L;
 
@@ -130,6 +133,20 @@ public final class EventQuickCopy {
     @Override
     public String getCorrelationId() {
       return getLegacyCorrelationId() != null ? getLegacyCorrelationId() : getContext().getCorrelationId();
+    }
+
+    @Override
+    public DistributedTraceContext getDistributedTraceContext() {
+      if (context instanceof DistributedTraceContextAware) {
+        return ((DistributedTraceContextAware) context).getDistributedTraceContext();
+      }
+
+      return emptyDistributedEventContext();
+    }
+
+    @Override
+    public void setDistributedTraceContext(DistributedTraceContext distributedTraceContext) {
+
     }
   }
 

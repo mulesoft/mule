@@ -15,6 +15,7 @@ import static org.mule.runtime.module.extension.internal.runtime.execution.Metho
 import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isConnectionParameter;
 import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isCorrelationInfoType;
 import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isDefaultEncoding;
+import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isDistributedTraceContextManagerType;
 import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isLiteralType;
 import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isParameterResolverType;
 import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isSourceCompletionCallbackType;
@@ -77,6 +78,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.Configuration
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.CorrelationInfoArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.DefaultEncodingArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.DistributedTraceContextManagerResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ErrorArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExtensionsClientArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.FlowListenerArgumentResolver;
@@ -105,6 +107,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.StreamingHelp
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.VoidCallbackArgumentResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 
 /**
@@ -161,6 +164,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       new SdkOperationTransactionalActionArgumentResolver();
   private static final ArgumentResolver<CorrelationInfo> CORRELATION_INFO_ARGUMENT_RESOLVER =
       new CorrelationInfoArgumentResolver();
+  private static final ArgumentResolver<DistributedTraceContextManager> DISTRIBUTED_TRACE_CONTEXT_MANAGER_RESOLVER =
+      new DistributedTraceContextManagerResolver();
   private static final ArgumentResolver<NotificationEmitter> LEGACY_NOTIFICATION_HANDLER_ARGUMENT_RESOLVER =
       new NotificationHandlerArgumentResolver();
   private static final ArgumentResolver<org.mule.sdk.api.notification.NotificationEmitter> NOTIFICATION_HANDLER_ARGUMENT_RESOLVER =
@@ -283,6 +288,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = OPERATION_TRANSACTIONAL_ACTION_ARGUMENT_RESOLVER;
       } else if (isCorrelationInfoType(parameterType)) {
         argumentResolver = CORRELATION_INFO_ARGUMENT_RESOLVER;
+      } else if (isDistributedTraceContextManagerType(parameterType)) {
+        argumentResolver = DISTRIBUTED_TRACE_CONTEXT_MANAGER_RESOLVER;
       } else if (NotificationEmitter.class.equals(parameterType)) {
         argumentResolver = LEGACY_NOTIFICATION_HANDLER_ARGUMENT_RESOLVER;
       } else if (org.mule.sdk.api.notification.NotificationEmitter.class.equals(parameterType)) {

@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.core.internal.execution;
 
+import static org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter.emptyTraceContextMapGetter;
+
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.internal.util.mediatype.PayloadMediaTypeResolver;
+import org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter;
 import org.mule.sdk.api.runtime.operation.Result;
 
 import java.util.List;
@@ -28,6 +31,7 @@ public class SourceResultAdapter {
   private final MediaType mediaType;
   private final Optional<String> correlationId;
   private final PayloadMediaTypeResolver payloadMediaTypeResolver;
+  private final DistributedTraceContextGetter distributedTraceContextGetter;
 
   /**
    * Creates a new instance
@@ -63,12 +67,24 @@ public class SourceResultAdapter {
                              boolean isCollection,
                              Optional<String> correlationId,
                              PayloadMediaTypeResolver payloadMediaTypeResolver) {
+    this(result, cursorProviderFactory, mediaType, isCollection, correlationId, payloadMediaTypeResolver,
+         emptyTraceContextMapGetter());
+  }
+
+  public SourceResultAdapter(Result<?, ?> result,
+                             CursorProviderFactory cursorProviderFactory,
+                             MediaType mediaType,
+                             boolean isCollection,
+                             Optional<String> correlationId,
+                             PayloadMediaTypeResolver payloadMediaTypeResolver,
+                             DistributedTraceContextGetter distributedTraceContextGetter) {
     this.result = result;
     this.cursorProviderFactory = cursorProviderFactory;
     this.mediaType = mediaType;
     this.isCollection = isCollection;
     this.correlationId = correlationId;
     this.payloadMediaTypeResolver = payloadMediaTypeResolver;
+    this.distributedTraceContextGetter = distributedTraceContextGetter;
   }
 
   /**
@@ -109,5 +125,14 @@ public class SourceResultAdapter {
    */
   public PayloadMediaTypeResolver getPayloadMediaTypeResolver() {
     return payloadMediaTypeResolver;
+  }
+
+  /**
+   * @return the {@link DistributedTraceContextGetter} used to retrieve the distributed trace context.
+   *
+   * @since 4.5.0
+   */
+  public DistributedTraceContextGetter getDistributedTraceContextGetter() {
+    return distributedTraceContextGetter;
   }
 }

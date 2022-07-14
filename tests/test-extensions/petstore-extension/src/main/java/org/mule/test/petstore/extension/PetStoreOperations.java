@@ -22,6 +22,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.metadata.MetadataContext;
+import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.security.SecurityException;
@@ -47,6 +48,7 @@ import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 import org.mule.runtime.extension.api.stereotype.ValidatorStereotype;
 import org.mule.sdk.api.annotation.param.RuntimeVersion;
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -248,6 +250,11 @@ public class PetStoreOperations {
     return animal.toString();
   }
 
+  @OutputResolver(output = DistributedContextPropagatorOutputResolver.class)
+  public DistributedTraceContextManager getPetTraceContextPropagator(DistributedTraceContextManager distributedTraceContextManager) {
+    return distributedTraceContextManager;
+  }
+
   @OutputResolver(output = CorrelationInfoOutputResolver.class)
   public CorrelationInfo getPetCorrelation(CorrelationInfo correlationInfo) {
     return correlationInfo;
@@ -337,6 +344,21 @@ public class PetStoreOperations {
   @MediaType(ANY)
   public String getStreamToString(InputStream stream) {
     return stream.toString();
+  }
+
+  public static class DistributedContextPropagatorOutputResolver
+      implements OutputTypeResolver<DistributedTraceContextManager> {
+
+    @Override
+    public MetadataType getOutputType(MetadataContext context, DistributedTraceContextManager key)
+        throws MetadataResolvingException, ConnectionException {
+      return context.getTypeLoader().load(DistributedTraceContextManager.class);
+    }
+
+    @Override
+    public String getCategoryName() {
+      return "distributedTraceContextPropagator";
+    }
   }
 
   public static class CorrelationInfoOutputResolver implements OutputTypeResolver<CorrelationInfo> {
