@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java.error;
 
+import static java.util.Locale.ROOT;
 import static java.util.Objects.hash;
 import static java.util.Optional.empty;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils.getDeclarationClass;
 
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
@@ -23,7 +25,9 @@ import java.util.Optional;
  */
 public class JavaErrorModelParser implements ErrorModelParser {
 
-  private final boolean muleError;
+  private static final String MULE = CORE_PREFIX.toUpperCase(ROOT);
+
+  private final String extensionNamespace;
   private final ErrorTypeDefinition<?> errorTypeDefinition;
   private final Class<?> errorTypeDefinitionDeclarationClass;
   private Optional<ErrorModelParser> parent = empty();
@@ -32,11 +36,11 @@ public class JavaErrorModelParser implements ErrorModelParser {
    * Create a new instance
    *
    * @param errorTypeDefinition the {@link ErrorTypeDefinition}
-   * @param muleError           whether this represents a mule error
+   * @param extensionNamespace  the namespace of the extension that is being parsed.
    */
-  public JavaErrorModelParser(ErrorTypeDefinition<?> errorTypeDefinition, boolean muleError) {
+  public JavaErrorModelParser(ErrorTypeDefinition<?> errorTypeDefinition, String extensionNamespace) {
+    this.extensionNamespace = extensionNamespace;
     this.errorTypeDefinition = errorTypeDefinition;
-    this.muleError = muleError;
     errorTypeDefinitionDeclarationClass = getDeclarationClass(errorTypeDefinition);
   }
 
@@ -47,12 +51,12 @@ public class JavaErrorModelParser implements ErrorModelParser {
 
   @Override
   public String getNamespace() {
-    return null;
+    return extensionNamespace;
   }
 
   @Override
   public boolean isMuleError() {
-    return muleError;
+    return MULE.equals(extensionNamespace);
   }
 
   public void setParent(Optional<ErrorModelParser> parent) {

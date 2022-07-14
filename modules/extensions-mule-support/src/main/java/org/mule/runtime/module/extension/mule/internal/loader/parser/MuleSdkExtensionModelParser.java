@@ -141,7 +141,6 @@ class MuleSdkExtensionModelParser implements ExtensionModelParser {
   @Override
   public Optional<XmlDslConfiguration> getXmlDslConfiguration() {
     return of(new XmlDslConfiguration(THIS_PREFIX, THIS_NAMESPACE));
-
   }
 
   @Override
@@ -177,6 +176,11 @@ class MuleSdkExtensionModelParser implements ExtensionModelParser {
   @Override
   public List<NotificationModel> getNotificationModels() {
     return emptyList();
+  }
+
+  @Override
+  public String getNamespace() {
+    return "THIS";
   }
 
   private List<OperationModelParser> computeOperationModelParsers() {
