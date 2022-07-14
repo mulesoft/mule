@@ -13,12 +13,132 @@
         <some:sum-big-decimal-list numbers="#[[vars.x, vars.y]]"/>
     </flow>
 
+    <flow name="BD:ZERO+ZERO">
+        <some:sum-big-decimal x="${ZERO}" y="${ZERO}"/>
+    </flow>
+
+    <flow name="BD:ZERO+SMALL_NUMBER">
+        <some:sum-big-decimal x="${ZERO}" y="${SMALL_NUMBER}"/>
+    </flow>
+
+    <flow name="BD:ZERO+SMALL_NUMBER_NEGATIVE">
+        <some:sum-big-decimal x="${ZERO}" y="${SMALL_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BD:ZERO+BIG_NUMBER">
+        <some:sum-big-decimal x="${ZERO}" y="30414093201713378043612608166064768844377641568960512000000000000"/>
+    </flow>
+
+    <flow name="BD:ZERO+BIG_NUMBER_NEGATIVE">
+        <some:sum-big-decimal x="${ZERO}" y="${BIG_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BD:SMALL_NUMBER+SMALL_NUMBER">
+        <some:sum-big-decimal x="${SMALL_NUMBER}" y="${SMALL_NUMBER}"/>
+    </flow>
+
+    <flow name="BD:SMALL_NUMBER+SMALL_NUMBER_NEGATIVE">
+        <some:sum-big-decimal x="${SMALL_NUMBER}" y="${SMALL_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BD:SMALL_NUMBER+BIG_NUMBER">
+        <some:sum-big-decimal x="${SMALL_NUMBER}" y="${BIG_NUMBER}"/>
+    </flow>
+
+    <flow name="BD:SMALL_NUMBER+BIG_NUMBER_NEGATIVE">
+        <some:sum-big-decimal x="${SMALL_NUMBER}" y="${BIG_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BD:SMALL_NUMBER_NEGATIVE+SMALL_NUMBER_NEGATIVE">
+        <some:sum-big-decimal x="${SMALL_NUMBER_NEGATIVE}" y="${SMALL_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BD:SMALL_NUMBER_NEGATIVE+BIG_NUMBER">
+        <some:sum-big-decimal x="${SMALL_NUMBER_NEGATIVE}" y="${BIG_NUMBER}"/>
+    </flow>
+
+    <flow name="BD:SMALL_NUMBER_NEGATIVE+BIG_NUMBER_NEGATIVE">
+        <some:sum-big-decimal x="${SMALL_NUMBER_NEGATIVE}" y="${BIG_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BD:BIG_NUMBER+BIG_NUMBER">
+        <some:sum-big-decimal x="${BIG_NUMBER}" y="${BIG_NUMBER}"/>
+    </flow>
+
+    <flow name="BD:BIG_NUMBER+BIG_NUMBER_NEGATIVE">
+        <some:sum-big-decimal x="${BIG_NUMBER}" y="${BIG_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BD:BIG_NUMBER_NEGATIVE+BIG_NUMBER_NEGATIVE">
+        <some:sum-big-decimal x="${BIG_NUMBER_NEGATIVE}" y="${BIG_NUMBER_NEGATIVE}"/>
+    </flow>
+
     <flow name="sumBigInteger">
         <some:sum-big-integer a="#[vars.x]" b="#[vars.y]"/>
     </flow>
 
     <flow name="sumBigIntegerList">
         <some:sum-big-integer-list listNumbers="#[[vars.x, vars.y]]"/>
+    </flow>
+
+    <flow name="BI:ZERO+ZERO">
+        <some:sum-big-integer a="${ZERO}" b="${ZERO}"/>
+    </flow>
+
+    <flow name="BI:ZERO+SMALL_NUMBER">
+        <some:sum-big-integer a="${ZERO}" b="${SMALL_NUMBER}"/>
+    </flow>
+
+    <flow name="BI:ZERO+SMALL_NUMBER_NEGATIVE">
+        <some:sum-big-integer a="${ZERO}" b="${SMALL_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BI:ZERO+BIG_NUMBER">
+        <some:sum-big-integer a="${ZERO}" b="${BIG_NUMBER}"/>
+    </flow>
+
+    <flow name="BI:ZERO+BIG_NUMBER_NEGATIVE">
+        <some:sum-big-integer a="${ZERO}" b="${BIG_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BI:SMALL_NUMBER+SMALL_NUMBER">
+        <some:sum-big-integer a="${SMALL_NUMBER}" b="${SMALL_NUMBER}"/>
+    </flow>
+
+    <flow name="BI:SMALL_NUMBER+SMALL_NUMBER_NEGATIVE">
+        <some:sum-big-integer a="${SMALL_NUMBER}" b="${SMALL_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BI:SMALL_NUMBER+BIG_NUMBER">
+        <some:sum-big-integer a="${SMALL_NUMBER}" b="${BIG_NUMBER}"/>
+    </flow>
+
+    <flow name="BI:SMALL_NUMBER+BIG_NUMBER_NEGATIVE">
+        <some:sum-big-integer a="${SMALL_NUMBER}" b="${BIG_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BI:SMALL_NUMBER_NEGATIVE+SMALL_NUMBER_NEGATIVE">
+        <some:sum-big-integer a="${SMALL_NUMBER_NEGATIVE}" b="${SMALL_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BI:SMALL_NUMBER_NEGATIVE+BIG_NUMBER">
+        <some:sum-big-integer a="${SMALL_NUMBER_NEGATIVE}" b="${BIG_NUMBER}"/>
+    </flow>
+
+    <flow name="BI:SMALL_NUMBER_NEGATIVE+BIG_NUMBER_NEGATIVE">
+        <some:sum-big-integer a="${SMALL_NUMBER_NEGATIVE}" b="${BIG_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BI:BIG_NUMBER+BIG_NUMBER">
+        <some:sum-big-integer a="${BIG_NUMBER}" b="${BIG_NUMBER}"/>
+    </flow>
+
+    <flow name="BI:BIG_NUMBER+BIG_NUMBER_NEGATIVE">
+        <some:sum-big-integer a="${BIG_NUMBER}" b="${BIG_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BI:BIG_NUMBER_NEGATIVE+BIG_NUMBER_NEGATIVE">
+        <some:sum-big-integer a="${BIG_NUMBER_NEGATIVE}" b="${BIG_NUMBER_NEGATIVE}"/>
     </flow>
 
 </mule>

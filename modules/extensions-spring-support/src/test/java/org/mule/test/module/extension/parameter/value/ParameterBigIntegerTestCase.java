@@ -6,22 +6,25 @@
  */
 package org.mule.test.module.extension.parameter.value;
 
-import static java.util.Arrays.asList;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.JavaSdk.JAVA_SDK;
 import static org.mule.test.allure.AllureConstants.JavaSdk.Parameters.PARAMETERS;
 
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
@@ -31,8 +34,24 @@ import org.junit.runners.Parameterized;
 @RunnerDelegateTo(Parameterized.class)
 public class ParameterBigIntegerTestCase extends AbstractExtensionFunctionalTestCase {
 
+  private String name;
   private String x;
   private String y;
+
+  @Rule
+  public SystemProperty zero = new SystemProperty("ZERO", ZERO);
+
+  @Rule
+  public SystemProperty small_number = new SystemProperty("SMALL_NUMBER", SMALL_NUMBER);
+
+  @Rule
+  public SystemProperty small_number_negative = new SystemProperty("SMALL_NUMBER_NEGATIVE", SMALL_NUMBER_NEGATIVE);
+
+  @Rule
+  public SystemProperty big_number = new SystemProperty("BIG_NUMBER", BIG_NUMBER);
+
+  @Rule
+  public SystemProperty big_number_negative = new SystemProperty("BIG_NUMBER_NEGATIVE", BIG_NUMBER_NEGATIVE);
 
   private static String ZERO = "0";
   private static String SMALL_NUMBER = "10";
@@ -40,14 +59,22 @@ public class ParameterBigIntegerTestCase extends AbstractExtensionFunctionalTest
   private static String BIG_NUMBER = "30414093201713378043612608166064768844377641568960512000000000000";
   private static String BIG_NUMBER_NEGATIVE = "-30414093201713378043612608166064768844377641568960512000000000099";
 
-  @Parameterized.Parameters()
+  @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
-    return asList(new Object[][] {{ZERO, ZERO}, {ZERO, SMALL_NUMBER}, {ZERO, SMALL_NUMBER_NEGATIVE},
-        {SMALL_NUMBER, SMALL_NUMBER_NEGATIVE}, {SMALL_NUMBER, SMALL_NUMBER}, {SMALL_NUMBER_NEGATIVE, SMALL_NUMBER_NEGATIVE},
-        {BIG_NUMBER, BIG_NUMBER_NEGATIVE}, {BIG_NUMBER, BIG_NUMBER}, {BIG_NUMBER_NEGATIVE, BIG_NUMBER_NEGATIVE}});
+
+    List<Object[]> combinations = new ArrayList<>();
+    String[] names = {"ZERO", "SMALL_NUMBER", "SMALL_NUMBER_NEGATIVE", "BIG_NUMBER", "BIG_NUMBER_NEGATIVE"};
+    String[] numbers = {ZERO, SMALL_NUMBER, SMALL_NUMBER_NEGATIVE, BIG_NUMBER, BIG_NUMBER_NEGATIVE};
+    for (int i = 0; i < numbers.length; i++) {
+      for (int j = i; j < numbers.length; j++) {
+        combinations.add(new String[] {names[i] + "+" + names[j], numbers[i], numbers[j]});
+      }
+    }
+    return combinations;
   }
 
-  public ParameterBigIntegerTestCase(String x, String y) {
+  public ParameterBigIntegerTestCase(String name, String x, String y) {
+    this.name = name;
     this.x = x;
     this.y = y;
   }
@@ -67,6 +94,13 @@ public class ParameterBigIntegerTestCase extends AbstractExtensionFunctionalTest
   @Test
   public void sumBigIntegersList() throws Exception {
     CoreEvent result = flowRunner("sumBigIntegerList").withVariable("x", x).withVariable("y", y).run();
+    BigInteger number = new BigInteger(x).add(new BigInteger(y));
+    assertThat(result.getMessage().getPayload().getValue(), is(number));
+  }
+
+  @Test
+  public void sumBigIntegersInline() throws Exception {
+    CoreEvent result = flowRunner("BI:" + name).run();
     BigInteger number = new BigInteger(x).add(new BigInteger(y));
     assertThat(result.getMessage().getPayload().getValue(), is(number));
   }
