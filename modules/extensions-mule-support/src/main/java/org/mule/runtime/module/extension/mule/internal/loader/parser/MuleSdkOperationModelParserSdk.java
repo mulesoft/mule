@@ -49,6 +49,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupMo
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.mule.internal.execution.MuleOperationExecutor;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic;
+import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.AggregatedErrorsCharacteristic;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.IsBlockingCharacteristic;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.IsTransactionalCharacteristic;
 
@@ -86,6 +87,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   private final Characteristic<Boolean> isBlocking = new IsBlockingCharacteristic();
   private final Characteristic<List<NotificationModel>> notificationModels = new AggregatedNotificationsCharacteristic();
   private final FilteringCharacteristic<Boolean> isTransactional = new IsTransactionalCharacteristic();
+  private final Characteristic<List<ErrorModelParser>> errorModels = new AggregatedErrorsCharacteristic();
 
   private final List<ModelProperty> additionalModelProperties =
       asList(new NoStreamingConfigurationModelProperty(), new NoTransactionalActionModelProperty(),
@@ -265,7 +267,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   @Override
   public List<ErrorModelParser> getErrorModelParsers() {
-    return emptyList();
+    return errorModels.getValue();
   }
 
   @Override
