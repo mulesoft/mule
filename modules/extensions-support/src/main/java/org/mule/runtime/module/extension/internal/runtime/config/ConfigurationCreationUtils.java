@@ -98,18 +98,11 @@ public final class ConfigurationCreationUtils {
                                                                parametersOwner,
                                                                dslSyntaxResolver);
 
-      final ConnectionProviderValueResolver connectionResolver;
-      if (connectionProviderResolver.isPresent()) {
-        connectionResolver = connectionProviderResolver.get();
-      } else {
-        if (supportsConnectivity(extensionModel, configurationModel)) {
-          connectionResolver =
-              new ImplicitConnectionProviderValueResolver(configName, extensionModel, configurationModel, reflectionCache,
-                                                          expressionManager, muleContext);
-        } else {
-          connectionResolver = new StaticConnectionProviderResolver(null, null);
-        }
-      }
+      final ConnectionProviderValueResolver connectionResolver = connectionProviderResolver
+          .orElseGet(() -> supportsConnectivity(extensionModel, configurationModel)
+              ? new ImplicitConnectionProviderValueResolver(configName, extensionModel, configurationModel, reflectionCache,
+                                                            expressionManager, muleContext)
+              : new StaticConnectionProviderResolver(null, null));
 
       connectionResolver.getResolverSet()
           .ifPresent((CheckedConsumer) resolver -> initialiseIfNeeded(resolver, true, muleContext));
