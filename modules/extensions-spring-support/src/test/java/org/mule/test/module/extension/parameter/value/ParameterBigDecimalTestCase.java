@@ -80,7 +80,7 @@ public class ParameterBigDecimalTestCase extends AbstractExtensionFunctionalTest
 
   @Override
   protected String getConfigFile() {
-    return "values/some-extension-big-numbers-config.xml";
+    return "values/some-extension-big-decimals-config.xml";
   }
 
   @Test
@@ -98,8 +98,15 @@ public class ParameterBigDecimalTestCase extends AbstractExtensionFunctionalTest
   }
 
   @Test
-  public void sumBigDecimalsInline() throws Exception {
+  public void sumBigDecimalsProperties() throws Exception {
     CoreEvent result = flowRunner("BD:" + name).run();
+    BigDecimal number = new BigDecimal(x).add(new BigDecimal(y));
+    assertThat(result.getMessage().getPayload().getValue(), is(number));
+  }
+
+  @Test
+  public void sumBigDecimalsInline() throws Exception {
+    CoreEvent result = flowRunner("sumBigDecimalListInline").withVariable("x", x).withVariable("y", y).run();
     BigDecimal number = new BigDecimal(x).add(new BigDecimal(y));
     assertThat(result.getMessage().getPayload().getValue(), is(number));
   }

@@ -165,11 +165,11 @@ public class SomeOps {
     return x.add(y);
   }
 
-  public BigDecimal sumBigDecimalList(BigDecimal[] numbers) {
-    if (numbers.length == 0) {
+  public BigDecimal sumBigDecimalList(List<BigDecimal> numbers) {
+    if (numbers.size() == 0) {
       return valueOf(0);
     }
-    return Arrays.stream(numbers).reduce(BigDecimal::add).get();
+    return numbers.stream().reduce(BigDecimal::add).get();
   }
 
   public BigInteger sumBigInteger(BigInteger a, BigInteger b) {

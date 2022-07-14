@@ -81,7 +81,7 @@ public class ParameterBigIntegerTestCase extends AbstractExtensionFunctionalTest
 
   @Override
   protected String getConfigFile() {
-    return "values/some-extension-big-numbers-config.xml";
+    return "values/some-extension-big-integers-config.xml";
   }
 
   @Test
@@ -99,8 +99,15 @@ public class ParameterBigIntegerTestCase extends AbstractExtensionFunctionalTest
   }
 
   @Test
-  public void sumBigIntegersInline() throws Exception {
+  public void sumBigIntegersProperties() throws Exception {
     CoreEvent result = flowRunner("BI:" + name).run();
+    BigInteger number = new BigInteger(x).add(new BigInteger(y));
+    assertThat(result.getMessage().getPayload().getValue(), is(number));
+  }
+
+  @Test
+  public void sumBigIntegersInline() throws Exception {
+    CoreEvent result = flowRunner("sumBigIntegerListInline").withVariable("x", x).withVariable("y", y).run();
     BigInteger number = new BigInteger(x).add(new BigInteger(y));
     assertThat(result.getMessage().getPayload().getValue(), is(number));
   }
