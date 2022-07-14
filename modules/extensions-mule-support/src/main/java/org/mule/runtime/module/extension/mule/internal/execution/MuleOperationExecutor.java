@@ -91,12 +91,21 @@ public class MuleOperationExecutor implements CompletableComponentExecutor<Compo
   }
 
   private static Throwable tryCreateTypedExceptionFrom(Throwable exception) {
+    // Wrapping the caught exception into a TypedException allows us to explicit the error type,
+    // which we are extracting from a ComponentExecutionException.
+    // Other way to implement it would be to change the method MessagingExceptionResolver#errorTypeFromException
+    // to handle instances of ComponentExecutionException, but having this code in this module will allow us to
+    // do custom mappings without modifying the error handling mechanism.
     return getErrorType(exception).map(errorType -> wrapInTyped(exception, errorType)).orElse(exception);
   }
 
   private static Optional<ErrorType> getErrorType(Throwable exception) {
     List<Throwable> exceptionsAsList = getExceptionsAsList(exception);
     for (Throwable e : exceptionsAsList) {
+      // The MuleOperation has a chain which is an AbstractExecutableComponent, so
+      // given the logic of AbstractExecutableComponent#doProcess, some exception in this list
+      // must be an instance of ComponentExecutionException, and the event within it should have
+      // the event with the actual error.
       if (e instanceof ComponentExecutionException) {
         Optional<Error> optionalError = ((ComponentExecutionException) e).getEvent().getError();
         if (optionalError.isPresent()) {
