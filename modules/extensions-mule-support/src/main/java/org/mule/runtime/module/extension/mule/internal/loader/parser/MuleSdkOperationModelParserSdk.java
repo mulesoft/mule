@@ -377,7 +377,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   }
 
   public void computeCharacteristics(Map<String, MuleSdkOperationModelParserSdk> operationModelParsersByName) {
-    computeCharacteristicsWithoutFiltering(asList(isBlocking, notificationModels), operationModelParsersByName);
+    computeCharacteristicsWithoutFiltering(asList(isBlocking, notificationModels, errorModels), operationModelParsersByName);
     computeCharacteristicsWithFiltering(singletonList(isTransactional), operationModelParsersByName);
   }
 
