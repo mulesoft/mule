@@ -25,6 +25,11 @@ public interface ErrorModelParser {
   String getType();
 
   /**
+   * @return the error's namespace
+   */
+  String getNamespace();
+
+  /**
    * @return {@code true} if it represents to a core Mule language error.
    */
   boolean isMuleError();

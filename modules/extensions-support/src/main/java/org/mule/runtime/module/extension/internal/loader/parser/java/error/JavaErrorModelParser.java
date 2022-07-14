@@ -46,6 +46,11 @@ public class JavaErrorModelParser implements ErrorModelParser {
   }
 
   @Override
+  public String getNamespace() {
+    return null;
+  }
+
+  @Override
   public boolean isMuleError() {
     return muleError;
   }

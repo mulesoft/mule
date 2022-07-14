@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.mule.internal.utils;
 
+import static java.util.Optional.ofNullable;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic.AggregatedNotificationsCharacteristic;
@@ -44,28 +45,35 @@ public class CharacteristicsTestsCase {
   @Test
   @Description("Checks that AnyMatchCharacteristic is updated accordingly after different computations")
   public void anyMatchTestCase() {
-    OperationModel model = mock(OperationModel.class);
+    ComponentAst operationAst = createOperationAst();
     Reference<Boolean> value = new Reference<>(FALSE);
     Characteristic<Boolean> characteristic = new AnyMatchCharacteristic(x -> value.get());
     assertThat(characteristic.hasValue(), is(false));
     assertThat(characteristic.hasDefinitiveValue(), is(false));
 
-    characteristic.computeFrom(model);
+    characteristic.computeFrom(operationAst);
     assertThat(characteristic.hasValue(), is(true));
     assertThat(characteristic.hasDefinitiveValue(), is(false));
     assertThat(characteristic.getValue(), is(false));
 
     value.set(true);
-    characteristic.computeFrom(model);
+    characteristic.computeFrom(operationAst);
     assertThat(characteristic.hasValue(), is(true));
     assertThat(characteristic.hasDefinitiveValue(), is(true));
     assertThat(characteristic.getValue(), is(true));
   }
 
+  private ComponentAst createOperationAst() {
+    OperationModel operationModel = mock(OperationModel.class);
+    ComponentAst operationAst = mock(ComponentAst.class);
+    when(operationAst.getModel(OperationModel.class)).thenReturn(ofNullable(operationModel));
+    return operationAst;
+  }
+
   @Test
   @Description("Checks that AnyMatchFilteringCharacteristic is updated accordingly after different computations, including filters")
   public void anyMathFilterTestCase() {
-    OperationModel model = mock(OperationModel.class);
+    ComponentAst operationAst = createOperationAst();
     ComponentAst ast = mock(ComponentAst.class);
     Reference<Boolean> value = new Reference<>(FALSE);
     Reference<Boolean> filter = new Reference<>(FALSE);
@@ -75,13 +83,13 @@ public class CharacteristicsTestsCase {
     assertThat(characteristic.hasValue(), is(false));
     assertThat(characteristic.hasDefinitiveValue(), is(false));
 
-    characteristic.computeFrom(model);
+    characteristic.computeFrom(operationAst);
     assertThat(characteristic.hasValue(), is(true));
     assertThat(characteristic.hasDefinitiveValue(), is(false));
     assertThat(characteristic.getValue(), is(false));
 
     value.set(true);
-    characteristic.computeFrom(model);
+    characteristic.computeFrom(operationAst);
     assertThat(characteristic.hasValue(), is(true));
     assertThat(characteristic.hasDefinitiveValue(), is(true));
     assertThat(characteristic.getValue(), is(true));
@@ -101,25 +109,28 @@ public class CharacteristicsTestsCase {
   @Test
   @Description("Checks that AggregatedNotificationsCharacteristic is updated accordingly and aggregates results after different computations")
   public void aggregatedTestCase() {
-    OperationModel model1 = mock(OperationModel.class);
-    OperationModel model2 = mock(OperationModel.class);
-    OperationModel model3 = mock(OperationModel.class);
+    ComponentAst componentAst1 = createOperationAst();
+    ComponentAst componentAst2 = createOperationAst();
+    ComponentAst componentAst3 = createOperationAst();
     NotificationModel notification1 = new ImmutableNotificationModel("test", "1", mock(MetadataType.class));
     NotificationModel notification2 = new ImmutableNotificationModel("test", "2", mock(MetadataType.class));
     NotificationModel notification3 = new ImmutableNotificationModel("test", "3", mock(MetadataType.class));
     NotificationModel notification4 = new ImmutableNotificationModel("test", "4", mock(MetadataType.class));
     NotificationModel notification5 = new ImmutableNotificationModel("test", "5", mock(MetadataType.class));
-    when(model1.getNotificationModels()).thenReturn(new HashSet<>(asList(notification1, notification2)));
-    when(model2.getNotificationModels()).thenReturn(new HashSet<>(asList(notification3, notification4)));
-    when(model3.getNotificationModels()).thenReturn(new HashSet<>(singletonList(notification5)));
+    when(componentAst1.getModel(OperationModel.class).get().getNotificationModels())
+        .thenReturn(new HashSet<>(asList(notification1, notification2)));
+    when(componentAst2.getModel(OperationModel.class).get().getNotificationModels())
+        .thenReturn(new HashSet<>(asList(notification3, notification4)));
+    when(componentAst3.getModel(OperationModel.class).get().getNotificationModels())
+        .thenReturn(new HashSet<>(singletonList(notification5)));
 
     Characteristic<List<NotificationModel>> characteristic = new AggregatedNotificationsCharacteristic();
 
     assertThat(characteristic.hasDefinitiveValue(), is(false));
 
-    characteristic.computeFrom(model1);
-    characteristic.computeFrom(model2);
-    characteristic.computeFrom(model3);
+    characteristic.computeFrom(componentAst1);
+    characteristic.computeFrom(componentAst2);
+    characteristic.computeFrom(componentAst3);
     assertThat(characteristic.hasDefinitiveValue(), is(false));
     assertThat(characteristic.hasValue(), is(true));
     assertThat(characteristic.getValue(), hasSize(5));
