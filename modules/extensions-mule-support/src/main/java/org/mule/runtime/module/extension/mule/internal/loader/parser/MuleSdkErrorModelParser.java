@@ -6,25 +6,42 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
+import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 
 import java.util.Optional;
 
+/**
+ * {@link ErrorModelParser} implementation for errors defined through the Mule SDK.
+ *
+ * @since 4.5.0
+ */
+// TODO: Add test? Would it be so obvious?
 public class MuleSdkErrorModelParser implements ErrorModelParser {
 
   private final String namespace;
   private final String type;
   private final ErrorModelParser parent;
 
+  /**
+   * Create a new instance since an {@link ErrorModel}.
+   *
+   * @param errorModel the {@link ErrorModel} with the error data.
+   */
   public MuleSdkErrorModelParser(ErrorModel errorModel) {
     this(errorModel.getNamespace(), errorModel.getType(), errorModel.getParent().map(MuleSdkErrorModelParser::new).orElse(null));
   }
 
-  public MuleSdkErrorModelParser(String namespace, String type) {
-    this(namespace, type, null);
-  }
-
+  /**
+   * Create a new instance since the namespace, type, and parent.
+   *
+   * @param namespace the error namespace.
+   * @param type the error type.
+   * @param parent a reference to the parent error parser. If {@code null}, the method #getParent will return an empty
+   *               instance of {@link Optional}, and it will end up meaning MULE:ANY.
+   */
   public MuleSdkErrorModelParser(String namespace, String type, ErrorModelParser parent) {
     this.namespace = namespace;
     this.type = type;
@@ -43,6 +60,6 @@ public class MuleSdkErrorModelParser implements ErrorModelParser {
 
   @Override
   public Optional<ErrorModelParser> getParent() {
-    return Optional.ofNullable(parent);
+    return ofNullable(parent);
   }
 }

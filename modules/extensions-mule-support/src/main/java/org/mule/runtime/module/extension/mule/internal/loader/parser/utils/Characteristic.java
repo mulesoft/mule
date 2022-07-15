@@ -253,7 +253,7 @@ public class Characteristic<T> {
         return;
       }
 
-      errorModels.add(new MuleSdkErrorModelParser(errorId.get().getNamespace(), errorId.get().getName()));
+      errorModels.add(new MuleSdkErrorModelParser(errorId.get().getNamespace(), errorId.get().getName(), null));
     }
 
     private static boolean isRaiseError(ComponentAst operationAst) {

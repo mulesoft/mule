@@ -180,6 +180,7 @@ class MuleSdkExtensionModelParser implements ExtensionModelParser {
 
   @Override
   public String getNamespace() {
+    // TODO: Change this when it's an actual extension.
     return "THIS";
   }
 
