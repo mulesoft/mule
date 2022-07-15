@@ -73,7 +73,36 @@ public class ErrorsModelFactory {
    */
   public ErrorsModelFactory(List<ErrorModelParser> extensionErrorParsers, String extensionNamespace)
       throws IllegalModelDefinitionException {
-    this(toDefinitionArray(extensionErrorParsers), extensionNamespace);
+    this.extensionNamespace = extensionNamespace.toUpperCase();
+    final Graph<ErrorModelParser, DefaultEdge> graph = toGraph(extensionErrorParsers);
+
+    errorModelMap = new HashMap<>();
+    initErrorModelMap(errorModelMap);
+
+    new TopologicalOrderIterator<>(graph).forEachRemaining(parser -> {
+      ErrorModel errorModel = toErrorModel(parser, errorModelMap);
+      errorModelMap.put(errorModel.toString(), errorModel);
+    });
+    addConnectivityErrors(errorModelMap);
+  }
+
+  private Graph<ErrorModelParser, DefaultEdge> toGraph(List<ErrorModelParser> extensionErrorParsers) {
+    final DefaultDirectedGraph<ErrorModelParser, DefaultEdge> graph =
+        new DefaultDirectedWeightedGraph<>(DefaultEdge.class);
+    extensionErrorParsers.forEach(error -> addType(error, graph));
+    detectCycleReferences(graph);
+    return graph;
+  }
+
+  private void addType(ErrorModelParser parser, DefaultDirectedGraph<ErrorModelParser, DefaultEdge> graph) {
+    graph.addVertex(parser);
+    String type = parser.getType();
+    if (!ANY.name().equals(type) && !CRITICAL.name().equals(type)) {
+      parser.getParent().ifPresent(parentErrorType -> {
+        graph.addVertex(parentErrorType);
+        graph.addEdge(parser, parentErrorType);
+      });
+    }
   }
 
   /**
@@ -102,7 +131,7 @@ public class ErrorsModelFactory {
     initErrorModelMap(errorModelMap);
 
     new TopologicalOrderIterator<>(graph).forEachRemaining(errorType -> {
-      ErrorModel errorModel = toErrorModel(errorType, errorModelMap);
+      ErrorModel errorModel = definitionToErrorModel(errorType, errorModelMap);
       errorModelMap.put(errorModel.toString(), errorModel);
     });
     addConnectivityErrors(errorModelMap);
@@ -135,12 +164,12 @@ public class ErrorsModelFactory {
    * @return The correspondent {@link ErrorModel} for a given {@link ErrorModelParser}
    */
   public ErrorModel getErrorModel(ErrorModelParser errorModelParser) {
-    String errorKey = toIdentifier(toErrorTypeDefinition(errorModelParser));
+    String errorKey = toIdentifier(errorModelParser);
     if (errorModelMap.containsKey(errorKey)) {
       return errorModelMap.get(errorKey);
     }
 
-    return toErrorModel(toErrorTypeDefinition(errorModelParser), errorModelMap);
+    return toErrorModel(errorModelParser, errorModelMap);
   }
 
   private DefaultDirectedGraph<ErrorTypeDefinition, DefaultEdge> toGraph(ErrorTypeDefinition<?>[] errorTypesEnum) {
@@ -152,24 +181,27 @@ public class ErrorsModelFactory {
   }
 
   /**
-   * @param errorTypeDefinition
+   * @param errorModelParser
    * @param errorModelMap
    * @return
    */
-  private ErrorModel toErrorModel(ErrorTypeDefinition<?> errorTypeDefinition, Map<String, ErrorModel> errorModelMap) {
-    if (errorModelMap.containsKey(toIdentifier(errorTypeDefinition))) {
-      return errorModelMap.get(toIdentifier(errorTypeDefinition));
+  private ErrorModel toErrorModel(ErrorModelParser errorModelParser, Map<String, ErrorModel> errorModelMap) {
+    if (errorModelMap.containsKey(toIdentifier(errorModelParser))) {
+      return errorModelMap.get(toIdentifier(errorModelParser));
     } else {
-      ErrorModelBuilder builder = newError(errorTypeDefinition.getType(), getErrorNamespace(errorTypeDefinition));
-      builder.withParent(toErrorModel(errorTypeDefinition.getParent().orElse(ANY), errorModelMap));
+      ErrorModelBuilder builder = newError(errorModelParser.getType(), errorModelParser.getNamespace());
+      builder.withParent(toErrorModel(errorModelParser.getParent().orElse(null), errorModelMap));
       ErrorModel errorModel = builder.build();
-      errorModelMap.put(toIdentifier(errorTypeDefinition), errorModel);
+      errorModelMap.put(toIdentifier(errorModelParser), errorModel);
       return errorModel;
     }
   }
 
-  private String toIdentifier(ErrorTypeDefinition errorTypeDefinition) {
-    return getErrorNamespace(errorTypeDefinition) + ":" + errorTypeDefinition.getType();
+  private String toIdentifier(ErrorModelParser parser) {
+    if (parser == null) {
+      return "MULE:ANY";
+    }
+    return parser.getNamespace() + ":" + parser.getType();
   }
 
   private String getErrorNamespace(ErrorTypeDefinition errorType) {
@@ -195,20 +227,36 @@ public class ErrorsModelFactory {
   }
 
   private void addConnectivityErrors(Map<String, ErrorModel> errorModelMap) {
-    ErrorModel connectivityError = toErrorModel(CONNECTIVITY, errorModelMap);
+    ErrorModel connectivityError = definitionToErrorModel(CONNECTIVITY, errorModelMap);
     String key = connectivityError.toString();
     if (!errorModelMap.containsKey(key)) {
       errorModelMap.put(key, connectivityError);
     }
 
-    ErrorModel retryExhaustedError = toErrorModel(RETRY_EXHAUSTED, errorModelMap);
+    ErrorModel retryExhaustedError = definitionToErrorModel(RETRY_EXHAUSTED, errorModelMap);
     String retry = retryExhaustedError.toString();
     if (!errorModelMap.containsKey(retry)) {
       errorModelMap.put(retry, retryExhaustedError);
     }
   }
 
+  private ErrorModel definitionToErrorModel(ErrorTypeDefinition<?> definition, Map<String, ErrorModel> errorModelMap) {
+    if (errorModelMap.containsKey(toIdentifier(definition))) {
+      return errorModelMap.get(toIdentifier(definition));
+    } else {
+      ErrorModelBuilder builder = newError(definition.getType(), getErrorNamespace(definition));
+      builder.withParent(definitionToErrorModel(definition.getParent().orElse(ANY), errorModelMap));
+      ErrorModel errorModel = builder.build();
+      errorModelMap.put(toIdentifier(definition), errorModel);
+      return errorModel;
+    }
+  }
+
+  private String toIdentifier(ErrorTypeDefinition<?> errorTypeDefinition) {
+    return getErrorNamespace(errorTypeDefinition) + ":" + errorTypeDefinition.getType();
+  }
+
   private void initErrorModelMap(Map<String, ErrorModel> errorModelMap) {
-    errorModelMap.put(toIdentifier(ANY), newError(ANY.getType(), MULE).build());
+    errorModelMap.put("MULE:ANY", newError(ANY.getType(), MULE).build());
   }
 }

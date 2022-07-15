@@ -6,10 +6,6 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-
-import static java.util.Locale.ROOT;
-
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 
@@ -17,7 +13,6 @@ import java.util.Optional;
 
 public class MuleSdkErrorModelParser implements ErrorModelParser {
 
-  private static final String MULE_ERROR_NAMESPACE = CORE_PREFIX.toUpperCase(ROOT);
   private final String namespace;
   private final String type;
   private final ErrorModelParser parent;
@@ -44,11 +39,6 @@ public class MuleSdkErrorModelParser implements ErrorModelParser {
   @Override
   public String getNamespace() {
     return namespace;
-  }
-
-  @Override
-  public boolean isMuleError() {
-    return MULE_ERROR_NAMESPACE.equals(namespace);
   }
 
   @Override

@@ -6,11 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java.error;
 
-import static java.util.Locale.ROOT;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils.getDeclarationClass;
+
 import static java.util.Objects.hash;
 import static java.util.Optional.empty;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils.getDeclarationClass;
 
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 import org.mule.sdk.api.error.ErrorTypeDefinition;
@@ -24,8 +23,6 @@ import java.util.Optional;
  * @since 4.5.0
  */
 public class JavaErrorModelParser implements ErrorModelParser {
-
-  private static final String MULE = CORE_PREFIX.toUpperCase(ROOT);
 
   private final String extensionNamespace;
   private final ErrorTypeDefinition<?> errorTypeDefinition;
@@ -54,11 +51,6 @@ public class JavaErrorModelParser implements ErrorModelParser {
     return extensionNamespace;
   }
 
-  @Override
-  public boolean isMuleError() {
-    return MULE.equals(extensionNamespace);
-  }
-
   public void setParent(Optional<ErrorModelParser> parent) {
     this.parent = parent;
   }
@@ -85,11 +77,13 @@ public class JavaErrorModelParser implements ErrorModelParser {
       return false;
     }
     JavaErrorModelParser that = (JavaErrorModelParser) o;
-    return Objects.equals(errorTypeDefinitionDeclarationClass, that.errorTypeDefinitionDeclarationClass);
+    return Objects.equals(errorTypeDefinitionDeclarationClass, that.errorTypeDefinitionDeclarationClass)
+        && Objects.equals(this.extensionNamespace, that.extensionNamespace)
+        && Objects.equals(this.errorTypeDefinition, that.errorTypeDefinition);
   }
 
   @Override
   public int hashCode() {
-    return hash(errorTypeDefinitionDeclarationClass);
+    return hash(errorTypeDefinitionDeclarationClass, extensionNamespace, errorTypeDefinition);
   }
 }
