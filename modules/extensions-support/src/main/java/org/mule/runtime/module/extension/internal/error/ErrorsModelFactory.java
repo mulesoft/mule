@@ -257,6 +257,6 @@ public class ErrorsModelFactory {
   }
 
   private void initErrorModelMap(Map<String, ErrorModel> errorModelMap) {
-    errorModelMap.put("MULE:ANY", newError(ANY.getType(), MULE).build());
+    errorModelMap.put(toIdentifier(ANY), newError(ANY.getType(), MULE).build());
   }
 }
