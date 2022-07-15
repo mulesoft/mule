@@ -12,6 +12,8 @@ import static org.mule.runtime.dsl.api.component.DslSimpleType.isSimpleType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -51,6 +53,8 @@ public class DslSimpleTypeTestCase extends AbstractMuleTestCase {
     assertThat(isSimpleType(LocalDate.class), is(true));
     assertThat(isSimpleType(Calendar.class), is(true));
     assertThat(isSimpleType(LocalDateTime.class), is(true));
+    assertThat(isSimpleType(BigDecimal.class), is(true));
+    assertThat(isSimpleType(BigInteger.class), is(true));
   }
 
 }
