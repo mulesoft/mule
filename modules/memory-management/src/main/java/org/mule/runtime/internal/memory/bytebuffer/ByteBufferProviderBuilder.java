@@ -10,6 +10,7 @@ import static org.mule.runtime.api.memory.provider.type.ByteBufferType.DIRECT;
 
 import org.mule.runtime.api.memory.provider.ByteBufferPoolConfiguration;
 import org.mule.runtime.api.memory.provider.ByteBufferProvider;
+import org.mule.runtime.api.memory.provider.type.ByteBufferPoolStrategy;
 import org.mule.runtime.api.memory.provider.type.ByteBufferType;
 import org.mule.runtime.api.profiling.ProfilingService;
 
@@ -39,6 +40,10 @@ public final class ByteBufferProviderBuilder {
   public ByteBufferProvider<ByteBuffer> build() {
     if (isDirect) {
       if (poolConfiguration != null) {
+        if (poolConfiguration.getPoolStrategy() == ByteBufferPoolStrategy.DW) {
+          return new WeavePoolBasedByteBufferProvider(name, poolConfiguration.getMaxBufferSize(),
+                                                      poolConfiguration.getNumberOfPools(), profilingService);
+        }
         return new DirectByteBufferProvider(name, poolConfiguration.getMaxBufferSize(), poolConfiguration.getBaseByteBufferSize(),
                                             poolConfiguration.getGrowthFactor(), poolConfiguration.getNumberOfPools(),
                                             profilingService);
