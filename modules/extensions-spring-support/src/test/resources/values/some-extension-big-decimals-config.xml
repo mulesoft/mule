@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:some="http://www.mulesoft.org/schema/mule/some"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/some http://www.mulesoft.org/schema/mule/some/current/mule-some.xsd">
+
+    <flow name="sumBigDecimal">
+        <some:sum-big-decimal x="#[vars.x]" y="#[vars.y]"/>
+    </flow>
+
+    <flow name="sumBigDecimalList">
+        <some:sum-big-decimal-list numbers="#[[vars.x, vars.y]]"/>
+    </flow>
+
+    <flow name="sumBigDecimalListInline">
+        <some:sum-big-decimal-list>
+            <some:numbers>
+                <some:number value="#[vars.x]"/>
+                <some:number value="#[vars.y]"/>
+            </some:numbers>
+        </some:sum-big-decimal-list>
+    </flow>
+
+    <flow name="BD:ZERO+ZERO">
+        <some:sum-big-decimal x="${ZERO}" y="${ZERO}"/>
+    </flow>
+
+    <flow name="BD:ZERO+SMALL_NUMBER">
+        <some:sum-big-decimal x="${ZERO}" y="${SMALL_NUMBER}"/>
+    </flow>
+
+    <flow name="BD:ZERO+SMALL_NUMBER_NEGATIVE">
+        <some:sum-big-decimal x="${ZERO}" y="${SMALL_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BD:ZERO+BIG_NUMBER">
+        <some:sum-big-decimal x="${ZERO}" y="${BIG_NUMBER}"/>
+    </flow>
+
+    <flow name="BD:ZERO+BIG_NUMBER_NEGATIVE">
+        <some:sum-big-decimal x="${ZERO}" y="${BIG_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BD:SMALL_NUMBER+SMALL_NUMBER">
+        <some:sum-big-decimal x="${SMALL_NUMBER}" y="${SMALL_NUMBER}"/>
+    </flow>
+
+    <flow name="BD:SMALL_NUMBER+SMALL_NUMBER_NEGATIVE">
+        <some:sum-big-decimal x="${SMALL_NUMBER}" y="${SMALL_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BD:SMALL_NUMBER+BIG_NUMBER">
+        <some:sum-big-decimal x="${SMALL_NUMBER}" y="${BIG_NUMBER}"/>
+    </flow>
+
+    <flow name="BD:SMALL_NUMBER+BIG_NUMBER_NEGATIVE">
+        <some:sum-big-decimal x="${SMALL_NUMBER}" y="${BIG_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BD:SMALL_NUMBER_NEGATIVE+SMALL_NUMBER_NEGATIVE">
+        <some:sum-big-decimal x="${SMALL_NUMBER_NEGATIVE}" y="${SMALL_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BD:SMALL_NUMBER_NEGATIVE+BIG_NUMBER">
+        <some:sum-big-decimal x="${SMALL_NUMBER_NEGATIVE}" y="${BIG_NUMBER}"/>
+    </flow>
+
+    <flow name="BD:SMALL_NUMBER_NEGATIVE+BIG_NUMBER_NEGATIVE">
+        <some:sum-big-decimal x="${SMALL_NUMBER_NEGATIVE}" y="${BIG_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BD:BIG_NUMBER+BIG_NUMBER">
+        <some:sum-big-decimal x="${BIG_NUMBER}" y="${BIG_NUMBER}"/>
+    </flow>
+
+    <flow name="BD:BIG_NUMBER+BIG_NUMBER_NEGATIVE">
+        <some:sum-big-decimal x="${BIG_NUMBER}" y="${BIG_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BD:BIG_NUMBER_NEGATIVE+BIG_NUMBER_NEGATIVE">
+        <some:sum-big-decimal x="${BIG_NUMBER_NEGATIVE}" y="${BIG_NUMBER_NEGATIVE}"/>
+    </flow>
+
+</mule>

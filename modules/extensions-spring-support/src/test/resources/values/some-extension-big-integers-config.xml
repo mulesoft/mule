@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:some="http://www.mulesoft.org/schema/mule/some"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/some http://www.mulesoft.org/schema/mule/some/current/mule-some.xsd">
+
+    <flow name="sumBigInteger">
+        <some:sum-big-integer a="#[vars.x]" b="#[vars.y]"/>
+    </flow>
+
+    <flow name="sumBigIntegerList">
+        <some:sum-big-integer-list listNumbers="#[[vars.x, vars.y]]"/>
+    </flow>
+
+    <flow name="sumBigIntegerListInline">
+        <some:sum-big-integer-list>
+            <some:list-numbers>
+                <some:list-number value="#[vars.x]"/>
+                <some:list-number value="#[vars.y]"/>
+            </some:list-numbers>
+        </some:sum-big-integer-list>
+    </flow>
+
+    <flow name="BI:ZERO+ZERO">
+        <some:sum-big-integer a="${ZERO}" b="${ZERO}"/>
+    </flow>
+
+    <flow name="BI:ZERO+SMALL_NUMBER">
+        <some:sum-big-integer a="${ZERO}" b="${SMALL_NUMBER}"/>
+    </flow>
+
+    <flow name="BI:ZERO+SMALL_NUMBER_NEGATIVE">
+        <some:sum-big-integer a="${ZERO}" b="${SMALL_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BI:ZERO+BIG_NUMBER">
+        <some:sum-big-integer a="${ZERO}" b="${BIG_NUMBER}"/>
+    </flow>
+
+    <flow name="BI:ZERO+BIG_NUMBER_NEGATIVE">
+        <some:sum-big-integer a="${ZERO}" b="${BIG_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BI:SMALL_NUMBER+SMALL_NUMBER">
+        <some:sum-big-integer a="${SMALL_NUMBER}" b="${SMALL_NUMBER}"/>
+    </flow>
+
+    <flow name="BI:SMALL_NUMBER+SMALL_NUMBER_NEGATIVE">
+        <some:sum-big-integer a="${SMALL_NUMBER}" b="${SMALL_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BI:SMALL_NUMBER+BIG_NUMBER">
+        <some:sum-big-integer a="${SMALL_NUMBER}" b="${BIG_NUMBER}"/>
+    </flow>
+
+    <flow name="BI:SMALL_NUMBER+BIG_NUMBER_NEGATIVE">
+        <some:sum-big-integer a="${SMALL_NUMBER}" b="${BIG_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BI:SMALL_NUMBER_NEGATIVE+SMALL_NUMBER_NEGATIVE">
+        <some:sum-big-integer a="${SMALL_NUMBER_NEGATIVE}" b="${SMALL_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BI:SMALL_NUMBER_NEGATIVE+BIG_NUMBER">
+        <some:sum-big-integer a="${SMALL_NUMBER_NEGATIVE}" b="${BIG_NUMBER}"/>
+    </flow>
+
+    <flow name="BI:SMALL_NUMBER_NEGATIVE+BIG_NUMBER_NEGATIVE">
+        <some:sum-big-integer a="${SMALL_NUMBER_NEGATIVE}" b="${BIG_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BI:BIG_NUMBER+BIG_NUMBER">
+        <some:sum-big-integer a="${BIG_NUMBER}" b="${BIG_NUMBER}"/>
+    </flow>
+
+    <flow name="BI:BIG_NUMBER+BIG_NUMBER_NEGATIVE">
+        <some:sum-big-integer a="${BIG_NUMBER}" b="${BIG_NUMBER_NEGATIVE}"/>
+    </flow>
+
+    <flow name="BI:BIG_NUMBER_NEGATIVE+BIG_NUMBER_NEGATIVE">
+        <some:sum-big-integer a="${BIG_NUMBER_NEGATIVE}" b="${BIG_NUMBER_NEGATIVE}"/>
+    </flow>
+
+</mule>
