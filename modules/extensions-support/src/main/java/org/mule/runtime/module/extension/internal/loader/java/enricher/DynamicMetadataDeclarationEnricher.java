@@ -57,10 +57,12 @@ import org.mule.runtime.module.extension.internal.loader.java.type.property.Exte
 import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataScopeAdapter;
 import org.mule.runtime.module.extension.internal.metadata.MetadataScopeAdapter;
 import org.mule.runtime.module.extension.internal.metadata.MuleAttributesTypeResolverAdapter;
+import org.mule.runtime.module.extension.internal.metadata.MuleInputTypeResolverAdapter;
 import org.mule.runtime.module.extension.internal.metadata.MuleOutputTypeResolverAdapter;
 import org.mule.runtime.module.extension.internal.metadata.QueryMetadataResolverFactory;
 import org.mule.runtime.module.extension.internal.metadata.SdkOutputTypeResolverAdapter;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -267,7 +269,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
         }
 
         @Override
-        public Map<String, Supplier<? extends InputTypeResolver>> getInputResolvers() {
+        public Map<String, Supplier<? extends org.mule.sdk.api.metadata.resolving.InputTypeResolver>> getInputResolvers() {
           return emptyMap();
         }
 
@@ -306,7 +308,12 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
       Supplier<AttributesTypeResolver<?>> attributesTypeResolverSupplier =
           () -> MuleAttributesTypeResolverAdapter.from(scope.getAttributesResolver());
 
-      return scope.isCustomScope() ? new DefaultMetadataResolverFactory(scope.getKeysResolver(), scope.getInputResolvers(),
+      Map<String, Supplier<? extends InputTypeResolver>> inputTypeResolversSupplier = new HashMap<>();
+      scope.getInputResolvers().entrySet().stream()
+          .map(entry -> inputTypeResolversSupplier.put(entry.getKey(),
+                                                       () -> MuleInputTypeResolverAdapter.from(entry.getValue().get())));
+
+      return scope.isCustomScope() ? new DefaultMetadataResolverFactory(scope.getKeysResolver(), inputTypeResolversSupplier,
                                                                         outputTypeResolverSupplier,
                                                                         attributesTypeResolverSupplier)
           : new NullMetadataResolverFactory();
@@ -402,14 +409,17 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
       NamedTypeResolver resolver = metadataScopeAdapter.getKeysResolver().get();
       if (resolver instanceof NullMetadataResolver) {
         if (metadataScopeAdapter.hasInputResolvers()) {
-          resolver = metadataScopeAdapter.getInputResolvers().values().iterator().next().get();
+          org.mule.sdk.api.metadata.resolving.InputTypeResolver inputTypeResolver =
+              metadataScopeAdapter.getInputResolvers().values().iterator().next().get();
+          return inputTypeResolver instanceof org.mule.sdk.api.metadata.NullMetadataResolver ? null
+              : inputTypeResolver.getCategoryName();
         } else {
           org.mule.sdk.api.metadata.resolving.OutputTypeResolver sdkResolver = metadataScopeAdapter.getOutputResolver();
           return sdkResolver instanceof org.mule.sdk.api.metadata.NullMetadataResolver ? null : sdkResolver.getCategoryName();
         }
       }
 
-      return resolver instanceof NullMetadataResolver ? null : resolver.getCategoryName();
+      return resolver.getCategoryName();
     }
 
   }
