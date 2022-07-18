@@ -22,6 +22,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_REQUIRED_EX
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_REDELIVERY;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
@@ -333,6 +334,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureValidateAppModelWithRegionClassloader();
       configurePrintDetailedCompositeExceptionLog();
       configureHonourErrorMappingsWhenPolicyAppliedOnOperation();
+      configureFiniteTransactionRedeliveries();
     }
   }
 
@@ -1471,6 +1473,12 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(HONOUR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION,
                                                 minMuleVersion("4.5.0"));
+  }
+
+  private static void configureFiniteTransactionRedeliveries() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(HONOUR_REDELIVERY,
+                                                minMuleVersion("4.3.0"));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {

@@ -12,6 +12,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.execution.CompletableCallback.always;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_REDELIVERY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
@@ -34,6 +35,7 @@ import static reactor.core.publisher.Mono.create;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -146,6 +148,9 @@ public class SourceAdapter implements Lifecycle, Restartable {
 
   @Inject
   private MuleContext muleContext;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   public SourceAdapter(ExtensionModel extensionModel, SourceModel sourceModel,
                        Source source,
@@ -347,7 +352,7 @@ public class SourceAdapter implements Lifecycle, Restartable {
       }
 
       if (context.getTransactionHandle().isTransacted()) {
-        if (isRedeliveryExhaustedError) {
+        if (isRedeliveryExhaustedError && featureFlaggingService.isEnabled(HONOUR_REDELIVERY)) {
           callback = callback.finallyBefore(this::commit);
         } else {
           callback = callback.finallyBefore(this::rollback);
