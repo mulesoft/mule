@@ -234,8 +234,8 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   }
 
   private boolean shouldSetLocation() {
-    return !reuseGlobalErrorHandler()
-        || !(messagingExceptionHandler instanceof GlobalErrorHandler) && messagingExceptionHandler instanceof ErrorHandler;
+    return (!reuseGlobalErrorHandler() || !(messagingExceptionHandler instanceof GlobalErrorHandler))
+        && messagingExceptionHandler instanceof ErrorHandler;
   }
 
   @Override
