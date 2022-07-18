@@ -374,8 +374,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void onReconnectionSuccessful() {
-    if (LOGGER.isWarnEnabled()) {
-      LOGGER.warn("Message source '{}' on flow '{}' successfully reconnected",
+    if (LOGGER.isInfoEnabled()) {
+      LOGGER.info("Message source '{}' on flow '{}' successfully reconnected",
                   sourceModel.getName(), getLocation().getRootContainerName());
     }
     reconnecting.set(false);
