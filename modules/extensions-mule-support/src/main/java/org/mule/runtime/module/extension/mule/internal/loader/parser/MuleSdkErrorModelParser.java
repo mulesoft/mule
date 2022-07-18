@@ -38,9 +38,9 @@ public class MuleSdkErrorModelParser implements ErrorModelParser {
    * Create a new instance since the namespace, type, and parent.
    *
    * @param namespace the error namespace.
-   * @param type the error type.
-   * @param parent a reference to the parent error parser. If {@code null}, the method #getParent will return an empty
-   *               instance of {@link Optional}, and it will end up meaning MULE:ANY.
+   * @param type      the error type.
+   * @param parent    a reference to the parent error parser. If {@code null}, the method #getParent will return an empty instance
+   *                  of {@link Optional}, and it will end up meaning MULE:ANY.
    */
   public MuleSdkErrorModelParser(String namespace, String type, ErrorModelParser parent) {
     this.namespace = namespace;
