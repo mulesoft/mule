@@ -49,6 +49,7 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
+import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
@@ -181,17 +182,20 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   public void initialise() throws InitialisationException {
     if (messagingExceptionHandler == null) {
       messagingExceptionHandler = muleContext.getDefaultErrorHandler(of(getRootContainerLocation().toString()));
-      if (!reuseGlobalErrorHandler()) {
-        if (messagingExceptionHandler instanceof ErrorHandler) {
-          ((ErrorHandler) messagingExceptionHandler)
-              .setExceptionListenersLocation(this.getLocation());
-        }
+      if (shouldSetLocation()) {
+        ((ErrorHandler) messagingExceptionHandler)
+            .setExceptionListenersLocation(this.getLocation());
       }
     }
     this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, this), processors,
                                                          messagingExceptionHandler);
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
     super.initialise();
+  }
+
+  private boolean shouldSetLocation() {
+    return (!reuseGlobalErrorHandler() || !(messagingExceptionHandler instanceof GlobalErrorHandler))
+        && messagingExceptionHandler instanceof ErrorHandler;
   }
 
   @Override
