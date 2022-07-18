@@ -70,7 +70,7 @@ import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -298,7 +298,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
     private Serializable updatedWatermark;
     private Serializable minimumRejectedByLimitPassingWatermark;
     private Comparator<Serializable> watermarkComparator = null;
-    private LocalDateTime timestamp;
+    private ZonedDateTime timestamp;
 
     private int currentPollItems;
 
@@ -309,7 +309,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
       this.updatedWatermark = updatedWatermark;
       this.currentPollItems = 0;
       this.minimumRejectedByLimitPassingWatermark = null;
-      this.timestamp = LocalDateTime.now();
+      this.timestamp = ZonedDateTime.now();
     }
 
     public String getPollId() {

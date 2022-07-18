@@ -17,7 +17,6 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.api.notification.PollingSourceItemNotification.ITEM_DISPATCHED;
-import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollItemNotificationAction.ACCEPTED_ITEM;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
 import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
@@ -36,8 +35,6 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.notification.ExceptionNotification;
 import org.mule.runtime.api.notification.ExceptionNotificationListener;
-import org.mule.runtime.api.notification.ExtensionNotification;
-import org.mule.runtime.api.notification.ExtensionNotificationListener;
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.notification.PipelineMessageNotification;
 import org.mule.runtime.api.notification.PipelineMessageNotificationListener;
@@ -306,7 +303,8 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
       assertThat(timeout2, is(false));
       assertThat(notifications.isEmpty(), is(false));
       assertThat(notifications2.isEmpty(), is(false));
-      assertThat(((PipelineMessageNotification) notifications2.get(0)).getEvent().getContext().getRootId(), is(notifications.get(0).getEventId()));
+      assertThat(((PipelineMessageNotification) notifications2.get(0)).getEvent().getContext().getRootId(),
+                 is(notifications.get(0).getEventId()));
     } finally {
       notificationListenerRegistry.unregisterListener(listener);
     }
