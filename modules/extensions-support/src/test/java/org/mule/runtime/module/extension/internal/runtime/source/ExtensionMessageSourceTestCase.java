@@ -40,6 +40,7 @@ import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionE
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 import static org.slf4j.event.Level.DEBUG;
 import static org.slf4j.event.Level.ERROR;
+import static org.slf4j.event.Level.INFO;
 import static org.slf4j.event.Level.WARN;
 
 import org.mule.runtime.api.connection.ConnectionException;
@@ -628,13 +629,13 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   }
 
   public void reconnectAndLogSuccessMessage() throws Exception {
-    ArrayList<String> warnMessages = new ArrayList<>();
-    Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(warnMessages, WARN));
+    ArrayList<String> infoMessages = new ArrayList<>();
+    Logger oldLogger = setLogger(messageSource, LOGGER_FIELD_NAME, createMockLogger(infoMessages, INFO));
     start();
     ConnectionException e = new ConnectionException(ERROR_MESSAGE);
     messageSource.onException(e);
     new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
-      verifyLogMessage(warnMessages, "Message source 'source' on flow 'appleFlow' successfully reconnected");
+      verifyLogMessage(infoMessages, "Message source 'source' on flow 'appleFlow' successfully reconnected");
       return true;
     }));
     setLogger(messageSource, LOGGER_FIELD_NAME, oldLogger);
