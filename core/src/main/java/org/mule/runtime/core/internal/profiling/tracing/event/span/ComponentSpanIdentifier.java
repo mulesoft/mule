@@ -18,6 +18,7 @@ import java.util.Objects;
  */
 public class ComponentSpanIdentifier implements SpanIdentifier {
 
+  public static final String UNKNOWN = "unknown";
   private final String artifactId;
   private final String location;
   private final String correlationId;
@@ -30,7 +31,14 @@ public class ComponentSpanIdentifier implements SpanIdentifier {
 
   public static SpanIdentifier componentSpanIdentifierFrom(String artifactId, ComponentLocation location,
                                                            String correlationId) {
-    return new ComponentSpanIdentifier(artifactId, location.getLocation(), correlationId);
+    return new ComponentSpanIdentifier(artifactId, getLocation(location), correlationId);
+  }
+
+  private static String getLocation(ComponentLocation location) {
+    if (location == null) {
+      return UNKNOWN;
+    }
+    return location.getLocation();
   }
 
   @Override

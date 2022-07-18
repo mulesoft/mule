@@ -26,6 +26,7 @@ import java.util.Optional;
 public class CoreEventSpanUtils {
 
   private static final String CORE_EVENT_SPAN_NAME_SEPARATOR = ":";
+  public static final String UNKNOWN = "unknown";
 
   /**
    * @param eventContext the {@link EventContext} to extract the parent span from.
@@ -46,7 +47,24 @@ public class CoreEventSpanUtils {
    * @return the name for the {@link org.mule.runtime.api.profiling.tracing.Span}
    */
   public static String getCoreEventSpanName(ComponentIdentifier componentIdentifier) {
-    return componentIdentifier.getNamespace() + CORE_EVENT_SPAN_NAME_SEPARATOR + componentIdentifier.getName();
+    return getUnknownIfEmptyNamespace(componentIdentifier) + CORE_EVENT_SPAN_NAME_SEPARATOR
+        + getUnknownIfEmptyName(componentIdentifier);
+  }
+
+  private static String getUnknownIfEmptyName(ComponentIdentifier componentIdentifier) {
+    if (componentIdentifier == null) {
+      return UNKNOWN;
+    }
+
+    return componentIdentifier.getNamespace();
+  }
+
+  private static String getUnknownIfEmptyNamespace(ComponentIdentifier componentIdentifier) {
+    if (componentIdentifier == null) {
+      return "unknown";
+    }
+
+    return componentIdentifier.getNamespace();
   }
 
   /**
