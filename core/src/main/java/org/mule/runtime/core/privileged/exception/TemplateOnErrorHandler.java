@@ -16,10 +16,14 @@ import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LAX_ERROR_TYPE
 import static org.mule.runtime.api.util.MuleSystemProperties.REUSE_GLOBAL_ERROR_HANDLER_PROPERTY;
 import static org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher.WILDCARD_TOKEN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.addContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.getDefaultProcessingStrategyFactory;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 
 import static java.lang.Boolean.FALSE;
@@ -47,6 +51,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -61,6 +66,7 @@ import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
@@ -134,6 +140,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private Function<Function<Publisher<CoreEvent>, Publisher<CoreEvent>>, FluxSink<CoreEvent>> fluxFactory;
 
   private final CopyOnWriteArrayList<String> suppressedErrorTypeMatches = new CopyOnWriteArrayList<>();
+  private Optional<ProcessingStrategy> ownedProcessingStrategy;
+
 
   private final class OnErrorHandlerFluxObjectFactory
       implements Function<Function<Publisher<CoreEvent>, Publisher<CoreEvent>>, FluxSink<CoreEvent>>, Disposable {
@@ -300,12 +308,35 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   @Override
+  public void start() throws MuleException {
+    if (fromGlobalErrorHandler && reuseGlobalErrorHandler()) {
+      if (ownedProcessingStrategy.isPresent()) {
+        startIfNeeded(ownedProcessingStrategy);
+      }
+    }
+    super.start();
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    if (fromGlobalErrorHandler && reuseGlobalErrorHandler()) {
+      if (ownedProcessingStrategy.isPresent()) {
+        stopIfNeeded(ownedProcessingStrategy);
+      }
+    }
+    super.stop();
+  }
+
+  @Override
   protected void doInitialise() throws InitialisationException {
     super.doInitialise();
     this.location = this.getLocation();
     Optional<ProcessingStrategy> processingStrategy;
     if (fromGlobalErrorHandler && reuseGlobalErrorHandler()) {
-      processingStrategy = getProcessingStrategyFromGlobalErrorHandler(locator);
+      processingStrategy =
+          ofNullable(getDefaultProcessingStrategyFactory(muleContext).create(muleContext, getLocation().getRootContainerName()));
+      initialiseIfNeeded(processingStrategy);
+      ownedProcessingStrategy = processingStrategy;
     } else if (flowLocation.isPresent()) {
       Location location = builderFromStringRepresentation(flowLocation.get()).build();
       processingStrategy = getProcessingStrategy(locator, location);
@@ -328,14 +359,11 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     }
   }
 
-  // Todo: we are evaluating if this is needed. If no propagation of the ps is needed we can avoid this (and the overhead
-  // involved).
-  private Optional<ProcessingStrategy> getProcessingStrategyFromGlobalErrorHandler(ConfigurationComponentLocator locator) {
-    return of(new OnRuntimeProcessingStrategy(locator));
-  }
-
   @Override
   public void dispose() {
+    if (fromGlobalErrorHandler && reuseGlobalErrorHandler()) {
+      ownedProcessingStrategy.ifPresent(processingStrategy -> disposeIfNeeded(processingStrategy, LOGGER));
+    }
     disposeIfNeeded(fluxFactory, LOGGER);
     super.dispose();
   }
