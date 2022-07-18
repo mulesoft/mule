@@ -2,10 +2,16 @@
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:this="http://www.mulesoft.org/schema/mule/this"
       xmlns:test-components="http://www.mulesoft.org/schema/mule/test-components"
+      xmlns:marvel="http://www.mulesoft.org/schema/mule/marvel"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/test-components http://www.mulesoft.org/schema/mule/test-components/current/mule-test-components.xsd
+        http://www.mulesoft.org/schema/mule/marvel http://www.mulesoft.org/schema/mule/marvel/current/mule-marvel.xsd
         http://www.mulesoft.org/schema/mule/this http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd">
+
+    <marvel:iron-man-config name="ironMan">
+        <marvel:missile-connection />
+    </marvel:iron-man-config>
 
     <import file="salutation-operations-def.xml"/>
 
@@ -37,6 +43,10 @@
 
     <flow name="recursiveOperationFlow">
         <this:repeated-hello-world receiver="Malaga!" count="3"/>
+    </flow>
+
+    <flow name="configurableOperationFlow">
+        <this:salute-aggressively missileLauncherConfig="ironMan"/>
     </flow>
 
 </mule>

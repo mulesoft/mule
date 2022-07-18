@@ -6,12 +6,19 @@
  */
 package org.mule.functional.api.flow;
 
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
-import static org.mockito.Mockito.spy;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.fromGroupCorrelation;
-import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+
+import static org.mockito.Mockito.spy;
+
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
@@ -23,12 +30,14 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.OptionalInt;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
@@ -266,12 +275,7 @@ public class TestEventBuilder {
     }
     final Message muleMessage = messageBuilder.build();
 
-    EventContext eventContext;
-    if (externalCompletionCallback != null) {
-      eventContext = create(flow, TEST_CONNECTOR_LOCATION, sourceCorrelationId, of(externalCompletionCallback));
-    } else {
-      eventContext = create(flow, TEST_CONNECTOR_LOCATION, sourceCorrelationId);
-    }
+    EventContext eventContext = getEventContext(flow);
 
     CoreEvent.Builder builder = InternalEvent.builder(eventContext)
         .message(spyMessage.apply(muleMessage)).itemSequenceInfo(ofNullable(itemSequenceInfo));
@@ -288,6 +292,21 @@ public class TestEventBuilder {
     }
 
     return spyEvent.apply(event);
+  }
+
+  private EventContext getEventContext(FlowConstruct flow) {
+    EventContext eventContext;
+    DefaultComponentLocation location = ((DefaultComponentLocation) from(flow.getName())).appendProcessorsPart()
+        .appendLocationPart("0", of(builder()
+            .type(OPERATION)
+            .identifier(buildFromStringRepresentation("test"))
+            .build()), empty(), OptionalInt.empty(), OptionalInt.empty());
+    if (externalCompletionCallback != null) {
+      eventContext = create(flow, location, sourceCorrelationId, of(externalCompletionCallback));
+    } else {
+      eventContext = create(flow, location, sourceCorrelationId);
+    }
+    return eventContext;
   }
 
   private void setInboundProperties(Message.Builder messageBuilder, Map<String, Serializable> inboundProperties) {

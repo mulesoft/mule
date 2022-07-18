@@ -32,6 +32,7 @@ import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.internal.property.ComposedOperationModelProperty;
@@ -81,6 +82,7 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   private final ComponentAst operation;
   private final TypeLoader typeLoader;
+  private final ExtensionModelHelper extensionModelHelper;
 
   private final Characteristic<Boolean> isBlocking = new AnyMatchCharacteristic(OperationModel::isBlocking);
   private final Characteristic<List<NotificationModel>> notificationModels = new AggregatedNotificationsCharacteristic();
@@ -94,9 +96,11 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
 
   private String name;
 
-  public MuleSdkOperationModelParserSdk(ComponentAst operation, TypeLoader typeLoader) {
+  public MuleSdkOperationModelParserSdk(ComponentAst operation, TypeLoader typeLoader,
+                                        ExtensionModelHelper extensionModelHelper) {
     this.operation = operation;
     this.typeLoader = typeLoader;
+    this.extensionModelHelper = extensionModelHelper;
 
     parseStructure();
   }
@@ -153,7 +157,8 @@ class MuleSdkOperationModelParserSdk extends BaseMuleSdkExtensionModelParser imp
   public List<ParameterGroupModelParser> getParameterGroupModelParsers() {
     return getSingleChild(operation, "parameters")
         .map(parameters -> Collections
-            .<ParameterGroupModelParser>singletonList(new MuleSdkParameterGroupModelParser(parameters, typeLoader)))
+            .<ParameterGroupModelParser>singletonList(new MuleSdkParameterGroupModelParser(parameters, typeLoader,
+                                                                                           extensionModelHelper)))
         .orElse(emptyList());
   }
 

@@ -24,9 +24,11 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExclusiveOptionalModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionBasedParameterResolverValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionTypedValueValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverValueResolverWrapper;
@@ -69,7 +71,9 @@ public class ValueResolverFactory {
 
     final Class<?> expectedClass = ExtensionMetadataTypeUtils.getType(expectedType).orElse(Object.class);
 
-    if (isExpression(value)) {
+    if (expectedClass.equals(ConfigurationProvider.class)) {
+      resolver = (ValueResolver<T>) new ConfigurationProviderValueResolver((String) value);
+    } else if (isExpression(value)) {
       final String expression = (String) value;
       resolver = getExpressionBasedValueResolver(expectedType, expression, modelProperties, expectedClass);
       if (required || isRequiredByExclusiveOptional(modelProperties)) {
@@ -99,7 +103,8 @@ public class ValueResolverFactory {
    * Generates the {@link ValueResolver} for expression based values
    */
   private ValueResolver getExpressionBasedValueResolver(MetadataType expectedType, String value,
-                                                        Set<ModelProperty> modelProperties, Class<?> expectedClass) {
+                                                        Set<ModelProperty> modelProperties,
+                                                        Class<?> expectedClass) {
     ValueResolver resolver;
     Optional<StackedTypesModelProperty> stackedTypesModelProperty = getStackedTypesModelProperty(modelProperties);
     if (stackedTypesModelProperty.isPresent()) {

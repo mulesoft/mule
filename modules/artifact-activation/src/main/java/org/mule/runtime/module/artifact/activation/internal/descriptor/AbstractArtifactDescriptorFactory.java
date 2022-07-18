@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
-import static org.mule.runtime.module.artifact.activation.internal.ExecutionContext.isMuleFramework;
+import static org.mule.runtime.module.artifact.activation.internal.ExecutionEnvironment.isMuleFramework;
 
 import org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;

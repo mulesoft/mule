@@ -6,21 +6,87 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.reuseGlobalErrorHandler;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.reactivestreams.Publisher;
 
 public class GlobalErrorHandler extends ErrorHandler {
+
+  private final AtomicBoolean initialised = new AtomicBoolean(false);
+  private final AtomicInteger started = new AtomicInteger(0);
 
   @Override
   public Publisher<CoreEvent> apply(Exception exception) {
     throw new IllegalStateException("GlobalErrorHandlers should be used only as template for local ErrorHandlers");
   }
 
+  @Override
+  public void initialise() throws InitialisationException {
+    if (!reuseGlobalErrorHandler()) {
+      super.initialise();
+      return;
+    }
+
+    if (!initialised.getAndSet(true)) {
+      super.initialise();
+    }
+  }
+
+  @Override
+  public void start() throws MuleException {
+    if (!reuseGlobalErrorHandler()) {
+      super.start();
+      return;
+    }
+
+    if (started.getAndIncrement() == 0) {
+      super.start();
+    }
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    if (!reuseGlobalErrorHandler()) {
+      super.stop();
+      return;
+    }
+
+    if (started.decrementAndGet() == 0) {
+      super.stop();
+    }
+  }
+
+  @Override
+  public void dispose() {
+    if (!reuseGlobalErrorHandler()) {
+      super.dispose();
+      return;
+    }
+
+    if (started.get() == 0 && initialised.getAndSet(false)) {
+      super.dispose();
+    }
+  }
+
+  public void setFromGlobalErrorHandler() {
+    this.getExceptionListeners().stream()
+        .filter(TemplateOnErrorHandler.class::isInstance)
+        .forEach(exceptionListener -> ((TemplateOnErrorHandler) exceptionListener).setFromGlobalErrorHandler(true));
+  }
+
   public ErrorHandler createLocalErrorHandler(ComponentLocation flowLocation) {
     ErrorHandler local = new ErrorHandler();
-    local.setName(this.name);
-    local.setExceptionListeners(this.getExceptionListeners());
+    local.setName(name);
+    local.setExceptionListeners(getExceptionListeners());
     local.setExceptionListenersLocation(flowLocation);
     return local;
   }

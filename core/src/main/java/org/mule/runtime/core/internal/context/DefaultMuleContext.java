@@ -21,6 +21,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_EXPRESSION_
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_REQUIRED_EXPRESSION_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
@@ -66,6 +67,7 @@ import static org.mule.runtime.core.internal.profiling.AbstractProfilingService.
 import static org.mule.runtime.core.internal.transformer.simple.ObjectToString.configureToStringTransformerTransformIteratorElements;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
+import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.reuseGlobalErrorHandler;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
 import static java.lang.String.format;
@@ -169,7 +171,6 @@ import java.util.function.Predicate;
 import javax.transaction.TransactionManager;
 
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMuleContext {
@@ -331,6 +332,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureEnableByteBuddyObjectCreation();
       configureValidateAppModelWithRegionClassloader();
       configurePrintDetailedCompositeExceptionLog();
+      configureHonourErrorMappingsWhenPolicyAppliedOnOperation();
     }
   }
 
@@ -939,14 +941,17 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
                                                                   config.getDefaultErrorHandlerName())));
       }
 
-      if (rootContainerName.isPresent()) {
-        defaultErrorHandler = ((GlobalErrorHandler) defaultErrorHandler)
-            .createLocalErrorHandler(from(rootContainerName.get()));
-      } else {
-        try {
-          defaultErrorHandler = new ErrorHandlerFactory().createDefault(getRegistry().lookupObject(NotificationDispatcher.class));
-        } catch (RegistrationException e) {
-          throw new MuleRuntimeException(e);
+      if (!reuseGlobalErrorHandler()) {
+        if (rootContainerName.isPresent()) {
+          defaultErrorHandler = ((GlobalErrorHandler) defaultErrorHandler)
+              .createLocalErrorHandler(from(rootContainerName.get()));
+        } else {
+          try {
+            defaultErrorHandler =
+                new ErrorHandlerFactory().createDefault(getRegistry().lookupObject(NotificationDispatcher.class));
+          } catch (RegistrationException e) {
+            throw new MuleRuntimeException(e);
+          }
         }
       }
     } else {
@@ -1454,6 +1459,17 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configurePrintDetailedCompositeExceptionLog() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG,
+                                                minMuleVersion("4.5.0"));
+  }
+
+  /**
+   * Configures the {@link MuleRuntimeFeature#HONOUR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION} feature flag.
+   *
+   * @since 4.5.0, 4.4.0-202207, 4.3.0-202207
+   */
+  private static void configureHonourErrorMappingsWhenPolicyAppliedOnOperation() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(HONOUR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION,
                                                 minMuleVersion("4.5.0"));
   }
 

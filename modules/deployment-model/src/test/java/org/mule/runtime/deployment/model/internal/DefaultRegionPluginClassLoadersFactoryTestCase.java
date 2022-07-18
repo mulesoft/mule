@@ -7,6 +7,8 @@
 
 package org.mule.runtime.deployment.model.internal;
 
+import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
@@ -31,8 +33,19 @@ import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
 import org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver;
-import org.mule.runtime.module.artifact.api.classloader.*;
-import org.mule.runtime.module.artifact.api.descriptor.*;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilter;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.api.classloader.DelegateOnlyLookupStrategy;
+import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
+import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
@@ -66,8 +79,10 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
           .setVersion("1.0").setClassifier("mule-plugin").build();
 
   private final ModuleRepository moduleRepository = mock(ModuleRepository.class);
+  private final ArtifactClassLoader containerClassLoader = createContainerClassLoader(moduleRepository);
   private final DefaultRegionPluginClassLoadersFactory factory =
-      new DefaultRegionPluginClassLoadersFactory(new DefaultArtifactClassLoaderResolver(moduleRepository, null));
+      new DefaultRegionPluginClassLoadersFactory(new DefaultArtifactClassLoaderResolver(containerClassLoader,
+                                                                                        moduleRepository, null));
   private final ClassLoaderLookupPolicy regionOwnerLookupPolicy = mock(ClassLoaderLookupPolicy.class);
   private MuleDeployableArtifactClassLoader artifactClassLoader;
   private RegionClassLoader regionClassLoader;

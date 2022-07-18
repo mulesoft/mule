@@ -15,6 +15,7 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
+import org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils;
 
 import java.util.Set;
 
@@ -43,5 +44,9 @@ public class DefaultComponentBuildingDefinitionRegistryFactory implements Compon
           .forEach(registry::register);
     }
     return registry;
+  }
+
+  public void refreshRuntimeComponentBuildingDefinitions() {
+    ComponentBuildingDefinitionUtils.setRuntimeComponentBuildingDefinitions(null);
   }
 }

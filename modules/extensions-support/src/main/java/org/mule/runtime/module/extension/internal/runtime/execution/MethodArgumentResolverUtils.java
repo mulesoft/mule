@@ -14,6 +14,7 @@ import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
@@ -65,6 +66,10 @@ public class MethodArgumentResolverUtils {
   public static boolean isCorrelationInfoType(Class<?> parameterType) {
     return CorrelationInfo.class.equals(parameterType)
         || org.mule.sdk.api.runtime.parameter.CorrelationInfo.class.equals(parameterType);
+  }
+
+  public static boolean isDistributedTraceContextManagerType(Class<?> parameterType) {
+    return DistributedTraceContextManager.class.equals(parameterType);
   }
 
 }

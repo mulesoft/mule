@@ -15,8 +15,10 @@ import org.mule.runtime.core.internal.execution.NotificationFunction;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.module.extension.internal.runtime.notification.legacy.LegacyNotificationActionDefinitionAdapter;
 import org.mule.runtime.module.extension.internal.runtime.source.SourceCallbackContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.source.trace.DefaultDistributedSourceTraceContext;
 import org.mule.sdk.api.notification.NotificationActionDefinition;
 import org.mule.sdk.api.runtime.source.SourceCallback;
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 import org.mule.sdk.api.tx.TransactionHandle;
 
 import java.util.List;
@@ -30,6 +32,7 @@ import java.util.Optional;
 public class SdkSourceCallBackContextAdapter implements SourceCallbackContextAdapter {
 
   private final SourceCallbackContext delegate;
+  private DistributedTraceContextManager distributedSourceTraceContext = new DefaultDistributedSourceTraceContext();
 
   public SdkSourceCallBackContextAdapter(SourceCallbackContext delegate) {
     this.delegate = delegate;
@@ -83,6 +86,11 @@ public class SdkSourceCallBackContextAdapter implements SourceCallbackContextAda
   @Override
   public void fireOnHandle(NotificationActionDefinition<?> notificationActionDefinition, TypedValue<?> typedValue) {
     delegate.fireOnHandle(new LegacyNotificationActionDefinitionAdapter(notificationActionDefinition), typedValue);
+  }
+
+  @Override
+  public DistributedTraceContextManager getDistributedSourceTraceContext() {
+    return distributedSourceTraceContext;
   }
 
   @Override

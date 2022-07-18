@@ -37,6 +37,7 @@ import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 import org.mule.sdk.api.runtime.parameter.Literal;
 import org.mule.sdk.api.runtime.parameter.ParameterResolver;
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.Set;
@@ -76,6 +77,7 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
       .add(Chain.class)
       .add(org.mule.sdk.api.runtime.route.Chain.class)
       .add(CorrelationInfo.class)
+      .add(DistributedTraceContextManager.class)
       .add(org.mule.sdk.api.runtime.parameter.CorrelationInfo.class)
       .add(NotificationEmitter.class)
       .add(org.mule.sdk.api.notification.NotificationEmitter.class)

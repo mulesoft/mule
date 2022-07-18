@@ -26,6 +26,7 @@ import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ResultTransformer;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProviderProducer;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
@@ -56,7 +57,7 @@ public final class OperationMessageProcessorBuilder
 
   @Override
   protected OperationMessageProcessor createMessageProcessor(ExtensionManager extensionManager, ResolverSet arguments) {
-    ConfigurationProvider configurationProvider = getConfigurationProvider();
+    ValueResolver<ConfigurationProvider> configurationProviderResolver = getConfigurationProviderResolver();
     ResultTransformer resultTransformer = null;
 
     final boolean supportsOAuth = supportsOAuth(extensionModel);
@@ -65,13 +66,14 @@ public final class OperationMessageProcessorBuilder
     }
 
     if (supportsOAuth) {
-      return new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
+      return new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProviderResolver, target,
+                                                targetValue,
                                                 errorMappings, arguments, cursorProviderFactory, retryPolicyTemplate,
                                                 nestedChain,
                                                 extensionManager, policyManager, reflectionCache, resultTransformer,
                                                 terminationTimeout);
     } else {
-      return new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
+      return new OperationMessageProcessor(extensionModel, operationModel, configurationProviderResolver, target, targetValue,
                                            errorMappings, arguments, cursorProviderFactory, retryPolicyTemplate, nestedChain,
                                            extensionManager, policyManager, reflectionCache, resultTransformer,
                                            terminationTimeout);

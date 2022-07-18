@@ -78,6 +78,7 @@ public interface AllureConstants {
     interface DeploymentSuccessfulStory {
 
       String DEPLOYMENT_SUCCESS = "Deployment Success";
+      String POLICY_ISOLATION = "Policy Isolation from App";
 
     }
 
@@ -121,6 +122,7 @@ public interface AllureConstants {
     interface ClassloadingIsolationStory {
 
       String ARTIFACT_DESCRIPTORS = "Artifact descriptors";
+      String PATCHED_ARTIFACT_DESCRIPTORS = "Artifact descriptors with patched plugins";
       String CLASSLOADER_MODEL = "ClassLoader model";
       String CLASSLOADER_GENERATION = "ClassLoader generation";
     }
@@ -204,6 +206,7 @@ public interface AllureConstants {
       String ON_ERROR_CONTINUE = "On Error Continue";
       String ON_ERROR_PROPAGATE = "On Error Propagate";
       String DEFAULT_ERROR_HANDLER = "Default Error Handler";
+      String GLOBAL_ERROR_HANDLER = "Global Error Handler";
       String RAISE_ERROR = "Raise Errors";
     }
   }
@@ -215,6 +218,7 @@ public interface AllureConstants {
     interface EventContextStory {
 
       String RESPONSE_AND_COMPLETION_PUBLISHERS = "Response and completion publishers";
+      String DISTRIBUTED_TRACE_CONTEXT = "Distributed Trace Context";
     }
   }
 
@@ -329,6 +333,7 @@ public interface AllureConstants {
       String OPERATIONS = "Operations";
       String PARAMETERS = "Parameters";
       String TYPES_CATALOG = "Types Catalog";
+      String ERROR_HANDLING = "Error Handling";
     }
   }
 
@@ -910,6 +915,18 @@ public interface AllureConstants {
 
   }
 
+  interface Sdk {
+
+    String SDK = "SDK";
+
+    interface Parameters {
+
+      String EXPRESSIONS_ON_CONFIG_REF = "Expressions on config-ref parameters";
+
+    }
+
+  }
+
   interface JavaSdk {
 
     String JAVA_SDK = "Java SDK";
@@ -1028,5 +1045,15 @@ public interface AllureConstants {
   interface ObjectSerializer {
 
     String CUSTOM_OBJECT_SERIALIZER = "Custom object serializer";
+  }
+
+  interface PoliciesEngineFeature {
+
+    String POLICIES_ENGINE = "Policies Engine";
+
+    interface OperationPolicyStory {
+
+      String OPERATION_POLICIES = "Operation policies";
+    }
   }
 }

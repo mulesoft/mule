@@ -75,6 +75,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   }
 
   private ConfigurationProvider createInnerInstance() throws ConfigurationException {
+    // TODO: W-11365218
     if (expirationPolicy == null) {
       expirationPolicy = muleContext.getConfiguration().getDynamicConfigExpiration().getExpirationPolicy();
     }

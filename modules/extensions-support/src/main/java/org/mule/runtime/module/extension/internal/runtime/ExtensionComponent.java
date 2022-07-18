@@ -11,17 +11,15 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIGURATION;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
-import static org.mule.runtime.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
-import static org.mule.runtime.core.privileged.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
@@ -74,7 +72,6 @@ import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.privileged.util.TemplateParser;
 import org.mule.runtime.extension.api.data.sample.ComponentSampleDataProvider;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -91,6 +88,9 @@ import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.config.DynamicConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
@@ -120,9 +120,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   private final static Logger LOGGER = getLogger(ExtensionComponent.class);
 
-  private final TemplateParser expressionParser = createMuleStyleParser();
   private final ExtensionModel extensionModel;
-  private final AtomicReference<ConfigurationProvider> configurationProvider = new AtomicReference<>();
+  private final AtomicReference<ValueResolver<ConfigurationProvider>> configurationProviderResolver = new AtomicReference<>();
   private final MetadataMediator<T> metadataMediator;
   private final ClassTypeLoader typeLoader;
   private final LazyValue<Boolean> requiresConfig = new LazyValue<>(this::computeRequiresConfig);
@@ -188,10 +187,21 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                                ConfigurationProvider configurationProvider,
                                CursorProviderFactory cursorProviderFactory,
                                ExtensionManager extensionManager) {
+    this(extensionModel, componentModel,
+         configurationProvider != null ? new StaticValueResolver<>(configurationProvider) : null,
+         cursorProviderFactory,
+         extensionManager);
+  }
+
+  protected ExtensionComponent(ExtensionModel extensionModel,
+                               T componentModel,
+                               ValueResolver<ConfigurationProvider> configurationProviderResolver,
+                               CursorProviderFactory cursorProviderFactory,
+                               ExtensionManager extensionManager) {
     this.extensionModel = extensionModel;
     this.classLoader = getClassLoader(extensionModel);
     this.componentModel = componentModel;
-    this.configurationProvider.set(configurationProvider);
+    this.configurationProviderResolver.set(configurationProviderResolver);
     this.extensionManager = extensionManager;
     this.cursorProviderFactory = cursorProviderFactory;
     this.metadataMediator = new MetadataMediator<>(componentModel);
@@ -223,9 +233,13 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     }
 
     withContextClassLoader(classLoader, () -> {
-      validateConfigurationProviderIsNotExpression();
+      Optional<ValueResolver<ConfigurationProvider>> configProviderResolver = findConfigurationProviderResolver();
+      if (configProviderResolver.isPresent()) {
+        initialiseIfNeeded(configProviderResolver.get(), muleContext);
+      }
       initConfigurationResolver();
-      findConfigurationProvider().ifPresent(this::validateOperationConfiguration);
+      configProviderResolver.flatMap(this::resolveConfigurationProviderStatically)
+          .ifPresent(this::validateOperationConfiguration);
       doInitialise();
       return null;
     }, InitialisationException.class, e -> {
@@ -242,7 +256,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     }
 
     // check for implicit provider
-    findConfigurationProvider().ifPresent(configurationProvider::set);
+    findConfigurationProviderResolver().ifPresent(configurationProviderResolver::set);
 
     Optional<ConfigurationInstance> staticConfiguration = getStaticConfiguration();
     if (staticConfiguration.isPresent()) {
@@ -250,23 +264,63 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       return;
     }
 
-    if (isConfigurationSpecified()) {
-      // the config is dynamic
-      configurationResolver = event -> {
-        ConfigurationInstance instance = configurationProvider.get().get(event);
-        if (instance == null) {
-          throw new IllegalModelDefinitionException(format(
-                                                           "Root component '%s' contains a reference to config '%s' but it doesn't exists",
-                                                           getLocation().getRootContainerName(),
-                                                           configurationProvider));
-        }
-
-        return of(instance);
-      };
-    } else {
+    if (!isConfigurationSpecified()) {
       // obtain implicit instance
       configurationResolver = event -> extensionManager.getConfiguration(extensionModel, componentModel, event);
+      return;
     }
+
+    if (doesConfigurationDependOnEvent()) {
+      // the config reference is dynamic, the config can be either dynamic or static
+      configurationResolver = this::resolveConfigFromDynamicResolver;
+      return;
+    }
+
+    // the optional should be always present at this point because we already checked dependsOnEvent
+    // we can cache the resolution of the provider at this point because the reference is static
+    final ConfigurationProvider configurationProvider = getConfigurationProvider().get();
+
+    // the config provider is dynamic (we already checked for static at the beginning)
+    configurationResolver = event -> resolveConfigFromProvider(configurationProvider, event);
+  }
+
+  /**
+   * First resolves the configuration provider (which can be either static or dynamic) and then gets the configuration instance
+   * from it.
+   * <p>
+   * Even though this method would work if the provider resolver is static, it only makes sense to use it when it is dynamic,
+   * otherwise it is best to cache the resolution of the provider.
+   */
+  private Optional<ConfigurationInstance> resolveConfigFromDynamicResolver(CoreEvent event) {
+    ConfigurationProvider configurationProvider;
+    try {
+      configurationProvider = resolveConfigurationProvider(configurationProviderResolver.get(), event);
+      validateDynamicOperationConfiguration(configurationProvider);
+    } catch (MuleException e) {
+      throw new IllegalArgumentException(format("Error resolving configuration for component '%s'",
+                                                getLocation().getRootContainerName()),
+                                         e);
+    }
+
+    // the config provider at this point can be either static or dynamic, it doesn't matter, we need to resolve the
+    // config anyway
+    return resolveConfigFromProvider(configurationProvider, event);
+  }
+
+  /**
+   * Resolves a configuration instance from a given provider (which can be either static or dynamic).
+   */
+  private Optional<ConfigurationInstance> resolveConfigFromProvider(ConfigurationProvider configurationProvider,
+                                                                    CoreEvent event) {
+    ConfigurationInstance instance = configurationProvider.get(event);
+    if (instance == null) {
+      throw new IllegalModelDefinitionException(format(
+                                                       "Root component '%s' contains a reference to config '%s' but it doesn't exists",
+                                                       getLocation().getRootContainerName(),
+                                                       configurationProvider));
+    }
+
+    return of(instance);
   }
 
   /**
@@ -347,6 +401,23 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    * @param configurationProvider
    */
   protected abstract void validateOperationConfiguration(ConfigurationProvider configurationProvider);
+
+  /**
+   * Validates that the configuration returned by the {@code configurationProvider} is compatible with the associated
+   * {@link ComponentModel}.
+   * <p>
+   * The difference with {@link #validateOperationConfiguration(ConfigurationProvider)} is that this version will wrap the thrown
+   * exception with {@link IllegalArgumentException} which is more suitable for runtime validations.
+   *
+   * @param configurationProvider
+   */
+  private void validateDynamicOperationConfiguration(ConfigurationProvider configurationProvider) {
+    try {
+      validateOperationConfiguration(configurationProvider);
+    } catch (Exception e) {
+      throw new IllegalArgumentException(e.getMessage(), e);
+    }
+  }
 
   @Override
   public void setMuleContext(MuleContext context) {
@@ -588,12 +659,14 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       Optional<ConfigurationInstance> configuration = getConfiguration(fakeEvent);
 
       if (configuration.isPresent()) {
-        ConfigurationProvider configurationProvider = findConfigurationProvider()
+        ValueResolver<ConfigurationProvider> configurationProviderResolver = findConfigurationProviderResolver()
             .orElseThrow(
                          () -> new MetadataResolvingException("Failed to create the required configuration for Metadata retrieval",
                                                               INVALID_CONFIGURATION));
 
-        if (configurationProvider instanceof DynamicConfigurationProvider) {
+        Optional<ConfigurationProvider> configurationProvider =
+            resolveConfigurationProviderStatically(configurationProviderResolver);
+        if (!configurationProvider.isPresent() || configurationProvider.get() instanceof DynamicConfigurationProvider) {
           throw new MetadataResolvingException("Configuration used for Metadata fetch cannot be dynamic", INVALID_CONFIGURATION);
         }
       }
@@ -634,17 +707,50 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return requiresConfig.get();
   }
 
-  protected ConfigurationProvider getConfigurationProvider() {
-    return configurationProvider.get();
+  private ConfigurationProvider resolveConfigurationProvider(ValueResolver<ConfigurationProvider> configurationProviderResolver,
+                                                             CoreEvent event)
+      throws MuleException {
+    ValueResolvingContext valueResolvingContext = ValueResolvingContext.builder(event)
+        .withExpressionManager(expressionManager)
+        .build();
+
+    return configurationProviderResolver.resolve(valueResolvingContext);
+  }
+
+  private Optional<ConfigurationProvider> resolveConfigurationProviderStatically(ValueResolver<ConfigurationProvider> configurationProviderResolver) {
+    // If the resolver is dynamic, then it cannot be resolved statically
+    if (configurationProviderResolver.isDynamic()) {
+      return empty();
+    }
+
+    // Since the resolver is not dynamic, we can resolve it using a null Event
+    CoreEvent nullEvent = getNullEvent(muleContext);
+
+    try {
+      return of(resolveConfigurationProvider(configurationProviderResolver, nullEvent));
+    } catch (MuleException e) {
+      throw new MuleRuntimeException(e);
+    } finally {
+      if (nullEvent != null) {
+        ((BaseEventContext) nullEvent.getContext()).success();
+      }
+    }
+  }
+
+  protected Optional<ConfigurationProvider> getConfigurationProvider() {
+    return resolveConfigurationProviderStatically(configurationProviderResolver.get());
   }
 
   protected boolean usesDynamicConfiguration() {
-    return isConfigurationSpecified() && configurationProvider.get().isDynamic();
+    // TODO W-11267571: if not being able to resolve the ValueResolver<ConfigurationProvider> at this point, hence
+    // treating it as dynamic, ends up causing performance issues.
+    return isConfigurationSpecified()
+        && (doesConfigurationDependOnEvent() || getConfigurationProvider().map(ConfigurationProvider::isDynamic).orElse(true));
   }
 
   /**
-   * Similar to {@link #getConfiguration(CoreEvent)} but only works if the {@link #configurationProvider} is static. Otherwise,
-   * returns an empty value.
+   * Similar to {@link #getConfiguration(CoreEvent)} but only works if the {@link #configurationProviderResolver} is static.
+   * Otherwise, returns an empty value.
    */
   protected Optional<ConfigurationInstance> getStaticConfiguration() {
     if (!requiresConfig()) {
@@ -670,33 +776,25 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return cursorProviderFactory;
   }
 
-  private Optional<ConfigurationProvider> findConfigurationProvider() {
+  private Optional<ValueResolver<ConfigurationProvider>> findConfigurationProviderResolver() {
     if (isConfigurationSpecified()) {
-      return of(configurationProvider.get());
+      return of(configurationProviderResolver.get());
     }
 
-    return extensionManager.getConfigurationProvider(extensionModel, componentModel);
+    return extensionManager.getConfigurationProvider(extensionModel, componentModel)
+        .map(StaticValueResolver::new);
   }
 
   private boolean isConfigurationSpecified() {
-    return configurationProvider.get() != null;
+    return configurationProviderResolver.get() != null;
+  }
+
+  private boolean doesConfigurationDependOnEvent() {
+    return isConfigurationSpecified() && configurationProviderResolver.get().isDynamic();
   }
 
   private boolean computeRequiresConfig() {
     return ExtensionModelUtils.requiresConfig(extensionModel, componentModel);
-  }
-
-  private void validateConfigurationProviderIsNotExpression() throws InitialisationException {
-    if (isConfigurationSpecified() && expressionParser.isContainsTemplate(configurationProvider.get().getName())) {
-      throw new InitialisationException(
-                                        createStaticMessage(
-                                                            format("Root component '%s' defines component '%s' which specifies the expression '%s' as a config-ref. "
-                                                                + "Expressions are not allowed as config references",
-                                                                   getLocation().getRootContainerName(),
-                                                                   hyphenize(componentModel.getName()),
-                                                                   configurationProvider)),
-                                        this);
-    }
   }
 
   private void setCacheIdGenerator() {

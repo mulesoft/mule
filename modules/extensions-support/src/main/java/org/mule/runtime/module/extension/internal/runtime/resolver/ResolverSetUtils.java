@@ -8,11 +8,14 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static com.google.common.collect.ImmutableBiMap.of;
 import static java.util.Collections.emptySet;
+import static java.util.Optional.empty;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ComponentParameterizationUtils.createComponentParameterization;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver.fromValues;
 
 import org.mule.metadata.api.model.ArrayType;
@@ -22,6 +25,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -29,6 +33,8 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.extension.api.component.ComponentParameterization;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
@@ -52,8 +58,12 @@ import java.util.function.Function;
  */
 public class ResolverSetUtils {
 
+  private ResolverSetUtils() {}
+
   /**
-   * Creates a {@link ResolverSet} of a {@link ParameterizedModel} based on static values of its parameters.
+   * Creates a {@link ResolverSet} of a {@link ParameterizedModel} based on static values of its parameters. Keep in mind that
+   * this method will not work if the given {@link ParameterizedModel} contains parameter that share the same name, since the map
+   * representation falls short in that case.
    *
    * @param parameters         static parameter values.
    * @param parameterizedModel the parameterized group.
@@ -74,12 +84,40 @@ public class ResolverSetUtils {
                                                            String parametersOwner,
                                                            DslSyntaxResolver dslSyntaxResolver)
       throws MuleException {
+    return getResolverSetFromComponentParameterization(createComponentParameterization(parameterizedModel, parameters),
+                                                       muleContext,
+                                                       disableValidations,
+                                                       reflectionCache,
+                                                       expressionManager, parametersOwner, dslSyntaxResolver);
+  }
+
+  /**
+   * Creates a {@link ResolverSet} of a {@link ParameterizedModel} based on static values of its parameters.
+   *
+   * @param componentParameterization the componentParameterization that describes the model parameter values.
+   * @param muleContext               the mule context.
+   * @param disableValidations        whether validations should be disabled or not.
+   * @param reflectionCache           a reflection cache.
+   * @param expressionManager         the expression manager.
+   * @param parametersOwner           the owner of the parameters from the parameters resolver.
+   * @return the corresponding {@link ResolverSet}
+   * @throws MuleException
+   */
+  public static ResolverSet getResolverSetFromComponentParameterization(ComponentParameterization<?> componentParameterization,
+                                                                        MuleContext muleContext,
+                                                                        boolean disableValidations,
+                                                                        ReflectionCache reflectionCache,
+                                                                        ExpressionManager expressionManager,
+                                                                        String parametersOwner,
+                                                                        DslSyntaxResolver dslSyntaxResolver)
+      throws MuleException {
     Map<String, ValueResolver> resolvers = new HashMap<>();
     ValueResolverFactory valueResolverFactory = new ValueResolverFactory(dslSyntaxResolver);
 
-    for (ParameterGroupModel parameterGroupModel : parameterizedModel.getParameterGroupModels()) {
-      resolvers.putAll(getParameterGroupValueResolvers(parameterGroupModel, parameters, reflectionCache, muleContext,
-                                                       valueResolverFactory));
+    for (ParameterGroupModel parameterGroupModel : componentParameterization.getModel().getParameterGroupModels()) {
+      resolvers
+          .putAll(getParameterGroupValueResolvers(componentParameterization, parameterGroupModel, reflectionCache, muleContext,
+                                                  valueResolverFactory));
     }
 
     return fromValues(resolvers,
@@ -87,18 +125,18 @@ public class ResolverSetUtils {
                       disableValidations,
                       reflectionCache,
                       expressionManager,
-                      parametersOwner).getParametersAsResolverSet(parameterizedModel, muleContext);
+                      parametersOwner).getParametersAsResolverSet(componentParameterization.getModel(), muleContext);
   }
 
-  private static Map<String, ValueResolver> getParameterGroupValueResolvers(ParameterGroupModel parameterGroupModel,
-                                                                            Map<String, Object> parameters,
+  private static Map<String, ValueResolver> getParameterGroupValueResolvers(ComponentParameterization componentParameterization,
+                                                                            ParameterGroupModel parameterGroupModel,
                                                                             ReflectionCache reflectionCache,
                                                                             MuleContext muleContext,
                                                                             ValueResolverFactory valueResolverFactory)
       throws MuleException {
     Map<String, ValueResolver> parameterGroupParametersValueResolvers =
         getParameterGroupParametersValueResolvers(parameterGroupModel,
-                                                  parameters, reflectionCache, muleContext, valueResolverFactory);
+                                                  componentParameterization, reflectionCache, muleContext, valueResolverFactory);
 
     if (parameterGroupModel.isShowInDsl() && !parameterGroupParametersValueResolvers.isEmpty()) {
       Optional<ParameterGroupModelProperty> parameterGroupModelProperty =
@@ -126,23 +164,22 @@ public class ResolverSetUtils {
   }
 
   private static Map<String, ValueResolver> getParameterGroupParametersValueResolvers(ParameterGroupModel parameterGroupModel,
-                                                                                      Map<String, Object> parameters,
+                                                                                      ComponentParameterization componentParameterization,
                                                                                       ReflectionCache reflectionCache,
                                                                                       MuleContext muleContext,
                                                                                       ValueResolverFactory valueResolverFactory)
       throws MuleException {
     Map<String, ValueResolver> parameterGroupParametersValueResolvers = new HashMap<>();
     for (ParameterModel parameterModel : parameterGroupModel.getParameterModels()) {
-      if (parameters.containsKey(parameterModel.getName())) {
+      Object value = componentParameterization.getParameter(parameterGroupModel, parameterModel);
+      if (value != null) {
         parameterGroupParametersValueResolvers.put(parameterModel
             .getName(), getParameterValueResolver(parameterModel.getName(), parameterModel.getType(),
-                                                  parameters
-                                                      .get(parameterModel
-                                                          .getName()),
+                                                  value,
                                                   parameterModel.getModelProperties(),
                                                   reflectionCache,
                                                   muleContext,
-                                                  valueResolverFactory));
+                                                  valueResolverFactory, acceptsReferences(parameterModel)));
       }
     }
     return parameterGroupParametersValueResolvers;
@@ -150,7 +187,8 @@ public class ResolverSetUtils {
 
   private static ValueResolver getParameterValueResolver(String parameterName, MetadataType type, Object value,
                                                          Set<ModelProperty> modelProperties, ReflectionCache reflectionCache,
-                                                         MuleContext muleContext, ValueResolverFactory valueResolverFactory)
+                                                         MuleContext muleContext, ValueResolverFactory valueResolverFactory,
+                                                         boolean acceptsReferences)
       throws MuleException {
     Reference<ValueResolver> resolverReference = new Reference<>();
 
@@ -158,55 +196,94 @@ public class ResolverSetUtils {
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
-        if (value instanceof Collection) {
-          try {
-            resolverReference.set(getParameterValueResolverForCollection(parameterName, arrayType, (Collection) value,
-                                                                         reflectionCache, muleContext,
-                                                                         valueResolverFactory));
-          } catch (MuleException e) {
-            throw new MuleRuntimeException(e);
+        boolean actualAcceptReferences = acceptsReferences;
+        ValueResolver resolver;
+        try {
+          if (value instanceof Collection) {
+
+            resolver = getParameterValueResolverForCollection(parameterName, arrayType, (Collection) value,
+                                                              reflectionCache, muleContext,
+                                                              valueResolverFactory);
+            actualAcceptReferences = false;
+          } else {
+            resolver = new StaticValueResolver(value);
           }
-        } else {
-          defaultVisit(arrayType);
+          resolverReference
+              .set(getValueResolverFor(parameterName, arrayType, resolveAndinjectIfStatic(resolver, muleContext),
+                                       getDefaultValue(type),
+                                       getExpressionSupport(arrayType), false, modelProperties, actualAcceptReferences));
+        } catch (MuleException e) {
+          throw new MuleRuntimeException(e);
         }
       }
 
       @Override
       public void visitObject(ObjectType objectType) {
-        if (isMap(objectType)) {
-          if (value instanceof Map) {
-            try {
-              resolverReference.set(getParameterValueResolverForMap(parameterName, objectType, (Map) value, reflectionCache,
-                                                                    muleContext, valueResolverFactory));
-            } catch (MuleException e) {
-              throw new MuleRuntimeException(e);
+        boolean actualAcceptReferences = acceptsReferences;
+        ValueResolver resolver;
+        try {
+          if (isMap(objectType)) {
+            if (value instanceof Map) {
+              resolver = getParameterValueResolverForMap(parameterName, objectType, (Map) value, reflectionCache,
+                                                         muleContext, valueResolverFactory);
+              actualAcceptReferences = false;
+            } else {
+              resolver = new StaticValueResolver(value);
             }
           } else {
-            defaultVisit(objectType);
+            Optional<ValueResolver> pojoResolver =
+                getPojoParameterValueResolver(parameterName, objectType, value, reflectionCache,
+                                              muleContext, valueResolverFactory);
+            if (pojoResolver.isPresent()) {
+              resolver = pojoResolver.get();
+              actualAcceptReferences = false;
+            } else {
+              resolver = new StaticValueResolver(value);
+            }
           }
-        } else {
-          try {
-            resolverReference.set(getPojoParameterValueResolver(parameterName, objectType, value, reflectionCache,
-                                                                muleContext, valueResolverFactory));
-          } catch (MuleException e) {
-            throw new MuleRuntimeException(e);
-          }
+          resolverReference
+              .set(getValueResolverFor(parameterName, objectType, resolveAndinjectIfStatic(resolver, muleContext),
+                                       getDefaultValue(type),
+                                       getExpressionSupport(objectType), false, modelProperties, actualAcceptReferences));
+        } catch (MuleException e) {
+          throw new MuleRuntimeException(e);
         }
       }
 
       @Override
       protected void defaultVisit(MetadataType metadataType) {
-        resolverReference.set(valueResolverFactory.of(parameterName, metadataType, value, getDefaultValue(type),
-                                                      getExpressionSupport(metadataType), false, modelProperties));
+        resolverReference.set(getValueResolverFor(parameterName, metadataType, value, getDefaultValue(type),
+                                                  getExpressionSupport(metadataType), false, modelProperties, acceptsReferences));
       }
+
+      private ValueResolver getValueResolverFor(String parameterName, MetadataType metadataType, Object value,
+                                                Object defaultValue, ExpressionSupport expressionSupport, boolean required,
+                                                Set<ModelProperty> modelProperties, boolean acceptsReferences) {
+        return valueResolverFactory.of(parameterName, metadataType, value, defaultValue,
+                                       expressionSupport, required, modelProperties, acceptsReferences);
+      }
+
     });
     initialiseIfNeeded(resolverReference.get(), muleContext);
     return resolverReference.get();
   }
 
-  private static ValueResolver getPojoParameterValueResolver(String parameterName, ObjectType objectType, Object value,
-                                                             ReflectionCache reflectionCache, MuleContext muleContext,
-                                                             ValueResolverFactory valueResolverFactory)
+  private static Object resolveAndinjectIfStatic(ValueResolver valueResolver, MuleContext muleContext) throws MuleException {
+    if (valueResolver.isDynamic()) {
+      return valueResolver;
+    }
+    CoreEvent initialiserEvent = getInitialiserEvent(muleContext);
+    try (
+        ValueResolvingContext ctx = ValueResolvingContext.builder(initialiserEvent, muleContext.getExpressionManager()).build()) {
+      Object staticProduct = valueResolver.resolve(ctx);
+      muleContext.getInjector().inject(staticProduct);
+      return staticProduct;
+    }
+  }
+
+  private static Optional<ValueResolver> getPojoParameterValueResolver(String parameterName, ObjectType objectType, Object value,
+                                                                       ReflectionCache reflectionCache, MuleContext muleContext,
+                                                                       ValueResolverFactory valueResolverFactory)
       throws MuleException {
 
     Optional<Class<Object>> pojoClass = getType(objectType);
@@ -221,27 +298,14 @@ public class ResolverSetUtils {
                                                                       valuesMap
                                                                           .get(objectFieldType.getKey().getName().toString()),
                                                                       emptySet(), reflectionCache,
-                                                                      muleContext, valueResolverFactory));
+                                                                      muleContext, valueResolverFactory, false));
         }
       }
-      initialiseIfNeeded(objectBuilder, muleContext);
 
-      return new ValueResolver() {
-
-        @Override
-        public Object resolve(ValueResolvingContext context) throws MuleException {
-          Object result = objectBuilder.build(context);
-          muleContext.getInjector().inject(result);
-          return result;
-        }
-
-        @Override
-        public boolean isDynamic() {
-          return objectBuilder.isDynamic();
-        }
-      };
+      ObjectBuilderValueResolver objectBuilderValueResolver = new ObjectBuilderValueResolver(objectBuilder, muleContext);
+      return Optional.of(objectBuilderValueResolver);
     } else {
-      return new StaticValueResolver<>(value);
+      return empty();
     }
   }
 
@@ -258,7 +322,7 @@ public class ResolverSetUtils {
       for (Object collectionItem : collection) {
         itemsResolvers
             .add(getParameterValueResolver(parameterName, arrayType.getType(), collectionItem, emptySet(), reflectionCache,
-                                           muleContext, valueResolverFactory));
+                                           muleContext, valueResolverFactory, false));
       }
       return CollectionValueResolver.of(type, itemsResolvers);
     } else {
@@ -279,7 +343,7 @@ public class ResolverSetUtils {
       valueValueResolverFunction = value -> {
         try {
           return getParameterValueResolver(parameterName, valueType, value, emptySet(), reflectionCache,
-                                           muleContext, valueResolverFactory);
+                                           muleContext, valueResolverFactory, false);
         } catch (MuleException e) {
           throw new MuleRuntimeException(e);
         }
@@ -298,4 +362,7 @@ public class ResolverSetUtils {
     return MapValueResolver.of(mapClass, keyResolvers, valueResolvers, reflectionCache, muleContext);
   }
 
+  public static boolean acceptsReferences(ParameterModel parameterModel) {
+    return parameterModel.getDslConfiguration().allowsReferences();
+  }
 }

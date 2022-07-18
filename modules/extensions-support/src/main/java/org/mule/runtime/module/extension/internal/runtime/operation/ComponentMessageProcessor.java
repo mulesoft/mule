@@ -264,7 +264,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   public ComponentMessageProcessor(ExtensionModel extensionModel,
                                    T componentModel,
-                                   ConfigurationProvider configurationProvider,
+                                   ValueResolver<ConfigurationProvider> configurationProviderResolver,
                                    String target,
                                    String targetValue,
                                    ResolverSet resolverSet,
@@ -276,7 +276,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                    ReflectionCache reflectionCache,
                                    ResultTransformer resultTransformer,
                                    long terminationTimeout) {
-    super(extensionModel, componentModel, configurationProvider, cursorProviderFactory, extensionManager);
+    super(extensionModel, componentModel, configurationProviderResolver, cursorProviderFactory, extensionManager);
     this.extensionModel = extensionModel;
     this.resolverSet = resolverSet;
     this.target = target;

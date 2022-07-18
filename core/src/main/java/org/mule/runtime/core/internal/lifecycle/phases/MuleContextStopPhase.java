@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.lifecycle.phases;
 
+import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.reuseGlobalErrorHandler;
+
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -17,9 +19,12 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.util.queue.QueueManager;
+import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.core.privileged.routing.OutboundRouter;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * The Stop phase for the Management context LifecycleManager. Calling {@link MuleContext#stop()} with initiate this phase via the
@@ -52,7 +57,7 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase {
     });
   }
 
-  public MuleContextStopPhase(Class<?>[] ignorredObjects) {
+  public MuleContextStopPhase(Class<?>[] ignoredObjects) {
     super(Stoppable.PHASE_NAME, LifecycleUtils::stopIfNeeded);
 
     setOrderedLifecycleTypes(new Class<?>[] {
@@ -63,7 +68,11 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase {
         Stoppable.class
     });
 
-    setIgnoredObjectTypes(ignorredObjects);
+    if (reuseGlobalErrorHandler()) {
+      ignoredObjects = ArrayUtils.add(ignoredObjects, GlobalErrorHandler.class);
+    }
+
+    setIgnoredObjectTypes(ignoredObjects);
     // Yuo can initialise and stop
     registerSupportedPhase(Initialisable.PHASE_NAME);
     // Stop/Start/Stop

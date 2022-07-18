@@ -100,7 +100,7 @@ public class ModuleExceptionHandler {
 
   private Throwable handleTypedException(final Throwable exception,
                                          org.mule.runtime.extension.api.error.ErrorTypeDefinition<?> errorDefinition) {
-    return new TypedException(getExceptionCause(exception), errorTypeCache.get(from(errorDefinition)).apply(exception));
+    return handleTypedException(exception, from(errorDefinition));
   }
 
   private Throwable handleTypedException(final Throwable exception, ErrorTypeDefinition<?> errorDefinition) {
@@ -123,12 +123,13 @@ public class ModuleExceptionHandler {
   }
 
   private Throwable getExceptionCause(Throwable throwable) {
-    // For subclasses of ModuleException, we use it as it already contains additional information
+    // For subclasses of ModuleException, or if the ModuleException contains an error message and its cause does not,
+    // we use it as it already contains additional information
     if (throwable.getClass().equals(ModuleException.class) ||
         throwable.getClass().equals(org.mule.sdk.api.exception.ModuleException.class)) {
-      return throwable.getCause() != null
+      return throwable.getCause() != null && (throwable.getCause().getMessage() != null || throwable.getMessage() == null)
           ? suppressIfPresent(throwable.getCause(), MessagingException.class)
-          : new MuleRuntimeException(createStaticMessage(throwable.getMessage()));
+          : new MuleRuntimeException(createStaticMessage(throwable.getMessage()), throwable.getCause());
     } else {
       return suppressIfPresent(throwable, MessagingException.class);
     }

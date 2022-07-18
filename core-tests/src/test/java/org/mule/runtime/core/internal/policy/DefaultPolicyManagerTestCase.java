@@ -39,6 +39,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -65,6 +66,8 @@ import org.mule.tck.probe.PollingProber;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -76,10 +79,13 @@ import io.qameta.allure.Issue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.mockito.ArgumentCaptor;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
+@RunWith(Parameterized.class)
 public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
 
   private static final int GC_POLLING_TIMEOUT = 10000;
@@ -93,6 +99,19 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
   private Component testOperationOne;
   private Component testOperationTwo;
   private Component differentTestOperation;
+
+  private final boolean featureFlagsEnabled;
+
+  public DefaultPolicyManagerTestCase(boolean featureFlagsEnabled) {
+    this.featureFlagsEnabled = featureFlagsEnabled;
+  }
+
+  @Parameterized.Parameters(name = "Apply Feature flags: {0}")
+  public static Collection<Boolean> data() {
+    return asList(
+                  true,
+                  false);
+  }
 
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
@@ -233,6 +252,33 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
+  public void sourceSamePolicyForDifferentFlowSameParams() {
+    final PolicyPointcutParameters policyParams = mock(PolicyPointcutParameters.class);
+
+    final Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
+    final PolicyChain policyChain = policy.getPolicyChain();
+    when(policyChain.onChainError(any())).thenReturn(policyChain);
+
+    when(policyProvider.findSourceParameterizedPolicies(policyParams)).thenReturn(asList(policy));
+    clearPolicyManagerCaches();
+
+    final InternalEvent event = mock(InternalEvent.class);
+    SourcePolicyContext ctx = mock(SourcePolicyContext.class);
+    when(event.getSourcePolicyContext()).thenReturn((EventInternalContext) ctx);
+    when(ctx.getPointcutParameters()).thenReturn(policyParams);
+
+    final SourcePolicy policy1 = policyManager.createSourcePolicyInstance(flowOne, event, ePub -> ePub,
+                                                                          mock(MessageSourceResponseParametersProcessor.class));
+    final SourcePolicy policy2 = policyManager.createSourcePolicyInstance(flowTwo, event, ePub -> ePub,
+                                                                          mock(MessageSourceResponseParametersProcessor.class));
+
+    assertThat(policy1, instanceOf(CompositeSourcePolicy.class));
+    assertThat(policy2, instanceOf(CompositeSourcePolicy.class));
+
+    assertThat(policy1, not(policy2));
+  }
+
+  @Test
   public void operationNoPoliciesPresent() {
     when(policyProvider.isOperationPoliciesAvailable()).thenReturn(false);
     when(policyProvider.findOperationParameterizedPolicies(any())).thenReturn(emptyList());
@@ -266,7 +312,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     assertThat(operationPolicy1, instanceOf(CompositeOperationPolicy.class));
     assertThat(operationPolicy2, instanceOf(CompositeOperationPolicy.class));
 
-    assertThat(operationPolicy1, sameInstance(operationPolicy2));
+    assertThat(operationPolicy1, not(operationPolicy2));
   }
 
   @Test
@@ -469,10 +515,11 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
       public OperationPolicy createOperationPolicy(Component operation, List<Policy> innerKey,
                                                    Optional<OperationPolicyParametersTransformer> paramsTransformer,
                                                    OperationPolicyProcessorFactory operationPolicyProcessorFactory,
-                                                   long shutdownTimeout, Scheduler scheduler) {
+                                                   long shutdownTimeout, Scheduler scheduler,
+                                                   FeatureFlaggingService featureFlaggingService) {
         final OperationPolicy operationPolicy =
             super.createOperationPolicy(operation, innerKey, paramsTransformer, operationPolicyProcessorFactory, shutdownTimeout,
-                                        scheduler);
+                                        scheduler, feature -> featureFlagsEnabled);
 
         return new DisposeListenerPolicy(operationPolicy, () -> {
           isPolicyDisposed.set(true);

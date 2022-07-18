@@ -40,6 +40,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.SourceRemoteConnectionException;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
@@ -67,7 +68,10 @@ import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.AbstractPipeline;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
+import org.mule.runtime.core.internal.event.trace.DistributedTraceContextGetter;
+import org.mule.runtime.core.internal.event.trace.EventDistributedTraceContext;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -540,7 +544,8 @@ public class FlowProcessMediator implements Initialisable {
 
     SourceResultAdapter adapter = template.getSourceMessage();
     Builder eventBuilder =
-        createEventBuilder(source.getLocation(), responseCompletion, flowConstruct, resolveSourceCorrelationId(adapter));
+        createEventBuilder(source.getLocation(), responseCompletion, flowConstruct, resolveSourceCorrelationId(adapter),
+                           adapter.getDistributedTraceContextGetter());
 
     return eventBuilder.message(eventCtx -> {
       final Result<?, ?> result = adapter.getResult();
@@ -567,8 +572,25 @@ public class FlowProcessMediator implements Initialisable {
   }
 
   private Builder createEventBuilder(ComponentLocation sourceLocation, CompletableFuture<Void> responseCompletion,
-                                     FlowConstruct flowConstruct, String correlationId) {
-    return InternalEvent.builder(create(flowConstruct, sourceLocation, correlationId, Optional.of(responseCompletion)));
+                                     FlowConstruct flowConstruct, String correlationId,
+                                     DistributedTraceContextGetter distributedTraceContextGetter) {
+    return InternalEvent.builder(getEventContext(sourceLocation, responseCompletion, flowConstruct, correlationId,
+                                                 distributedTraceContextGetter));
+  }
+
+  private EventContext getEventContext(ComponentLocation sourceLocation, CompletableFuture<Void> responseCompletion,
+                                       FlowConstruct flowConstruct, String correlationId,
+                                       DistributedTraceContextGetter distributedTraceContextGetter) {
+    EventContext eventContext = create(flowConstruct, sourceLocation, correlationId, Optional.of(responseCompletion));
+
+    if (eventContext instanceof DistributedTraceContextAware) {
+      ((DistributedTraceContextAware) eventContext).setDistributedTraceContext(
+                                                                               EventDistributedTraceContext.builder()
+                                                                                   .withGetter(distributedTraceContextGetter)
+                                                                                   .build());
+    }
+
+    return eventContext;
   }
 
   /**

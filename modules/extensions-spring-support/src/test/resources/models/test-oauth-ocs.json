@@ -496,7 +496,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -1184,7 +1184,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -1475,7 +1475,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -2048,7 +2048,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -2604,7 +2604,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -3211,7 +3211,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -3854,7 +3854,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -4543,7 +4543,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -5287,7 +5287,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -5843,7 +5843,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -6323,7 +6323,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -6905,7 +6905,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -7233,7 +7233,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -8351,6 +8351,169 @@
                   "name": "externalPojo",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.values.extension.MyPojo"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 16
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypePojoParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.Integer"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 17
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypeArrayParameters",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.Map",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.String",
+                          "java.lang.Integer"
+                        ],
+                        "isMap": true
+                      }
+                    },
+                    "open": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 18
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypeMapParameter",
+                  "description": "",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -8388,7 +8551,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 19
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -8434,7 +8597,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 20
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -8478,7 +8641,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -8524,7 +8687,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -8553,7 +8716,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -8767,7 +8930,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21,
+                    "order": 24,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -8823,7 +8986,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -8854,7 +9017,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 26
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -8886,7 +9049,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -8918,7 +9081,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -8950,7 +9113,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -8979,7 +9142,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -9010,7 +9173,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 31
                   },
                   "allowedStereotypeModels": [
                     {
@@ -9044,7 +9207,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 32
                   },
                   "allowedStereotypeModels": [
                     {
@@ -9096,7 +9259,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 33
                   },
                   "allowedStereotypeModels": [
                     {
@@ -9134,7 +9297,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 34
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -9165,7 +9328,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 32
+                    "order": 35
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -9196,7 +9359,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 33
+                    "order": 36
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -9245,7 +9408,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 34
+                    "order": 37
                   },
                   "allowedStereotypeModels": [
                     {
@@ -9310,6 +9473,9 @@
                 "resolverConnectionDisplayName",
                 "connectionTime",
                 "externalPojo",
+                "stackedTypePojoParameter",
+                "stackedTypeArrayParameters",
+                "stackedTypeMapParameter",
                 "anotherConnectionProperties",
                 "detailsPriority",
                 "profileConnectionProperties",
@@ -9965,6 +10131,169 @@
                   "name": "externalPojo",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.values.extension.MyPojo"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 16
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypePojoParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.Integer"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 17
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypeArrayParameters",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.Map",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.String",
+                          "java.lang.Integer"
+                        ],
+                        "isMap": true
+                      }
+                    },
+                    "open": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 18
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypeMapParameter",
+                  "description": "",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -10002,7 +10331,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 19
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -10048,7 +10377,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 20
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -10092,7 +10421,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -10138,7 +10467,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -10167,7 +10496,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -10381,7 +10710,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21,
+                    "order": 24,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -10437,7 +10766,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -10468,7 +10797,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 26
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -10500,7 +10829,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -10532,7 +10861,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -10563,7 +10892,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -10592,7 +10921,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -10623,7 +10952,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 31
                   },
                   "allowedStereotypeModels": [
                     {
@@ -10657,7 +10986,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 32
                   },
                   "allowedStereotypeModels": [
                     {
@@ -10709,7 +11038,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 33
                   },
                   "allowedStereotypeModels": [
                     {
@@ -10747,7 +11076,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 34
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -10778,7 +11107,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 32
+                    "order": 35
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -10809,7 +11138,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 33
+                    "order": 36
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -10858,7 +11187,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 34
+                    "order": 37
                   },
                   "allowedStereotypeModels": [
                     {
@@ -10922,6 +11251,9 @@
                 "resolverConnectionDisplayName",
                 "connectionTime",
                 "externalPojo",
+                "stackedTypePojoParameter",
+                "stackedTypeArrayParameters",
+                "stackedTypeMapParameter",
                 "anotherConnectionProperties",
                 "detailsPriority",
                 "profileConnectionProperties",
@@ -11662,6 +11994,169 @@
                   "name": "externalPojo",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.values.extension.MyPojo"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 16
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypePojoParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.Integer"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 17
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypeArrayParameters",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.Map",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.String",
+                          "java.lang.Integer"
+                        ],
+                        "isMap": true
+                      }
+                    },
+                    "open": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 18
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypeMapParameter",
+                  "description": "",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -11699,7 +12194,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 19
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -11745,7 +12240,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 20
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -11789,7 +12284,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -11835,7 +12330,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -11864,7 +12359,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -12078,7 +12573,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21,
+                    "order": 24,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -12134,7 +12629,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -12165,7 +12660,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 26
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -12197,7 +12692,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -12229,7 +12724,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -12260,7 +12755,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -12289,7 +12784,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -12320,7 +12815,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 31
                   },
                   "allowedStereotypeModels": [
                     {
@@ -12354,7 +12849,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 32
                   },
                   "allowedStereotypeModels": [
                     {
@@ -12406,7 +12901,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 33
                   },
                   "allowedStereotypeModels": [
                     {
@@ -12444,7 +12939,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 34
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -12475,7 +12970,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 32
+                    "order": 35
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -12506,7 +13001,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 33
+                    "order": 36
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -12555,7 +13050,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 34
+                    "order": 37
                   },
                   "allowedStereotypeModels": [
                     {
@@ -12619,6 +13114,9 @@
                 "resolverConnectionDisplayName",
                 "connectionTime",
                 "externalPojo",
+                "stackedTypePojoParameter",
+                "stackedTypeArrayParameters",
+                "stackedTypeMapParameter",
                 "anotherConnectionProperties",
                 "detailsPriority",
                 "profileConnectionProperties",
@@ -13274,6 +13772,169 @@
                   "name": "externalPojo",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.values.extension.MyPojo"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 16
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypePojoParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.Integer"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 17
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypeArrayParameters",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.Map",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.String",
+                          "java.lang.Integer"
+                        ],
+                        "isMap": true
+                      }
+                    },
+                    "open": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 18
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypeMapParameter",
+                  "description": "",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -13311,7 +13972,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 19
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -13357,7 +14018,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 20
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -13401,7 +14062,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -13447,7 +14108,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -13476,7 +14137,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -13690,7 +14351,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21,
+                    "order": 24,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -13746,7 +14407,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -13777,7 +14438,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 26
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -13809,7 +14470,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -13841,7 +14502,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -13873,7 +14534,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -13902,7 +14563,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -13933,7 +14594,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 31
                   },
                   "allowedStereotypeModels": [
                     {
@@ -13967,7 +14628,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 32
                   },
                   "allowedStereotypeModels": [
                     {
@@ -14019,7 +14680,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 33
                   },
                   "allowedStereotypeModels": [
                     {
@@ -14057,7 +14718,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 34
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -14088,7 +14749,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 32
+                    "order": 35
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -14119,7 +14780,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 33
+                    "order": 36
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -14168,7 +14829,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 34
+                    "order": 37
                   },
                   "allowedStereotypeModels": [
                     {
@@ -14233,6 +14894,9 @@
                 "resolverConnectionDisplayName",
                 "connectionTime",
                 "externalPojo",
+                "stackedTypePojoParameter",
+                "stackedTypeArrayParameters",
+                "stackedTypeMapParameter",
                 "anotherConnectionProperties",
                 "detailsPriority",
                 "profileConnectionProperties",
@@ -14888,6 +15552,169 @@
                   "name": "externalPojo",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.values.extension.MyPojo"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 16
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypePojoParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.Integer"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 17
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypeArrayParameters",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.Map",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.String",
+                          "java.lang.Integer"
+                        ],
+                        "isMap": true
+                      }
+                    },
+                    "open": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 18
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypeMapParameter",
+                  "description": "",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -14925,7 +15752,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 19
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -14971,7 +15798,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 20
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -15015,7 +15842,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -15061,7 +15888,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -15090,7 +15917,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -15304,7 +16131,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21,
+                    "order": 24,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -15360,7 +16187,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -15391,7 +16218,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 26
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -15423,7 +16250,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -15455,7 +16282,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -15486,7 +16313,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -15515,7 +16342,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -15546,7 +16373,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 31
                   },
                   "allowedStereotypeModels": [
                     {
@@ -15580,7 +16407,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 32
                   },
                   "allowedStereotypeModels": [
                     {
@@ -15632,7 +16459,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 33
                   },
                   "allowedStereotypeModels": [
                     {
@@ -15670,7 +16497,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 34
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -15701,7 +16528,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 32
+                    "order": 35
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -15732,7 +16559,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 33
+                    "order": 36
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -15781,7 +16608,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 34
+                    "order": 37
                   },
                   "allowedStereotypeModels": [
                     {
@@ -15845,6 +16672,9 @@
                 "resolverConnectionDisplayName",
                 "connectionTime",
                 "externalPojo",
+                "stackedTypePojoParameter",
+                "stackedTypeArrayParameters",
+                "stackedTypeMapParameter",
                 "anotherConnectionProperties",
                 "detailsPriority",
                 "profileConnectionProperties",
@@ -16504,6 +17334,169 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "@ref:org.mule.test.values.extension.MyPojo"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 16
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypePojoParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.Integer"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 17
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypeArrayParameters",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.Map",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.String",
+                          "java.lang.Integer"
+                        ],
+                        "isMap": true
+                      }
+                    },
+                    "open": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 18
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypeMapParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "String"
                   },
                   "hasDynamicType": false,
@@ -16522,7 +17515,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 19
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -16551,7 +17544,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 20
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -16580,7 +17573,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -16609,7 +17602,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -16653,7 +17646,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -16699,7 +17692,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21
+                    "order": 24
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -16743,7 +17736,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -16789,7 +17782,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 26
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -16818,7 +17811,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -17032,7 +18025,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25,
+                    "order": 28,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -17088,7 +18081,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -17119,7 +18112,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -17151,7 +18144,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 31
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -17183,7 +18176,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 32
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -17215,7 +18208,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 33
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -17244,7 +18237,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 34
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -17275,7 +18268,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 32
+                    "order": 35
                   },
                   "allowedStereotypeModels": [
                     {
@@ -17309,7 +18302,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 33
+                    "order": 36
                   },
                   "allowedStereotypeModels": [
                     {
@@ -17361,7 +18354,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 34
+                    "order": 37
                   },
                   "allowedStereotypeModels": [
                     {
@@ -17399,7 +18392,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 35
+                    "order": 38
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -17430,7 +18423,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 36
+                    "order": 39
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -17461,7 +18454,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 37
+                    "order": 40
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -17510,7 +18503,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 38
+                    "order": 41
                   },
                   "allowedStereotypeModels": [
                     {
@@ -17575,6 +18568,9 @@
                 "resolverConnectionDisplayName",
                 "connectionTime",
                 "externalPojo",
+                "stackedTypePojoParameter",
+                "stackedTypeArrayParameters",
+                "stackedTypeMapParameter",
                 "withAlias",
                 "defaultPlacement",
                 "queryParam",
@@ -18998,7 +19994,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -19629,7 +20625,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -20202,7 +21198,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -20758,7 +21754,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -21365,7 +22361,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -22008,7 +23004,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -22697,7 +23693,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -23441,7 +24437,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -23997,7 +24993,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -24477,7 +25473,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -25059,7 +26055,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -25387,7 +26383,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -26509,6 +27505,169 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "@ref:org.mule.test.values.extension.MyPojo"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 16
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypePojoParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.Integer"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 17
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypeArrayParameters",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.Map",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.String",
+                          "java.lang.Integer"
+                        ],
+                        "isMap": true
+                      }
+                    },
+                    "open": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 18
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypeMapParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "String"
                   },
                   "hasDynamicType": false,
@@ -26527,7 +27686,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 19
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -26577,7 +27736,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 20
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -26621,7 +27780,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -26667,7 +27826,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -26711,7 +27870,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -26757,7 +27916,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21
+                    "order": 24
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -26786,7 +27945,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -27000,7 +28159,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23,
+                    "order": 26,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -27056,7 +28215,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -27087,7 +28246,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -27119,7 +28278,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -27151,7 +28310,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -27198,7 +28357,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 31
                   },
                   "allowedStereotypeModels": [
                     {
@@ -27260,6 +28419,9 @@
                 "resolverConnectionDisplayName",
                 "connectionTime",
                 "externalPojo",
+                "stackedTypePojoParameter",
+                "stackedTypeArrayParameters",
+                "stackedTypeMapParameter",
                 "knownCustomHeader",
                 "randomHeaders",
                 "anotherConnectionProperties",
@@ -27721,7 +28883,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -28352,7 +29514,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -28925,7 +30087,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -29481,7 +30643,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -30088,7 +31250,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -30731,7 +31893,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -31420,7 +32582,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -32164,7 +33326,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -32720,7 +33882,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -33200,7 +34362,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -33782,7 +34944,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -34110,7 +35272,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -35232,6 +36394,169 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "@ref:org.mule.test.values.extension.MyPojo"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 16
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypePojoParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.Integer"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 17
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypeArrayParameters",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.Map",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.String",
+                          "java.lang.Integer"
+                        ],
+                        "isMap": true
+                      }
+                    },
+                    "open": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 18
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypeMapParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "String"
                   },
                   "hasDynamicType": false,
@@ -35250,7 +36575,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 19
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -35300,7 +36625,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 20
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -35344,7 +36669,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -35390,7 +36715,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -35434,7 +36759,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -35480,7 +36805,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21
+                    "order": 24
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -35509,7 +36834,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -35723,7 +37048,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23,
+                    "order": 26,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -35779,7 +37104,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -35810,7 +37135,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -35842,7 +37167,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -35874,7 +37199,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -35921,7 +37246,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 31
                   },
                   "allowedStereotypeModels": [
                     {
@@ -35983,6 +37308,9 @@
                 "resolverConnectionDisplayName",
                 "connectionTime",
                 "externalPojo",
+                "stackedTypePojoParameter",
+                "stackedTypeArrayParameters",
+                "stackedTypeMapParameter",
                 "knownCustomHeader",
                 "randomHeaders",
                 "anotherConnectionProperties",
@@ -36632,6 +37960,169 @@
                   "name": "externalPojo",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.values.extension.MyPojo"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 16
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypePojoParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.Integer"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 17
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypeArrayParameters",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.Map",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.String",
+                          "java.lang.Integer"
+                        ],
+                        "isMap": true
+                      }
+                    },
+                    "open": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 18
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypeMapParameter",
+                  "description": "",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -36669,7 +38160,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 19
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -36715,7 +38206,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 20
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -36759,7 +38250,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -36805,7 +38296,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -36834,7 +38325,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -37048,7 +38539,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21,
+                    "order": 24,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -37104,7 +38595,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -37135,7 +38626,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 26
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -37167,7 +38658,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -37199,7 +38690,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -37231,7 +38722,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -37260,7 +38751,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -37291,7 +38782,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 31
                   },
                   "allowedStereotypeModels": [
                     {
@@ -37325,7 +38816,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 32
                   },
                   "allowedStereotypeModels": [
                     {
@@ -37377,7 +38868,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 33
                   },
                   "allowedStereotypeModels": [
                     {
@@ -37415,7 +38906,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 34
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -37446,7 +38937,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 32
+                    "order": 35
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -37477,7 +38968,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 33
+                    "order": 36
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -37526,7 +39017,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 34
+                    "order": 37
                   },
                   "allowedStereotypeModels": [
                     {
@@ -37591,6 +39082,9 @@
                 "resolverConnectionDisplayName",
                 "connectionTime",
                 "externalPojo",
+                "stackedTypePojoParameter",
+                "stackedTypeArrayParameters",
+                "stackedTypeMapParameter",
                 "anotherConnectionProperties",
                 "detailsPriority",
                 "profileConnectionProperties",
@@ -38058,7 +39552,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -38689,7 +40183,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -39262,7 +40756,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -39818,7 +41312,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -40425,7 +41919,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -41068,7 +42562,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -41757,7 +43251,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -42501,7 +43995,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -43057,7 +44551,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -43537,7 +45031,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -44119,7 +45613,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -44447,7 +45941,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -45650,6 +47144,169 @@
                   "name": "externalPojo",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.values.extension.MyPojo"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 16
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypePojoParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.Integer"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 17
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypeArrayParameters",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.Map",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.String",
+                          "java.lang.Integer"
+                        ],
+                        "isMap": true
+                      }
+                    },
+                    "open": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 18
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypeMapParameter",
+                  "description": "",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -45687,7 +47344,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 19
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -45733,7 +47390,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 20
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -45777,7 +47434,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -45823,7 +47480,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -45852,7 +47509,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -46066,7 +47723,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21,
+                    "order": 24,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -46282,7 +47939,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22,
+                    "order": 25,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -46338,7 +47995,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 26
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -46369,7 +48026,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -46401,7 +48058,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -46433,7 +48090,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -46464,7 +48121,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -46493,7 +48150,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 31
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -46524,7 +48181,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 32
                   },
                   "allowedStereotypeModels": [
                     {
@@ -46558,7 +48215,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 33
                   },
                   "allowedStereotypeModels": [
                     {
@@ -46610,7 +48267,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 34
                   },
                   "allowedStereotypeModels": [
                     {
@@ -46648,7 +48305,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 32
+                    "order": 35
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -46679,7 +48336,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 33
+                    "order": 36
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -46710,7 +48367,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 34
+                    "order": 37
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -46759,7 +48416,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 35
+                    "order": 38
                   },
                   "allowedStereotypeModels": [
                     {
@@ -46823,6 +48480,9 @@
                 "resolverConnectionDisplayName",
                 "connectionTime",
                 "externalPojo",
+                "stackedTypePojoParameter",
+                "stackedTypeArrayParameters",
+                "stackedTypeMapParameter",
                 "anotherConnectionProperties",
                 "detailsPriority",
                 "profileConnectionProperties",
@@ -47205,7 +48865,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -47836,7 +49496,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -48409,7 +50069,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -48965,7 +50625,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -49572,7 +51232,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -50215,7 +51875,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -50904,7 +52564,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -51648,7 +53308,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -52204,7 +53864,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -52684,7 +54344,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -53266,7 +54926,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -53594,7 +55254,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -54797,6 +56457,169 @@
                   "name": "externalPojo",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.values.extension.MyPojo"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 16
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypePojoParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.Integer"
+                        ],
+                        "isMap": false
+                      }
+                    },
+                    "item": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 17
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypeArrayParameters",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.Map",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.String",
+                          "java.lang.Integer"
+                        ],
+                        "isMap": true
+                      }
+                    },
+                    "open": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 18
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "stackedTypeMapParameter",
+                  "description": "",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -54834,7 +56657,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 16
+                    "order": 19
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -54880,7 +56703,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 17
+                    "order": 20
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -54924,7 +56747,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 18
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -54970,7 +56793,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 19
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -54999,7 +56822,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -55213,7 +57036,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21,
+                    "order": 24,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -55269,7 +57092,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -55300,7 +57123,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 26
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -55332,7 +57155,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -55364,7 +57187,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -55395,7 +57218,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -55424,7 +57247,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -55455,7 +57278,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 31
                   },
                   "allowedStereotypeModels": [
                     {
@@ -55489,7 +57312,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 32
                   },
                   "allowedStereotypeModels": [
                     {
@@ -55541,7 +57364,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 33
                   },
                   "allowedStereotypeModels": [
                     {
@@ -55579,7 +57402,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 34
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -55610,7 +57433,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 32
+                    "order": 35
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -55641,7 +57464,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 33
+                    "order": 36
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -55690,7 +57513,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 34
+                    "order": 37
                   },
                   "allowedStereotypeModels": [
                     {
@@ -55754,6 +57577,9 @@
                 "resolverConnectionDisplayName",
                 "connectionTime",
                 "externalPojo",
+                "stackedTypePojoParameter",
+                "stackedTypeArrayParameters",
+                "stackedTypeMapParameter",
                 "anotherConnectionProperties",
                 "detailsPriority",
                 "profileConnectionProperties",
@@ -58266,6 +60092,191 @@
                       }
                     }
                   ]
+                },
+                "annotations": {
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "stackedTypePojoParameter"
+                },
+                "model": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "org.mule.test.values.extension.MyPojo",
+                    "classInformation": {
+                      "classname": "org.mule.test.values.extension.MyPojo",
+                      "hasDefaultConstructor": true,
+                      "isInterface": false,
+                      "isInstantiable": true,
+                      "isAbstract": false,
+                      "isFinal": false,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": [],
+                      "isMap": false
+                    },
+                    "typeAlias": {
+                      "value": "MyPojo"
+                    }
+                  },
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "pojoBoolean"
+                      },
+                      "model": {
+                        "type": "Boolean",
+                        "annotations": {
+                          "typeId": "boolean"
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "pojoId"
+                      },
+                      "model": {
+                        "type": "String"
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "pojoName"
+                      },
+                      "model": {
+                        "type": "String"
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "pojoNumber"
+                      },
+                      "model": {
+                        "type": "Number",
+                        "annotations": {
+                          "classInformation": {
+                            "classname": "int",
+                            "hasDefaultConstructor": false,
+                            "isInterface": false,
+                            "isInstantiable": false,
+                            "isAbstract": true,
+                            "isFinal": true,
+                            "implementedInterfaces": [],
+                            "parent": "",
+                            "genericTypes": [],
+                            "isMap": false
+                          },
+                          "int": {}
+                        }
+                      }
+                    }
+                  ]
+                },
+                "annotations": {
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "stackedTypeArrayParameters"
+                },
+                "model": {
+                  "type": "Array",
+                  "annotations": {
+                    "classInformation": {
+                      "classname": "java.util.List",
+                      "hasDefaultConstructor": false,
+                      "isInterface": true,
+                      "isInstantiable": false,
+                      "isAbstract": true,
+                      "isFinal": false,
+                      "implementedInterfaces": [
+                        "java.util.Collection"
+                      ],
+                      "parent": "",
+                      "genericTypes": [
+                        "java.lang.Integer"
+                      ],
+                      "isMap": false
+                    }
+                  },
+                  "item": {
+                    "type": "Number",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.lang.Integer",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [
+                          "java.lang.Comparable"
+                        ],
+                        "parent": "java.lang.Number",
+                        "genericTypes": [],
+                        "isMap": false
+                      },
+                      "int": {}
+                    }
+                  }
+                },
+                "annotations": {
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "stackedTypeMapParameter"
+                },
+                "model": {
+                  "type": "Object",
+                  "annotations": {
+                    "classInformation": {
+                      "classname": "java.util.Map",
+                      "hasDefaultConstructor": false,
+                      "isInterface": true,
+                      "isInstantiable": false,
+                      "isAbstract": true,
+                      "isFinal": false,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": [
+                        "java.lang.String",
+                        "java.lang.Integer"
+                      ],
+                      "isMap": true
+                    }
+                  },
+                  "open": {
+                    "type": "Number",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.lang.Integer",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [
+                          "java.lang.Comparable"
+                        ],
+                        "parent": "java.lang.Number",
+                        "genericTypes": [],
+                        "isMap": false
+                      },
+                      "int": {}
+                    }
+                  },
+                  "fields": []
                 },
                 "annotations": {
                   "expressionSupport": {

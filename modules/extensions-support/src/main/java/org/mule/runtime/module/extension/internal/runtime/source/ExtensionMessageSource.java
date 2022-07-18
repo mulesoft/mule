@@ -13,12 +13,14 @@ import static java.util.Optional.of;
 import static java.util.function.Function.identity;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.COMPUTE_CONNECTION_ERRORS_IN_STATS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
+import static org.mule.runtime.core.privileged.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
@@ -71,6 +73,7 @@ import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.core.privileged.util.TemplateParser;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
@@ -143,6 +146,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private final ExceptionHandlerManager exceptionEnricherManager;
   private final AtomicBoolean reconnecting = new AtomicBoolean(false);
   private final DefaultLifecycleManager<ExtensionMessageSource> lifecycleManager;
+  private final TemplateParser expressionParser = createMuleStyleParser();
+  private final ConfigurationProvider explicitConfigProvider;
 
   private SourceConnectionManager sourceConnectionManager;
   private Processor messageProcessor;
@@ -182,6 +187,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     this.applicationName = applicationName;
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, sourceModel);
     this.lifecycleManager = new DefaultLifecycleManager<>(sourceModel.getName(), this);
+    this.explicitConfigProvider = configurationProvider;
   }
 
   private synchronized void createSource(boolean restarting) throws Exception {
@@ -374,8 +380,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void onReconnectionSuccessful() {
-    if (LOGGER.isWarnEnabled()) {
-      LOGGER.warn("Message source '{}' on flow '{}' successfully reconnected",
+    if (LOGGER.isInfoEnabled()) {
+      LOGGER.info("Message source '{}' on flow '{}' successfully reconnected",
                   sourceModel.getName(), getLocation().getRootContainerName());
     }
     reconnecting.set(false);
@@ -646,6 +652,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Override
   protected void doInitialise() throws InitialisationException {
+    validateConfigurationProviderIsNotExpression();
     flowConstruct = new LazyValue<>(() -> (FlowConstruct) componentLocator.find(getRootContainerLocation()).orElse(null));
     messageProcessContext = createProcessingContext();
     if (shouldRunOnThisNode()) {
@@ -771,5 +778,18 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   private void invalidateConnection(ConnectionException exception) {
     exception.getConnection().ifPresent(sourceConnectionManager::invalidate);
+  }
+
+  private void validateConfigurationProviderIsNotExpression() throws InitialisationException {
+    if (explicitConfigProvider != null && expressionParser.isContainsTemplate(explicitConfigProvider.getName())) {
+      throw new InitialisationException(
+                                        createStaticMessage(
+                                                            format("Root component '%s' defines component '%s' which specifies the expression '%s' as a config-ref. "
+                                                                + "Expressions are not allowed as config references",
+                                                                   getLocation().getRootContainerName(),
+                                                                   hyphenize(componentModel.getName()),
+                                                                   explicitConfigProvider)),
+                                        this);
+    }
   }
 }

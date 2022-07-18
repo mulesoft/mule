@@ -22,6 +22,7 @@ import org.mule.runtime.module.artifact.activation.api.descriptor.DomainDescript
 import org.mule.runtime.module.artifact.activation.api.descriptor.DomainDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
+import org.mule.runtime.module.artifact.activation.api.plugin.PluginPatchesResolver;
 import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -31,6 +32,7 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -47,11 +49,13 @@ public class ApplicationDescriptorFactory
   private final DomainDescriptorResolver domainDescriptorResolver;
 
   public ApplicationDescriptorFactory(DeployableProjectModel deployableProjectModel,
-                                      Map<String, String> deploymentProperties, PluginModelResolver pluginModelResolver,
+                                      Map<String, String> deploymentProperties,
+                                      PluginPatchesResolver pluginPatchesResolver,
+                                      PluginModelResolver pluginModelResolver,
                                       PluginDescriptorResolver pluginDescriptorResolver,
                                       ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder,
                                       DomainDescriptorResolver domainDescriptorResolver) {
-    super(deployableProjectModel, deploymentProperties, pluginModelResolver, pluginDescriptorResolver,
+    super(deployableProjectModel, deploymentProperties, pluginPatchesResolver, pluginModelResolver, pluginDescriptorResolver,
           artifactDescriptorValidatorBuilder);
     this.domainDescriptorResolver = domainDescriptorResolver;
   }

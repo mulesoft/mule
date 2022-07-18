@@ -19,6 +19,7 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 
@@ -37,17 +38,20 @@ class MuleSdkParameterGroupModelParser extends BaseMuleSdkExtensionModelParser i
 
   private final List<ParameterModelParser> parameters;
   private final Optional<ExclusiveOptionalDescriptor> exclusiveOptionals;
+  private final ExtensionModelHelper extensionModelHelper;
 
-  public MuleSdkParameterGroupModelParser(ComponentAst parametersComponent, TypeLoader typeLoader) {
+  public MuleSdkParameterGroupModelParser(ComponentAst parametersComponent, TypeLoader typeLoader,
+                                          ExtensionModelHelper extensionModelHelper) {
+    this.extensionModelHelper = extensionModelHelper;
     parameters = doParserParameters(parametersComponent, typeLoader);
     exclusiveOptionals = doParseExclusiveOptionalDescriptorFromGroup(parametersComponent);
   }
 
   private List<ParameterModelParser> doParserParameters(ComponentAst parametersComponent, TypeLoader typeLoader) {
     Stream<ParameterModelParser> parameterParsers = getChildren(parametersComponent, "parameter")
-        .map(p -> new MuleSdkParameterModelParserSdk(p, typeLoader));
+        .map(p -> new MuleSdkParameterModelParserSdk(p, typeLoader, extensionModelHelper));
     Stream<ParameterModelParser> optionalParameterParsers = getChildren(parametersComponent, "optional-parameter")
-        .map(p -> new MuleSdkOptionalParameterModelParserSdk(p, typeLoader));
+        .map(p -> new MuleSdkOptionalParameterModelParserSdk(p, typeLoader, extensionModelHelper));
 
     return concat(parameterParsers, optionalParameterParsers).collect(toList());
   }

@@ -9,16 +9,20 @@ package org.mule.runtime.module.extension.mule.internal.operation;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERATIONS;
+import static org.mule.test.marvel.model.Villain.KABOOM;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.test.marvel.ironman.IronMan;
 
 import java.util.List;
 import java.util.Map;
@@ -81,6 +85,22 @@ public class MuleOperationExecutionTestCase extends MuleArtifactFunctionalTestCa
     CoreEvent resultEvent = flowRunner("recursiveOperationFlow").run();
     assertThat(resultEvent.getMessage().getPayload().getValue(), equalTo("Hello,   Malaga! Hello,   Malaga! Hello,   Malaga! "));
     assertThat(resultEvent.getMessage().getAttributes().getValue(), is(nullValue()));
+  }
+
+  @Test
+  @Description("Calls a flow that executes the <this:salute-aggressively> operation which is configurable")
+  public void executeConfigurableOperation() throws Exception {
+    ConfigurationInstance config = muleContext.getExtensionManager().getConfiguration("ironMan", testEvent());
+    assertThat(config, is(notNullValue()));
+
+    IronMan ironManConfig = (IronMan) config.getValue();
+    assertThat(ironManConfig.getMissilesFired(), is(0));
+
+    CoreEvent resultEvent = flowRunner("configurableOperationFlow").run();
+    String result = (String) resultEvent.getMessage().getPayload().getValue();
+    assertThat(result, is(KABOOM));
+
+    assertThat(ironManConfig.getMissilesFired(), is(1));
   }
 
   @Test

@@ -10,6 +10,7 @@ import static java.util.Optional.empty;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
+import org.mule.runtime.module.artifact.activation.api.plugin.PluginPatchesResolver;
 import org.mule.runtime.module.artifact.activation.internal.descriptor.AbstractArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
@@ -37,6 +38,7 @@ public class ArtifactPluginDescriptorFactory
   private final ArtifactCoordinates pluginArtifactCoordinates;
   private final List<BundleDependency> projectDependencies;
   private final Set<BundleDescriptor> sharedProjectDependencies;
+  private final PluginPatchesResolver pluginPatchesResolver;
 
   public ArtifactPluginDescriptorFactory(BundleDependency bundleDependency,
                                          MulePluginModel pluginModel,
@@ -45,6 +47,7 @@ public class ArtifactPluginDescriptorFactory
                                          ArtifactCoordinates pluginArtifactCoordinates,
                                          List<BundleDependency> projectDependencies,
                                          Set<BundleDescriptor> sharedProjectDependencies,
+                                         PluginPatchesResolver pluginPatchesResolver,
                                          ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
     super(new File(bundleDependency.getBundleUri()), artifactDescriptorValidatorBuilder);
 
@@ -55,6 +58,7 @@ public class ArtifactPluginDescriptorFactory
     this.pluginArtifactCoordinates = pluginArtifactCoordinates;
     this.projectDependencies = projectDependencies;
     this.sharedProjectDependencies = sharedProjectDependencies;
+    this.pluginPatchesResolver = pluginPatchesResolver;
   }
 
   @Override
@@ -81,7 +85,9 @@ public class ArtifactPluginDescriptorFactory
                                                        getArtifactLocation(),
                                                        muleArtifactLoaderDescriptor,
                                                        bundleDependencies,
-                                                       bundleDescriptor, ownerDescriptor)
+                                                       bundleDescriptor,
+                                                       ownerDescriptor,
+                                                       pluginPatchesResolver)
                                                            .createClassLoaderModel();
   }
 

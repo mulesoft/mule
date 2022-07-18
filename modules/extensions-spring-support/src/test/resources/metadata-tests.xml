@@ -29,6 +29,10 @@
         <metadata:output-metadata-with-key-id config-ref="config" type="PERSON"/>
     </flow>
 
+    <flow name="outputMetadataWithKeyIdUsingConfig">
+        <metadata:output-metadata-with-key-id config-ref="config" type="PERSON"/>
+    </flow>
+
     <flow name="contentAndOutputMetadataWithKeyId">
         <metadata:content-and-output-metadata-with-key-id config-ref="config" type="PERSON"/>
     </flow>

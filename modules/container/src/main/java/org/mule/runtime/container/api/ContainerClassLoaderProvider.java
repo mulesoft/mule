@@ -17,6 +17,17 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 public class ContainerClassLoaderProvider {
 
   /**
+   * Creates the classLoader to represent the Mule container, with this class classloader as the parent classloader.
+   *
+   * @param moduleRepository provides access to the modules available on the container. Non null.
+   * @return an {@link ArtifactClassLoader} containing container code that can be used as parent classLoader for other Mule
+   *         artifacts.
+   */
+  public static ArtifactClassLoader createContainerClassLoader(ModuleRepository moduleRepository) {
+    return createContainerClassLoader(moduleRepository, ContainerClassLoaderProvider.class.getClassLoader());
+  }
+
+  /**
    * Creates the classLoader to represent the Mule container.
    *
    * @param moduleRepository  provides access to the modules available on the container. Non null.
@@ -26,6 +37,5 @@ public class ContainerClassLoaderProvider {
    */
   public static ArtifactClassLoader createContainerClassLoader(ModuleRepository moduleRepository, ClassLoader parentClassLoader) {
     return new ContainerClassLoaderFactory(moduleRepository).createContainerClassLoader(parentClassLoader);
-
   }
 }

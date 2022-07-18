@@ -78,4 +78,20 @@ public class TypesValidationsTestCase extends AbstractConfigFileValidationTestCa
   public void parameterTypeCanBeString() throws Exception {
     parseConfig("validation/parameter-with-string-type.xml");
   }
+
+  @Test
+  @Description("Reference parameter stereotype must match")
+  public void referenceParameterStereotypesMustMatch() throws Exception {
+    expected.expect(ConfigurationException.class);
+    expected.expectMessage("Referenced component 'someOtherConfig' must be one of stereotypes [MARVEL:IRON_MAN]");
+    parseConfig("validation/reference-parameter-with-mismatching-stereotype.xml");
+  }
+
+  @Test
+  @Description("Reference parameter to something that does not exist will also fail due to mismatching stereotype")
+  public void parameterReferencingNonExistingComponentWillStillFailBecauseOfStereotype() throws Exception {
+    expected.expect(ConfigurationException.class);
+    expected.expectMessage("Referenced component 'somethingThatDoesNotExists' must be one of stereotypes [MARVEL:IRON_MAN]");
+    parseConfig("validation/reference-parameter-not-found.xml");
+  }
 }

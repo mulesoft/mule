@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:this="http://www.mulesoft.org/schema/mule/this"
+      xmlns:operation="http://www.mulesoft.org/schema/mule/operation"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/operation http://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd
+          http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd
+          http://www.mulesoft.org/schema/mule/this http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd">
+
+    <!-- Use Case 1.1: Errors thrown by mule operations within the same app -->
+
+    <flow name="raiseErrorWithinThisNamespace">
+        <this:raise-this />
+    </flow>
+
+    <flow name="raiseErrorWithinOtherNamespace">
+        <this:raise-other />
+    </flow>
+
+    <flow name="divisionByZeroFlow">
+        <this:division-by-zero />
+    </flow>
+
+    <flow name="heisenbergCureCancerFlow">
+        <this:heisenberg-cure-cancer />
+    </flow>
+
+    <operation:def name="raiseThis" displayName="." summary=".">
+        <operation:output>
+            <operation:payload-type type="void"/>
+        </operation:output>
+        <operation:body>
+            <raise-error type="THIS:CUSTOM" />
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="raiseOther" displayName="." summary=".">
+        <operation:output>
+            <operation:payload-type type="void"/>
+        </operation:output>
+        <operation:body>
+            <raise-error type="OTHER:CUSTOM" />
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="divisionByZero" displayName="." summary=".">
+        <operation:output>
+            <operation:payload-type type="void"/>
+        </operation:output>
+        <operation:body>
+            <set-payload value="#[84 / 0]" />
+        </operation:body>
+    </operation:def>
+
+    <operation:def name="heisenbergCureCancer" displayName="." summary=".">
+        <operation:output>
+            <operation:payload-type type="void"/>
+        </operation:output>
+        <operation:body>
+            <heisenberg:cure-cancer />
+        </operation:body>
+    </operation:def>
+
+    <!-- Use Case 1.2: Error mapping on invocation -->
+
+    <flow name="errorMappingOnInvocationFlow">
+        <this:raise-custom>
+            <error-mapping sourceType="MY:CUSTOM" targetType="MY:MAPPED"/>
+        </this:raise-custom>
+    </flow>
+
+    <operation:def name="raiseCustom" displayName="." summary=".">
+        <operation:output>
+            <operation:payload-type type="void"/>
+        </operation:output>
+        <operation:body>
+            <raise-error type="MY:CUSTOM" />
+        </operation:body>
+    </operation:def>
+
+    <!-- Use Case 1.3: Error mapping inside body -->
+
+    <flow name="errorMappingInsideBodyFlow">
+        <this:with-mapping-inside-body />
+    </flow>
+
+    <operation:def name="withMappingInsideBody" displayName="." summary=".">
+        <operation:output>
+            <operation:payload-type type="void"/>
+        </operation:output>
+        <operation:body>
+            <heisenberg:cure-cancer>
+                <error-mapping sourceType="HEISENBERG:HEALTH" targetType="MY:MAPPED"/>
+            </heisenberg:cure-cancer>
+        </operation:body>
+    </operation:def>
+
+    <flow name="errorMappingInsideBodyAndInInvocationFlow">
+        <this:with-mapping-inside-body >
+            <error-mapping sourceType="MY:MAPPED" targetType="MY:MAPPED_TWICE"/>
+        </this:with-mapping-inside-body>
+    </flow>
+</mule>

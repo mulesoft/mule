@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:module-implicit-configuration="http://www.mulesoft.org/schema/mule/module-implicit-configuration"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/module-implicit-configuration http://www.mulesoft.org/schema/mule/module-implicit-configuration/current/mule-module-implicit-configuration.xsd">
+
+    <flow name="testSetPayloadConfigDefaultParamFlow">
+        <module-implicit-configuration:set-payload-config-default-param-value />
+    </flow>
+
+</mule>

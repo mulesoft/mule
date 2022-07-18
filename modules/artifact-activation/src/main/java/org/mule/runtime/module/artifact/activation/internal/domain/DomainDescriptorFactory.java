@@ -14,11 +14,14 @@ import org.mule.runtime.api.deployment.meta.MuleDomainModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
+import org.mule.runtime.module.artifact.activation.api.plugin.PluginPatchesResolver;
 import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,10 +30,12 @@ import java.util.Map;
 public class DomainDescriptorFactory extends AbstractDeployableArtifactDescriptorFactory<MuleDomainModel, DomainDescriptor> {
 
   public DomainDescriptorFactory(DeployableProjectModel deployableProjectModel,
-                                 Map<String, String> deploymentProperties, PluginModelResolver pluginModelResolver,
+                                 Map<String, String> deploymentProperties,
+                                 PluginPatchesResolver artifactPatches,
+                                 PluginModelResolver pluginModelResolver,
                                  PluginDescriptorResolver pluginDescriptorResolver,
                                  ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
-    super(deployableProjectModel, deploymentProperties, pluginModelResolver, pluginDescriptorResolver,
+    super(deployableProjectModel, deploymentProperties, artifactPatches, pluginModelResolver, pluginDescriptorResolver,
           artifactDescriptorValidatorBuilder);
   }
 

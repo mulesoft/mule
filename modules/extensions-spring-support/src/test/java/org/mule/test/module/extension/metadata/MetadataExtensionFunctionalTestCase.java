@@ -80,6 +80,7 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
 
   protected static final String CONTENT_METADATA_WITH_KEY_ID = "contentMetadataWithKeyId";
   protected static final String OUTPUT_METADATA_WITH_KEY_ID = "outputMetadataWithKeyId";
+  protected static final String OUTPUT_METADATA_WITH_KEY_ID_USING_CONFIG = "outputMetadataWithKeyIdUsingConfig";
   protected static final String CONTENT_AND_OUTPUT_METADATA_WITH_KEY_ID = "contentAndOutputMetadataWithKeyId";
   protected static final String OUTPUT_ONLY_WITHOUT_CONTENT_PARAM = "outputOnlyWithoutContentParam";
   protected static final String CONTENT_ONLY_IGNORES_OUTPUT = "contentOnlyIgnoresOutput";

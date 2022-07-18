@@ -14,6 +14,8 @@ import static org.mule.runtime.module.extension.mule.internal.loader.parser.Util
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.stringParameterAst;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERATIONS;
+
+import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -26,6 +28,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -61,7 +64,7 @@ public class MuleSdkOperationModelParserSdkTestCase extends AbstractMuleTestCase
     someMetadataType = mock(MetadataType.class);
     when(typeLoader.load("some")).thenReturn(Optional.of(someMetadataType));
 
-    operationModelParser = new MuleSdkOperationModelParserSdk(operationAst, typeLoader);
+    operationModelParser = new MuleSdkOperationModelParserSdk(operationAst, typeLoader, new ExtensionModelHelper(emptySet()));
   }
 
   // ------------------------------- //
