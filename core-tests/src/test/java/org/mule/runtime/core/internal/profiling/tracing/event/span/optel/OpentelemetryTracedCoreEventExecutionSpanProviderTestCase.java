@@ -11,8 +11,6 @@ import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEv
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_MULE_CORE_EVENT_TRACER;
 
-import static java.util.Arrays.asList;
-
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -27,35 +25,21 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.InternalSpan;
 import org.mule.runtime.core.internal.profiling.OpentelemetryExecutionSpan;
 
-import java.util.Collection;
-
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.hamcrest.Matchers;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 @Feature(PROFILING)
 @Story(DEFAULT_MULE_CORE_EVENT_TRACER)
-@RunWith(Parameterized.class)
-public class AbstractOpentelemetryTracedCoreEventExecutionSpanProviderTestCase {
+public class OpentelemetryTracedCoreEventExecutionSpanProviderTestCase {
 
   public static final String IDENTIFIER_NAMESPACE = "namespace";
   public static final String IDENTIFIER_NAME = "name";
   public static final String COMPONENT_LOCATION = "location";
   public static final String APP_ID = "appId";
-  private final AbstractOpentelemetryTracedCoreEventExecutionSpanProvider coreEventExecutionSpanProvider;
-
-  @Parameterized.Parameters(name = "coreEventExecutionSpanProvider: {0}")
-  public static Collection<AbstractOpentelemetryTracedCoreEventExecutionSpanProvider> eventType() {
-    return asList(new OpentelemetryRouterTracedCoreEventExecutionSpanProvider(),
-                  new OpentelemetryTracedCoreEventExecutionSpanProvider());
-  }
-
-  public AbstractOpentelemetryTracedCoreEventExecutionSpanProviderTestCase(AbstractOpentelemetryTracedCoreEventExecutionSpanProvider coreEventExecutionSpanProvider) {
-    this.coreEventExecutionSpanProvider = coreEventExecutionSpanProvider;
-  }
+  private final OpentelemetryTracedCoreEventExecutionSpanProvider coreEventExecutionSpanProvider =
+      new OpentelemetryTracedCoreEventExecutionSpanProvider();
 
   @Test
   public void testOpenTelemetryRouterTracedCoreEventExecutionSpanProviderTestCase() {
@@ -77,7 +61,6 @@ public class AbstractOpentelemetryTracedCoreEventExecutionSpanProviderTestCase {
     assertThat(span, instanceOf(OpentelemetryExecutionSpan.class));
 
     OpentelemetryExecutionSpan opentelemetryExecutionSpan = (OpentelemetryExecutionSpan) span;
-    assertThat(opentelemetryExecutionSpan.getName(), Matchers.equalTo(getCoreEventSpanName(componentIdentifier) +
-        coreEventExecutionSpanProvider.getComponentSubTaskSuffix()));
+    assertThat(opentelemetryExecutionSpan.getName(), Matchers.equalTo(getCoreEventSpanName(componentIdentifier)));
   }
 }

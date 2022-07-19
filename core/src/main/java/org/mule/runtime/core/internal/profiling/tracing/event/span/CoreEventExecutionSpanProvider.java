@@ -29,4 +29,16 @@ public interface CoreEventExecutionSpanProvider {
    * @return the {@link InternalSpan} for that coreEvent and component.
    */
   InternalSpan getSpan(CoreEvent coreEvent, Component component, MuleConfiguration muleConfiguration);
+
+  /**
+   * Provides a span for related to a component that is hit by an event.
+   *
+   * @param coreEvent               the core event that hits the component.
+   * @param component               the component hit
+   * @param muleConfiguration       the mule configuration related to the deployed artifact.
+   * @param coreEventSpanCustomizer the {@link CoreEventSpanCustomizer} customizer for the span.
+   * @return the {@link InternalSpan} for that coreEvent and component.
+   */
+  InternalSpan getSpan(CoreEvent coreEvent, Component component, MuleConfiguration muleConfiguration,
+                       CoreEventSpanCustomizer coreEventSpanCustomizer);
 }

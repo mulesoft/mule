@@ -13,6 +13,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventExecutionSpanProvider;
 import org.mule.runtime.core.internal.profiling.InternalSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.MuleCoreEventTracer;
 
 /**
@@ -40,15 +41,18 @@ public class DefaultMuleCoreEventTracer implements MuleCoreEventTracer {
 
   @Override
   public InternalSpan startComponentExecutionSpan(CoreEvent coreEvent, Component component) {
-    return startComponentExecutionSpan(coreEvent, component, defaultCoreEventExecutionSpanProvider);
+    return setCurrentContextSpanInEventContextIfPossible(coreEvent,
+                                                         defaultCoreEventExecutionSpanProvider.getSpan(coreEvent, component,
+                                                                                                       muleConfiguration));
   }
 
   @Override
   public InternalSpan startComponentExecutionSpan(CoreEvent coreEvent, Component component,
-                                                  CoreEventExecutionSpanProvider coreEventExecutionSpanProvider) {
-    InternalSpan currentSpan = coreEventExecutionSpanProvider.getSpan(coreEvent, component, muleConfiguration);
-    setCurrentContextSpanInEventContextIfPossible(coreEvent, currentSpan);
-    return currentSpan;
+                                                  CoreEventSpanCustomizer coreEventSpanCustomizer) {
+    return setCurrentContextSpanInEventContextIfPossible(coreEvent,
+                                                         defaultCoreEventExecutionSpanProvider.getSpan(coreEvent, component,
+                                                                                                       muleConfiguration,
+                                                                                                       coreEventSpanCustomizer));
   }
 
   @Override
@@ -56,7 +60,7 @@ public class DefaultMuleCoreEventTracer implements MuleCoreEventTracer {
     endCurrentContextSpanIfPosibble(coreEvent);
   }
 
-  private void setCurrentContextSpanInEventContextIfPossible(CoreEvent coreEvent, InternalSpan currentSpan) {
+  private InternalSpan setCurrentContextSpanInEventContextIfPossible(CoreEvent coreEvent, InternalSpan currentSpan) {
     EventContext eventContext = coreEvent.getContext();
 
     if (eventContext instanceof DistributedTraceContextAware) {
@@ -64,6 +68,8 @@ public class DefaultMuleCoreEventTracer implements MuleCoreEventTracer {
           .getDistributedTraceContext()
           .setContextCurrentSpan(currentSpan);
     }
+
+    return currentSpan;
   }
 
   private void endCurrentContextSpanIfPosibble(CoreEvent coreEvent) {

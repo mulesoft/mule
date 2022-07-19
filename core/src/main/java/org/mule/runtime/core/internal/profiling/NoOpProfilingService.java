@@ -22,6 +22,7 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import java.util.function.Function;
 
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.MuleCoreEventTracer;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventExecutionSpanProvider;
 import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
@@ -146,7 +147,7 @@ public class NoOpProfilingService implements InternalProfilingService, Privilege
 
     @Override
     public InternalSpan startComponentExecutionSpan(CoreEvent coreEvent, Component component,
-                                                    CoreEventExecutionSpanProvider coreEventExecutionSpanProvider) {
+                                                    CoreEventSpanCustomizer coreEventSpanCustomizer) {
       return NoOpInternalSpan.INSTANCE;
     }
 

@@ -44,6 +44,7 @@ import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventExecutionSpanProvider;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExecutionSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.MuleCoreEventTracer;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
@@ -136,6 +137,18 @@ public class DefaultMuleCoreEventTracerTestCase {
     @Override
     public InternalSpan getSpan(CoreEvent coreEvent, Component component, MuleConfiguration muleConfiguration) {
       return new ExecutionSpan(getCoreEventSpanName(component.getIdentifier()),
+                               componentSpanIdentifierFrom(muleConfiguration.getId(),
+                                                           component.getLocation(),
+                                                           coreEvent.getCorrelationId()),
+                               currentTimeMillis(),
+                               null,
+                               getCurrentContextSpan(coreEvent.getContext()).orElse(null));
+    }
+
+    @Override
+    public InternalSpan getSpan(CoreEvent coreEvent, Component component, MuleConfiguration muleConfiguration,
+                                CoreEventSpanCustomizer coreEventSpanCustomizer) {
+      return new ExecutionSpan(coreEventSpanCustomizer.getName(coreEvent, component),
                                componentSpanIdentifierFrom(muleConfiguration.getId(),
                                                            component.getLocation(),
                                                            coreEvent.getCorrelationId()),
