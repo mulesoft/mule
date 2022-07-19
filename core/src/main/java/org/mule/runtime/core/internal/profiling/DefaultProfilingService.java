@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.profiling;
 
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
 import static java.util.Optional.empty;
-import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultMuleCoreEventTracer.getMuleEventTracerBuilder;
+import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracer.getCoreEventTracerBuilder;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getMuleDefaultCoreEventExecutionSpanProvider;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -21,7 +21,7 @@ import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import org.mule.runtime.api.profiling.tracing.TracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.MuleCoreEventTracer;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.discovery.DefaultProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.producer.provider.ProfilingDataProducerResolver;
@@ -53,7 +53,7 @@ public class DefaultProfilingService extends AbstractProfilingService {
   @Inject
   private ProfilingFeatureFlaggingService featureFlaggingService;
 
-  private MuleCoreEventTracer eventTracer;
+  private CoreEventTracer eventTracer;
 
   private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies = empty();
 
@@ -86,8 +86,8 @@ public class DefaultProfilingService extends AbstractProfilingService {
     super.initialise();
   }
 
-  private void createMuleEventTracer() {
-    this.eventTracer = getMuleEventTracerBuilder()
+  private void getDefaultCoreEventExecutionSpanProvider() {
+    this.eventTracer = getCoreEventTracerBuilder()
         .withDefaultCoreEventExecutionSpanProvider(getMuleDefaultCoreEventExecutionSpanProvider())
         .withMuleConfiguration(muleContext.getConfiguration())
         .build();
@@ -176,9 +176,9 @@ public class DefaultProfilingService extends AbstractProfilingService {
   }
 
   @Override
-  public MuleCoreEventTracer getMuleCoreEventTracer() {
+  public CoreEventTracer getCoreEventTracer() {
     if (eventTracer == null) {
-      createMuleEventTracer();
+      getDefaultCoreEventExecutionSpanProvider();
     }
     return eventTracer;
   }

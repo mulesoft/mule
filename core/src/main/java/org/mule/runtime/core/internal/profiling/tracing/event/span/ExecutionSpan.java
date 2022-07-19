@@ -60,11 +60,6 @@ public class ExecutionSpan implements InternalSpan {
     this.endTime = currentTimeMillis();
   }
 
-  @Override
-  public InternalSpan getInternalParentSpan() {
-    return parent;
-  }
-
   /**
    * An default implementation for a {@link SpanDuration}
    */

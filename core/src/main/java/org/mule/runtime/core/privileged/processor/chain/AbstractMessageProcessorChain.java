@@ -74,7 +74,7 @@ import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcess
 import org.mule.runtime.core.internal.processor.interceptor.ProcessorInterceptorFactoryAdapter;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.MuleCoreEventTracer;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadingProfilingEventContext;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
@@ -172,7 +172,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private ProfilingDataProducer<org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext, CoreEvent> endOperationExecutionDataProducer;
 
   private Scheduler switchOnErrorScheduler;
-  private MuleCoreEventTracer muleEventTracer;
+  private CoreEventTracer muleEventTracer;
 
   AbstractMessageProcessorChain(String name,
                                 Optional<ProcessingStrategy> processingStrategyOptional,
@@ -400,7 +400,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     try {
       postNotification(processor).accept(result);
       setCurrentEvent((PrivilegedEvent) result);
-      muleEventTracer.endCurrentExecutionSpan(result);
+      muleEventTracer.endCurrentSpan(result);
 
 
       // If the processor returns a CursorProvider, then have the StreamingManager manage it
@@ -421,7 +421,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     }
     ComponentLocation componentLocation = getLocationIfComponent(processor);
     if (processor instanceof Component) {
-      muleEventTracer.startComponentExecutionSpan(event, (Component) processor);
+      muleEventTracer.startComponentSpan(event, (Component) processor);
     }
     triggerStartingOperation(event, componentLocation);
     preNotification(event, processor);
@@ -620,7 +620,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       switchOnErrorScheduler = schedulerService.cpuLightScheduler();
     }
 
-    muleEventTracer = profilingService.getMuleCoreEventTracer();
+    muleEventTracer = profilingService.getCoreEventTracer();
   }
 
   @Override

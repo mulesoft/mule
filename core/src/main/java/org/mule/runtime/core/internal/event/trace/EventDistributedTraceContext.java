@@ -13,7 +13,7 @@ import static org.mule.runtime.core.internal.event.trace.extractor.RuntimeEventT
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.core.internal.profiling.InternalSpan;
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.MuleCoreEventTracer;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.core.internal.event.trace.extractor.TraceContextFieldExtractor;
 
@@ -32,7 +32,7 @@ import java.util.Optional;
  */
 public class EventDistributedTraceContext implements DistributedTraceContext {
 
-  private MuleCoreEventTracer muleEventTracer;
+  private CoreEventTracer muleEventTracer;
   private Map<String, String> tracingFields = new HashMap<>();
   private Map<String, String> baggageItems = new HashMap<>();
   private InternalSpan currentSpan;
@@ -78,7 +78,7 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
   public DistributedTraceContext copy() {
     EventDistributedTraceContext eventDistributedTraceContext =
         new EventDistributedTraceContext(tracingFields, baggageItems);
-    eventDistributedTraceContext.setContextCurrentSpan(currentSpan);
+    eventDistributedTraceContext.setCurrentSpan(currentSpan);
     return eventDistributedTraceContext;
   }
 
@@ -86,17 +86,17 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
   public void endCurrentContextSpan() {
     if (currentSpan != null) {
       currentSpan.end();
-      currentSpan = currentSpan.getInternalParentSpan();
+      currentSpan = (InternalSpan) currentSpan.getParent();
     }
   }
 
   @Override
-  public void setContextCurrentSpan(InternalSpan currentSpan) {
+  public void setCurrentSpan(InternalSpan currentSpan) {
     this.currentSpan = currentSpan;
   }
 
   @Override
-  public Optional<InternalSpan> getContextCurrentSpan() {
+  public Optional<InternalSpan> getCurrentSpan() {
     return ofNullable(currentSpan);
   }
 

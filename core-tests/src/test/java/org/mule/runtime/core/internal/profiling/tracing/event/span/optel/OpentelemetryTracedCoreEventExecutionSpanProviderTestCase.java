@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span.optel;
 
-import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getCoreEventSpanName;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_MULE_CORE_EVENT_TRACER;
 
@@ -61,6 +61,6 @@ public class OpentelemetryTracedCoreEventExecutionSpanProviderTestCase {
     assertThat(span, instanceOf(OpentelemetryExecutionSpan.class));
 
     OpentelemetryExecutionSpan opentelemetryExecutionSpan = (OpentelemetryExecutionSpan) span;
-    assertThat(opentelemetryExecutionSpan.getName(), Matchers.equalTo(getCoreEventSpanName(componentIdentifier)));
+    assertThat(opentelemetryExecutionSpan.getName(), Matchers.equalTo(getSpanName(componentIdentifier)));
   }
 }

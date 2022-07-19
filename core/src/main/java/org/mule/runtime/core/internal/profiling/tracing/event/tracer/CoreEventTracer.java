@@ -10,7 +10,6 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.InternalSpan;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventExecutionSpanProvider;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
 
 /**
@@ -32,7 +31,7 @@ import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpan
  *
  * @since 4.5.0
  */
-public interface MuleCoreEventTracer {
+public interface CoreEventTracer {
 
   /**
    * Starts a span associated to the {@param component} as the current context span for the {@link CoreEvent}.
@@ -42,7 +41,7 @@ public interface MuleCoreEventTracer {
    *
    * @return the span generated for the context of the {@link CoreEvent} when it hits the {@param component}
    */
-  InternalSpan startComponentExecutionSpan(CoreEvent coreEvent, Component component);
+  InternalSpan startComponentSpan(CoreEvent coreEvent, Component component);
 
   /**
    * Starts a span associated to the {@param component} as the current context span for the {@link CoreEvent}.
@@ -53,12 +52,12 @@ public interface MuleCoreEventTracer {
    *
    * @return the span generated for the context of the {@link CoreEvent} when it hits the {@param component}
    */
-  InternalSpan startComponentExecutionSpan(CoreEvent coreEvent, Component component,
-                                           CoreEventSpanCustomizer coreEventSpanCustomizer);
+  InternalSpan startComponentSpan(CoreEvent coreEvent, Component component,
+                                  CoreEventSpanCustomizer coreEventSpanCustomizer);
 
   /**
    * @param coreEvent ends the current context {@link Span}.
    */
-  void endCurrentExecutionSpan(CoreEvent coreEvent);
+  void endCurrentSpan(CoreEvent coreEvent);
 
 }

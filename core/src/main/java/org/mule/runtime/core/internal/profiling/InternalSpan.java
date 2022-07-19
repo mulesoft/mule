@@ -24,11 +24,4 @@ public interface InternalSpan extends Span {
    * Ends the span.
    */
   void end();
-
-  /**
-   * Gets the parent span as an {@link InternalSpan}
-   *
-   * @return the internal paranet span.
-   */
-  InternalSpan getInternalParentSpan();
 }

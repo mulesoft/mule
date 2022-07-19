@@ -10,8 +10,8 @@ package org.mule.runtime.core.internal.profiling.tracing.event.span.optel;
 import static java.lang.System.currentTimeMillis;
 
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.ComponentSpanIdentifier.componentSpanIdentifierFrom;
-import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getCoreEventSpanName;
-import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getCurrentContextSpan;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getCurrentSpan;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.optel.OpenTelemetryResourcesProvider.getOpentelemetryTracer;
 
 import org.mule.runtime.api.component.Component;
@@ -20,19 +20,18 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.InternalSpan;
 import org.mule.runtime.core.internal.profiling.OpentelemetryExecutionSpan;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventExecutionSpanProvider;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanProvider;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExecutionSpan;
 
 import io.opentelemetry.api.trace.Tracer;
 
 /**
- * A {@link CoreEventExecutionSpanProvider} that provides open telemetry traced
- * {@link org.mule.runtime.api.profiling.tracing.Span}.
+ * A {@link CoreEventSpanProvider} that provides open telemetry traced {@link org.mule.runtime.api.profiling.tracing.Span}.
  *
  * @since 4.5.0
  */
-public class OpentelemetryTracedCoreEventExecutionSpanProvider implements CoreEventExecutionSpanProvider {
+public class OpentelemetryTracedCoreEventExecutionSpanProvider implements CoreEventSpanProvider {
 
   private final Tracer openTelemetryTracer = getOpentelemetryTracer();
 
@@ -63,7 +62,7 @@ public class OpentelemetryTracedCoreEventExecutionSpanProvider implements CoreEv
                                                                                         eventContext.getCorrelationId()),
                                                             currentTimeMillis(),
                                                             null,
-                                                            getCurrentContextSpan(eventContext).orElse(null)),
+                                                            getCurrentSpan(eventContext).orElse(null)),
                                           eventContext, openTelemetryTracer);
   }
 
@@ -71,7 +70,7 @@ public class OpentelemetryTracedCoreEventExecutionSpanProvider implements CoreEv
 
     @Override
     public String getName(CoreEvent coreEvent, Component component) {
-      return getCoreEventSpanName(component.getIdentifier());
+      return getSpanName(component.getIdentifier());
     }
   }
 }

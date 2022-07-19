@@ -48,8 +48,8 @@ public class DistributedTraceContextManagerResolver implements ArgumentResolver<
   private DistributedTraceContext getDistributedTraceContext(CoreEvent event) {
     if (event instanceof DistributedTraceContextAware) {
       DistributedTraceContext distributedTraceContext = ((DistributedTraceContextAware) event).getDistributedTraceContext();
-      OpentelemetryExecutionSpan span = distributedTraceContext.getContextCurrentSpan().map(
-                                                                                            e -> getInternalSpanOpentelemetryExecutionSpanFunction(e))
+      OpentelemetryExecutionSpan span = distributedTraceContext.getCurrentSpan().map(
+                                                                                     e -> getInternalSpanOpentelemetryExecutionSpanFunction(e))
           .orElse(null);
       Map<String, String> map = new HashMap<>();
       map.putAll(distributedTraceContext.tracingFieldsAsMap());
@@ -90,12 +90,12 @@ public class DistributedTraceContextManagerResolver implements ArgumentResolver<
         }
 
         @Override
-        public void setContextCurrentSpan(InternalSpan span) {
+        public void setCurrentSpan(InternalSpan span) {
           // Nothing to do.
         }
 
         @Override
-        public Optional<InternalSpan> getContextCurrentSpan() {
+        public Optional<InternalSpan> getCurrentSpan() {
           return empty();
         }
       };

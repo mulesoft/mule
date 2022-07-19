@@ -72,11 +72,6 @@ public class OpentelemetryExecutionSpan implements InternalSpan {
     opentelemetrySpan.end();
   }
 
-  @Override
-  public InternalSpan getInternalParentSpan() {
-    return runtimeInternalSpan.getInternalParentSpan();
-  }
-
   public io.opentelemetry.api.trace.Span getOpentelemetrySpan() {
     return opentelemetrySpan;
   }

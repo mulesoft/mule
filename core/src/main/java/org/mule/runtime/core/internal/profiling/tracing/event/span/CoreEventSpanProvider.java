@@ -17,7 +17,7 @@ import org.mule.runtime.core.internal.profiling.InternalSpan;
  *
  * @since 4.5.0
  */
-public interface CoreEventExecutionSpanProvider {
+public interface CoreEventSpanProvider {
 
   /**
    * Provides a span for related to a component that is hit by an event.

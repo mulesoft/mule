@@ -14,7 +14,7 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.optel.OpentelemetryTracedCoreEventExecutionSpanProvider;
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.MuleCoreEventTracer;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 
 import java.util.Optional;
 
@@ -32,11 +32,11 @@ public class CoreEventSpanUtils {
    * @param eventContext the {@link EventContext} to extract the parent span from.
    * @return the current context span
    *
-   * @see MuleCoreEventTracer
+   * @see CoreEventTracer
    */
-  public static Optional<InternalSpan> getCurrentContextSpan(EventContext eventContext) {
+  public static Optional<InternalSpan> getCurrentSpan(EventContext eventContext) {
     if (eventContext instanceof DistributedTraceContextAware) {
-      return ((DistributedTraceContextAware) eventContext).getDistributedTraceContext().getContextCurrentSpan();
+      return ((DistributedTraceContextAware) eventContext).getDistributedTraceContext().getCurrentSpan();
     }
 
     return empty();
@@ -46,7 +46,7 @@ public class CoreEventSpanUtils {
    * @param componentIdentifier the {@link ComponentIdentifier}
    * @return the name for the {@link org.mule.runtime.api.profiling.tracing.Span}
    */
-  public static String getCoreEventSpanName(ComponentIdentifier componentIdentifier) {
+  public static String getSpanName(ComponentIdentifier componentIdentifier) {
     return getUnknownIfEmptyNamespace(componentIdentifier) + CORE_EVENT_SPAN_NAME_SEPARATOR
         + getUnknownIfEmptyName(componentIdentifier);
   }
@@ -68,9 +68,9 @@ public class CoreEventSpanUtils {
   }
 
   /**
-   * @return the default {@link CoreEventExecutionSpanProvider}
+   * @return the default {@link CoreEventSpanProvider}
    */
-  public static CoreEventExecutionSpanProvider getMuleDefaultCoreEventExecutionSpanProvider() {
+  public static CoreEventSpanProvider getMuleDefaultCoreEventExecutionSpanProvider() {
     return new OpentelemetryTracedCoreEventExecutionSpanProvider();
   }
 

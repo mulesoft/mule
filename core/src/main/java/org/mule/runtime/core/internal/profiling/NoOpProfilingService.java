@@ -23,8 +23,7 @@ import java.util.function.Function;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.MuleCoreEventTracer;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventExecutionSpanProvider;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -37,7 +36,7 @@ import reactor.core.publisher.Mono;
  */
 public class NoOpProfilingService implements InternalProfilingService, PrivilegedProfilingService {
 
-  private MuleCoreEventTracer muleCoreEventTracer = new NoOpCoreEventTracer();
+  private CoreEventTracer muleCoreEventTracer = new NoOpCoreEventTracer();
 
   private final TracingService noOpTracingService = new TracingService() {
 
@@ -134,25 +133,25 @@ public class NoOpProfilingService implements InternalProfilingService, Privilege
   }
 
   @Override
-  public MuleCoreEventTracer getMuleCoreEventTracer() {
+  public CoreEventTracer getCoreEventTracer() {
     return muleCoreEventTracer;
   }
 
-  private static class NoOpCoreEventTracer implements MuleCoreEventTracer {
+  private static class NoOpCoreEventTracer implements CoreEventTracer {
 
     @Override
-    public InternalSpan startComponentExecutionSpan(CoreEvent coreEvent, Component component) {
+    public InternalSpan startComponentSpan(CoreEvent coreEvent, Component component) {
       return NoOpInternalSpan.INSTANCE;
     }
 
     @Override
-    public InternalSpan startComponentExecutionSpan(CoreEvent coreEvent, Component component,
-                                                    CoreEventSpanCustomizer coreEventSpanCustomizer) {
+    public InternalSpan startComponentSpan(CoreEvent coreEvent, Component component,
+                                           CoreEventSpanCustomizer coreEventSpanCustomizer) {
       return NoOpInternalSpan.INSTANCE;
     }
 
     @Override
-    public void endCurrentExecutionSpan(CoreEvent coreEvent) {
+    public void endCurrentSpan(CoreEvent coreEvent) {
 
     }
 
@@ -163,11 +162,6 @@ public class NoOpProfilingService implements InternalProfilingService, Privilege
         @Override
         public void end() {
 
-        }
-
-        @Override
-        public InternalSpan getInternalParentSpan() {
-          return null;
         }
 
         @Override

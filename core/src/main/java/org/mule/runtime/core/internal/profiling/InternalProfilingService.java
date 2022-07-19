@@ -13,7 +13,7 @@ import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 
 import java.util.function.Function;
 
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.MuleCoreEventTracer;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -59,9 +59,9 @@ public interface InternalProfilingService extends ProfilingService {
   <S> Flux<S> setCurrentExecutionContext(Flux<S> original, Function<S, ExecutionContext> executionContextSupplier);
 
   /**
-   * @return the {@link MuleCoreEventTracer}.
+   * @return the {@link CoreEventTracer}.
    *
    * @since 4.5.0
    */
-  MuleCoreEventTracer getMuleCoreEventTracer();
+  CoreEventTracer getCoreEventTracer();
 }
