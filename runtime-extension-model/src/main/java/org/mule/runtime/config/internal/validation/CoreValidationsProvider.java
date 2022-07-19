@@ -57,6 +57,7 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                           new RaiseErrorTypeReferencesPresent(featureFlaggingService),
                                                           new RaiseErrorReferenceDoNotUseExtensionNamespaces(featureFlaggingService),
                                                           new RaiseErrorTypeReferencesExist(featureFlaggingService),
+                                                          new ErrorMappingTargetTypeReferencesDoNotUseExtensionNamespace(featureFlaggingService),
                                                           new ErrorMappingTargetTypeReferencesExist(featureFlaggingService),
                                                           new ErrorMappingSourceTypeReferencesExist(featureFlaggingService),
                                                           new ErrorHandlerOnErrorTypeExists(featureFlaggingService),
