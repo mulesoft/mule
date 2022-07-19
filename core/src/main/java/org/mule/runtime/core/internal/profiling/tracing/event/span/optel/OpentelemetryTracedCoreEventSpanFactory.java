@@ -58,8 +58,8 @@ public class OpentelemetryTracedCoreEventSpanFactory implements CoreEventSpanFac
                                                  EventContext eventContext, String name) {
     return new OpentelemetrySpan(new ExecutionSpan(name,
                                                    componentSpanIdentifierFrom(muleConfiguration.getId(),
-                                                                                        component.getLocation(),
-                                                                                        eventContext.getCorrelationId()),
+                                                                               component.getLocation(),
+                                                                               eventContext.getCorrelationId()),
                                                    currentTimeMillis(),
                                                    null,
                                                    getCurrentSpan(eventContext).orElse(null)),

@@ -43,7 +43,7 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
   public InternalSpan startComponentSpan(CoreEvent coreEvent, Component component) {
     return startCurrentSpanIfPossible(coreEvent,
                                       coreEventSpanFactory.getSpan(coreEvent, component,
-                                                                 muleConfiguration));
+                                                                   muleConfiguration));
   }
 
   @Override
@@ -51,8 +51,8 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
                                          CoreEventSpanCustomizer coreEventSpanCustomizer) {
     return startCurrentSpanIfPossible(coreEvent,
                                       coreEventSpanFactory.getSpan(coreEvent, component,
-                                                                 muleConfiguration,
-                                                                 coreEventSpanCustomizer));
+                                                                   muleConfiguration,
+                                                                   coreEventSpanCustomizer));
   }
 
   @Override
@@ -97,7 +97,7 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
     }
 
     public DefaultEventTracerBuilder withDefaultCoreEventSpanFactory(
-                                                                               CoreEventSpanFactory defaultCoreEventSpanFactory) {
+                                                                     CoreEventSpanFactory defaultCoreEventSpanFactory) {
       this.defaultCoreEventSpanFactory = defaultCoreEventSpanFactory;
       return this;
 
