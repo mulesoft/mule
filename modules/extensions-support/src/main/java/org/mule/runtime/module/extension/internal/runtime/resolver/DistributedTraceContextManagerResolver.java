@@ -11,7 +11,7 @@ import static org.mule.runtime.core.internal.trace.DistributedTraceContext.empty
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.InternalSpan;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.ExecutionSpan;
+import org.mule.runtime.core.internal.profiling.OpentelemetryExecutionSpan;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -35,15 +35,9 @@ import java.util.Optional;
  */
 public class DistributedTraceContextManagerResolver implements ArgumentResolver<DistributedTraceContextManager> {
 
+  // Insert the context as Header
   TextMapSetter<Map<String, String>> setter =
-      new TextMapSetter<Map<String, String>>() {
-
-        @Override
-        public void set(Map<String, String> carrier, String key, String value) {
-          // Insert the context as Header
-          carrier.put(key, value);
-        }
-      };
+      Map::put;
 
   @Override
   public DistributedTraceContextManager resolve(ExecutionContext executionContext) {
@@ -54,10 +48,14 @@ public class DistributedTraceContextManagerResolver implements ArgumentResolver<
   private DistributedTraceContext getDistributedTraceContext(CoreEvent event) {
     if (event instanceof DistributedTraceContextAware) {
       DistributedTraceContext distributedTraceContext = ((DistributedTraceContextAware) event).getDistributedTraceContext();
-      ExecutionSpan span = distributedTraceContext.getContextCurrentSpan().map(e -> (ExecutionSpan) e).orElse(null);
+      OpentelemetryExecutionSpan span = distributedTraceContext.getContextCurrentSpan().map(
+                                                                                            e -> getInternalSpanOpentelemetryExecutionSpanFunction(e))
+          .orElse(null);
       Map<String, String> map = new HashMap<>();
+      map.putAll(distributedTraceContext.tracingFieldsAsMap());
+      map.putAll(distributedTraceContext.baggageItemsAsMap());
       GlobalOpenTelemetry.get().getPropagators().getTextMapPropagator()
-          .inject(Context.current().with(null), map, setter);
+          .inject(Context.current().with(span.getOpentelemetrySpan()), map, setter);
 
       return new DistributedTraceContext() {
 
@@ -88,11 +86,13 @@ public class DistributedTraceContextManagerResolver implements ArgumentResolver<
 
         @Override
         public void endCurrentContextSpan() {
-
+          // Nothing to do.
         }
 
         @Override
-        public void setContextCurrentSpan(InternalSpan span) {}
+        public void setContextCurrentSpan(InternalSpan span) {
+          // Nothing to do.
+        }
 
         @Override
         public Optional<InternalSpan> getContextCurrentSpan() {
@@ -102,5 +102,13 @@ public class DistributedTraceContextManagerResolver implements ArgumentResolver<
     }
 
     return emptyDistributedEventContext();
+  }
+
+  private OpentelemetryExecutionSpan getInternalSpanOpentelemetryExecutionSpanFunction(InternalSpan internalSpan) {
+    if (internalSpan instanceof OpentelemetryExecutionSpan) {
+      return (OpentelemetryExecutionSpan) internalSpan;
+    }
+
+    return null;
   }
 }

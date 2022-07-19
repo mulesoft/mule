@@ -139,7 +139,7 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
 
   @Override
   public MuleCoreEventTracer getMuleCoreEventTracer() {
-    return profilingService.getMuleCoreEventTracer();
+    return getProfilingService().getMuleCoreEventTracer();
   }
 
   @Override

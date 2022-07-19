@@ -59,6 +59,7 @@ import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.MuleCoreEventTracer;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
@@ -102,6 +103,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
   public void createMocks() throws Exception {
     muleContext.dispose();
     InternalProfilingService coreProfilingService = mock(InternalProfilingService.class);
+    when(coreProfilingService.getMuleCoreEventTracer()).thenReturn(mock(MuleCoreEventTracer.class));
     mockProcessingStrategyProfilingChainWithoutTriggeringEvent(coreProfilingService);
     muleContext = mockContextWithServicesWithProfilingService(coreProfilingService);
     when(muleContext.getStatistics()).thenReturn(new AllStatistics());

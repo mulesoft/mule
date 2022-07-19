@@ -360,7 +360,6 @@ public final class DefaultEventContext extends AbstractEventContext implements S
       this.rootId = root.getRootId();
       if (parent instanceof DistributedTraceContextAware) {
         distributedTraceContext = getParentDistributedTraceContext((DistributedTraceContextAware) parent).copy();
-        distributedTraceContext.setContextCurrentSpan(distributedTraceContext.getContextCurrentSpan().get());
       }
     }
 
