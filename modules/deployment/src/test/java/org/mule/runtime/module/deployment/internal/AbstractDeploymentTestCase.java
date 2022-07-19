@@ -61,6 +61,7 @@ import static java.util.stream.Collectors.joining;
 import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.copyFile;
+import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.moveDirectory;
 import static org.apache.commons.io.FileUtils.toFile;
@@ -104,6 +105,7 @@ import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuild
 import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
 import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
@@ -447,6 +449,16 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     return new File(AbstractDeploymentTestCase.class.getResource(resource).toURI());
   }
 
+  protected static File getResourceFile(String resource, File tempFolder) {
+    final File targetFile = new File(tempFolder, resource);
+    try {
+      copyInputStreamToFile(AbstractDeploymentTestCase.class.getResourceAsStream(resource), targetFile);
+    } catch (IOException e) {
+      throw new MuleRuntimeException(e);
+    }
+    return targetFile;
+  }
+
   // Application plugin file builders
   protected final ArtifactPluginFileBuilder echoPlugin = new ArtifactPluginFileBuilder("echoPlugin")
       .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
@@ -585,7 +597,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     services.mkdirs();
     copyDirectory(buildSchedulerServiceFile(compilerWorkFolder.newFolder(SCHEDULER_SERVICE_NAME)),
                   new File(services, SCHEDULER_SERVICE_NAME));
-    copyDirectory(buildExpressionLanguageServiceFile(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_SERVICE_NAME)),
+    copyDirectory(getExpressionLanguageServiceFile(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_SERVICE_NAME)),
                   new File(services, EXPRESSION_LANGUAGE_SERVICE_NAME));
 
     applicationDeploymentListener = mock(DeploymentListener.class);
@@ -703,6 +715,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected void installEchoService() throws IOException {
     installService("echoService", "org.mule.runtime.service.test.api.EchoService", "org.mule.echo.EchoServiceProvider",
                    defaulServiceEchoJarFile);
+  }
+
+  protected File getExpressionLanguageServiceFile(File tempFolder) {
+    return buildExpressionLanguageServiceFile(tempFolder);
   }
 
   private void installService(String serviceName, String satisfiedServiceClassName, String serviceProviderClassName,
