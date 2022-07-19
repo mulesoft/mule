@@ -8,9 +8,10 @@
 package org.mule.runtime.core.internal.profiling;
 
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
-import static java.util.Optional.empty;
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracer.getCoreEventTracerBuilder;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getMuleDefaultCoreEventExecutionSpanProvider;
+
+import static java.util.Optional.empty;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;

@@ -13,7 +13,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.InternalSpan;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.optel.OpentelemetryTracedCoreEventExecutionSpanProvider;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.optel.OpentelemetryTracedCoreEventExecutionSpanFactory;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 
 import java.util.Optional;
@@ -68,10 +68,10 @@ public class CoreEventSpanUtils {
   }
 
   /**
-   * @return the default {@link CoreEventSpanProvider}
+   * @return the default {@link CoreEventSpanFactory}
    */
-  public static CoreEventSpanProvider getMuleDefaultCoreEventExecutionSpanProvider() {
-    return new OpentelemetryTracedCoreEventExecutionSpanProvider();
+  public static CoreEventSpanFactory getMuleDefaultCoreEventExecutionSpanProvider() {
+    return new OpentelemetryTracedCoreEventExecutionSpanFactory();
   }
 
 }

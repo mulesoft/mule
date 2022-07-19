@@ -38,8 +38,8 @@ public class OpentelemetryTracedCoreEventExecutionSpanProviderTestCase {
   public static final String IDENTIFIER_NAME = "name";
   public static final String COMPONENT_LOCATION = "location";
   public static final String APP_ID = "appId";
-  private final OpentelemetryTracedCoreEventExecutionSpanProvider coreEventExecutionSpanProvider =
-      new OpentelemetryTracedCoreEventExecutionSpanProvider();
+  private final OpentelemetryTracedCoreEventExecutionSpanFactory coreEventExecutionSpanProvider =
+      new OpentelemetryTracedCoreEventExecutionSpanFactory();
 
   @Test
   public void testOpenTelemetryRouterTracedCoreEventExecutionSpanProviderTestCase() {

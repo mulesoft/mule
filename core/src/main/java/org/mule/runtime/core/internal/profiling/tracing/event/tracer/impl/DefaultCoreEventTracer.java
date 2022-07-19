@@ -11,7 +11,7 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanProvider;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanFactory;
 import org.mule.runtime.core.internal.profiling.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
@@ -23,7 +23,7 @@ import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTr
  */
 public class DefaultCoreEventTracer implements CoreEventTracer {
 
-  private final CoreEventSpanProvider defaultCoreEventExecutionSpanProvider;
+  private final CoreEventSpanFactory defaultCoreEventExecutionSpanProvider;
   private final MuleConfiguration muleConfiguration;
 
   /**
@@ -34,7 +34,7 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
   }
 
   private DefaultCoreEventTracer(MuleConfiguration muleConfiguration,
-                                 CoreEventSpanProvider coreEventExecutionSpanProvider) {
+                                 CoreEventSpanFactory coreEventExecutionSpanProvider) {
     this.muleConfiguration = muleConfiguration;
     this.defaultCoreEventExecutionSpanProvider = coreEventExecutionSpanProvider;
   }
@@ -89,7 +89,7 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
   public static final class DefaultEventTracerBuilder {
 
     private MuleConfiguration muleConfiguration;
-    private CoreEventSpanProvider coreEventExecutionSpanProvider;
+    private CoreEventSpanFactory coreEventExecutionSpanProvider;
 
     public DefaultEventTracerBuilder withMuleConfiguration(MuleConfiguration muleConfiguration) {
       this.muleConfiguration = muleConfiguration;
@@ -97,7 +97,7 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
     }
 
     public DefaultEventTracerBuilder withDefaultCoreEventExecutionSpanProvider(
-                                                                               CoreEventSpanProvider coreEventExecutionSpanProvider) {
+                                                                               CoreEventSpanFactory coreEventExecutionSpanProvider) {
       this.coreEventExecutionSpanProvider = coreEventExecutionSpanProvider;
       return this;
 

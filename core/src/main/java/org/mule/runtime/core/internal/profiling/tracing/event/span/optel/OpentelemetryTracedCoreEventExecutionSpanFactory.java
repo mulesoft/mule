@@ -20,18 +20,18 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.InternalSpan;
 import org.mule.runtime.core.internal.profiling.OpentelemetryExecutionSpan;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanProvider;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanFactory;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExecutionSpan;
 
 import io.opentelemetry.api.trace.Tracer;
 
 /**
- * A {@link CoreEventSpanProvider} that provides open telemetry traced {@link org.mule.runtime.api.profiling.tracing.Span}.
+ * A {@link CoreEventSpanFactory} that provides open telemetry traced {@link org.mule.runtime.api.profiling.tracing.Span}.
  *
  * @since 4.5.0
  */
-public class OpentelemetryTracedCoreEventExecutionSpanProvider implements CoreEventSpanProvider {
+public class OpentelemetryTracedCoreEventExecutionSpanFactory implements CoreEventSpanFactory {
 
   private final Tracer openTelemetryTracer = getOpentelemetryTracer();
 

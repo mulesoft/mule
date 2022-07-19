@@ -43,7 +43,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.InternalSpan;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanProvider;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanFactory;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExecutionSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
@@ -117,7 +117,7 @@ public class DefaultMuleCoreEventTracerTestCase {
   }
 
   @NotNull
-  private CoreEventTracer getTestCoreEventTracer(CoreEventSpanProvider mockedCoreEventExecutionSpanProvider,
+  private CoreEventTracer getTestCoreEventTracer(CoreEventSpanFactory mockedCoreEventExecutionSpanProvider,
                                                  MuleConfiguration mockedMuleConfiguration) {
     return getCoreEventTracerBuilder()
         .withDefaultCoreEventExecutionSpanProvider(mockedCoreEventExecutionSpanProvider)
@@ -126,11 +126,11 @@ public class DefaultMuleCoreEventTracerTestCase {
   }
 
   /**
-   * A {@link CoreEventSpanProvider} for testing purposes.
+   * A {@link CoreEventSpanFactory} for testing purposes.
    */
-  private static class TestCoreEventExecutionSpanProvider implements CoreEventSpanProvider {
+  private static class TestCoreEventExecutionSpanProvider implements CoreEventSpanFactory {
 
-    public static CoreEventSpanProvider getTestCoreEventExecutionSpanProviderInstance() {
+    public static CoreEventSpanFactory getTestCoreEventExecutionSpanProviderInstance() {
       return new TestCoreEventExecutionSpanProvider();
     }
 
