@@ -87,11 +87,11 @@ public class DefaultCoreEventTracerTestCase {
     when(component.getLocation()).thenReturn(componentLocation);
     when(componentLocation.getLocation()).thenReturn(TEST_COMPONENT_LOCATION);
 
-    CoreEventTracer muleCoreEventTracer =
+    CoreEventTracer coreEventTracer =
         getTestCoreEventTracer(TestCoreEventSpanFactory.getTestCoreEventSpanFactoryInstance(),
                                mockedMuleConfiguration);
 
-    InternalSpan span = muleCoreEventTracer.startComponentSpan(coreEvent, component);
+    InternalSpan span = coreEventTracer.startComponentSpan(coreEvent, component);
 
     assertThat(span.getName(), equalTo(getSpanName(component.getIdentifier())));
     assertThat(span.getParent(), nullValue());
@@ -107,11 +107,11 @@ public class DefaultCoreEventTracerTestCase {
   public void endCurrentExecutionSpan() {
     MuleConfiguration mockedMuleConfiguration = mock(MuleConfiguration.class);
     when(mockedMuleConfiguration.getId()).thenReturn(TEST_APP);
-    CoreEventTracer muleCoreEventTracer =
+    CoreEventTracer coreEventTracer =
         getTestCoreEventTracer(TestCoreEventSpanFactory.getTestCoreEventSpanFactoryInstance(),
                                mockedMuleConfiguration);
     DistributedTraceContext distributedTraceContext = mock(DistributedTraceContext.class);
-    muleCoreEventTracer.endCurrentSpan(new FakeCoreEvent(new FakeCoreEventContext(distributedTraceContext)));
+    coreEventTracer.endCurrentSpan(new FakeCoreEvent(new FakeCoreEventContext(distributedTraceContext)));
 
     verify(distributedTraceContext).endCurrentContextSpan();
   }
