@@ -81,7 +81,6 @@ import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 import org.mule.runtime.core.internal.processor.interceptor.CompletableInterceptorSourceFailureCallbackAdapter;
 import org.mule.runtime.core.internal.processor.interceptor.CompletableInterceptorSourceSuccessCallbackAdapter;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
-import org.mule.runtime.core.internal.profiling.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.MuleCoreEventTracer;
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultCollection;
 import org.mule.runtime.core.internal.util.message.TransformingLegacyResultAdapterCollection;
@@ -257,8 +256,7 @@ public class FlowProcessMediator implements Initialisable {
     try {
       onMessageReceived(event, flowConstruct, ctx);
       flowConstruct.checkBackpressure(event);
-      InternalSpan span =
-          muleEventTracer.startComponentExecutionSpan(event, flowConstruct);
+      muleEventTracer.startComponentExecutionSpan(event, flowConstruct);
       ctx.template.getNotificationFunctions().forEach(notificationFunction -> notificationManager
           .fireNotification(notificationFunction.apply(event, flowConstruct.getSource())));
       sourcePolicy.process(event, ctx.template,
@@ -266,13 +264,13 @@ public class FlowProcessMediator implements Initialisable {
 
                              @Override
                              public void complete(Either<SourcePolicyFailureResult, SourcePolicySuccessResult> value) {
-                               span.end();
+                               muleEventTracer.endCurrentExecutionSpan(event);
                                dispatchResponse(flowConstruct, ctx, value);
                              }
 
                              @Override
                              public void error(Throwable e) {
-                               span.end();
+                               muleEventTracer.endCurrentExecutionSpan(event);
                                dispatchResponse(flowConstruct, ctx,
                                                 left(new SourcePolicyFailureResult(new MessagingException(event, e),
                                                                                    Collections::emptyMap)));
