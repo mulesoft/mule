@@ -22,19 +22,27 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * A {@link org.mule.runtime.api.memory.provider.ByteBufferProvider} implementation that can be used to retrieve direct or heap
+ * {@link ByteBuffer}'s based on a pool that saves released DirectByteBuffers to be reused.
+ *
+ * Based on DataWeave Implementation.
+ *
+ * @since 4.5.0
+ */
 public class WeavePoolBasedByteBufferProvider implements ByteBufferProvider<ByteBuffer> {
 
   private final int capacity;
   private final String name;
 
-  private final ByteBufferPool pool;
+  private final WeaveByteBufferPool pool;
   ProfilingDataProducer<ByteBufferProviderEventContext, Object> allocationDataProducer;
   ProfilingDataProducer<ByteBufferProviderEventContext, Object> deallocationDataProducer;
 
   protected WeavePoolBasedByteBufferProvider(String name, int capacity, int maxSize, ProfilingService profilingService) {
     this.name = name;
     this.capacity = capacity;
-    this.pool = new ByteBufferPool(capacity, maxSize);
+    this.pool = new WeaveByteBufferPool(capacity, maxSize);
     allocationDataProducer =
         profilingService.getProfilingDataProducer(MEMORY_BYTE_BUFFER_ALLOCATION, new ContainerProfilingScope());
     deallocationDataProducer =
@@ -88,27 +96,34 @@ public class WeavePoolBasedByteBufferProvider implements ByteBufferProvider<Byte
   }
 
   @Override
-  public void dispose() {}
+  public void dispose() {
+    pool.dispose();
+  }
 
 
   /**
-   * BytBuffer Pool based on the DataWeave one.
-   *
-   * capacity The capacity of each BytBuffer maxSize The max amount of elements in the Pool
+   * BytBufferPool that saves released DirectByteBuffers to been reused.
    */
-  private static final class ByteBufferPool {
+  private static final class WeaveByteBufferPool {
 
     private final int capacity;
     private final int maxSize;
 
-    final private ConcurrentLinkedDeque<ByteBuffer> queue = new ConcurrentLinkedDeque();
+    final private ConcurrentLinkedDeque<ByteBuffer> queue = new ConcurrentLinkedDeque<>();
     private final AtomicInteger amount = new AtomicInteger();
 
-    private ByteBufferPool(int capacity, int maxSize) {
+    /**
+     * @param capacity The capacity of each BytBuffer
+     * @param maxSize  The max amount of elements in the Pool
+     */
+    private WeaveByteBufferPool(int capacity, int maxSize) {
       this.capacity = capacity;
       this.maxSize = maxSize;
     }
 
+    /**
+     * @return A ByteBuffer of the pool previously released or a new one if there is still space in the pool.
+     */
     private ByteBuffer take() {
       ByteBuffer buffer = queuePoll();
       if (buffer == null) {
@@ -126,6 +141,11 @@ public class WeavePoolBasedByteBufferProvider implements ByteBufferProvider<Byte
       }
     }
 
+    /**
+     * Adds the buffer in the pool to be reused.
+     *
+     * @param buffer The buffer to be released.
+     */
     private void release(ByteBuffer buffer) {
       queueOffer(buffer);
     }
@@ -156,6 +176,10 @@ public class WeavePoolBasedByteBufferProvider implements ByteBufferProvider<Byte
 
     private Boolean isEmpty() {
       return queue.isEmpty();
+    }
+
+    public void dispose() {
+      queue.clear();
     }
 
   }
