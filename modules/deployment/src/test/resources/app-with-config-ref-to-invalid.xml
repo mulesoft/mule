@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:classloader-config-connect="http://www.mulesoft.org/schema/mule/classloader-config-connect"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/classloader-config-connect http://www.mulesoft.org/schema/mule/classloader-config-connect/current/mule-classloader-config-connect.xsd">
+
+    <flow name="flowWithReferenceToInvalidConfig">
+        <classloader-config-connect:foo-config-operation1 config-ref="test-config-in-domain-with-invalid-type" />
+        <logger level="WARN" message="message received at flowWithReferenceToNonExistentConfig" />
+    </flow>
+
+</mule>
+

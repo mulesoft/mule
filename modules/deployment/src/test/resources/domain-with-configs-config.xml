@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule-domain xmlns="http://www.mulesoft.org/schema/mule/domain"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:classloader-config-connect="http://www.mulesoft.org/schema/mule/classloader-config-connect"
+             xmlns:classloader-connect="http://www.mulesoft.org/schema/mule/classloader-connect"
+             xsi:schemaLocation="
+                http://www.mulesoft.org/schema/mule/domain http://www.mulesoft.org/schema/mule/domain/current/mule-domain.xsd
+                http://www.mulesoft.org/schema/mule/classloader-config-connect http://www.mulesoft.org/schema/mule/classloader-config-connect/current/mule-classloader-config-connect.xsd
+                http://www.mulesoft.org/schema/mule/classloader-connect http://www.mulesoft.org/schema/mule/classloader-connect/current/mule-classloader-connect.xsd">
+
+    <classloader-config-connect:config name="test-config-in-domain"/>
+    <classloader-connect:config name="test-config-in-domain-with-invalid-type"/>
+
+</mule-domain>
