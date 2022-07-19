@@ -31,7 +31,7 @@ import io.opentelemetry.api.trace.Tracer;
  *
  * @since 4.5.0
  */
-public class OpentelemetryTracedCoreEventExecutionSpanFactory implements CoreEventSpanFactory {
+public class OpentelemetryTracedCoreEventSpanFactory implements CoreEventSpanFactory {
 
   private final Tracer openTelemetryTracer = getOpentelemetryTracer();
 
