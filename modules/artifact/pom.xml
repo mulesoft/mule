@@ -27,8 +27,8 @@
             <artifactId>semver4j</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-api</artifactId>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>

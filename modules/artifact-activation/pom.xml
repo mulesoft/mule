@@ -59,8 +59,8 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-util</artifactId>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-util</artifactId>
             <!-- provided by mule-maven-client-impl -->
             <scope>provided</scope>
         </dependency>
