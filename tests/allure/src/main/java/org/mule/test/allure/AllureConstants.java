@@ -1018,7 +1018,7 @@ public interface AllureConstants {
 
       String DEFAULT_PROFILING_SERVICE = "Default Profiling Service";
 
-      String DEFAULT_MULE_CORE_EVENT_TRACER = "Default Mule Core Event Tracer";
+      String DEFAULT_CORE_EVENT_TRACER = "Default Mule Core Event Tracer";
     }
   }
 

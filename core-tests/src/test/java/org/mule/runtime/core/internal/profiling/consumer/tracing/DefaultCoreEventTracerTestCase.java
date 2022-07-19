@@ -12,7 +12,7 @@ import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getCurrentSpan;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
-import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_MULE_CORE_EVENT_TRACER;
+import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.emptyMap;
@@ -60,8 +60,8 @@ import org.junit.Test;
 
 
 @Feature(PROFILING)
-@Story(DEFAULT_MULE_CORE_EVENT_TRACER)
-public class DefaultMuleCoreEventTracerTestCase {
+@Story(DEFAULT_CORE_EVENT_TRACER)
+public class DefaultCoreEventTracerTestCase {
 
   public static final String CORRELATION_ID = "correlationId";
   public static final String TEST_COMPONENT_IDENTIFIER_NAME = "test";
@@ -88,7 +88,7 @@ public class DefaultMuleCoreEventTracerTestCase {
     when(componentLocation.getLocation()).thenReturn(TEST_COMPONENT_LOCATION);
 
     CoreEventTracer muleCoreEventTracer =
-        getTestCoreEventTracer(TestCoreEventExecutionSpanProvider.getTestCoreEventExecutionSpanProviderInstance(),
+        getTestCoreEventTracer(TestCoreEventSpanFactory.getTestCoreEventSpanFactoryInstance(),
                                mockedMuleConfiguration);
 
     InternalSpan span = muleCoreEventTracer.startComponentSpan(coreEvent, component);
@@ -108,7 +108,7 @@ public class DefaultMuleCoreEventTracerTestCase {
     MuleConfiguration mockedMuleConfiguration = mock(MuleConfiguration.class);
     when(mockedMuleConfiguration.getId()).thenReturn(TEST_APP);
     CoreEventTracer muleCoreEventTracer =
-        getTestCoreEventTracer(TestCoreEventExecutionSpanProvider.getTestCoreEventExecutionSpanProviderInstance(),
+        getTestCoreEventTracer(TestCoreEventSpanFactory.getTestCoreEventSpanFactoryInstance(),
                                mockedMuleConfiguration);
     DistributedTraceContext distributedTraceContext = mock(DistributedTraceContext.class);
     muleCoreEventTracer.endCurrentSpan(new FakeCoreEvent(new FakeCoreEventContext(distributedTraceContext)));
@@ -117,10 +117,10 @@ public class DefaultMuleCoreEventTracerTestCase {
   }
 
   @NotNull
-  private CoreEventTracer getTestCoreEventTracer(CoreEventSpanFactory mockedCoreEventExecutionSpanProvider,
+  private CoreEventTracer getTestCoreEventTracer(CoreEventSpanFactory mockedCoreEventSpanFactory,
                                                  MuleConfiguration mockedMuleConfiguration) {
     return getCoreEventTracerBuilder()
-        .withDefaultCoreEventExecutionSpanProvider(mockedCoreEventExecutionSpanProvider)
+        .withDefaultCoreEventSpanFactory(mockedCoreEventSpanFactory)
         .withMuleConfiguration(mockedMuleConfiguration)
         .build();
   }
@@ -128,10 +128,10 @@ public class DefaultMuleCoreEventTracerTestCase {
   /**
    * A {@link CoreEventSpanFactory} for testing purposes.
    */
-  private static class TestCoreEventExecutionSpanProvider implements CoreEventSpanFactory {
+  private static class TestCoreEventSpanFactory implements CoreEventSpanFactory {
 
-    public static CoreEventSpanFactory getTestCoreEventExecutionSpanProviderInstance() {
-      return new TestCoreEventExecutionSpanProvider();
+    public static CoreEventSpanFactory getTestCoreEventSpanFactoryInstance() {
+      return new TestCoreEventSpanFactory();
     }
 
     @Override

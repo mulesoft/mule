@@ -70,7 +70,7 @@ public class CoreEventSpanUtils {
   /**
    * @return the default {@link CoreEventSpanFactory}
    */
-  public static CoreEventSpanFactory getMuleDefaultCoreEventExecutionSpanProvider() {
+  public static CoreEventSpanFactory getDefaultCoreEventSpanFactory() {
     return new OpentelemetryTracedCoreEventSpanFactory();
   }
 

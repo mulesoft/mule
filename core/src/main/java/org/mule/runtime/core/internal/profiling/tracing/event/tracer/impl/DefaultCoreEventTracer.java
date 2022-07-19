@@ -23,7 +23,7 @@ import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTr
  */
 public class DefaultCoreEventTracer implements CoreEventTracer {
 
-  private final CoreEventSpanFactory defaultCoreEventExecutionSpanProvider;
+  private final CoreEventSpanFactory coreEventSpanFactory;
   private final MuleConfiguration muleConfiguration;
 
   /**
@@ -34,33 +34,33 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
   }
 
   private DefaultCoreEventTracer(MuleConfiguration muleConfiguration,
-                                 CoreEventSpanFactory coreEventExecutionSpanProvider) {
+                                 CoreEventSpanFactory coreEventSpanFatory) {
     this.muleConfiguration = muleConfiguration;
-    this.defaultCoreEventExecutionSpanProvider = coreEventExecutionSpanProvider;
+    this.coreEventSpanFactory = coreEventSpanFatory;
   }
 
   @Override
   public InternalSpan startComponentSpan(CoreEvent coreEvent, Component component) {
-    return endCurrentSpanIfPossible(coreEvent,
-                                    defaultCoreEventExecutionSpanProvider.getSpan(coreEvent, component,
-                                                                                  muleConfiguration));
+    return startCurrentSpanIfPossible(coreEvent,
+                                      coreEventSpanFactory.getSpan(coreEvent, component,
+                                                                 muleConfiguration));
   }
 
   @Override
   public InternalSpan startComponentSpan(CoreEvent coreEvent, Component component,
                                          CoreEventSpanCustomizer coreEventSpanCustomizer) {
-    return endCurrentSpanIfPossible(coreEvent,
-                                    defaultCoreEventExecutionSpanProvider.getSpan(coreEvent, component,
-                                                                                  muleConfiguration,
-                                                                                  coreEventSpanCustomizer));
+    return startCurrentSpanIfPossible(coreEvent,
+                                      coreEventSpanFactory.getSpan(coreEvent, component,
+                                                                 muleConfiguration,
+                                                                 coreEventSpanCustomizer));
   }
 
   @Override
   public void endCurrentSpan(CoreEvent coreEvent) {
-    endCurrentContextSpanIfPosibble(coreEvent);
+    endCurrentSpanIfPossible(coreEvent);
   }
 
-  private InternalSpan endCurrentSpanIfPossible(CoreEvent coreEvent, InternalSpan currentSpan) {
+  private InternalSpan startCurrentSpanIfPossible(CoreEvent coreEvent, InternalSpan currentSpan) {
     EventContext eventContext = coreEvent.getContext();
 
     if (eventContext instanceof DistributedTraceContextAware) {
@@ -72,7 +72,7 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
     return currentSpan;
   }
 
-  private void endCurrentContextSpanIfPosibble(CoreEvent coreEvent) {
+  private void endCurrentSpanIfPossible(CoreEvent coreEvent) {
     EventContext eventContext = coreEvent.getContext();
     if (eventContext instanceof DistributedTraceContextAware) {
       ((DistributedTraceContextAware) eventContext)
@@ -89,22 +89,22 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
   public static final class DefaultEventTracerBuilder {
 
     private MuleConfiguration muleConfiguration;
-    private CoreEventSpanFactory coreEventExecutionSpanProvider;
+    private CoreEventSpanFactory defaultCoreEventSpanFactory;
 
     public DefaultEventTracerBuilder withMuleConfiguration(MuleConfiguration muleConfiguration) {
       this.muleConfiguration = muleConfiguration;
       return this;
     }
 
-    public DefaultEventTracerBuilder withDefaultCoreEventExecutionSpanProvider(
-                                                                               CoreEventSpanFactory coreEventExecutionSpanProvider) {
-      this.coreEventExecutionSpanProvider = coreEventExecutionSpanProvider;
+    public DefaultEventTracerBuilder withDefaultCoreEventSpanFactory(
+                                                                               CoreEventSpanFactory defaultCoreEventSpanFactory) {
+      this.defaultCoreEventSpanFactory = defaultCoreEventSpanFactory;
       return this;
 
     }
 
     public CoreEventTracer build() {
-      return new DefaultCoreEventTracer(muleConfiguration, coreEventExecutionSpanProvider);
+      return new DefaultCoreEventTracer(muleConfiguration, defaultCoreEventSpanFactory);
     }
   }
 }

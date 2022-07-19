@@ -19,7 +19,7 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.InternalSpan;
-import org.mule.runtime.core.internal.profiling.OpentelemetryExecutionSpan;
+import org.mule.runtime.core.internal.profiling.OpentelemetrySpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanFactory;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExecutionSpan;
@@ -54,16 +54,16 @@ public class OpentelemetryTracedCoreEventSpanFactory implements CoreEventSpanFac
                                     .startOpentelemetrySpan();
   }
 
-  private OpentelemetryExecutionSpan getOpentelemetrySpan(Component component, MuleConfiguration muleConfiguration,
-                                                          EventContext eventContext, String name) {
-    return new OpentelemetryExecutionSpan(new ExecutionSpan(name,
-                                                            componentSpanIdentifierFrom(muleConfiguration.getId(),
+  private OpentelemetrySpan getOpentelemetrySpan(Component component, MuleConfiguration muleConfiguration,
+                                                 EventContext eventContext, String name) {
+    return new OpentelemetrySpan(new ExecutionSpan(name,
+                                                   componentSpanIdentifierFrom(muleConfiguration.getId(),
                                                                                         component.getLocation(),
                                                                                         eventContext.getCorrelationId()),
-                                                            currentTimeMillis(),
-                                                            null,
-                                                            getCurrentSpan(eventContext).orElse(null)),
-                                          eventContext, openTelemetryTracer);
+                                                   currentTimeMillis(),
+                                                   null,
+                                                   getCurrentSpan(eventContext).orElse(null)),
+                                 eventContext, openTelemetryTracer);
   }
 
   private static final class DefaultEventSpanCustomizer implements CoreEventSpanCustomizer {

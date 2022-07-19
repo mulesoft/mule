@@ -148,7 +148,7 @@ public class FlowProcessMediator implements Initialisable {
   private NotificationHelper notificationHelper;
   private final List<SourceInterceptor> sourceInterceptors = new LinkedList<>();
   private Optional<CorrelationIdGenerator> correlationIdGenerator;
-  private CoreEventTracer muleEventTracer;
+  private CoreEventTracer eventTracer;
 
   public FlowProcessMediator(PolicyManager policyManager, PhaseResultNotifier phaseResultNotifier) {
     this.policyManager = policyManager;
@@ -157,7 +157,7 @@ public class FlowProcessMediator implements Initialisable {
 
   @Override
   public void initialise() throws InitialisationException {
-    this.muleEventTracer = profilingService.getCoreEventTracer();
+    this.eventTracer = profilingService.getCoreEventTracer();
     this.notificationHelper =
         new NotificationHelper(notificationManager, ConnectorMessageNotification.class, false);
 
@@ -256,7 +256,7 @@ public class FlowProcessMediator implements Initialisable {
     try {
       onMessageReceived(event, flowConstruct, ctx);
       flowConstruct.checkBackpressure(event);
-      muleEventTracer.startComponentSpan(event, flowConstruct);
+      eventTracer.startComponentSpan(event, flowConstruct);
       ctx.template.getNotificationFunctions().forEach(notificationFunction -> notificationManager
           .fireNotification(notificationFunction.apply(event, flowConstruct.getSource())));
       sourcePolicy.process(event, ctx.template,
@@ -264,13 +264,13 @@ public class FlowProcessMediator implements Initialisable {
 
                              @Override
                              public void complete(Either<SourcePolicyFailureResult, SourcePolicySuccessResult> value) {
-                               muleEventTracer.endCurrentSpan(event);
+                               eventTracer.endCurrentSpan(event);
                                dispatchResponse(flowConstruct, ctx, value);
                              }
 
                              @Override
                              public void error(Throwable e) {
-                               muleEventTracer.endCurrentSpan(event);
+                               eventTracer.endCurrentSpan(event);
                                dispatchResponse(flowConstruct, ctx,
                                                 left(new SourcePolicyFailureResult(new MessagingException(event, e),
                                                                                    Collections::emptyMap)));

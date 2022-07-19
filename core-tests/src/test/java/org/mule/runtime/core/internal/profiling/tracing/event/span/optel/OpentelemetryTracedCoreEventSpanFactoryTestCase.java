@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.profiling.tracing.event.span.optel;
 
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
-import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_MULE_CORE_EVENT_TRACER;
+import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
@@ -23,7 +23,7 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.InternalSpan;
-import org.mule.runtime.core.internal.profiling.OpentelemetryExecutionSpan;
+import org.mule.runtime.core.internal.profiling.OpentelemetrySpan;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -31,18 +31,18 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 
 @Feature(PROFILING)
-@Story(DEFAULT_MULE_CORE_EVENT_TRACER)
-public class OpentelemetryTracedCoreEventExecutionSpanProviderTestCase {
+@Story(DEFAULT_CORE_EVENT_TRACER)
+public class OpentelemetryTracedCoreEventSpanFactoryTestCase {
 
   public static final String IDENTIFIER_NAMESPACE = "namespace";
   public static final String IDENTIFIER_NAME = "name";
   public static final String COMPONENT_LOCATION = "location";
   public static final String APP_ID = "appId";
-  private final OpentelemetryTracedCoreEventSpanFactory coreEventExecutionSpanProvider =
+  private final OpentelemetryTracedCoreEventSpanFactory coreEventSpanFactory =
       new OpentelemetryTracedCoreEventSpanFactory();
 
   @Test
-  public void testOpenTelemetryRouterTracedCoreEventExecutionSpanProviderTestCase() {
+  public void testOpentelemetryTracedSpanFactory() {
     CoreEvent coreEvent = mock(CoreEvent.class);
     Component component = mock(Component.class);
     EventContext coreEventContext = mock(EventContext.class);
@@ -57,10 +57,10 @@ public class OpentelemetryTracedCoreEventExecutionSpanProviderTestCase {
     when(muleConfiguration.getId()).thenReturn(APP_ID);
     when(component.getLocation()).thenReturn(componentLocation);
 
-    InternalSpan span = coreEventExecutionSpanProvider.getSpan(coreEvent, component, muleConfiguration);
-    assertThat(span, instanceOf(OpentelemetryExecutionSpan.class));
+    InternalSpan span = coreEventSpanFactory.getSpan(coreEvent, component, muleConfiguration);
+    assertThat(span, instanceOf(OpentelemetrySpan.class));
 
-    OpentelemetryExecutionSpan opentelemetryExecutionSpan = (OpentelemetryExecutionSpan) span;
+    OpentelemetrySpan opentelemetryExecutionSpan = (OpentelemetrySpan) span;
     assertThat(opentelemetryExecutionSpan.getName(), Matchers.equalTo(getSpanName(componentIdentifier)));
   }
 }

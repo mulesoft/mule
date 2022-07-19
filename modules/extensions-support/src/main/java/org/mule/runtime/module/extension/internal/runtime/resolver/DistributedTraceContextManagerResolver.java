@@ -11,7 +11,7 @@ import static org.mule.runtime.core.internal.trace.DistributedTraceContext.empty
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.InternalSpan;
-import org.mule.runtime.core.internal.profiling.OpentelemetryExecutionSpan;
+import org.mule.runtime.core.internal.profiling.OpentelemetrySpan;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -48,7 +48,7 @@ public class DistributedTraceContextManagerResolver implements ArgumentResolver<
   private DistributedTraceContext getDistributedTraceContext(CoreEvent event) {
     if (event instanceof DistributedTraceContextAware) {
       DistributedTraceContext distributedTraceContext = ((DistributedTraceContextAware) event).getDistributedTraceContext();
-      OpentelemetryExecutionSpan span = distributedTraceContext.getCurrentSpan().map(
+      OpentelemetrySpan span = distributedTraceContext.getCurrentSpan().map(
                                                                                      e -> getInternalSpanOpentelemetryExecutionSpanFunction(e))
           .orElse(null);
       Map<String, String> map = new HashMap<>();
@@ -104,9 +104,9 @@ public class DistributedTraceContextManagerResolver implements ArgumentResolver<
     return emptyDistributedEventContext();
   }
 
-  private OpentelemetryExecutionSpan getInternalSpanOpentelemetryExecutionSpanFunction(InternalSpan internalSpan) {
-    if (internalSpan instanceof OpentelemetryExecutionSpan) {
-      return (OpentelemetryExecutionSpan) internalSpan;
+  private OpentelemetrySpan getInternalSpanOpentelemetryExecutionSpanFunction(InternalSpan internalSpan) {
+    if (internalSpan instanceof OpentelemetrySpan) {
+      return (OpentelemetrySpan) internalSpan;
     }
 
     return null;

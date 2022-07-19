@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.profiling;
 
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracer.getCoreEventTracerBuilder;
-import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getMuleDefaultCoreEventExecutionSpanProvider;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getDefaultCoreEventSpanFactory;
 
 import static java.util.Optional.empty;
 
@@ -87,9 +87,9 @@ public class DefaultProfilingService extends AbstractProfilingService {
     super.initialise();
   }
 
-  private void getDefaultCoreEventExecutionSpanProvider() {
+  private void getEventTracer() {
     this.eventTracer = getCoreEventTracerBuilder()
-        .withDefaultCoreEventExecutionSpanProvider(getMuleDefaultCoreEventExecutionSpanProvider())
+        .withDefaultCoreEventSpanFactory(getDefaultCoreEventSpanFactory())
         .withMuleConfiguration(muleContext.getConfiguration())
         .build();
   }
@@ -179,7 +179,7 @@ public class DefaultProfilingService extends AbstractProfilingService {
   @Override
   public CoreEventTracer getCoreEventTracer() {
     if (eventTracer == null) {
-      getDefaultCoreEventExecutionSpanProvider();
+      getEventTracer();
     }
     return eventTracer;
   }

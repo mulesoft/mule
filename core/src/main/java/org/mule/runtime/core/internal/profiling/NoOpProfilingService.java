@@ -36,7 +36,7 @@ import reactor.core.publisher.Mono;
  */
 public class NoOpProfilingService implements InternalProfilingService, PrivilegedProfilingService {
 
-  private CoreEventTracer muleCoreEventTracer = new NoOpCoreEventTracer();
+  private CoreEventTracer eventTracer = new NoOpCoreEventTracer();
 
   private final TracingService noOpTracingService = new TracingService() {
 
@@ -134,7 +134,7 @@ public class NoOpProfilingService implements InternalProfilingService, Privilege
 
   @Override
   public CoreEventTracer getCoreEventTracer() {
-    return muleCoreEventTracer;
+    return eventTracer;
   }
 
   private static class NoOpCoreEventTracer implements CoreEventTracer {

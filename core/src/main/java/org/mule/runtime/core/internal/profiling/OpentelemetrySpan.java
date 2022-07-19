@@ -31,7 +31,7 @@ import io.opentelemetry.context.propagation.TextMapGetter;
  *
  * @since 4.5.0
  */
-public class OpentelemetryExecutionSpan implements InternalSpan {
+public class OpentelemetrySpan implements InternalSpan {
 
   private static final TextMapGetter<Map<String, String>> getter = new MuleOpenTelemetryRemoteContextGetter();
 
@@ -40,7 +40,7 @@ public class OpentelemetryExecutionSpan implements InternalSpan {
   private io.opentelemetry.api.trace.Span opentelemetrySpan;
   private final DistributedTraceContext distributedTraceContext;
 
-  public OpentelemetryExecutionSpan(InternalSpan runtimeInternalSpan, EventContext eventContext, Tracer tracer) {
+  public OpentelemetrySpan(InternalSpan runtimeInternalSpan, EventContext eventContext, Tracer tracer) {
     this.tracer = tracer;
     this.runtimeInternalSpan = runtimeInternalSpan;
     this.distributedTraceContext = resolveDistributedTraceContext(eventContext);
@@ -76,7 +76,7 @@ public class OpentelemetryExecutionSpan implements InternalSpan {
     return opentelemetrySpan;
   }
 
-  public OpentelemetryExecutionSpan startOpentelemetrySpan() {
+  public OpentelemetrySpan startOpentelemetrySpan() {
     opentelemetrySpan = tracer.spanBuilder(runtimeInternalSpan.getName())
         .setParent(resolveParentOpentelemetrySpan())
         .setStartTimestamp(ofEpochMilli(this.getDuration().getStart())).startSpan();
@@ -87,8 +87,8 @@ public class OpentelemetryExecutionSpan implements InternalSpan {
   private Context resolveParentOpentelemetrySpan() {
     Span parentSpan = runtimeInternalSpan.getParent();
 
-    if (parentSpan instanceof OpentelemetryExecutionSpan) {
-      io.opentelemetry.api.trace.Span parentOpentelemetrySpan = ((OpentelemetryExecutionSpan) parentSpan).getOpentelemetrySpan();
+    if (parentSpan instanceof OpentelemetrySpan) {
+      io.opentelemetry.api.trace.Span parentOpentelemetrySpan = ((OpentelemetrySpan) parentSpan).getOpentelemetrySpan();
       if (parentOpentelemetrySpan != null) {
         return Context.current().with(parentOpentelemetrySpan);
       }
