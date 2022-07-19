@@ -70,7 +70,7 @@ import reactor.core.scheduler.Schedulers;
  * <li>Delay error behavior, where all errors are collated and thrown as a composite exception.
  * </ul>
  */
-      public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrategyFactory {
+public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrategyFactory {
 
   public static final String TIMEOUT_EXCEPTION_DESCRIPTION = "Route Timeout";
   public static final String TIMEOUT_EXCEPTION_DETAILED_DESCRIPTION_PREFIX = "Timeout while processing route/part:";
