@@ -35,46 +35,46 @@ public class OpentelemetryExecutionSpan implements InternalSpan {
 
   private static final TextMapGetter<Map<String, String>> getter = new MuleOpenTelemetryRemoteContextGetter();
 
-  private final InternalSpan delegate;
+  private final InternalSpan runtimeInternalSpan;
   private final Tracer tracer;
   private io.opentelemetry.api.trace.Span opentelemetrySpan;
   private final DistributedTraceContext distributedTraceContext;
 
-  public OpentelemetryExecutionSpan(InternalSpan delegate, EventContext eventContext, Tracer tracer) {
+  public OpentelemetryExecutionSpan(InternalSpan runtimeInternalSpan, EventContext eventContext, Tracer tracer) {
     this.tracer = tracer;
-    this.delegate = delegate;
+    this.runtimeInternalSpan = runtimeInternalSpan;
     this.distributedTraceContext = resolveDistributedTraceContext(eventContext);
   }
 
   @Override
   public Span getParent() {
-    return delegate.getParent();
+    return runtimeInternalSpan.getParent();
   }
 
   @Override
   public SpanIdentifier getIdentifier() {
-    return delegate.getIdentifier();
+    return runtimeInternalSpan.getIdentifier();
   }
 
   @Override
   public String getName() {
-    return delegate.getName();
+    return runtimeInternalSpan.getName();
   }
 
   @Override
   public SpanDuration getDuration() {
-    return delegate.getDuration();
+    return runtimeInternalSpan.getDuration();
   }
 
   @Override
   public void end() {
-    delegate.end();
+    runtimeInternalSpan.end();
     opentelemetrySpan.end();
   }
 
   @Override
   public InternalSpan getInternalParentSpan() {
-    return delegate.getInternalParentSpan();
+    return runtimeInternalSpan.getInternalParentSpan();
   }
 
   public io.opentelemetry.api.trace.Span getOpentelemetrySpan() {
@@ -82,7 +82,7 @@ public class OpentelemetryExecutionSpan implements InternalSpan {
   }
 
   public OpentelemetryExecutionSpan startOpentelemetrySpan() {
-    opentelemetrySpan = tracer.spanBuilder(delegate.getName())
+    opentelemetrySpan = tracer.spanBuilder(runtimeInternalSpan.getName())
         .setParent(resolveParentOpentelemetrySpan())
         .setStartTimestamp(ofEpochMilli(this.getDuration().getStart())).startSpan();
 
@@ -90,7 +90,7 @@ public class OpentelemetryExecutionSpan implements InternalSpan {
   }
 
   private Context resolveParentOpentelemetrySpan() {
-    Span parentSpan = delegate.getParent();
+    Span parentSpan = runtimeInternalSpan.getParent();
 
     if (parentSpan instanceof OpentelemetryExecutionSpan) {
       io.opentelemetry.api.trace.Span parentOpentelemetrySpan = ((OpentelemetryExecutionSpan) parentSpan).getOpentelemetrySpan();
