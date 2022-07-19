@@ -35,6 +35,7 @@
         <dependency>
             <groupId>org.apache.maven.resolver</groupId>
             <artifactId>maven-resolver-spi</artifactId>
+            <version>1.8.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.resolver</groupId>
