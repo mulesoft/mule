@@ -56,7 +56,7 @@ public class CoreEventSpanUtils {
       return UNKNOWN;
     }
 
-    return componentIdentifier.getNamespace();
+    return componentIdentifier.getName();
   }
 
   private static String getUnknownIfEmptyNamespace(ComponentIdentifier componentIdentifier) {
