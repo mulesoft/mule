@@ -8,7 +8,9 @@
 package org.mule.runtime.core.internal.profiling.tracing.event.span.optel.config.impl;
 
 import static java.lang.System.getProperty;
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 
+import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.optel.config.OpentelemetryExporterConfiguration;
 
 /**
@@ -25,4 +27,11 @@ public class SystemPropertyOpentelemetryExporterConfiguration implements Opentel
   public String getEndpoint() {
     return getProperty(MULE_OPENTELEMETRY_ENDPOINT_SYSPROP, DEFAULT_ENDPOINT);
   }
+
+  @Override
+  public boolean isEnabled() {
+    return !isEmpty(getEndpoint());
+  }
+
+
 }

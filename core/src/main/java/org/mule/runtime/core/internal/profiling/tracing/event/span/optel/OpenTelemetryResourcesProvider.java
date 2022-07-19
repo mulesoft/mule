@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span.optel;
 
+import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.optel.config.OpentelemetryExporterConfiguration;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.optel.config.impl.SystemPropertyOpentelemetryExporterConfiguration;
 
 import io.opentelemetry.api.OpenTelemetry;
@@ -35,12 +37,18 @@ public class OpenTelemetryResourcesProvider {
   private static final Tracer OPEN_TELEMETRY_TRACER = createTracer();
 
   private static Tracer createTracer() {
-    SdkTracerProvider sdkTracerProvider = SdkTracerProvider.builder()
-        .addSpanProcessor(BatchSpanProcessor
-            .builder(OtlpGrpcSpanExporter.builder()
-                .setEndpoint(new SystemPropertyOpentelemetryExporterConfiguration().getEndpoint()).build())
-            .build())
-        .build();
+    OpentelemetryExporterConfiguration configuration = new SystemPropertyOpentelemetryExporterConfiguration();
+
+    SdkTracerProviderBuilder sdkTracerProviderBuilder = SdkTracerProvider.builder();
+
+    if (configuration.isEnabled()) {
+      sdkTracerProviderBuilder.addSpanProcessor(BatchSpanProcessor
+          .builder(OtlpGrpcSpanExporter.builder()
+              .setEndpoint(new SystemPropertyOpentelemetryExporterConfiguration().getEndpoint()).build())
+          .build());
+    }
+
+    SdkTracerProvider sdkTracerProvider = sdkTracerProviderBuilder.build();
 
     OpenTelemetry openTelemetry = OpenTelemetrySdk.builder()
         .setTracerProvider(sdkTracerProvider)

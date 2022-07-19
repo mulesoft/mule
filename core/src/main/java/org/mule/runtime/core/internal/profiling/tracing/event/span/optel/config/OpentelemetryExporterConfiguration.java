@@ -18,4 +18,9 @@ public interface OpentelemetryExporterConfiguration {
    * @return the export endpoint.
    */
   String getEndpoint();
+
+  /**
+   * @return if opentelemetry export is enabled
+   */
+  boolean isEnabled();
 }
