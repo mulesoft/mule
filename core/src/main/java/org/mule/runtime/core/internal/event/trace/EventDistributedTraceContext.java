@@ -12,6 +12,8 @@ import static org.mule.runtime.core.internal.event.trace.extractor.RuntimeEventT
 
 import static java.util.Optional.ofNullable;
 
+import org.mule.runtime.core.internal.profiling.InternalSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.core.internal.event.trace.extractor.TraceContextFieldExtractor;
 
@@ -20,15 +22,20 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * A {@link DistributedTraceContext} associated to an event. Represents the distributed context that was propagated to the
- * {@link org.mule.runtime.api.event.EventContext}
+ * A {@link DistributedTraceContext} associated to an event.
+ *
+ * A {@link org.mule.runtime.core.api.event.CoreEvent} is the component that travels through the execution of a flow. For tracing
+ * purposes the {@link org.mule.runtime.api.event.EventContext} has a {@link DistributedTraceContext} that has information that
+ * may be propagated through runtime boundaries for distributed tracing purposes.
  *
  * @since 4.5.0
  */
 public class EventDistributedTraceContext implements DistributedTraceContext {
 
-  private final Map<String, String> tracingFields = new HashMap<>();
-  private final Map<String, String> baggageItems = new HashMap<>();
+  private CoreEventTracer muleEventTracer;
+  private Map<String, String> tracingFields = new HashMap<>();
+  private Map<String, String> baggageItems = new HashMap<>();
+  private InternalSpan currentSpan;
 
   public static EventDistributedContextBuilder builder() {
     return new EventDistributedContextBuilder();
@@ -39,6 +46,12 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
                                        DistributedTraceContextGetter getter) {
     tracingFields.putAll(tracingFieldExtractor.extract(getter));
     baggageItems.putAll(baggageItemsExtractor.extract(getter));
+  }
+
+  private EventDistributedTraceContext(Map<String, String> tracingFields,
+                                       Map<String, String> baggageItems) {
+    this.tracingFields = tracingFields;
+    this.baggageItems = baggageItems;
   }
 
   @Override
@@ -59,6 +72,32 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
   @Override
   public Map<String, String> baggageItemsAsMap() {
     return baggageItems;
+  }
+
+  @Override
+  public DistributedTraceContext copy() {
+    EventDistributedTraceContext eventDistributedTraceContext =
+        new EventDistributedTraceContext(tracingFields, baggageItems);
+    eventDistributedTraceContext.setCurrentSpan(currentSpan);
+    return eventDistributedTraceContext;
+  }
+
+  @Override
+  public void endCurrentContextSpan() {
+    if (currentSpan != null) {
+      currentSpan.end();
+      currentSpan = (InternalSpan) currentSpan.getParent();
+    }
+  }
+
+  @Override
+  public void setCurrentSpan(InternalSpan currentSpan) {
+    this.currentSpan = currentSpan;
+  }
+
+  @Override
+  public Optional<InternalSpan> getCurrentSpan() {
+    return ofNullable(currentSpan);
   }
 
   /**

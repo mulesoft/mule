@@ -6,19 +6,24 @@
  */
 package org.mule.runtime.core.internal.profiling;
 
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.tracing.ExecutionContext;
+import org.mule.runtime.api.profiling.tracing.Span;
+import org.mule.runtime.api.profiling.tracing.SpanDuration;
+import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.api.profiling.tracing.TracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 
 import java.util.function.Function;
 
-import org.mule.runtime.core.internal.profiling.consumer.tracing.span.DefaultSpanManager;
-import org.mule.runtime.core.internal.profiling.consumer.tracing.span.SpanManager;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -31,7 +36,7 @@ import reactor.core.publisher.Mono;
  */
 public class NoOpProfilingService implements InternalProfilingService, PrivilegedProfilingService {
 
-  private SpanManager spanManager = new DefaultSpanManager();
+  private CoreEventTracer eventTracer = new NoOpCoreEventTracer();
 
   private final TracingService noOpTracingService = new TracingService() {
 
@@ -128,7 +133,57 @@ public class NoOpProfilingService implements InternalProfilingService, Privilege
   }
 
   @Override
-  public SpanManager getSpanManager() {
-    return spanManager;
+  public CoreEventTracer getCoreEventTracer() {
+    return eventTracer;
+  }
+
+  private static class NoOpCoreEventTracer implements CoreEventTracer {
+
+    @Override
+    public InternalSpan startComponentSpan(CoreEvent coreEvent, Component component) {
+      return NoOpInternalSpan.INSTANCE;
+    }
+
+    @Override
+    public InternalSpan startComponentSpan(CoreEvent coreEvent, Component component,
+                                           CoreEventSpanCustomizer coreEventSpanCustomizer) {
+      return NoOpInternalSpan.INSTANCE;
+    }
+
+    @Override
+    public void endCurrentSpan(CoreEvent coreEvent) {
+
+    }
+
+    private static class NoOpInternalSpan {
+
+      public static final InternalSpan INSTANCE = new InternalSpan() {
+
+        @Override
+        public void end() {
+
+        }
+
+        @Override
+        public Span getParent() {
+          return this;
+        }
+
+        @Override
+        public SpanIdentifier getIdentifier() {
+          return null;
+        }
+
+        @Override
+        public String getName() {
+          return "no-op";
+        }
+
+        @Override
+        public SpanDuration getDuration() {
+          return null;
+        }
+      };
+    }
   }
 }

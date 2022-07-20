@@ -63,6 +63,7 @@ import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -91,6 +92,7 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
@@ -801,6 +803,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                                 isTargetWithPolicies(event) ? valueReturnDelegate : returnDelegate));
     } finally {
       unsetCurrentLocation(wasProcessorPathSet);
+      EventContext eventContext = event.getContext();
+      if (eventContext instanceof DistributedTraceContextAware) {
+        ((DistributedTraceContextAware) eventContext).getDistributedTraceContext().endCurrentContextSpan();
+      }
     }
   }
 

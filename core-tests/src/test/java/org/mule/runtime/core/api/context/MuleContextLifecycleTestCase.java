@@ -32,6 +32,7 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
@@ -44,6 +45,8 @@ import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationListenerRegistry;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
+import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.util.JdkVersionUtils;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -84,6 +87,9 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
                                                                  notificationListenerRegistry);
     ((MuleContextWithRegistry) ctx).getRegistry().registerObject(ErrorTypeRepository.class.getName(),
                                                                  CORE_ERROR_TYPE_REPO.get());
+    ((MuleContextWithRegistry) ctx).getRegistry().registerObject(InternalProfilingService.class.getName(),
+                                                                 new DefaultProfilingService());
+
     testServicesConfigurationBuilder.configure(ctx);
   }
 

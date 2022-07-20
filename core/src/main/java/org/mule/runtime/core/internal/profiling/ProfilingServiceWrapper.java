@@ -31,7 +31,7 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.core.internal.profiling.consumer.tracing.span.SpanManager;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -138,8 +138,8 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
   }
 
   @Override
-  public SpanManager getSpanManager() {
-    return profilingService.getSpanManager();
+  public CoreEventTracer getCoreEventTracer() {
+    return getProfilingService().getCoreEventTracer();
   }
 
   @Override

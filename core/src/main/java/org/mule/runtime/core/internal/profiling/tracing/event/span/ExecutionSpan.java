@@ -4,27 +4,30 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.profiling.consumer.tracing.span;
+package org.mule.runtime.core.internal.profiling.tracing.event.span;
+
+import static java.lang.System.currentTimeMillis;
 
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
+import org.mule.runtime.core.internal.profiling.InternalSpan;
 
 /**
  * A {@link Span} that represents the trace corresponding to the execution of mule flow or component.
  *
  * @since 4.5.0
  */
-public class ExecutionSpan implements Span {
+public class ExecutionSpan implements InternalSpan {
 
   private final String name;
   private final SpanIdentifier identifier;
-  private final Span parent;
+  private final InternalSpan parent;
   private final Long startTime;
-  private final Long endTime;
+  private Long endTime;
 
   public ExecutionSpan(String name, SpanIdentifier identifier, Long startTime, Long endTime,
-                       Span parent) {
+                       InternalSpan parent) {
     this.name = name;
     this.identifier = identifier;
     this.startTime = startTime;
@@ -52,10 +55,15 @@ public class ExecutionSpan implements Span {
     return new DefaultSpanDuration(startTime, endTime);
   }
 
+  @Override
+  public void end() {
+    this.endTime = currentTimeMillis();
+  }
+
   /**
    * An default implementation for a {@link SpanDuration}
    */
-  private class DefaultSpanDuration implements SpanDuration {
+  private static class DefaultSpanDuration implements SpanDuration {
 
     private final Long startTime;
     private final Long endTime;
