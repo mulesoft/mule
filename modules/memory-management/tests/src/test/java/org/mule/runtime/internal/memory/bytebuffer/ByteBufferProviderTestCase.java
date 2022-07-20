@@ -61,11 +61,13 @@ public class ByteBufferProviderTestCase extends AbstractMuleTestCase {
   public static List<Object[]> parameters() {
     return asList(new Object[][] {
         {new HeapByteBufferProvider(TEST_HEAP_BUFFER_PROVIDER, mock(ProfilingService.class)),
-            new HeapByteBufferProvider(TEST_HEAP_BUFFER_PROVIDER1, TEST_MAX_BUFFER_SIZE, TEST_BASE_BYTE_BUFFER_SIZE, TEST_GROWTH_FACTOR,
+            new HeapByteBufferProvider(TEST_HEAP_BUFFER_PROVIDER1, TEST_MAX_BUFFER_SIZE, TEST_BASE_BYTE_BUFFER_SIZE,
+                                       TEST_GROWTH_FACTOR,
                                        TEST_NUMBER_OF_POOLS, mock(ProfilingService.class)),
             false},
         {new DirectByteBufferProvider(TEST_DIRECT_BUFFER_PROVIDER, mock(ProfilingService.class)),
-            new DirectByteBufferProvider(TEST_DIRECT_BUFFER_PROVIDER1, TEST_MAX_BUFFER_SIZE, TEST_BASE_BYTE_BUFFER_SIZE, TEST_GROWTH_FACTOR,
+            new DirectByteBufferProvider(TEST_DIRECT_BUFFER_PROVIDER1, TEST_MAX_BUFFER_SIZE, TEST_BASE_BYTE_BUFFER_SIZE,
+                                         TEST_GROWTH_FACTOR,
                                          TEST_NUMBER_OF_POOLS, mock(ProfilingService.class)),
             true}
     });

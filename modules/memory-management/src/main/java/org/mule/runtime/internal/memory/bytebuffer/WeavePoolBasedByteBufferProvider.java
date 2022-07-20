@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class WeavePoolBasedByteBufferProvider implements ByteBufferProvider<ByteBuffer> {
 
   private final int capacity;
+  private final int maxSize;
   private final String name;
 
   private final WeaveByteBufferPool pool;
@@ -42,7 +43,8 @@ public class WeavePoolBasedByteBufferProvider implements ByteBufferProvider<Byte
   protected WeavePoolBasedByteBufferProvider(String name, int capacity, int maxSize, ProfilingService profilingService) {
     this.name = name;
     this.capacity = capacity;
-    this.pool = new WeaveByteBufferPool(capacity, maxSize);
+    this.maxSize = maxSize;
+    this.pool = new WeaveByteBufferPool();
     allocationDataProducer =
         profilingService.getProfilingDataProducer(MEMORY_BYTE_BUFFER_ALLOCATION, new ContainerProfilingScope());
     deallocationDataProducer =
@@ -100,26 +102,17 @@ public class WeavePoolBasedByteBufferProvider implements ByteBufferProvider<Byte
     pool.dispose();
   }
 
+  WeaveByteBufferPool getPool() {
+    return pool;
+  }
 
   /**
    * BytBufferPool that saves released DirectByteBuffers to been reused.
    */
-  private static final class WeaveByteBufferPool {
+  protected final class WeaveByteBufferPool {
 
-    private final int capacity;
-    private final int maxSize;
-
-    final private ConcurrentLinkedDeque<ByteBuffer> queue = new ConcurrentLinkedDeque<>();
+    private final ConcurrentLinkedDeque<ByteBuffer> queue = new ConcurrentLinkedDeque<>();
     private final AtomicInteger amount = new AtomicInteger();
-
-    /**
-     * @param capacity The capacity of each BytBuffer
-     * @param maxSize  The max amount of elements in the Pool
-     */
-    private WeaveByteBufferPool(int capacity, int maxSize) {
-      this.capacity = capacity;
-      this.maxSize = maxSize;
-    }
 
     /**
      * @return A ByteBuffer of the pool previously released or a new one if there is still space in the pool.
@@ -150,7 +143,7 @@ public class WeavePoolBasedByteBufferProvider implements ByteBufferProvider<Byte
       queueOffer(buffer);
     }
 
-    private int size() {
+    int size() {
       return queue.size();
     }
 
@@ -174,11 +167,11 @@ public class WeavePoolBasedByteBufferProvider implements ByteBufferProvider<Byte
       buffer.limit(0);
     }
 
-    private Boolean isEmpty() {
+    Boolean isEmpty() {
       return queue.isEmpty();
     }
 
-    public void dispose() {
+    private void dispose() {
       queue.clear();
     }
 
