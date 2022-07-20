@@ -140,7 +140,7 @@ public abstract class AbstractErrorTypesValidation implements Validation {
 
   protected static Set<String> getAlreadyUsedErrorNamespaces(ArtifactAst artifact) {
     return artifact.dependencies().stream()
-            .map(d -> d.getXmlDslModel().getPrefix().toUpperCase())
-            .collect(toSet());
+        .map(d -> d.getXmlDslModel().getPrefix().toUpperCase())
+        .collect(toSet());
   }
 }
