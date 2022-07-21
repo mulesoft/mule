@@ -28,7 +28,7 @@ public class JavaErrorModelParser implements ErrorModelParser {
 
   private static final String MULE = CORE_PREFIX.toUpperCase(ROOT);
 
-  private final String extensionNamespace;
+  private final String namespace;
   private final ErrorTypeDefinition<?> errorTypeDefinition;
   private final Class<?> errorTypeDefinitionDeclarationClass;
   private Optional<ErrorModelParser> parent = empty();
@@ -38,13 +38,13 @@ public class JavaErrorModelParser implements ErrorModelParser {
    * Create a new instance
    *
    * @param errorTypeDefinition the {@link ErrorTypeDefinition}
-   * @param extensionNamespace  the namespace of the extension that is being parsed.
+   * @param namespace           the error namespace of the extension that is being parsed.
    */
-  public JavaErrorModelParser(ErrorTypeDefinition<?> errorTypeDefinition, String extensionNamespace) {
-    this.extensionNamespace = extensionNamespace;
+  public JavaErrorModelParser(ErrorTypeDefinition<?> errorTypeDefinition, String namespace) {
+    this.namespace = namespace;
     this.errorTypeDefinition = errorTypeDefinition;
     this.errorTypeDefinitionDeclarationClass = getDeclarationClass(errorTypeDefinition);
-    this.isMuleError = MULE.equals(extensionNamespace);
+    this.isMuleError = MULE.equals(namespace);
   }
 
   @Override
@@ -54,7 +54,7 @@ public class JavaErrorModelParser implements ErrorModelParser {
 
   @Override
   public String getNamespace() {
-    return extensionNamespace;
+    return namespace;
   }
 
   @Override
@@ -89,12 +89,12 @@ public class JavaErrorModelParser implements ErrorModelParser {
     }
     JavaErrorModelParser that = (JavaErrorModelParser) o;
     return Objects.equals(errorTypeDefinitionDeclarationClass, that.errorTypeDefinitionDeclarationClass)
-        && Objects.equals(this.extensionNamespace, that.extensionNamespace)
+        && Objects.equals(this.namespace, that.namespace)
         && Objects.equals(this.errorTypeDefinition, that.errorTypeDefinition);
   }
 
   @Override
   public int hashCode() {
-    return hash(errorTypeDefinitionDeclarationClass, extensionNamespace, errorTypeDefinition);
+    return hash(errorTypeDefinitionDeclarationClass, namespace, errorTypeDefinition);
   }
 }
