@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+
+import static java.util.Locale.ROOT;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.meta.model.error.ErrorModel;
@@ -21,9 +24,12 @@ import java.util.Optional;
 // TODO: Add test? Would it be so obvious?
 public class MuleSdkErrorModelParser implements ErrorModelParser {
 
+  private static final String MULE = CORE_PREFIX.toUpperCase(ROOT);
+
   private final String namespace;
   private final String type;
   private final ErrorModelParser parent;
+  private final boolean isMuleError;
 
   /**
    * Create a new instance since an {@link ErrorModel}.
@@ -46,6 +52,7 @@ public class MuleSdkErrorModelParser implements ErrorModelParser {
     this.namespace = namespace;
     this.type = type;
     this.parent = parent;
+    this.isMuleError = MULE.equals(namespace);
   }
 
   @Override
@@ -56,6 +63,11 @@ public class MuleSdkErrorModelParser implements ErrorModelParser {
   @Override
   public String getNamespace() {
     return namespace;
+  }
+
+  @Override
+  public boolean isMuleError() {
+    return isMuleError;
   }
 
   @Override

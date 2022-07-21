@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java.error;
 
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils.getDeclarationClass;
 
+import static java.util.Locale.ROOT;
 import static java.util.Objects.hash;
 import static java.util.Optional.empty;
 
@@ -24,10 +26,13 @@ import java.util.Optional;
  */
 public class JavaErrorModelParser implements ErrorModelParser {
 
+  private static final String MULE = CORE_PREFIX.toUpperCase(ROOT);
+
   private final String extensionNamespace;
   private final ErrorTypeDefinition<?> errorTypeDefinition;
   private final Class<?> errorTypeDefinitionDeclarationClass;
   private Optional<ErrorModelParser> parent = empty();
+  private final boolean isMuleError;
 
   /**
    * Create a new instance
@@ -38,7 +43,8 @@ public class JavaErrorModelParser implements ErrorModelParser {
   public JavaErrorModelParser(ErrorTypeDefinition<?> errorTypeDefinition, String extensionNamespace) {
     this.extensionNamespace = extensionNamespace;
     this.errorTypeDefinition = errorTypeDefinition;
-    errorTypeDefinitionDeclarationClass = getDeclarationClass(errorTypeDefinition);
+    this.errorTypeDefinitionDeclarationClass = getDeclarationClass(errorTypeDefinition);
+    this.isMuleError = MULE.equals(extensionNamespace);
   }
 
   @Override
@@ -49,6 +55,11 @@ public class JavaErrorModelParser implements ErrorModelParser {
   @Override
   public String getNamespace() {
     return extensionNamespace;
+  }
+
+  @Override
+  public boolean isMuleError() {
+    return isMuleError;
   }
 
   public void setParent(Optional<ErrorModelParser> parent) {

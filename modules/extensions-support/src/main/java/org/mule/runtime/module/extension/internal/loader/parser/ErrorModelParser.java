@@ -30,6 +30,11 @@ public interface ErrorModelParser {
   String getNamespace();
 
   /**
+   * @return {@code true} if it represents to a core Mule language error.
+   */
+  boolean isMuleError();
+
+  /**
    * @return the error's parent definition
    */
   Optional<ErrorModelParser> getParent();
