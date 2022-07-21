@@ -24,6 +24,7 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -70,7 +71,7 @@ public final class DeployableProjectModel {
                                 BundleDescriptor descriptor,
                                 Supplier<MuleDeployableModel> deployableModelSupplier,
                                 File projectFolder,
-                                List<BundleDependency> dependencies,
+                                Collection<BundleDependency> dependencies,
                                 Set<BundleDescriptor> sharedLibraries,
                                 Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies) {
 
