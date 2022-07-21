@@ -6,9 +6,15 @@
  */
 package org.mule.runtime.core.privileged.profiling;
 
+import static java.util.Collections.emptySet;
+
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.core.api.event.CoreEvent;
+
+import java.util.Collection;
 
 /**
  * A {@link ProfilingService} that allows to perform some extra privileged operations.
@@ -23,4 +29,45 @@ public interface PrivilegedProfilingService extends ProfilingService {
    *                              listens to.
    */
   <T extends ProfilingEventContext> void registerProfilingDataConsumer(ProfilingDataConsumer<T> profilingDataConsumer);
+
+  /**
+   * @return gets an {@link ExportedSpanCapturer}.
+   *
+   *         This is used for capturing spans in privileged modules but should not be exposed as API.
+   *
+   * @since 4.5.0
+   */
+  default ExportedSpanCapturer getExportedSpanCapturer() {
+    return new ExportedSpanCapturer() {
+
+      @Override
+      public Collection<CapturedExportedSpan> getExportedSpans() {
+        return emptySet();
+      }
+
+      @Override
+      public void dispose() {
+
+      }
+    };
+  }
+
+  /**
+   * Starts a component span. This is used as a privileged api only for testing.
+   *
+   * @param coreEvent the {@link CoreEvent} that has hit the {@link Component}
+   * @param component the {@link Component} that was hit by the {@link CoreEvent}
+   *
+   * @since 4.5.0
+   */
+  default void startComponentSpan(CoreEvent coreEvent, Component component) {}
+
+  /**
+   * End a component span. This is used as a privileged api only for testing.
+   *
+   * @param coreEvent the {@link CoreEvent}.
+   *
+   * @since 4.5.0
+   */
+  default void endComponentSpan(CoreEvent coreEvent) {}
 }

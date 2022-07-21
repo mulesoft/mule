@@ -7,10 +7,17 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
+import io.opentelemetry.sdk.trace.data.SpanData;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.InternalSpan;
+import org.mule.runtime.core.privileged.profiling.CapturedExportedSpan;
+import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
+
+import java.util.Collection;
+
+import static java.util.Collections.emptyList;
 
 /**
  * Provides the Span from the core event and the component.
@@ -41,4 +48,22 @@ public interface CoreEventSpanFactory {
    */
   InternalSpan getSpan(CoreEvent coreEvent, Component component, MuleConfiguration muleConfiguration,
                        CoreEventSpanCustomizer coreEventSpanCustomizer);
+
+  /**
+   * @return a capturer for created spans that are exported.
+   */
+  default ExportedSpanCapturer getExportedSpanCapturer() {
+    return new ExportedSpanCapturer() {
+
+      @Override
+      public Collection<CapturedExportedSpan> getExportedSpans() {
+        return emptyList();
+      }
+
+      @Override
+      public void dispose() {
+        // Nothing to dispose
+      }
+    };
+  }
 }

@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.profiling;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -26,13 +27,15 @@ import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import org.mule.runtime.api.profiling.tracing.TracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
+import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
+import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
 
 import java.util.function.Function;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
-import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -95,6 +98,15 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
       return profilingService;
     }
     return initialiseProfilingService();
+  }
+
+  @Override
+  public ExportedSpanCapturer getExportedSpanCapturer() {
+    if (profilingService instanceof PrivilegedProfilingService) {
+      return ((PrivilegedProfilingService) getProfilingService()).getExportedSpanCapturer();
+    }
+
+    return PrivilegedProfilingService.super.getExportedSpanCapturer();
   }
 
   private InternalProfilingService initialiseProfilingService() throws MuleRuntimeException {
@@ -161,6 +173,20 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
 
     if (profilingService instanceof Initialisable) {
       ((Initialisable) profilingService).initialise();
+    }
+  }
+
+  @Override
+  public void startComponentSpan(CoreEvent event, Component component) {
+    if (profilingService instanceof PrivilegedProfilingService) {
+      ((PrivilegedProfilingService) getProfilingService()).startComponentSpan(event, component);
+    }
+  }
+
+  @Override
+  public void endComponentSpan(CoreEvent event) {
+    if (profilingService instanceof PrivilegedProfilingService) {
+      ((PrivilegedProfilingService) getProfilingService()).endComponentSpan(event);
     }
   }
 

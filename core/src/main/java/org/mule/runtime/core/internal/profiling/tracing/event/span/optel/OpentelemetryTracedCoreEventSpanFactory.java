@@ -12,6 +12,7 @@ import static java.lang.System.currentTimeMillis;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.ComponentSpanIdentifier.componentSpanIdentifierFrom;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getCurrentSpan;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.optel.OpenTelemetryResourcesProvider.getNewExportedSpanCapturer;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.optel.OpenTelemetryResourcesProvider.getOpentelemetryTracer;
 
 import org.mule.runtime.api.component.Component;
@@ -23,6 +24,7 @@ import org.mule.runtime.core.internal.profiling.OpentelemetrySpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanFactory;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExecutionSpan;
+import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
 
 import io.opentelemetry.api.trace.Tracer;
 
@@ -64,6 +66,11 @@ public class OpentelemetryTracedCoreEventSpanFactory implements CoreEventSpanFac
                                                    null,
                                                    getCurrentSpan(eventContext).orElse(null)),
                                  eventContext, openTelemetryTracer);
+  }
+
+  @Override
+  public ExportedSpanCapturer getExportedSpanCapturer() {
+    return getNewExportedSpanCapturer();
   }
 
   private static final class DefaultEventSpanCustomizer implements CoreEventSpanCustomizer {

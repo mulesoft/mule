@@ -7,10 +7,9 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span.optel.config.impl;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.System.getProperty;
-import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 
-import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.optel.config.OpentelemetryExporterConfiguration;
 
 /**
@@ -21,17 +20,16 @@ import org.mule.runtime.core.internal.profiling.tracing.event.span.optel.config.
 public class SystemPropertyOpentelemetryExporterConfiguration implements OpentelemetryExporterConfiguration {
 
   private static final String MULE_OPENTELEMETRY_ENDPOINT_SYSPROP = "mule.opentelemetry.endpoint";
-  public static final String DEFAULT_ENDPOINT = "http://localhot:4317";
+  private static final String DISABLE_OPENTELEMETRY_EXPORT = "mule.opentelemetry.export";
 
   @Override
   public String getEndpoint() {
-    return getProperty(MULE_OPENTELEMETRY_ENDPOINT_SYSPROP, DEFAULT_ENDPOINT);
+    return getProperty(MULE_OPENTELEMETRY_ENDPOINT_SYSPROP);
   }
 
   @Override
   public boolean isEnabled() {
-    return !isEmpty(getEndpoint());
+    return !getBoolean(DISABLE_OPENTELEMETRY_EXPORT);
   }
-
 
 }

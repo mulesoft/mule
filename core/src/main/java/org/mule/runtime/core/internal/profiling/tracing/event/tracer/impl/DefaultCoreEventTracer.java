@@ -15,6 +15,7 @@ import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpan
 import org.mule.runtime.core.internal.profiling.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
+import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
 
 /**
  * A default implementation for a {@link CoreEventTracer}.
@@ -81,6 +82,10 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
     }
   }
 
+  public ExportedSpanCapturer getSpanCapturer() {
+    return coreEventSpanFactory.getExportedSpanCapturer();
+  }
+
   /**
    * A Builder for a {@link DefaultEventTracerBuilder}.
    *
@@ -103,7 +108,7 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
 
     }
 
-    public CoreEventTracer build() {
+    public DefaultCoreEventTracer build() {
       return new DefaultCoreEventTracer(muleConfiguration, defaultCoreEventSpanFactory);
     }
   }

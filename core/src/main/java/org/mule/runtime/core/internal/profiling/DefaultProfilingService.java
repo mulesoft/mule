@@ -13,6 +13,7 @@ import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEv
 
 import static java.util.Optional.empty;
 
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
@@ -22,11 +23,14 @@ import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import org.mule.runtime.api.profiling.tracing.TracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.discovery.DefaultProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.producer.provider.ProfilingDataProducerResolver;
 import org.mule.runtime.core.internal.profiling.threading.JvmThreadSnapshotCollector;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracer;
+import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 import org.mule.runtime.core.internal.profiling.tracing.ThreadLocalTracingService;
 
@@ -54,7 +58,7 @@ public class DefaultProfilingService extends AbstractProfilingService {
   @Inject
   private ProfilingFeatureFlaggingService featureFlaggingService;
 
-  private CoreEventTracer eventTracer;
+  private DefaultCoreEventTracer eventTracer;
 
   private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies = empty();
 
@@ -192,5 +196,20 @@ public class DefaultProfilingService extends AbstractProfilingService {
     } else {
       return getArtifactId(muleContext);
     }
+  }
+
+  @Override
+  public ExportedSpanCapturer getExportedSpanCapturer() {
+    return eventTracer.getSpanCapturer();
+  }
+
+  @Override
+  public void startComponentSpan(CoreEvent event, Component component) {
+    eventTracer.startComponentSpan(event, component);
+  }
+
+  @Override
+  public void endComponentSpan(CoreEvent event) {
+    eventTracer.endCurrentSpan(event);
   }
 }
