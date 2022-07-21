@@ -107,7 +107,7 @@ public class WeavePoolBasedByteBufferProvider implements ByteBufferProvider<Byte
   }
 
   /**
-   * BytBufferPool that saves released DirectByteBuffers to been reused.
+   * BytBufferPool that saves released DirectByteBuffers to be reused.
    */
   protected final class WeaveByteBufferPool {
 
