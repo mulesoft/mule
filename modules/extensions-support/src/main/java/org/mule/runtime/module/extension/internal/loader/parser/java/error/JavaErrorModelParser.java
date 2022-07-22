@@ -6,13 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java.error;
 
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils.getDeclarationClass;
 
-import static java.util.Locale.ROOT;
 import static java.util.Objects.hash;
-import static java.util.Optional.empty;
 
+import org.mule.runtime.module.extension.internal.loader.parser.BaseErrorModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 import org.mule.sdk.api.error.ErrorTypeDefinition;
 
@@ -24,15 +22,10 @@ import java.util.Optional;
  *
  * @since 4.5.0
  */
-public class JavaErrorModelParser implements ErrorModelParser {
+public class JavaErrorModelParser extends BaseErrorModelParser {
 
-  private static final String MULE = CORE_PREFIX.toUpperCase(ROOT);
-
-  private final String namespace;
   private final ErrorTypeDefinition<?> errorTypeDefinition;
   private final Class<?> errorTypeDefinitionDeclarationClass;
-  private Optional<ErrorModelParser> parent = empty();
-  private final boolean isMuleError;
 
   /**
    * Create a new instance
@@ -41,38 +34,13 @@ public class JavaErrorModelParser implements ErrorModelParser {
    * @param namespace           the error namespace of the extension that is being parsed.
    */
   public JavaErrorModelParser(ErrorTypeDefinition<?> errorTypeDefinition, String namespace) {
-    this.namespace = namespace;
+    super(namespace, errorTypeDefinition.getType());
     this.errorTypeDefinition = errorTypeDefinition;
     this.errorTypeDefinitionDeclarationClass = getDeclarationClass(errorTypeDefinition);
-    this.isMuleError = MULE.equals(namespace);
-  }
-
-  @Override
-  public String getType() {
-    return errorTypeDefinition.getType();
-  }
-
-  @Override
-  public String getNamespace() {
-    return namespace;
-  }
-
-  @Override
-  public boolean isMuleError() {
-    return isMuleError;
   }
 
   public void setParent(Optional<ErrorModelParser> parent) {
-    this.parent = parent;
-  }
-
-  @Override
-  public Optional<ErrorModelParser> getParent() {
-    return parent;
-  }
-
-  public ErrorTypeDefinition<?> getErrorTypeDefinition() {
-    return errorTypeDefinition;
+    super.setParent(parent.orElse(null));
   }
 
   public Class<?> getErrorTypeDefinitionDeclarationClass() {
@@ -89,12 +57,12 @@ public class JavaErrorModelParser implements ErrorModelParser {
     }
     JavaErrorModelParser that = (JavaErrorModelParser) o;
     return Objects.equals(errorTypeDefinitionDeclarationClass, that.errorTypeDefinitionDeclarationClass)
-        && Objects.equals(this.namespace, that.namespace)
+        && Objects.equals(this.getNamespace(), that.getNamespace())
         && Objects.equals(this.errorTypeDefinition, that.errorTypeDefinition);
   }
 
   @Override
   public int hashCode() {
-    return hash(errorTypeDefinitionDeclarationClass, namespace, errorTypeDefinition);
+    return hash(errorTypeDefinitionDeclarationClass, getNamespace(), errorTypeDefinition);
   }
 }

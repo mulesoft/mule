@@ -6,14 +6,11 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-
-import static java.util.Locale.ROOT;
-import static java.util.Optional.ofNullable;
-
 import org.mule.runtime.api.meta.model.error.ErrorModel;
+import org.mule.runtime.module.extension.internal.loader.parser.BaseErrorModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -21,15 +18,7 @@ import java.util.Optional;
  *
  * @since 4.5.0
  */
-// TODO: Add test? Would it be so obvious?
-public class MuleSdkErrorModelParser implements ErrorModelParser {
-
-  private static final String MULE = CORE_PREFIX.toUpperCase(ROOT);
-
-  private final String namespace;
-  private final String type;
-  private final ErrorModelParser parent;
-  private final boolean isMuleError;
+public class MuleSdkErrorModelParser extends BaseErrorModelParser {
 
   /**
    * Create a new instance since an {@link ErrorModel}.
@@ -49,29 +38,26 @@ public class MuleSdkErrorModelParser implements ErrorModelParser {
    *                  of {@link Optional}, and it will end up meaning MULE:ANY.
    */
   public MuleSdkErrorModelParser(String namespace, String type, ErrorModelParser parent) {
-    this.namespace = namespace;
-    this.type = type;
-    this.parent = parent;
-    this.isMuleError = MULE.equals(namespace);
+    super(namespace, type);
+    setParent(parent);
   }
 
   @Override
-  public String getType() {
-    return type;
+  public int hashCode() {
+    return Objects.hash(getNamespace(), getType(), getParent());
   }
 
   @Override
-  public String getNamespace() {
-    return namespace;
-  }
-
-  @Override
-  public boolean isMuleError() {
-    return isMuleError;
-  }
-
-  @Override
-  public Optional<ErrorModelParser> getParent() {
-    return ofNullable(parent);
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    MuleSdkErrorModelParser that = (MuleSdkErrorModelParser) o;
+    return Objects.equals(this.getNamespace(), that.getNamespace())
+        && Objects.equals(this.getType(), that.getType())
+        && Objects.equals(this.getParent(), that.getParent());
   }
 }

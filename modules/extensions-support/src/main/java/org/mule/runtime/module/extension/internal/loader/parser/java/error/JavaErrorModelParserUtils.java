@@ -44,7 +44,6 @@ import org.mule.sdk.api.error.ErrorTypeDefinition;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -167,6 +166,10 @@ public final class JavaErrorModelParserUtils {
           " to throw errors of %s type, but an error of %s type has been detected",
                                                        extensionErrorType, error.getClass()));
     }
+  }
+
+  public static ErrorModelParser toParser(String extensionNamespace, ErrorTypeDefinition<?> errorTypeDefinition) {
+    return toParser(extensionNamespace, errorTypeDefinition, new HashMap<>());
   }
 
   private static ErrorModelParser toParser(String extensionNamespace,
