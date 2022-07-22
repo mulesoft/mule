@@ -40,7 +40,7 @@ public final class ByteBufferProviderBuilder {
   public ByteBufferProvider<ByteBuffer> build() {
     if (isDirect) {
       if (poolConfiguration != null) {
-        if (poolConfiguration.getPoolStrategy() == ByteBufferPoolStrategy.DW) {
+        if (poolConfiguration.getByteBufferPoolStrategy() == ByteBufferPoolStrategy.DW) {
           return new WeavePoolBasedByteBufferProvider(name, poolConfiguration.getMaxBufferSize(),
                                                       poolConfiguration.getNumberOfPools(), profilingService);
         }
