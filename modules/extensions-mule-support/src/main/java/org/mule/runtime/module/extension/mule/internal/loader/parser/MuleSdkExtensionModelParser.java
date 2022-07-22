@@ -51,6 +51,9 @@ import java.util.Optional;
  */
 class MuleSdkExtensionModelParser implements ExtensionModelParser {
 
+  // The namespace of the extension when it's defined within an application rather than in a separate artifact.
+  private static final String APP_LOCAL_EXTENSION_NAMESPACE = "THIS";
+
   private final String extensionName;
   private final ArtifactAst ast;
   private final TypeLoader typeLoader;
@@ -141,7 +144,6 @@ class MuleSdkExtensionModelParser implements ExtensionModelParser {
   @Override
   public Optional<XmlDslConfiguration> getXmlDslConfiguration() {
     return of(new XmlDslConfiguration(THIS_PREFIX, THIS_NAMESPACE));
-
   }
 
   @Override
@@ -177,6 +179,12 @@ class MuleSdkExtensionModelParser implements ExtensionModelParser {
   @Override
   public List<NotificationModel> getNotificationModels() {
     return emptyList();
+  }
+
+  @Override
+  public String getNamespace() {
+    // TODO: Change this when it's an actual extension.
+    return APP_LOCAL_EXTENSION_NAMESPACE;
   }
 
   private List<OperationModelParser> computeOperationModelParsers() {

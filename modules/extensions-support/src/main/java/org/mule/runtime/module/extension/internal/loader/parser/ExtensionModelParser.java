@@ -152,4 +152,8 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
    */
   List<NotificationModel> getNotificationModels();
 
+  /**
+   * @return the extension's namespace.
+   */
+  String getNamespace();
 }
