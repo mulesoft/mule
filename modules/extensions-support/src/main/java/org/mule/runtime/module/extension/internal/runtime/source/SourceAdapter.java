@@ -6,14 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static com.google.common.base.Functions.identity;
-import static java.lang.String.format;
-import static java.util.Collections.emptyMap;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.component.execution.CompletableCallback.always;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
+import static org.mule.runtime.api.util.MuleSystemProperties.COMMIT_REDELIVERY_EXHAUSTED;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -28,6 +24,14 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsOfType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
 import static org.mule.sdk.api.tx.SourceTransactionalAction.NONE;
+
+import static java.lang.Boolean.getBoolean;
+import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
+import static com.google.common.base.Functions.identity;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 
@@ -107,6 +111,7 @@ import org.slf4j.Logger;
 public class SourceAdapter implements Lifecycle, Restartable {
 
   private static final Logger LOGGER = getLogger(SourceAdapter.class);
+  private static final Boolean COMMIT_ON_REDELIVERY = getBoolean(COMMIT_REDELIVERY_EXHAUSTED);
 
   private final ExtensionModel extensionModel;
   private final SourceModel sourceModel;
@@ -347,7 +352,7 @@ public class SourceAdapter implements Lifecycle, Restartable {
       }
 
       if (context.getTransactionHandle().isTransacted()) {
-        if (isRedeliveryExhaustedError) {
+        if (isRedeliveryExhaustedError && COMMIT_ON_REDELIVERY) {
           callback = callback.finallyBefore(this::commit);
         } else {
           callback = callback.finallyBefore(this::rollback);
