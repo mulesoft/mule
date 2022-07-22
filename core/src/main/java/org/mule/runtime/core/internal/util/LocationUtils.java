@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.util;
 
 import static org.mule.runtime.api.component.location.Location.CONNECTION;
+import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 
 import org.mule.runtime.api.component.location.Location;
 
@@ -29,6 +30,15 @@ public class LocationUtils {
     for (int i = 0; i < parts.size() - 1; i++) {
       builder = builder.addPart(parts.get(i));
     }
+    return builder.build();
+  }
+
+  /**
+   * Given a string representation of a location, creates the location for the global element.
+   */
+  public static Location globalLocation(String location) {
+    Location.Builder builder = Location.builder();
+    builder = builder.globalName(builderFromStringRepresentation(location).build().getGlobalName());
     return builder.build();
   }
 
