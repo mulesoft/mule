@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:forward-compatibility="http://www.mulesoft.org/schema/mule/forward-compatibility"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+		http://www.mulesoft.org/schema/mule/forward-compatibility http://www.mulesoft.org/schema/mule/forward-compatibility/current/mule-forward-compatibility.xsd">
+
+    <munit:config name="fc-helper-suite.xml"/>
+
+    <munit:test name="fcHelperIsDefaultImplementationFor4.5.0+" description="MUnit Test" ignore="#[Munit::muleVersionPriorTo('4.4.1-SNAPSHOT')]">
+        <munit:execution>
+            <forward-compatibility:get-helper-class-name/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::equalTo('org.mule.runtime.module.extension.api.runtime.compatibility.DefaultForwardCompatibilityHelper')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="fcHelperIsAnonymousImplementationPriorTo4.5.0" description="MUnit Test" ignore="#[Munit::muleVersionNewerThan('4.4.1-SNAPSHOT')]">
+        <munit:execution>
+            <forward-compatibility:get-helper-class-name/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::equalTo('org.mule.sdk.api.utils.ForwardCompatibilityHelper\$1')]"/>
+        </munit:validation>
+    </munit:test>
+
+</mule>
