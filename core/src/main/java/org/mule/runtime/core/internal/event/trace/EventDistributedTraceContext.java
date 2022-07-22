@@ -12,8 +12,8 @@ import static org.mule.runtime.core.internal.event.trace.extractor.RuntimeEventT
 
 import static java.util.Optional.ofNullable;
 
+import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.core.internal.profiling.InternalSpan;
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.core.internal.event.trace.extractor.TraceContextFieldExtractor;
 
@@ -32,7 +32,6 @@ import java.util.Optional;
  */
 public class EventDistributedTraceContext implements DistributedTraceContext {
 
-  private CoreEventTracer muleEventTracer;
   private Map<String, String> tracingFields = new HashMap<>();
   private Map<String, String> baggageItems = new HashMap<>();
   private InternalSpan currentSpan;
@@ -86,8 +85,16 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
   public void endCurrentContextSpan() {
     if (currentSpan != null) {
       currentSpan.end();
-      currentSpan = (InternalSpan) currentSpan.getParent();
+      currentSpan = resolveParentAsInternalSpan();
     }
+  }
+
+  private InternalSpan resolveParentAsInternalSpan() {
+    Span parentSpan = currentSpan.getParent();
+    if (parentSpan != null) {
+      return (InternalSpan) parentSpan;
+    }
+    return null;
   }
 
   @Override
