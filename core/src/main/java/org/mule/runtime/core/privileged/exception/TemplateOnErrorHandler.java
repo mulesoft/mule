@@ -299,7 +299,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     if (fromGlobalErrorHandler && reuseGlobalErrorHandler()) {
       processingStrategy = getProcessingStrategyFromGlobalErrorHandler(locator);
     } else if (flowLocation.isPresent()) {
-      Location location = builderFromStringRepresentation(flowLocation.get()).build();
+      Location location = globalLocation(flowLocation.get());
       processingStrategy = getProcessingStrategy(locator, location);
     } else {
       processingStrategy = getProcessingStrategy(locator, this);
@@ -318,6 +318,15 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
         errorHandlerLocation = errorHandlerLocation.substring(0, errorHandlerLocation.lastIndexOf('/'));
       }
     }
+  }
+
+  /**
+   * Given a string representation of a location, creates the location for the global element.
+   */
+  private static Location globalLocation(String location) {
+    Location.Builder builder = Location.builder();
+    builder = builder.globalName(builderFromStringRepresentation(location).build().getGlobalName());
+    return builder.build();
   }
 
   // Todo: we are evaluating if this is needed. If no propagation of the ps is needed we can avoid this (and the overhead
