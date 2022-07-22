@@ -14,6 +14,9 @@ import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporter;
 
+import java.util.Map;
+import java.util.Optional;
+
 /**
  * A wrapper for a span that exports spans on end.
  *
@@ -54,6 +57,21 @@ public class ExportOnEndSpan implements InternalSpan {
   public void end() {
     runtimeInternalSpan.end();
     spanExporter.export(this);
+  }
+
+  @Override
+  public Optional<String> getAttribute(String key) {
+    return runtimeInternalSpan.getAttribute(key);
+  }
+
+  @Override
+  public void addAttribute(String key, String value) {
+    runtimeInternalSpan.addAttribute(key, value);
+  }
+
+  @Override
+  public Map<String, String> attributesAsMap() {
+    return runtimeInternalSpan.attributesAsMap();
   }
 
   @Override

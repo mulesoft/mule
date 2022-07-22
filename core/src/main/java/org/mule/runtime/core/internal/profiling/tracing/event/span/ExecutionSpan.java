@@ -7,10 +7,17 @@
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
 import static java.lang.System.currentTimeMillis;
+import static java.util.Optional.ofNullable;
+
+import static com.google.common.collect.ImmutableMap.copyOf;
 
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * A {@link Span} that represents the trace corresponding to the execution of mule flow or component.
@@ -24,6 +31,7 @@ public class ExecutionSpan implements InternalSpan {
   private final InternalSpan parent;
   private final Long startTime;
   private Long endTime;
+  private final Map<String, String> attributes = new HashMap<>();
 
   public ExecutionSpan(String name, SpanIdentifier identifier, Long startTime, Long endTime,
                        InternalSpan parent) {
@@ -64,6 +72,11 @@ public class ExecutionSpan implements InternalSpan {
     return visitor.accept(this);
   }
 
+  @Override
+  public Map<String, String> attributesAsMap() {
+    return copyOf(attributes);
+  }
+
   /**
    * An default implementation for a {@link SpanDuration}
    */
@@ -86,5 +99,15 @@ public class ExecutionSpan implements InternalSpan {
     public Long getEnd() {
       return endTime;
     }
+  }
+
+  @Override
+  public void addAttribute(String key, String value) {
+    attributes.put(key, value);
+  }
+
+  @Override
+  public Optional<String> getAttribute(String key) {
+    return ofNullable(attributes.get(key));
   }
 }

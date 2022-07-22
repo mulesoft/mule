@@ -59,6 +59,10 @@ public class OpentelemetrySpanExporter implements InternalSpanExporter {
 
   @Override
   public void export(InternalSpan internalSpan) {
+    for (Map.Entry<String, String> entry : internalSpan.attributesAsMap().entrySet()) {
+      openTelemetrySpan.setAttribute(entry.getKey(), entry.getValue());
+    }
+
     openTelemetrySpan.end(ofEpochMilli(internalSpan.getDuration().getEnd()));
   }
 
