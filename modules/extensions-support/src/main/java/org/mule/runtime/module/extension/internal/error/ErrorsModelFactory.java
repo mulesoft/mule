@@ -53,7 +53,8 @@ public class ErrorsModelFactory {
   }
 
   private static List<ErrorModelParser> adaptToParsersArray(ErrorTypeDefinition<?>[] errorTypesEnum, String extensionNamespace) {
-    return Stream.of(errorTypesEnum).map(def -> toParser(extensionNamespace, def)).collect(toList());
+    String errorExtensionNamespace = extensionNamespace.toUpperCase();
+    return Stream.of(errorTypesEnum).map(def -> toParser(errorExtensionNamespace, def)).collect(toList());
   }
 
   private static final String MULE = CORE_PREFIX.toUpperCase();
