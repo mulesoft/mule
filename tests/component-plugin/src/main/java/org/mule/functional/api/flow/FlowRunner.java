@@ -231,13 +231,14 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
       try {
         result = Flux.<CoreEvent>create(fluxSink -> {
           CoreEvent event = getOrBuildEvent();
-          privilegedProfilingService
-              .ifPresent(privilegedProfilingService -> privilegedProfilingService.startComponentSpan(event, flow));
           fluxSink.next(event);
           sinkReference.set(fluxSink);
-        }).transform(flow::apply).blockFirst();
-        privilegedProfilingService
-            .ifPresent(privilegedProfilingService -> privilegedProfilingService.endComponentSpan(getOrBuildEvent()));
+        }).doOnNext(event -> privilegedProfilingService
+            .ifPresent(privilegedProfilingService -> privilegedProfilingService.startComponentSpan(event, flow)))
+            .transform(flow::apply)
+            .doOnNext(event -> privilegedProfilingService
+                .ifPresent(privilegedProfilingService -> privilegedProfilingService.endComponentSpan(event)))
+            .blockFirst();
       } catch (RuntimeException ex) {
         if (ex.getCause() instanceof MuleException) {
           throw (MuleException) ex.getCause();
