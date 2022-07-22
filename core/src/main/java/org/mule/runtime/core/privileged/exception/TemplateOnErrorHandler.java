@@ -7,7 +7,6 @@
 package org.mule.runtime.core.privileged.exception;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
-import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
@@ -22,6 +21,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.addContext;
+import static org.mule.runtime.core.internal.util.LocationUtils.globalLocation;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getDefaultProcessingStrategyFactory;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
@@ -35,7 +35,6 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.newSetFromMap;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static java.util.regex.Pattern.compile;
@@ -48,7 +47,6 @@ import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
@@ -66,7 +64,6 @@ import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
@@ -338,7 +335,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       initialiseIfNeeded(processingStrategy);
       ownedProcessingStrategy = processingStrategy;
     } else if (flowLocation.isPresent()) {
-      Location location = builderFromStringRepresentation(flowLocation.get()).build();
+      Location location = globalLocation(flowLocation.get());
       processingStrategy = getProcessingStrategy(locator, location);
     } else {
       processingStrategy = getProcessingStrategy(locator, this);
