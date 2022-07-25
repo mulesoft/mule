@@ -12,8 +12,10 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanFactory;
-import org.mule.runtime.core.internal.profiling.InternalSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.ExportOnEndCoreEventSpanFactory;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 
 /**
@@ -34,9 +36,9 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
   }
 
   private DefaultCoreEventTracer(MuleConfiguration muleConfiguration,
-                                 CoreEventSpanFactory coreEventSpanFatory) {
+                                 InternalSpanExportManager<EventContext> spanExportManager) {
     this.muleConfiguration = muleConfiguration;
-    this.coreEventSpanFactory = coreEventSpanFatory;
+    this.coreEventSpanFactory = new ExportOnEndCoreEventSpanFactory(spanExportManager);
   }
 
   @Override
@@ -89,22 +91,20 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
   public static final class DefaultEventTracerBuilder {
 
     private MuleConfiguration muleConfiguration;
-    private CoreEventSpanFactory defaultCoreEventSpanFactory;
+    private InternalSpanExportManager<EventContext> spanExportManager;
 
     public DefaultEventTracerBuilder withMuleConfiguration(MuleConfiguration muleConfiguration) {
       this.muleConfiguration = muleConfiguration;
       return this;
     }
 
-    public DefaultEventTracerBuilder withDefaultCoreEventSpanFactory(
-                                                                     CoreEventSpanFactory defaultCoreEventSpanFactory) {
-      this.defaultCoreEventSpanFactory = defaultCoreEventSpanFactory;
-      return this;
-
+    public DefaultCoreEventTracer build() {
+      return new DefaultCoreEventTracer(muleConfiguration, spanExportManager);
     }
 
-    public CoreEventTracer build() {
-      return new DefaultCoreEventTracer(muleConfiguration, defaultCoreEventSpanFactory);
+    public DefaultEventTracerBuilder withSpanExporterManager(InternalSpanExportManager<EventContext> spanExportManager) {
+      this.spanExportManager = spanExportManager;
+      return this;
     }
   }
 }

@@ -7,14 +7,19 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenetelemetryCoreEventInternalSpanExporterFactory.getOpenetelemetryCoreEventInternalSpanExporterFactory;
+
 import static java.util.Optional.empty;
 
+import io.opentelemetry.sdk.trace.export.SpanExporter;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
-import org.mule.runtime.core.internal.profiling.InternalSpan;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.optel.OpentelemetryTracedCoreEventSpanFactory;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.ExportOnEndCoreEventSpanFactory;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpentelemetrySpanExporterManager;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
+import org.mule.runtime.core.privileged.profiling.SpanExportManager;
 
 import java.util.Optional;
 
@@ -27,6 +32,8 @@ public class CoreEventSpanUtils {
 
   private static final String CORE_EVENT_SPAN_NAME_SEPARATOR = ":";
   public static final String UNKNOWN = "unknown";
+
+  private CoreEventSpanUtils() {}
 
   /**
    * @param eventContext the {@link EventContext} to extract the parent span from.
@@ -61,17 +68,17 @@ public class CoreEventSpanUtils {
 
   private static String getUnknownIfEmptyNamespace(ComponentIdentifier componentIdentifier) {
     if (componentIdentifier == null) {
-      return "unknown";
+      return UNKNOWN;
     }
 
     return componentIdentifier.getNamespace();
   }
 
   /**
-   * @return the default {@link CoreEventSpanFactory}
+   * @return the default {@link InternalSpanExportManager}.
    */
-  public static CoreEventSpanFactory getDefaultCoreEventSpanFactory() {
-    return new OpentelemetryTracedCoreEventSpanFactory();
+  public static InternalSpanExportManager<EventContext> getDefaultSpanExporterManager() {
+    return new OpentelemetrySpanExporterManager();
   }
 
 }

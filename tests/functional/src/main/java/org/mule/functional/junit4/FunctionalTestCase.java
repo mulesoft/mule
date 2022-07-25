@@ -30,6 +30,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -63,6 +64,9 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
 
   @Inject
   protected Registry registry;
+
+  @Inject
+  protected PrivilegedProfilingService privilegedProfilingService;
 
   private volatile boolean tearingDown = false;
   private final Set<FlowRunner> runners = new HashSet<>();
@@ -219,7 +223,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
       if (tearingDown) {
         throw new IllegalStateException("Already tearing down.");
       }
-      final FlowRunner flowRunner = new FlowRunner(registry, flowName);
+      final FlowRunner flowRunner = new FlowRunner(registry, flowName, privilegedProfilingService);
       runners.add(flowRunner);
       return flowRunner;
     }

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.event;
 
+import static org.mule.runtime.core.internal.event.trace.EventDistributedTraceContext.emptyDistributedTraceContext;
 import static org.mule.runtime.core.internal.trace.DistributedTraceContext.emptyDistributedEventContext;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
@@ -325,7 +326,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   @Override
   public DistributedTraceContext getDistributedTraceContext() {
     if (distributedTraceContext == null) {
-      distributedTraceContext = emptyDistributedEventContext();
+      distributedTraceContext = emptyDistributedTraceContext();
     }
 
     return distributedTraceContext;

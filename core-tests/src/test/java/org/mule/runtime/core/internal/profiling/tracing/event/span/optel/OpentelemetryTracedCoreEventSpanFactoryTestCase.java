@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span.optel;
 
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getDefaultSpanExporterManager;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
@@ -22,8 +23,9 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.profiling.InternalSpan;
-import org.mule.runtime.core.internal.profiling.OpentelemetrySpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.ExportOnEndCoreEventSpanFactory;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -38,8 +40,8 @@ public class OpentelemetryTracedCoreEventSpanFactoryTestCase {
   public static final String IDENTIFIER_NAME = "name";
   public static final String COMPONENT_LOCATION = "location";
   public static final String APP_ID = "appId";
-  private final OpentelemetryTracedCoreEventSpanFactory coreEventSpanFactory =
-      new OpentelemetryTracedCoreEventSpanFactory();
+  private final ExportOnEndCoreEventSpanFactory coreEventSpanFactory =
+      new ExportOnEndCoreEventSpanFactory(getDefaultSpanExporterManager());
 
   @Test
   public void testOpentelemetryTracedSpanFactory() {
@@ -58,9 +60,9 @@ public class OpentelemetryTracedCoreEventSpanFactoryTestCase {
     when(component.getLocation()).thenReturn(componentLocation);
 
     InternalSpan span = coreEventSpanFactory.getSpan(coreEvent, component, muleConfiguration);
-    assertThat(span, instanceOf(OpentelemetrySpan.class));
+    assertThat(span, instanceOf(ExportOnEndSpan.class));
 
-    OpentelemetrySpan opentelemetryExecutionSpan = (OpentelemetrySpan) span;
+    ExportOnEndSpan opentelemetryExecutionSpan = (ExportOnEndSpan) span;
     assertThat(opentelemetryExecutionSpan.getName(), Matchers.equalTo(getSpanName(componentIdentifier)));
   }
 }

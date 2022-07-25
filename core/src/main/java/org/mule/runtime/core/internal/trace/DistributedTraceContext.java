@@ -11,8 +11,8 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 
 import org.mule.runtime.api.event.Event;
-import org.mule.runtime.core.internal.profiling.CurrentSpanAware;
-import org.mule.runtime.core.internal.profiling.InternalSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.CurrentSpanAware;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 
 import java.util.Map;
 import java.util.Optional;

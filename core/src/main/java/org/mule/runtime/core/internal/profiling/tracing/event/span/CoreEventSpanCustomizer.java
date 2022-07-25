@@ -11,15 +11,14 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 /**
- * A Customizer for the creation of {@link org.mule.runtime.core.internal.profiling.InternalSpan}.
+ * A Customizer for the creation of {@link InternalSpan}.
  *
  * @since 4.5.0
  */
 public interface CoreEventSpanCustomizer {
 
   /**
-   * Gets the {@link org.mule.runtime.core.internal.profiling.InternalSpan} name from the {@param coreEvent} andthe
-   * {@param component}
+   * Gets the {@link InternalSpan} name from the {@param coreEvent} andthe {@param component}
    *
    * @param coreEvent the {@link CoreEvent} to resolve the span name from.
    * @param component the {@link Component} to resolve the span name from.
