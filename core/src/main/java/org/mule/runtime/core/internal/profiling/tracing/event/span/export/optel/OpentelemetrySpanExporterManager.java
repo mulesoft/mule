@@ -22,7 +22,7 @@ import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
  */
 public class OpentelemetrySpanExporterManager implements InternalSpanExportManager<EventContext> {
 
-  private final static OpenetelemetryCoreEventInternalSpanExporterFactory SPAN_EXPORTER_FACTORY =
+  private static final OpenetelemetryCoreEventInternalSpanExporterFactory SPAN_EXPORTER_FACTORY =
       getOpenetelemetryCoreEventInternalSpanExporterFactory();
 
   @Override
