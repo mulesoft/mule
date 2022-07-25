@@ -228,13 +228,18 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
       Reference<FluxSink<CoreEvent>> sinkReference = new Reference<>(null);
 
       CoreEvent result;
+      // TODO: W-11486418 - Improve FlowRunner Creation of Spans
+      SpanHolder spanHolder = new SpanHolder();;
       try {
         result = Flux.<CoreEvent>create(fluxSink -> {
           CoreEvent event = getOrBuildEvent();
           fluxSink.next(event);
           sinkReference.set(fluxSink);
         }).doOnNext(event -> privilegedProfilingService
-            .ifPresent(privilegedProfilingService -> privilegedProfilingService.startComponentSpan(event, flow)))
+            .ifPresent(privilegedProfilingService -> {
+              privilegedProfilingService.startComponentSpan(event, flow);
+              spanHolder.setEvent(event);
+            }))
             .transform(flow::apply)
             .doOnNext(event -> privilegedProfilingService
                 .ifPresent(privilegedProfilingService -> privilegedProfilingService.endComponentSpan(event)))
@@ -245,6 +250,8 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
         } else {
           throw ex;
         }
+      } finally {
+        spanHolder.endSpan();
       }
 
       sinkReference.get().complete();
@@ -415,6 +422,24 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
       return flow;
     } else {
       return super.getFlowConstruct();
+    }
+  }
+
+  /**
+   * A SpanHolder to end current span after the test.
+   */
+  private class SpanHolder {
+
+    private CoreEvent event;
+
+    public void setEvent(CoreEvent event) {
+      this.event = event;
+    }
+
+    public void endSpan() {
+      if (event != null) {
+        privilegedProfilingService.ifPresent(profilingService -> profilingService.endComponentSpan(event));
+      }
     }
   }
 }
