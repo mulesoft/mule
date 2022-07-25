@@ -13,6 +13,8 @@ import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporter;
+import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporterVisitor;
+import org.mule.runtime.core.internal.profiling.tracing.export.OpentelemetrySpanExporter;
 
 import java.util.Map;
 import java.util.Optional;
@@ -67,6 +69,7 @@ public class ExportOnEndSpan implements InternalSpan {
   @Override
   public void addAttribute(String key, String value) {
     runtimeInternalSpan.addAttribute(key, value);
+    spanExporter.visit(new AddAtributeVisitor(key, value));
   }
 
   @Override
@@ -81,5 +84,25 @@ public class ExportOnEndSpan implements InternalSpan {
 
   public InternalSpanExporter getSpanExporter() {
     return spanExporter;
+  }
+
+  /**
+   * Adds attribute to the exporter.
+   */
+  private static class AddAtributeVisitor implements InternalSpanExporterVisitor<InternalSpanExporter> {
+
+    private final String key;
+    private final String value;
+
+    public AddAtributeVisitor(String key, String value) {
+      this.key = key;
+      this.value = value;
+    }
+
+    @Override
+    public InternalSpanExporter accept(OpentelemetrySpanExporter opentelemetrySpanExporter) {
+      opentelemetrySpanExporter.getOpentelemetrySpan().setAttribute(key, value);
+      return opentelemetrySpanExporter;
+    }
   }
 }

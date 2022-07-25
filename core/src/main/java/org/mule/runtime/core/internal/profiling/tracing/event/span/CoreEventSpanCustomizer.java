@@ -28,7 +28,7 @@ public interface CoreEventSpanCustomizer {
    *
    * @param coreEvent the {@link CoreEvent} to resolve the span name from.
    * @param component the {@link Component} to resolve the span name from.
-   * @return the name
+   * @return the name of the span.
    */
   String getName(CoreEvent coreEvent, Component component);
 
