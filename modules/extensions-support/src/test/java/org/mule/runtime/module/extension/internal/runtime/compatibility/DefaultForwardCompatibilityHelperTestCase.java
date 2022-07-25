@@ -18,7 +18,7 @@ import org.junit.Test;
 public class DefaultForwardCompatibilityHelperTestCase extends AbstractMuleContextTestCase {
 
   @Test
-  public void test() {
+  public void isDefaultImplementation() {
     assertThat(ForwardCompatibilityHelper.getInstance(), instanceOf(DefaultForwardCompatibilityHelper.class));
   }
 }
