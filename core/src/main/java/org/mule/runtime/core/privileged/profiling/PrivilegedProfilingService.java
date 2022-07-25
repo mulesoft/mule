@@ -64,10 +64,9 @@ public interface PrivilegedProfilingService extends ProfilingService {
    * @param coreEvent the {@link CoreEvent} that has hit the {@link Component}
    * @param component the {@link Component} that was hit by the {@link CoreEvent}
    *
-   *                  TODO: W-11486418 - Improve FlowRunner Creation of Spans
-   *
    * @since 4.5.0
    */
+     // TODO: W-11486418 - Improve FlowRunner Creation of Spans
   default void startComponentSpan(CoreEvent coreEvent, Component component) {}
 
   /**
@@ -75,9 +74,8 @@ public interface PrivilegedProfilingService extends ProfilingService {
    *
    * @param coreEvent the {@link CoreEvent}.
    *
-   *                  TODO: W-11486418 - Improve FlowRunner Creation of Spans
-   *
    * @since 4.5.0
    */
+     // TODO: W-11486418 - Improve FlowRunner Creation of Spans
   default void endComponentSpan(CoreEvent coreEvent) {}
 }
