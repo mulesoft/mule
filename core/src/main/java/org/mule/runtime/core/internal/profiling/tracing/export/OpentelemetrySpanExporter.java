@@ -108,14 +108,8 @@ public class OpentelemetrySpanExporter implements InternalSpanExporter {
       spanBuilder = spanBuilder.setParent(parentSpanContext);
     }
 
-    Span span = spanBuilder.setStartTimestamp(ofEpochMilli(internalSpan.getDuration().getStart()))
+    return spanBuilder.setStartTimestamp(ofEpochMilli(internalSpan.getDuration().getStart()))
         .startSpan();
-
-    for (Map.Entry<String, String> entry : internalSpan.attributesAsMap().entrySet()) {
-      span.setAttribute(entry.getKey(), entry.getValue());
-    }
-
-    return span;
   }
 
   public io.opentelemetry.api.trace.Span getOpentelemetrySpan() {
