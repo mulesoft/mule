@@ -30,12 +30,12 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
-import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
 
 import java.util.function.Function;
 
 import javax.inject.Inject;
 
+import org.mule.runtime.core.privileged.profiling.SpanExportManager;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -101,12 +101,12 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
   }
 
   @Override
-  public ExportedSpanCapturer getExportedSpanCapturer() {
+  public SpanExportManager getSpanExportManager() {
     if (profilingService instanceof PrivilegedProfilingService) {
-      return ((PrivilegedProfilingService) getProfilingService()).getExportedSpanCapturer();
+      return ((PrivilegedProfilingService) getProfilingService()).getSpanExportManager();
     }
 
-    return PrivilegedProfilingService.super.getExportedSpanCapturer();
+    return PrivilegedProfilingService.super.getSpanExportManager();
   }
 
   private InternalProfilingService initialiseProfilingService() throws MuleRuntimeException {

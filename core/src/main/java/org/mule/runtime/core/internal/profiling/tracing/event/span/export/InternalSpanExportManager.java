@@ -9,20 +9,19 @@ package org.mule.runtime.core.internal.profiling.tracing.event.span.export;
 
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporter;
-import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
+import org.mule.runtime.core.privileged.profiling.SpanExportManager;
 
 /**
- * A factory for a {@link InternalSpanExporter}
+ * An internal {@link SpanExportManager}.
  *
  * @since 4.5.0
  */
-public interface InternalSpanExporterFactory<T> {
+public interface InternalSpanExportManager<T> extends SpanExportManager {
 
   /**
-   * @param context      an extra instance that may have extra information for creat
-   *
-   * @param internalSpan the {@link InternalSpan} that will eventually be exported
-   * @return the result exporter.
+   * @param context      the context
+   * @param internalSpan the {@link InternalSpan} to export.
+   * @return an {@link InternalSpanExporter}.
    */
-  InternalSpanExporter from(T context, InternalSpan internalSpan);
+  InternalSpanExporter getInternalSpanExporter(T context, InternalSpan internalSpan);
 }

@@ -7,8 +7,8 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span.optel;
 
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getDefaultSpanExporterManager;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
-import static org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenetelemetryCoreEventInternalSpanExporterFactory.getOpenetelemetryCoreEventInternalSpanExporterFactory;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
@@ -25,12 +25,12 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.ExportOnEndCoreEventSpanFactory;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.hamcrest.Matchers;
 import org.junit.Test;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.ExportOnEndCoreEventSpanFactory;
 
 @Feature(PROFILING)
 @Story(DEFAULT_CORE_EVENT_TRACER)
@@ -41,7 +41,7 @@ public class OpentelemetryTracedCoreEventSpanFactoryTestCase {
   public static final String COMPONENT_LOCATION = "location";
   public static final String APP_ID = "appId";
   private final ExportOnEndCoreEventSpanFactory coreEventSpanFactory =
-      new ExportOnEndCoreEventSpanFactory(getOpenetelemetryCoreEventInternalSpanExporterFactory());
+      new ExportOnEndCoreEventSpanFactory(getDefaultSpanExporterManager());
 
   @Test
   public void testOpentelemetryTracedSpanFactory() {

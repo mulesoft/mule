@@ -10,11 +10,9 @@ package org.mule.runtime.core.internal.profiling.consumer.tracing;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.ComponentSpanIdentifier.componentSpanIdentifierFrom;
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracer.getCoreEventTracerBuilder;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
-import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getCurrentSpan;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
-import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 
@@ -43,10 +41,10 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanFactory;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.ExecutionSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
+import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporter;
+import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporterVisitor;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 
 import java.time.Instant;
@@ -57,7 +55,6 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
-
 
 @Feature(PROFILING)
 @Story(DEFAULT_CORE_EVENT_TRACER)
@@ -81,6 +78,7 @@ public class DefaultCoreEventTracerTestCase {
 
     when(coreEvent.getCorrelationId()).thenReturn(CORRELATION_ID);
     when(coreEvent.getContext()).thenReturn(eventContext);
+    when(eventContext.getCorrelationId()).thenReturn(CORRELATION_ID);
     when(component.getIdentifier()).thenReturn(componentIdentifier);
     when(componentIdentifier.getName()).thenReturn(TEST_COMPONENT_IDENTIFIER_NAME);
     when(componentIdentifier.getNamespace()).thenReturn(TEST_COMPONENT_NAMESPACE_NAME);
@@ -88,7 +86,7 @@ public class DefaultCoreEventTracerTestCase {
     when(componentLocation.getLocation()).thenReturn(TEST_COMPONENT_LOCATION);
 
     CoreEventTracer coreEventTracer =
-        getTestCoreEventTracer(TestCoreEventSpanFactory.getTestCoreEventSpanFactoryInstance(),
+        getTestCoreEventTracer(TestSpanExportManager.getTestSpanExportManagerInstance(),
                                mockedMuleConfiguration);
 
     InternalSpan span = coreEventTracer.startComponentSpan(coreEvent, component);
@@ -108,7 +106,7 @@ public class DefaultCoreEventTracerTestCase {
     MuleConfiguration mockedMuleConfiguration = mock(MuleConfiguration.class);
     when(mockedMuleConfiguration.getId()).thenReturn(TEST_APP);
     CoreEventTracer coreEventTracer =
-        getTestCoreEventTracer(TestCoreEventSpanFactory.getTestCoreEventSpanFactoryInstance(),
+        getTestCoreEventTracer(TestSpanExportManager.getTestSpanExportManagerInstance(),
                                mockedMuleConfiguration);
     DistributedTraceContext distributedTraceContext = mock(DistributedTraceContext.class);
     coreEventTracer.endCurrentSpan(new FakeCoreEvent(new FakeCoreEventContext(distributedTraceContext)));
@@ -117,44 +115,37 @@ public class DefaultCoreEventTracerTestCase {
   }
 
   @NotNull
-  private CoreEventTracer getTestCoreEventTracer(CoreEventSpanFactory mockedCoreEventSpanFactory,
+  private CoreEventTracer getTestCoreEventTracer(InternalSpanExportManager<EventContext> mockedSpanExporterManager,
                                                  MuleConfiguration mockedMuleConfiguration) {
     return getCoreEventTracerBuilder()
-        .withDefaultCoreEventSpanFactory(mockedCoreEventSpanFactory)
+        .withSpanExporterManager(mockedSpanExporterManager)
         .withMuleConfiguration(mockedMuleConfiguration)
         .build();
   }
 
   /**
-   * A {@link CoreEventSpanFactory} for testing purposes.
+   * A {@link InternalSpanExportManager} for testing purposes.
    */
-  private static class TestCoreEventSpanFactory implements CoreEventSpanFactory {
+  private static class TestSpanExportManager implements InternalSpanExportManager<EventContext> {
 
-    public static CoreEventSpanFactory getTestCoreEventSpanFactoryInstance() {
-      return new TestCoreEventSpanFactory();
+    public static TestSpanExportManager getTestSpanExportManagerInstance() {
+      return new TestSpanExportManager();
     }
 
     @Override
-    public InternalSpan getSpan(CoreEvent coreEvent, Component component, MuleConfiguration muleConfiguration) {
-      return new ExecutionSpan(getSpanName(component.getIdentifier()),
-                               componentSpanIdentifierFrom(muleConfiguration.getId(),
-                                                           component.getLocation(),
-                                                           coreEvent.getCorrelationId()),
-                               currentTimeMillis(),
-                               null,
-                               getCurrentSpan(coreEvent.getContext()).orElse(null));
-    }
+    public InternalSpanExporter getInternalSpanExporter(EventContext context, InternalSpan internalSpan) {
+      return new InternalSpanExporter() {
 
-    @Override
-    public InternalSpan getSpan(CoreEvent coreEvent, Component component, MuleConfiguration muleConfiguration,
-                                CoreEventSpanCustomizer coreEventSpanCustomizer) {
-      return new ExecutionSpan(coreEventSpanCustomizer.getName(coreEvent, component),
-                               componentSpanIdentifierFrom(muleConfiguration.getId(),
-                                                           component.getLocation(),
-                                                           coreEvent.getCorrelationId()),
-                               currentTimeMillis(),
-                               null,
-                               getCurrentSpan(coreEvent.getContext()).orElse(null));
+        @Override
+        public void export(InternalSpan internalSpan) {
+          // nothing to do.
+        }
+
+        @Override
+        public <T> T visit(InternalSpanExporterVisitor<T> internalSpanExporterVisitor) {
+          return null;
+        }
+      };
     }
   }
 

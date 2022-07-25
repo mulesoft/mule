@@ -19,11 +19,10 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExporterFactory;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanFactory;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExecutionSpan;
-import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
 
 /**
  * A {@link CoreEventSpanFactory} that provides {@link org.mule.runtime.api.profiling.tracing.Span} that exports the
@@ -34,10 +33,10 @@ import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
 public class ExportOnEndCoreEventSpanFactory implements CoreEventSpanFactory {
 
   private static final CoreEventSpanCustomizer defaultCoreEventSpanCustomizer = new DefaultEventSpanCustomizer();
-  private final InternalSpanExporterFactory<?> internalSpanExporterFactory;
+  private final InternalSpanExportManager<EventContext> internalSpanExportManager;
 
-  public ExportOnEndCoreEventSpanFactory(InternalSpanExporterFactory<?> internalSpanExporterFactory) {
-    this.internalSpanExporterFactory = internalSpanExporterFactory;
+  public ExportOnEndCoreEventSpanFactory(InternalSpanExportManager<EventContext> internalSpanExportManager) {
+    this.internalSpanExportManager = internalSpanExportManager;
   }
 
   @Override
@@ -65,12 +64,7 @@ public class ExportOnEndCoreEventSpanFactory implements CoreEventSpanFactory {
                                                  null,
                                                  getCurrentSpan(eventContext).orElse(null)),
                                eventContext,
-                               internalSpanExporterFactory);
-  }
-
-  @Override
-  public ExportedSpanCapturer getExportedSpanCapturer() {
-    return internalSpanExporterFactory.getExportedSpanCapturer();
+                               internalSpanExportManager);
   }
 
   private static final class DefaultEventSpanCustomizer implements CoreEventSpanCustomizer {

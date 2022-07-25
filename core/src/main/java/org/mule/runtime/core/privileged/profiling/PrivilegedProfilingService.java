@@ -31,23 +31,29 @@ public interface PrivilegedProfilingService extends ProfilingService {
   <T extends ProfilingEventContext> void registerProfilingDataConsumer(ProfilingDataConsumer<T> profilingDataConsumer);
 
   /**
-   * @return gets an {@link ExportedSpanCapturer}.
+   * @return gets an {@link SpanExportManager}.
    *
    *         This is used for capturing spans in privileged modules but should not be exposed as API.
    *
    * @since 4.5.0
    */
-  default ExportedSpanCapturer getExportedSpanCapturer() {
-    return new ExportedSpanCapturer() {
+  default SpanExportManager getSpanExportManager() {
+    return new SpanExportManager() {
 
       @Override
-      public Collection<CapturedExportedSpan> getExportedSpans() {
-        return emptySet();
-      }
+      public ExportedSpanCapturer getExportedSpanCapturer() {
+        return new ExportedSpanCapturer() {
 
-      @Override
-      public void dispose() {
-        // Nothing to dispose.
+          @Override
+          public Collection<CapturedExportedSpan> getExportedSpans() {
+            return emptySet();
+          }
+
+          @Override
+          public void dispose() {
+            // Nothing to dispose.
+          }
+        };
       }
     };
   }

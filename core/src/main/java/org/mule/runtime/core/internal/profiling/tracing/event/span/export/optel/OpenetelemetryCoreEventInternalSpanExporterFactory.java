@@ -48,7 +48,6 @@ public class OpenetelemetryCoreEventInternalSpanExporterFactory implements Inter
     return new OpentelemetrySpanExporter(TRACER, eventContext, internalSpan);
   }
 
-  @Override
   public ExportedSpanCapturer getExportedSpanCapturer() {
     return getNewExportedSpanCapturer();
   }
