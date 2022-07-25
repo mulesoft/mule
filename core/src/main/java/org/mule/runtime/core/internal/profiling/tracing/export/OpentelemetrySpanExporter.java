@@ -55,7 +55,6 @@ public class OpentelemetrySpanExporter implements InternalSpanExporter {
     this.tracer = tracer;
     remoteContext = resolveRemoteContext(eventContext);
     openTelemetrySpan = resolveOpentelemetrySpan(internalSpan);
-
   }
 
   @Override
