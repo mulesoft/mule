@@ -7,7 +7,6 @@
 package org.mule.runtime.core.privileged.exception;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
-import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
@@ -19,6 +18,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.addContext;
+import static org.mule.runtime.core.internal.util.LocationUtils.globalLocation;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 
@@ -31,7 +31,6 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.newSetFromMap;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static java.util.regex.Pattern.compile;
@@ -307,7 +306,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     if (fromGlobalErrorHandler && reuseGlobalErrorHandler()) {
       processingStrategy = getProcessingStrategyFromGlobalErrorHandler(locator);
     } else if (flowLocation.isPresent()) {
-      Location location = builderFromStringRepresentation(flowLocation.get()).build();
+      Location location = globalLocation(flowLocation.get());
       processingStrategy = getProcessingStrategy(locator, location);
     } else {
       processingStrategy = getProcessingStrategy(locator, this);
