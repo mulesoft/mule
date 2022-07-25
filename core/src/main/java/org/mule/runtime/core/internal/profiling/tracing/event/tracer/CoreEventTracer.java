@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.profiling.tracing.event.tracer;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.profiling.InternalSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
 
 /**

@@ -5,7 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.internal.profiling;
+package org.mule.runtime.core.internal.profiling.tracing.event.span;
+
+import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 
 import java.util.Optional;
 

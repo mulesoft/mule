@@ -7,11 +7,9 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
-import io.opentelemetry.sdk.trace.data.SpanData;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.profiling.InternalSpan;
 import org.mule.runtime.core.privileged.profiling.CapturedExportedSpan;
 import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
 

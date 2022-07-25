@@ -18,13 +18,15 @@ import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.api.profiling.tracing.TracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpanVisitor;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
+import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 
 import java.util.function.Function;
 
-import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
-import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
-import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -36,7 +38,7 @@ import reactor.core.publisher.Mono;
  */
 public class NoOpProfilingService implements InternalProfilingService, PrivilegedProfilingService {
 
-  private CoreEventTracer eventTracer = new NoOpCoreEventTracer();
+  private final CoreEventTracer eventTracer = new NoOpCoreEventTracer();
 
   private final TracingService noOpTracingService = new TracingService() {
 
@@ -152,7 +154,7 @@ public class NoOpProfilingService implements InternalProfilingService, Privilege
 
     @Override
     public void endCurrentSpan(CoreEvent coreEvent) {
-
+      // Nothing to do.
     }
 
     private static class NoOpInternalSpan {
@@ -161,7 +163,12 @@ public class NoOpProfilingService implements InternalProfilingService, Privilege
 
         @Override
         public void end() {
+          // Nothing to do.
+        }
 
+        @Override
+        public <T> T visit(InternalSpanVisitor<T> visitor) {
+          return null;
         }
 
         @Override

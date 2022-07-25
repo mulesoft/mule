@@ -47,7 +47,7 @@ public interface PrivilegedProfilingService extends ProfilingService {
 
       @Override
       public void dispose() {
-
+        // Nothing to dispose.
       }
     };
   }
@@ -58,6 +58,8 @@ public interface PrivilegedProfilingService extends ProfilingService {
    * @param coreEvent the {@link CoreEvent} that has hit the {@link Component}
    * @param component the {@link Component} that was hit by the {@link CoreEvent}
    *
+   *                  TODO: W-11486418 - Improve FlowRunner Creation of Spans
+   *
    * @since 4.5.0
    */
   default void startComponentSpan(CoreEvent coreEvent, Component component) {}
@@ -66,6 +68,8 @@ public interface PrivilegedProfilingService extends ProfilingService {
    * End a component span. This is used as a privileged api only for testing.
    *
    * @param coreEvent the {@link CoreEvent}.
+   *
+   *                  TODO: W-11486418 - Improve FlowRunner Creation of Spans
    *
    * @since 4.5.0
    */

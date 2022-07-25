@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.internal.profiling.tracing.event.span.optel.config;
+package org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.config;
 
 /**
  * A configuration for the export of open telemetry spans.

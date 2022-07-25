@@ -11,7 +11,6 @@ import static java.lang.System.currentTimeMillis;
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
-import org.mule.runtime.core.internal.profiling.InternalSpan;
 
 /**
  * A {@link Span} that represents the trace corresponding to the execution of mule flow or component.
@@ -58,6 +57,11 @@ public class ExecutionSpan implements InternalSpan {
   @Override
   public void end() {
     this.endTime = currentTimeMillis();
+  }
+
+  @Override
+  public <T> T visit(InternalSpanVisitor<T> visitor) {
+    return visitor.accept(this);
   }
 
   /**

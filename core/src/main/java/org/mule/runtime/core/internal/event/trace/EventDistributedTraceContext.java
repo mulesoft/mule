@@ -9,11 +9,11 @@ package org.mule.runtime.core.internal.event.trace;
 
 import static org.mule.runtime.core.internal.event.trace.extractor.RuntimeEventTraceExtractors.getDefaultBaggageExtractor;
 import static org.mule.runtime.core.internal.event.trace.extractor.RuntimeEventTraceExtractors.getDefaultTraceContextFieldsExtractor;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan.getAsInternalSpan;
 
 import static java.util.Optional.ofNullable;
 
-import org.mule.runtime.api.profiling.tracing.Span;
-import org.mule.runtime.core.internal.profiling.InternalSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
 import org.mule.runtime.core.internal.event.trace.extractor.TraceContextFieldExtractor;
 
@@ -38,6 +38,10 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
 
   public static EventDistributedContextBuilder builder() {
     return new EventDistributedContextBuilder();
+  }
+
+  public static DistributedTraceContext emptyDistributedTraceContext() {
+    return new EventDistributedTraceContext(new HashMap<>(), new HashMap<>());
   }
 
   private EventDistributedTraceContext(TraceContextFieldExtractor tracingFieldExtractor,
@@ -90,11 +94,7 @@ public class EventDistributedTraceContext implements DistributedTraceContext {
   }
 
   private InternalSpan resolveParentAsInternalSpan() {
-    Span parentSpan = currentSpan.getParent();
-    if (parentSpan != null) {
-      return (InternalSpan) parentSpan;
-    }
-    return null;
+    return getAsInternalSpan(currentSpan.getParent());
   }
 
   @Override
