@@ -38,7 +38,7 @@ public interface CoreEventSpanCustomizer {
    * @param muleConfiguration the {@link MuleConfiguration} corresponding to span being created.
    * @param artifactType      the {@link ArtifactType} corresponding to span being created.
    *
-   *  @return the attributes of the span being created.
+   * @return the attributes of the span being created.
    */
   default Map<String, String> getAttributes(CoreEvent coreEvent, Component component, MuleConfiguration muleConfiguration,
                                             ArtifactType artifactType) {
