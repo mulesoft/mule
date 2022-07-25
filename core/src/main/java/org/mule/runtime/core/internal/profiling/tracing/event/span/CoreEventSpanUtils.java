@@ -12,7 +12,9 @@ import static org.mule.runtime.core.internal.profiling.tracing.event.span.export
 import static java.util.Optional.empty;
 
 import io.opentelemetry.sdk.trace.export.SpanExporter;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
@@ -47,6 +49,18 @@ public class CoreEventSpanUtils {
     }
 
     return empty();
+  }
+
+  /**
+   * @param componentLocation the component location
+   * @return componentLocation as string or unknown
+   */
+  public static String getLocationAsString(ComponentLocation componentLocation) {
+    if (componentLocation != null) {
+      return componentLocation.getLocation();
+    }
+
+    return UNKNOWN;
   }
 
   /**

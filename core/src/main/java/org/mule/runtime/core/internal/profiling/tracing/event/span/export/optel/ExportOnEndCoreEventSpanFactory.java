@@ -8,6 +8,7 @@
 package org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel;
 
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.ComponentSpanIdentifier.componentSpanIdentifierFrom;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getLocationAsString;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getCurrentSpan;
 
@@ -18,6 +19,7 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
@@ -109,7 +111,7 @@ public class ExportOnEndCoreEventSpanFactory implements CoreEventSpanFactory {
     public Map<String, String> getAttributes(CoreEvent coreEvent, Component component,
                                              MuleConfiguration muleConfiguration, ArtifactType artifactType) {
       Map<String, String> attributes = new HashMap<>();
-      attributes.put(LOCATION_KEY, component.getLocation().getLocation());
+      attributes.put(LOCATION_KEY, getLocationAsString(component.getLocation()));
       attributes.put(CORRELATION_ID_KEY, coreEvent.getCorrelationId());
       attributes.put(ARTIFACT_ID_KEY, muleConfiguration.getId());
       attributes.put(ARTIFACT_TYPE_ID, artifactType.getAsString());
