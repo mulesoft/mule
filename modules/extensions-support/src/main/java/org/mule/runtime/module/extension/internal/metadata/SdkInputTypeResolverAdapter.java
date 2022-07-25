@@ -4,7 +4,6 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.module.extension.internal.metadata;
 
 import org.mule.metadata.api.model.MetadataType;
@@ -35,5 +34,9 @@ public class SdkInputTypeResolverAdapter implements InputTypeResolver {
   @Override
   public String getResolverName() {
     return delegate.getResolverName();
+  }
+
+  public org.mule.runtime.api.metadata.resolving.InputTypeResolver getDelegate() {
+    return delegate;
   }
 }

@@ -31,6 +31,8 @@ public class MuleInputTypeResolverAdapter implements InputTypeResolver {
       return (InputTypeResolver) resolver;
     } else if (resolver instanceof NullMetadataResolver) {
       return new org.mule.runtime.extension.api.metadata.NullMetadataResolver();
+    } else if (resolver instanceof SdkInputTypeResolverAdapter) {
+      return ((SdkInputTypeResolverAdapter) resolver).getDelegate();
     } else if (resolver instanceof org.mule.sdk.api.metadata.resolving.InputTypeResolver) {
       return new MuleInputTypeResolverAdapter((org.mule.sdk.api.metadata.resolving.InputTypeResolver) resolver);
     } else {
@@ -49,7 +51,7 @@ public class MuleInputTypeResolverAdapter implements InputTypeResolver {
   @Override
   public MetadataType getInputMetadata(MetadataContext context, Object key)
       throws MetadataResolvingException, ConnectionException {
-    return null;
+    return delegate.getInputMetadata(new SdkMetadataContextAdapter(context), key);
   }
 
   @Override

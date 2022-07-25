@@ -14,7 +14,6 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
-import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.sdk.api.metadata.NullMetadataResolver;
 
 public class MuleAttributesTypeResolverAdapter implements AttributesTypeResolver {
@@ -37,8 +36,8 @@ public class MuleAttributesTypeResolverAdapter implements AttributesTypeResolver
     } else {
       throw new IllegalArgumentException(format("Resolver of class '%s' is neither a '%s' nor a '%s'",
                                                 resolver.getClass().getName(),
-                                                OutputTypeResolver.class.getName(),
-                                                org.mule.sdk.api.metadata.resolving.OutputTypeResolver.class.getName()));
+                                                AttributesTypeResolver.class.getName(),
+                                                org.mule.sdk.api.metadata.resolving.AttributesTypeResolver.class.getName()));
     }
   }
 

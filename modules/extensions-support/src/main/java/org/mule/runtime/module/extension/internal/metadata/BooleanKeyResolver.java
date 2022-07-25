@@ -7,12 +7,13 @@
 package org.mule.runtime.module.extension.internal.metadata;
 
 import static java.util.Collections.unmodifiableSet;
-import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
+import static org.mule.sdk.api.metadata.MetadataKeyBuilder.newKey;
+
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.metadata.MetadataContext;
-import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
+import org.mule.sdk.api.metadata.MetadataContext;
+import org.mule.sdk.api.metadata.MetadataKey;
+import org.mule.sdk.api.metadata.resolving.TypeKeysResolver;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -37,7 +38,7 @@ public final class BooleanKeyResolver implements TypeKeysResolver {
   };
   private final String categoryName;
 
-  BooleanKeyResolver(String categoryName) {
+  public BooleanKeyResolver(String categoryName) {
     this.categoryName = categoryName;
   }
 
