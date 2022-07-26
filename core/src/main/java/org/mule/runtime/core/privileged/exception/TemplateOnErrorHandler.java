@@ -330,7 +330,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   // Todo: we are evaluating if this is needed. If no propagation of the ps is needed we can avoid this (and the overhead
   // involved).
   private Optional<ProcessingStrategy> getProcessingStrategyFromGlobalErrorHandler(ConfigurationComponentLocator locator) {
-    return of(new OnRuntimeProcessingStrategy(locator));
+    return Optional.of(new OnRuntimeProcessingStrategy(locator));
   }
 
   @Override
