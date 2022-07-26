@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.internal.profiling.consumer.tracing;
 
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.ComponentSpanIdentifier.componentSpanIdentifierFrom;
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracer.getCoreEventTracerBuilder;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
@@ -36,6 +37,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
@@ -120,6 +122,7 @@ public class DefaultCoreEventTracerTestCase {
     return getCoreEventTracerBuilder()
         .withSpanExporterManager(mockedSpanExporterManager)
         .withMuleConfiguration(mockedMuleConfiguration)
+        .withArtifactType(APP)
         .build();
   }
 
