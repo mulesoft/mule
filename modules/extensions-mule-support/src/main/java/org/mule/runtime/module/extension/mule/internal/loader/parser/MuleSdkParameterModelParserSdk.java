@@ -6,11 +6,10 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
-import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
-import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.STRING;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.core.api.type.catalog.SpecialTypesTypeLoader.VOID;
+import static org.mule.runtime.extension.internal.loader.enricher.ConfigRefDeclarationEnricher.buildConfigRefType;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -18,6 +17,7 @@ import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.annotation.TypeAnnotation;
@@ -63,6 +63,7 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
   private String name;
   private MetadataType type;
   private List<StereotypeModel> allowedStereotypes = emptyList();
+  private Optional<ParameterDslConfiguration> dslConfiguration = empty();
   private ParameterLayoutParser parameterLayoutParser;
 
   public MuleSdkParameterModelParserSdk(ComponentAst parameterAst, TypeLoader typeLoader,
@@ -139,7 +140,8 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
     }
 
     // Sets the type as the string primitive and the allowed stereotype to the one from the configuration model
-    this.type = PRIMITIVE_TYPES.get(STRING);
+    this.type = buildConfigRefType();
+    this.dslConfiguration = of(ParameterDslConfiguration.builder().allowsReferences(true).build());
     this.allowedStereotypes = singletonList(configurationModel.get().getStereotype());
     return true;
   }
@@ -199,7 +201,7 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
 
   @Override
   public Optional<ParameterDslConfiguration> getDslConfiguration() {
-    return empty();
+    return dslConfiguration;
   }
 
   @Override

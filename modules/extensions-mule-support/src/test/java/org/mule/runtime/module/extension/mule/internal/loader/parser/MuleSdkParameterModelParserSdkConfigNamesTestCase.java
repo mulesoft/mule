@@ -7,8 +7,6 @@
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
-import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.STRING;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIG;
@@ -26,12 +24,14 @@ import static org.mockito.Mockito.mock;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.MetadataTypeEnricher;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -92,8 +92,12 @@ public class MuleSdkParameterModelParserSdkConfigNamesTestCase extends AbstractM
   @Description("Checks that when the parameter type matches a configuration from an extension, it is treated as a configuration name")
   public void parameterTypeMatchingConfigurationFromOtherExtensionIsTreatedAsReference() {
     StereotypeModel expectedStereotype = newStereotype("some-config", "SOME").withParent(CONFIG).build();
+    MetadataType expectedType = BaseTypeBuilder.create(JAVA).objectType()
+        .id(ConfigurationProvider.class.getName())
+        .with(new ClassInformationAnnotation(ConfigurationProvider.class))
+        .build();
     MuleSdkParameterModelParserSdk parameterModelParser = baseParameterParserBuilder.withType("some:some-config").build();
-    assertThat(parameterModelParser.getType(), is(PRIMITIVE_TYPES.get(STRING)));
+    assertThat(parameterModelParser.getType(), is(expectedType));
     assertThat(parameterModelParser.getAllowedStereotypes(mock(StereotypeModelFactory.class)), contains(expectedStereotype));
   }
 
