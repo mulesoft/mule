@@ -17,11 +17,13 @@ import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
+import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.management.stats.ApplicationStatistics;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * <code>AllStatistics</code> TODO
@@ -35,6 +37,10 @@ public class AllStatistics {
   private final ApplicationStatistics appStats;
   private final Map<String, FlowConstructStatistics> flowConstructStats = new HashMap<>();
   private final Map<String, PayloadStatistics> payloadStatistics = emptyMap();
+  private final AtomicInteger declaredPrivateFlows = new AtomicInteger(0);
+  private final AtomicInteger activePrivateFlows = new AtomicInteger(0);
+  private final AtomicInteger declaredTriggerFlows = new AtomicInteger(0);
+  private final AtomicInteger activeTriggerFlows = new AtomicInteger(0);
 
   /**
    *
@@ -51,6 +57,10 @@ public class AllStatistics {
       statistics.clear();
     }
     startTime = currentTimeMillis();
+    declaredPrivateFlows.set(0);
+    activePrivateFlows.set(0);
+    declaredTriggerFlows.set(0);
+    activeTriggerFlows.set(0);
   }
 
   /**
@@ -72,7 +82,6 @@ public class AllStatistics {
   }
 
   /**
-   *
    * @deprecated since 4.4.1, 4.5.0. Payload statistics are no longer supported, this method does nothing.
    */
   @Experimental
@@ -131,12 +140,12 @@ public class AllStatistics {
   @Deprecated
   public PayloadStatistics computePayloadStatisticsIfAbsent(Component component) {
     return payloadStatistics.computeIfAbsent(component.getLocation().getLocation(),
-                                             loc -> {
-                                               final PayloadStatistics statistics =
-                                                   new PayloadStatistics(loc, component.getIdentifier().toString());
-                                               statistics.setEnabled(isPayloadStatisticsEnabled());
-                                               return statistics;
-                                             });
+        loc -> {
+          final PayloadStatistics statistics =
+              new PayloadStatistics(loc, component.getIdentifier().toString());
+          statistics.setEnabled(isPayloadStatisticsEnabled());
+          return statistics;
+        });
   }
 
   /**
@@ -163,6 +172,134 @@ public class AllStatistics {
   }
 
   /**
+   * Increments the counter of private flows declared in the application. The flow is considered private when it doesn't contain
+   * a {@link MessageSource}
+   *
+   * @return The number of declared private flows
+   * @since 4.5.0
+   */
+  @Experimental
+  public int addDeclaredPrivateFlow() {
+    return declaredPrivateFlows.incrementAndGet();
+  }
+
+  /**
+   * Increments the counter of active private flows declared in the application. The flow is considered private when it doesn't
+   * contain a {@link MessageSource}.
+   * <p>
+   * The flow is also considered active when it's in {@code started} state.
+   *
+   * @return The number of started private flows
+   * @since 4.5.0
+   */
+  @Experimental
+  public int addActivePrivateFlow() {
+    return activePrivateFlows.incrementAndGet();
+  }
+
+  /**
+   * Increments the counter of trigger flows declared in the application. Trigger flows are those which include a
+   * {@link MessageSource}.
+   * <p>
+   * The flow is also considered active when it's in {@code started} state.
+   *
+   * @return The number of declared trigger flows
+   * @since 4.5.0
+   */
+  @Experimental
+  public int addDeclaredTriggerFlow() {
+    return declaredTriggerFlows.incrementAndGet();
+  }
+
+  /**
+   * Increments the counter of trigger flows in the application. Trigger flows are those which include a
+   * {@link MessageSource}.
+   * <p>
+   * The flow is also considered active when it's in {@code started} state.
+   *
+   * @return The number of declared private flows
+   * @since 4.5.0
+   */
+  @Experimental
+  public int addActiveTriggerFlow() {
+    return activeTriggerFlows.incrementAndGet();
+  }
+
+  /**
+   * Decrements the active trigger flow counter
+   *
+   * @return the updated counter value
+   * @since 4.5.0
+   */
+  @Experimental
+  public int decrementActiveTriggerFlow() {
+    return activeTriggerFlows.addAndGet(-1);
+  }
+
+  /**
+   * Decrements the active private flow counter
+   *
+   * @return the updated counter value
+   * @since 4.5.0
+   */
+  @Experimental
+  public int decrementActivePrivateFlow() {
+    return activePrivateFlows.addAndGet(-1);
+  }
+
+  /**
+   * Returns the counter of private flows declared in the application. Trigger flows are those which include a
+   * {@link MessageSource}.
+   *
+   * @return The number of declared private flows
+   * @since 4.5.0
+   */
+  @Experimental
+  public int getDeclaredPrivateFlows() {
+    return declaredPrivateFlows.get();
+  }
+
+  /**
+   * Returns the counter of trigger flows in the application. Trigger flows are those which include a
+   * {@link MessageSource}.
+   * <p>
+   * The flow is also considered active when it's in {@code started} state.
+   *
+   * @return The number of declared private flows
+   * @since 4.5.0
+   */
+  @Experimental
+  public int getActivePrivateFlows() {
+    return activePrivateFlows.get();
+  }
+
+  /**
+   * Returns the counter of trigger flows declared in the application. Trigger flows are those which include a
+   * {@link MessageSource}.
+   *
+   * @return The number of declared private flows
+   * @since 4.5.0
+   */
+  @Experimental
+  public int getDeclaredTriggerFlows() {
+    return declaredTriggerFlows.get();
+  }
+
+  /**
+   * Returns the counter of trigger flows in the application. Trigger flows are those which include a
+   * {@link MessageSource}.
+   * <p>
+   * The flow is also considered active when it's in {@code started} state.
+   *
+   * @return The number of declared private flows
+   * @since 4.5.0
+   */
+  @Experimental
+  public int getActiveTriggerFlows() {
+    return activeTriggerFlows.get();
+  }
+
+  /**
    * Configures the {@link MuleRuntimeFeature#COMPUTE_CONNECTION_ERRORS_IN_STATS} feature flag.
    *
    * @since 4.4.0, 4.3.1
@@ -170,7 +307,7 @@ public class AllStatistics {
   public static void configureComputeConnectionErrorsInStats() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(COMPUTE_CONNECTION_ERRORS_IN_STATS,
-                                                featureContext -> featureContext.getArtifactMinMuleVersion()
-                                                    .filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
+        featureContext -> featureContext.getArtifactMinMuleVersion()
+            .filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
   }
 }

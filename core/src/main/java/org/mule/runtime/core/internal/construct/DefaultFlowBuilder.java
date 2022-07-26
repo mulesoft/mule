@@ -203,7 +203,7 @@ public class DefaultFlowBuilder implements Builder {
                           Integer maxConcurrency, FlowConstructStatistics flowConstructStatistics,
                           ComponentInitialStateManager componentInitialStateManager) {
       super(name, muleContext, source, processors, exceptionListener, processingStrategyFactory, initialState, maxConcurrency,
-            flowConstructStatistics, componentInitialStateManager);
+            muleContext.getStatistics(), flowConstructStatistics, componentInitialStateManager);
     }
 
     @Override

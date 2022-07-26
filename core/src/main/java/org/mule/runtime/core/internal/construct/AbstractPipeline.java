@@ -59,6 +59,7 @@ import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
+import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -129,11 +130,12 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private final ComponentInitialStateManager componentInitialStateManager;
   private final BackPressureStrategySelector backpressureStrategySelector;
   private final ErrorType FLOW_BACKPRESSURE_ERROR_TYPE;
+  private final AllStatistics allStatistics;
 
   public AbstractPipeline(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                           Optional<FlowExceptionHandler> exceptionListener,
                           Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
-                          Integer maxConcurrency, FlowConstructStatistics flowConstructStatistics,
+                          Integer maxConcurrency, AllStatistics allStatistics, FlowConstructStatistics flowConstructStatistics,
                           ComponentInitialStateManager componentInitialStateManager) {
     super(name, muleContext, exceptionListener, initialState, flowConstructStatistics);
 
@@ -159,6 +161,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                   this.processingStrategyFactory.getClass().getSimpleName());
     }
 
+    this.allStatistics = allStatistics;
     processingStrategy = this.processingStrategyFactory.create(muleContext, getName());
     backpressureStrategySelector = new BackPressureStrategySelector(this);
     FLOW_BACKPRESSURE_ERROR_TYPE = muleContext.getErrorTypeRepository().getErrorType(FLOW_BACK_PRESSURE).get();
@@ -246,6 +249,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
               .transform(dispatchToFlow());
         }
       });
+
+      allStatistics.addDeclaredTriggerFlow();
+    } else {
+      allStatistics.addDeclaredPrivateFlow();
     }
 
     initialiseIfNeeded(source, muleContext);
@@ -522,22 +529,27 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
 
     canProcessMessage = true;
-    if (source != null && getMuleContext().isStarted()) {
-      try {
-        if (componentInitialStateManager.mustStartMessageSource(source)) {
-          LOGGER.debug("Starting source of flow '{}'...", getName());
-          startIfStartable(source);
-        } else {
-          LOGGER.info("Not starting source for '{}' because of {}", getName(), componentInitialStateManager);
+    if (source != null) {
+      if (getMuleContext().isStarted()) {
+        try {
+          if (componentInitialStateManager.mustStartMessageSource(source)) {
+            LOGGER.debug("Starting source of flow '{}'...", getName());
+            startIfStartable(source);
+          } else {
+            LOGGER.info("Not starting source for '{}' because of {}", getName(), componentInitialStateManager);
+          }
+        } catch (ConnectException ce) {
+          // Let connection exceptions bubble up to trigger the reconnection strategy.
+          throw ce;
+        } catch (Exception e) {
+          // If the source couldn't be started we would need to stop the pipeline (if possible) in order to leave
+          // its LifecycleManager also as initialise phase so the flow can be disposed later
+          stopOnFailure(e);
         }
-      } catch (ConnectException ce) {
-        // Let connection exceptions bubble up to trigger the reconnection strategy.
-        throw ce;
-      } catch (Exception e) {
-        // If the source couldn't be started we would need to stop the pipeline (if possible) in order to leave
-        // its LifecycleManager also as initialise phase so the flow can be disposed later
-        stopOnFailure(e);
       }
+      allStatistics.addActiveTriggerFlow();
+    } else {
+      allStatistics.addActivePrivateFlow();
     }
   }
 
@@ -582,6 +594,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   @Override
   protected void doStop() throws MuleException {
     if (source != null) {
+      allStatistics.decrementActiveTriggerFlow();
       stopSafely(() -> {
         if (componentInitialStateManager.mustStartMessageSource(source)) {
           LOGGER.debug("Stopping source of flow '{}'...", getName());
@@ -590,6 +603,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
           LOGGER.info("Not stopping source for '{}', it was not started because of {}", getName(), componentInitialStateManager);
         }
       });
+    } else {
+      allStatistics.decrementActivePrivateFlow();
     }
     canProcessMessage = false;
 
