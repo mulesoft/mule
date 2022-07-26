@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static java.lang.Boolean.getBoolean;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_ROLLBACK;
+import static org.mule.runtime.api.util.MuleSystemProperties.COMMIT_REDELIVERY_EXHAUSTED;
 import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
 import static org.mule.runtime.core.api.transaction.TransactionUtils.profileTransactionAction;
@@ -23,6 +25,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.privileged.exception.MessageRedeliveredException;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
 import javax.inject.Inject;
@@ -37,6 +40,8 @@ import java.util.function.Function;
  * @since 4.0
  */
 public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
+
+  private static final Boolean COMMIT_ON_REDELIVERY = getBoolean(COMMIT_REDELIVERY_EXHAUSTED);
 
   private final SingleErrorTypeMatcher redeliveryExhaustedMatcher;
 
@@ -94,7 +99,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @param buildFor
    */
   @Override
@@ -116,12 +121,15 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   private boolean isRedeliveryExhausted(Exception exception) {
-    if (exception instanceof MessagingException) {
-      Optional<Error> error = ((MessagingException) exception).getEvent().getError();
-      return error.map(e -> redeliveryExhaustedMatcher.match(e.getErrorType()))
-          .orElse(false);
+    if (COMMIT_ON_REDELIVERY) {
+      if (exception instanceof MessagingException) {
+        Optional<Error> error = ((MessagingException) exception).getEvent().getError();
+        return error.map(e -> redeliveryExhaustedMatcher.match(e.getErrorType()))
+            .orElse(false);
+      }
+      return false;
+    } else {
+      return exception instanceof MessageRedeliveredException;
     }
-    return false;
   }
-
 }
