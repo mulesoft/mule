@@ -8,7 +8,13 @@
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
+
+import java.util.Map;
+
+import static java.util.Collections.emptyMap;
 
 /**
  * A Customizer for the creation of {@link InternalSpan}.
@@ -22,8 +28,21 @@ public interface CoreEventSpanCustomizer {
    *
    * @param coreEvent the {@link CoreEvent} to resolve the span name from.
    * @param component the {@link Component} to resolve the span name from.
-   * @return
+   * @return the name of the span.
    */
   String getName(CoreEvent coreEvent, Component component);
+
+  /**
+   * @param coreEvent         the {@link CoreEvent} corresponding to span being created.
+   * @param component         the {@link Component} corresponding to span being created.
+   * @param muleConfiguration the {@link MuleConfiguration} corresponding to span being created.
+   * @param artifactType      the {@link ArtifactType} corresponding to span being created.
+   *
+   * @return the attributes of the span being created.
+   */
+  default Map<String, String> getAttributes(CoreEvent coreEvent, Component component, MuleConfiguration muleConfiguration,
+                                            ArtifactType artifactType) {
+    return emptyMap();
+  }
 
 }

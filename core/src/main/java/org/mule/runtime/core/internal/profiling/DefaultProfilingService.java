@@ -100,6 +100,7 @@ public class DefaultProfilingService extends AbstractProfilingService {
     this.eventTracer = getCoreEventTracerBuilder()
         .withSpanExporterManager(SPAN_EXPORT_MANAGER)
         .withMuleConfiguration(muleContext.getConfiguration())
+        .withArtifactType(muleContext.getArtifactType())
         .build();
   }
 

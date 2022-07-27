@@ -375,6 +375,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
                 @Override
                 public void error(Throwable e) {
+                  EventContext eventContext = event.getContext();
+                  if (eventContext instanceof DistributedTraceContextAware) {
+                    ((DistributedTraceContextAware) eventContext).getDistributedTraceContext().endCurrentContextSpan();
+                  }
                   // if `sink.error` is called here, it will cancel the flux altogether.
                   // That's why an `Either` is used here,
                   // so the error can be propagated afterwards in a way consistent with our expected error handling.
@@ -803,10 +807,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                                 isTargetWithPolicies(event) ? valueReturnDelegate : returnDelegate));
     } finally {
       unsetCurrentLocation(wasProcessorPathSet);
-      EventContext eventContext = event.getContext();
-      if (eventContext instanceof DistributedTraceContextAware) {
-        ((DistributedTraceContextAware) eventContext).getDistributedTraceContext().endCurrentContextSpan();
-      }
     }
   }
 

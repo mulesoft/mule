@@ -7,9 +7,15 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
+
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
+
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * A {@link InternalSpan }used internally by the runtime. It defines an extension of the span contract that is only used
@@ -23,6 +29,30 @@ public interface InternalSpan extends Span {
    * Ends the span.
    */
   void end();
+
+  /**
+   * @return the attribute corresponding to the {@param key}
+   */
+  default Optional<String> getAttribute(String key) {
+    return empty();
+  }
+
+  /**
+   * Add an attribute
+   *
+   * @param key   key for the attribute
+   * @param value the value for the attribute added
+   */
+  default void addAttribute(String key, String value) {
+
+  }
+
+  /**
+   * @return the attributes as a map.
+   */
+  default Map<String, String> attributesAsMap() {
+    return emptyMap();
+  }
 
   /**
    * @param visitor the visitor

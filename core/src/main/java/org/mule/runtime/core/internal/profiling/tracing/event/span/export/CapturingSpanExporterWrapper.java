@@ -7,18 +7,23 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span.export;
 
+import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.privileged.profiling.CapturedExportedSpan;
 import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
+
+import static java.lang.String.valueOf;
 
 /**
  * A {@link SpanExporter} that captures the exported spans.
@@ -111,6 +116,13 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
       @Override
       public String getSpanId() {
         return spanData.getSpanId();
+      }
+
+      @Override
+      public Map<String, String> getAttributes() {
+        Map<String, String> attributes = new HashMap<>();
+        spanData.getAttributes().asMap().forEach((k, v) -> attributes.put(k.getKey(), valueOf(v)));
+        return attributes;
       }
     }
   }

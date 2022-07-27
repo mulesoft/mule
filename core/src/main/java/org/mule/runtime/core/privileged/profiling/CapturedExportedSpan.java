@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.privileged.profiling;
 
+import java.util.Map;
+
 /**
  * Encapsulates data corresponding to a captured exported span. This is only used for testing purposes and is not exposed as
  * general API.
@@ -31,4 +33,9 @@ public interface CapturedExportedSpan {
    * @return the span id.
    */
   String getSpanId();
+
+  /**
+   * @return the span attributes
+   */
+  Map<String, String> getAttributes();
 }
