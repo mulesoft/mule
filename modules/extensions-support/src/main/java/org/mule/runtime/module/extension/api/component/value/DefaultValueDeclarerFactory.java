@@ -13,8 +13,8 @@ import org.mule.runtime.extension.api.component.value.ValueDeclarer;
 public class DefaultValueDeclarerFactory extends AbstractValueDeclarerFactory {
 
   @Override
-  protected ValueDeclarer create(ParameterModel parameterModel) {
-    return null;
+  public ValueDeclarer create(ParameterModel parameterModel) {
+    return new DefaultValueDeclarer(parameterModel.getType(), parameterModel.getName(), parameterModel.getModelProperties());
   }
 
 }

@@ -162,7 +162,7 @@ public abstract class ExtensionDefinitionParser {
     this.definitionBuilder = definitionBuilder;
     this.dslResolver = dslResolver;
     this.parsingContext = ctx;
-    this.valueResolverFactory = new ValueResolverFactory(dslResolver);
+    this.valueResolverFactory = new ValueResolverFactory();
   }
 
   /**

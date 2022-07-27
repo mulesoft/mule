@@ -47,12 +47,6 @@ import org.mule.sdk.api.runtime.parameter.Literal;
  */
 public class ValueResolverFactory {
 
-  private final DslSyntaxResolver dslResolver;
-
-  public ValueResolverFactory(DslSyntaxResolver dslResolver) {
-    this.dslResolver = dslResolver;
-  }
-
   public <T> ValueResolver<T> of(String parameterName, MetadataType expectedType, Object value, Object defaultValue,
                                  ExpressionSupport expressionSupport, boolean required,
                                  Set<ModelProperty> modelProperties) {
@@ -169,7 +163,7 @@ public class ValueResolverFactory {
   private ValueResolver getValueResolverFromMetadataType(String paramName, MetadataType expected, Object value,
                                                          Object defaultValue, boolean acceptsReferences, Class<?> expectedClass) {
     ValueResolverFactoryTypeVisitor visitor =
-        new ValueResolverFactoryTypeVisitor(dslResolver, paramName, value, defaultValue, acceptsReferences,
+        new ValueResolverFactoryTypeVisitor(paramName, value, defaultValue, acceptsReferences,
                                             expectedClass);
     expected.accept(visitor);
     return visitor.getResolver();
