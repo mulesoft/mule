@@ -19,16 +19,17 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanFactory;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExecutionSpan;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * A {@link CoreEventSpanFactory} that provides {@link org.mule.runtime.api.profiling.tracing.Span} that exports the
@@ -117,7 +118,19 @@ public class ExportOnEndCoreEventSpanFactory implements CoreEventSpanFactory {
       attributes.put(ARTIFACT_TYPE_ID, artifactType.getAsString());
       attributes.put(THREAD_START_ID_KEY, Long.toString(Thread.currentThread().getId()));
       attributes.put(THREAD_START_NAME_KEY, Thread.currentThread().getName());
+      addLogggingVariablesAsAttributes(coreEvent, attributes);
       return attributes;
+    }
+
+    private void addLogggingVariablesAsAttributes(CoreEvent coreEvent, Map<String, String> attributes) {
+      if (coreEvent instanceof PrivilegedEvent) {
+        Optional<Map<String, String>> loggingVariables = ((PrivilegedEvent) coreEvent).getLoggingVariables();
+        if (loggingVariables.isPresent()) {
+          for (Map.Entry<String, String> entry : ((PrivilegedEvent) coreEvent).getLoggingVariables().get().entrySet()) {
+            attributes.put(entry.getKey(), entry.getValue());
+          }
+        }
+      }
     }
   }
 }
