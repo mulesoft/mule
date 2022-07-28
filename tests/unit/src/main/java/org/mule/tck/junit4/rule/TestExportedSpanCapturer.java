@@ -28,19 +28,23 @@ public class TestExportedSpanCapturer extends ExternalResource implements Export
 
   private ExportedSpanCapturer exportedSpanCapturer;
 
-  @Override protected void after() {
+  @Override
+  protected void after() {
     dispose();
   }
 
-  @Override public void dispose() {
+  @Override
+  public void dispose() {
     exportedSpanCapturer.dispose();
   }
 
-  @Override public Collection<CapturedExportedSpan> getExportedSpans() {
+  @Override
+  public Collection<CapturedExportedSpan> getExportedSpans() {
     return exportedSpanCapturer.getExportedSpans();
   }
 
-  @Override public void initialise() throws InitialisationException {
+  @Override
+  public void initialise() throws InitialisationException {
     if (exportedSpanCapturer == null) {
       exportedSpanCapturer = privilegedProfilingService.getSpanExportManager().getExportedSpanCapturer();
     }

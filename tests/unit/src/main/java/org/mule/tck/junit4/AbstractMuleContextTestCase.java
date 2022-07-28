@@ -311,7 +311,8 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     return context;
   }
 
-  private void injectDependenciesInRuleParameters(MuleContext muleContext, AbstractMuleContextTestCase abstractMuleContextTestCase) {
+  private void injectDependenciesInRuleParameters(MuleContext muleContext,
+                                                  AbstractMuleContextTestCase abstractMuleContextTestCase) {
     Field[] fields = abstractMuleContextTestCase.getClass().getFields();
 
     for (Field field : fields) {

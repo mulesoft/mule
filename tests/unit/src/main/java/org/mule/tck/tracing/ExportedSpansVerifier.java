@@ -53,7 +53,7 @@ public class ExportedSpansVerifier {
   /**
    * Indicates to the {@link ExportedSpansVerifier} that the attribute should be present with the corresponding value.
    *
-   * @param key the attribute key.
+   * @param key   the attribute key.
    * @param value the attribute value.
    *
    * @return the resulting {@link ExportedSpansVerifier}.
@@ -65,10 +65,10 @@ public class ExportedSpansVerifier {
 
 
   /**
-   * Indicates to the {@link ExportedSpansVerifier} that the attribute should be present with the corresponding value
-   * in all the span children.
+   * Indicates to the {@link ExportedSpansVerifier} that the attribute should be present with the corresponding value in all the
+   * span children.
    *
-   * @param key the attribute key.
+   * @param key   the attribute key.
    * @param value the attribute value.
    *
    * @return the resulting {@link ExportedSpansVerifier}.
@@ -103,7 +103,8 @@ public class ExportedSpansVerifier {
   }
 
   /**
-   * Indicates to the {@link ExportedSpansVerifier} that the attribute should be present in the captured span and all its children.
+   * Indicates to the {@link ExportedSpansVerifier} that the attribute should be present in the captured span and all its
+   * children.
    *
    * @param attribute the attribute key.
    *
@@ -116,8 +117,8 @@ public class ExportedSpansVerifier {
 
 
   /**
-   * Verifies that the {@param exportedSpanCapturer} captured {@link CapturedExportedSpan} according to the hierarchy
-   * defined in the verifier.
+   * Verifies that the {@param exportedSpanCapturer} captured {@link CapturedExportedSpan} according to the hierarchy defined in
+   * the verifier.
    *
    * @param exportedSpanCapturer the {@link ExportedSpanCapturer}
    */
@@ -129,7 +130,7 @@ public class ExportedSpansVerifier {
   }
 
   private void verify(ExportedSpanCapturer spanCapturer, String parentId,
-                     Map<String, String> attributesInAllChildren) {
+                      Map<String, String> attributesInAllChildren) {
     new ExportedSpanExpectedHierarchy(name, attributesToVerifyInSpan, attributesThatMustExist,
                                       spanChildren).verify(spanCapturer, parentId,
                                                            attributesInAllChildren,
@@ -137,21 +138,24 @@ public class ExportedSpansVerifier {
   }
 
   private static final class ExportedSpanExpectedHierarchy {
+
     private final String name;
     private final Map<String, String> attributes;
     private final List<ExportedSpansVerifier> children;
     private final Set<String> existingAttributes;
 
-    private ExportedSpanExpectedHierarchy(String name, Map<String, String> attributes, Set<String> existingAttributes, List<ExportedSpansVerifier> children) {
+    private ExportedSpanExpectedHierarchy(String name, Map<String, String> attributes, Set<String> existingAttributes,
+                                          List<ExportedSpansVerifier> children) {
       this.name = name;
       this.attributes = attributes;
       this.children = children;
       this.existingAttributes = existingAttributes;
     }
 
-    public void verify(ExportedSpanCapturer spanCapturer, String expectedParentId, Map<String, String> attributesInAllChildren, Set<String> existingAttributesInAllChildren) {
-      Optional<CapturedExportedSpan>
-        optionalCapturedExportedSpan = spanCapturer.getExportedSpans().stream().filter(span -> span.getName().equals(name)).findFirst();
+    public void verify(ExportedSpanCapturer spanCapturer, String expectedParentId, Map<String, String> attributesInAllChildren,
+                       Set<String> existingAttributesInAllChildren) {
+      Optional<CapturedExportedSpan> optionalCapturedExportedSpan =
+          spanCapturer.getExportedSpans().stream().filter(span -> span.getName().equals(name)).findFirst();
 
       if (!optionalCapturedExportedSpan.isPresent()) {
         fail("A Span with name" + name + " was not captured");
@@ -169,18 +173,21 @@ public class ExportedSpansVerifier {
         } else {
           String parentSpanId = capturedExportedSpan.getParent().get().getSpanId();
           if (!capturedExportedSpan.getParent().get().getSpanId().equals(expectedParentId)) {
-            fail("The expected parent span is wrong for span " + name + ": expected: " + expectedParentId + ", actual: " + parentSpanId);
+            fail("The expected parent span is wrong for span " + name + ": expected: " + expectedParentId + ", actual: "
+                + parentSpanId);
           }
         }
       }
 
-      assertExistingAttributes(capturedExportedSpan, resolveExistingAttributesToAssert(existingAttributes, existingAttributesInAllChildren));
+      assertExistingAttributes(capturedExportedSpan,
+                               resolveExistingAttributesToAssert(existingAttributes, existingAttributesInAllChildren));
       assertAttributes(capturedExportedSpan, resolveAttributesToAssert(attributes, attributesInAllChildren));
 
       children.forEach(hierarchy -> hierarchy.verify(spanCapturer, capturedExportedSpan.getSpanId(), attributesInAllChildren));
     }
 
-    private Set<String> resolveExistingAttributesToAssert(Set<String> existingAttributes, Set<String> existingAttributesInAllChildren) {
+    private Set<String> resolveExistingAttributesToAssert(Set<String> existingAttributes,
+                                                          Set<String> existingAttributesInAllChildren) {
       Set<String> resolvedExistingAttributes = new HashSet<>(existingAttributes);
       resolvedExistingAttributes.addAll(existingAttributesInAllChildren);
       return resolvedExistingAttributes;
@@ -195,7 +202,8 @@ public class ExportedSpansVerifier {
       });
     }
 
-    private Map<String, String> resolveAttributesToAssert(Map<String, String> attributes, Map<String, String> attributesInAllChildren) {
+    private Map<String, String> resolveAttributesToAssert(Map<String, String> attributes,
+                                                          Map<String, String> attributesInAllChildren) {
       Map<String, String> resolvedAttributes = new HashMap<>(attributes);
       attributesInAllChildren.forEach(resolvedAttributes::putIfAbsent);
       return resolvedAttributes;
