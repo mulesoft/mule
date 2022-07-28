@@ -7,7 +7,9 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span.export;
 
-import org.mule.runtime.core.api.util.StringUtils;
+import static java.lang.String.valueOf;
+import static java.util.stream.Collectors.toList;
+
 import org.mule.runtime.core.privileged.profiling.CapturedExportedSpan;
 import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
 
@@ -16,14 +18,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-
-import static java.lang.String.valueOf;
 
 /**
  * A {@link SpanExporter} that captures the exported spans.
@@ -84,7 +85,7 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
     public Collection<CapturedExportedSpan> getExportedSpans() {
       List<CapturedExportedSpan> exportedSpans = new ArrayList<>();
       for (SpanData spanData : spanData) {
-        exportedSpans.add(new SpanDataWrapper(spanData));
+        exportedSpans.add(new SpanDataWrapper(spanData, this));
       }
 
       return exportedSpans;
@@ -98,8 +99,10 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
     private static final class SpanDataWrapper implements CapturedExportedSpan {
 
       private final SpanData spanData;
+      private final ExportedSpanCapturer exportedSpanCapturer;
 
-      public SpanDataWrapper(SpanData spanData) {
+      private SpanDataWrapper(SpanData spanData, ExportedSpanCapturer exportedSpanCapturer) {
+        this.exportedSpanCapturer = exportedSpanCapturer;
         this.spanData = spanData;
       }
 
@@ -109,8 +112,18 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
       }
 
       @Override
-      public String getParentSpanId() {
-        return spanData.getParentSpanId();
+      public Optional<CapturedExportedSpan> getParent() {
+        return exportedSpanCapturer
+            .getExportedSpans().stream().filter(exportedSpan -> exportedSpan.getSpanId().equals(spanData.getParentSpanId()))
+            .findFirst();
+      }
+
+      @Override
+      public List<CapturedExportedSpan> getChildren() {
+        return exportedSpanCapturer.getExportedSpans().stream()
+            .filter(exportedSpan -> exportedSpan.getParent().map(parentSpan -> parentSpan.getSpanId()).orElse(null)
+                .equals(spanData.getSpanId()))
+            .collect(toList());
       }
 
       @Override

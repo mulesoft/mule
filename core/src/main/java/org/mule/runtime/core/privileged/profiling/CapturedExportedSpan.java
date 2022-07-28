@@ -7,7 +7,9 @@
 
 package org.mule.runtime.core.privileged.profiling;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Encapsulates data corresponding to a captured exported span. This is only used for testing purposes and is not exposed as
@@ -25,9 +27,14 @@ public interface CapturedExportedSpan {
   String getName();
 
   /**
-   * @return the paranet span id.
+   * @return the optional parent span.
    */
-  String getParentSpanId();
+  Optional<CapturedExportedSpan> getParent();
+
+  /**
+   * @return the children for this captured span.
+   */
+  List<CapturedExportedSpan> getChildren();
 
   /**
    * @return the span id.

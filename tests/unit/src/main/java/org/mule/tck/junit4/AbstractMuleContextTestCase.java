@@ -23,6 +23,7 @@ import static org.mule.runtime.api.component.AbstractComponent.ANNOTATION_NAME;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
@@ -34,6 +35,7 @@ import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingFo
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.junit.Rule;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -44,6 +46,7 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.scheduler.SchedulerView;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
@@ -294,6 +297,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         contextBuilder.setArtifactCoordinates(getTestArtifactCoordinates());
         configureMuleContext(contextBuilder);
         context = muleContextFactory.createMuleContext(builders, contextBuilder);
+        injectDependenciesInRuleParameters(context, this);
         recordSchedulersOnInit(context);
         if (!isGracefulShutdown()) {
           // Even though graceful shutdown is disabled allow small amount of time to avoid rejection errors when stream emits
@@ -305,6 +309,21 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
       }
     }
     return context;
+  }
+
+  private void injectDependenciesInRuleParameters(MuleContext muleContext, AbstractMuleContextTestCase abstractMuleContextTestCase) {
+    Field[] fields = abstractMuleContextTestCase.getClass().getFields();
+
+    for (Field field : fields) {
+      if (field.isAnnotationPresent(Rule.class)) {
+        try {
+          initialiseIfNeeded(field.get(this), muleContext);
+        } catch (Exception e) {
+          // Nothing to do. Just attempted to inject a rule.
+        }
+      }
+    }
+
   }
 
   protected DefaultMuleConfiguration createMuleConfiguration() {
