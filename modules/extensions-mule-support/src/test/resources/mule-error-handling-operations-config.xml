@@ -9,6 +9,19 @@
           http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd
           http://www.mulesoft.org/schema/mule/this http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd">
 
+    <flow name="newRaiseFlow">
+        <this:new-raise />
+    </flow>
+
+    <operation:def name="newRaise" displayName="." summary=".">
+        <operation:output>
+            <operation:payload-type type="void"/>
+        </operation:output>
+        <operation:body>
+            <operation:raise-error type="CUSTOM" />
+        </operation:body>
+    </operation:def>
+
     <!-- Use Case 1.1: Errors thrown by mule operations within the same app -->
 
     <flow name="raiseErrorWithinThisNamespace">

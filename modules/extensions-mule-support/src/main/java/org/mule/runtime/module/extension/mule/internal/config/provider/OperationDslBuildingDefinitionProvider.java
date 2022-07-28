@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.mule.internal.config.provider;
 
-import static java.util.Arrays.asList;
 import static org.mule.runtime.config.internal.dsl.processor.xml.OperationDslNamespaceInfoProvider.OPERATION_DSL_NAMESPACE;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
@@ -14,14 +13,17 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
+import static java.util.Arrays.asList;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
-import org.mule.runtime.module.extension.internal.runtime.operation.construct.Operation;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
+import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
+import org.mule.runtime.module.extension.internal.runtime.operation.construct.Operation;
+import org.mule.runtime.module.extension.mule.api.processor.MuleSdkRaiseErrorProcessor;
 import org.mule.runtime.module.extension.mule.internal.config.factory.DefaultOperationObjectFactory;
 
 import java.util.List;
@@ -35,6 +37,9 @@ public class OperationDslBuildingDefinitionProvider implements ComponentBuilding
 
   private static ComponentBuildingDefinition.Builder baseDefinition =
       new ComponentBuildingDefinition.Builder().withNamespace(OPERATION_DSL_NAMESPACE);
+
+  public OperationDslBuildingDefinitionProvider()  {
+  }
 
   @Override
   public void init() {}
@@ -55,6 +60,11 @@ public class OperationDslBuildingDefinitionProvider implements ComponentBuilding
                   baseDefinition.withIdentifier("body")
                       .withTypeDefinition(fromType(OperationBody.class))
                       .withSetterParameterDefinition("processors", fromChildCollectionConfiguration(Processor.class).build())
+                      .build(),
+                  baseDefinition.withIdentifier("raise-error")
+                      .withTypeDefinition(fromType(MuleSdkRaiseErrorProcessor.class))
+                      .withSetterParameterDefinition("type", fromSimpleParameter("type").build())
+                      .withSetterParameterDefinition("description", fromSimpleParameter("description").build())
                       .build());
   }
 
