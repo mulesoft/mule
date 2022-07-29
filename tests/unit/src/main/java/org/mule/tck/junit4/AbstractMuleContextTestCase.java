@@ -320,7 +320,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         try {
           initialiseIfNeeded(field.get(this), muleContext);
         } catch (Exception e) {
-          // Nothing to do. Just attempted to inject a rule.
+          // Nothing to do. Just attempted to inject dependencies in a rule.
         }
       }
     }

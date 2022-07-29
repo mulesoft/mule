@@ -81,11 +81,11 @@ public class ExportedSpansVerifier {
   /**
    * Indicates that the span has to have a child span that can be verified with the {@param childExportedSpanVerifier}
    *
-   * @param childExportedSpanVerifier
+   * @param childExportedSpanVerifier the {@link ExportedSpansVerifier}
    *
    * @return the resulting {@link ExportedSpansVerifier}.
    */
-  public ExportedSpansVerifier withChildExportedSpanVerifier(ExportedSpansVerifier childExportedSpanVerifier) {
+  public ExportedSpansVerifier withChildExportedSpan(ExportedSpansVerifier childExportedSpanVerifier) {
     spanChildren.add(childExportedSpanVerifier);
     return this;
   }
@@ -158,21 +158,22 @@ public class ExportedSpansVerifier {
           spanCapturer.getExportedSpans().stream().filter(span -> span.getName().equals(name)).findFirst();
 
       if (!optionalCapturedExportedSpan.isPresent()) {
-        fail("A Span with name" + name + " was not captured");
+        fail("A Span with name " + name + " was not captured");
       }
 
       CapturedExportedSpan capturedExportedSpan = optionalCapturedExportedSpan.get();
 
       if (expectedParentId == null && capturedExportedSpan.getParent().isPresent()) {
-        fail("The span" + name + " has a parent");
+        fail("The span " + name + " has parent");
       }
 
       if (expectedParentId != null) {
-        if (!capturedExportedSpan.getParent().isPresent()) {
-          fail("The span" + name + " has no parent");
+        Optional<CapturedExportedSpan> capturedParentSpanOptional = capturedExportedSpan.getParent();
+        if (!capturedParentSpanOptional.isPresent()) {
+          fail("The span " + name + " has no parent");
         } else {
-          String parentSpanId = capturedExportedSpan.getParent().get().getSpanId();
-          if (!capturedExportedSpan.getParent().get().getSpanId().equals(expectedParentId)) {
+          String parentSpanId = capturedParentSpanOptional.get().getSpanId();
+          if (!parentSpanId.equals(expectedParentId)) {
             fail("The expected parent span is wrong for span " + name + ": expected: " + expectedParentId + ", actual: "
                 + parentSpanId);
           }
@@ -211,8 +212,8 @@ public class ExportedSpansVerifier {
 
     private void assertAttributes(CapturedExportedSpan capturedSpan, Map<String, String> attrs) {
       attrs.forEach((key, value) -> {
-        Map<String, String> attributes = capturedSpan.getAttributes();
-        if (!attributes.containsKey(key) || !attributes.get(key).equals(value)) {
+        Map<String, String> attributesToAssert = capturedSpan.getAttributes();
+        if (!attributesToAssert.containsKey(key) || !attributesToAssert.get(key).equals(value)) {
           fail("The attribute " + key + " with value " + value + " is not present in span " + name);
         }
       });
