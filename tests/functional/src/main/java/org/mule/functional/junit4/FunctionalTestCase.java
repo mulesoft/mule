@@ -256,7 +256,9 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   @Override
   protected DefaultMuleConfiguration createMuleConfiguration() {
     if (enableLazyInit()) {
-      return new ReconfigurableMuleConfiguration();
+      DefaultMuleConfiguration muleConfiguration = new ReconfigurableMuleConfiguration();
+      configureMuleConfiguration(muleConfiguration);
+      return muleConfiguration;
     } else {
       return super.createMuleConfiguration();
     }
