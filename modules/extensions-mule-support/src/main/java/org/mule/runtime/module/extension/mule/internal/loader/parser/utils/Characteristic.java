@@ -218,10 +218,12 @@ public class Characteristic<T> {
 
     private static final String ERROR_TYPE_PARAM = "type";
 
-    private static final ComponentIdentifier RAISE_ERROR_IDENTIFIER = builder().namespace(OPERATION_DSL_NAMESPACE).name(RAISE_ERROR).build();
+    private static final ComponentIdentifier RAISE_ERROR_IDENTIFIER =
+        builder().namespace(OPERATION_DSL_NAMESPACE).name(RAISE_ERROR).build();
 
-    //TODO: Remove!
-    private static final ComponentIdentifier OLD_RAISE_ERROR_IDENTIFIER = builder().namespace(CORE_PREFIX).name(RAISE_ERROR).build();
+    // TODO: Remove!
+    private static final ComponentIdentifier OLD_RAISE_ERROR_IDENTIFIER =
+        builder().namespace(CORE_PREFIX).name(RAISE_ERROR).build();
 
     public AggregatedErrorsCharacteristic() {
       super(AggregatedErrorsCharacteristic::aggregator, emptyList(), null);
@@ -265,7 +267,7 @@ public class Characteristic<T> {
       return operationAst.getIdentifier().equals(RAISE_ERROR_IDENTIFIER);
     }
 
-    //TODO: Remove!
+    // TODO: Remove!
     private static void handleOldRaiseError(ComponentAst raiseErrorAst, List<ErrorModelParser> errorModels) {
       final ComponentParameterAst typeParameter = raiseErrorAst.getParameter(DEFAULT_GROUP_NAME, ERROR_TYPE_PARAM);
       if (null == typeParameter) {
@@ -273,7 +275,7 @@ public class Characteristic<T> {
       }
 
       Optional<ComponentIdentifier> errorId =
-              typeParameter.getValue().<String>getValue().map(typeAsString -> buildFromStringRepresentation(typeAsString));
+          typeParameter.getValue().<String>getValue().map(typeAsString -> buildFromStringRepresentation(typeAsString));
       if (!errorId.isPresent()) {
         return;
       }
@@ -281,7 +283,7 @@ public class Characteristic<T> {
       errorModels.add(new MuleSdkErrorModelParser(errorId.get().getNamespace(), errorId.get().getName(), null));
     }
 
-    //TODO: Remove!
+    // TODO: Remove!
     private static boolean isOldRaiseError(ComponentAst operationAst) {
       return operationAst.getIdentifier().equals(OLD_RAISE_ERROR_IDENTIFIER);
     }

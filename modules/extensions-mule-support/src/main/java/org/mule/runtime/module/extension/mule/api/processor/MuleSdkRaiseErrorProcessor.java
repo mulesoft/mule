@@ -19,12 +19,11 @@ import org.mule.runtime.core.api.processor.AbstractRaiseErrorProcessor;
  */
 public final class MuleSdkRaiseErrorProcessor extends AbstractRaiseErrorProcessor {
 
-    public MuleSdkRaiseErrorProcessor() {
-    }
+  public MuleSdkRaiseErrorProcessor() {}
 
-    @Override
-    protected ComponentIdentifier calculateErrorIdentifier(String typeId) {
-        return builder().namespace("THIS").name(typeId).build();
-    }
+  @Override
+  protected ComponentIdentifier calculateErrorIdentifier(String typeId) {
+    return builder().namespace("THIS").name(typeId).build();
+  }
 
 }
