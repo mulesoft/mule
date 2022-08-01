@@ -41,11 +41,12 @@ public class PetStoreExpressionConfigRefTestCase extends AbstractExtensionFuncti
   @Test
   @Description("When using a regular static reference it works as always")
   public void getPetsWithReference() throws Exception {
+    CoreEvent response = runFlow("getPetsWithReference");
+    List<String> pets = (List<String>) response.getMessage().getPayload().getValue();
+
     ConfigurationInstance config = muleContext.getExtensionManager().getConfiguration("paw-patrol-store", testEvent());
     assertThat(config, is(notNullValue()));
 
-    CoreEvent response = runFlow("getPetsWithReference");
-    List<String> pets = (List<String>) response.getMessage().getPayload().getValue();
     PetStoreConnector configValue = (PetStoreConnector) config.getValue();
     assertThat(pets, containsInAnyOrder(configValue.getPets().toArray()));
   }
@@ -53,11 +54,12 @@ public class PetStoreExpressionConfigRefTestCase extends AbstractExtensionFuncti
   @Test
   @Description("When using an expression involving variables from the event, it resolves the right configuration")
   public void getPetsWithExpression() throws Exception {
+    CoreEvent response = flowRunner("getPetsWithExpression").withVariable("storeName", "paw-patrol").run();
+    List<String> pets = (List<String>) response.getMessage().getPayload().getValue();
+
     ConfigurationInstance config = muleContext.getExtensionManager().getConfiguration("paw-patrol-store", testEvent());
     assertThat(config, is(notNullValue()));
 
-    CoreEvent response = flowRunner("getPetsWithExpression").withVariable("storeName", "paw-patrol").run();
-    List<String> pets = (List<String>) response.getMessage().getPayload().getValue();
     PetStoreConnector configValue = (PetStoreConnector) config.getValue();
     assertThat(pets, containsInAnyOrder(configValue.getPets().toArray()));
   }
