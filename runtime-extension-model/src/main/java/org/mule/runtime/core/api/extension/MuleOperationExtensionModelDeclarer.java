@@ -192,22 +192,22 @@ class MuleOperationExtensionModelDeclarer {
 
   private void declareRaiseError(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer raiseError = extensionDeclarer.withOperation("raiseError")
-            .describedAs("Throws an error with the specified type and description.")
-            .withModelProperty(new NoErrorMappingModelProperty());
+        .describedAs("Throws an error with the specified type and description.")
+        .withModelProperty(new NoErrorMappingModelProperty());
 
     raiseError.withOutput().ofType(VOID_TYPE);
     raiseError.withOutputAttributes().ofType(VOID_TYPE);
 
     raiseError.onDefaultParameterGroup()
-            .withRequiredParameter("type")
-            .ofType(ERROR_TYPE_DEFINITION)
-            .withExpressionSupport(NOT_SUPPORTED)
-            .describedAs("The error type to raise.");
+        .withRequiredParameter("type")
+        .ofType(ERROR_TYPE_DEFINITION)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The error type to raise.");
 
     raiseError.onDefaultParameterGroup()
-            .withOptionalParameter("description")
-            .ofType(STRING_TYPE)
-            .describedAs("The description of this error.");
+        .withOptionalParameter("description")
+        .ofType(STRING_TYPE)
+        .describedAs("The description of this error.");
   }
 
   private void declareOutputTypeParameters(NestedComponentDeclarer component, String outputRole) {
