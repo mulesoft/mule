@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel
 
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 
-import static java.lang.Boolean.getBoolean;
+import static java.lang.Boolean.parseBoolean;
 
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.CapturingSpanExporterWrapper;
 import org.mule.runtime.core.internal.profiling.tracing.export.SpanExporterConfiguration;
@@ -54,7 +54,7 @@ public class OpenTelemetryResourcesProvider {
   public static Tracer getOpenTelemetryTracer(SpanExporterConfiguration spanExporterConfiguration) {
     SdkTracerProviderBuilder sdkTracerProviderBuilder = SdkTracerProvider.builder();
 
-    if (getBoolean(spanExporterConfiguration.getValue(OPENTELEMETRY_EXPORT_ENABLED_SYSPROP))) {
+    if (parseBoolean(spanExporterConfiguration.getValue(OPENTELEMETRY_EXPORT_ENABLED_SYSPROP))) {
       sdkTracerProviderBuilder = sdkTracerProviderBuilder.addSpanProcessor(resolveExporterProcessor(spanExporterConfiguration));
     } else {
       sdkTracerProviderBuilder =
