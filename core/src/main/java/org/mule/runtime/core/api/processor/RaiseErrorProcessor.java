@@ -17,8 +17,8 @@ import org.mule.runtime.api.component.ComponentIdentifier;
  */
 public final class RaiseErrorProcessor extends AbstractRaiseErrorProcessor {
 
-    @Override
-    protected ComponentIdentifier calculateErrorIdentifier(String typeId) {
-        return buildFromStringRepresentation(typeId);
-    }
+  @Override
+  protected ComponentIdentifier calculateErrorIdentifier(String typeId) {
+    return buildFromStringRepresentation(typeId);
+  }
 }

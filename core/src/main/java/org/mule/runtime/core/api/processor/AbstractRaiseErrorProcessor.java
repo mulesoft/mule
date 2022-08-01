@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 package org.mule.runtime.core.api.processor;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -23,47 +29,49 @@ import javax.inject.Inject;
 
 public abstract class AbstractRaiseErrorProcessor extends AbstractComponent implements Processor, Initialisable {
 
-    private static final String DEFAULT_ERROR_MESSAGE = "An error occurred.";
+  private static final String DEFAULT_ERROR_MESSAGE = "An error occurred.";
 
-    private AttributeEvaluator descriptionEvaluator = new AttributeEvaluator(DEFAULT_ERROR_MESSAGE, STRING);
-    private String typeId;
-    private ErrorType errorType;
+  private AttributeEvaluator descriptionEvaluator = new AttributeEvaluator(DEFAULT_ERROR_MESSAGE, STRING);
+  private String typeId;
+  private ErrorType errorType;
 
-    @Inject
-    private ErrorTypeRepository errorTypeRepository;
+  @Inject
+  private ErrorTypeRepository errorTypeRepository;
 
-    @Inject
-    private ExtendedExpressionManager expressionManager;
+  @Inject
+  private ExtendedExpressionManager expressionManager;
 
-    @Override
-    public void initialise() throws InitialisationException {
-        // These validations are already covered by RaiseErrorTypeReferencesPresent and RaiseErrorTypeReferencesExist
-        // So it should never reach this point since these situations must be caught eagerly by those validations
-        if (isEmpty(typeId)) {
-            throw new InitialisationException(createStaticMessage("type cannot be an empty string or null"), this);
-        }
-
-        ComponentIdentifier errorTypeComponentIdentifier = calculateErrorIdentifier(typeId);
-
-        errorType = errorTypeRepository.lookupErrorType(errorTypeComponentIdentifier)
-                .orElseThrow(() -> new InitialisationException(createStaticMessage(format("Could not find error '%s'.", errorTypeComponentIdentifier)), this));
-
-        descriptionEvaluator.initialize(expressionManager);
+  @Override
+  public void initialise() throws InitialisationException {
+    // These validations are already covered by RaiseErrorTypeReferencesPresent and RaiseErrorTypeReferencesExist
+    // So it should never reach this point since these situations must be caught eagerly by those validations
+    if (isEmpty(typeId)) {
+      throw new InitialisationException(createStaticMessage("type cannot be an empty string or null"), this);
     }
 
-    protected abstract ComponentIdentifier calculateErrorIdentifier(String typeId);
+    ComponentIdentifier errorTypeComponentIdentifier = calculateErrorIdentifier(typeId);
 
-    @Override
-    public CoreEvent process(CoreEvent event) throws MuleException {
-        String message = descriptionEvaluator.resolveValue(event);
-        throw new TypedException(new DefaultMuleException(message), errorType);
-    }
+    errorType = errorTypeRepository.lookupErrorType(errorTypeComponentIdentifier)
+        .orElseThrow(() -> new InitialisationException(createStaticMessage(format("Could not find error '%s'.",
+                                                                                  errorTypeComponentIdentifier)),
+                                                       this));
 
-    public void setType(String type) {
-        this.typeId = type;
-    }
+    descriptionEvaluator.initialize(expressionManager);
+  }
 
-    public void setDescription(String description) {
-        this.descriptionEvaluator = new AttributeEvaluator(description, STRING);
-    }
+  protected abstract ComponentIdentifier calculateErrorIdentifier(String typeId);
+
+  @Override
+  public CoreEvent process(CoreEvent event) throws MuleException {
+    String message = descriptionEvaluator.resolveValue(event);
+    throw new TypedException(new DefaultMuleException(message), errorType);
+  }
+
+  public void setType(String type) {
+    this.typeId = type;
+  }
+
+  public void setDescription(String description) {
+    this.descriptionEvaluator = new AttributeEvaluator(description, STRING);
+  }
 }
