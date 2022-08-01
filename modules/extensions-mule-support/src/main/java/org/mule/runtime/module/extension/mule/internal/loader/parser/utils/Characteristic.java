@@ -260,6 +260,7 @@ public class Characteristic<T> {
         return;
       }
 
+      // TODO: Use the extension parser's namespace.
       errorModels.add(new MuleSdkErrorModelParser("THIS", errorId.get(), null));
     }
 
