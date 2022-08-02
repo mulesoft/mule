@@ -6,6 +6,12 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
+import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY;
+import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+
 import static java.lang.Long.MIN_VALUE;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
@@ -14,18 +20,13 @@ import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 import static java.time.Duration.ofMillis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
-import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY;
-import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.FluxSink.OverflowStrategy.BUFFER;
+import static reactor.core.publisher.Mono.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.util.LazyValue;
@@ -54,7 +55,6 @@ import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.core.publisher.EmitterProcessor;
 
 /**
@@ -322,9 +322,9 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     @Override
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
       reactor.core.scheduler.Scheduler scheduler = fromExecutorService(decorateScheduler(getFlowDispatcherScheduler()));
-      return publisher -> from(publisher).publishOn(scheduler)
+      return publisher -> from(publisher).flatMap(e -> just(e).publishOn(scheduler)
           .doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader))
-          .transform(pipeline);
+          .transform(pipeline));
     }
 
     @Override
