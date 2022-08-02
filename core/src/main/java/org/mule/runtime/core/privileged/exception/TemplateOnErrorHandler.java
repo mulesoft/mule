@@ -323,7 +323,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
     Optional<ProcessingStrategy> processingStrategy;
     if (fromGlobalErrorHandler && reuseGlobalErrorHandler()) {
       processingStrategy =
-        ofNullable(getDefaultProcessingStrategyFactory(muleContext).create(muleContext, getLocation().getRootContainerName()));
+          ofNullable(getDefaultProcessingStrategyFactory(muleContext).create(muleContext, getLocation().getRootContainerName()));
       initialiseIfNeeded(processingStrategy);
       ownedProcessingStrategy = processingStrategy;
     } else if (flowLocation.isPresent()) {
