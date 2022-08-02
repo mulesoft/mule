@@ -310,8 +310,20 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   protected DefaultMuleConfiguration createMuleConfiguration() {
     DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
-    muleConfiguration.setMinMuleVersion(new MuleVersion(getMavenProjectVersionProperty()));
+    configureMuleConfiguration(muleConfiguration);
     return muleConfiguration;
+  }
+
+  /**
+   * Configures convenient default values for the Mule configuration of the testing environment.
+   * 
+   * @param muleConfiguration A {@link MuleConfiguration} to configure.
+   */
+  protected void configureMuleConfiguration(DefaultMuleConfiguration muleConfiguration) {
+    String mvnVersionProperty = getMavenProjectVersionProperty();
+    if (mvnVersionProperty != null) {
+      muleConfiguration.setMinMuleVersion(new MuleVersion(mvnVersionProperty));
+    }
   }
 
   /**
