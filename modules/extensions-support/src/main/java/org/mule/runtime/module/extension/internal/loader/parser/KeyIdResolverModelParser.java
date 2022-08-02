@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser;
 
+import org.mule.sdk.api.metadata.NullMetadataResolver;
+import org.mule.sdk.api.metadata.resolving.PartialTypeKeysResolver;
 import org.mule.sdk.api.metadata.resolving.TypeKeysResolver;
 
 /**
@@ -17,10 +19,21 @@ import org.mule.sdk.api.metadata.resolving.TypeKeysResolver;
  */
 public interface KeyIdResolverModelParser {
 
+  /**
+   * @return {@code true} if this parser parse a Key resolver different from {@link NullMetadataResolver} and
+   *         {@link org.mule.runtime.extension.api.metadata.NullMetadataResolver}
+   */
   boolean hasKeyIdResolver();
 
+  /**
+   * @return {@code true} if this parser parse a Key resolver is an instance of {@link PartialTypeKeysResolver} or
+   *         {@link org.mule.runtime.api.metadata.resolving.PartialTypeKeysResolver}
+   */
   boolean isPartialKeyResolver();
 
+  /**
+   * @return an instance of {@link TypeKeysResolver}
+   */
   TypeKeysResolver getKeyResolver();
 
 }

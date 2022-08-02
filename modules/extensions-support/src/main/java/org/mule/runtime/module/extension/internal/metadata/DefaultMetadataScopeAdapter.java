@@ -46,7 +46,7 @@ import java.util.function.Supplier;
 public final class DefaultMetadataScopeAdapter implements MetadataScopeAdapter {
 
   private JavaKeyIdResolverModelParser javaKeyIdResolverModelParser =
-      new JavaKeyIdResolverModelParser(null, null, org.mule.sdk.api.metadata.NullMetadataResolver.class, false);
+      new JavaKeyIdResolverModelParser(null, null, org.mule.sdk.api.metadata.NullMetadataResolver.class);
 
   private JavaOutputResolverModelParser javaOutputResolverModelParser =
       new JavaOutputResolverModelParser(org.mule.sdk.api.metadata.NullMetadataResolver.class, false);

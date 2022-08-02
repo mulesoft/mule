@@ -39,6 +39,7 @@ import org.mule.test.metadata.extension.query.MetadataExtensionEntityResolver;
 import org.mule.test.metadata.extension.query.MetadataExtensionQueryTranslator;
 import org.mule.test.metadata.extension.query.NativeQueryOutputResolver;
 import org.mule.test.metadata.extension.resolver.AnyJsonTypeStaticResolver;
+import org.mule.test.metadata.extension.resolver.SdkTestInputResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.SdkTestOutputAnyTypeResolver;
 import org.mule.test.metadata.extension.resolver.SdkTestOutputAttributesResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestAttributesResolverWithKeyResolver;
@@ -76,8 +77,8 @@ public class MetadataOperations {
   @org.mule.sdk.api.annotation.metadata.OutputResolver(output = SdkTestOutputAnyTypeResolver.class)
   @MediaType(value = ANY, strict = false)
   public Object sdkContentMetadataWithKeyId(@Config Object object, @Connection MetadataConnection connection,
-                                            @MetadataKeyId(TestInputResolverWithKeyResolver.class) String type,
-                                            @Content @TypeResolver(TestInputResolverWithKeyResolver.class) Object content) {
+                                            @org.mule.sdk.api.annotation.metadata.MetadataKeyId(SdkTestInputResolverWithKeyResolver.class) String type,
+                                            @Content @org.mule.sdk.api.annotation.metadata.TypeResolver(SdkTestInputResolverWithKeyResolver.class) Object content) {
     return null;
   }
 
@@ -249,7 +250,7 @@ public class MetadataOperations {
   @org.mule.sdk.api.annotation.metadata.OutputResolver(output = SdkTestOutputAttributesResolverWithKeyResolver.class,
       attributes = SdkTestOutputAttributesResolverWithKeyResolver.class)
   public Result<Object, AbstractOutputAttributes> sdkOutputAttributesWithDynamicMetadata(
-                                                                                         @MetadataKeyId(TestOutputAttributesResolverWithKeyResolver.class) String type) {
+                                                                                         @MetadataKeyId(SdkTestOutputAttributesResolverWithKeyResolver.class) String type) {
     return null;
   }
 

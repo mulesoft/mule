@@ -12,19 +12,18 @@ import static org.mule.runtime.core.api.util.ClassUtils.getClassName;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
 import org.mule.runtime.module.extension.internal.metadata.SdkInputTypeResolverAdapter;
 import org.mule.sdk.api.metadata.resolving.InputTypeResolver;
 
-public class JavaInputResolverModelParser {
+public class JavaInputResolverModelParser implements InputResolverModelParser {
 
   private final String parameterName;
   private final Class<?> inputTypeResolverDeclarationClass;
-  private final boolean muleResolver;
 
-  public JavaInputResolverModelParser(String parameterName, Class<?> inputTypeResolverDeclarationClass, boolean muleResolver) {
+  public JavaInputResolverModelParser(String parameterName, Class<?> inputTypeResolverDeclarationClass) {
     this.parameterName = parameterName;
     this.inputTypeResolverDeclarationClass = inputTypeResolverDeclarationClass;
-    this.muleResolver = muleResolver;
   }
 
   public String getParameterName() {
@@ -38,7 +37,7 @@ public class JavaInputResolverModelParser {
   private InputTypeResolver instantiateResolver(Class<?> factoryType) {
     try {
       Object resolver = ClassUtils.instantiateClass(factoryType);
-      if (muleResolver) {
+      if (resolver instanceof org.mule.runtime.api.metadata.resolving.InputTypeResolver) {
         return new SdkInputTypeResolverAdapter((org.mule.runtime.api.metadata.resolving.InputTypeResolver) resolver);
       } else {
         return (InputTypeResolver) resolver;

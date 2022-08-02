@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.loader.java.enricher;
 
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builderFrom;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.getMetadataKeyPart;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.hasKeyId;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isASTMode;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
@@ -51,6 +53,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.QueryPara
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils;
 import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataScopeAdapter;
 import org.mule.runtime.module.extension.internal.metadata.MetadataScopeAdapter;
 import org.mule.runtime.module.extension.internal.metadata.MuleAttributesTypeResolverAdapter;
@@ -372,7 +375,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
       return component.getParameterGroups().stream()
           .map(group -> group.getModelProperty(ParameterGroupModelProperty.class).orElse(null))
           .filter(Objects::nonNull)
-          .filter(group -> group.getDescriptor().getAnnotatedContainer().isAnnotatedWith(MetadataKeyId.class))
+          .filter(group -> hasKeyId(group.getDescriptor().getAnnotatedContainer()))
           .map(group -> new MetadataKeyIdModelProperty(group.getDescriptor().getMetadataType(),
                                                        group.getDescriptor().getName(), categoryName))
           .findFirst();
@@ -383,7 +386,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
                                                                                String categoryName) {
       return component.getParameterGroups().stream()
           .flatMap(g -> g.getParameters().stream())
-          .filter(p -> getExtensionParameter(p).map(element -> element.isAnnotatedWith(MetadataKeyId.class)).orElse(false))
+          .filter(p -> getExtensionParameter(p).map(JavaMetadataKeyIdModelParserUtils::hasKeyId).orElse(false))
           .map(p -> new MetadataKeyIdModelProperty(p.getType(), p.getName(), categoryName))
           .findFirst();
     }
@@ -403,16 +406,12 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
      */
     private void parseMetadataKeyAnnotations(ExtensionParameter element, BaseDeclaration baseDeclaration,
                                              MetadataScopeAdapter metadataScope) {
-      element.getValueFromAnnotation(MetadataKeyId.class)
-          .ifPresent(valueFetcher -> baseDeclaration
-              .addModelProperty(new MetadataKeyPartModelProperty(1, metadataScope.hasKeysResolver())));
+      if (hasKeyId(element)) {
+        baseDeclaration.addModelProperty(new MetadataKeyPartModelProperty(1, metadataScope.hasKeysResolver()));
+      }
 
-      element.getValueFromAnnotation(MetadataKeyPart.class)
-          .ifPresent(valueFetcher -> baseDeclaration
-              .addModelProperty(new MetadataKeyPartModelProperty(valueFetcher.getNumberValue(MetadataKeyPart::order),
-                                                                 valueFetcher
-                                                                     .getBooleanValue(MetadataKeyPart::providedByKeyResolver))));
-
+      getMetadataKeyPart(element).ifPresent(metadataKeyPart -> baseDeclaration
+          .addModelProperty(new MetadataKeyPartModelProperty(metadataKeyPart.getFirst(), metadataKeyPart.getSecond())));
     }
 
     private String getCategoryName(MetadataScopeAdapter metadataScopeAdapter) {

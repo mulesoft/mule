@@ -4,16 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.module.extension.internal.loader.utils;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedElement;
 
-import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceCallbackDeclaration;
 import org.mule.runtime.api.metadata.resolving.StaticResolver;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
@@ -22,9 +19,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaInputResolverModelParser;
 import org.mule.sdk.api.annotation.metadata.TypeResolver;
-import org.mule.sdk.api.metadata.resolving.InputTypeResolver;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,9 +67,7 @@ public class JavaInputResolverModelParserUtils {
       return empty();
     }
 
-    boolean muleResolver = org.mule.runtime.api.metadata.resolving.InputTypeResolver.class.isAssignableFrom(resolverClazz);
-
-    return of(new JavaInputResolverModelParser(parameterName, resolverClazz, muleResolver));
+    return of(new JavaInputResolverModelParser(parameterName, resolverClazz));
   }
 
   private static boolean isStaticResolver(Class<?> resolverClazz) {

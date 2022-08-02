@@ -15,12 +15,13 @@ import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.module.extension.internal.loader.parser.KeyIdResolverModelParser;
 import org.mule.runtime.module.extension.internal.metadata.BooleanKeyResolver;
 import org.mule.runtime.module.extension.internal.metadata.EnumKeyResolver;
 import org.mule.runtime.module.extension.internal.metadata.SdkTypeKeysResolverAdapter;
+import org.mule.sdk.api.metadata.NullMetadataResolver;
 import org.mule.sdk.api.metadata.resolving.PartialTypeKeysResolver;
+import org.mule.sdk.api.metadata.resolving.TypeKeysResolver;
 
 /**
  * {@link KeyIdResolverModelParser} for Java based syntax
@@ -32,19 +33,16 @@ public class JavaKeyIdResolverModelParser implements KeyIdResolverModelParser {
   private final MetadataType metadataType;
   private final String categoryName;
   private final Class<?> keyIdResolverDeclarationClass;
-  private final boolean muleResolver;
 
-  public JavaKeyIdResolverModelParser(String categoryName, MetadataType metadataType, Class<?> keyIdResolverDeclarationClass,
-                                      boolean muleResolver) {
+  public JavaKeyIdResolverModelParser(String categoryName, MetadataType metadataType, Class<?> keyIdResolverDeclarationClass) {
     this.metadataType = metadataType;
     this.categoryName = categoryName;
     this.keyIdResolverDeclarationClass = keyIdResolverDeclarationClass;
-    this.muleResolver = muleResolver;
   }
 
   @Override
   public boolean hasKeyIdResolver() {
-    return (!org.mule.sdk.api.metadata.NullMetadataResolver.class.isAssignableFrom(keyIdResolverDeclarationClass) &&
+    return (!NullMetadataResolver.class.isAssignableFrom(keyIdResolverDeclarationClass) &&
         !org.mule.runtime.extension.api.metadata.NullMetadataResolver.class.isAssignableFrom(keyIdResolverDeclarationClass)) ||
         ((metadataType != null) && ((metadataType instanceof BooleanType) || isEnum(metadataType)));
   }
@@ -56,12 +54,12 @@ public class JavaKeyIdResolverModelParser implements KeyIdResolverModelParser {
   }
 
   @Override
-  public org.mule.sdk.api.metadata.resolving.TypeKeysResolver getKeyResolver() {
-    org.mule.sdk.api.metadata.resolving.TypeKeysResolver typeKeysResolver;
+  public TypeKeysResolver getKeyResolver() {
+    TypeKeysResolver typeKeysResolver;
     if (metadataType == null || categoryName == null) {
       typeKeysResolver = instantiateResolver();
     } else if (NullMetadataResolver.class.isAssignableFrom(keyIdResolverDeclarationClass) ||
-        org.mule.sdk.api.metadata.NullMetadataResolver.class.isAssignableFrom(keyIdResolverDeclarationClass)) {
+        org.mule.runtime.extension.api.metadata.NullMetadataResolver.class.isAssignableFrom(keyIdResolverDeclarationClass)) {
       if (metadataType instanceof BooleanType) {
         typeKeysResolver = new BooleanKeyResolver(categoryName);
       } else if (isEnum(metadataType)) {
@@ -76,13 +74,13 @@ public class JavaKeyIdResolverModelParser implements KeyIdResolverModelParser {
     return typeKeysResolver;
   }
 
-  private org.mule.sdk.api.metadata.resolving.TypeKeysResolver instantiateResolver() {
+  private TypeKeysResolver instantiateResolver() {
     try {
       Object resolver = ClassUtils.instantiateClass(keyIdResolverDeclarationClass);
-      if (muleResolver) {
+      if (resolver instanceof org.mule.runtime.api.metadata.resolving.TypeKeysResolver) {
         return new SdkTypeKeysResolverAdapter((org.mule.runtime.api.metadata.resolving.TypeKeysResolver) resolver);
       } else {
-        return (org.mule.sdk.api.metadata.resolving.TypeKeysResolver) resolver;
+        return (TypeKeysResolver) resolver;
       }
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not create instance of type "
