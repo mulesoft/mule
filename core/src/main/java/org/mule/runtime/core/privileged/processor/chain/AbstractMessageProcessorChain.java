@@ -217,8 +217,10 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
             final AtomicInteger inflightEvents = new AtomicInteger();
 
             final Consumer<Exception> errorRouter;
+            final boolean globalRouter;
 
             if (routers.containsKey(messagingExceptionHandler)) {
+              globalRouter = true;
               errorRouter = routers.get(messagingExceptionHandler);
             } else {
               errorRouter = messagingExceptionHandler
@@ -226,7 +228,10 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                           handled -> errorSwitchSinkSinkRef.next(right(handled)),
                           rethrown -> errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class)));
               if (messagingExceptionHandler instanceof GlobalErrorHandler) {
+                globalRouter = true;
                 routers.put((GlobalErrorHandler) messagingExceptionHandler, errorRouter);
+              } else {
+                globalRouter = false;
               }
             }
 
@@ -250,8 +255,10 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                                                 }),
                                             inflightEvents,
                                             () -> {
-                                              errorSwitchSinkSinkRef.complete();
-                                              disposeIfNeeded(errorRouter, LOGGER);
+                                              if (!globalRouter) {
+                                                errorSwitchSinkSinkRef.complete();
+                                                disposeIfNeeded(errorRouter, LOGGER);
+                                              }
                                             },
                                             t -> {
                                               errorSwitchSinkSinkRef.error(t);
