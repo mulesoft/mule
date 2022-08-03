@@ -229,7 +229,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
 
       CoreEvent result;
       // TODO: W-11486418 - Improve FlowRunner Creation of Spans
-      SpanHolder spanHolder = new SpanHolder();;
+      SpanHolder spanHolder = new SpanHolder();
       try {
         result = Flux.<CoreEvent>create(fluxSink -> {
           CoreEvent event = getOrBuildEvent();
@@ -263,17 +263,26 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
     return () -> {
       Reference<FluxSink<CoreEvent>> sinkReference = new Reference<>(null);
 
+      // TODO: W-11486418 - Improve FlowRunner Creation of Spans
+      SpanHolder spanHolder = new SpanHolder();
       try {
         Flux.<CoreEvent>create(fluxSink -> {
           fluxSink.next(getOrBuildEvent());
           sinkReference.set(fluxSink);
-        }).transform(flow::apply).blockFirst();
+        }).doOnNext(event -> privilegedProfilingService
+            .ifPresent(privilegedProfilingService -> {
+              privilegedProfilingService.startComponentSpan(event, flow);
+              spanHolder.setEvent(event);
+            }))
+            .transform(flow::apply).blockFirst();
       } catch (RuntimeException ex) {
         if (ex.getCause() instanceof MuleException) {
           throw (MuleException) ex.getCause();
         } else {
           throw ex;
         }
+      } finally {
+        spanHolder.endSpan();
       }
 
       sinkReference.get().complete();

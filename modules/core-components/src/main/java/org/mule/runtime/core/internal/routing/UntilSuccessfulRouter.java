@@ -15,6 +15,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -34,6 +35,8 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.internal.event.EventInternalContextResolver;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
@@ -80,6 +83,7 @@ class UntilSuccessfulRouter {
   private final FluxSinkRecorder<CoreEvent> innerRecorder = new FluxSinkRecorder<>();
   private final FluxSinkRecorder<Either<Throwable, CoreEvent>> downstreamRecorder = new FluxSinkRecorder<>();
   private final AtomicReference<Context> downstreamCtxReference = new AtomicReference<>(empty());
+  private final CoreEventTracer coreEventTracer;
 
   // Retry settings, such as the maximum number of retries, and the delay between them
   // are managed by suppliers. By doing this, the implementations remains agnostic of whether
@@ -97,12 +101,14 @@ class UntilSuccessfulRouter {
   UntilSuccessfulRouter(Component owner, Publisher<CoreEvent> publisher, Processor nestedChain,
                         ProcessingStrategy processingStrategy, ExtendedExpressionManager expressionManager,
                         Predicate<CoreEvent> shouldRetry, Scheduler delayScheduler,
-                        String maxRetries, String millisBetweenRetries) {
+                        String maxRetries, String millisBetweenRetries,
+                        CoreEventTracer coreEventTracer) {
     this.owner = owner;
     this.shouldRetry = shouldRetry;
     this.delayScheduler = new ConditionalExecutorServiceDecorator(delayScheduler, s -> isTransactionActive());
     this.retryContextResolver = new EventInternalContextResolver<>(RETRY_CTX_INTERNAL_PARAM_KEY,
                                                                    HashMap::new);
+    this.coreEventTracer = coreEventTracer;
 
     // Upstream side of until successful chain. Injects events into retrial chain.
     upstreamFlux = Flux.from(publisher)
@@ -110,7 +116,9 @@ class UntilSuccessfulRouter {
           // Inject event into retrial execution chain
           RetryContext ctx = new RetryContext(event, sessionSupplier, maxRetriesSupplier, delaySupplier);
           inflightEvents.getAndIncrement();
+          coreEventTracer.startComponentSpan(ctx.event, owner, new RouteSpanCustomizer());
           innerRecorder.next(eventWithCurrentContext(event, ctx));
+
         })
         .doOnComplete(() -> {
           // TODO MULE-18170
@@ -129,6 +137,7 @@ class UntilSuccessfulRouter {
         .doOnNext(successfulEvent -> {
           // Scope execution was successful, pop current ctx
           downstreamRecorder.next(right(Throwable.class, eventWithCurrentContextDeleted(successfulEvent)));
+          coreEventTracer.endCurrentSpan(successfulEvent);
           completeRouterIfNecessary();
         })
         .onErrorContinue(getRetryPredicate(), getRetryHandler());
@@ -179,15 +188,20 @@ class UntilSuccessfulRouter {
       RetryContext ctx = getRetryContextForEvent(messagingError.getEvent());
       int retriesLeft =
           ctx.retryCount.getAndDecrement();
+
+      coreEventTracer.endCurrentSpan(ctx.event);
+
       if (retriesLeft > 0) {
         LOGGER.error("Retrying execution of event, attempt {} of {}.", ctx.getAttemptNumber(),
                      ctx.maxRetries != RETRY_COUNT_FOREVER ? ctx.maxRetries : "unlimited");
 
+        coreEventTracer.startComponentSpan(ctx.event, owner, new RouteSpanCustomizer());
         // Schedule retry with delay
         UntilSuccessfulRouter.this.delayScheduler.schedule(() -> innerRecorder.next(eventWithCurrentContext(ctx.event, ctx)),
                                                            ctx.delayInMillis, MILLISECONDS);
       } else { // Retries exhausted
         // Current context already pooped. No need to re-insert it
+        coreEventTracer.endCurrentSpan(ctx.event);
         LOGGER.error("Retry attempts exhausted. Failing...");
         Throwable resolvedError = getThrowableFunction(ctx.event).apply(error);
         // Delete current context from event
@@ -336,6 +350,19 @@ class UntilSuccessfulRouter {
 
     public RetryContextInitializationException(Throwable cause) {
       super(cause);
+    }
+  }
+
+  /**
+   * A {@link CoreEventSpanCustomizer} for routes.
+   */
+  private static class RouteSpanCustomizer implements CoreEventSpanCustomizer {
+
+    public static final String ROUTE = ":route";
+
+    @Override
+    public String getName(CoreEvent coreEvent, Component component) {
+      return getSpanName(component.getIdentifier()) + ROUTE;
     }
   }
 
