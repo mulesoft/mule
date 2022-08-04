@@ -35,6 +35,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
+import org.mule.sdk.api.connectivity.oauth.AuthCodeRequest;
 import org.mule.sdk.api.runtime.parameter.Literal;
 import org.mule.sdk.api.runtime.parameter.ParameterResolver;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
@@ -98,6 +99,7 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
       .add(Literal.class)
       .add(TlsContextFactory.class)
       .add(ObjectStore.class)
+      .add(AuthCodeRequest.class)
       .build();
 
   /**

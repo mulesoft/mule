@@ -19,4 +19,11 @@ public class CallbackOperations {
     config.getCapturedAuthCodeRequests().add(request);
     config.getCapturedAuthCodeStates().add(state);
   }
+
+  public void captureSdkCallbackPayloads(@Config AuthCodeConfig config,
+                                         @Optional org.mule.sdk.api.connectivity.oauth.AuthCodeRequest request,
+                                         @Optional AuthorizationCodeState state) {
+    config.getCapturedAuthCodeRequests().add(request);
+    config.getCapturedAuthCodeStates().add(state);
+  }
 }

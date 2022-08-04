@@ -10,6 +10,8 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.internal.loader.util.JavaParserUtils.getExpressionSupport;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.AUTHORIZATION_CODE_STATE_INTERFACES;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.CLIENT_CREDENTIALS_STATE_INTERFACES;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 
@@ -31,6 +33,8 @@ import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,11 +69,11 @@ public class JavaOAuthConnectionProviderModelValidator implements ExtensionModel
         }
 
         if (supportsAuthCode) {
-          validateStateField(implementingType, AuthorizationCodeState.class, "authorization code");
+          validateStateField(implementingType, AUTHORIZATION_CODE_STATE_INTERFACES, "authorization code");
         }
 
         if (supportsClientCredentials) {
-          validateStateField(implementingType, ClientCredentialsState.class, "client credentials");
+          validateStateField(implementingType, CLIENT_CREDENTIALS_STATE_INTERFACES, "client credentials");
         }
 
         validateOAuthParameters(model, problemsReporter);
@@ -106,9 +110,9 @@ public class JavaOAuthConnectionProviderModelValidator implements ExtensionModel
     }
   }
 
-  private void validateStateField(Class<?> implementingType, Class<?> stateFieldType, String grantType) {
+  private void validateStateField(Class<?> implementingType, List<Class<?>> stateFieldTypes, String grantType) {
     List<Field> stateFields = getFields(implementingType).stream()
-        .filter(f -> f.getType().equals(stateFieldType))
+        .filter(f -> stateFieldTypes.stream().anyMatch(stateFieldType -> f.getType().equals(stateFieldType)))
         .collect(toList());
 
     if (stateFields.size() != 1) {
@@ -117,7 +121,7 @@ public class JavaOAuthConnectionProviderModelValidator implements ExtensionModel
                                                                       + "one (and only one) field of type %s. %d were found",
                                                                          implementingType,
                                                                          grantType,
-                                                                         AuthorizationCodeState.class.getName(),
+                                                                         stateFieldTypes.get(0).getName(),
                                                                          stateFields.size()));
     }
   }

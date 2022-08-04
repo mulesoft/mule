@@ -19,7 +19,7 @@ import org.mule.sdk.api.annotation.connectivity.oauth.AuthorizationCode;
 @AuthorizationCode(accessTokenUrl = TestOAuthConnectionProvider.ACCESS_TOKEN_URL,
     authorizationUrl = TestOAuthConnectionProvider.AUTH_URL)
 @Alias("refresh-validation")
-public class TestOAuthRefreshValidationProvider extends TestOAuthConnectionState
+public class TestOAuthRefreshValidationProvider extends LegacyTestOAuthConnectionState
     implements CachedConnectionProvider<TestOAuthConnection> {
 
   public static int TIMES_REFRESH_IS_NEEDED = 0;

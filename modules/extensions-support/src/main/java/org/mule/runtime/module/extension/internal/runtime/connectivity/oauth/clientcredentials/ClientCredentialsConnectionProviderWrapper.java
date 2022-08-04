@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials;
 
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.CLIENT_CREDENTIALS_STATE_INTERFACES;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getOAuthStateSetter;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.updateOAuthParameters;
 
@@ -39,7 +40,7 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends BaseOAuthConn
   private final ClientCredentialsConfig oauthConfig;
 
   private final ClientCredentialsOAuthHandler oauthHandler;
-  private final FieldSetter<Object, ClientCredentialsState> oauthStateSetter;
+  private final FieldSetter<Object, Object> oauthStateSetter;
   private final RunOnce dance;
 
   private ClientCredentialsOAuthDancer dancer;
@@ -52,7 +53,8 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends BaseOAuthConn
     super(delegate, reconnectionConfig, callbackValues);
     this.oauthConfig = oauthConfig;
     this.oauthHandler = oauthHandler;
-    oauthStateSetter = getOAuthStateSetter(getDelegateForInjection(), ClientCredentialsState.class, oauthConfig.getGrantType());
+    oauthStateSetter =
+        getOAuthStateSetter(getDelegateForInjection(), CLIENT_CREDENTIALS_STATE_INTERFACES, oauthConfig.getGrantType());
     dance = Once.of(this::updateOAuthState);
   }
 

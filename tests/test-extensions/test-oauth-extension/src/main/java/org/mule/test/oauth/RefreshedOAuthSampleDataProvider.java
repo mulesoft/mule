@@ -8,8 +8,8 @@ package org.mule.test.oauth;
 
 import static org.mule.sdk.api.runtime.operation.Result.builder;
 
-import org.mule.runtime.extension.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.sdk.api.annotation.param.Connection;
+import org.mule.sdk.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.sdk.api.data.sample.SampleDataException;
 import org.mule.sdk.api.data.sample.SampleDataProvider;
 import org.mule.sdk.api.runtime.operation.Result;

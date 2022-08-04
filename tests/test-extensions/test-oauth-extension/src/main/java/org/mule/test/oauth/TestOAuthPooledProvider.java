@@ -20,7 +20,8 @@ import java.util.Queue;
 @AuthorizationCode(accessTokenUrl = TestOAuthConnectionProvider.ACCESS_TOKEN_URL,
     authorizationUrl = TestOAuthConnectionProvider.AUTH_URL)
 @Alias("pooled")
-public class TestOAuthPooledProvider extends TestOAuthConnectionState implements PoolingConnectionProvider<TestOAuthConnection> {
+public class TestOAuthPooledProvider extends LegacyTestOAuthConnectionState
+    implements PoolingConnectionProvider<TestOAuthConnection> {
 
   public static String BORROWED = "Connection borrowed";
   public static String RETURNED = "Connection returned";

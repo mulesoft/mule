@@ -9,10 +9,9 @@ package org.mule.test.oauth;
 import static org.mule.runtime.extension.api.values.ValueBuilder.getValuesFor;
 
 import org.mule.runtime.api.value.Value;
-import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
+import org.mule.sdk.api.connectivity.oauth.AccessTokenExpiredException;
 
 import java.util.Set;
 
