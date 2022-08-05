@@ -210,11 +210,6 @@ public class DefaultProfilingService extends AbstractProfilingService {
   }
 
   @Override
-  public void startComponentSpan(CoreEvent event, Component component) {
-    eventTracer.startComponentSpan(event, component);
-  }
-
-  @Override
   public void endComponentSpan(CoreEvent event) {
     eventTracer.endCurrentSpan(event);
   }

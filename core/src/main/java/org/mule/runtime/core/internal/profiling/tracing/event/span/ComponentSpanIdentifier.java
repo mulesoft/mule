@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 
 import java.util.Objects;
@@ -20,30 +19,21 @@ public class ComponentSpanIdentifier implements SpanIdentifier {
 
   public static final String UNKNOWN = "unknown";
   private final String artifactId;
-  private final String location;
   private final String correlationId;
 
-  private ComponentSpanIdentifier(String artifactId, String location, String correlationId) {
+  private ComponentSpanIdentifier(String artifactId, String correlationId) {
     this.artifactId = artifactId;
-    this.location = location;
     this.correlationId = correlationId;
   }
 
-  public static SpanIdentifier componentSpanIdentifierFrom(String artifactId, ComponentLocation location,
+  public static SpanIdentifier componentSpanIdentifierFrom(String artifactId,
                                                            String correlationId) {
-    return new ComponentSpanIdentifier(artifactId, getLocation(location), correlationId);
-  }
-
-  private static String getLocation(ComponentLocation location) {
-    if (location == null) {
-      return UNKNOWN;
-    }
-    return location.getLocation();
+    return new ComponentSpanIdentifier(artifactId, correlationId);
   }
 
   @Override
   public String getId() {
-    return artifactId + "/" + location + "/" + correlationId;
+    return artifactId + "/" + correlationId;
   }
 
   @Override
@@ -53,12 +43,12 @@ public class ComponentSpanIdentifier implements SpanIdentifier {
     if (o == null || getClass() != o.getClass())
       return false;
     ComponentSpanIdentifier that = (ComponentSpanIdentifier) o;
-    return Objects.equals(artifactId, that.artifactId) && Objects.equals(location, that.location)
+    return Objects.equals(artifactId, that.artifactId)
         && Objects.equals(correlationId, that.correlationId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(artifactId, location, correlationId);
+    return Objects.hash(artifactId, correlationId);
   }
 }

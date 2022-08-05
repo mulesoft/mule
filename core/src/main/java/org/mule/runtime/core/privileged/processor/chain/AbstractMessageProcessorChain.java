@@ -74,6 +74,9 @@ import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcess
 import org.mule.runtime.core.internal.processor.interceptor.ProcessorInterceptorFactoryAdapter;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.ComponentSpanCustomizer;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.MessageProcessorChainSpanCustomizer;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizer;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadingProfilingEventContext;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
@@ -173,6 +176,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   private Scheduler switchOnErrorScheduler;
   private CoreEventTracer muleEventTracer;
+  private static final SpanCustomizer DEFAULT_CHAIN_SPAN_CUSTOMIZER = new MessageProcessorChainSpanCustomizer();
+  private SpanCustomizer chainSpanCustomizer = DEFAULT_CHAIN_SPAN_CUSTOMIZER;
 
   AbstractMessageProcessorChain(String name,
                                 Optional<ProcessingStrategy> processingStrategyOptional,
@@ -209,6 +214,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
             final Flux<CoreEvent> upstream =
                 from(doApply(publisher, interceptors, (context, throwable) -> {
                   inflightEvents.incrementAndGet();
+                  muleEventTracer.endCurrentSpan(((MessagingException) throwable).getEvent());
                   routeError(errorRouter, throwable);
                 }));
 
@@ -233,7 +239,13 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           });
 
     } else {
-      return doApply(publisher, interceptors, (context, throwable) -> context.error(throwable));
+      return doApply(publisher, interceptors, (context, throwable) -> {
+        // Ending current span
+        muleEventTracer.endCurrentSpan(((MessagingException) throwable).getEvent());
+        // Ending parent span
+        muleEventTracer.endCurrentSpan(((MessagingException) throwable).getEvent());
+        context.error(throwable);
+      });
     }
   }
 
@@ -258,6 +270,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                                        List<ReactiveInterceptor> interceptors,
                                        BiConsumer<BaseEventContext, ? super Exception> errorBubbler) {
     Flux<CoreEvent> stream = from(publisher);
+    stream = stream.doOnNext(event -> muleEventTracer.startComponentSpan(event, chainSpanCustomizer));
     for (Processor processor : getProcessorsToExecute()) {
       // Perform assembly for processor chain by transforming the existing publisher with a publisher function for each processor
       // along with the interceptors that decorate it.
@@ -270,6 +283,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           .onErrorContinue(exception -> !(exception instanceof LifecycleException),
                            getContinueStrategyErrorHandler(processor, errorBubbler));
     }
+    stream = stream.doOnNext(event -> muleEventTracer.endCurrentSpan(event));
 
     stream = stream.subscriberContext(ctx -> {
       ClassLoader tccl = currentThread().getContextClassLoader();
@@ -421,7 +435,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     }
     ComponentLocation componentLocation = getLocationIfComponent(processor);
     if (processor instanceof Component) {
-      muleEventTracer.startComponentSpan(event, (Component) processor);
+      muleEventTracer.startComponentSpan(event, new ComponentSpanCustomizer((Component) processor));
     }
     triggerStartingOperation(event, componentLocation);
     preNotification(event, processor);
@@ -660,5 +674,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   FlowExceptionHandler getMessagingExceptionHandler() {
     return messagingExceptionHandler;
+  }
+
+  public void setSpanCustomizer(SpanCustomizer spanCustomizer) {
+    this.chainSpanCustomizer = spanCustomizer;
   }
 }

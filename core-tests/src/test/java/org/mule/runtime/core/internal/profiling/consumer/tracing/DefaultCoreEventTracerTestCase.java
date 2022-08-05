@@ -91,12 +91,12 @@ public class DefaultCoreEventTracerTestCase {
         getTestCoreEventTracer(TestSpanExportManager.getTestSpanExportManagerInstance(),
                                mockedMuleConfiguration);
 
-    InternalSpan span = coreEventTracer.startComponentSpan(coreEvent, component);
+    InternalSpan span = coreEventTracer.startComponentSpan(coreEvent, coreEvent1 -> getSpanName(component.getIdentifier()));
 
     assertThat(span.getName(), equalTo(getSpanName(component.getIdentifier())));
     assertThat(span.getParent(), nullValue());
     assertThat(span.getIdentifier(), equalTo(
-                                             componentSpanIdentifierFrom(mockedMuleConfiguration.getId(), component.getLocation(),
+                                             componentSpanIdentifierFrom(mockedMuleConfiguration.getId(),
                                                                          coreEvent.getCorrelationId())));
     assertThat(span.getParent(), nullValue());
     assertThat(span.getDuration().getStart(), notNullValue());

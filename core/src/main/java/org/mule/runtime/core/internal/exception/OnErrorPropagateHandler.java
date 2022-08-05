@@ -124,4 +124,8 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     return false;
   }
 
+  @Override
+  protected String getErrorHandlerType() {
+    return "on-error-propagate";
+  }
 }
