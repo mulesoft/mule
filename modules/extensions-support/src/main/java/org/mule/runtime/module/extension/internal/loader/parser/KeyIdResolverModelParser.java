@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser;
 
-import org.mule.sdk.api.metadata.NullMetadataResolver;
-import org.mule.sdk.api.metadata.resolving.PartialTypeKeysResolver;
-import org.mule.sdk.api.metadata.resolving.TypeKeysResolver;
+import org.mule.runtime.api.metadata.resolving.PartialTypeKeysResolver;
+import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
+import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 
 /**
  * Parses the syntactic definition of the metadata keys id so that the semantics reflected in it can be extracted in a uniform

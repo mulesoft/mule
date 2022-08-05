@@ -11,11 +11,11 @@ import static java.util.stream.Collectors.toSet;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.metadata.MetadataContext;
+import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.sdk.api.metadata.MetadataContext;
-import org.mule.sdk.api.metadata.MetadataKey;
-import org.mule.sdk.api.metadata.MetadataKeyBuilder;
-import org.mule.sdk.api.metadata.resolving.TypeKeysResolver;
+import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 
 import java.util.Set;
 import java.util.stream.Stream;

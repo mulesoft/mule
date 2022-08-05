@@ -14,14 +14,15 @@ import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.KeyIdResolverModelParser;
 import org.mule.runtime.module.extension.internal.metadata.BooleanKeyResolver;
 import org.mule.runtime.module.extension.internal.metadata.EnumKeyResolver;
-import org.mule.runtime.module.extension.internal.metadata.SdkTypeKeysResolverAdapter;
+import org.mule.runtime.module.extension.internal.metadata.MuleTypeKeysResolverAdapter;
 import org.mule.sdk.api.metadata.NullMetadataResolver;
 import org.mule.sdk.api.metadata.resolving.PartialTypeKeysResolver;
-import org.mule.sdk.api.metadata.resolving.TypeKeysResolver;
+
 
 /**
  * {@link KeyIdResolverModelParser} for Java based syntax
@@ -77,8 +78,8 @@ public class JavaKeyIdResolverModelParser implements KeyIdResolverModelParser {
   private TypeKeysResolver instantiateResolver() {
     try {
       Object resolver = ClassUtils.instantiateClass(keyIdResolverDeclarationClass);
-      if (resolver instanceof org.mule.runtime.api.metadata.resolving.TypeKeysResolver) {
-        return new SdkTypeKeysResolverAdapter((org.mule.runtime.api.metadata.resolving.TypeKeysResolver) resolver);
+      if (resolver instanceof org.mule.sdk.api.metadata.resolving.TypeKeysResolver) {
+        return MuleTypeKeysResolverAdapter.from(resolver);
       } else {
         return (TypeKeysResolver) resolver;
       }

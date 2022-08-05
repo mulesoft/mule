@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.metadata;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
+import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 
 import java.util.Map;
@@ -34,9 +36,9 @@ public interface MetadataScopeAdapter {
 
   boolean hasAttributesResolver();
 
-  org.mule.sdk.api.metadata.resolving.TypeKeysResolver getKeysResolver();
+  TypeKeysResolver getKeysResolver();
 
-  Map<String, Supplier<? extends org.mule.sdk.api.metadata.resolving.InputTypeResolver>> getInputResolvers();
+  Map<String, Supplier<? extends InputTypeResolver>> getInputResolvers();
 
   org.mule.sdk.api.metadata.resolving.OutputTypeResolver getOutputResolver();
 

@@ -39,8 +39,6 @@ public class MuleTypeKeysResolverAdapter implements TypeKeysResolver {
       return (TypeKeysResolver) resolver;
     } else if (resolver instanceof NullMetadataResolver) {
       return new org.mule.runtime.extension.api.metadata.NullMetadataResolver();
-    } else if (resolver instanceof SdkTypeKeysResolverAdapter) {
-      return ((SdkTypeKeysResolverAdapter) resolver).getDelegate();
     } else if (resolver instanceof org.mule.sdk.api.metadata.resolving.TypeKeysResolver) {
       return new MuleTypeKeysResolverAdapter((org.mule.sdk.api.metadata.resolving.TypeKeysResolver) resolver);
     } else {

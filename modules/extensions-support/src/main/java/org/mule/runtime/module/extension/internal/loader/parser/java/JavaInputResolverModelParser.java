@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ClassUtils.getClassName;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
-import org.mule.runtime.module.extension.internal.metadata.SdkInputTypeResolverAdapter;
-import org.mule.sdk.api.metadata.resolving.InputTypeResolver;
+import org.mule.runtime.module.extension.internal.metadata.MuleInputTypeResolverAdapter;
+
 
 public class JavaInputResolverModelParser implements InputResolverModelParser {
 
@@ -37,8 +37,8 @@ public class JavaInputResolverModelParser implements InputResolverModelParser {
   private InputTypeResolver instantiateResolver(Class<?> factoryType) {
     try {
       Object resolver = ClassUtils.instantiateClass(factoryType);
-      if (resolver instanceof org.mule.runtime.api.metadata.resolving.InputTypeResolver) {
-        return new SdkInputTypeResolverAdapter((org.mule.runtime.api.metadata.resolving.InputTypeResolver) resolver);
+      if (resolver instanceof org.mule.sdk.api.metadata.resolving.InputTypeResolver) {
+        return MuleInputTypeResolverAdapter.from(resolver);
       } else {
         return (InputTypeResolver) resolver;
       }

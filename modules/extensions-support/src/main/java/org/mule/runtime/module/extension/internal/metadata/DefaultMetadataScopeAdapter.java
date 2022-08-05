@@ -20,8 +20,11 @@ import org.mule.runtime.api.meta.model.declaration.fluent.SourceCallbackDeclarat
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.TypedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOutputDeclaration;
+import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
+import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefinedStaticTypeAnnotation;
@@ -119,8 +122,8 @@ public final class DefaultMetadataScopeAdapter implements MetadataScopeAdapter {
     }
 
     for (JavaInputResolverModelParser inputResolverModelParser : javaInputResolverModelParsers) {
-      org.mule.sdk.api.metadata.resolving.InputTypeResolver inputTypeResolver = inputResolverModelParser.getInputResolver();
-      if (!(inputTypeResolver instanceof org.mule.sdk.api.metadata.NullMetadataResolver)) {
+      InputTypeResolver<?> inputTypeResolver = inputResolverModelParser.getInputResolver();
+      if (!(inputTypeResolver instanceof NullMetadataResolver)) {
         return inputTypeResolver.getCategoryName();
       }
     }
@@ -164,13 +167,13 @@ public final class DefaultMetadataScopeAdapter implements MetadataScopeAdapter {
   }
 
   @Override
-  public org.mule.sdk.api.metadata.resolving.TypeKeysResolver getKeysResolver() {
+  public TypeKeysResolver getKeysResolver() {
     return javaKeyIdResolverModelParser.getKeyResolver();
   }
 
   @Override
-  public Map<String, Supplier<? extends org.mule.sdk.api.metadata.resolving.InputTypeResolver>> getInputResolvers() {
-    Map<String, Supplier<? extends org.mule.sdk.api.metadata.resolving.InputTypeResolver>> inputTypeResolvers = new HashMap<>();
+  public Map<String, Supplier<? extends InputTypeResolver>> getInputResolvers() {
+    Map<String, Supplier<? extends InputTypeResolver>> inputTypeResolvers = new HashMap<>();
     javaInputResolverModelParsers
         .forEach(parser -> inputTypeResolvers.put(parser.getParameterName(), parser::getInputResolver));
     return inputTypeResolvers;
