@@ -33,7 +33,8 @@ public class RaiseErrorValidationTestCase extends AbstractConfigFileValidationTe
   @Description("Operation can't use mule:raise-error")
   public void operationCanNotUseCoreRaiseError() throws Exception {
     expected.expect(ConfigurationException.class);
-    expected.expectMessage("Usages of the component 'raise-error' are not allowed inside a Mule Operation Definition (operation:def)");
+    expected
+        .expectMessage("Usages of the component 'raise-error' are not allowed inside a Mule Operation Definition (operation:def)");
     parseConfig("validation/operation-with-core-raise-error.xml");
   }
 }

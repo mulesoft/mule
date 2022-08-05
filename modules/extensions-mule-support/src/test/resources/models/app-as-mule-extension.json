@@ -1252,7 +1252,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [
-        "MULE:ANY"
+        "THIS:CUSTOM"
       ],
       "semanticTerms": [],
       "stereotype": {
@@ -1728,7 +1728,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [
-        "MULE:ANY"
+        "THIS:CUSTOM"
       ],
       "semanticTerms": [],
       "stereotype": {
@@ -2114,7 +2114,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [
-        "MULE:ANY"
+        "THIS:CUSTOM"
       ],
       "semanticTerms": [],
       "stereotype": {
@@ -2526,7 +2526,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [
-        "MULE:ANY"
+        "THIS:CUSTOM"
       ],
       "semanticTerms": [],
       "stereotype": {
@@ -3511,7 +3511,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [
-        "MULE:ANY"
+        "THIS:CUSTOM"
       ],
       "semanticTerms": [],
       "visibility": "PUBLIC",
@@ -4274,6 +4274,11 @@
     {
       "error": "THIS:RETRY_EXHAUSTED",
       "parent": "MULE:RETRY_EXHAUSTED",
+      "handleable": true
+    },
+    {
+      "error": "THIS:CUSTOM",
+      "parent": "MULE:ANY",
       "handleable": true
     },
     {

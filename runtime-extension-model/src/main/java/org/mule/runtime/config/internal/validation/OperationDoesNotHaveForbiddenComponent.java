@@ -55,8 +55,9 @@ public abstract class OperationDoesNotHaveForbiddenComponent implements Validati
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
     if (component.recursiveStream().anyMatch(c -> c.getIdentifier().equals(forbiddenComponentIdentifier()))) {
-      return of(create(component, this, format("Usages of the component '%s' are not allowed inside a Mule Operation Definition (%s)",
-              forbiddenComponentIdentifier(), OPERATION_IDENTIFIER)));
+      return of(create(component, this,
+                       format("Usages of the component '%s' are not allowed inside a Mule Operation Definition (%s)",
+                              forbiddenComponentIdentifier(), OPERATION_IDENTIFIER)));
     } else {
       return empty();
     }

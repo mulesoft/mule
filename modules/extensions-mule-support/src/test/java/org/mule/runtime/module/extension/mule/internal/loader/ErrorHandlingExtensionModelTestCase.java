@@ -53,8 +53,7 @@ public class ErrorHandlingExtensionModelTestCase extends MuleArtifactFunctionalT
   @BeforeClass
   public static void setupExpectedErrors() {
     expectedErrors.put("raiseThis", singletonList("THIS:CUSTOM"));
-    expectedErrors.put("raiseOther", singletonList("OTHER:CUSTOM"));
-    expectedErrors.put("raiseCustom", singletonList("MY:CUSTOM"));
+    expectedErrors.put("raiseCustom", singletonList("THIS:CUSTOM"));
     expectedErrors.put("heisenbergCureCancer", asList("HEISENBERG:HEALTH", "HEISENBERG:OAUTH2"));
 
     // Not applying the mappings in the extension model. Otherwise, this would declare "MY:MAPPED".
@@ -77,8 +76,8 @@ public class ErrorHandlingExtensionModelTestCase extends MuleArtifactFunctionalT
     ExtensionModel extensionModel = getAppExtensionModel();
     List<String> raisedErrors = getRaisedErrors(extensionModel);
     assertThat(raisedErrors,
-               hasItems("THIS:CONNECTIVITY", "MULE:ANY", "MULE:RETRY_EXHAUSTED", "THIS:RETRY_EXHAUSTED", "MULE:CONNECTIVITY",
-                        "HEISENBERG:HEALTH", "HEISENBERG:OAUTH2", "MY:CUSTOM", "OTHER:CUSTOM", "THIS:CUSTOM"));
+               containsInAnyOrder("THIS:CONNECTIVITY", "MULE:ANY", "MULE:RETRY_EXHAUSTED", "THIS:RETRY_EXHAUSTED",
+                                  "MULE:CONNECTIVITY", "HEISENBERG:HEALTH", "HEISENBERG:OAUTH2", "THIS:CUSTOM"));
   }
 
   @Test
