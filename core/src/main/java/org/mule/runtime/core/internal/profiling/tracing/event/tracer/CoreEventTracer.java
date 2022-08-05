@@ -14,18 +14,18 @@ import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizer;
 
 /**
  * A tracer for {@link CoreEvent}'s.
- * <p>
+ *
  * Once a core event is dispatched to a flow, it will hit different components. The processing of a core event in each component
  * will represent a {@link Span}, that is, a unit of work with a start time and an end time that encompasses what each component
  * does (a http request, a batch job, an until successful block, etc.). In each moment of a core event processing, the
  * {@link CoreEvent} will have a current context span, which is the most specific span associated to that core event, that is the
  * most specific processing that is being done in a certain moment.
- * <p>
+ *
  * Example:
- * <p>
+ *
  * A {@link CoreEvent} is dispatched to a flow and begins to perform a Http Request. The flow is being processed and also the
  * http:request, but the current context span is the span corresponding to the http request:
- * <p>
+ *
  * ------------- Flow Span -----------------------------------------------------------> |________________ Http Request Span
  * ------- (Current Context Span) ------------>
  *
