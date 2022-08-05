@@ -6,13 +6,11 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser.utils;
 
-import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR;
 import static org.mule.runtime.config.internal.dsl.processor.xml.OperationDslNamespaceInfoProvider.OPERATION_DSL_NAMESPACE;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
@@ -221,10 +219,6 @@ public class Characteristic<T> {
     private static final ComponentIdentifier RAISE_ERROR_IDENTIFIER =
         builder().namespace(OPERATION_DSL_NAMESPACE).name(RAISE_ERROR).build();
 
-    // TODO: Remove!
-    private static final ComponentIdentifier OLD_RAISE_ERROR_IDENTIFIER =
-        builder().namespace(CORE_PREFIX).name(RAISE_ERROR).build();
-
     public AggregatedErrorsCharacteristic() {
       super(AggregatedErrorsCharacteristic::aggregator, emptyList(), null);
     }
@@ -237,8 +231,6 @@ public class Characteristic<T> {
 
       if (isRaiseError(operationAst)) {
         handleRaiseError(operationAst, models);
-      } else if (isOldRaiseError(operationAst)) {
-        handleOldRaiseError(operationAst, models);
       } else {
         Optional<OperationModel> operationModel = operationAst.getModel(OperationModel.class);
         if (operationModel.isPresent()) {
@@ -266,27 +258,6 @@ public class Characteristic<T> {
 
     private static boolean isRaiseError(ComponentAst operationAst) {
       return operationAst.getIdentifier().equals(RAISE_ERROR_IDENTIFIER);
-    }
-
-    // TODO: Remove!
-    private static void handleOldRaiseError(ComponentAst raiseErrorAst, List<ErrorModelParser> errorModels) {
-      final ComponentParameterAst typeParameter = raiseErrorAst.getParameter(DEFAULT_GROUP_NAME, ERROR_TYPE_PARAM);
-      if (null == typeParameter) {
-        return;
-      }
-
-      Optional<ComponentIdentifier> errorId =
-          typeParameter.getValue().<String>getValue().map(typeAsString -> buildFromStringRepresentation(typeAsString));
-      if (!errorId.isPresent()) {
-        return;
-      }
-
-      errorModels.add(new MuleSdkErrorModelParser(errorId.get().getNamespace(), errorId.get().getName(), null));
-    }
-
-    // TODO: Remove!
-    private static boolean isOldRaiseError(ComponentAst operationAst) {
-      return operationAst.getIdentifier().equals(OLD_RAISE_ERROR_IDENTIFIER);
     }
   }
 }

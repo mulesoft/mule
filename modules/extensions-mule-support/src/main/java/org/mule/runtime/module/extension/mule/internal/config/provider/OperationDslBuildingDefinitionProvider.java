@@ -38,8 +38,6 @@ public class OperationDslBuildingDefinitionProvider implements ComponentBuilding
   private static ComponentBuildingDefinition.Builder baseDefinition =
       new ComponentBuildingDefinition.Builder().withNamespace(OPERATION_DSL_NAMESPACE);
 
-  public OperationDslBuildingDefinitionProvider() {}
-
   @Override
   public void init() {}
 
