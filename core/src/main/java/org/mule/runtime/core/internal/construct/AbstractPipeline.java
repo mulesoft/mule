@@ -77,6 +77,8 @@ import org.mule.runtime.core.internal.interception.ReactiveInterceptor;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.processor.interceptor.FlowInterceptorFactoryAdapter;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.ComponentSpanCustomizer;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizer;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
@@ -129,6 +131,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private final ComponentInitialStateManager componentInitialStateManager;
   private final BackPressureStrategySelector backpressureStrategySelector;
   private final ErrorType FLOW_BACKPRESSURE_ERROR_TYPE;
+  private SpanCustomizer spanCustomizer = new ComponentSpanCustomizer(this);
 
   public AbstractPipeline(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                           Optional<FlowExceptionHandler> exceptionListener,
@@ -181,6 +184,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     configureMessageProcessors(builder);
     builder.setMessagingExceptionHandler(getExceptionListener());
     builder.setPipelineLocation(getLocation());
+    builder.setSpanCustomizer(spanCustomizer);
     return builder.build();
   }
 

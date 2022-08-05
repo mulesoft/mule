@@ -68,9 +68,11 @@ import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager;
 import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ErrorHandlerContext;
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizer;
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 
 import java.util.ArrayList;
@@ -114,6 +116,9 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   @Inject
   private ConfigurationProperties configurationProperties;
+
+  @Inject
+  private InternalProfilingService internalProfilingService;
 
   protected Optional<String> flowLocation = empty();
   private MessageProcessorChain configuredMessageProcessors;
@@ -193,7 +198,14 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
                                     Consumer<CoreEvent> continueCallback,
                                     Consumer<Throwable> propagateCallback) {
     FluxSink<CoreEvent> fluxSink = fluxFactory.apply(publisherPostProcessor);
-
+    Consumer<CoreEvent> wrappedContinueCallback = coreEvent -> {
+      continueCallback.accept(coreEvent);
+      internalProfilingService.getCoreEventTracer().endCurrentSpan(coreEvent);
+    };
+    Consumer<Throwable> wrappedPropagateCallback = throwable -> {
+      propagateCallback.accept(throwable);
+      internalProfilingService.getCoreEventTracer().endCurrentSpan(((MessagingException) throwable).getEvent());
+    };
     return new ExceptionRouter() {
 
       @Override
@@ -204,7 +216,8 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       @Override
       public void accept(Exception error) {
         // All calling methods will end up transforming any error class other than MessagingException into that one
-        fluxSink.next(addContext(TemplateOnErrorHandler.this, (MessagingException) error, continueCallback, propagateCallback));
+        fluxSink.next(addContext(TemplateOnErrorHandler.this, (MessagingException) error, wrappedContinueCallback,
+                                 wrappedPropagateCallback));
       }
     };
   }
@@ -302,7 +315,8 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       processingStrategy = getProcessingStrategy(locator, this);
     }
     configuredMessageProcessors =
-        buildNewChainWithListOfProcessors(processingStrategy, getMessageProcessors(), NullExceptionHandler.getInstance());
+        buildNewChainWithListOfProcessors(processingStrategy, getMessageProcessors(), NullExceptionHandler.getInstance(),
+                                          coreEvent -> getErrorHandlerType());
 
     fluxFactory = new OnErrorHandlerFluxObjectFactory(processingStrategy);
 
@@ -602,5 +616,9 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       reuseGlobalErrorHandler = parseBoolean(getProperty(REUSE_GLOBAL_ERROR_HANDLER_PROPERTY));
     }
     return reuseGlobalErrorHandler;
+  }
+
+  protected String getErrorHandlerType() {
+    return "error-handler";
   }
 }

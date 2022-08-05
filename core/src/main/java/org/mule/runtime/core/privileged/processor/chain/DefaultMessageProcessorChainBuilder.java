@@ -114,35 +114,58 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
   protected MessageProcessorChain createSimpleChain(List<Processor> tempList,
                                                     Optional<ProcessingStrategy> processingStrategyOptional) {
     if (tempList.size() == 1 && tempList.get(0) instanceof DefaultMessageProcessorChain) {
-      return (MessageProcessorChain) tempList.get(0);
+      DefaultMessageProcessorChain messageProcessorChain = (DefaultMessageProcessorChain) tempList.get(0);
+      if (spanCustomizer != null) {
+        messageProcessorChain.setSpanCustomizer(spanCustomizer);
+      }
+      return messageProcessorChain;
     } else {
-      return new DefaultMessageProcessorChain(name != null ? "(chain) of " + name : "(chain)",
-                                              processingStrategyOptional,
-                                              new ArrayList<>(tempList),
-                                              messagingExceptionHandler,
-                                              location);
+      DefaultMessageProcessorChain messageProcessorChain =
+          new DefaultMessageProcessorChain(name != null ? "(chain) of " + name : "(chain)",
+                                           processingStrategyOptional,
+                                           new ArrayList<>(tempList),
+                                           messagingExceptionHandler,
+                                           location);
+      if (spanCustomizer != null) {
+        messageProcessorChain.setSpanCustomizer(spanCustomizer);
+      }
+      return messageProcessorChain;
     }
   }
 
   private MessageProcessorChain createSimpleInterceptedChain(List<Processor> tempList,
                                                              Optional<ProcessingStrategy> processingStrategyOptional) {
     if (tempList.size() == 1 && tempList.get(0) instanceof DefaultMessageProcessorChain) {
-      return (MessageProcessorChain) tempList.get(0);
+      DefaultMessageProcessorChain messageProcessorChain = (DefaultMessageProcessorChain) tempList.get(0);
+      if (spanCustomizer != null) {
+        messageProcessorChain.setSpanCustomizer(spanCustomizer);
+      }
+      return messageProcessorChain;
     } else {
-      return new DefaultMessageProcessorChain(name != null ? "(chain) of " + name : "(chain)",
-                                              processingStrategyOptional,
-                                              new ArrayList<>(tempList),
-                                              NullExceptionHandler.getInstance(),
-                                              location);
+      DefaultMessageProcessorChain messageProcessorChain =
+          new DefaultMessageProcessorChain(name != null ? "(chain) of " + name : "(chain)",
+                                           processingStrategyOptional,
+                                           new ArrayList<>(tempList),
+                                           NullExceptionHandler.getInstance(),
+                                           location);
+      if (spanCustomizer != null) {
+        messageProcessorChain.setSpanCustomizer(spanCustomizer);
+      }
+      return messageProcessorChain;
     }
   }
 
   protected MessageProcessorChain createInterceptingChain(Processor head, List<Processor> processors,
                                                           List<Processor> processorsForLifecycle) {
-    return new InterceptingMessageProcessorChain(name != null ? "(intercepting chain) of " + name : "(intercepting chain)",
-                                                 ofNullable(processingStrategy), head,
-                                                 processors, processorsForLifecycle, NullExceptionHandler.getInstance(),
-                                                 location);
+    InterceptingMessageProcessorChain messageProcessorChain =
+        new InterceptingMessageProcessorChain(name != null ? "(intercepting chain) of " + name : "(intercepting chain)",
+                                              ofNullable(processingStrategy), head,
+                                              processors, processorsForLifecycle, NullExceptionHandler.getInstance(),
+                                              location);
+    if (spanCustomizer != null) {
+      messageProcessorChain.setSpanCustomizer(spanCustomizer);
+    }
+    return messageProcessorChain;
   }
 
   @Override
@@ -200,7 +223,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     /**
      * This constructor left for backwards compatibility
      *
-     * @deprecated Use {@link #DefaultMessageProcessorChainBuilder(String, Optional, List, FlowExceptionHandler)} instead.
+     * @deprecated Use {@link DefaultMessageProcessorChainBuilder(String, Optional, List, FlowExceptionHandler)} instead.
      */
     @Deprecated
     protected DefaultMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional, Processor head,

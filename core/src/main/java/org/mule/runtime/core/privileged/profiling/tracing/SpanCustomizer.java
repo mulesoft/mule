@@ -5,42 +5,39 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.internal.profiling.tracing.event.span;
+package org.mule.runtime.core.privileged.profiling.tracing;
 
-import org.mule.runtime.api.component.Component;
+import static java.util.Collections.emptyMap;
+
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 
 import java.util.Map;
-
-import static java.util.Collections.emptyMap;
 
 /**
  * A Customizer for the creation of {@link InternalSpan}.
  *
  * @since 4.5.0
  */
-public interface CoreEventSpanCustomizer {
+public interface SpanCustomizer {
 
   /**
-   * Gets the {@link InternalSpan} name from the {@param coreEvent} andthe {@param component}
+   * Gets the {@link InternalSpan} name from the {@param coreEvent} and the {@param component}
    *
    * @param coreEvent the {@link CoreEvent} to resolve the span name from.
-   * @param component the {@link Component} to resolve the span name from.
    * @return the name of the span.
    */
-  String getName(CoreEvent coreEvent, Component component);
+  String getName(CoreEvent coreEvent);
 
   /**
    * @param coreEvent         the {@link CoreEvent} corresponding to span being created.
-   * @param component         the {@link Component} corresponding to span being created.
    * @param muleConfiguration the {@link MuleConfiguration} corresponding to span being created.
    * @param artifactType      the {@link ArtifactType} corresponding to span being created.
-   *
    * @return the attributes of the span being created.
    */
-  default Map<String, String> getAttributes(CoreEvent coreEvent, Component component, MuleConfiguration muleConfiguration,
+  default Map<String, String> getAttributes(CoreEvent coreEvent, MuleConfiguration muleConfiguration,
                                             ArtifactType artifactType) {
     return emptyMap();
   }

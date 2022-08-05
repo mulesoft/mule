@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl;
 
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -14,7 +13,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanFactory;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizer;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.ExportOnEndCoreEventSpanFactory;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
@@ -46,21 +45,13 @@ public class DefaultCoreEventTracer implements CoreEventTracer {
   }
 
   @Override
-  public InternalSpan startComponentSpan(CoreEvent coreEvent, Component component) {
+  public InternalSpan startComponentSpan(CoreEvent coreEvent,
+                                         SpanCustomizer spanCustomizer) {
     return startCurrentSpanIfPossible(coreEvent,
-                                      coreEventSpanFactory.getSpan(coreEvent, component,
-                                                                   muleConfiguration,
-                                                                   artifactType));
-  }
-
-  @Override
-  public InternalSpan startComponentSpan(CoreEvent coreEvent, Component component,
-                                         CoreEventSpanCustomizer coreEventSpanCustomizer) {
-    return startCurrentSpanIfPossible(coreEvent,
-                                      coreEventSpanFactory.getSpan(coreEvent, component,
+                                      coreEventSpanFactory.getSpan(coreEvent,
                                                                    muleConfiguration,
                                                                    artifactType,
-                                                                   coreEventSpanCustomizer));
+                                                                   spanCustomizer));
   }
 
   @Override

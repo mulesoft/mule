@@ -177,13 +177,6 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
   }
 
   @Override
-  public void startComponentSpan(CoreEvent event, Component component) {
-    if (profilingService instanceof PrivilegedProfilingService) {
-      ((PrivilegedProfilingService) getProfilingService()).startComponentSpan(event, component);
-    }
-  }
-
-  @Override
   public void endComponentSpan(CoreEvent event) {
     if (profilingService instanceof PrivilegedProfilingService) {
       ((PrivilegedProfilingService) getProfilingService()).endComponentSpan(event);

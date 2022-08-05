@@ -106,4 +106,9 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
     final Optional<Error> error = event.getError();
     return error.isPresent() && sourceErrorMatcher.match(error.get().getErrorType());
   }
+
+  @Override
+  protected String getErrorHandlerType() {
+    return "on-error-continue";
+  }
 }
