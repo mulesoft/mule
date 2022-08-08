@@ -11,6 +11,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.supportsConnectivity;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromComponentParameterization;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromStaticValues;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -169,14 +170,14 @@ public final class ConfigurationCreationUtils {
       throws MuleException {
 
     final ConnectionProviderModel providerModel = settings.getConnectionProviderModel();
-    final ResolverSet resolverSet = getResolverSetFromStaticValues(providerModel,
-                                                                   settings.getParameters(),
-                                                                   muleContext,
-                                                                   false,
-                                                                   reflectionCache,
-                                                                   expressionManager,
-                                                                   parametersOwner,
-                                                                   dslSyntaxResolver);
+    final ResolverSet resolverSet = getResolverSetFromComponentParameterization(
+                                                                                settings.getParameters(),
+                                                                                muleContext,
+                                                                                false,
+                                                                                reflectionCache,
+                                                                                expressionManager,
+                                                                                parametersOwner,
+                                                                                dslSyntaxResolver);
 
     ConnectionProviderObjectBuilder builder;
     if (providerModel.getModelProperty(OAuthModelProperty.class).isPresent()) {
