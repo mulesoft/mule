@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizer;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizer;
 
 import java.util.HashMap;
@@ -53,6 +54,11 @@ public class ComponentSpanCustomizer implements SpanCustomizer {
     return attributes;
   }
 
+  @Override
+  public ChildSpanCustomizer getChildSpanCustomizer() {
+    return ChildSpanCustomizerResolver.getChildSpanCustomizer(component);
+  }
+
   private void addLogggingVariablesAsAttributes(CoreEvent coreEvent, Map<String, String> attributes) {
     if (coreEvent instanceof PrivilegedEvent) {
       Optional<Map<String, String>> loggingVariables = ((PrivilegedEvent) coreEvent).getLoggingVariables();
@@ -61,6 +67,16 @@ public class ComponentSpanCustomizer implements SpanCustomizer {
           attributes.put(entry.getKey(), entry.getValue());
         }
       }
+    }
+  }
+
+  static class ChildSpanCustomizerResolver {
+
+    public static ChildSpanCustomizer getChildSpanCustomizer(Component component) {
+      if (component.getIdentifier().getName().equals("until-successful")) {
+        return new DefaultChildSpanCustomizer(":try");
+      }
+      return new DefaultChildSpanCustomizer(":route");
     }
   }
 }

@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.ComponentSpanIdentifier.componentSpanIdentifierFrom;
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracer.getCoreEventTracerBuilder;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
+import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizer.getDefaultChildCustomizer;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
@@ -48,6 +49,8 @@ import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTr
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporter;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporterVisitor;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
+import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizer;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizer;
 
 import java.time.Instant;
 import java.util.Map;
@@ -91,7 +94,18 @@ public class DefaultCoreEventTracerTestCase {
         getTestCoreEventTracer(TestSpanExportManager.getTestSpanExportManagerInstance(),
                                mockedMuleConfiguration);
 
-    InternalSpan span = coreEventTracer.startComponentSpan(coreEvent, coreEvent1 -> getSpanName(component.getIdentifier()));
+    InternalSpan span = coreEventTracer.startComponentSpan(coreEvent, new SpanCustomizer() {
+
+      @Override
+      public String getName(CoreEvent coreEvent) {
+        return getSpanName(componentIdentifier);
+      }
+
+      @Override
+      public ChildSpanCustomizer getChildSpanCustomizer() {
+        return getDefaultChildCustomizer();
+      }
+    });
 
     assertThat(span.getName(), equalTo(getSpanName(component.getIdentifier())));
     assertThat(span.getParent(), nullValue());

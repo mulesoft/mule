@@ -63,7 +63,7 @@ public class ExportOnEndCoreEventSpanFactory implements CoreEventSpanFactory {
                                                                             null,
                                                                             getCurrentSpan(eventContext).orElse(null)),
                                                           eventContext,
-                                                          internalSpanExportManager);
+                                                          internalSpanExportManager, spanCustomizer.getChildSpanCustomizer());
 
 
     Map<String, String> attributes =
