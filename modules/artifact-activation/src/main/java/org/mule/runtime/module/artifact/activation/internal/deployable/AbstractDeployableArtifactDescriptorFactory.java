@@ -7,6 +7,8 @@
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
+import static org.mule.runtime.module.artifact.activation.internal.ExecutionEnvironment.isMuleFramework;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 
 import static java.lang.String.format;
@@ -32,6 +34,8 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -123,7 +127,19 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
 
     descriptor.setPlugins(createArtifactPluginDescriptors(descriptor));
 
-    // TODO W-11202321 - add log config file to descriptor, which currently relies in the mule home folder
+    if (!isMuleFramework()) {
+      descriptor.setLogConfigFile(getLogConfigFile(getArtifactModel()));
+    }
+  }
+
+  private File getLogConfigFile(M artifactModel) {
+    File logConfigFile = null;
+    if (artifactModel.getLogConfigFile() != null) {
+      Path logConfigFilePath = new File(artifactModel.getLogConfigFile()).toPath();
+      Path muleHomeFolderPath = getMuleHomeFolder().toPath();
+      logConfigFile = muleHomeFolderPath.resolve(logConfigFilePath).toFile();
+    }
+    return logConfigFile;
   }
 
   private Set<ArtifactPluginDescriptor> createArtifactPluginDescriptors(DeployableArtifactDescriptor descriptor) {

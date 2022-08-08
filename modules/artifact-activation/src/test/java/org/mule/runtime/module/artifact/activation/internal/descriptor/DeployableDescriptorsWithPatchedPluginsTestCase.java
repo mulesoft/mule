@@ -62,7 +62,7 @@ public class DeployableDescriptorsWithPatchedPluginsTestCase extends AbstractDep
   }
 
   @Test
-  public void createApplicationDescriptorWithPatchedPlugins() throws URISyntaxException {
+  public void createDeployableDescriptorWithPatchedPlugins() throws URISyntaxException {
     DeployableArtifactDescriptor deployableArtifactDescriptor = getDeployableArtifactDescriptor();
 
     ArtifactPluginDescriptor httpPlugin = deployableArtifactDescriptor.getPlugins()
