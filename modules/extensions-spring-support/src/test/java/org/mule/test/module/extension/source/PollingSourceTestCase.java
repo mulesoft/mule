@@ -6,7 +6,6 @@
  */
 package org.mule.test.module.extension.source;
 
-import static java.lang.String.valueOf;
 import static java.lang.Thread.sleep;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toList;
@@ -15,8 +14,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_COMPLETE;
-import static org.mule.runtime.api.notification.PollingSourceItemNotification.ITEM_DISPATCHED;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
 import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
@@ -27,7 +24,6 @@ import static org.mule.test.petstore.extension.PetAdoptionSource.FAILED_ADOPTION
 import static org.mule.test.petstore.extension.PetAdoptionSource.STARTED_POLLS;
 import static org.mule.test.petstore.extension.PetFailingPollingSource.POLL_INVOCATIONS;
 import static org.mule.test.petstore.extension.PetFailingPollingSource.STARTED_SOURCES;
-import static org.mule.test.petstore.extension.WatermarkingPetAdoptionSource.resetSource;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
@@ -35,11 +31,6 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.notification.ExceptionNotification;
 import org.mule.runtime.api.notification.ExceptionNotificationListener;
-import org.mule.runtime.api.notification.Notification;
-import org.mule.runtime.api.notification.PipelineMessageNotification;
-import org.mule.runtime.api.notification.PipelineMessageNotificationListener;
-import org.mule.runtime.api.notification.PollingSourceItemNotification;
-import org.mule.runtime.api.notification.PollingSourceItemNotificationListener;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -80,7 +71,6 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
   @Override
   protected void doTearDown() throws Exception {
     ADOPTION_EVENTS.clear();
-    resetSource();
   }
 
   @Override
@@ -269,42 +259,6 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
       startFlow("pet-dog");
       boolean timeout = !latch.await(TIMEOUT, MILLISECONDS);
       assertThat(timeout, is(true));
-    } finally {
-      notificationListenerRegistry.unregisterListener(listener);
-    }
-  }
-
-  @Test
-  public void PollingSourceNotification() throws Exception {
-    final Latch latch2 = new Latch();
-    final List<Notification> notifications2 = new ArrayList<>();
-    final PipelineMessageNotificationListener listener2 = notification -> {
-      notifications2.add(notification);
-      if (valueOf(PROCESS_COMPLETE).equals(notification.getAction().getIdentifier())) {
-        latch2.release();
-      }
-    };
-    notificationListenerRegistry.registerListener(listener2);
-
-    final Latch latch = new Latch();
-    final List<PollingSourceItemNotification> notifications = new ArrayList<>();
-    final PollingSourceItemNotificationListener listener = notification -> {
-      notifications.add(notification);
-      if (valueOf(ITEM_DISPATCHED).equals(notification.getAction().getIdentifier())) {
-        latch.release();
-      }
-    };
-    notificationListenerRegistry.registerListener(listener);
-    try {
-      startFlow("oneItemPoll");
-      boolean timeout = !latch.await(50000, MILLISECONDS);
-      boolean timeout2 = !latch2.await(50000, MILLISECONDS);
-      assertThat(timeout, is(false));
-      assertThat(timeout2, is(false));
-      assertThat(notifications.isEmpty(), is(false));
-      assertThat(notifications2.isEmpty(), is(false));
-      assertThat(((PipelineMessageNotification) notifications2.get(0)).getEvent().getContext().getRootId(),
-                 is(notifications.get(0).getEventId()));
     } finally {
       notificationListenerRegistry.unregisterListener(listener);
     }
