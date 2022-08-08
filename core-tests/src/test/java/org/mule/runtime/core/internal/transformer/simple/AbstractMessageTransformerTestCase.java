@@ -21,6 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
@@ -65,6 +66,11 @@ public class AbstractMessageTransformerTestCase extends AbstractMuleContextTestC
     protected CoreEvent createTransformationEvent(Message message, EventContext eventCtx) {
       builTransformationtEvent = InternalEvent.builder(eventCtx).message(message).build();
       return builTransformationtEvent;
+    }
+
+    @Override
+    public ComponentIdentifier getIdentifier() {
+      return ComponentIdentifier.buildFromStringRepresentation("mule:abstract-message-transformer");
     }
   };
 
