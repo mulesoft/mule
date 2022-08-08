@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.mule.api.processor;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionModelParser.APP_LOCAL_EXTENSION_NAMESPACE;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.core.api.processor.AbstractRaiseErrorProcessor;
@@ -20,6 +21,6 @@ public final class MuleSdkRaiseErrorProcessor extends AbstractRaiseErrorProcesso
 
   @Override
   protected ComponentIdentifier calculateErrorIdentifier(String typeId) {
-    return builder().namespace("THIS").name(typeId).build();
+    return builder().namespace(APP_LOCAL_EXTENSION_NAMESPACE).name(typeId).build();
   }
 }

@@ -11,6 +11,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR;
 import static org.mule.runtime.config.internal.dsl.processor.xml.OperationDslNamespaceInfoProvider.OPERATION_DSL_NAMESPACE;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkExtensionModelParser.APP_LOCAL_EXTENSION_NAMESPACE;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
@@ -253,7 +254,7 @@ public class Characteristic<T> {
       }
 
       // TODO: Use the extension parser's namespace.
-      errorModels.add(new MuleSdkErrorModelParser("THIS", errorId.get(), null));
+      errorModels.add(new MuleSdkErrorModelParser(APP_LOCAL_EXTENSION_NAMESPACE, errorId.get(), null));
     }
 
     private static boolean isRaiseError(ComponentAst operationAst) {
