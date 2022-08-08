@@ -35,14 +35,13 @@ import java.util.function.Predicate;
  */
 public class OperationRaiseErrorDoesntSpecifyNamespace implements Validation {
 
-  private static final String NAMESPACE_IDENTIFIER_SEPARATOR = ":";
+  private static final char NAMESPACE_IDENTIFIER_SEPARATOR = ':';
 
   private static final String OPERATION_PREFIX = "operation";
   private static final String RAISE_ERROR = "raise-error";
 
   private static final ComponentIdentifier OPERATION_RAISE_ERROR_IDENTIFIER =
-          builder().namespace(OPERATION_PREFIX).name(RAISE_ERROR).build();
-
+      builder().namespace(OPERATION_PREFIX).name(RAISE_ERROR).build();
 
   @Override
   public String getName() {
@@ -69,8 +68,12 @@ public class OperationRaiseErrorDoesntSpecifyNamespace implements Validation {
     final ComponentParameterAst errorTypeParam = getErrorTypeParam(component);
     final String errorTypeString = errorTypeParam.getResolvedRawValue();
 
-    if (errorTypeString.contains(NAMESPACE_IDENTIFIER_SEPARATOR)) {
-      return of(create(component, errorTypeParam, this, format("Operation raise error component (%s) is not allowed to specify a namespace: '%s'", OPERATION_RAISE_ERROR_IDENTIFIER, errorTypeString)));
+    int indexOfSeparator = errorTypeString.indexOf(NAMESPACE_IDENTIFIER_SEPARATOR);
+    if (indexOfSeparator != -1) {
+      String namespace = errorTypeString.substring(0, indexOfSeparator);
+      return of(create(component, errorTypeParam, this,
+                       format("Operation raise error component (%s) is not allowed to specify a namespace: '%s'",
+                              OPERATION_RAISE_ERROR_IDENTIFIER, namespace)));
     }
 
     return empty();

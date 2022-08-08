@@ -42,7 +42,23 @@ public class RaiseErrorValidationTestCase extends AbstractConfigFileValidationTe
   @Description("Operation's raise-error is not allowed to specify a namespace")
   public void operationRaiseErrorIsNotAllowedToSpecifyNamespace() throws Exception {
     expected.expect(ConfigurationException.class);
-    expected.expectMessage("Operation raise error component (operation:raise-error) is not allowed to specify a namespace: 'APP:CUSTOM'");
-    parseConfig("validation/raise-error-specifying-namespace.xml");
+    expected
+        .expectMessage("Operation raise error component (operation:raise-error) is not allowed to specify a namespace: 'APP'");
+    parseConfig("validation/operation-raise-error-specifying-namespace.xml");
+  }
+
+  @Test
+  @Description("Operation's raise-error is not allowed to specify THIS namespace")
+  public void operationRaiseErrorIsNotAllowedToSpecifyNamespaceThis() throws Exception {
+    expected.expect(ConfigurationException.class);
+    expected
+        .expectMessage("Operation raise error component (operation:raise-error) is not allowed to specify a namespace: 'THIS'");
+    parseConfig("validation/operation-raise-error-specifying-namespace-this.xml");
+  }
+
+  @Test
+  @Description("Operation's raise-error allowed configs don't fail")
+  public void operationRaiseErrorAllowedConfigs() throws Exception {
+    parseConfig("validation/operation-raise-error-allowed-usages.xml");
   }
 }
