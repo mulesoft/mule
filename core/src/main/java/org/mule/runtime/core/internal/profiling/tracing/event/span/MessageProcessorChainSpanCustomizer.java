@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
+import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizer.getDefaultChildCustomizer;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.ComponentSpanCustomizer.ARTIFACT_ID_KEY;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.ComponentSpanCustomizer.ARTIFACT_TYPE_ID;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.ComponentSpanCustomizer.CORRELATION_ID_KEY;
@@ -18,6 +19,7 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizer;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizer;
 
 import java.util.HashMap;
@@ -28,7 +30,8 @@ public class MessageProcessorChainSpanCustomizer implements SpanCustomizer {
 
   @Override
   public String getName(CoreEvent coreEvent) {
-    return getSpan(coreEvent).map(internalSpan -> internalSpan.getName() + ":route").orElse("");
+    return getSpan(coreEvent)
+        .map(internalSpan -> internalSpan.getName() + internalSpan.getChildSpanCustomizer().getChildSpanName()).orElse("");
   }
 
   @Override
@@ -43,6 +46,11 @@ public class MessageProcessorChainSpanCustomizer implements SpanCustomizer {
     attributes.put(THREAD_START_NAME_KEY, Thread.currentThread().getName());
     addLogggingVariablesAsAttributes(coreEvent, attributes);
     return attributes;
+  }
+
+  @Override
+  public ChildSpanCustomizer getChildSpanCustomizer() {
+    return getDefaultChildCustomizer();
   }
 
   private Optional<InternalSpan> getSpan(CoreEvent coreEvent) {

@@ -11,6 +11,7 @@ import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEv
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
+import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizer.getDefaultChildCustomizer;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
@@ -28,9 +29,11 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizer;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.ExportOnEndCoreEventSpanFactory;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizer;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -72,7 +75,18 @@ public class ExportOnEndCoreEventSpanFactoryTestCase {
     when(component.getLocation()).thenReturn(componentLocation);
 
     InternalSpan span =
-        coreEventSpanFactory.getSpan(coreEvent, muleConfiguration, APP, coreEvent1 -> getSpanName(componentIdentifier));
+        coreEventSpanFactory.getSpan(coreEvent, muleConfiguration, APP, new SpanCustomizer() {
+
+          @Override
+          public String getName(CoreEvent coreEvent) {
+            return getSpanName(componentIdentifier);
+          }
+
+          @Override
+          public ChildSpanCustomizer getChildSpanCustomizer() {
+            return getDefaultChildCustomizer();
+          }
+        });
     assertThat(span, instanceOf(ExportOnEndSpan.class));
 
     ExportOnEndSpan ExportOnEndSpan = (ExportOnEndSpan) span;

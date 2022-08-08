@@ -7,12 +7,15 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
+import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizer.getDefaultChildCustomizer;
+
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
+import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizer;
 
 import java.util.Map;
 import java.util.Optional;
@@ -75,6 +78,10 @@ public interface InternalSpan extends Span {
     }
 
     return new SpanInternalWrapper(span);
+  }
+
+  default ChildSpanCustomizer getChildSpanCustomizer() {
+    return getDefaultChildCustomizer();
   }
 
   /**
