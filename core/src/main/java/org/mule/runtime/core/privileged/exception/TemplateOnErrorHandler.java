@@ -357,6 +357,9 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   @Override
   public void dispose() {
+    if (fromGlobalErrorHandler && reuseGlobalErrorHandler()) {
+      ownedProcessingStrategy.ifPresent(processingStrategy -> disposeIfNeeded(processingStrategy, LOGGER));
+    }
     disposeIfNeeded(fluxFactory, LOGGER);
     super.dispose();
   }
