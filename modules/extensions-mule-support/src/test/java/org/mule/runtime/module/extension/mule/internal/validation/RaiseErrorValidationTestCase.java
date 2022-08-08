@@ -37,4 +37,12 @@ public class RaiseErrorValidationTestCase extends AbstractConfigFileValidationTe
         .expectMessage("Usages of the component 'raise-error' are not allowed inside a Mule Operation Definition (operation:def)");
     parseConfig("validation/operation-with-core-raise-error.xml");
   }
+
+  @Test
+  @Description("Operation's raise-error is not allowed to specify a namespace")
+  public void operationRaiseErrorIsNotAllowedToSpecifyNamespace() throws Exception {
+    expected.expect(ConfigurationException.class);
+    expected.expectMessage("Operation raise error component (operation:raise-error) is not allowed to specify a namespace: 'APP:CUSTOM'");
+    parseConfig("validation/raise-error-specifying-namespace.xml");
+  }
 }

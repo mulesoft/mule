@@ -29,7 +29,6 @@ import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
 import org.junit.Test;
 
-
 @Features({@Feature(MULE_DSL), @Feature(REUSE)})
 @Stories({@Story(DSL_VALIDATION_STORY), @Story(OPERATIONS)})
 public class OperationDoesNotHaveCoreRaiseErrorTestCase extends AbstractCoreValidationTestCase {
@@ -45,43 +44,30 @@ public class OperationDoesNotHaveCoreRaiseErrorTestCase extends AbstractCoreVali
 
   @Override
   protected Validation getValidation() {
-    return new OperationDoesNotHaveFlowRef();
+    return new OperationDoesNotHaveCoreRaiseError();
   }
 
   @Test
   @Description("Checks that no validation message is returned if there is no operation")
   public void withoutOperation() {
-    final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
-        "    <flow name=\"flow\">\n" +
-        "        <logger level=\"WARN\"/>\n" +
-        "    </flow>\n" +
-        "    <flow name=\"otherFlow\">\n" +
-        "        <flow-ref name=\"flow\"/>" +
-        "     </flow>" +
-        XML_CLOSE).stream().findFirst();
+    final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF + XML_CLOSE).stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
   @Test
   @Description("Checks that no validation message is returned if there is no core raise-error inside operation")
-  public void withoutFlowRef() {
+  public void withoutCoreRaiseError() {
     final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
-        "    <flow name=\"flow\">\n" +
-        "        <logger level=\"WARN\"/>\n" +
-        "    </flow>\n" +
-        "    <operation:def name=\"someOp\"><operation:body><logger level=\"WARN\"/></operation:body></operation:def>" +
+        "<operation:def name=\"someOp\"><operation:body><logger level=\"WARN\"/></operation:body></operation:def>" +
         XML_CLOSE).stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
   @Test
   @Description("Checks that a corresponding validation message is returned if there is a core raise-error inside an operation")
-  public void withFlowRef() {
+  public void withCoreRaiseError() {
     final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
-        "    <flow name=\"flow\">\n" +
-        "        <logger level=\"WARN\"/>\n" +
-        "    </flow>\n" +
-        "    <operation:def name=\"someOp\"><operation:body><logger level=\"WARN\"/>" +
+        "<operation:def name=\"someOp\"><operation:body><logger level=\"WARN\"/>" +
         "    <raise-error type=\"APP:SOME\"/>" +
         "</operation:body></operation:def>" +
         XML_CLOSE).stream().findFirst();
@@ -89,6 +75,4 @@ public class OperationDoesNotHaveCoreRaiseErrorTestCase extends AbstractCoreVali
     assertThat(msg.get().getMessage(),
                containsString("Usages of the component 'raise-error' are not allowed inside a Mule Operation Definition"));
   }
-
-
 }

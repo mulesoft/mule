@@ -72,6 +72,7 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                           new ScatterGatherRoutes(),
                                                           new ParseTemplateResourceExist(artifactRegionClassLoader),
                                                           new SourcePositiveMaxItemsPerPoll(),
+                                                          new OperationRaiseErrorDoesntSpecifyNamespace(),
                                                           new OperationDoesNotHaveCoreRaiseError(),
                                                           new OperationDoesNotHaveFlowRef()));
 
