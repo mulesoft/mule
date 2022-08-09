@@ -68,7 +68,6 @@ import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager;
 import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ErrorHandlerContext;
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.profiling.tracing.event.NamedSpanBasedOnComponentIdentifierAloneSpanCustomizer;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
@@ -116,9 +115,6 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   @Inject
   private ConfigurationProperties configurationProperties;
-
-  @Inject
-  private InternalProfilingService internalProfilingService;
 
   protected Optional<String> flowLocation = empty();
   private MessageProcessorChain configuredMessageProcessors;
