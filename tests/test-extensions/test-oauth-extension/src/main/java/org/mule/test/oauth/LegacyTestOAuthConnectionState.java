@@ -17,7 +17,4 @@ public class LegacyTestOAuthConnectionState extends TestOAuthConnectionState {
   public OAuthState getState() {
     return state;
   }
-
-  // Crear el otro para extender
-  // Ver tema de nombres, si este nombre no tendria que ser el de la abstracta
 }
