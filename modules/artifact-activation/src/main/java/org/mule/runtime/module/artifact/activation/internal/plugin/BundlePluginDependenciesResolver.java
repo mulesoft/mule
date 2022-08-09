@@ -7,6 +7,7 @@
 package org.mule.runtime.module.artifact.activation.internal.plugin;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.artifact.activation.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
 
@@ -216,8 +217,9 @@ public class BundlePluginDependenciesResolver {
                     ClassLoaderModel originalClassLoaderModel = pluginDescriptor.getClassLoaderModel();
                     // TODO W-11203349 - check if the dependency belongs to the deny-list to decide whether to include local
                     // packages and resources
+                    boolean includeLocals = !isDenylisted(pluginDescriptor.getBundleDescriptor());
                     pluginDescriptor
-                        .setClassLoaderModel(createBuilderWithoutDependency(originalClassLoaderModel, dependency, true)
+                        .setClassLoaderModel(createBuilderWithoutDependency(originalClassLoaderModel, dependency, includeLocals)
                             .dependingOn(ImmutableSet.of(
                                                          new BundleDependency.Builder()
                                                              .setDescriptor(artifactPluginDescriptorResolved
@@ -267,7 +269,8 @@ public class BundlePluginDependenciesResolver {
     exportedClassPackages.removeAll(packagesExportedByDependencies);
     // TODO W-11203349 - check if the dependency belongs to the deny-list to decide whether to include local packages and
     // resources
-    pluginDescriptor.setClassLoaderModel(createBuilderWithoutExportedPackages(originalClassLoaderModel, true)
+    boolean includeLocals = !isDenylisted(pluginDescriptor.getBundleDescriptor());
+    pluginDescriptor.setClassLoaderModel(createBuilderWithoutExportedPackages(originalClassLoaderModel, includeLocals)
         .exportingPackages(exportedClassPackages).build());
   }
 

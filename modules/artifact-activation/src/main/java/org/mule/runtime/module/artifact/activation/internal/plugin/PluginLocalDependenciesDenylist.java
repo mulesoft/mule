@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.deployment.impl.internal.plugin;
+package org.mule.runtime.module.artifact.activation.internal.plugin;
 
 import static java.util.Collections.unmodifiableList;
 
@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.2.2
  */
-// TODO W-11086310/W-11086334 - remove this class after these migrations
 public class PluginLocalDependenciesDenylist {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PluginLocalDependenciesDenylist.class);
