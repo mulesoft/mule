@@ -18,6 +18,8 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.BOO
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULESOFT_VENDOR;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.VOID_TYPE;
+import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_DEFINITION;
 import static org.mule.sdk.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.DEPRECATED_STEREOTYPE;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OPERATION_DEF_STEREOTYPE;
@@ -31,10 +33,12 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedComponentDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
+import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
 
 /**
  * Builds the {@link ExtensionDeclarer} for the {@code operation} namespace used to define Mule DSL operations
@@ -134,6 +138,8 @@ class MuleOperationExtensionModelDeclarer {
     def.withChain("body")
         .describedAs("The operations that makes for the operation's implementation")
         .setRequired(true);
+
+    declareRaiseError(declarer);
   }
 
   private void declareOutputConstruct(ConstructDeclarer def) {
@@ -182,6 +188,26 @@ class MuleOperationExtensionModelDeclarer {
         .describedAs("The version of the extension in which the annotated member will be removed or was removed")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED);
+  }
+
+  private void declareRaiseError(ExtensionDeclarer extensionDeclarer) {
+    OperationDeclarer raiseError = extensionDeclarer.withOperation("raiseError")
+        .describedAs("Throws an error with the specified type and description.")
+        .withModelProperty(new NoErrorMappingModelProperty());
+
+    raiseError.withOutput().ofType(VOID_TYPE);
+    raiseError.withOutputAttributes().ofType(VOID_TYPE);
+
+    raiseError.onDefaultParameterGroup()
+        .withRequiredParameter("type")
+        .ofType(ERROR_TYPE_DEFINITION)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The error type to raise.");
+
+    raiseError.onDefaultParameterGroup()
+        .withOptionalParameter("description")
+        .ofType(STRING_TYPE)
+        .describedAs("The description of this error.");
   }
 
   private void declareOutputTypeParameters(NestedComponentDeclarer component, String outputRole) {

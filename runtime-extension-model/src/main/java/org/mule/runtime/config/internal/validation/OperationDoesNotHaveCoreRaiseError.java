@@ -11,14 +11,14 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 
-public class OperationDoesNotHaveFlowRef extends OperationDoesNotHaveForbiddenComponent {
+public class OperationDoesNotHaveCoreRaiseError extends OperationDoesNotHaveForbiddenComponent {
 
-  private static final String FLOW_REF_ELEMENT = "flow-ref";
-  private static final ComponentIdentifier FLOW_REF_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(FLOW_REF_ELEMENT).build();
+  private static final String CORE_RAISE_ERROR_ELEMENT = "raise-error";
+  private static final ComponentIdentifier CORE_RAISE_ERROR_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(CORE_RAISE_ERROR_ELEMENT).build();
 
   @Override
   protected ComponentIdentifier forbiddenComponentIdentifier() {
-    return FLOW_REF_IDENTIFIER;
+    return CORE_RAISE_ERROR_IDENTIFIER;
   }
 }

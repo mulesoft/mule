@@ -136,11 +136,6 @@ public abstract class AbstractErrorTypesValidation implements Validation {
     // raise-error is allowed to throw errors from the MULE namespace.
     namespaces.add("MULE");
 
-    // TODO W-11464483: If a Mule Operation wants to throw a "THIS:SOME_ERROR", the current way to implement it is by
-    // using a raise-error. If W-11464483 is done, remove this line and the raise-error won't be able to throw such
-    // error.
-    namespaces.add("THIS");
-
     // TODO W-11464525: We have several tests using an extension with namespace "test" and a raise-error with the same
     // namespace. Refactor all those tests and remove this line.
     namespaces.add("TEST");

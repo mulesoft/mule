@@ -33,11 +33,6 @@ public class MuleOperationErrorHandlingTestCase extends MuleArtifactFunctionalTe
   }
 
   @Test
-  public void errorWithinAppWithNamespaceOther() throws Exception {
-    flowRunner("raiseErrorWithinOtherNamespace").runExpectingException(errorType("OTHER", "CUSTOM"));
-  }
-
-  @Test
   public void divisionByZero() throws Exception {
     flowRunner("divisionByZeroFlow").runExpectingException(errorType("MULE", "EXPRESSION"));
   }
@@ -45,6 +40,11 @@ public class MuleOperationErrorHandlingTestCase extends MuleArtifactFunctionalTe
   @Test
   public void heisenbergCureCancer() throws Exception {
     flowRunner("heisenbergCureCancerFlow").runExpectingException(errorType("HEISENBERG", "HEALTH"));
+  }
+
+  @Test
+  public void usingOperationRaiseError() throws Exception {
+    flowRunner("usingOperationRaiseErrorFlow").runExpectingException(errorType("THIS", "CUSTOM"));
   }
 
   @Test

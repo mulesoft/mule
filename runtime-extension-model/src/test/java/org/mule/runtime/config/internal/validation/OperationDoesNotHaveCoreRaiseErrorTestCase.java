@@ -12,7 +12,6 @@ import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERATIONS;
 
 import static java.util.Optional.empty;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -23,17 +22,16 @@ import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
 import java.util.Optional;
 
-import org.junit.Test;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Features;
-import io.qameta.allure.Story;
 import io.qameta.allure.Stories;
-
+import io.qameta.allure.Story;
+import org.junit.Test;
 
 @Features({@Feature(MULE_DSL), @Feature(REUSE)})
 @Stories({@Story(DSL_VALIDATION_STORY), @Story(OPERATIONS)})
-public class OperationDoesNotHaveFlowRefTestCase extends AbstractCoreValidationTestCase {
+public class OperationDoesNotHaveCoreRaiseErrorTestCase extends AbstractCoreValidationTestCase {
 
   private static final String XML_NAMESPACE_DEF = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
       "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
@@ -46,50 +44,35 @@ public class OperationDoesNotHaveFlowRefTestCase extends AbstractCoreValidationT
 
   @Override
   protected Validation getValidation() {
-    return new OperationDoesNotHaveFlowRef();
+    return new OperationDoesNotHaveCoreRaiseError();
   }
 
   @Test
   @Description("Checks that no validation message is returned if there is no operation")
   public void withoutOperation() {
+    final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF + XML_CLOSE).stream().findFirst();
+    assertThat(msg, is(empty()));
+  }
+
+  @Test
+  @Description("Checks that no validation message is returned if there is no core raise-error inside operation")
+  public void withoutCoreRaiseError() {
     final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
-        "    <flow name=\"flow\">\n" +
-        "        <logger level=\"WARN\"/>\n" +
-        "    </flow>\n" +
-        "    <flow name=\"otherFlow\">\n" +
-        "        <flow-ref name=\"flow\"/>" +
-        "     </flow>" +
+        "<operation:def name=\"someOp\"><operation:body><logger level=\"WARN\"/></operation:body></operation:def>" +
         XML_CLOSE).stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
   @Test
-  @Description("Checks that no validation message is returned if there is no flow-ref inside operation")
-  public void withoutFlowRef() {
+  @Description("Checks that a corresponding validation message is returned if there is a core raise-error inside an operation")
+  public void withCoreRaiseError() {
     final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
-        "    <flow name=\"flow\">\n" +
-        "        <logger level=\"WARN\"/>\n" +
-        "    </flow>\n" +
-        "    <operation:def name=\"someOp\"><operation:body><logger level=\"WARN\"/></operation:body></operation:def>" +
-        XML_CLOSE).stream().findFirst();
-    assertThat(msg, is(empty()));
-  }
-
-  @Test
-  @Description("Checks that a corresponding validation message is returned if there is a flow-ref inside an operation")
-  public void withFlowRef() {
-    final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
-        "    <flow name=\"flow\">\n" +
-        "        <logger level=\"WARN\"/>\n" +
-        "    </flow>\n" +
-        "    <operation:def name=\"someOp\"><operation:body><logger level=\"WARN\"/>" +
-        "    <flow-ref name=\"flow\"/>" +
+        "<operation:def name=\"someOp\"><operation:body><logger level=\"WARN\"/>" +
+        "    <raise-error type=\"APP:SOME\"/>" +
         "</operation:body></operation:def>" +
         XML_CLOSE).stream().findFirst();
     assertThat(msg, is(not(empty())));
     assertThat(msg.get().getMessage(),
-               containsString("Usages of the component 'flow-ref' are not allowed inside a Mule Operation Definition"));
+               containsString("Usages of the component 'raise-error' are not allowed inside a Mule Operation Definition"));
   }
-
-
 }

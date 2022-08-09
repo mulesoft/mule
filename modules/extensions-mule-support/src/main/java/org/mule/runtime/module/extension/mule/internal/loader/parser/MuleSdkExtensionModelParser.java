@@ -49,10 +49,10 @@ import java.util.Optional;
  *
  * @since 4.5.0
  */
-class MuleSdkExtensionModelParser implements ExtensionModelParser {
+public class MuleSdkExtensionModelParser implements ExtensionModelParser {
 
   // The namespace of the extension when it's defined within an application rather than in a separate artifact.
-  private static final String APP_LOCAL_EXTENSION_NAMESPACE = "THIS";
+  public static final String APP_LOCAL_EXTENSION_NAMESPACE = "THIS";
 
   private final String extensionName;
   private final ArtifactAst ast;
