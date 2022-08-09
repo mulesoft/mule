@@ -40,21 +40,21 @@ public class DeployableDescriptorsWithCustomLogConfig extends AbstractDeployable
   @Rule
   public final SystemProperty muleHomeSystemProperty;
 
-  @Parameterized.Parameters(name = "deployableProjectFolder: {0}, isApplication: {1}")
-  public static Collection<Pair<String, String>> deployableArtifactDescriptors() {
-    return asList(
-                  new Pair<>("apps/with-custom-log-config", "some-path"),
-                  new Pair<>("domains/with-custom-log-config", "some-path"),
-                  new Pair<>("apps/with-custom-log-config", null),
-                  new Pair<>("domains/with-custom-log-config", null));
+  @Parameterized.Parameters(name = "Deployable project folder: {0}, Custom log config file path: {1}")
+  public static Collection<Object[]> deployableArtifactDescriptors() {
+    return asList(new Object[][] {
+        {"apps/with-custom-log-config", "some-path"},
+        {"domains/with-custom-log-config", "some-path"},
+        {"apps/with-custom-log-config", null},
+        {"domains/with-custom-log-config", null}});
   }
 
-  public DeployableDescriptorsWithCustomLogConfig(Pair<String, String> deployableProjectInfo) {
-    deployableProjectFolder = deployableProjectInfo.getFirst();
+  public DeployableDescriptorsWithCustomLogConfig(String deployableProjectFolder, String customLogConfigFilePath) {
+    this.deployableProjectFolder = deployableProjectFolder;
     isApplication = deployableProjectFolder.startsWith("apps");
 
     muleHomeSystemProperty =
-        new SystemProperty(MULE_HOME_DIRECTORY_PROPERTY, deployableProjectInfo.getSecond());
+        new SystemProperty(MULE_HOME_DIRECTORY_PROPERTY, customLogConfigFilePath);
   }
 
   @Test

@@ -45,17 +45,15 @@ public class DeployableDescriptorsWithPatchedPluginsTestCase extends AbstractDep
   @Rule
   public final SystemProperty muleHomeSystemProperty;
 
-  @Parameters(name = "deployableProjectFolder: {0}, isApplication: {1}")
-  public static Collection<Pair<String, Boolean>> deployableArtifactDescriptors() {
-    return asList(
-                  new Pair<>("apps/with-patched-artifacts", true),
-                  new Pair<>("domains/with-patched-artifacts", false));
+  @Parameters(name = "Deployable project folder: {0}")
+  public static Collection<String> deployableArtifactDescriptors() {
+    return asList("apps/with-patched-artifacts", "domains/with-patched-artifacts");
   }
 
-  public DeployableDescriptorsWithPatchedPluginsTestCase(Pair<String, Boolean> deployableProjectInfo)
+  public DeployableDescriptorsWithPatchedPluginsTestCase(String deployableProjectFolder)
       throws URISyntaxException, IOException {
-    deployableProjectFolder = deployableProjectInfo.getFirst();
-    isApplication = deployableProjectInfo.getSecond();
+    this.deployableProjectFolder = deployableProjectFolder;
+    isApplication = deployableProjectFolder.startsWith("apps");
 
     muleHomeSystemProperty =
         new SystemProperty(MULE_HOME_DIRECTORY_PROPERTY, getDeployableFolder(deployableProjectFolder).getCanonicalPath());
