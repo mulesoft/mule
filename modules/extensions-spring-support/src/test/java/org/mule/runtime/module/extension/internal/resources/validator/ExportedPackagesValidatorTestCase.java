@@ -60,8 +60,9 @@ public class ExportedPackagesValidatorTestCase {
 
   private final ClassTypeLoader loader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
-  private static boolean isValidationSkipped() {
-    return getProperties().contains("exportedPackagesValidator.skip");
+  private static boolean shouldValidate() {
+    String skip = System.getProperty("exportedPackagesValidator.skip");
+    return !(skip != null ? Boolean.valueOf(skip) : false);
   }
 
   @Mock(lenient = true)
@@ -75,7 +76,7 @@ public class ExportedPackagesValidatorTestCase {
 
   @Test
   public void invalidExportedPackages() {
-    assumeThat(isValidationSkipped(), is(false));
+    assumeThat(shouldValidate(), is(true));
 
     setUpInvalidExtension();
 
