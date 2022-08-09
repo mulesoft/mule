@@ -103,7 +103,6 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
   private List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency,
                                                             ClassLoaderModelBuilder classLoaderConfigurationBuilder) {
     return bundleDependency.getAdditionalDependenciesList().stream().map(additionalDependency -> {
-      // TODO W-11203349 - check if the dependency belongs to the deny-list
       if (!isDenylisted(additionalDependency.getDescriptor())) {
         classLoaderConfigurationBuilder.withLocalPackages(additionalDependency.getPackages());
         classLoaderConfigurationBuilder.withLocalResources(additionalDependency.getResources());
@@ -129,7 +128,6 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
 
   @Override
   protected boolean shouldPopulateLocalPackages() {
-    // TODO W-11203349 - check if it belongs to the deny-list to decide whether local packages should be populated
     return !isDenylisted(bundleDescriptor);
   }
 }

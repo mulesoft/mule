@@ -215,8 +215,6 @@ public class BundlePluginDependenciesResolver {
                                      pluginDescriptor.getBundleDescriptor(), dependency.getDescriptor(),
                                      artifactPluginDescriptorResolved.getBundleDescriptor()));
                     ClassLoaderModel originalClassLoaderModel = pluginDescriptor.getClassLoaderModel();
-                    // TODO W-11203349 - check if the dependency belongs to the deny-list to decide whether to include local
-                    // packages and resources
                     boolean includeLocals = !isDenylisted(pluginDescriptor.getBundleDescriptor());
                     pluginDescriptor
                         .setClassLoaderModel(createBuilderWithoutDependency(originalClassLoaderModel, dependency, includeLocals)
@@ -267,8 +265,6 @@ public class BundlePluginDependenciesResolver {
     ClassLoaderModel originalClassLoaderModel = pluginDescriptor.getClassLoaderModel();
     final Set<String> exportedClassPackages = new HashSet<>(originalClassLoaderModel.getExportedPackages());
     exportedClassPackages.removeAll(packagesExportedByDependencies);
-    // TODO W-11203349 - check if the dependency belongs to the deny-list to decide whether to include local packages and
-    // resources
     boolean includeLocals = !isDenylisted(pluginDescriptor.getBundleDescriptor());
     pluginDescriptor.setClassLoaderModel(createBuilderWithoutExportedPackages(originalClassLoaderModel, includeLocals)
         .exportingPackages(exportedClassPackages).build());
