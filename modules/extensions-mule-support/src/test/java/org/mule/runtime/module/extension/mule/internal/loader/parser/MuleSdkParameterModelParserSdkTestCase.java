@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.PARAMETERS;
 
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static org.hamcrest.Matchers.is;
@@ -16,9 +18,12 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 
+import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
+import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.MetadataTypeEnricher;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Optional;
@@ -42,7 +47,7 @@ public class MuleSdkParameterModelParserSdkTestCase extends AbstractMuleTestCase
 
   @Before
   public void setUp() {
-    someValidMetadataType = mock(MetadataType.class);
+    someValidMetadataType = BaseTypeBuilder.create(JAVA).anyType().build();
     baseParameterParserBuilder = new MuleSdkParameterModelParserSdkBuilder("someparam", "somevalid")
         .withTypeLoaderTypes(singletonMap("somevalid", someValidMetadataType));
   }
@@ -68,7 +73,9 @@ public class MuleSdkParameterModelParserSdkTestCase extends AbstractMuleTestCase
   @Test
   public void parameterTypeCanBeSomeValidParameterInTheApplicationTypeLoader() {
     MuleSdkParameterModelParserSdk parameterModelParser = baseParameterParserBuilder.withType("somevalid").build();
-    assertThat(parameterModelParser.getType(), is(someValidMetadataType));
+    MetadataType expectedType =
+        new MetadataTypeEnricher().enrich(someValidMetadataType, singleton(new TypedValueTypeAnnotation()));
+    assertThat(parameterModelParser.getType(), is(expectedType));
   }
 
   // ------------------------------- //

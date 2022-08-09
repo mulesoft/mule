@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -35,7 +36,9 @@ import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
+import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.MetadataTypeEnricher;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 
@@ -95,7 +98,11 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
       return false;
     }
 
-    this.type = metadataType.get();
+    // We want to enrich all types with the TypedValue annotation so that the DataType is preserved and available inside the body
+    // of the operation.
+    // While this makes most sense for String and Stream types, we want to keep it for all attributes so that delegation to
+    // composed operations that expect TypedValue parameters works properly.
+    this.type = new MetadataTypeEnricher().enrich(metadataType.get(), singleton(new TypedValueTypeAnnotation()));
     return true;
   }
 

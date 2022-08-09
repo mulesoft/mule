@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.STRING;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
@@ -14,6 +15,7 @@ import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.PARAMETERS;
 
+import static java.util.Collections.singleton;
 import static java.util.Collections.unmodifiableMap;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -22,11 +24,14 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 
+import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
+import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.module.extension.internal.loader.java.enricher.MetadataTypeEnricher;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -53,7 +58,7 @@ public class MuleSdkParameterModelParserSdkConfigNamesTestCase extends AbstractM
 
   @Before
   public void setUp() {
-    someValidMetadataType = mock(MetadataType.class);
+    someValidMetadataType = BaseTypeBuilder.create(JAVA).anyType().build();
 
     final Map<String, MetadataType> typeLoaderTypes = new HashMap<>();
     typeLoaderTypes.put("somevalid", someValidMetadataType);
@@ -105,7 +110,9 @@ public class MuleSdkParameterModelParserSdkConfigNamesTestCase extends AbstractM
   public void parameterTypeMatchingExtensionConfigCollidingWithTypeInTypeLoaderPrioritizesTypeLoader() {
     MuleSdkParameterModelParserSdk parameterModelParser =
         baseParameterParserBuilder.withType("some:some-config-colliding-with-type").build();
-    assertThat(parameterModelParser.getType(), is(someValidMetadataType));
+    MetadataType expectedType =
+        new MetadataTypeEnricher().enrich(someValidMetadataType, singleton(new TypedValueTypeAnnotation()));
+    assertThat(parameterModelParser.getType(), is(expectedType));
   }
 
   @Test
