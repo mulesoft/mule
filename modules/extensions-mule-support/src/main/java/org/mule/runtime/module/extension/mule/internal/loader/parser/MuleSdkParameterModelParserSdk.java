@@ -22,6 +22,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import org.mule.metadata.api.TypeLoader;
+import org.mule.metadata.api.annotation.TypeAnnotation;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.ExpressionSupport;
@@ -52,6 +53,9 @@ import java.util.Set;
  * @since 4.5.0
  */
 public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelParser implements ParameterModelParser {
+
+  private static final MetadataTypeEnricher METADATA_TYPE_ENRICHER = new MetadataTypeEnricher();
+  private static final Set<TypeAnnotation> METADATA_TYPE_ANNOTATIONS = singleton(new TypedValueTypeAnnotation());
 
   protected final ComponentAst parameterAst;
   private final TypeLoader typeLoader;
@@ -102,7 +106,7 @@ public class MuleSdkParameterModelParserSdk extends BaseMuleSdkExtensionModelPar
     // of the operation.
     // While this makes most sense for String and Stream types, we want to keep it for all attributes so that delegation to
     // composed operations that expect TypedValue parameters works properly.
-    this.type = new MetadataTypeEnricher().enrich(metadataType.get(), singleton(new TypedValueTypeAnnotation()));
+    this.type = METADATA_TYPE_ENRICHER.enrich(metadataType.get(), METADATA_TYPE_ANNOTATIONS);
     return true;
   }
 
