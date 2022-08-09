@@ -214,6 +214,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
             final Flux<CoreEvent> upstream =
                 from(doApply(publisher, interceptors, (context, throwable) -> {
                   inflightEvents.incrementAndGet();
+                  // Ending current span
+                  muleEventTracer.endCurrentSpan(((MessagingException) throwable).getEvent());
+                  // Ending parent span
                   muleEventTracer.endCurrentSpan(((MessagingException) throwable).getEvent());
                   routeError(errorRouter, throwable);
                 }));

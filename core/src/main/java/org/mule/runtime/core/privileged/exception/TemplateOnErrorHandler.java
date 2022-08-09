@@ -200,14 +200,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
                                     Consumer<CoreEvent> continueCallback,
                                     Consumer<Throwable> propagateCallback) {
     FluxSink<CoreEvent> fluxSink = fluxFactory.apply(publisherPostProcessor);
-    Consumer<CoreEvent> wrappedContinueCallback = coreEvent -> {
-      continueCallback.accept(coreEvent);
-      internalProfilingService.getCoreEventTracer().endCurrentSpan(coreEvent);
-    };
-    Consumer<Throwable> wrappedPropagateCallback = throwable -> {
-      propagateCallback.accept(throwable);
-      internalProfilingService.getCoreEventTracer().endCurrentSpan(((MessagingException) throwable).getEvent());
-    };
+
     return new ExceptionRouter() {
 
       @Override
@@ -218,8 +211,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       @Override
       public void accept(Exception error) {
         // All calling methods will end up transforming any error class other than MessagingException into that one
-        fluxSink.next(addContext(TemplateOnErrorHandler.this, (MessagingException) error, wrappedContinueCallback,
-                                 wrappedPropagateCallback));
+        fluxSink.next(addContext(TemplateOnErrorHandler.this, (MessagingException) error, continueCallback, propagateCallback));
       }
     };
   }
