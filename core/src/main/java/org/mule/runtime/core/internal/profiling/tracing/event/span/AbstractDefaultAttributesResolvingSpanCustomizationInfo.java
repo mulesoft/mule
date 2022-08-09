@@ -11,18 +11,18 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
-import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizer;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 /**
- * A {@link SpanCustomizer} that resolves the attributes from the {@link CoreEvent} with a default behaviour.
+ * A {@link SpanCustomizationInfo} that resolves the attributes from the {@link CoreEvent} with a default behaviour.
  *
  * @since 4.5.0
  */
-public abstract class AbstractDefaultAttributesResolvingSpanCustomizer implements SpanCustomizer {
+public abstract class AbstractDefaultAttributesResolvingSpanCustomizationInfo implements SpanCustomizationInfo {
 
   public static final String LOCATION_KEY = "location";
   public static final String CORRELATION_ID_KEY = "correlationId";

@@ -6,21 +6,22 @@
  */
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
-import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanInfo.getDefaultChildSpanInfo;
+import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo.getDefaultChildSpanInfo;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
-import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanInfo;
+import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 
 import java.util.Optional;
 
 /**
- * A {@link org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizer} that sets the name based on the parent span's
- * {@link ChildSpanInfo}.
+ * A {@link SpanCustomizationInfo} that sets the name based on the parent span's {@link ChildSpanCustomizationInfo}.
  *
  * @since 4.5.0
  */
-public class NamedSpanBasedOnParentSpanChildCustomizerSpanCustomizer extends AbstractDefaultAttributesResolvingSpanCustomizer {
+public class NamedSpanBasedOnParentSpanChildSpanCustomizationInfo
+    extends AbstractDefaultAttributesResolvingSpanCustomizationInfo {
 
   @Override
   public String getName(CoreEvent coreEvent) {
@@ -29,7 +30,7 @@ public class NamedSpanBasedOnParentSpanChildCustomizerSpanCustomizer extends Abs
   }
 
   @Override
-  public ChildSpanInfo getChildSpanCustomizer() {
+  public ChildSpanCustomizationInfo getChildSpanCustomizationInfo() {
     return getDefaultChildSpanInfo();
   }
 

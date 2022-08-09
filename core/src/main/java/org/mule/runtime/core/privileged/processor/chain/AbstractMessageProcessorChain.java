@@ -74,9 +74,9 @@ import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcess
 import org.mule.runtime.core.internal.processor.interceptor.ProcessorInterceptorFactoryAdapter;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
-import org.mule.runtime.core.internal.profiling.tracing.event.NamedSpanBasedOnComponentIdentifierAloneSpanCustomizer;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.NamedSpanBasedOnParentSpanChildCustomizerSpanCustomizer;
-import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizer;
+import org.mule.runtime.core.internal.profiling.tracing.event.NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.NamedSpanBasedOnParentSpanChildSpanCustomizationInfo;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadingProfilingEventContext;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
@@ -176,13 +176,13 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   private Scheduler switchOnErrorScheduler;
   private CoreEventTracer muleEventTracer;
-  private static final SpanCustomizer DEFAULT_CHAIN_SPAN_CUSTOMIZER =
-      new NamedSpanBasedOnParentSpanChildCustomizerSpanCustomizer();
+  private static final SpanCustomizationInfo DEFAULT_CHAIN_SPAN_CUSTOMIZATION_INFO =
+      new NamedSpanBasedOnParentSpanChildSpanCustomizationInfo();
 
   /**
-   * The span customizer for the chain.
+   * The span customization info for the chain.
    */
-  private SpanCustomizer chainSpanCustomizer = DEFAULT_CHAIN_SPAN_CUSTOMIZER;
+  private SpanCustomizationInfo chainSpanCustomizationInfo = DEFAULT_CHAIN_SPAN_CUSTOMIZATION_INFO;
 
   AbstractMessageProcessorChain(String name,
                                 Optional<ProcessingStrategy> processingStrategyOptional,
@@ -278,7 +278,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                                        List<ReactiveInterceptor> interceptors,
                                        BiConsumer<BaseEventContext, ? super Exception> errorBubbler) {
     Flux<CoreEvent> stream = from(publisher);
-    stream = stream.doOnNext(event -> muleEventTracer.startComponentSpan(event, chainSpanCustomizer));
+    stream = stream.doOnNext(event -> muleEventTracer.startComponentSpan(event, chainSpanCustomizationInfo));
     for (Processor processor : getProcessorsToExecute()) {
       // Perform assembly for processor chain by transforming the existing publisher with a publisher function for each processor
       // along with the interceptors that decorate it.
@@ -444,7 +444,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     ComponentLocation componentLocation = getLocationIfComponent(processor);
     if (processor instanceof Component) {
       muleEventTracer.startComponentSpan(event,
-                                         new NamedSpanBasedOnComponentIdentifierAloneSpanCustomizer((Component) processor));
+                                         new NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo((Component) processor));
     }
     triggerStartingOperation(event, componentLocation);
     preNotification(event, processor);
@@ -685,7 +685,10 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     return messagingExceptionHandler;
   }
 
-  public void setSpanCustomizer(SpanCustomizer spanCustomizer) {
-    this.chainSpanCustomizer = spanCustomizer;
+  /**
+   * @param spanCustomizationInfo sets the {@link SpanCustomizationInfo} for the chain.
+   */
+  public void setSpanCustomizationInfo(SpanCustomizationInfo spanCustomizationInfo) {
+    this.chainSpanCustomizationInfo = spanCustomizationInfo;
   }
 }

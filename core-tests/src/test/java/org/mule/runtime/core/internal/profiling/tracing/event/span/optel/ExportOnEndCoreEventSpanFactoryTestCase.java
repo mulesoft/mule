@@ -29,11 +29,11 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanInfo;
+import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.ExportOnEndCoreEventSpanFactory;
-import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizer;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 
 import java.util.Map;
 
@@ -49,7 +49,7 @@ public class ExportOnEndCoreEventSpanFactoryTestCase {
   public static final String IDENTIFIER_NAMESPACE = "namespace";
   public static final String IDENTIFIER_NAME = "name";
   public static final String APP_ID = "appId";
-  public static final ChildSpanInfo DEFAULT_CHILD_SPAN_INFO = ChildSpanInfo.getDefaultChildSpanInfo();
+  public static final ChildSpanCustomizationInfo DEFAULT_CHILD_SPAN_INFO = ChildSpanCustomizationInfo.getDefaultChildSpanInfo();
   private final ExportOnEndCoreEventSpanFactory coreEventSpanFactory =
       new ExportOnEndCoreEventSpanFactory(getDefaultSpanExporterManager());
   public static final String CORRELATION_ID = "000-000-0000";
@@ -71,7 +71,7 @@ public class ExportOnEndCoreEventSpanFactoryTestCase {
     when(componentIdentifier.getName()).thenReturn(IDENTIFIER_NAME);
 
     InternalSpan span =
-        coreEventSpanFactory.getSpan(coreEvent, muleConfiguration, APP, new SpanCustomizer() {
+        coreEventSpanFactory.getSpan(coreEvent, muleConfiguration, APP, new SpanCustomizationInfo() {
 
           @Override
           public String getName(CoreEvent coreEvent) {
@@ -79,7 +79,7 @@ public class ExportOnEndCoreEventSpanFactoryTestCase {
           }
 
           @Override
-          public ChildSpanInfo getChildSpanCustomizer() {
+          public ChildSpanCustomizationInfo getChildSpanCustomizationInfo() {
             return DEFAULT_CHILD_SPAN_INFO;
           }
 

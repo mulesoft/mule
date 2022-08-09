@@ -115,8 +115,8 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                                                     Optional<ProcessingStrategy> processingStrategyOptional) {
     if (tempList.size() == 1 && tempList.get(0) instanceof DefaultMessageProcessorChain) {
       DefaultMessageProcessorChain messageProcessorChain = (DefaultMessageProcessorChain) tempList.get(0);
-      if (spanCustomizer != null) {
-        messageProcessorChain.setSpanCustomizer(spanCustomizer);
+      if (spanCustomizationInfo != null) {
+        messageProcessorChain.setSpanCustomizationInfo(spanCustomizationInfo);
       }
       return messageProcessorChain;
     } else {
@@ -126,8 +126,8 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                                            new ArrayList<>(tempList),
                                            messagingExceptionHandler,
                                            location);
-      if (spanCustomizer != null) {
-        messageProcessorChain.setSpanCustomizer(spanCustomizer);
+      if (spanCustomizationInfo != null) {
+        messageProcessorChain.setSpanCustomizationInfo(spanCustomizationInfo);
       }
       return messageProcessorChain;
     }
@@ -137,8 +137,8 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                                                              Optional<ProcessingStrategy> processingStrategyOptional) {
     if (tempList.size() == 1 && tempList.get(0) instanceof DefaultMessageProcessorChain) {
       DefaultMessageProcessorChain messageProcessorChain = (DefaultMessageProcessorChain) tempList.get(0);
-      if (spanCustomizer != null) {
-        messageProcessorChain.setSpanCustomizer(spanCustomizer);
+      if (spanCustomizationInfo != null) {
+        messageProcessorChain.setSpanCustomizationInfo(spanCustomizationInfo);
       }
       return messageProcessorChain;
     } else {
@@ -148,8 +148,8 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                                            new ArrayList<>(tempList),
                                            NullExceptionHandler.getInstance(),
                                            location);
-      if (spanCustomizer != null) {
-        messageProcessorChain.setSpanCustomizer(spanCustomizer);
+      if (spanCustomizationInfo != null) {
+        messageProcessorChain.setSpanCustomizationInfo(spanCustomizationInfo);
       }
       return messageProcessorChain;
     }
@@ -162,8 +162,8 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                                               ofNullable(processingStrategy), head,
                                               processors, processorsForLifecycle, NullExceptionHandler.getInstance(),
                                               location);
-    if (spanCustomizer != null) {
-      messageProcessorChain.setSpanCustomizer(spanCustomizer);
+    if (spanCustomizationInfo != null) {
+      messageProcessorChain.setSpanCustomizationInfo(spanCustomizationInfo);
     }
     return messageProcessorChain;
   }
