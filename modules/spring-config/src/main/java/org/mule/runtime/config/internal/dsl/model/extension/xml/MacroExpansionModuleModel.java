@@ -18,6 +18,8 @@ import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.SUBFLOW_ELEMENT_IDENTIFIER;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -92,6 +94,8 @@ public class MacroExpansionModuleModel {
 
   public static final String DEFAULT_GLOBAL_ELEMENTS = "_defaultGlobalElements";
 
+  public static final String IMPLICIT_CONFIG_NAME = "xml-sdk-implicit-config";
+
   /**
    * Used when the <module/> contains global elements without <property/>ies to be expanded, thus the macro expansion will take
    * care of the default global elements macro expanding them ONCE, and replacing the {@link #MODULE_OPERATION_CONFIG_REF} in the
@@ -118,8 +122,9 @@ public class MacroExpansionModuleModel {
     final List<ComponentModel> moduleGlobalElements = getModuleGlobalElements();
     final Set<String> moduleGlobalElementsNames =
         moduleGlobalElements.stream().map(ComponentModel::getNameAttribute).collect(toSet());
-    expandOperations(moduleGlobalElementsNames);
+
     expandGlobalElements(moduleGlobalElements, moduleGlobalElementsNames);
+    expandOperations(moduleGlobalElementsNames);
   }
 
   private void expandOperations(Set<String> moduleGlobalElementsNames) {
@@ -213,6 +218,24 @@ public class MacroExpansionModuleModel {
   }
 
   private void macroExpandGlobalElements(List<ComponentModel> moduleComponentModels, Set<String> moduleGlobalElementsNames) {
+    if (existOperationThatUsesImplicitConfiguration()
+        && extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).isPresent()) {
+      ComponentModel configModel = new ComponentModel.Builder()
+          .setIdentifier(ComponentIdentifier.builder()
+              .namespaceUri(extensionModel.getXmlDslModel().getNamespace())
+              .namespace(extensionModel.getXmlDslModel().getPrefix())
+              .name(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).build())
+          .addParameter("name", IMPLICIT_CONFIG_NAME, false)
+          .build();
+      configModel.setComponentLocation(fromSingleComponent(MODULE_CONFIG_GLOBAL_ELEMENT_NAME));
+      configModel.setConfigurationModel(extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).get());
+
+      configModel.setRoot(true);
+      configModel.setParent(applicationModel.getRootComponentModel());
+
+      applicationModel.getRootComponentModel().getInnerComponents().add(configModel);
+    }
+
     // scenario where it will macro expand as many times as needed all the references of the smart connector configurations
     applicationModel.executeOnEveryMuleComponentTree(muleRootComponentModel -> {
       muleRootComponentModel.getInnerComponents()
@@ -238,6 +261,30 @@ public class MacroExpansionModuleModel {
                 });
           });
     });
+  }
+
+  private boolean existOperationThatUsesImplicitConfiguration() {
+    return applicationModel.getRootComponentModel().getInnerComponents().stream()
+        .filter(componentModel -> componentModel.getIdentifier().getName().equals(FLOW_ELEMENT_IDENTIFIER)
+            || componentModel.getIdentifier().getName().equals(SUBFLOW_ELEMENT_IDENTIFIER))
+        .flatMap(componentModel -> componentModel.getInnerComponents().stream())
+        .anyMatch(this::existOperationThatUsesImplicitConfiguration);
+  }
+
+  private boolean existOperationThatUsesImplicitConfiguration(ComponentModel componentModel) {
+    if (componentModel.getIdentifier().getNamespace().equals(extensionModel.getXmlDslModel().getPrefix()) &&
+        componentModel.getModel(OperationModel.class).isPresent() &&
+        !componentModel.getRawParameters().keySet().contains(MODULE_OPERATION_CONFIG_REF)) {
+      return true;
+    }
+
+    for (ComponentModel childComponent : componentModel.getInnerComponents()) {
+      if (existOperationThatUsesImplicitConfiguration(childComponent)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private Optional<ConfigurationModel> getConfigurationModel() {
@@ -312,11 +359,15 @@ public class MacroExpansionModuleModel {
 
     operationRefModel.getMetadata().getSourceCode().ifPresent(processorChainBuilder::setSourceCode);
 
+    final Optional<String> configRef =
+        !configRefName.isPresent() && extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).isPresent()
+            ? of(IMPLICIT_CONFIG_NAME) : configRefName;
+
     bodyProcessors.stream()
         .map(bodyProcessor -> lookForTNSOperation((ComponentAst) bodyProcessor)
             .map(tnsOperation -> createModuleOperationChain(bodyProcessor, tnsOperation, moduleGlobalElementsNames,
-                                                            configRefName, containerName))
-            .orElseGet(() -> copyOperationComponentModel(bodyProcessor, configRefName, moduleGlobalElementsNames,
+                                                            configRef, containerName))
+            .orElseGet(() -> copyOperationComponentModel(bodyProcessor, configRef, moduleGlobalElementsNames,
                                                          getLiteralParameters(propertiesMap, parametersMap),
                                                          containerName)))
         .forEach(processorChainBuilder::addChildComponentModel);
