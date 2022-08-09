@@ -15,8 +15,8 @@ import org.mule.runtime.core.internal.profiling.tracing.event.span.AbstractNamed
 
 /**
  * A {@link org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizer} that sets the span name based on the
- * {@link org.mule.runtime.api.component.ComponentIdentifier} of the {@link Component} that corresponds to that span.
- * It doesn't take into account any other detail
+ * {@link org.mule.runtime.api.component.ComponentIdentifier} of the {@link Component} that corresponds to that span. It doesn't
+ * take into account any other detail
  *
  * @since 4.5.0
  */
