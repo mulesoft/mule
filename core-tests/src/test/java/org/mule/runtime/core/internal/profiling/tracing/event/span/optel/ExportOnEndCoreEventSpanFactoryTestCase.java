@@ -11,7 +11,6 @@ import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEv
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
-import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizer.getDefaultChildCustomizer;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
@@ -25,14 +24,12 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizer;
+import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanInfo;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.ExportOnEndCoreEventSpanFactory;
@@ -51,8 +48,8 @@ public class ExportOnEndCoreEventSpanFactoryTestCase {
 
   public static final String IDENTIFIER_NAMESPACE = "namespace";
   public static final String IDENTIFIER_NAME = "name";
-  public static final String COMPONENT_LOCATION = "location";
   public static final String APP_ID = "appId";
+  public static final ChildSpanInfo DEFAULT_CHILD_SPAN_INFO = ChildSpanInfo.getDefaultChildSpanInfo();
   private final ExportOnEndCoreEventSpanFactory coreEventSpanFactory =
       new ExportOnEndCoreEventSpanFactory(getDefaultSpanExporterManager());
   public static final String CORRELATION_ID = "000-000-0000";
@@ -82,8 +79,8 @@ public class ExportOnEndCoreEventSpanFactoryTestCase {
           }
 
           @Override
-          public ChildSpanCustomizer getChildSpanCustomizer() {
-            return getDefaultChildCustomizer();
+          public ChildSpanInfo getChildSpanCustomizer() {
+            return DEFAULT_CHILD_SPAN_INFO;
           }
 
           @Override

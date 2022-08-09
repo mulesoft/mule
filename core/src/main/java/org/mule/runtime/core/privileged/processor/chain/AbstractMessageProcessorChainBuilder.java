@@ -64,6 +64,12 @@ public abstract class AbstractMessageProcessorChainBuilder implements MessagePro
     this.location = location;
   }
 
+  /**
+   * @param spanCustomizer thge span customizer for the creation of the {@link org.mule.runtime.api.profiling.tracing.Span}
+   *                       associated to the chain.
+   *
+   * @since 4.5.0
+   */
   public void setSpanCustomizer(SpanCustomizer spanCustomizer) {
     this.spanCustomizer = spanCustomizer;
   }

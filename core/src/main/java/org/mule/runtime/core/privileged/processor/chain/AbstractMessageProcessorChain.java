@@ -74,8 +74,8 @@ import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcess
 import org.mule.runtime.core.internal.processor.interceptor.ProcessorInterceptorFactoryAdapter;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.ComponentSpanCustomizer;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.MessageProcessorChainSpanCustomizer;
+import org.mule.runtime.core.internal.profiling.tracing.event.NamedSpanBasedOnComponentIdentifierAloneSpanCustomizer;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.NamedSpanBasedOnParentSpanChildCustomizerSpanCustomizer;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizer;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadingProfilingEventContext;
@@ -176,7 +176,12 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   private Scheduler switchOnErrorScheduler;
   private CoreEventTracer muleEventTracer;
-  private static final SpanCustomizer DEFAULT_CHAIN_SPAN_CUSTOMIZER = new MessageProcessorChainSpanCustomizer();
+  private static final SpanCustomizer DEFAULT_CHAIN_SPAN_CUSTOMIZER =
+      new NamedSpanBasedOnParentSpanChildCustomizerSpanCustomizer();
+
+  /**
+   * The span customizer for the chain.
+   */
   private SpanCustomizer chainSpanCustomizer = DEFAULT_CHAIN_SPAN_CUSTOMIZER;
 
   AbstractMessageProcessorChain(String name,
@@ -438,7 +443,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     }
     ComponentLocation componentLocation = getLocationIfComponent(processor);
     if (processor instanceof Component) {
-      muleEventTracer.startComponentSpan(event, new ComponentSpanCustomizer((Component) processor));
+      muleEventTracer.startComponentSpan(event,
+                                         new NamedSpanBasedOnComponentIdentifierAloneSpanCustomizer((Component) processor));
     }
     triggerStartingOperation(event, componentLocation);
     preNotification(event, processor);

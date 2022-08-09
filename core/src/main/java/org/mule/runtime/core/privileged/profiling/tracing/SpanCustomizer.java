@@ -13,6 +13,7 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.NamedSpanBasedOnParentSpanChildCustomizerSpanCustomizer;
 
 import java.util.Map;
 
@@ -42,6 +43,14 @@ public interface SpanCustomizer {
     return emptyMap();
   }
 
-  ChildSpanCustomizer getChildSpanCustomizer();
+  /**
+   * Defines the {@link ChildSpanInfo} that will be set for the created Span. This customizer will be available for the child
+   * spans in case it is needed.
+   *
+   * @see {@link NamedSpanBasedOnParentSpanChildCustomizerSpanCustomizer}
+   *
+   * @return the {@link ChildSpanInfo} corresponding to the span that will be created.
+   */
+  ChildSpanInfo getChildSpanCustomizer();
 
 }
