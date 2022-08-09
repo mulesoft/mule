@@ -20,7 +20,7 @@ import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExportOnEndSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanFactory;
-import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizer;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.ExecutionSpan;
 
 import java.util.Map;
@@ -42,20 +42,20 @@ public class ExportOnEndCoreEventSpanFactory implements CoreEventSpanFactory {
   @Override
   public InternalSpan getSpan(CoreEvent coreEvent, MuleConfiguration muleConfiguration,
                               ArtifactType artifactType,
-                              SpanCustomizer spanCustomizer) {
+                              SpanCustomizationInfo spanCustomizationInfo) {
     return getExportOnEndSpan(muleConfiguration,
                               artifactType,
                               coreEvent,
-                              spanCustomizer);
+                              spanCustomizationInfo);
   }
 
   private ExportOnEndSpan getExportOnEndSpan(MuleConfiguration muleConfiguration,
                                              ArtifactType artifactType,
-                                             CoreEvent coreEvent, SpanCustomizer spanCustomizer) {
+                                             CoreEvent coreEvent, SpanCustomizationInfo spanCustomizationInfo) {
 
     EventContext eventContext = coreEvent.getContext();
 
-    ExportOnEndSpan exportOnEndSpan = new ExportOnEndSpan(new ExecutionSpan(spanCustomizer.getName(coreEvent),
+    ExportOnEndSpan exportOnEndSpan = new ExportOnEndSpan(new ExecutionSpan(spanCustomizationInfo.getName(coreEvent),
                                                                             componentSpanIdentifierFrom(muleConfiguration.getId(),
                                                                                                         eventContext
                                                                                                             .getCorrelationId()),
@@ -63,11 +63,12 @@ public class ExportOnEndCoreEventSpanFactory implements CoreEventSpanFactory {
                                                                             null,
                                                                             getCurrentSpan(eventContext).orElse(null)),
                                                           eventContext,
-                                                          internalSpanExportManager, spanCustomizer.getChildSpanCustomizer());
+                                                          internalSpanExportManager,
+                                                          spanCustomizationInfo.getChildSpanCustomizationInfo());
 
 
     Map<String, String> attributes =
-        spanCustomizer.getAttributes(coreEvent, muleConfiguration, artifactType);
+        spanCustomizationInfo.getAttributes(coreEvent, muleConfiguration, artifactType);
 
     for (Map.Entry<String, String> entry : attributes.entrySet()) {
       exportOnEndSpan.addAttribute(entry.getKey(), entry.getValue());

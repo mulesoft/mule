@@ -18,7 +18,7 @@ import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.api.profiling.tracing.TracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizer;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpanVisitor;
 import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
@@ -142,7 +142,7 @@ public class NoOpProfilingService implements InternalProfilingService, Privilege
 
     @Override
     public InternalSpan startComponentSpan(CoreEvent coreEvent,
-                                           SpanCustomizer spanCustomizer) {
+                                           SpanCustomizationInfo spanCustomizationInfo) {
       return NoOpInternalSpan.INSTANCE;
     }
 

@@ -13,16 +13,16 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.NamedSpanBasedOnParentSpanChildCustomizerSpanCustomizer;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.NamedSpanBasedOnParentSpanChildSpanCustomizationInfo;
 
 import java.util.Map;
 
 /**
- * A Customizer for the creation of {@link InternalSpan}.
+ * Info for a customized creation of an {@link InternalSpan}.
  *
  * @since 4.5.0
  */
-public interface SpanCustomizer {
+public interface SpanCustomizationInfo {
 
   /**
    * Gets the {@link InternalSpan} name from the {@param coreEvent} and the {@param component}
@@ -44,13 +44,13 @@ public interface SpanCustomizer {
   }
 
   /**
-   * Defines the {@link ChildSpanInfo} that will be set for the created Span. This customizer will be available for the child
-   * spans in case it is needed.
+   * Defines the {@link ChildSpanCustomizationInfo} that will be set for the created Span. This customization info will be
+   * available for the child spans in case it is needed.
    *
-   * @see {@link NamedSpanBasedOnParentSpanChildCustomizerSpanCustomizer}
+   * @see {@link NamedSpanBasedOnParentSpanChildSpanCustomizationInfo}
    *
-   * @return the {@link ChildSpanInfo} corresponding to the span that will be created.
+   * @return the {@link ChildSpanCustomizationInfo} corresponding to the span that will be created.
    */
-  ChildSpanInfo getChildSpanCustomizer();
+  ChildSpanCustomizationInfo getChildSpanCustomizationInfo();
 
 }

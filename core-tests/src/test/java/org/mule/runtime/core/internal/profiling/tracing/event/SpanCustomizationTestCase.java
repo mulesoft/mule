@@ -31,10 +31,10 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.execution.tracing.DistributedTraceContextAware;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.NamedSpanBasedOnParentSpanChildCustomizerSpanCustomizer;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.NamedSpanBasedOnParentSpanChildSpanCustomizationInfo;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
-import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanInfo;
-import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizer;
+import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -44,7 +44,7 @@ import java.util.Map;
 
 @Feature(PROFILING)
 @Story(DEFAULT_CORE_EVENT_TRACER)
-public class NamedSpanBasedOnComponentTestCase {
+public class SpanCustomizationTestCase {
 
   public static final String SPAN_NAME_SEPARATOR_FOR_TEST = ":";
   public static final String COMPONENT_IDENTIFIER_NAME = "component";
@@ -64,7 +64,7 @@ public class NamedSpanBasedOnComponentTestCase {
   public static final String ARTIFACT_ID = "artifactId";
 
   @Test
-  public void namedSpanBasedOnComponentIdentifierAloneSpanCustomizer() {
+  public void namedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo() {
     Component component = mock(Component.class);
     ComponentIdentifier identifier = mock(ComponentIdentifier.class);
     ComponentLocation location = mock(ComponentLocation.class);
@@ -80,24 +80,24 @@ public class NamedSpanBasedOnComponentTestCase {
     CoreEvent coreEvent = mock(CoreEvent.class);
     when(coreEvent.getCorrelationId()).thenReturn(CORRELATION_ID);
 
-    SpanCustomizer spanCustomizer = new NamedSpanBasedOnComponentIdentifierAloneSpanCustomizer(component);
+    SpanCustomizationInfo spanCustomizationInfo = new NamedSpanBasedOnComponentIdentifierAloneSpanCustomizationInfo(component);
 
-    assertThat(spanCustomizer.getName(coreEvent), equalTo(COMPONENT_IDENTIFIER_NAMESPACE + SPAN_NAME_SEPARATOR_FOR_TEST
+    assertThat(spanCustomizationInfo.getName(coreEvent), equalTo(COMPONENT_IDENTIFIER_NAMESPACE + SPAN_NAME_SEPARATOR_FOR_TEST
         + COMPONENT_IDENTIFIER_NAME));
-    assertThat(spanCustomizer.getChildSpanCustomizer().getChildSpanSuggestedName(),
+    assertThat(spanCustomizationInfo.getChildSpanCustomizationInfo().getChildSpanSuggestedName(),
                equalTo(SPAN_NAME_SEPARATOR_FOR_TEST + ROUTE));
 
-    assertAttributes(spanCustomizer.getAttributes(coreEvent, muleConfiguration, APP));
+    assertAttributes(spanCustomizationInfo.getAttributes(coreEvent, muleConfiguration, APP));
   }
 
   @Test
-  public void namedSpanBasedOnParentSpanChildCustomizerSpanCustomizer() {
+  public void namedSpanBasedOnParentSpanSpanCustomizationInfo() {
     CoreEvent coreEvent = mock(CoreEvent.class);
     DistributedTraceContextAware eventContext =
         mock(DistributedTraceContextAware.class, withSettings().extraInterfaces(EventContext.class));
     DistributedTraceContext distributedTraceContext = mock(DistributedTraceContext.class);
     InternalSpan span = mock(InternalSpan.class);
-    ChildSpanInfo childSpanInfo = mock(ChildSpanInfo.class);
+    ChildSpanCustomizationInfo childSpanInfo = mock(ChildSpanCustomizationInfo.class);
     MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
     when(muleConfiguration.getId()).thenReturn(MULE_CONFIGURATION_ID);
 
@@ -111,14 +111,15 @@ public class NamedSpanBasedOnComponentTestCase {
     when(span.getAttribute(LOCATION_KEY)).thenReturn(of(LOCATION_TEST));
     when(childSpanInfo.getChildSpanSuggestedName()).thenReturn(SPAN_NAME_SEPARATOR_FOR_TEST + CHILD_SPAN_NAME);
 
-    SpanCustomizer spanCustomizer = new NamedSpanBasedOnParentSpanChildCustomizerSpanCustomizer();
+    SpanCustomizationInfo spanCustomizationInfo = new NamedSpanBasedOnParentSpanChildSpanCustomizationInfo();
 
-    assertThat(spanCustomizer.getName(coreEvent), equalTo(PARENT_SPAN_NAMESPACE + SPAN_NAME_SEPARATOR_FOR_TEST + PARENT_SPAN_NAME
-        + SPAN_NAME_SEPARATOR_FOR_TEST
-        + CHILD_SPAN_NAME));
-    assertThat(spanCustomizer.getChildSpanCustomizer().getChildSpanSuggestedName(), emptyString());
+    assertThat(spanCustomizationInfo.getName(coreEvent),
+               equalTo(PARENT_SPAN_NAMESPACE + SPAN_NAME_SEPARATOR_FOR_TEST + PARENT_SPAN_NAME
+                   + SPAN_NAME_SEPARATOR_FOR_TEST
+                   + CHILD_SPAN_NAME));
+    assertThat(spanCustomizationInfo.getChildSpanCustomizationInfo().getChildSpanSuggestedName(), emptyString());
 
-    assertAttributes(spanCustomizer.getAttributes(coreEvent, muleConfiguration, APP));
+    assertAttributes(spanCustomizationInfo.getAttributes(coreEvent, muleConfiguration, APP));
   }
 
   private void assertAttributes(Map<String, String> attributes) {

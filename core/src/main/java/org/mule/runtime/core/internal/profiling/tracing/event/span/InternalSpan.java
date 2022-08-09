@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
-import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanInfo.getDefaultChildSpanInfo;
+import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo.getDefaultChildSpanInfo;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
@@ -15,7 +15,7 @@ import static java.util.Optional.empty;
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
-import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanInfo;
+import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo;
 
 import java.util.Map;
 import java.util.Optional;
@@ -81,9 +81,9 @@ public interface InternalSpan extends Span {
   }
 
   /**
-   * @return {@link ChildSpanInfo} representing additional about the creation of children spans.
+   * @return {@link ChildSpanCustomizationInfo} representing additional about the creation of children spans.
    */
-  default ChildSpanInfo getChildSpanInfo() {
+  default ChildSpanCustomizationInfo getChildSpanInfo() {
     return getDefaultChildSpanInfo();
   }
 

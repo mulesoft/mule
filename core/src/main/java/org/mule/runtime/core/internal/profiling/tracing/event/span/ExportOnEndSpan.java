@@ -15,7 +15,7 @@ import org.mule.runtime.core.internal.profiling.tracing.event.span.export.Intern
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporter;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporterVisitor;
 import org.mule.runtime.core.internal.profiling.tracing.export.OpentelemetrySpanExporter;
-import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanInfo;
+import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo;
 
 import java.util.Map;
 import java.util.Optional;
@@ -29,14 +29,14 @@ public class ExportOnEndSpan implements InternalSpan {
 
   private final InternalSpan runtimeInternalSpan;
   private final InternalSpanExporter spanExporter;
-  private ChildSpanInfo childSpanCustomizer;
+  private ChildSpanCustomizationInfo childSpanCustomizationInfo;
 
   public ExportOnEndSpan(InternalSpan runtimeInternalSpan, EventContext eventContext,
                          InternalSpanExportManager<EventContext> internalSpanExportManager,
-                         ChildSpanInfo childSpanCustomizer) {
+                         ChildSpanCustomizationInfo childSpanCustomizationInfo) {
     this.runtimeInternalSpan = runtimeInternalSpan;
     this.spanExporter = internalSpanExportManager.getInternalSpanExporter(eventContext, this);
-    this.childSpanCustomizer = childSpanCustomizer;
+    this.childSpanCustomizationInfo = childSpanCustomizationInfo;
   }
 
   @Override
@@ -91,8 +91,8 @@ public class ExportOnEndSpan implements InternalSpan {
   }
 
   @Override
-  public ChildSpanInfo getChildSpanInfo() {
-    return childSpanCustomizer;
+  public ChildSpanCustomizationInfo getChildSpanInfo() {
+    return childSpanCustomizationInfo;
   }
 
   /**

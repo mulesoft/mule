@@ -7,18 +7,19 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
-import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanInfo;
+import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo;
 
 /**
- * A {@link ChildSpanInfo} that allows to customize the default {@link DefaultChildSpanInfo#getChildSpanSuggestedName()}.
+ * A {@link ChildSpanCustomizationInfo} that allows to customize the default
+ * {@link DefaultChildSpanCustomizationInfo#getChildSpanSuggestedName()}.
  *
  * @since 4.5.0
  */
-public class DefaultChildSpanInfo implements ChildSpanInfo {
+public class DefaultChildSpanCustomizationInfo implements ChildSpanCustomizationInfo {
 
   private String childSpanSuggestedName;
 
-  public DefaultChildSpanInfo(String childSpanSuggestedName) {
+  public DefaultChildSpanCustomizationInfo(String childSpanSuggestedName) {
     this.childSpanSuggestedName = childSpanSuggestedName;
   }
 
