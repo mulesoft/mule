@@ -4,26 +4,26 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
-import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getLocationAsString;
-import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
-
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
-import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizer;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizer;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class ComponentSpanCustomizer implements SpanCustomizer {
+/**
+ * A {@link SpanCustomizer} that resolves the attributes from the {@link CoreEvent} with a default behaviour.
+ *
+ * @since 4.5.0
+ */
+public abstract class AbstractDefaultAttributesResolvingSpanCustomizer implements SpanCustomizer {
 
-  private Component component;
   public static final String LOCATION_KEY = "location";
   public static final String CORRELATION_ID_KEY = "correlationId";
   public static final String ARTIFACT_ID_KEY = "artifactId";
@@ -31,20 +31,10 @@ public class ComponentSpanCustomizer implements SpanCustomizer {
   public static final String THREAD_START_ID_KEY = "threadStartId";
   public static final String THREAD_START_NAME_KEY = "threadStartName";
 
-  public ComponentSpanCustomizer(Component component) {
-    this.component = component;
-  }
-
   @Override
-  public String getName(CoreEvent coreEvent) {
-    return getSpanName(component.getIdentifier());
-  }
-
-  @Override
-  public Map<String, String> getAttributes(CoreEvent coreEvent,
-                                           MuleConfiguration muleConfiguration, ArtifactType artifactType) {
+  public Map<String, String> getAttributes(CoreEvent coreEvent, MuleConfiguration muleConfiguration, ArtifactType artifactType) {
     Map<String, String> attributes = new HashMap<>();
-    attributes.put(LOCATION_KEY, getLocationAsString(component.getLocation()));
+    attributes.put(LOCATION_KEY, getLocationAsString(coreEvent));
     attributes.put(CORRELATION_ID_KEY, coreEvent.getCorrelationId());
     attributes.put(ARTIFACT_ID_KEY, muleConfiguration.getId());
     attributes.put(ARTIFACT_TYPE_ID, artifactType.getAsString());
@@ -54,10 +44,13 @@ public class ComponentSpanCustomizer implements SpanCustomizer {
     return attributes;
   }
 
-  @Override
-  public ChildSpanCustomizer getChildSpanCustomizer() {
-    return ChildSpanCustomizerResolver.getChildSpanCustomizer(component);
-  }
+  /**
+   * @param coreEvent {@link CoreEvent} the coreEvent associated to the span.
+   *
+   * @return the location representation as a string
+   */
+  public abstract String getLocationAsString(CoreEvent coreEvent);
+
 
   private void addLogggingVariablesAsAttributes(CoreEvent coreEvent, Map<String, String> attributes) {
     if (coreEvent instanceof PrivilegedEvent) {
@@ -67,16 +60,6 @@ public class ComponentSpanCustomizer implements SpanCustomizer {
           attributes.put(entry.getKey(), entry.getValue());
         }
       }
-    }
-  }
-
-  static class ChildSpanCustomizerResolver {
-
-    public static ChildSpanCustomizer getChildSpanCustomizer(Component component) {
-      if (component.getIdentifier().getName().equals("until-successful")) {
-        return new DefaultChildSpanCustomizer(":try");
-      }
-      return new DefaultChildSpanCustomizer(":route");
     }
   }
 }

@@ -11,7 +11,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.ComponentSpanIdentifier.componentSpanIdentifierFrom;
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracer.getCoreEventTracerBuilder;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
-import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizer.getDefaultChildCustomizer;
+import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanInfo.getDefaultChildSpanInfo;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
@@ -38,7 +38,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
@@ -49,7 +48,7 @@ import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTr
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporter;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporterVisitor;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
-import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizer;
+import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanInfo;
 import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizer;
 
 import java.time.Instant;
@@ -102,8 +101,8 @@ public class DefaultCoreEventTracerTestCase {
       }
 
       @Override
-      public ChildSpanCustomizer getChildSpanCustomizer() {
-        return getDefaultChildCustomizer();
+      public ChildSpanInfo getChildSpanCustomizer() {
+        return getDefaultChildSpanInfo();
       }
     });
 

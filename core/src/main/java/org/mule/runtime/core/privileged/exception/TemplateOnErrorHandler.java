@@ -18,7 +18,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.addContext;
-import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizer.getDefaultChildCustomizer;
 import static org.mule.runtime.core.internal.util.LocationUtils.globalLocation;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
@@ -70,11 +69,10 @@ import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.Error
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
-import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizer;
+import org.mule.runtime.core.internal.profiling.tracing.event.NamedSpanBasedOnComponentIdentifierAloneSpanCustomizer;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizer;
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 
 import java.util.ArrayList;
@@ -310,18 +308,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
     }
     configuredMessageProcessors =
         buildNewChainWithListOfProcessors(processingStrategy, getMessageProcessors(), NullExceptionHandler.getInstance(),
-                                          new SpanCustomizer() {
-
-                                            @Override
-                                            public String getName(CoreEvent coreEvent) {
-                                              return getErrorHandlerType();
-                                            }
-
-                                            @Override
-                                            public ChildSpanCustomizer getChildSpanCustomizer() {
-                                              return getDefaultChildCustomizer();
-                                            }
-                                          });
+                                          new NamedSpanBasedOnComponentIdentifierAloneSpanCustomizer(this));
 
     fluxFactory = new OnErrorHandlerFluxObjectFactory(processingStrategy);
 
@@ -623,7 +610,4 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
     return reuseGlobalErrorHandler;
   }
 
-  protected String getErrorHandlerType() {
-    return "error-handler";
-  }
 }
