@@ -43,19 +43,18 @@ public class DeployableDescriptorsWithCustomLogConfig extends AbstractDeployable
   @Parameterized.Parameters(name = "deployableProjectFolder: {0}, isApplication: {1}")
   public static Collection<Pair<String, String>> deployableArtifactDescriptors() {
     return asList(
-                  new Pair<>("apps/with-custom-log-config", "."),
-                  new Pair<>("domains/with-custom-log-config", "."),
+                  new Pair<>("apps/with-custom-log-config", "some-path"),
+                  new Pair<>("domains/with-custom-log-config", "some-path"),
                   new Pair<>("apps/with-custom-log-config", null),
                   new Pair<>("domains/with-custom-log-config", null));
   }
 
-  public DeployableDescriptorsWithCustomLogConfig(Pair<String, Boolean> deployableProjectInfo)
-      throws URISyntaxException, IOException {
+  public DeployableDescriptorsWithCustomLogConfig(Pair<String, String> deployableProjectInfo) {
     deployableProjectFolder = deployableProjectInfo.getFirst();
     isApplication = deployableProjectFolder.startsWith("apps");
 
     muleHomeSystemProperty =
-        new SystemProperty(MULE_HOME_DIRECTORY_PROPERTY, getDeployableFolder(deployableProjectFolder).getCanonicalPath());
+        new SystemProperty(MULE_HOME_DIRECTORY_PROPERTY, deployableProjectInfo.getSecond());
   }
 
   @Test
