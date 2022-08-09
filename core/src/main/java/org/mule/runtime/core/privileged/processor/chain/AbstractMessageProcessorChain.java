@@ -67,7 +67,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
-import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.interception.ReactiveInterceptor;
@@ -90,11 +89,9 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
@@ -187,8 +184,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
    */
   private SpanCustomizationInfo chainSpanCustomizationInfo = DEFAULT_CHAIN_SPAN_CUSTOMIZATION_INFO;
 
-  private Map<GlobalErrorHandler, Consumer<Exception>> routers = new HashMap<>();
-
   AbstractMessageProcessorChain(String name,
                                 Optional<ProcessingStrategy> processingStrategyOptional,
                                 List<Processor> processors, FlowExceptionHandler messagingExceptionHandler) {
@@ -216,19 +211,10 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
             // finished.
             final AtomicInteger inflightEvents = new AtomicInteger();
 
-            final Consumer<Exception> errorRouter;
-
-            if (routers.containsKey(messagingExceptionHandler)) {
-              errorRouter = routers.get(messagingExceptionHandler);
-            } else {
-              errorRouter = messagingExceptionHandler
-                  .router(pub -> from(pub).subscriberContext(ctx),
-                          handled -> errorSwitchSinkSinkRef.next(right(handled)),
-                          rethrown -> errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class)));
-              if (messagingExceptionHandler instanceof GlobalErrorHandler) {
-                routers.put((GlobalErrorHandler) messagingExceptionHandler, errorRouter);
-              }
-            }
+            final Consumer<Exception> errorRouter = messagingExceptionHandler
+                .router(pub -> from(pub).subscriberContext(ctx),
+                        handled -> errorSwitchSinkSinkRef.next(right(handled)),
+                        rethrown -> errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class)));
 
             final Flux<CoreEvent> upstream =
                 from(doApply(publisher, interceptors, (context, throwable) -> {
@@ -252,12 +238,10 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                                             () -> {
                                               errorSwitchSinkSinkRef.complete();
                                               disposeIfNeeded(errorRouter, LOGGER);
-                                              routers.clear();
                                             },
                                             t -> {
                                               errorSwitchSinkSinkRef.error(t);
                                               disposeIfNeeded(errorRouter, LOGGER);
-                                              routers.clear();
                                             }))
                                                 .map(RxUtils.<MessagingException>propagateErrorResponseMapper());
           });

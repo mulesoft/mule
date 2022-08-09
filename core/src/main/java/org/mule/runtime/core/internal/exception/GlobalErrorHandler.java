@@ -16,6 +16,8 @@ import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 
@@ -24,9 +26,20 @@ public class GlobalErrorHandler extends ErrorHandler {
   private final AtomicBoolean initialised = new AtomicBoolean(false);
   private final AtomicInteger started = new AtomicInteger(0);
 
+  private Consumer<Exception> router;
+
   @Override
   public Publisher<CoreEvent> apply(Exception exception) {
     throw new IllegalStateException("GlobalErrorHandlers should be used only as template for local ErrorHandlers");
+  }
+
+  @Override
+  public Consumer<Exception> router(Function<Publisher<CoreEvent>, Publisher<CoreEvent>> publisherPostProcessor,
+                                    Consumer<CoreEvent> continueCallback, Consumer<Throwable> propagateCallback) {
+    if (router == null) {
+      router = super.router(publisherPostProcessor, continueCallback, propagateCallback);
+    }
+    return router;
   }
 
   @Override
@@ -62,6 +75,7 @@ public class GlobalErrorHandler extends ErrorHandler {
 
     if (started.decrementAndGet() == 0) {
       super.stop();
+      router = null;
     }
   }
 
