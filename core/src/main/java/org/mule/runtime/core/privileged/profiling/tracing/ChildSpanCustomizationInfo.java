@@ -10,8 +10,8 @@ package org.mule.runtime.core.privileged.profiling.tracing;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.NamedSpanBasedOnParentSpanChildSpanCustomizationInfo;
 
 /**
- * A {@link ChildSpanCustomizationInfo} that has additional information on how the children spans of a span has to be created. It
- * can be used or ignored by the {@link SpanCustomizationInfo}
+ * A {@link ChildSpanCustomizationInfo} that has additional information on how the children spans of a span have to be created. It
+ * can be used or ignored by the {@link SpanCustomizationInfo}.
  *
  * @see {@link NamedSpanBasedOnParentSpanChildSpanCustomizationInfo}
  *
