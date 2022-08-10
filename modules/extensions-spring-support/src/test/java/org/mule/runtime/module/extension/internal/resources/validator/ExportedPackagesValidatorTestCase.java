@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.resources.validator;
 
+import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
+
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -13,12 +17,11 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.OutputModel;
@@ -38,13 +41,12 @@ import org.mule.test.module.extension.api.ApiTestClass;
 import org.mule.test.module.extension.internal.InternalTestClass;
 import org.mule.test.vegan.extension.VeganAttributes;
 
-import com.google.common.reflect.TypeToken;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
 
+import com.google.common.reflect.TypeToken;
 import org.hamcrest.collection.IsEmptyCollection;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,6 +59,11 @@ public class ExportedPackagesValidatorTestCase {
 
   private final ClassTypeLoader loader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
+  private static boolean shouldValidate() {
+    String skip = System.getProperty("exportedPackagesValidator.skip");
+    return !(skip != null ? Boolean.valueOf(skip) : false);
+  }
+
   @Mock(lenient = true)
   private ExtensionModel extensionModel;
 
@@ -68,6 +75,8 @@ public class ExportedPackagesValidatorTestCase {
 
   @Test
   public void invalidExportedPackages() {
+    assumeThat(shouldValidate(), is(true));
+
     setUpInvalidExtension();
 
     ExportedPackagesValidator exportedPackagesValidator = new ExportedPackagesValidator();
