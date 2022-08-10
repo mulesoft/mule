@@ -30,6 +30,8 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.extension.api.model.notification.ImmutableNotificationModel;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
 import java.util.HashSet;
 import java.util.List;
 import org.junit.Test;
@@ -40,7 +42,7 @@ import io.qameta.allure.Story;
 
 @Feature(REUSE)
 @Story(OPERATIONS)
-public class CharacteristicsTestsCase {
+public class CharacteristicsTestCase extends AbstractMuleTestCase {
 
   @Test
   @Description("Checks that AnyMatchCharacteristic is updated accordingly after different computations")
