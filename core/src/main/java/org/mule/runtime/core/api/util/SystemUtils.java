@@ -12,6 +12,7 @@ import static org.apache.commons.lang3.StringUtils.INDEX_NOT_FOUND;
 import static org.apache.commons.lang3.StringUtils.indexOf;
 import static org.apache.commons.lang3.StringUtils.substring;
 import static org.apache.commons.lang3.SystemUtils.JAVA_VENDOR;
+import static org.apache.commons.lang3.SystemUtils.JAVA_VM_NAME;
 import static org.apache.commons.lang3.SystemUtils.JAVA_VM_VENDOR;
 
 import org.mule.api.annotation.NoInstantiate;
@@ -71,7 +72,7 @@ public class SystemUtils {
   }
 
   public static boolean isIbmJDK() {
-    return JAVA_VM_VENDOR.toLowerCase().contains("ibm");
+    return JAVA_VM_VENDOR.toLowerCase().contains("ibm") || JAVA_VENDOR.toLowerCase().contains("ibm");
   }
 
   public static boolean isAzulJDK() {
@@ -83,7 +84,8 @@ public class SystemUtils {
   }
 
   public static boolean isOpenJDK() {
-    return JAVA_VM_VENDOR.toLowerCase().contains("openjdk") || JAVA_VENDOR.toLowerCase().contains("openjdk");
+    return JAVA_VM_VENDOR.toLowerCase().contains("openjdk") || JAVA_VENDOR.toLowerCase().contains("openjdk") ||
+        JAVA_VM_NAME.toLowerCase().contains("openjdk");
   }
 
   public static boolean isAdoptOpenJDK() {
@@ -91,7 +93,8 @@ public class SystemUtils {
   }
 
   public static boolean isAdoptiumTemurinJDK() {
-    return JAVA_VM_VENDOR.toLowerCase().contains("temurin") || JAVA_VENDOR.toLowerCase().contains("temurin");
+    return JAVA_VM_VENDOR.toLowerCase().contains("temurin") || JAVA_VENDOR.toLowerCase().contains("temurin") ||
+        JAVA_VM_VENDOR.toLowerCase().contains("adoptium") || JAVA_VENDOR.toLowerCase().contains("adoptium");
   }
 
   /**
