@@ -59,14 +59,14 @@ public class PluginLocalDependenciesDenylist {
    * @return true if the {@link BundleDescriptor} is denylisted, or false otherwise.
    */
   public static boolean isDenylisted(BundleDescriptor pluginDescriptor) {
-    for (BundleDescriptor denylistedPluginDescriptor : PLUGINS_DENYLIST) {
-      if (doDescriptorsMatch(denylistedPluginDescriptor, pluginDescriptor)) {
-        LOGGER
-            .warn("Plugin '{}' local dependencies won't have precedence over the dependencies of the artifact being deployed. Please update to the latest plugin version",
-                  pluginDescriptor);
-        return true;
-      }
+    if (PLUGINS_DENYLIST.stream()
+        .anyMatch(denylistedPluginDescriptor -> doDescriptorsMatch(denylistedPluginDescriptor, pluginDescriptor))) {
+      LOGGER
+          .warn("Plugin '{}' local dependencies won't have precedence over the dependencies of the artifact being deployed. Please update to the latest plugin version",
+                pluginDescriptor);
+      return true;
     }
+
     return false;
   }
 
