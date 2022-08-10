@@ -528,9 +528,11 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
         new DefaultMessageProcessorChainBuilder().chain(getAppendingMP("a"), getAppendingMP("b"), new ReturnNullMP())
             .build();
     nested.setMuleContext(muleContext);
+    initialiseIfNeeded(nested, muleContext);
     builder.chain(getAppendingMP("1"), event -> nested.process(event), getAppendingMP("2"));
     messageProcessor = builder.build();
     assertThat("012", process(messageProcessor, getTestEventUsingFlow("0")), is(nullValue()));
+    disposeIfNeeded(nested, LOGGER);
   }
 
   @Test
@@ -540,10 +542,12 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
         new DefaultMessageProcessorChainBuilder().chain(getAppendingMP("a"), getAppendingMP("b"), new ReturnVoidMP())
             .build();
     nested.setMuleContext(muleContext);
+    initialiseIfNeeded(nested, muleContext);
     builder.chain(getAppendingMP("1"), event -> nested.process(InternalEvent.builder(event)
         .message(event.getMessage()).build()), getAppendingMP("2"));
     messageProcessor = builder.build();
     assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(), equalTo("01ab2"));
+    disposeIfNeeded(nested, LOGGER);
   }
 
   @Test
@@ -875,9 +879,13 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     initialiseIfNeeded(processingStrategy, muleContext);
     startIfNeeded(processingStrategy);
 
+    MessageProcessorChain innerChain = null;
+    MessageProcessorChain outerChain = null;
     try {
-      final MessageProcessorChain innerChain = newChain(Optional.of(processingStrategy), p -> p);
-      final MessageProcessorChain outerChain = newChain(Optional.of(processingStrategy), new Processor() {
+      innerChain = newChain(Optional.of(processingStrategy), p -> p);
+      // This is used for accessing the chains in a static context.
+      final MessageProcessorChain finalInnerChain = innerChain;
+      outerChain = newChain(Optional.of(processingStrategy), new Processor() {
 
         @Override
         public CoreEvent process(CoreEvent event) throws MuleException {
@@ -891,7 +899,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
                 ctx.get("key");
                 return ctx;
               })
-              .transform(innerChain)
+              .transform(finalInnerChain)
               .subscriberContext(ctx -> {
                 ctx.get("key");
                 return ctx;
@@ -899,11 +907,15 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
         };
       });
 
+      final MessageProcessorChain finalOuterChain = outerChain;
+
       if (innerChain instanceof MuleContextAware) {
         ((MuleContextAware) innerChain).setMuleContext(muleContext);
+        initialiseIfNeeded(innerChain, muleContext);
       }
       if (outerChain instanceof MuleContextAware) {
         ((MuleContextAware) outerChain).setMuleContext(muleContext);
+        initialiseIfNeeded(outerChain, muleContext);
       }
 
       Processor caller = new Processor() {
@@ -916,7 +928,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
         @Override
         public org.reactivestreams.Publisher<CoreEvent> apply(org.reactivestreams.Publisher<CoreEvent> p) {
           return Flux.from(p)
-              .transform(outerChain)
+              .transform(finalOuterChain)
               .subscriberContext(ctx -> ctx.put("key", "value"));
         };
       };
@@ -925,6 +937,14 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     } finally {
       stopIfNeeded(processingStrategy);
       disposeIfNeeded(processingStrategy, LOGGER);
+
+      if (innerChain != null) {
+        disposeIfNeeded(innerChain, LOGGER);
+      }
+
+      if (outerChain != null) {
+        disposeIfNeeded(outerChain, LOGGER);
+      }
     }
   }
 

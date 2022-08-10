@@ -13,6 +13,7 @@ import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.extension.api.component.ComponentParameterization;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeOAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials.ClientCredentialsOAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthHandler;
@@ -28,7 +29,8 @@ import java.util.Optional;
 public class ConnectionProviderSettings {
 
   private final ConnectionProviderModel connectionProviderModel;
-  private final Map<String, Object> parameters;
+
+  private final ComponentParameterization<ConnectionProviderModel> componentParameterization;
   private final Optional<PoolingProfile> poolingProfile;
   private final Optional<ReconnectionConfig> reconnectionConfig;
   private final AuthorizationCodeOAuthHandler authorizationCodeOAuthHandler;
@@ -36,14 +38,14 @@ public class ConnectionProviderSettings {
   private final PlatformManagedOAuthHandler platformManagedOAuthHandler;
 
   public ConnectionProviderSettings(ConnectionProviderModel connectionProviderModel,
-                                    Map<String, Object> parameters,
+                                    ComponentParameterization componentParameterization,
                                     PoolingProfile poolingProfile,
                                     ReconnectionConfig reconnectionConfig,
                                     AuthorizationCodeOAuthHandler authorizationCodeOAuthHandler,
                                     ClientCredentialsOAuthHandler clientCredentialsOAuthHandler,
                                     PlatformManagedOAuthHandler platformManagedOAuthHandler) {
     this.connectionProviderModel = connectionProviderModel;
-    this.parameters = unmodifiableMap(parameters);
+    this.componentParameterization = componentParameterization;
     this.poolingProfile = ofNullable(poolingProfile);
     this.reconnectionConfig = ofNullable(reconnectionConfig);
     this.authorizationCodeOAuthHandler = authorizationCodeOAuthHandler;
@@ -55,8 +57,8 @@ public class ConnectionProviderSettings {
     return connectionProviderModel;
   }
 
-  public Map<String, Object> getParameters() {
-    return parameters;
+  public ComponentParameterization<ConnectionProviderModel> getParameters() {
+    return componentParameterization;
   }
 
   public Optional<PoolingProfile> getPoolingProfile() {

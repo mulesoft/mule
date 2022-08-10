@@ -55,9 +55,11 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                           new ErrorHandlerRefOrOnErrorExclusiveness(),
                                                           new ErrorHandlerOnErrorHasTypeOrWhen(),
                                                           new RaiseErrorTypeReferencesPresent(featureFlaggingService),
+                                                          new RaiseErrorReferenceDoNotUseExtensionNamespaces(featureFlaggingService),
                                                           new RaiseErrorTypeReferencesExist(featureFlaggingService),
                                                           new ErrorMappingTargetTypeReferencesExist(featureFlaggingService),
                                                           new ErrorMappingSourceTypeReferencesExist(featureFlaggingService),
+                                                          new ErrorMappingTargetTypeReferencesDoNotUseExtensionNamespace(featureFlaggingService),
                                                           new ErrorHandlerOnErrorTypeExists(featureFlaggingService),
                                                           new RequiredParametersPresent(),
                                                           new ParameterGroupExclusiveness(),
@@ -70,6 +72,8 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                           new ScatterGatherRoutes(),
                                                           new ParseTemplateResourceExist(artifactRegionClassLoader),
                                                           new SourcePositiveMaxItemsPerPoll(),
+                                                          new OperationRaiseErrorDoesntSpecifyNamespace(),
+                                                          new OperationDoesNotHaveCoreRaiseError(),
                                                           new OperationDoesNotHaveFlowRef()));
 
     // Do not fail if the expressionLanguage was not provided, skip these validations.

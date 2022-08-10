@@ -9,11 +9,13 @@ package org.mule.runtime.module.extension.internal.loader.parser.java.error;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.Locale.ROOT;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static javax.lang.model.element.ElementKind.ENUM_CONSTANT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.error.ErrorModelUtils.isMuleError;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
@@ -54,19 +56,23 @@ import java.util.stream.Stream;
  */
 public final class JavaErrorModelParserUtils {
 
+  private static final String MULE = CORE_PREFIX.toUpperCase(ROOT);
+
   /**
    * Parses the error types defined at the extension level
    *
-   * @param element the {@link ExtensionElement}
+   * @param element            the {@link ExtensionElement}
+   * @param extensionNamespace the extension's namespace.
    * @return a list of {@link ErrorModelParser}.
    */
-  public static List<ErrorModelParser> parseExtensionErrorModels(ExtensionElement element) {
+  public static List<ErrorModelParser> parseExtensionErrorModels(ExtensionElement element, String extensionNamespace) {
     return mapReduceSingleAnnotation(element,
                                      ErrorTypes.class,
                                      org.mule.sdk.api.annotation.error.ErrorTypes.class,
-                                     value -> parseErrorTypeDefinitions(value.getClassValue(ErrorTypes::value)),
+                                     value -> parseErrorTypeDefinitions(value.getClassValue(ErrorTypes::value),
+                                                                        extensionNamespace),
                                      value -> parseErrorTypeDefinitions(value
-                                         .getClassValue(org.mule.sdk.api.annotation.error.ErrorTypes::value)))
+                                         .getClassValue(org.mule.sdk.api.annotation.error.ErrorTypes::value), extensionNamespace))
                                              .orElse(new LinkedList<>());
   }
 
@@ -127,19 +133,19 @@ public final class JavaErrorModelParserUtils {
         .map(clazz -> new ExceptionHandlerModelProperty(new DefaultExceptionHandlerFactory(clazz)));
   }
 
-  private static List<ErrorModelParser> parseErrorTypeDefinitions(Type type) {
+  private static List<ErrorModelParser> parseErrorTypeDefinitions(Type type, String extensionNamespace) {
     Map<ErrorTypeDefinition, ErrorModelParser> cycleControl = new HashMap<>(emptyMap());
 
     if (type.getDeclaringClass().isPresent()) {
       Class<Enum> enumClass = (Class<Enum>) type.getDeclaringClass().get();
       return Stream.of(enumClass.getEnumConstants())
-          .map(def -> toParser(SdkErrorTypeDefinitionAdapter.from(def), cycleControl))
+          .map(def -> toParser(extensionNamespace, SdkErrorTypeDefinitionAdapter.from(def), cycleControl))
           .collect(toList());
     } else {
       return type.getElement()
           .map(element -> element.getEnclosedElements().stream()
               .filter(enclosed -> enclosed.getKind().equals(ENUM_CONSTANT))
-              .map(def -> toParser(new AstElementErrorTypeDefinitionAdapter(def), cycleControl))
+              .map(def -> toParser(extensionNamespace, new AstElementErrorTypeDefinitionAdapter(def), cycleControl))
               .collect(toList()))
           .orElse(emptyList());
     }
@@ -162,14 +168,20 @@ public final class JavaErrorModelParserUtils {
     }
   }
 
-  private static ErrorModelParser toParser(ErrorTypeDefinition<?> errorTypeDefinition,
+  public static ErrorModelParser toParser(String extensionNamespace, ErrorTypeDefinition<?> errorTypeDefinition) {
+    return toParser(extensionNamespace, errorTypeDefinition, new HashMap<>());
+  }
+
+  private static ErrorModelParser toParser(String extensionNamespace,
+                                           ErrorTypeDefinition<?> errorTypeDefinition,
                                            Map<ErrorTypeDefinition, ErrorModelParser> cycleControl) {
-    JavaErrorModelParser parser = new JavaErrorModelParser(errorTypeDefinition, isMuleError(errorTypeDefinition));
+    JavaErrorModelParser parser =
+        new JavaErrorModelParser(errorTypeDefinition, isMuleError(errorTypeDefinition) ? MULE : extensionNamespace);
     cycleControl.put(errorTypeDefinition, parser);
     parser.setParent(errorTypeDefinition.getParent().map(p -> {
       ErrorModelParser parentParser = cycleControl.get(p);
       if (parentParser == null) {
-        parentParser = toParser(p, cycleControl);
+        parentParser = toParser(extensionNamespace, p, cycleControl);
         cycleControl.put(p, parentParser);
       }
       return parentParser;
@@ -190,7 +202,7 @@ public final class JavaErrorModelParserUtils {
             return errorTypeProvider.getErrorTypes().stream()
                 .map(error -> {
                   validateOperationThrows(extensionParser, error);
-                  return toParser(error, cycleControl);
+                  return toParser(extensionParser.getNamespace(), error, cycleControl);
                 });
           } catch (InstantiationException | IllegalAccessException e) {
             throw new MuleRuntimeException(createStaticMessage("Could not create ErrorTypeProvider of type "

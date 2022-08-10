@@ -88,7 +88,7 @@ public class OperationDoesNotHaveFlowRefTestCase extends AbstractCoreValidationT
         XML_CLOSE).stream().findFirst();
     assertThat(msg, is(not(empty())));
     assertThat(msg.get().getMessage(),
-               containsString("Flow references (flow-ref) are not allowed inside a Mule Operation Definition"));
+               containsString("Usages of the component 'flow-ref' are not allowed inside a Mule Operation Definition"));
   }
 
 

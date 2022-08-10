@@ -64,7 +64,8 @@ public class ArtifactMemoryManagementTestCase extends AbstractMuleTestCase {
         new ArtifactMemoryManagementService(containerMemoryManagementService);
 
     when(containerMemoryManagementService.getByteBufferProvider(any(), any())).thenReturn(new HeapByteBufferProvider(
-      BYTE_BUFFER_NAME, mock(ProfilingService.class)));
+                                                                                                                     BYTE_BUFFER_NAME,
+                                                                                                                     mock(ProfilingService.class)));
 
     artifactMemoryManagementService.getByteBufferProvider(TEST_BYTE_BUFFER, HEAP);
     anotherArtifactMemoryManagementService.getByteBufferProvider(ANOTHER_BYTE_BUFFER, HEAP);

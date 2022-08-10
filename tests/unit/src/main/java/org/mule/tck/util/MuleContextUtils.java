@@ -68,6 +68,7 @@ import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
@@ -297,7 +298,9 @@ public class MuleContextUtils {
    */
   public static MuleContextWithRegistry mockContextWithServices() {
     InternalProfilingService profilingService = mock(InternalProfilingService.class);
+    CoreEventTracer muleCoreEventTracer = mock(CoreEventTracer.class);
     when(profilingService.getProfilingDataProducer(any(ProfilingEventType.class))).thenReturn(mock(ProfilingDataProducer.class));
+    when(profilingService.getCoreEventTracer()).thenReturn(muleCoreEventTracer);
     return mockContextWithServicesWithProfilingService(profilingService);
   }
 

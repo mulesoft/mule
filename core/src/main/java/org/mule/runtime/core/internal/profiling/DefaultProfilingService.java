@@ -8,8 +8,13 @@
 package org.mule.runtime.core.internal.profiling;
 
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getDefaultSpanExporterManager;
+import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracer.getCoreEventTracerBuilder;
+
 import static java.util.Optional.empty;
 
+import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
@@ -19,12 +24,16 @@ import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import org.mule.runtime.api.profiling.tracing.TracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.core.internal.profiling.consumer.tracing.span.DefaultSpanManager;
-import org.mule.runtime.core.internal.profiling.consumer.tracing.span.SpanManager;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.discovery.DefaultProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.producer.provider.ProfilingDataProducerResolver;
 import org.mule.runtime.core.internal.profiling.threading.JvmThreadSnapshotCollector;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracer;
+import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
+import org.mule.runtime.core.privileged.profiling.SpanExportManager;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 import org.mule.runtime.core.internal.profiling.tracing.ThreadLocalTracingService;
 
@@ -49,10 +58,12 @@ import reactor.core.publisher.Mono;
  */
 public class DefaultProfilingService extends AbstractProfilingService {
 
+  private static InternalSpanExportManager<EventContext> SPAN_EXPORT_MANAGER = getDefaultSpanExporterManager();
+
   @Inject
   private ProfilingFeatureFlaggingService featureFlaggingService;
 
-  private SpanManager spanManager = new DefaultSpanManager();
+  private DefaultCoreEventTracer eventTracer;
 
   private Optional<Set<ProfilingDataConsumerDiscoveryStrategy>> profilingDataConsumerDiscoveryStrategies = empty();
 
@@ -83,6 +94,14 @@ public class DefaultProfilingService extends AbstractProfilingService {
   public void initialise() throws InitialisationException {
     initialiseProfilingDataProducerIfNeeded();
     super.initialise();
+  }
+
+  private void getEventTracer() {
+    this.eventTracer = getCoreEventTracerBuilder()
+        .withSpanExporterManager(SPAN_EXPORT_MANAGER)
+        .withMuleConfiguration(muleContext.getConfiguration())
+        .withArtifactType(muleContext.getArtifactType())
+        .build();
   }
 
   @Override
@@ -168,8 +187,11 @@ public class DefaultProfilingService extends AbstractProfilingService {
   }
 
   @Override
-  public SpanManager getSpanManager() {
-    return spanManager;
+  public CoreEventTracer getCoreEventTracer() {
+    if (eventTracer == null) {
+      getEventTracer();
+    }
+    return eventTracer;
   }
 
   private String getScope() {
@@ -180,5 +202,20 @@ public class DefaultProfilingService extends AbstractProfilingService {
     } else {
       return getArtifactId(muleContext);
     }
+  }
+
+  @Override
+  public SpanExportManager getSpanExportManager() {
+    return SPAN_EXPORT_MANAGER;
+  }
+
+  @Override
+  public void startComponentSpan(CoreEvent event, Component component) {
+    eventTracer.startComponentSpan(event, component);
+  }
+
+  @Override
+  public void endComponentSpan(CoreEvent event) {
+    eventTracer.endCurrentSpan(event);
   }
 }

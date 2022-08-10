@@ -305,7 +305,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   }
 
   private List<ErrorModelParser> fetchErrorModelParsers() {
-    return parseExtensionErrorModels(extensionElement);
+    return parseExtensionErrorModels(extensionElement, getNamespace());
   }
 
   @Override
@@ -374,6 +374,11 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   @Override
   public List<NotificationModel> getNotificationModels() {
     return notificationModels;
+  }
+
+  @Override
+  public String getNamespace() {
+    return namespace;
   }
 
   public StereotypeModelLoaderDelegate getStereotypeLoaderDelegate() {

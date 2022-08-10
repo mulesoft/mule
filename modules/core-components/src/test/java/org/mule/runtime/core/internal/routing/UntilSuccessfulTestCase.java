@@ -35,6 +35,7 @@ import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.allure.AllureConstants.ScopeFeature.SCOPE;
 import static org.mule.test.allure.AllureConstants.ScopeFeature.UntilSuccessfulStory.UNTIL_SUCCESSFUL;
 
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -46,6 +47,9 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanCustomizer;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.InternalSpan;
+import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTracer;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -393,7 +397,26 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
 
     final UntilSuccessfulRouter router = new UntilSuccessfulRouter(flow, emitter.flux(), e -> e, ps,
                                                                    muleContext.getExpressionManager(), null, null,
-                                                                   "1", MILLIS_BETWEEN_RETRIES);
+                                                                   "1", MILLIS_BETWEEN_RETRIES, new CoreEventTracer() {
+
+                                                                     @Override
+                                                                     public InternalSpan startComponentSpan(CoreEvent coreEvent,
+                                                                                                            Component component) {
+                                                                       return null;
+                                                                     }
+
+                                                                     @Override
+                                                                     public InternalSpan startComponentSpan(CoreEvent coreEvent,
+                                                                                                            Component component,
+                                                                                                            CoreEventSpanCustomizer coreEventSpanCustomizer) {
+                                                                       return null;
+                                                                     }
+
+                                                                     @Override
+                                                                     public void endCurrentSpan(CoreEvent coreEvent) {
+
+                                                                     }
+                                                                   });
     // Assert that the inner flux was registered in the ps.
     verify(ps).configureInternalPublisher(any());
 

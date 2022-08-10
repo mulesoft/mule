@@ -1251,7 +1251,9 @@
       "visibility": "PUBLIC",
       "notifications": [],
       "nestedComponents": [],
-      "errors": [],
+      "errors": [
+        "THIS:CUSTOM"
+      ],
       "semanticTerms": [],
       "stereotype": {
         "type": "HELLO_AND_INTRODUCE",
@@ -1725,7 +1727,9 @@
       "visibility": "PRIVATE",
       "notifications": [],
       "nestedComponents": [],
-      "errors": [],
+      "errors": [
+        "THIS:CUSTOM"
+      ],
       "semanticTerms": [],
       "stereotype": {
         "type": "HELLO_PLACE",
@@ -2109,7 +2113,9 @@
       "visibility": "PUBLIC",
       "notifications": [],
       "nestedComponents": [],
-      "errors": [],
+      "errors": [
+        "THIS:CUSTOM"
+      ],
       "semanticTerms": [],
       "stereotype": {
         "type": "HELLO_WORLD",
@@ -2519,7 +2525,9 @@
       "visibility": "PUBLIC",
       "notifications": [],
       "nestedComponents": [],
-      "errors": [],
+      "errors": [
+        "THIS:CUSTOM"
+      ],
       "semanticTerms": [],
       "stereotype": {
         "type": "INTRODUCE_MYSELF",
@@ -3502,7 +3510,9 @@
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
-      "errors": [],
+      "errors": [
+        "THIS:CUSTOM"
+      ],
       "semanticTerms": [],
       "visibility": "PUBLIC",
       "stereotype": {
@@ -3944,7 +3954,10 @@
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
-      "errors": [],
+      "errors": [
+        "MARVEL:CONNECTIVITY",
+        "MARVEL:RETRY_EXHAUSTED"
+      ],
       "semanticTerms": [],
       "visibility": "PUBLIC",
       "stereotype": {
@@ -4260,6 +4273,21 @@
     },
     {
       "error": "THIS:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED",
+      "handleable": true
+    },
+    {
+      "error": "THIS:CUSTOM",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MARVEL:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY",
+      "handleable": true
+    },
+    {
+      "error": "MARVEL:RETRY_EXHAUSTED",
       "parent": "MULE:RETRY_EXHAUSTED",
       "handleable": true
     }

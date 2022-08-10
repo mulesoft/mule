@@ -32,7 +32,7 @@
 
             <choice>
                 <when expression="#[payload != null or attributes != null]">
-                    <raise-error type="MULE:ANY" description="payload or attributes not null"/>
+                    <operation:raise-error type="CUSTOM" description="payload or attributes not null"/>
                 </when>
             </choice>
             <set-payload
@@ -54,7 +54,7 @@
 
             <choice>
                 <when expression="#[sizeOf(vars) > 0]">
-                    <raise-error type="MULE:ANY" description="vars not empty"/>
+                    <operation:raise-error type="CUSTOM" description="vars not empty"/>
                 </when>
             </choice>
 

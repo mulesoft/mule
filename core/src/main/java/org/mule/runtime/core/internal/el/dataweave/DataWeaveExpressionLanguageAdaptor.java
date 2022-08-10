@@ -31,6 +31,7 @@ import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ExpressionLanguageConfiguration;
 import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
@@ -48,7 +49,7 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
-public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLanguageAdaptor {
+public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLanguageAdaptor, Disposable {
 
   public static final String SERVER = "server";
   public static final String MULE = "mule";
@@ -238,6 +239,11 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
       contextBuilder = addFlowNameBindingsToBuilder(componentLocation, contextBuilder);
     }
     return contextBuilder.build();
+  }
+
+  @Override
+  public void dispose() {
+    expressionExecutor.dispose();
   }
 
   @Override

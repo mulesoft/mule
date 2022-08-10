@@ -74,6 +74,7 @@ import org.junit.rules.ExpectedException;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
+import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
 
 //TODO: MULE-9307 re-write junits for rollback exception strategy
@@ -84,6 +85,7 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
 
   protected MuleContext muleContext = mockContextWithServices();
   private static final String DEFAULT_LOG_MESSAGE = "LOG";
+  private static final Logger LOGGER = getLogger(OnErrorPropagateHandlerTestCase.class);
 
   @Rule
   public ExpectedException expectedException = none();
@@ -284,8 +286,10 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
     startIfNeeded(onErrorPropagateHandler);
     MessageProcessorChain chain =
         buildNewChainWithListOfProcessors(empty(), singletonList(createSetStringMessageProcessor("")), onErrorPropagateHandler);
+    initialiseIfNeeded(chain, muleContext);
     just(testEvent()).transform(chain).block();
     onErrorPropagateHandler.assertAllRoutersWereDisposed();
+    disposeIfNeeded(chain, LOGGER);
   }
 
   @Test
