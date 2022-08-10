@@ -75,7 +75,6 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
                                                      ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
     super(deployableProjectModel.getProjectFolder(),
           artifactDescriptorValidatorBuilder);
-    // TODO W-11202204 - validate model dependencies checking for incompatibilities
     this.deployableProjectModel = deployableProjectModel;
     this.deploymentProperties = asProperties(deploymentProperties);
     this.pluginPatchesResolver = pluginPatchesResolver;

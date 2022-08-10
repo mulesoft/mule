@@ -7,6 +7,7 @@
 package org.mule.runtime.module.artifact.activation.internal.plugin;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.artifact.activation.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
@@ -102,9 +103,10 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
   private List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency,
                                                             ClassLoaderModelBuilder classLoaderConfigurationBuilder) {
     return bundleDependency.getAdditionalDependenciesList().stream().map(additionalDependency -> {
-      // TODO W-11203349 - check if the dependency belongs to the deny-list
-      classLoaderConfigurationBuilder.withLocalPackages(additionalDependency.getPackages());
-      classLoaderConfigurationBuilder.withLocalResources(additionalDependency.getResources());
+      if (!isDenylisted(additionalDependency.getDescriptor())) {
+        classLoaderConfigurationBuilder.withLocalPackages(additionalDependency.getPackages());
+        classLoaderConfigurationBuilder.withLocalResources(additionalDependency.getResources());
+      }
       return additionalDependency.getBundleUri();
     }).collect(toList());
   }
@@ -126,7 +128,6 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
 
   @Override
   protected boolean shouldPopulateLocalPackages() {
-    // TODO W-11203349 - check if it belongs to the deny-list to decide whether local packages should be populated
-    return true;
+    return !isDenylisted(bundleDescriptor);
   }
 }

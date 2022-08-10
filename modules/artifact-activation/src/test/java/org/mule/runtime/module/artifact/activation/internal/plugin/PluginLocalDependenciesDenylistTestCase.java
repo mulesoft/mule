@@ -5,9 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.deployment.impl.internal.plugin;
+package org.mule.runtime.module.artifact.activation.internal.plugin;
 
-import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
+import static org.mule.runtime.module.artifact.activation.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -18,7 +18,6 @@ import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;
 
-// TODO W-11086310/W-11086334 - remove this class after these migrations
 @SmallTest
 public class PluginLocalDependenciesDenylistTestCase extends AbstractMuleTestCase {
 
@@ -53,7 +52,7 @@ public class PluginLocalDependenciesDenylistTestCase extends AbstractMuleTestCas
   }
 
   @Test
-  public void latterVersionsAreNotDenylisted() {
+  public void laterVersionsAreNotDenylisted() {
     BundleDescriptor latterMajor = new BundleDescriptor.Builder().setGroupId("com.mulesoft.connectors")
         .setArtifactId("mule-ibm-ctg-connector").setVersion("3.0.0").build();
 
