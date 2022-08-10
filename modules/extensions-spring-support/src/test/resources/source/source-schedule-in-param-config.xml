@@ -27,7 +27,7 @@
                 </scheduling-strategy>
             </petstore:polling>
         </petstore:pet-adoption-scheduler-in-param-source>
-        <raise-error type="TEST:EXPECTED"/>
+        <raise-error type="APP:EXPECTED"/>
     </flow>
 
     <petstore:config name="petstore" cashierName="jim">

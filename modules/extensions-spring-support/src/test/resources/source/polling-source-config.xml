@@ -70,7 +70,7 @@
                 <fixed-frequency frequency="1000"/>
             </scheduling-strategy>
         </petstore:pet-adoption-source>
-        <raise-error type="TEST:EXPECTED"/>
+        <raise-error type="APP:EXPECTED"/>
     </flow>
 
     <petstore:config name="petstore" cashierName="jim">
