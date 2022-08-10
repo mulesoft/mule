@@ -13,11 +13,14 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 
@@ -26,20 +29,21 @@ public class GlobalErrorHandler extends ErrorHandler {
   private final AtomicBoolean initialised = new AtomicBoolean(false);
   private final AtomicInteger started = new AtomicInteger(0);
 
-  private Consumer<Exception> router;
+  private Map<MessageProcessorChain, Consumer<Exception>> routers = new HashMap<>();
 
   @Override
   public Publisher<CoreEvent> apply(Exception exception) {
     throw new IllegalStateException("GlobalErrorHandlers should be used only as template for local ErrorHandlers");
   }
 
-  @Override
-  public Consumer<Exception> router(Function<Publisher<CoreEvent>, Publisher<CoreEvent>> publisherPostProcessor,
-                                    Consumer<CoreEvent> continueCallback, Consumer<Throwable> propagateCallback) {
-    if (router == null) {
-      router = super.router(publisherPostProcessor, continueCallback, propagateCallback);
+  public Consumer<Exception> routerForChain(MessageProcessorChain chain, Supplier<Consumer<Exception>> errorRouterSupplier) {
+    if (!reuseGlobalErrorHandler()) {
+      return errorRouterSupplier.get();
     }
-    return router;
+    if (!routers.containsKey(chain)) {
+      routers.put(chain, errorRouterSupplier.get());
+    }
+    return routers.get(chain);
   }
 
   @Override
@@ -75,7 +79,6 @@ public class GlobalErrorHandler extends ErrorHandler {
 
     if (started.decrementAndGet() == 0) {
       super.stop();
-      router = null;
     }
   }
 
@@ -103,5 +106,11 @@ public class GlobalErrorHandler extends ErrorHandler {
     local.setExceptionListeners(getExceptionListeners());
     local.setExceptionListenersLocation(flowLocation);
     return local;
+  }
+
+  public void clearRouterForChain(MessageProcessorChain chain) {
+    if (reuseGlobalErrorHandler()) {
+      routers.remove(chain);
+    }
   }
 }
