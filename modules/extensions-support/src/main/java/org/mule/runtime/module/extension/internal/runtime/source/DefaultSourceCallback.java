@@ -14,6 +14,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper.ACCEPTED_POLL_ITEM_NOTIFICATION;
 import static org.mule.runtime.module.extension.internal.util.MediaTypeUtils.getDefaultMediaType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
 
@@ -254,7 +255,8 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
 
     SourceResultAdapter resultAdapter =
         new SourceResultAdapter(result, cursorProviderFactory, mediaType, returnsListOfMessages,
-                                context.getCorrelationId(), payloadMediaTypeResolver, getDistributedTraceContextGetter(context));
+                                context.getCorrelationId(), payloadMediaTypeResolver, getDistributedTraceContextGetter(context),
+                                context.getVariable(ACCEPTED_POLL_ITEM_NOTIFICATION));
 
     executeFlow(context, messageProcessContext, resultAdapter);
     contextAdapter.dispatched();

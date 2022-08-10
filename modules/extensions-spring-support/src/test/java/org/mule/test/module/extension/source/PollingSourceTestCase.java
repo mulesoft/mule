@@ -247,7 +247,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
   }
 
   @Test
-  public void noExceptionNotificationSended() throws Exception {
+  public void noExceptionNotificationSent() throws Exception {
     final Latch latch = new Latch();
     final List<ExceptionNotification> notifications = new ArrayList<>();
     final ExceptionNotificationListener listener = notification -> {

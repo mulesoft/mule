@@ -53,6 +53,8 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.notification.ConnectorMessageNotification;
+import org.mule.runtime.api.notification.Notification;
+import org.mule.runtime.api.notification.PollingSourceItemNotification;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.CorrelationIdGenerator;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -217,6 +219,10 @@ public class FlowProcessMediator implements Initialisable {
       final CoreEvent event = createEvent(template, messageSource,
                                           responseCompletion, flowConstruct);
 
+      template.getSourceMessage().getNotification().ifPresent(n -> {
+        ((PollingSourceItemNotification) n).setEventId(event.getContext().getId());
+        notificationManager.fireNotification((Notification) n);
+      });
       policyManager.addSourcePointcutParametersIntoEvent(messageSource, event.getMessage().getAttributes(),
                                                          (InternalEvent) event);
 
