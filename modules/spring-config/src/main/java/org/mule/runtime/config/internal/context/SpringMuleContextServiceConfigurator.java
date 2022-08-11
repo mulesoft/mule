@@ -278,7 +278,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
   private void loadServiceConfigurators() {
     new SpiServiceRegistry()
         .lookupProviders(ServiceConfigurator.class, Service.class.getClassLoader())
-        .forEach(customizer -> customizer.configure(getCustomServiceRegistry()));
+        .forEach(customizationInfo -> customizationInfo.configure(getCustomServiceRegistry()));
   }
 
   private void createCustomServices() {

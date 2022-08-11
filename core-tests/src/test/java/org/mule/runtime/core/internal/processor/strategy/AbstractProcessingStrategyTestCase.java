@@ -9,6 +9,8 @@ package org.mule.runtime.core.internal.processor.strategy;
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Collections.singleton;
 import static org.hamcrest.CoreMatchers.notNullValue;
+
+import static org.mule.runtime.api.component.AbstractComponent.ANNOTATION_NAME;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
@@ -75,6 +77,7 @@ import static reactor.core.publisher.Mono.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -108,6 +111,7 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.core.privileged.util.MapUtils;
 import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -118,6 +122,8 @@ import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -138,6 +144,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.google.common.collect.ImmutableMap;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -826,6 +833,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
                 public ProcessingType getProcessingType() {
                   return BLOCKING;
                 }
+
               }))
               .maxConcurrency(2)
               .build();
@@ -871,7 +879,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   }
 
   protected void startFlow() throws InitialisationException, MuleException {
-    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
+    flow.setAnnotations(ImmutableMap.of(LOCATION_KEY, from("flow"), ANNOTATION_NAME,
+                                        ComponentIdentifier.buildFromStringRepresentation("mule:flow")));
     flow.initialise();
     flow.start();
   }
@@ -922,6 +931,11 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
     public Latch getUnlatchedInvocationLatch() throws InterruptedException {
       return unlatchedInvocationLatch;
+    }
+
+    @Override
+    public ComponentIdentifier getIdentifier() {
+      return ComponentIdentifier.buildFromStringRepresentation("mule:multiple-invocation-latched-processor");
     }
 
   }
@@ -1062,6 +1076,11 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       }
     }
 
+    @Override
+    public ComponentIdentifier getIdentifier() {
+      return ComponentIdentifier.buildFromStringRepresentation("mule:thread-tracking-processor");
+    }
+
   }
 
   class WithInnerPublisherProcessor extends ThreadTrackingProcessor {
@@ -1152,6 +1171,11 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     @Override
     public ProcessingType getProcessingType() {
       return asyncProcessor.getProcessingType();
+    }
+
+    @Override
+    public ComponentIdentifier getIdentifier() {
+      return ComponentIdentifier.buildFromStringRepresentation("mule:annotated-async-processor");
     }
   }
 

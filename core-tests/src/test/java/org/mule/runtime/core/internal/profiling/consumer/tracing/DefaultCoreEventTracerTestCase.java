@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.ComponentSpanIdentifier.componentSpanIdentifierFrom;
 import static org.mule.runtime.core.internal.profiling.tracing.event.tracer.impl.DefaultCoreEventTracer.getCoreEventTracerBuilder;
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.CoreEventSpanUtils.getSpanName;
+import static org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo.getDefaultChildSpanInfo;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
@@ -37,7 +38,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
@@ -48,6 +48,8 @@ import org.mule.runtime.core.internal.profiling.tracing.event.tracer.CoreEventTr
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporter;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporterVisitor;
 import org.mule.runtime.core.internal.trace.DistributedTraceContext;
+import org.mule.runtime.core.privileged.profiling.tracing.ChildSpanCustomizationInfo;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 
 import java.time.Instant;
 import java.util.Map;
@@ -91,12 +93,23 @@ public class DefaultCoreEventTracerTestCase {
         getTestCoreEventTracer(TestSpanExportManager.getTestSpanExportManagerInstance(),
                                mockedMuleConfiguration);
 
-    InternalSpan span = coreEventTracer.startComponentSpan(coreEvent, component);
+    InternalSpan span = coreEventTracer.startComponentSpan(coreEvent, new SpanCustomizationInfo() {
+
+      @Override
+      public String getName(CoreEvent coreEvent) {
+        return getSpanName(componentIdentifier);
+      }
+
+      @Override
+      public ChildSpanCustomizationInfo getChildSpanCustomizationInfo() {
+        return getDefaultChildSpanInfo();
+      }
+    });
 
     assertThat(span.getName(), equalTo(getSpanName(component.getIdentifier())));
     assertThat(span.getParent(), nullValue());
     assertThat(span.getIdentifier(), equalTo(
-                                             componentSpanIdentifierFrom(mockedMuleConfiguration.getId(), component.getLocation(),
+                                             componentSpanIdentifierFrom(mockedMuleConfiguration.getId(),
                                                                          coreEvent.getCorrelationId())));
     assertThat(span.getParent(), nullValue());
     assertThat(span.getDuration().getStart(), notNullValue());

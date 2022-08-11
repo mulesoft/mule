@@ -223,7 +223,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
       if (tearingDown) {
         throw new IllegalStateException("Already tearing down.");
       }
-      final FlowRunner flowRunner = new FlowRunner(registry, flowName, privilegedProfilingService);
+      final FlowRunner flowRunner = new FlowRunner(registry, flowName);
       runners.add(flowRunner);
       return flowRunner;
     }

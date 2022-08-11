@@ -7,16 +7,16 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span;
 
-import org.mule.runtime.api.component.Component;
+import static java.util.Collections.emptyList;
+
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.profiling.CapturedExportedSpan;
 import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 
 import java.util.Collection;
-
-import static java.util.Collections.emptyList;
 
 /**
  * Provides the Span from the core event and the component.
@@ -28,29 +28,15 @@ public interface CoreEventSpanFactory {
   /**
    * Provides a span for related to a component that is hit by an event.
    *
-   * @param coreEvent         the core event that hits the component.
-   * @param component         the component hit
-   * @param muleConfiguration the mule configuration related to the deployed artifact.
-   * @param artifactType      the artifact type.
-   *
+   * @param coreEvent             the core event that hits the component.
+   * @param muleConfiguration     the mule configuration related to the deployed artifact.
+   * @param artifactType          the artifact type.
+   * @param spanCustomizationInfo the {@link SpanCustomizationInfo} for the span.
    * @return the {@link InternalSpan} for that coreEvent and component.
    */
-  InternalSpan getSpan(CoreEvent coreEvent, Component component, MuleConfiguration muleConfiguration,
-                       ArtifactType artifactType);
-
-  /**
-   * Provides a span for related to a component that is hit by an event.
-   *
-   * @param coreEvent               the core event that hits the component.
-   * @param component               the component hit
-   * @param muleConfiguration       the mule configuration related to the deployed artifact.
-   * @param artifactType            the artifact type.
-   * @param coreEventSpanCustomizer the {@link CoreEventSpanCustomizer} customizer for the span.
-   * @return the {@link InternalSpan} for that coreEvent and component.
-   */
-  InternalSpan getSpan(CoreEvent coreEvent, Component component, MuleConfiguration muleConfiguration,
+  InternalSpan getSpan(CoreEvent coreEvent, MuleConfiguration muleConfiguration,
                        ArtifactType artifactType,
-                       CoreEventSpanCustomizer coreEventSpanCustomizer);
+                       SpanCustomizationInfo spanCustomizationInfo);
 
   /**
    * @return a capturer for created spans that are exported.

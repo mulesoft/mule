@@ -53,6 +53,7 @@ import org.mule.runtime.core.internal.util.rx.RxUtils;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 
 import java.util.ArrayDeque;
 import java.util.List;
@@ -111,6 +112,17 @@ public class MessageProcessors {
     DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
     processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
     defaultMessageProcessorChainBuilder.setMessagingExceptionHandler(messagingExceptionHandler);
+    return defaultMessageProcessorChainBuilder.chain(processors).build();
+  }
+
+  public static MessageProcessorChain buildNewChainWithListOfProcessors(Optional<ProcessingStrategy> processingStrategy,
+                                                                        List<Processor> processors,
+                                                                        FlowExceptionHandler messagingExceptionHandler,
+                                                                        SpanCustomizationInfo spanCustomizationInfo) {
+    DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
+    processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
+    defaultMessageProcessorChainBuilder.setMessagingExceptionHandler(messagingExceptionHandler);
+    defaultMessageProcessorChainBuilder.setSpanCustomizationInfo(spanCustomizationInfo);
     return defaultMessageProcessorChainBuilder.chain(processors).build();
   }
 

@@ -90,6 +90,7 @@ import org.mule.runtime.core.internal.management.stats.DefaultProcessingTimeWatc
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.processor.interceptor.DefaultProcessorInterceptorManager;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
+import org.mule.runtime.core.internal.profiling.NoOpProfilingService;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.TypeBasedTransformerResolver;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
@@ -170,7 +171,7 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
 
     // This is overridden only if no other test configurator has set the profiling service.
     if (((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(MULE_PROFILING_SERVICE_KEY) == null) {
-      registerObject(MULE_PROFILING_SERVICE_KEY, new DefaultProfilingService(), muleContext);
+      registerObject(MULE_PROFILING_SERVICE_KEY, new NoOpProfilingService(), muleContext);
     }
 
     registerObject(ComponentInitialStateManager.SERVICE_ID, new ComponentInitialStateManager() {

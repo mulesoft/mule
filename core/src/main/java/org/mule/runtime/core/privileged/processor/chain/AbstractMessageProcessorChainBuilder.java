@@ -11,6 +11,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.privileged.profiling.tracing.SpanCustomizationInfo;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 
 import java.util.ArrayList;
@@ -35,6 +36,7 @@ public abstract class AbstractMessageProcessorChainBuilder implements MessagePro
   protected FlowExceptionHandler messagingExceptionHandler;
   protected ComponentLocation location;
   protected MuleContext muleContext;
+  protected SpanCustomizationInfo spanCustomizationInfo;
 
   // Argument is of type Object because it could be a MessageProcessor or a MessageProcessorBuilder
   protected Processor initializeMessageProcessor(Object processor) {
@@ -62,4 +64,13 @@ public abstract class AbstractMessageProcessorChainBuilder implements MessagePro
     this.location = location;
   }
 
+  /**
+   * @param spanCustomizationInfo the span customization info for the creation of the
+   *                              {@link org.mule.runtime.api.profiling.tracing.Span} associated to the chain.
+   *
+   * @since 4.5.0
+   */
+  public void setSpanCustomizationInfo(SpanCustomizationInfo spanCustomizationInfo) {
+    this.spanCustomizationInfo = spanCustomizationInfo;
+  }
 }

@@ -6,7 +6,6 @@
  */
 package org.mule.functional.api.flow;
 
-import static java.util.Optional.ofNullable;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
@@ -31,12 +30,10 @@ import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
-import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 import org.mule.tck.junit4.matcher.ErrorTypeMatcher;
 import org.mule.tck.junit4.matcher.EventMatcher;
 import org.mule.tck.processor.FlowAssert;
 
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
@@ -54,7 +51,6 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
 
   private final String flowName;
   private final Flow flow;
-  private Optional<PrivilegedProfilingService> privilegedProfilingService = Optional.empty();
 
   private ExecutionTemplate<CoreEvent> txExecutionTemplate = callback -> callback.process();
 
@@ -66,10 +62,15 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
 
   private boolean wasFlowOriginallyStopped = false;
 
-  public FlowRunner(Registry registry, String flowName, PrivilegedProfilingService privilegedProfilingService) {
+  /**
+   * Initializes this flow runner.
+   *
+   * @param registry the registry for the currently running test
+   * @param flowName the name of the flow to run events through
+   */
+  public FlowRunner(Registry registry, String flowName) {
     super(registry);
     this.flowName = flowName;
-    this.privilegedProfilingService = ofNullable(privilegedProfilingService);
 
     flow = (Flow) getFlowConstruct();
     if (((LifecycleStateEnabled) flow).getLifecycleState().isStopped()) {
@@ -80,16 +81,6 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
         throw new MuleRuntimeException(e);
       }
     }
-  }
-
-  /**
-   * Initializes this flow runner.
-   *
-   * @param registry the registry for the currently running test
-   * @param flowName the name of the flow to run events through
-   */
-  public FlowRunner(Registry registry, String flowName) {
-    this(registry, flowName, null);
   }
 
   /**
@@ -228,30 +219,17 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
       Reference<FluxSink<CoreEvent>> sinkReference = new Reference<>(null);
 
       CoreEvent result;
-      // TODO: W-11486418 - Improve FlowRunner Creation of Spans
-      SpanHolder spanHolder = new SpanHolder();
       try {
         result = Flux.<CoreEvent>create(fluxSink -> {
-          CoreEvent event = getOrBuildEvent();
-          fluxSink.next(event);
+          fluxSink.next(getOrBuildEvent());
           sinkReference.set(fluxSink);
-        }).doOnNext(event -> privilegedProfilingService
-            .ifPresent(privilegedProfilingService -> {
-              privilegedProfilingService.startComponentSpan(event, flow);
-              spanHolder.setEvent(event);
-            }))
-            .transform(flow::apply)
-            .doOnNext(event -> privilegedProfilingService
-                .ifPresent(privilegedProfilingService -> privilegedProfilingService.endComponentSpan(event)))
-            .blockFirst();
+        }).transform(flow::apply).blockFirst();
       } catch (RuntimeException ex) {
         if (ex.getCause() instanceof MuleException) {
           throw (MuleException) ex.getCause();
         } else {
           throw ex;
         }
-      } finally {
-        spanHolder.endSpan();
       }
 
       sinkReference.get().complete();
@@ -263,26 +241,17 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
     return () -> {
       Reference<FluxSink<CoreEvent>> sinkReference = new Reference<>(null);
 
-      // TODO: W-11486418 - Improve FlowRunner Creation of Spans
-      SpanHolder spanHolder = new SpanHolder();
       try {
         Flux.<CoreEvent>create(fluxSink -> {
           fluxSink.next(getOrBuildEvent());
           sinkReference.set(fluxSink);
-        }).doOnNext(event -> privilegedProfilingService
-            .ifPresent(privilegedProfilingService -> {
-              privilegedProfilingService.startComponentSpan(event, flow);
-              spanHolder.setEvent(event);
-            }))
-            .transform(flow::apply).blockFirst();
+        }).transform(flow::apply).blockFirst();
       } catch (RuntimeException ex) {
         if (ex.getCause() instanceof MuleException) {
           throw (MuleException) ex.getCause();
         } else {
           throw ex;
         }
-      } finally {
-        spanHolder.endSpan();
       }
 
       sinkReference.get().complete();
@@ -431,24 +400,6 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
       return flow;
     } else {
       return super.getFlowConstruct();
-    }
-  }
-
-  /**
-   * A SpanHolder to end current span after the test.
-   */
-  private class SpanHolder {
-
-    private CoreEvent event;
-
-    public void setEvent(CoreEvent event) {
-      this.event = event;
-    }
-
-    public void endSpan() {
-      if (event != null) {
-        privilegedProfilingService.ifPresent(profilingService -> profilingService.endComponentSpan(event));
-      }
     }
   }
 }
