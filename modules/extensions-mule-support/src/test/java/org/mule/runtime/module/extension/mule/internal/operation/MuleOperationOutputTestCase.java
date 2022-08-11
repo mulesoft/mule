@@ -9,11 +9,13 @@ package org.mule.runtime.module.extension.mule.internal.operation;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERATIONS;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import io.qameta.allure.Description;
@@ -42,5 +44,20 @@ public class MuleOperationOutputTestCase extends MuleArtifactFunctionalTestCase 
   public void stringOutputOperation() throws Exception {
     CoreEvent resultEvent = flowRunner("stringOutputOperationFlow").run();
     assertThat(resultEvent.getMessage().getPayload().getValue(), is("Expected output"));
+  }
+
+  @Test
+  @Description("Executes an operation setting a repeatable stream output, but with void output type, then the output payload is null")
+  public void withRepeatableStreamingAndVoidOutput() throws Exception {
+    CoreEvent resultEvent = flowRunner("withRepeatableStreamingAndVoidOutputFlow").run();
+    assertThat(resultEvent.getMessage().getPayload().getValue(), is(nullValue()));
+  }
+
+  @Test
+  @Description("Executes an operation setting a repeatable stream output, then the output payload is the stream")
+  public void withRepeatableStreaming() throws Exception {
+    CoreEvent resultEvent = flowRunner("withRepeatableStreamingFlow").run();
+    Object cursorIteratorProvider = resultEvent.getMessage().getPayload().getValue();
+    assertThat(cursorIteratorProvider, is(instanceOf(CursorIteratorProvider.class)));
   }
 }
