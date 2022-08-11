@@ -29,10 +29,10 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthCallbackValue;
-import org.mule.runtime.extension.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
+import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsState;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantTypeVisitor;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
@@ -48,8 +48,10 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.aut
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 import org.mule.runtime.oauth.api.builder.ClientCredentialsLocation;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
+import org.mule.sdk.api.connectivity.oauth.AccessTokenExpiredException;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +66,11 @@ import org.slf4j.Logger;
  * @since 4.0
  */
 public final class ExtensionsOAuthUtils {
+
+  public static final List<Class<?>> AUTHORIZATION_CODE_STATE_INTERFACES =
+      Arrays.asList(AuthorizationCodeState.class, org.mule.sdk.api.connectivity.oauth.AuthorizationCodeState.class);
+  public static final List<Class<?>> CLIENT_CREDENTIALS_STATE_INTERFACES =
+      Arrays.asList(ClientCredentialsState.class, org.mule.sdk.api.connectivity.oauth.ClientCredentialsState.class);;
 
   private static final Logger LOGGER = getLogger(ExtensionsOAuthUtils.class);
 
@@ -134,19 +141,19 @@ public final class ExtensionsOAuthUtils {
   /**
    * Returns a {@link FieldSetter} capable of setting a {@link OAuthState} field on the given {@code target}.
    *
-   * @param target    the target in which the value is to be set
-   * @param stateType the field's exact {@link OAuthState} type
-   * @param grantType the {@link OAuthGrantType} associated to the {@code stateType}
-   * @param <T>       the generic type of the {@link OAuthState}
+   * @param target     the target in which the value is to be set
+   * @param stateTypes the possible field's exact {@link OAuthState} type
+   * @param grantType  the {@link OAuthGrantType} associated to the {@code stateType}
+   * @param <T>        the generic type of the {@link OAuthState}
    * @retur a {@link FieldSetter} for the given {@code delegate}
    * @since 4.3.0
    */
-  public static <T extends OAuthState> FieldSetter<Object, T> getOAuthStateSetter(Object target,
-                                                                                  Class<T> stateType,
-                                                                                  OAuthGrantType grantType) {
+  public static <T extends OAuthState> FieldSetter<Object, Object> getOAuthStateSetter(Object target,
+                                                                                       List<Class<?>> stateTypes,
+                                                                                       OAuthGrantType grantType) {
 
     List<Field> stateFields = getFields(target.getClass()).stream()
-        .filter(f -> f.getType().equals(stateType))
+        .filter(f -> stateTypes.stream().anyMatch(stateType -> f.getType().equals(stateType)))
         .collect(toList());
 
     if (stateFields.size() != 1) {
@@ -155,7 +162,7 @@ public final class ExtensionsOAuthUtils {
                                                                       + "one (and only one) field of type %s. %d were found",
                                                                          target.getClass().getName(),
                                                                          grantType.getName(),
-                                                                         stateType,
+                                                                         stateTypes.get(0).getName(),
                                                                          stateFields.size()));
     }
 

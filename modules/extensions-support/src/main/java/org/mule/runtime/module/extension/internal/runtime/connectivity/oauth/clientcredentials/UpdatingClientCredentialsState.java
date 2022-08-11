@@ -21,7 +21,8 @@ import java.util.function.Consumer;
  *
  * @since 4.2.1
  */
-public class UpdatingClientCredentialsState implements ClientCredentialsState {
+public class UpdatingClientCredentialsState
+    implements ClientCredentialsState, org.mule.sdk.api.connectivity.oauth.ClientCredentialsState {
 
   private final ClientCredentialsOAuthDancer dancer;
   private ClientCredentialsState delegate;

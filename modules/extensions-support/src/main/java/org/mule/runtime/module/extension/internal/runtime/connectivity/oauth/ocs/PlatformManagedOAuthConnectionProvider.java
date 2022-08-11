@@ -19,6 +19,8 @@ import static org.mule.runtime.core.internal.connection.ConnectionUtils.unwrap;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.util.InjectionUtils.getInjectionTarget;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.AUTHORIZATION_CODE_STATE_INTERFACES;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.CLIENT_CREDENTIALS_STATE_INTERFACES;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getCallbackValuesExtractors;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.updateOAuthParameters;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.validateOAuthConnection;
@@ -114,7 +116,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
   private ConnectionProvider<C> delegate;
   private ConnectionProvider<C> unwrappedDelegate;
   private Object delegateForInjection;
-  private FieldSetter<Object, OAuthState> oauthStateFieldSetter;
+  private FieldSetter<Object, Object> oauthStateFieldSetter;
   private PlatformManagedConnectionDescriptor descriptor;
   private PoolingListener<C> delegatePoolingListener;
   private DslSyntaxResolver dslSyntaxResolver;
@@ -277,18 +279,20 @@ public class PlatformManagedOAuthConnectionProvider<C>
                                     e);
   }
 
-  private FieldSetter<Object, OAuthState> getOAuthStateSetter(Object target) {
-    Reference<FieldSetter<Object, ? extends OAuthState>> setter = new Reference<>();
+  private FieldSetter<Object, Object> getOAuthStateSetter(Object target) {
+    Reference<FieldSetter<Object, Object>> setter = new Reference<>();
     oauthConfig.getDelegateGrantType().accept(new OAuthGrantTypeVisitor() {
 
       @Override
       public void visit(AuthorizationCodeGrantType grantType) {
-        setter.set(ExtensionsOAuthUtils.getOAuthStateSetter(target, AuthorizationCodeState.class, oauthConfig.getGrantType()));
+        setter.set(ExtensionsOAuthUtils.getOAuthStateSetter(target, AUTHORIZATION_CODE_STATE_INTERFACES,
+                                                            oauthConfig.getGrantType()));
       }
 
       @Override
       public void visit(ClientCredentialsGrantType grantType) {
-        setter.set(ExtensionsOAuthUtils.getOAuthStateSetter(target, ClientCredentialsState.class, oauthConfig.getGrantType()));
+        setter.set(ExtensionsOAuthUtils.getOAuthStateSetter(target, CLIENT_CREDENTIALS_STATE_INTERFACES,
+                                                            oauthConfig.getGrantType()));
       }
 
       @Override
@@ -297,7 +301,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
       }
     });
 
-    return (FieldSetter<Object, OAuthState>) setter.get();
+    return (FieldSetter<Object, Object>) setter.get();
   }
 
   private IllegalConnectionProviderModelDefinitionException illegalDelegateException() {

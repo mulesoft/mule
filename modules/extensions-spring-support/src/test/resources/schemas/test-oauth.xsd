@@ -731,6 +731,411 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="sdk-authcode-connection">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractConnectionProviderType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="connection-properties">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="some-oauth-connection-properties">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" minOccurs="0" maxOccurs="unbounded" ref="test-oauth:abstract-connection-properties"></xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="some-connection-numbers">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="some-connection-number">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="some-map-of-connection-properties">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="some-map-of-connection-property">
+                    <xs:complexType>
+                      <xs:sequence maxOccurs="1">
+                        <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" minOccurs="0" maxOccurs="1" ref="test-oauth:abstract-connection-properties"></xs:element>
+                      </xs:sequence>
+                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                      <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="external-pojo">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-pojo-parameter">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-array-parameters">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="stacked-type-array-parameter">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-map-parameters">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="stacked-type-map-parameter">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="connection-profile">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence>
+                      <xs:element minOccurs="0" maxOccurs="1" name="profile-connection-properties">
+                        <xs:complexType>
+                          <xs:complexContent>
+                            <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
+                          </xs:complexContent>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                    <xs:attribute type="xs:string" use="optional" name="profileConnectionProperties"></xs:attribute>
+                    <xs:attribute type="mule:expressionInt" use="optional" name="profileLevel"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" name="profileDescription"></xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="1" maxOccurs="1" name="oauth-authorization-code">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence></xs:sequence>
+                    <xs:attribute type="xs:string" use="required" name="consumerKey">
+                      <xs:annotation>
+                        <xs:documentation>The OAuth consumerKey as registered with the service provider</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="required" name="consumerSecret">
+                      <xs:annotation>
+                        <xs:documentation>The OAuth consumerSecret as registered with the service provider</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" default="authUrl" name="authorizationUrl">
+                      <xs:annotation>
+                        <xs:documentation>The service provider's authorization endpoint URL</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" default="accessTokenUrl" name="accessTokenUrl">
+                      <xs:annotation>
+                        <xs:documentation>The service provider's accessToken endpoint URL</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" default="defaultScope" name="scopes">
+                      <xs:annotation>
+                        <xs:documentation>The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" name="resourceOwnerId">
+                      <xs:annotation>
+                        <xs:documentation>The resourceOwnerId which each component should use if it doesn't reference otherwise.</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="before">
+                      <xs:annotation>
+                        <xs:documentation>The name of a flow to be executed right before starting the OAuth dance</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="after">
+                      <xs:annotation>
+                        <xs:documentation>The name of a flow to be executed right after an accessToken has been received</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="1" maxOccurs="1" name="oauth-callback-config">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence></xs:sequence>
+                    <xs:attribute type="xs:string" use="required" name="listenerConfig">
+                      <xs:annotation>
+                        <xs:documentation>A reference to a &lt;http:listener-config /&gt; to be used in order to create the listener that will catch the access token callback endpoint.</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="required" name="callbackPath">
+                      <xs:annotation>
+                        <xs:documentation>The path of the access token callback endpoint</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="required" name="authorizePath">
+                      <xs:annotation>
+                        <xs:documentation>The path of the local http endpoint which triggers the OAuth dance</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="externalCallbackUrl">
+                      <xs:annotation>
+                        <xs:documentation>If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="oauth-store-config">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence></xs:sequence>
+                    <xs:attribute type="xs:string" use="optional" name="objectStore">
+                      <xs:annotation>
+                        <xs:documentation>A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute type="mule:expressionDouble" use="optional" default="34.0" name="apiVersion"></xs:attribute>
+          <xs:attribute type="xs:string" use="required" name="display"></xs:attribute>
+          <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="immediate"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="connectionProperties"></xs:attribute>
+          <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="prompt"></xs:attribute>
+          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/test-oauth" type="org.mule.test.oauth.ConnectionTypeEnumType" use="optional" name="oauthConnectionType"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="someOauthConnectionProperties"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="someConnectionNumbers"></xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="optional" name="someMapOfConnectionProperties"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="securityLevel"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="typedSecurityLevel"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="literalSecurityDescription"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="resolverConnectionDisplayName"></xs:attribute>
+          <xs:attribute type="mule:expressionDateTime" use="optional" name="connectionTime"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="externalPojo"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="stackedTypePojoParameter"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="sdk-client-credentials-connection">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractConnectionProviderType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="connection-properties">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="some-oauth-connection-properties">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" minOccurs="0" maxOccurs="unbounded" ref="test-oauth:abstract-connection-properties"></xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="some-connection-numbers">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="some-connection-number">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="some-map-of-connection-properties">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="some-map-of-connection-property">
+                    <xs:complexType>
+                      <xs:sequence maxOccurs="1">
+                        <xs:element xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" minOccurs="0" maxOccurs="1" ref="test-oauth:abstract-connection-properties"></xs:element>
+                      </xs:sequence>
+                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                      <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="external-pojo">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-pojo-parameter">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:values="http://www.mulesoft.org/schema/mule/values" base="values:org.mule.test.values.extension.MyPojo"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-array-parameters">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="stacked-type-array-parameter">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="stacked-type-map-parameters">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="stacked-type-map-parameter">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                      <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="another-connection-properties">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="connection-profile">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence>
+                      <xs:element minOccurs="0" maxOccurs="1" name="profile-connection-properties">
+                        <xs:complexType>
+                          <xs:complexContent>
+                            <xs:extension xmlns:test-oauth="http://www.mulesoft.org/schema/mule/test-oauth" base="test-oauth:org.mule.test.oauth.ConnectionProperties"></xs:extension>
+                          </xs:complexContent>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                    <xs:attribute type="xs:string" use="optional" name="profileConnectionProperties"></xs:attribute>
+                    <xs:attribute type="mule:expressionInt" use="optional" name="profileLevel"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" name="profileDescription"></xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="1" maxOccurs="1" name="oauth-client-credentials">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence></xs:sequence>
+                    <xs:attribute type="mule:expressionString" use="required" name="clientId">
+                      <xs:annotation>
+                        <xs:documentation>The OAuth client id as registered with the service provider</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="required" name="clientSecret">
+                      <xs:annotation>
+                        <xs:documentation>The OAuth client secret as registered with the service provider</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" default="accessTokenUrl" name="tokenUrl">
+                      <xs:annotation>
+                        <xs:documentation>The service provider's token endpoint URL</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" default="defaultScope" name="scopes">
+                      <xs:annotation>
+                        <xs:documentation>The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="oauth-store-config">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence></xs:sequence>
+                    <xs:attribute type="xs:string" use="optional" name="objectStore">
+                      <xs:annotation>
+                        <xs:documentation>A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute type="mule:expressionDouble" use="optional" default="34.0" name="apiVersion"></xs:attribute>
+          <xs:attribute type="xs:string" use="required" name="display"></xs:attribute>
+          <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="immediate"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="connectionProperties"></xs:attribute>
+          <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="prompt"></xs:attribute>
+          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/test-oauth" type="org.mule.test.oauth.ConnectionTypeEnumType" use="optional" name="oauthConnectionType"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="someOauthConnectionProperties"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="someConnectionNumbers"></xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="optional" name="someMapOfConnectionProperties"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="securityLevel"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="typedSecurityLevel"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="literalSecurityDescription"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="resolverConnectionDisplayName"></xs:attribute>
+          <xs:attribute type="mule:expressionDateTime" use="optional" name="connectionTime"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="externalPojo"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="stackedTypePojoParameter"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
   <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="validated-connection">
     <xs:complexType>
       <xs:complexContent>
@@ -1488,6 +1893,21 @@
   </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/test-oauth" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="CaptureCallbackPayloadsType" substitutionGroup="mule:abstract-operator" name="capture-callback-payloads"></xs:element>
   <xs:complexType name="CaptureCallbackPayloadsType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="xs:string" use="optional" name="request"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="state"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/test-oauth" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="CaptureSdkCallbackPayloadsType" substitutionGroup="mule:abstract-operator" name="capture-sdk-callback-payloads"></xs:element>
+  <xs:complexType name="CaptureSdkCallbackPayloadsType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>

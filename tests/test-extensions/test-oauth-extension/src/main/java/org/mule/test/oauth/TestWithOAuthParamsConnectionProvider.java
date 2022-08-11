@@ -20,7 +20,7 @@ import org.mule.runtime.extension.api.runtime.parameter.HttpParameterPlacement;
     authorizationUrl = TestOAuthConnectionProvider.AUTH_URL,
     defaultScopes = TestOAuthConnectionProvider.DEFAULT_SCOPE)
 @Alias("with-params-connection")
-public class TestWithOAuthParamsConnectionProvider extends TestOAuthConnectionState
+public class TestWithOAuthParamsConnectionProvider extends LegacyTestOAuthConnectionState
     implements ConnectionProvider<TestOAuthConnection> {
 
   public static final String ACCESS_TOKEN_URL = "accessTokenUrl";

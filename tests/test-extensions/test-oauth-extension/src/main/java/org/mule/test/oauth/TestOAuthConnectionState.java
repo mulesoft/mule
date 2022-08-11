@@ -13,7 +13,6 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.RefName;
-import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
@@ -24,7 +23,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
-public class TestOAuthConnectionState {
+public abstract class TestOAuthConnectionState {
 
   @RefName
   private String configName;
@@ -122,8 +121,6 @@ public class TestOAuthConnectionState {
   @Optional
   private ParameterResolver<TypedValue<Map<String, Integer>>> stackedTypeMapParameter;
 
-  private AuthorizationCodeState state;
-
   public Double getApiVersion() {
     return apiVersion;
   }
@@ -148,9 +145,7 @@ public class TestOAuthConnectionState {
     return userId;
   }
 
-  public OAuthState getState() {
-    return state;
-  }
+  public abstract OAuthState getState();
 
   public String getConfigName() {
     return configName;
@@ -219,4 +214,5 @@ public class TestOAuthConnectionState {
   public ParameterResolver<TypedValue<Map<String, Integer>>> getStackedTypeMapParameter() {
     return stackedTypeMapParameter;
   }
+
 }

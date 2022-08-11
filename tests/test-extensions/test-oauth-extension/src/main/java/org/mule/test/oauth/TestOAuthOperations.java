@@ -20,7 +20,6 @@ import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Query;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
-import org.mule.runtime.extension.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
 import org.mule.runtime.extension.api.dsql.QueryTranslator;
@@ -30,6 +29,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.sdk.api.annotation.data.sample.SampleData;
+import org.mule.sdk.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.test.oauth.metadata.OAuthMetadataResolver;
 import org.mule.test.oauth.metadata.RefreshedOAuthMetadataResolver;
 
