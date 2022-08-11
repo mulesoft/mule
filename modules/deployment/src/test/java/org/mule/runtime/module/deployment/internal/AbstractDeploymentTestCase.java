@@ -611,6 +611,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
             .moduleRepository(moduleRepository)
             .artifactConfigurationProcessor(serializedAstWithFallbackArtifactConfigurationProcessor())
             .build();
+    muleArtifactResourcesRegistry.inject(muleArtifactResourcesRegistry.getContainerProfilingService());
     serviceManager = muleArtifactResourcesRegistry.getServiceManager();
     containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();
     extensionModelLoaderManager = muleArtifactResourcesRegistry.getExtensionModelLoaderManager();
