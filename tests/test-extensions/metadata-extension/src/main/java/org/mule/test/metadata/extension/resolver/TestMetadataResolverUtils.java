@@ -39,6 +39,15 @@ public class TestMetadataResolverUtils {
     }).orElse(emptySet());
   }
 
+  public static Set<org.mule.sdk.api.metadata.MetadataKey> getSdkKeys(org.mule.sdk.api.metadata.MetadataContext context)
+      throws ConnectionException {
+    return context.getConnection().map(c -> {
+      MetadataConnection connection = (MetadataConnection) c;
+      return connection.getEntities().stream().map(e -> org.mule.sdk.api.metadata.MetadataKeyBuilder.newKey(e).build())
+          .collect(toSet());
+    }).orElse(emptySet());
+  }
+
   public static MetadataType getMetadata(String key) throws MetadataResolvingException {
 
 

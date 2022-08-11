@@ -20,11 +20,11 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.checkIsPresent;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getDeclaration;
+import static org.mule.test.metadata.extension.resolver.SdkTestInputResolverWithKeyResolver.SDK_TEST_INPUT_RESOLVER_WITH_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestInputAndOutputResolverWithKeyResolver.TEST_INPUT_AND_OUTPUT_RESOLVER_WITH_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestInputAndOutputWithAttributesResolverWithKeyResolver.TEST_INPUT_AND_OUTPUT_WITH_ATTRIBUTES_RESOLVER_WITH_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestInputOutputSourceResolverWithKeyResolver.TEST_INPUT_OUTPUT_SOURCE_RESOLVER_WITH_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestInputResolver.INPUT_RESOLVER_NAME;
-import static org.mule.test.metadata.extension.resolver.TestInputResolverWithKeyResolver.TEST_INPUT_RESOLVER_WITH_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestInputResolverWithoutKeyResolver.TEST_INPUT_RESOLVER_WITHOUT_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestMetadataInputCarResolver.TEST_INPUT_CAR_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestMetadataInputHouseResolver.TEST_INPUT_HOUSE_RESOLVER;
@@ -72,7 +72,7 @@ import org.junit.Test;
 
 public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
-  private static final String CONTENT_METADATA_WITH_KEY_ID = "sdkContentMetadataWithKeyId";
+  private static final String SDK_CONTENT_METADATA_WITH_KEY_ID = "sdkContentMetadataWithKeyId";
   private ExtensionDeclaration declaration;
 
   @Before
@@ -86,7 +86,7 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
   @Test
   public void parseMetadataAnnotationsOnParameter() {
     final OperationDeclaration operationDeclaration =
-        getDeclaration(declaration.getConfigurations().get(0).getOperations(), CONTENT_METADATA_WITH_KEY_ID);
+        getDeclaration(declaration.getConfigurations().get(0).getOperations(), SDK_CONTENT_METADATA_WITH_KEY_ID);
     final List<ParameterDeclaration> parameters = operationDeclaration.getAllParameters();
 
     assertParameterIsMetadataKeyPart(getDeclaration(parameters, "type"));
@@ -100,7 +100,7 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
     MetadataType outputMetadataType = IntrospectionUtils.getReturnType(new TypeWrapper(Object.class, TYPE_LOADER));
     MetadataType objectParameterMetadataType = (new ParameterTypeWrapper(Object.class, TYPE_LOADER)).asMetadataType();
 
-    OperationDeclaration dynamicContent = getDeclaration(operations, CONTENT_METADATA_WITH_KEY_ID);
+    OperationDeclaration dynamicContent = getDeclaration(operations, SDK_CONTENT_METADATA_WITH_KEY_ID);
     assertOutputType(dynamicContent.getOutput(), outputMetadataType, true);
     assertOutputType(dynamicContent.getOutputAttributes(), toMetadataType(void.class), false);
     params = dynamicContent.getAllParameters();
@@ -184,12 +184,12 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
   public void declaresTypeResolverInformationForDynamicResolver() throws Exception {
     List<OperationDeclaration> operations = declaration.getConfigurations().get(0).getOperations();
 
-    OperationDeclaration dynamicContent = getDeclaration(operations, CONTENT_METADATA_WITH_KEY_ID);
+    OperationDeclaration dynamicContent = getDeclaration(operations, SDK_CONTENT_METADATA_WITH_KEY_ID);
     assertCategoryInfo(dynamicContent, METADATA_EXTENSION_RESOLVER);
     assertOutputResolverInfo(dynamicContent, of(TEST_OUTPUT_ANY_TYPE_RESOLVER));
     assertAttributesResolverInfo(dynamicContent, empty());
     assertParamResolverInfo(dynamicContent, "type", empty());
-    assertParamResolverInfo(dynamicContent, "content", of(TEST_INPUT_RESOLVER_WITH_KEY_RESOLVER));
+    assertParamResolverInfo(dynamicContent, "content", of(SDK_TEST_INPUT_RESOLVER_WITH_KEY_RESOLVER));
 
 
     OperationDeclaration dynamicOutput = getDeclaration(operations, "outputMetadataWithKeyId");

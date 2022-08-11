@@ -13,38 +13,43 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
+import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.sdk.api.metadata.NullMetadataResolver;
 
-public class MuleAttributesTypeResolverAdapter implements AttributesTypeResolver {
+public class MuleInputTypeResolverAdapter implements InputTypeResolver {
 
-  private final org.mule.sdk.api.metadata.resolving.AttributesTypeResolver delegate;
+  private final org.mule.sdk.api.metadata.resolving.InputTypeResolver delegate;
 
-  MuleAttributesTypeResolverAdapter(org.mule.sdk.api.metadata.resolving.AttributesTypeResolver delegate) {
+  MuleInputTypeResolverAdapter(org.mule.sdk.api.metadata.resolving.InputTypeResolver delegate) {
     this.delegate = delegate;
   }
 
-  public static AttributesTypeResolver from(Object resolver) {
+  public static InputTypeResolver from(Object resolver) {
     checkArgument(resolver != null, "Cannot adapt null resolver");
 
-    if (resolver instanceof AttributesTypeResolver) {
-      return (AttributesTypeResolver) resolver;
+    if (resolver instanceof InputTypeResolver) {
+      return (InputTypeResolver) resolver;
     } else if (resolver instanceof NullMetadataResolver) {
       return new org.mule.runtime.extension.api.metadata.NullMetadataResolver();
-    } else if (resolver instanceof org.mule.sdk.api.metadata.resolving.AttributesTypeResolver) {
-      return new MuleAttributesTypeResolverAdapter((org.mule.sdk.api.metadata.resolving.AttributesTypeResolver) resolver);
+    } else if (resolver instanceof org.mule.sdk.api.metadata.resolving.InputTypeResolver) {
+      return new MuleInputTypeResolverAdapter((org.mule.sdk.api.metadata.resolving.InputTypeResolver) resolver);
     } else {
       throw new IllegalArgumentException(format("Resolver of class '%s' is neither a '%s' nor a '%s'",
                                                 resolver.getClass().getName(),
-                                                AttributesTypeResolver.class.getName(),
-                                                org.mule.sdk.api.metadata.resolving.AttributesTypeResolver.class.getName()));
+                                                InputTypeResolver.class.getName(),
+                                                org.mule.sdk.api.metadata.resolving.InputTypeResolver.class.getName()));
     }
   }
 
   @Override
-  public MetadataType getAttributesType(MetadataContext context, Object key)
+  public String getResolverName() {
+    return delegate.getResolverName();
+  }
+
+  @Override
+  public MetadataType getInputMetadata(MetadataContext context, Object key)
       throws MetadataResolvingException, ConnectionException {
-    return delegate.getAttributesType(new SdkMetadataContextAdapter(context), key);
+    return delegate.getInputMetadata(new SdkMetadataContextAdapter(context), key);
   }
 
   @Override

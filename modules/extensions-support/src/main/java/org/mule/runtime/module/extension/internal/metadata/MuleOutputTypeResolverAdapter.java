@@ -25,7 +25,7 @@ public class MuleOutputTypeResolverAdapter implements OutputTypeResolver {
 
   private final org.mule.sdk.api.metadata.resolving.OutputTypeResolver delegate;
 
-  MuleOutputTypeResolverAdapter(org.mule.sdk.api.metadata.resolving.OutputTypeResolver delegate) {
+  public MuleOutputTypeResolverAdapter(org.mule.sdk.api.metadata.resolving.OutputTypeResolver delegate) {
     this.delegate = delegate;
   }
 

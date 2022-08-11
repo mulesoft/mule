@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.metadata;
 
 import static java.util.stream.Collectors.toSet;
+
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -35,7 +36,7 @@ public final class EnumKeyResolver implements TypeKeysResolver {
    * @param anEnum       An {@link Enum} represented by a {@link EnumAnnotation} of a {@link MetadataType}
    * @param categoryName Category name of the current {@link TypeKeysResolver}
    */
-  EnumKeyResolver(EnumAnnotation anEnum, String categoryName) {
+  public EnumKeyResolver(EnumAnnotation anEnum, String categoryName) {
     keys = Stream.of(anEnum.getValues())
         .map(Object::toString)
         .map(MetadataKeyBuilder::newKey)

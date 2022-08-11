@@ -26,13 +26,17 @@ public interface MetadataScopeAdapter {
     return hasOutputResolver() || hasInputResolvers();
   }
 
+  boolean isPartialKeyResolver();
+
+  boolean hasKeysResolver();
+
   boolean hasInputResolvers();
 
   boolean hasOutputResolver();
 
   boolean hasAttributesResolver();
 
-  Supplier<? extends TypeKeysResolver> getKeysResolver();
+  TypeKeysResolver getKeysResolver();
 
   Map<String, Supplier<? extends InputTypeResolver>> getInputResolvers();
 
