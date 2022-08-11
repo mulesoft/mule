@@ -32,8 +32,6 @@ import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.extension.api.error.ErrorMapping;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -60,8 +58,6 @@ public abstract class AbstractErrorTypesValidation implements Validation {
       builder().namespace(CORE_PREFIX).name(ON_ERROR_CONTINUE).build();
 
   private final Optional<FeatureFlaggingService> featureFlaggingService;
-
-  private static final Collection<String> allowedBorrowedNamespaces = getAllowedBorrowedNamespaces();
 
   public AbstractErrorTypesValidation(Optional<FeatureFlaggingService> featureFlaggingService) {
     this.featureFlaggingService = featureFlaggingService;
@@ -127,19 +123,7 @@ public abstract class AbstractErrorTypesValidation implements Validation {
   }
 
   protected static boolean isAllowedBorrowedNamespace(String namespace) {
-    return allowedBorrowedNamespaces.contains(namespace);
-  }
-
-  private static Collection<String> getAllowedBorrowedNamespaces() {
-    Collection<String> namespaces = new HashSet<>(3);
-
-    // raise-error is allowed to throw errors from the MULE namespace.
-    namespaces.add("MULE");
-
-    // TODO W-11464525: We have several tests using an extension with namespace "test" and a raise-error with the same
-    // namespace. Refactor all those tests and remove this line.
-    namespaces.add("TEST");
-    return namespaces;
+    return "MULE".equals(namespace);
   }
 
   protected static Set<String> getAlreadyUsedErrorNamespaces(ArtifactAst artifact) {

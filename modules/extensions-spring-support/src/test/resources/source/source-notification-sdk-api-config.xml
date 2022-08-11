@@ -16,6 +16,6 @@
     <flow name="onErrorMethodCallFlow" initialState="stopped">
         <petstore:pet-source-with-sdk-api/>
         <flow-ref name="event"/>
-        <raise-error type="TEST:EXPECTED"/>
+        <raise-error type="APP:EXPECTED"/>
     </flow>
 </mule>

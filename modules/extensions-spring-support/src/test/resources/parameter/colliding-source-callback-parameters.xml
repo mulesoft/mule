@@ -25,7 +25,7 @@
 			<!-- no error info, must use the defaults -->
 		</heisenberg:listen-payments-all-optional>
 
-		<raise-error type="TEST:EXPECTED" />
+		<raise-error type="APP:EXPECTED" />
 	</flow>
 
 </mule>
