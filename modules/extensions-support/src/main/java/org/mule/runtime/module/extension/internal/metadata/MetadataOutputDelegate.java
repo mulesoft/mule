@@ -15,6 +15,7 @@ import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.ne
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
+import static org.mule.runtime.module.extension.internal.metadata.MetadataResolverUtils.resolveWithOAuthRefresh;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -128,7 +129,8 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
       return success(output.getType());
     }
     try {
-      MetadataType metadata = resolverFactory.getOutputResolver().getOutputType(context, key);
+      MetadataType metadata =
+          resolveWithOAuthRefresh(context, () -> resolverFactory.getOutputResolver().getOutputType(context, key));
       if (isMetadataResolvedCorrectly(metadata, true)) {
         return success(adaptToListIfNecessary(metadata, key, context));
       }
@@ -162,7 +164,8 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
   private MetadataResult<MetadataType> resolveOutputAttributesMetadata(MetadataContext context, Object key,
                                                                        Function<MetadataType, Boolean> metadataValidator) {
     try {
-      MetadataType metadata = resolverFactory.getOutputAttributesResolver().getAttributesType(context, key);
+      MetadataType metadata =
+          resolveWithOAuthRefresh(context, () -> resolverFactory.getOutputAttributesResolver().getAttributesType(context, key));
       if (metadataValidator.apply(metadata)) {
         return success(metadata);
       }

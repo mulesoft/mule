@@ -398,7 +398,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                                                                                            (CheckedSupplier<Object>) () -> context
                                                                                                .getConnection().orElse(null),
                                                                                            (CheckedSupplier<Object>) () -> context
-                                                                                               .getConfig().orElse(null))));
+                                                                                               .getConfig().orElse(null),
+                                                                                           context.getConnectionProvider()
+                                                                                               .orElse(null))));
     } catch (MuleRuntimeException e) {
       Throwable rootException = getRootException(e);
       if (rootException instanceof ValueResolvingException) {

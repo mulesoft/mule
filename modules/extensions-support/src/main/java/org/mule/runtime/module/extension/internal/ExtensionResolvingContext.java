@@ -7,10 +7,12 @@
 package org.mule.runtime.module.extension.internal;
 
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
@@ -27,8 +29,9 @@ import java.util.function.Supplier;
  */
 public class ExtensionResolvingContext {
 
-  private LazyValue<Optional<ConfigurationInstance>> configurationInstance;
-  private LazyValue<Optional<ConnectionHandler>> connectionHandler;
+  private final LazyValue<Optional<ConfigurationInstance>> configurationInstance;
+  private final LazyValue<Optional<ConnectionHandler>> connectionHandler;
+  private final LazyValue<Optional<ConnectionProvider>> connectionProvider;
 
 
   /**
@@ -48,6 +51,13 @@ public class ExtensionResolvingContext {
       }
       return empty();
     });
+    this.connectionProvider = new LazyValue<>(() -> {
+      Optional<ConfigurationInstance> configurationInstance = this.configurationInstance.get();
+      if (configurationInstance.isPresent() && configurationInstance.get().getConnectionProvider().isPresent()) {
+        return of(configurationInstance.get().getConnectionProvider().get());
+      }
+      return empty();
+    });
   }
 
   /**
@@ -56,6 +66,15 @@ public class ExtensionResolvingContext {
    */
   public <C> Optional<C> getConfig() {
     return (Optional<C>) configurationInstance.get().map(ConfigurationInstance::getValue);
+  }
+
+  /**
+   * Retrieves the connection provider for the related a component and configuration
+   *
+   * @return Optional connection instance of {@link ConnectionProvider} type for the component.
+   */
+  public Optional<ConnectionProvider> getConnectionProvider() {
+    return connectionProvider.get();
   }
 
   /**
