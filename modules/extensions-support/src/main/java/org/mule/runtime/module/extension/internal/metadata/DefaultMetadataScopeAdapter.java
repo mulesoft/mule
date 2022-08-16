@@ -60,7 +60,7 @@ public final class DefaultMetadataScopeAdapter implements MetadataScopeAdapter {
   private List<JavaInputResolverModelParser> javaInputResolverModelParsers = emptyList();
 
   public DefaultMetadataScopeAdapter(Type extensionElement, MethodElement operation, OperationDeclaration declaration) {
-    javaInputResolverModelParsers = parseInputResolversModelParser(operation);
+    javaInputResolverModelParsers = parseInputResolversModelParser(declaration);
 
     if (hasOutputResolverAnnotation(operation) || !javaInputResolverModelParsers.isEmpty()) {
       if (!hasCustomStaticType(declaration.getOutput())) {
