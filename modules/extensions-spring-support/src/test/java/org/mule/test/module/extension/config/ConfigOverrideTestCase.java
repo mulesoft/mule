@@ -51,11 +51,7 @@ public class ConfigOverrideTestCase extends AbstractExtensionFunctionalTestCase 
   @Test
   @Issue("MULE-18489")
   public void timeToPeelOverrideOperationWithDefaultsDifferentType() throws Exception {
-    flowRunner("timeToPeelOverrideOperationWithDefaultsDifferentType")
-        .run().getMessage().getPayload();
-    flowRunner("timeToPeelOverrideOperationWithDefaultsDifferentType")
-        .run().getMessage().getPayload();
-    TypedValue<Integer> result = flowRunner("timeToPeelOverrideOperationWithDefaultsDifferentType")
+    TypedValue<Long> result = flowRunner("timeToPeelOverrideOperationWithDefaultsDifferentType")
         .run().getMessage().getPayload();
     assertThat(result.getValue(), is(10L));
   }
@@ -63,11 +59,7 @@ public class ConfigOverrideTestCase extends AbstractExtensionFunctionalTestCase 
   @Test
   @Issue("MULE-18489")
   public void timeToPeelOverrideOperationWithDefaultEnum() throws Exception {
-    flowRunner("timeToPeelOverrideOperationWithDefaultEnum")
-        .run().getMessage().getPayload();
-    flowRunner("timeToPeelOverrideOperationWithDefaultEnum")
-        .run().getMessage().getPayload();
-    TypedValue<Integer> result = flowRunner("timeToPeelOverrideOperationWithDefaultEnum")
+    TypedValue<Time> result = flowRunner("timeToPeelOverrideOperationWithDefaultEnum")
         .run().getMessage().getPayload();
     assertThat(result.getValue(), is(Time.AVERAGE));
   }
