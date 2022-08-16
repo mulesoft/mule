@@ -17,6 +17,7 @@ import static org.mule.runtime.api.notification.PollingSourceItemNotification.IT
 import static org.mule.runtime.api.notification.PollingSourceItemNotification.ITEM_REJECTED_WATERMARK;
 import static org.mule.runtime.api.notification.PollingSourceNotification.POLL_FAILURE;
 import static org.mule.runtime.api.notification.PollingSourceNotification.POLL_SUCCESS;
+import static org.mule.runtime.api.util.MuleSystemProperties.EMIT_POLLING_SOURCE_NOTIFICATIONS;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENABLE_POLLING_SOURCE_LIMIT_PARAMETER;
 import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
 import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories.POLLING;
@@ -55,7 +56,7 @@ public class PollingSourceNotificationsTestCase extends AbstractExtensionFunctio
   private static final List<CoreEvent> ADOPTION_EVENTS = new LinkedList<>();
 
   @Rule
-  public SystemProperty emitNotifications = new SystemProperty("mule.emit.polling.source.notifications", "true");
+  public SystemProperty emitNotifications = new SystemProperty(EMIT_POLLING_SOURCE_NOTIFICATIONS, "true");
 
   @Override
   protected boolean mustRegenerateExtensionModels() {

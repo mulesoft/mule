@@ -7,7 +7,7 @@
                 http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
 
-    <object name="adopt" class="org.mule.test.module.extension.source.PollingSourceTestCase$AdoptionProcessor"/>
+    <object name="adopt" class="org.mule.test.module.extension.source.PollingSourceNotificationsTestCase$AdoptionProcessor"/>
 
     <flow name="idempotent" initialState="stopped">
         <petstore:pet-adoption-source idempotent="true">

@@ -98,7 +98,6 @@ import org.slf4j.Logger;
 public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements Restartable {
 
   public static final String ACCEPTED_POLL_ITEM_NOTIFICATION = "mule-polling-source-accepted-item";
-  public static final boolean EMIT_NOTIFICATIONS = parseBoolean(System.getProperty(EMIT_POLLING_SOURCE_NOTIFICATIONS));
 
   public static final String REJECTED_ITEM_MESSAGE = "Item with id:[{}] is rejected with status:[{}]";
   public static final String ACCEPTED_ITEM_MESSAGE = "Item with id:[{}] is accepted";
@@ -121,6 +120,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
   private final SchedulingStrategy scheduler;
   private final int maxItemsPerPoll;
   private final SystemExceptionHandler systemExceptionHandler;
+  private final boolean EMIT_NOTIFICATIONS = parseBoolean(System.getProperty(EMIT_POLLING_SOURCE_NOTIFICATIONS));
 
   @Inject
   private LockFactory lockFactory;
