@@ -15,7 +15,7 @@ import static java.util.Optional.of;
 import static java.util.function.Function.identity;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.COMPUTE_CONNECTION_ERRORS_IN_STATS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.MuleSystemProperties.SHOULD_HANDLE_ACCESS_TOKEN_EXPIRED_EXCEPTIONS_PROPERTY;
+import static org.mule.runtime.api.util.MuleSystemProperties.SHOULD_HANDLE_ACCESS_TOKEN_EXPIRED_EXCEPTIONS_ON_SOURCES_PROPERTY;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -118,8 +118,8 @@ import reactor.core.publisher.Mono;
 public class ExtensionMessageSource extends ExtensionComponent<SourceModel> implements MessageSource,
     ExceptionCallback<ConnectionException>, ParameterizedSource, ConfiguredComponent, LifecycleStateEnabled {
 
-  private static final Boolean SHOULD_HANDLE_ACCESS_TOKEN_EXPIRED_EXCEPTIONS =
-    parseBoolean(System.getProperty(SHOULD_HANDLE_ACCESS_TOKEN_EXPIRED_EXCEPTIONS_PROPERTY, "true"));
+  private static final Boolean SHOULD_HANDLE_ACCESS_TOKEN_EXPIRED_EXCEPTIONS_ON_SOURCES =
+    parseBoolean(System.getProperty(SHOULD_HANDLE_ACCESS_TOKEN_EXPIRED_EXCEPTIONS_ON_SOURCES_PROPERTY, "true"));
 
   private static final Logger LOGGER = getLogger(ExtensionMessageSource.class);
 
@@ -356,9 +356,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
 
     boolean accessTokenExpired = refreshTokenIfNecessary(
-        getConfigurationInstance().flatMap(configurationInstance -> configurationInstance.getConnectionProvider()).orElse(null),
+        getConfigurationInstance().flatMap(ConfigurationInstance::getConnectionProvider).orElse(null),
         exception);
-    boolean shouldHandleException = !accessTokenExpired || SHOULD_HANDLE_ACCESS_TOKEN_EXPIRED_EXCEPTIONS;
+    boolean shouldHandleException = !accessTokenExpired || SHOULD_HANDLE_ACCESS_TOKEN_EXPIRED_EXCEPTIONS_ON_SOURCES;
     if (shouldHandleException) {
       muleContext.getExceptionListener().handleException(exception, getLocation());
     }
