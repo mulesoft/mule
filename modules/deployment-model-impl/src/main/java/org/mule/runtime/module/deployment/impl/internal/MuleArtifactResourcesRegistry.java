@@ -120,7 +120,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
   private final ArtifactConfigurationProcessor artifactConfigurationProcessor;
   private final AbstractDeployableDescriptorFactory<MuleApplicationModel, ApplicationDescriptor> toolingApplicationDescriptorFactory;
   private final ServerLockFactory runtimeLockFactory;
-  private final ProfiledMemoryManagementService memoryManagementService;
+  private ProfiledMemoryManagementService memoryManagementService = DefaultMemoryManagementService.getInstance();
   private final ProfilingService containerProfilingService;
   private final ServerNotificationManager serverNotificationManager;
 
@@ -132,6 +132,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
 
     private ModuleRepository moduleRepository;
     private ArtifactConfigurationProcessor artifactConfigurationProcessor;
+    private ProfiledMemoryManagementService memoryManagementService;
 
     /**
      * Configures the {@link ModuleRepository} to use
@@ -162,6 +163,19 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     }
 
     /**
+     * Configures the container {@link MemoryManagementService} to use.
+     *
+     * @param memoryManagementService the memory management service at container level.
+     * @return the same builder instance
+     *
+     * @since 4.5
+     */
+    public Builder withMemoryManagementService(ProfiledMemoryManagementService memoryManagementService) {
+      this.memoryManagementService = memoryManagementService;
+      return this;
+    }
+
+    /**
      * Builds the desired instance
      *
      * @return a new {@link MuleArtifactResourcesRegistry} with the provided configuration.
@@ -176,7 +190,8 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
       }
 
       try {
-        return new MuleArtifactResourcesRegistry(containerClassLoader, moduleRepository, artifactConfigurationProcessor);
+        return new MuleArtifactResourcesRegistry(containerClassLoader, moduleRepository, artifactConfigurationProcessor,
+                                                 memoryManagementService);
       } catch (RegistrationException e) {
         throw new MuleRuntimeException(e);
       }
@@ -188,7 +203,8 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
    */
   private MuleArtifactResourcesRegistry(ArtifactClassLoader containerClassLoader,
                                         ModuleRepository moduleRepository,
-                                        ArtifactConfigurationProcessor artifactConfigurationProcessor)
+                                        ArtifactConfigurationProcessor artifactConfigurationProcessor,
+                                        ProfiledMemoryManagementService memoryManagementService)
       throws RegistrationException {
     // Creates a registry to be used as an injector.
     super(null, null);
@@ -199,7 +215,10 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                           new LazyValue<>(() -> "containerServerNotificationManager"));
     registerObject(SERVER_NOTIFICATION_MANAGER, serverNotificationManager);
 
-    this.memoryManagementService = DefaultMemoryManagementService.getInstance();
+    if (memoryManagementService != null) {
+      this.memoryManagementService = memoryManagementService;
+    }
+
     this.containerProfilingService = new DefaultProfilingService();
 
     memoryManagementService.setProfilingService(containerProfilingService);
