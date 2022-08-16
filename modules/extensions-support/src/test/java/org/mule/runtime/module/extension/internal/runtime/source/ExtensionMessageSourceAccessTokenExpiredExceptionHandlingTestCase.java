@@ -52,7 +52,9 @@ public class ExtensionMessageSourceAccessTokenExpiredExceptionHandlingTestCase e
   public SystemProperty shouldHandleAccessTokenExpiredException;
 
   public ExtensionMessageSourceAccessTokenExpiredExceptionHandlingTestCase(String shouldHandleAccessTokenExpiredException) {
-    this.shouldHandleAccessTokenExpiredException = new SystemProperty(SHOULD_HANDLE_ACCESS_TOKEN_EXPIRED_EXCEPTIONS_ON_SOURCES_PROPERTY, shouldHandleAccessTokenExpiredException);
+    this.shouldHandleAccessTokenExpiredException =
+        new SystemProperty(SHOULD_HANDLE_ACCESS_TOKEN_EXPIRED_EXCEPTIONS_ON_SOURCES_PROPERTY,
+                           shouldHandleAccessTokenExpiredException);
   }
 
   @Test
@@ -101,7 +103,7 @@ public class ExtensionMessageSourceAccessTokenExpiredExceptionHandlingTestCase e
     mockConnectionProvider();
 
     SystemExceptionHandler mockListener = mock(SystemExceptionHandler.class);
-    try(AutoCloseable ignore = withExceptionListener(mockListener)) {
+    try (AutoCloseable ignore = withExceptionListener(mockListener)) {
       ConnectionException e = new ConnectionException(ERROR_MESSAGE);
       messageSource.onException(e);
 
@@ -115,13 +117,13 @@ public class ExtensionMessageSourceAccessTokenExpiredExceptionHandlingTestCase e
     mockConnectionProvider();
 
     SystemExceptionHandler mockListener = mock(SystemExceptionHandler.class);
-    try(AutoCloseable ignore = withExceptionListener(mockListener)) {
+    try (AutoCloseable ignore = withExceptionListener(mockListener)) {
       AccessTokenExpiredException innerException = new AccessTokenExpiredException();
       ConnectionException e = new ConnectionException(innerException);
       messageSource.onException(e);
 
       boolean shouldHandleException = parseBoolean(shouldHandleAccessTokenExpiredException.getValue());
-      if(shouldHandleException) {
+      if (shouldHandleException) {
         verify(mockListener).handleException(e, messageSource.getLocation());
       } else {
         verify(mockListener).handleException(e, messageSource.getLocation());

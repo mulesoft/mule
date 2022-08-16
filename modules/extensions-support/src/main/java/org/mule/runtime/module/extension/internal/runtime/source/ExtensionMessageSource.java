@@ -119,7 +119,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     ExceptionCallback<ConnectionException>, ParameterizedSource, ConfiguredComponent, LifecycleStateEnabled {
 
   private static final Boolean SHOULD_HANDLE_ACCESS_TOKEN_EXPIRED_EXCEPTIONS_ON_SOURCES =
-    parseBoolean(System.getProperty(SHOULD_HANDLE_ACCESS_TOKEN_EXPIRED_EXCEPTIONS_ON_SOURCES_PROPERTY, "true"));
+      parseBoolean(System.getProperty(SHOULD_HANDLE_ACCESS_TOKEN_EXPIRED_EXCEPTIONS_ON_SOURCES_PROPERTY, "true"));
 
   private static final Logger LOGGER = getLogger(ExtensionMessageSource.class);
 
@@ -356,8 +356,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
 
     boolean accessTokenExpired = refreshTokenIfNecessary(
-        getConfigurationInstance().flatMap(ConfigurationInstance::getConnectionProvider).orElse(null),
-        exception);
+                                                         getConfigurationInstance()
+                                                             .flatMap(ConfigurationInstance::getConnectionProvider).orElse(null),
+                                                         exception);
     boolean shouldHandleException = !accessTokenExpired || SHOULD_HANDLE_ACCESS_TOKEN_EXPIRED_EXCEPTIONS_ON_SOURCES;
     if (shouldHandleException) {
       muleContext.getExceptionListener().handleException(exception, getLocation());
