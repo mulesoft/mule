@@ -140,12 +140,12 @@ public class AllStatistics {
   @Deprecated
   public PayloadStatistics computePayloadStatisticsIfAbsent(Component component) {
     return payloadStatistics.computeIfAbsent(component.getLocation().getLocation(),
-        loc -> {
-          final PayloadStatistics statistics =
-              new PayloadStatistics(loc, component.getIdentifier().toString());
-          statistics.setEnabled(isPayloadStatisticsEnabled());
-          return statistics;
-        });
+                                             loc -> {
+                                               final PayloadStatistics statistics =
+                                                   new PayloadStatistics(loc, component.getIdentifier().toString());
+                                               statistics.setEnabled(isPayloadStatisticsEnabled());
+                                               return statistics;
+                                             });
   }
 
   /**
@@ -172,8 +172,8 @@ public class AllStatistics {
   }
 
   /**
-   * Increments the counter of private flows declared in the application. The flow is considered private when it doesn't contain
-   * a {@link MessageSource}
+   * Increments the counter of private flows declared in the application. The flow is considered private when it doesn't contain a
+   * {@link MessageSource}
    *
    * @return The number of declared private flows
    * @since 4.5.0
@@ -212,8 +212,7 @@ public class AllStatistics {
   }
 
   /**
-   * Increments the counter of trigger flows in the application. Trigger flows are those which include a
-   * {@link MessageSource}.
+   * Increments the counter of trigger flows in the application. Trigger flows are those which include a {@link MessageSource}.
    * <p>
    * The flow is also considered active when it's in {@code started} state.
    *
@@ -260,8 +259,7 @@ public class AllStatistics {
   }
 
   /**
-   * Returns the counter of trigger flows in the application. Trigger flows are those which include a
-   * {@link MessageSource}.
+   * Returns the counter of trigger flows in the application. Trigger flows are those which include a {@link MessageSource}.
    * <p>
    * The flow is also considered active when it's in {@code started} state.
    *
@@ -286,8 +284,7 @@ public class AllStatistics {
   }
 
   /**
-   * Returns the counter of trigger flows in the application. Trigger flows are those which include a
-   * {@link MessageSource}.
+   * Returns the counter of trigger flows in the application. Trigger flows are those which include a {@link MessageSource}.
    * <p>
    * The flow is also considered active when it's in {@code started} state.
    *
@@ -307,7 +304,7 @@ public class AllStatistics {
   public static void configureComputeConnectionErrorsInStats() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(COMPUTE_CONNECTION_ERRORS_IN_STATS,
-        featureContext -> featureContext.getArtifactMinMuleVersion()
-            .filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
+                                                featureContext -> featureContext.getArtifactMinMuleVersion()
+                                                    .filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
   }
 }
