@@ -149,7 +149,8 @@ public class DefaultCoreEventTracerTestCase {
     }
 
     @Override
-    public InternalSpanExporter getInternalSpanExporter(EventContext context, InternalSpan internalSpan) {
+    public InternalSpanExporter getInternalSpanExporter(EventContext context, MuleConfiguration muleConfiguration,
+                                                        InternalSpan internalSpan) {
       return new InternalSpanExporter() {
 
         @Override

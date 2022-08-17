@@ -11,6 +11,11 @@ import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 
 import static java.lang.Boolean.parseBoolean;
 
+import static io.opentelemetry.api.common.AttributeKey.stringKey;
+
+import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.sdk.resources.Resource;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.CapturingSpanExporterWrapper;
 import org.mule.runtime.core.internal.profiling.tracing.export.SpanExporterConfiguration;
 import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
@@ -41,9 +46,32 @@ import java.util.Collection;
 public class OpenTelemetryResourcesProvider {
 
 
-  private static CapturingSpanExporterWrapper capturingSpanExporterWrapper;
+  private final static CapturingSpanExporterWrapper capturingSpanExporterWrapper =
+      new CapturingSpanExporterWrapper(new SpanExporter() {
+
+        @Override
+        public CompletableResultCode export(Collection<SpanData> collection) {
+          return new CompletableResultCode().succeed();
+        }
+
+        @Override
+        public CompletableResultCode flush() {
+          return new CompletableResultCode().succeed();
+        }
+
+        @Override
+        public CompletableResultCode shutdown() {
+          return new CompletableResultCode().succeed();
+        }
+      });
+
   private static final String OPENTELEMETRY_EXPORT_ENABLED_SYSPROP = "mule.openetelemetry.export.enabled";
   private static final String MULE_OPENTELEMETRY_ENDPOINT_SYSPROP = "mule.opentelemetry.endpoint";
+  // This is only defined in the semconv artifact which is in alpha state and is only needed for this.
+  // In order not to add another dependency we add it here.
+  // For the moment it is defined in the spec here:
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#semantic-attributes-with-dedicated-environment-variable
+  public static final AttributeKey<String> SERVICE_NAME_KEY = stringKey("service.name");
 
   private OpenTelemetryResourcesProvider() {}
 
@@ -51,8 +79,11 @@ public class OpenTelemetryResourcesProvider {
 
   private static final String INSTRUMENTATION_VERSION = "1.0.0";
 
-  public static Tracer getOpenTelemetryTracer(SpanExporterConfiguration spanExporterConfiguration) {
+  public static Tracer getOpenTelemetryTracer(SpanExporterConfiguration spanExporterConfiguration, String serviceName) {
     SdkTracerProviderBuilder sdkTracerProviderBuilder = SdkTracerProvider.builder();
+
+    Resource resource = Resource.getDefault()
+        .merge(Resource.create(Attributes.of(SERVICE_NAME_KEY, serviceName)));
 
     if (parseBoolean(spanExporterConfiguration.getValue(OPENTELEMETRY_EXPORT_ENABLED_SYSPROP))) {
       sdkTracerProviderBuilder = sdkTracerProviderBuilder.addSpanProcessor(resolveExporterProcessor(spanExporterConfiguration));
@@ -61,39 +92,18 @@ public class OpenTelemetryResourcesProvider {
           sdkTracerProviderBuilder.addSpanProcessor(resolveDummyExporterWithCapturer(spanExporterConfiguration));
     }
 
-    SdkTracerProvider sdkTracerProvider = sdkTracerProviderBuilder.build();
+    SdkTracerProvider sdkTracerProvider = sdkTracerProviderBuilder.setResource(resource).build();
 
     OpenTelemetry openTelemetry = OpenTelemetrySdk.builder()
         .setTracerProvider(sdkTracerProvider)
         .setPropagators(ContextPropagators.create(W3CTraceContextPropagator.getInstance()))
-        .buildAndRegisterGlobal();
+        .build();
 
     return openTelemetry.getTracer(MULE_INSTRUMENTATION_NAME, INSTRUMENTATION_VERSION);
   }
 
   private static SpanProcessor resolveDummyExporterWithCapturer(SpanExporterConfiguration spanExporterConfiguration) {
-
-    CapturingSpanExporterWrapper spanExporter = new CapturingSpanExporterWrapper(new SpanExporter() {
-
-      @Override
-      public CompletableResultCode export(Collection<SpanData> collection) {
-        return new CompletableResultCode().succeed();
-      }
-
-      @Override
-      public CompletableResultCode flush() {
-        return new CompletableResultCode().succeed();
-      }
-
-      @Override
-      public CompletableResultCode shutdown() {
-        return new CompletableResultCode().succeed();
-      }
-    });
-
-    capturingSpanExporterWrapper = spanExporter;
-
-    return SimpleSpanProcessor.create(spanExporter);
+    return SimpleSpanProcessor.create(capturingSpanExporterWrapper);
   }
 
   public static ExportedSpanCapturer getNewExportedSpanCapturer() {

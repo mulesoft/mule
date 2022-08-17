@@ -11,6 +11,7 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.export.InternalSpanExportManager;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporter;
 import org.mule.runtime.core.internal.profiling.tracing.export.InternalSpanExporterVisitor;
@@ -33,9 +34,10 @@ public class ExportOnEndSpan implements InternalSpan {
 
   public ExportOnEndSpan(InternalSpan runtimeInternalSpan, EventContext eventContext,
                          InternalSpanExportManager<EventContext> internalSpanExportManager,
-                         ChildSpanCustomizationInfo childSpanCustomizationInfo) {
+                         ChildSpanCustomizationInfo childSpanCustomizationInfo,
+                         MuleConfiguration muleConfiguration) {
     this.runtimeInternalSpan = runtimeInternalSpan;
-    this.spanExporter = internalSpanExportManager.getInternalSpanExporter(eventContext, this);
+    this.spanExporter = internalSpanExportManager.getInternalSpanExporter(eventContext, muleConfiguration, this);
     this.childSpanCustomizationInfo = childSpanCustomizationInfo;
   }
 

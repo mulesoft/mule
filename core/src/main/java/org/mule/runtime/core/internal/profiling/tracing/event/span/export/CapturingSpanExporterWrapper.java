@@ -7,7 +7,10 @@
 
 package org.mule.runtime.core.internal.profiling.tracing.event.span.export;
 
-import org.mule.runtime.core.api.util.StringUtils;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.export.optel.OpenTelemetryResourcesProvider.SERVICE_NAME_KEY;
+
+import static java.lang.String.valueOf;
+
 import org.mule.runtime.core.privileged.profiling.CapturedExportedSpan;
 import org.mule.runtime.core.privileged.profiling.ExportedSpanCapturer;
 
@@ -22,8 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-
-import static java.lang.String.valueOf;
 
 /**
  * A {@link SpanExporter} that captures the exported spans.
@@ -123,6 +124,11 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
         Map<String, String> attributes = new HashMap<>();
         spanData.getAttributes().asMap().forEach((k, v) -> attributes.put(k.getKey(), valueOf(v)));
         return attributes;
+      }
+
+      @Override
+      public String getServiceName() {
+        return spanData.getResource().getAttribute(SERVICE_NAME_KEY);
       }
     }
   }

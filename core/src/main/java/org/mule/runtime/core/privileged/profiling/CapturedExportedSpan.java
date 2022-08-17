@@ -38,4 +38,9 @@ public interface CapturedExportedSpan {
    * @return the span attributes
    */
   Map<String, String> getAttributes();
+
+  /**
+   * @return the service name
+   */
+  String getServiceName();
 }
