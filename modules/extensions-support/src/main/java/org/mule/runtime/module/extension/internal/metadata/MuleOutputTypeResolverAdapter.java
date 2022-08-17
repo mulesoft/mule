@@ -25,7 +25,7 @@ public class MuleOutputTypeResolverAdapter implements OutputTypeResolver {
 
   private final org.mule.sdk.api.metadata.resolving.OutputTypeResolver delegate;
 
-  public MuleOutputTypeResolverAdapter(org.mule.sdk.api.metadata.resolving.OutputTypeResolver delegate) {
+  MuleOutputTypeResolverAdapter(org.mule.sdk.api.metadata.resolving.OutputTypeResolver delegate) {
     this.delegate = delegate;
   }
 
@@ -36,8 +36,6 @@ public class MuleOutputTypeResolverAdapter implements OutputTypeResolver {
       return (OutputTypeResolver) resolver;
     } else if (resolver instanceof NullMetadataResolver) {
       return new org.mule.runtime.extension.api.metadata.NullMetadataResolver();
-    } else if (resolver instanceof SdkOutputTypeResolverAdapter) {
-      return ((SdkOutputTypeResolverAdapter) resolver).getDelegate();
     } else if (resolver instanceof org.mule.sdk.api.metadata.resolving.OutputTypeResolver) {
       return new MuleOutputTypeResolverAdapter((org.mule.sdk.api.metadata.resolving.OutputTypeResolver) resolver);
     } else {
@@ -49,6 +47,11 @@ public class MuleOutputTypeResolverAdapter implements OutputTypeResolver {
   }
 
   @Override
+  public String getResolverName() {
+    return delegate.getResolverName();
+  }
+
+  @Override
   public String getCategoryName() {
     return delegate.getCategoryName();
   }
@@ -56,5 +59,9 @@ public class MuleOutputTypeResolverAdapter implements OutputTypeResolver {
   @Override
   public MetadataType getOutputType(MetadataContext context, Object key) throws MetadataResolvingException, ConnectionException {
     return delegate.getOutputType(new SdkMetadataContextAdapter(context), key);
+  }
+
+  public org.mule.sdk.api.metadata.resolving.OutputTypeResolver getDelegate() {
+    return delegate;
   }
 }

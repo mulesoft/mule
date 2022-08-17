@@ -21,6 +21,7 @@ import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.checkIsPresent;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getDeclaration;
 import static org.mule.test.metadata.extension.resolver.SdkTestInputResolverWithKeyResolver.SDK_TEST_INPUT_RESOLVER_WITH_KEY_RESOLVER;
+import static org.mule.test.metadata.extension.resolver.SdkTestOutputAnyTypeResolver.TEST_OUTPUT_ANY_TYPE_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestInputAndOutputResolverWithKeyResolver.TEST_INPUT_AND_OUTPUT_RESOLVER_WITH_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestInputAndOutputWithAttributesResolverWithKeyResolver.TEST_INPUT_AND_OUTPUT_WITH_ATTRIBUTES_RESOLVER_WITH_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestInputOutputSourceResolverWithKeyResolver.TEST_INPUT_OUTPUT_SOURCE_RESOLVER_WITH_KEY_RESOLVER;
@@ -31,7 +32,6 @@ import static org.mule.test.metadata.extension.resolver.TestMetadataInputHouseRe
 import static org.mule.test.metadata.extension.resolver.TestMetadataInputPersonResolver.TEST_INPUT_PERSON_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.TEST_MULTI_LEVEL_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestOutputAnyTypeResolver.METADATA_EXTENSION_RESOLVER;
-import static org.mule.test.metadata.extension.resolver.TestOutputAnyTypeResolver.TEST_OUTPUT_ANY_TYPE_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestOutputResolverWithKeyResolver.TEST_OUTPUT_RESOLVER_WITH_KEY_RESOLVER;
 import static org.mule.test.module.extension.internal.util.ExtensionDeclarationTestUtils.declarerFor;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;

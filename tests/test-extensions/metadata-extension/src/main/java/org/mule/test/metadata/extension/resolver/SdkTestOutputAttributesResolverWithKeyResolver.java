@@ -50,6 +50,6 @@ public class SdkTestOutputAttributesResolverWithKeyResolver
 
   @Override
   public String getResolverName() {
-    return "TestOutputAttributesResolverWithKeyResolver";
+    return "SdkTestOutputAttributesResolverWithKeyResolver";
   }
 }

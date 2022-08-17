@@ -56,4 +56,8 @@ public class MuleInputTypeResolverAdapter implements InputTypeResolver {
   public String getCategoryName() {
     return delegate.getCategoryName();
   }
+
+  public org.mule.sdk.api.metadata.resolving.InputTypeResolver getDelegate() {
+    return delegate;
+  }
 }

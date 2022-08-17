@@ -67,4 +67,8 @@ public class MuleTypeKeysResolverAdapter implements TypeKeysResolver {
   public String getResolverName() {
     return delegate.getResolverName();
   }
+
+  public org.mule.sdk.api.metadata.resolving.TypeKeysResolver getDelegate() {
+    return delegate;
+  }
 }

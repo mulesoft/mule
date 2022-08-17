@@ -20963,7 +20963,7 @@
             "typeResolversInformation": {
               "category": "MetadataExtensionResolver",
               "outputResolver": {
-                "resolverName": "TestOutputAnyTypeResolver",
+                "resolverName": "SdkTestOutputAnyTypeResolver",
                 "requiresConnection": true,
                 "requiresConfiguration": true
               },
@@ -37780,17 +37780,17 @@
         "typeResolversInformation": {
           "category": "MetadataExtensionResolver",
           "outputResolver": {
-            "resolverName": "TestOutputAttributesResolverWithKeyResolver",
+            "resolverName": "SdkTestOutputAttributesResolverWithKeyResolver",
             "requiresConnection": false,
             "requiresConfiguration": false
           },
           "attributesResolver": {
-            "resolverName": "TestOutputAttributesResolverWithKeyResolver",
+            "resolverName": "SdkTestOutputAttributesResolverWithKeyResolver",
             "requiresConnection": false,
             "requiresConfiguration": false
           },
           "keysResolver": {
-            "resolverName": "TestOutputAttributesResolverWithKeyResolver",
+            "resolverName": "SdkTestOutputAttributesResolverWithKeyResolver",
             "requiresConnection": false,
             "requiresConfiguration": false
           },
@@ -43176,7 +43176,6 @@
       "format": "xml",
       "type": "Object",
       "annotations": {
-        "typeId": "#root:shiporder",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -43190,7 +43189,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "#root:shiporder"
       },
       "fields": [
         {
@@ -43341,7 +43341,6 @@
       "format": "csv",
       "type": "Object",
       "annotations": {
-        "typeId": "csv-object",
         "classInformation": {
           "classname": "java.lang.Integer",
           "hasDefaultConstructor": false,
@@ -43355,7 +43354,8 @@
           "parent": "java.lang.Number",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "csv-object"
       },
       "fields": []
     },
@@ -43363,7 +43363,6 @@
       "format": "java",
       "type": "Object",
       "annotations": {
-        "typeId": "custom-java",
         "classInformation": {
           "classname": "java.lang.Object",
           "hasDefaultConstructor": true,
@@ -43375,7 +43374,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "custom-java"
       },
       "fields": []
     },
@@ -43383,7 +43383,6 @@
       "format": "json",
       "type": "Object",
       "annotations": {
-        "typeId": "http://example.com/example.json",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -43398,6 +43397,7 @@
           "genericTypes": [],
           "isMap": false
         },
+        "typeId": "http://example.com/example.json",
         "label": "Person"
       },
       "open": {
@@ -43450,7 +43450,6 @@
       "format": "json",
       "type": "Object",
       "annotations": {
-        "typeId": "json-object",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -43464,7 +43463,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "json-object"
       },
       "fields": [
         {

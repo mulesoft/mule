@@ -51,4 +51,13 @@ public class MuleAttributesTypeResolverAdapter implements AttributesTypeResolver
   public String getCategoryName() {
     return delegate.getCategoryName();
   }
+
+  @Override
+  public String getResolverName() {
+    return delegate.getResolverName();
+  }
+
+  public org.mule.sdk.api.metadata.resolving.AttributesTypeResolver getDelegate() {
+    return delegate;
+  }
 }
