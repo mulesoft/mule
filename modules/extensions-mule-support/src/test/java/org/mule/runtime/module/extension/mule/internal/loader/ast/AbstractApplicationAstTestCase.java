@@ -9,14 +9,12 @@ package org.mule.runtime.module.extension.mule.internal.loader.ast;
 import static org.mule.runtime.ast.api.xml.AstXmlParser.builder;
 
 import static java.lang.Thread.currentThread;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
+import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -29,9 +27,11 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
-public class MuleOperationAstTestCase extends AbstractMuleTestCase {
+/**
+ * Extend this class to make assertions on the AST generated from an application's XML config file.
+ */
+public abstract class AbstractApplicationAstTestCase extends AbstractMuleTestCase {
 
   private ClassLoader classLoader;
   private AstXmlParser parser;
@@ -39,6 +39,8 @@ public class MuleOperationAstTestCase extends AbstractMuleTestCase {
   private final Map<String, String> properties = new HashMap<>();
 
   private static List<ExtensionModel> runtimeExtensionModels;
+
+  protected abstract String getConfigFile();
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -53,41 +55,31 @@ public class MuleOperationAstTestCase extends AbstractMuleTestCase {
   @Before
   public void before() {
     properties.clear();
-    classLoader = MuleOperationAstTestCase.class.getClassLoader();
+    classLoader = DeprecationAstTestCase.class.getClassLoader();
 
-    parser = builder()
+    Builder astParserBuilder = builder()
         .withSchemaValidationsDisabled()
         .withExtensionModels(runtimeExtensionModels)
-        .withPropertyResolver(propertyKey -> properties.getOrDefault(propertyKey, propertyKey))
-        .build();
+        .withPropertyResolver(propertyKey -> properties.getOrDefault(propertyKey, propertyKey));
+    customizeAstParserBuilder(astParserBuilder);
+    parser = astParserBuilder.build();
   }
 
-  @Test
-  public void operationDeprecation() {
-    ArtifactAst appAst = parser.parse(classLoader.getResource("mule-deprecations-config.xml"));
-    ComponentAst deprecatedOperationAst = getTopLevelComponent(appAst, "deprecatedOperation");
-    ComponentAst deprecationAst = getChild(deprecatedOperationAst, "deprecated");
-    ComponentModel deprecationComponentModel = deprecationAst.getModel(ComponentModel.class).get();
-    assertThat(deprecationComponentModel.getDescription(), is("Defines an operation's deprecation."));
+  protected void customizeAstParserBuilder(Builder astParserBuilder) {
+    // nothing to do here, override this method if you want to customize the builder (for example, to add a custom extension
+    // model)
   }
 
-  @Test
-  public void parameterDeprecation() {
-    ArtifactAst appAst = parser.parse(classLoader.getResource("mule-deprecations-config.xml"));
-    ComponentAst operationWithDeprecatedParameter = getTopLevelComponent(appAst, "operationWithDeprecatedParameter");
-    ComponentAst parametersAst = getChild(operationWithDeprecatedParameter, "parameters");
-    ComponentAst deprecatedParameterAst = getChild(parametersAst, "parameter");
-    ComponentAst deprecationAst = getChild(deprecatedParameterAst, "deprecated");
-    ComponentModel deprecationComponentModel = deprecationAst.getModel(ComponentModel.class).get();
-    assertThat(deprecationComponentModel.getDescription(), is("Defines a parameter's deprecation."));
+  protected ArtifactAst getApplicationAst() {
+    return parser.parse(classLoader.getResource(getConfigFile()));
   }
 
-  private ComponentAst getTopLevelComponent(ArtifactAst ast, String componentName) {
+  protected ComponentAst getTopLevelComponent(ArtifactAst ast, String componentName) {
     return ast.topLevelComponentsStream().filter(componentAst -> componentAst.getComponentId().get().equals(componentName))
         .findFirst().get();
   }
 
-  private ComponentAst getChild(ComponentAst ast, String childName) {
+  protected ComponentAst getChild(ComponentAst ast, String childName) {
     return ast.directChildrenStreamByIdentifier(null, childName).findFirst().get();
   }
 }
